@@ -45,6 +45,6 @@ for PACKAGE in $DH_DOPACKAGES; do
 	# ..and so are executable shared and static libraries 
 	# (and .la files from libtool)
 	complex_doit "find $TMP -perm -5 -type f \
-		\( -name "*.so*" -or -name "*.la" -or -name "*.a" \) $FIND_OPTIONS -print0 \
+		\( -name '*.so*' -or -name '*.la' -or -name '*.a' \) $FIND_OPTIONS -print0 \
 		2>/dev/null | xargs -0r chmod a-X"
 done

@@ -1,3 +1,17 @@
+debhelper (1.1.22) unstable; urgency=low
+
+  * dh_fixperms: quoting fix from Roderick Schertler <roderick@argon.org>
+  * Added support for register-window-manager command which will be in a new
+    (as yet unreleased) xbase. Now a new dh_installwm program handles
+    registration of a window manager and the necessary modifications to
+    postinst and postrm. It's safe to go ahead and start using this for your
+    window manager packages, just note that it won't do anything until the new
+    xbase is out, and that due to the design of register-window-manager, if
+    your wm is installed before a xbase that supports register-window-manager
+    is installed, the window manager will never be registered. (#20971)
+
+ -- Joey Hess <joeyh@master.debian.org>  Wed, 14 Oct 1998 23:08:04 -0700
+
 debhelper (1.1.21) unstable; urgency=low
 
   * Added install to .PHONY target of example rules files.
