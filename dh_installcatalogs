@@ -74,7 +74,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$fulldest =~ s|//|/|g; # beautification
 	
 			if (! -d dirname($fulldest)) {
-				doit("install","-d","-m755",dirname($dest));
+				doit("install","-d","-m755",$tmpdir."/".dirname($dest));
 			}
 
 			doit("install","-p","-m644",$source,$fulldest);
