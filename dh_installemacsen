@@ -6,11 +6,19 @@ BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
 use Dh_Lib;
 init();
 
+if (! defined $dh{number}) {
+	$dh{number}=50;
+}
+if (! defined $dh{flavor}) {
+	$dh{flavor}='emacs';
+}
+
 foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	$TMP=tmpdir($PACKAGE);
 
 	$emacsen_install=pkgfile($PACKAGE,"emacsen-install");
 	$emacsen_remove=pkgfile($PACKAGE,"emacsen-remove");
+	$emacsen_init=pkgfile($PACKAGE,"emacsen-init");
 
 	if ($emacsen_install ne '') {
 		if (! -d "$TMP/usr/lib/emacsen-common/packages/install") {
@@ -25,6 +33,13 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		}
 		doit("install","$emacsen_remove","$TMP/usr/lib/emacsen-common/packages/remove/$PACKAGE");
 	}
+	
+	if ($emacsen_init ne '') {
+		if (! -d "$TMP/etc/$dh{flavor}/site-start.d/") {
+			doit("install","-d","$TMP/etc/$dh{flavor}/site-start.d/");
+		}
+		doit("install",$emacsen_init,"$TMP/etc/$dh{flavor}/site-start.d/$dh{number}$PACKAGE.el");
+	}
 
 	if ($emacsen_install ne '' || $emacsen_remove ne '') {
 		if (! $dh{NOSCRIPTS}) {
@@ -34,4 +49,4 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 				"s/#PACKAGE#/$PACKAGE/");
 		}
 	}
-}
+}	

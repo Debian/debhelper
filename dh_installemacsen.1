@@ -3,7 +3,7 @@
 dh_installemacsen \- register an emacs add on package
 .SH SYNOPSIS
 .B dh_installemacsen
-.I "[debhelper options] [-n]"
+.I "[debhelper options] [-n] [--number=n] [--flavor=foo]"
 .SH "DESCRIPTION"
 dh_installemacsen is a debhelper program that is responsible for installing
 files used by the debian emacsen-common package into package build directories. 
@@ -16,10 +16,12 @@ for an explanation of how this works.
 If a file named debian/package.emacsen-install exists, then it is installed into
 usr/lib/emacsen-common/packages/install/package in the package build
 directory. Similarly, debian/package.emacsen-remove is installed into
-usr/lib/emacsen-common/packages/remove/package
+usr/lib/emacsen-common/packages/remove/package . And similarly,
+debian/package.emacsen-startup is installed into
+etc/emacs/site-start.d/50<package>.el (by default).
 .P
 For the first first binary package listed in the control file, you may use
-debian/emacsen-install and debian/emacsen-remove instead.
+debian/emacsen-install, debian/emacsen-remove, and debian/emacsen-startup instead.
 .SH OPTIONS
 .TP
 .B debhelper options
@@ -29,6 +31,13 @@ for a list of options common to all debhelper commands.
 .TP
 .B \-n, \--noscripts
 Do not modify postinst/prerm scripts.
+.TP
+.B \--number=n
+Sets the priority number of a site-start.d file. Default is 50.
+.TP
+.B \--flavor=foo
+Sets the flavor a site-start.d file will be installed in. Default is
+"emacs", alternatives include "xemacs" and "emacs20".
 .SH ENVIRONMENT
 See
 .BR debhelper (1)
