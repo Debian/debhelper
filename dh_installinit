@@ -55,9 +55,11 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			# -r on the command line sets R_FLAG. If it's set, there
 			# is no restart on upgrade.
 			if ($dh{R_FLAG}) {
-				autoscript($PACKAGE,"postinst","postinst-init-norestart",
+				autoscript($PACKAGE,"postinst", "postinst-init-norestart",
 					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
 				autoscript($PACKAGE,"postrm","postrm-init",
+					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
+				autoscript($PACKAGE,"prerm","prerm-init-norestart",
 					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
 			}
 			else {
