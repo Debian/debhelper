@@ -1,9 +1,48 @@
 #!/usr/bin/perl -w
-#
-# Build the .deb package, assuming all the files are set up.
+
+=head1 NAME
+
+dh_builddeb - build debian packages
+
+=cut
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_builddeb [debhelper options] [--destdir=directory] 
+              [--name=filename] [-uparams] [-- params]
+
+=head1 DESCRIPTION
+
+dh_builddeb simply calls L<dpkg(8)|dpkg> to build a debian package or
+packages.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--destdir=>I<directory>
+
+Use this if you want the generated .deb files to be put in a directory
+other than the default of ".."
+
+=item B<--name=>I<filename>
+
+Use this if you want to force the generated .deb file to have a particular
+file name. Does not work well if more than one .deb is generated!
+
+=item B<-u>I<params>
+=item B<--> I<params>
+
+Pass I<params> to L<dpkg(1)|dpkg> when it is used to build the
+package.
+
+=back
+
+=cut
+
 init();
 
 # Set the default destination directory.
@@ -22,3 +61,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	doit("dpkg","--build",$tmp,"$dh{DESTDIR}$dh{FILENAME}",@{$dh{U_PARAMS}});
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)|debhelper>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut
