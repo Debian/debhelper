@@ -3,7 +3,18 @@
 # Register modules with modutils.
 
 use Debian::Debhelper::Dh_Lib;
+use File::Find;
 init();
+
+# Returns true if there are any .o files in the passed directory.
+sub find_kernel_modules {
+	my $searchdir=shift;
+	my @results=();
+
+	return unless -d $searchdir;
+	find(sub { push @results, $_ if /\.o$/ }, $searchdir);
+	return @results > 0;
+}
 
 foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	$TMP=tmpdir($PACKAGE);
@@ -18,10 +29,11 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			doit("install","-d","$TMP/etc/modutils");
 			doit("install","-m","0644",$file,"$TMP/etc/modutils/$PACKAGE");
 		}
-		
-		if (! $dh{NOSCRIPTS}) {
+	}
+
+	if (! $dh{NOSCRIPTS} &&
+	    ($file || find_kernel_modules("$TMP/lib/modules"))) {
 			autoscript($PACKAGE,"postinst","postinst-modules","s/#PACKAGE#/$PACKAGE/");
 			autoscript($PACKAGE,"postrm","postrm-modules","s/#PACKAGE#/$PACKAGE/");
-		}
 	}
 }
