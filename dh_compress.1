@@ -21,7 +21,9 @@ If a debian/package.compress file exists (debian/compress may be used for the
 first binary package in debian/control), however, it will be ran as a shell
 script, and all filenames that the shell script outputs will be compressed
 instead of the default files. Note that the shell script will be run from
-inside the package build directory.
+inside the package build directory. Note though that using -X is a much
+better idea in general; you should only use a debian/compress file if you
+really have to.
 .SH EXAMPLE
 Here is a sample debian/compress file that causes dh_compress to compress
 the same files as it would by default. This is a good starting point for
