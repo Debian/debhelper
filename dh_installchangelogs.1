@@ -1,0 +1,52 @@
+.TH DH_INSTALLCHANGELOGS 1
+.SH NAME
+dh_installchangelogs \- install changelogs into package build directories
+.SH SYNOPSIS
+.B dh_installchangelogs
+.I "[-v] [-a] [-i] [-ppackage] upstream"
+.SH "DESCRIPTION"
+dh_installchangelogs is a debhelper program that is responsible for installing
+changelogs into package build directories.
+.P
+dh_installchangelogs determines if the package is a debian native package,
+and if so, it installs debian/changelog into usr/doc/package/changelog in
+the package build directory. Otherwise, it installs debian/changelog into
+usr/doc/package/changelog.Debian in the package build directory.
+.P
+If an upstream changelog file is specified as an option, and the package is
+not a native debian package, then this upstream changelog will be installed
+as usr/doc/package/changelog in the package build directory.
+.SH OPTIONS
+.TP
+.B \-v
+Verbose mode; show all commands that modify the package build directory.
+.TP
+.B \-a
+Install changelogs for all architecture dependent packages.
+.TP
+.B \-i
+Install changelogs for all architecture independent packages.
+.TP
+.B \-ppackage
+Install changelogs for the package named "package".
+.SH NOTES
+The
+.B \-a
+.B \-i
+and
+.B \-p
+arguments are cumulative. If none are specified, then all packages listed in
+the control file will have the changelogs installed into them.
+.P
+It is an error to specify an upstream changelog file for a debian native
+package.
+.SH ENVIRONMENT
+.TP
+.I DH_VERBOSE
+Enables verbose mode
+.SH "SEE ALSO"
+.BR /usr/doc/debhelper/README
+.SH "CONFORMS TO"
+Debian policy, version 2.3.0.0
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>

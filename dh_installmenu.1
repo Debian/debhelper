@@ -1,0 +1,52 @@
+.TH DH_INSTALLDOCS 1
+.SH NAME
+dh_installmenu \- install debian menu files into package build directories
+.SH SYNOPSIS
+.B dh_installmenu
+.I "[-v] [-a] [-i] [-ppackage]"
+.SH "DESCRIPTION"
+dh_installmenu is a debhelper program that is responsible for installing
+fils used by the debian menu package into package build directories.
+.P
+If a file named debian/menu exists, then it is installed into
+usr/lib/menu/package in the package build directory. This is a debian menu
+file.
+.P
+If a file named debian/menu-method exits, then it is installed into
+etc/menu-methods/package in the package build directory. This is a debian
+menu method file.
+.P
+For packages other than the first binary package listed in
+the control file, use debian/package.menu and debian/package.menu-method 
+instead (replace "package" with the name of the package.)
+.SH OPTIONS
+.TP
+.B \-v
+Verbose mode; show all commands that modify the package build directory.
+.TP
+.B \-a
+Install menu files into all architecture dependent packages.
+.TP
+.B \-i
+Install menu files into all architecture independent packages.
+.TP
+.B \-ppackage
+Install menu files into the package named "package".
+.SH NOTES
+The
+.B \-a
+.B \-i
+and
+.B \-p
+arguments are cumulative. If none are specified, then all packages listed in
+the control file will be effected.
+.SH ENVIRONMENT
+.TP
+.I DH_VERBOSE
+Enables verbose mode
+.SH "SEE ALSO"
+.BR /usr/doc/debhelper/README
+,
+.BR menufile (1)
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>

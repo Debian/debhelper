@@ -1,0 +1,67 @@
+.TH DH_INSTALLDOCS 1
+.SH NAME
+dh_installmanpages \- install man pages into package build directories
+.SH SYNOPSIS
+.B dh_installmanpages
+.I "[-v] [-a] [-i] [-ppackage] [file ...]"
+.SH "DESCRIPTION"
+dh_installmanpages is a debhelper program that is responsible for
+automatically installing man pages into usr/man/ and usr/X11R6/man/ in
+package build directories.
+.P
+dh_installmanpages scans the current directory and all subdirectories for
+filenames that look like man pages. It uses
+.BR file (1)
+to verify that the files are in the correct format. Then, based on the
+files' extentions, it installs them into the correct man directory.
+.P
+All filenames specified as parameters will be skipped by dh_installmanpages.
+This is useful if by default it installs some man pages that you do not want
+to be installed.
+.SH OPTIONS
+.TP
+.B \-v
+Verbose mode; show all commands that modify the package build directory.
+.TP
+.B \-a
+Install man pages into all architecture dependent packages.
+.TP
+.B \-i
+Install man pages into all architecture independent packages.
+.TP
+.B \-ppackage
+Install man pages into the package named "package".
+.TP
+.B file ...
+Do not install these files as man pages, even if they look like valid man
+pages.
+.SH NOTES
+The
+.B \-a
+.B \-i
+and
+.B \-p
+arguments are cumulative. If none are specified, then all packages listed in
+the control file will be effected.
+.P
+dh_installmanpages will install the man pages it finds into
+.B all
+packages you tell it to act on, since it can't tell what package the man
+pages belong in.
+.SH ENVIRONMENT
+.TP
+.I DH_VERBOSE
+Enables verbose mode
+.SH "SEE ALSO"
+.BR /usr/doc/debhelper/README
+.SH BUGS
+Man pages with the extention
+.B .man
+are not automatically installed. 
+.P
+Files specified as parameters that contain spaces in their filenames will
+not be processed properly.
+.P
+This is a "Do what I Mean" type program - you have been warned!
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>

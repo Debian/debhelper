@@ -1,0 +1,59 @@
+.TH DH_INSTALLDOCS 1
+.SH NAME
+dh_installdebfiles \- install files into the DEBIAN directory
+.SH SYNOPSIS
+.B dh_installdebfils
+.I "[-v] [-a] [-i] [-ppackage]"
+.SH "DESCRIPTION"
+dh_installdebfiles is a debhelper program that is responsible for installing
+files into the DEBIAN directory in package build directories with the
+correct prmissions.
+.P
+dh_installdocs automatically installs the following files from debian/ into
+the DEBIAN directory:
+.IP postinst
+.IP preinst
+.IP postrm
+.IP prerm
+.IP shlibs
+.IP conffiles
+.P
+(For packages other than the first binary package listed in debian/control,
+prefix these filenames with then name of the "package.", for example, 
+"foo.postinst".)
+.P
+In addition, it will generate a DEBIAN/control file, by running
+.BR dpkg-shlibdeps (1)
+and
+.BR dpkg-gencontrol (1)
+.SH OPTIONS
+.TP
+.B \-v
+Verbose mode; show all commands that modify the package build directory.
+.TP
+.B \-a
+Install files for all architecture dependent packages.
+.TP
+.B \-i
+Install files for all architecture independent packages.
+.TP
+.B \-ppackage
+Install files for the package named "package".
+.SH NOTES
+The
+.B \-a
+.B \-i
+and
+.B \-p
+arguments are cumulative. If none are specified, then all packages listed in
+the control file will be effected.
+.SH ENVIRONMENT
+.TP
+.I DH_VERBOSE
+Enables verbose mode
+.SH "SEE ALSO"
+.BR /usr/doc/debhelper/README
+.SH "CONFORMS TO"
+Debian policy, version 2.3.0.0
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>

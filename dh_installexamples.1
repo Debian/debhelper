@@ -1,0 +1,54 @@
+.TH DH_INSTALLEXAMPLES 1
+.SH NAME
+dh_installexamples \- install example files into package build directories
+.SH SYNOPSIS
+.B dh_installexamples
+.I "[-v] [-a] [-i] [-ppackage] [file ...]"
+.SH "DESCRIPTION"
+dh_installexamples is a debhelper program that is responsible for installing
+examples into usr/doc/package/examples in package build directories.
+.P
+Any filenames specified as parameters will be installed into the first
+binary package listed in debian/control, if dh_installexamples is acting on
+that package.
+.P
+A file named debian/examples (for the first binary package in debian/control),
+or debian/package.exmaples (for each additional package in debian/control) can
+list other files to be installed.
+.SH OPTIONS
+.TP
+.B \-v
+Verbose mode; show all commands that modify the package build directory.
+.TP
+.B \-a
+Install files for all architecture dependent packages.
+.TP
+.B \-i
+Install files for all architecture independent packages.
+.TP
+.B \-ppackage
+Install files for the package named "package".
+.TP
+.B file ...
+Install these files as documentation into the first binary package listed in
+debian/control, if we are acting on that package.
+.SH NOTES
+The
+.B \-a
+.B \-i
+and
+.B \-p
+arguments are cumulative. If none are specified, then all packages listed in
+the control file will be effected.
+.SH ENVIRONMENT
+.TP
+.I DH_VERBOSE
+Enables verbose mode
+.SH "SEE ALSO"
+.BR /usr/doc/debhelper/README
+.SH BUGS
+Filenames with spaces in them will not currently be installed.
+.SH "CONFORMS TO"
+Debian policy, version 2.3.0.0
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>
