@@ -2,7 +2,7 @@
 #
 # Library functions for debhelper programs, perl version.
 #
-# Joey Hess, GPL copyright 1997-2000.
+# Joey Hess, GPL copyright 1997, 1998.
 
 package Debian::Debhelper::Dh_Lib;
 use strict;
@@ -11,18 +11,15 @@ use Exporter;
 use vars qw(@ISA @EXPORT %dh);
 @ISA=qw(Exporter);
 @EXPORT=qw(&init &doit &complex_doit &verbose_print &error &warning &tmpdir
-	    &pkgfile &pkgext &isnative &autoscript &filearray &filedoublearray
-	    &GetPackages &basename &dirname &xargs %dh &compat &addsubstvar
-	    &delsubstvar &excludefile);
+	    &pkgfile &pkgext &isnative &autoscript &filearray &GetPackages
+	    &xargs
+	    %dh);
 
-my $max_compat=4;
+my $max_compat=2;
 
 sub init {
 	# If DH_OPTIONS is set, prepend it @ARGV.
 	if (defined($ENV{DH_OPTIONS})) {
-		# Ignore leading/trailing whitespace.
-		$ENV{DH_OPTIONS}=~s/^\s+//;
-		$ENV{DH_OPTIONS}=~s/\s+$//;
 		unshift @ARGV,split(/\s+/,$ENV{DH_OPTIONS});
 	}
 
@@ -43,23 +40,6 @@ sub init {
 		%dh=Debian::Debhelper::Dh_Getopt::parseopts();
 	}
 
-	# Another way to set excludes.
-	if (exists $ENV{DH_ALWAYS_EXCLUDE} && length $ENV{DH_ALWAYS_EXCLUDE}) {
-		push @{$dh{EXCLUDE}}, split(":", $ENV{DH_ALWAYS_EXCLUDE});
-	}
-	
-	# Generate EXCLUDE_FIND.
-	if ($dh{EXCLUDE}) {
-		$dh{EXCLUDE_FIND}='';
-		foreach (@{$dh{EXCLUDE}}) {
-			my $x=$_;
-			$x=escape_shell($x);
-			$x=~s/\./\\./g;
-			$dh{EXCLUDE_FIND}.="-regex .*$x.* -or ";
-		}
-		$dh{EXCLUDE_FIND}=~s/ -or $//;
-	}
-	
 	# Check to see if DH_VERBOSE environment variable was set, if so,
 	# make sure verbose is on.
 	if (defined $ENV{DH_VERBOSE} && $ENV{DH_VERBOSE} ne "") {
@@ -72,19 +52,18 @@ sub init {
 		$dh{NO_ACT}=1;
 	}
 
-	my @allpackages=GetPackages();
 	# Get the name of the main binary package (first one listed in
-	# debian/control). Only if the main package was not set on the
-	# command line.
-	if (! exists $dh{MAINPACKAGE} || ! defined $dh{MAINPACKAGE}) {
-		$dh{MAINPACKAGE}=$allpackages[0];
-	}
+	# debian/control).
+	my @allpackages=GetPackages();
+	$dh{MAINPACKAGE}=$allpackages[0];
 
 	# Check if packages to build have been specified, if not, fall back to
 	# the default, doing them all.
 	if (! defined $dh{DOPACKAGES} || ! @{$dh{DOPACKAGES}}) {
 		if ($dh{DOINDEP} || $dh{DOARCH} || $dh{DOSAME}) {
-			error("You asked that all arch in(dep) packages be built, but there are none of that type.");
+			# User specified that all arch (in)dep package be 
+			# built, and there are none of that type.
+			error("I have no package to act on");
 		}
 		push @{$dh{DOPACKAGES}},@allpackages;
 	}
@@ -99,34 +78,20 @@ sub init {
 	# This package gets special treatement: files and directories specified on
 	# the command line may affect it.
 	$dh{FIRSTPACKAGE}=${$dh{DOPACKAGES}}[0];
+
+	# Split the U_PARAMS up into an array.
+	my $u=$dh{U_PARAMS};
+	undef $dh{U_PARAMS};
+	if (defined $u) {
+		push @{$dh{U_PARAMS}}, split(/\s+/,$u);
+	}
 }
 
-# Pass it an array containing the arguments of a shell command like would
-# be run by exec(). It turns that into a line like you might enter at the
-# shell, escaping metacharacters and quoting arguments that contain spaces.
-sub escape_shell {
-	my @args=@_;
-	my $line="";
-	my @ret;
-	foreach my $word (@args) {
-		if ($word=~/\s/) {
-			# Escape only a few things since it will be quoted.
-			# Note we use double quotes because you cannot
-			# escape ' in single quotes, while " can be escaped
-			# in double.
-			# This does make -V"foo bar" turn into "-Vfoo bar",
-			# but that will be parsed identically by the shell
-			# anyway..
-			$word=~s/([\n`\$"\\])/\\$1/g;
-			push @ret, "\"$word\"";
-		}
-		else {
-			# This list is from _Unix in a Nutshell_. (except '#')
-			$word=~s/([\s!"\$()*+#;<>?@\[\]\\`|~])/\\$1/g;
-			push @ret,$word;
-		}
-	}
-	return join(' ', @ret);
+# Escapes out shell metacharacters in a word of shell script.
+sub escape_shell { my $word=shift;
+	# This list is from _Unix in a Nutshell_. (except '#')
+	$word=~s/([\s!"\$()*+#;<>?@\[\]\\`|~])/\\$1/g;
+	return $word;
 }
 
 # Run a command, and display the command to stdout if verbose mode is on.
@@ -136,11 +101,12 @@ sub escape_shell {
 # Note that this cannot handle complex commands, especially anything
 # involving redirection. Use complex_doit instead.
 sub doit {
-	verbose_print(escape_shell(@_));
-
+	verbose_print(join(" ",map { escape_shell($_) } @_));
+	
 	if (! $dh{NO_ACT}) {
-		my $ret=system(@_);
-		$ret == 0 || error("command returned error code $ret");
+		system(@_) == 0
+			|| error("command returned error code");
+		
 	}
 }
 
@@ -166,8 +132,7 @@ sub xargs {
 	my $args=shift;
 
         # The kernel can accept command lines up to 20k worth of characters.
-	my $command_max=20000; # LINUX SPECIFIC!!
-			# I could use POSIX::ARG_MAX, but that would be slow.
+	my $command_max=20000;
 
 	# Figure out length of static portion of command.
 	my $static_length=0;
@@ -195,49 +160,37 @@ sub xargs {
 }
 
 # Print something if the verbose flag is on.
-sub verbose_print {
-	my $message=shift;
-	
+sub verbose_print { my $message=shift;
 	if ($dh{VERBOSE}) {
 		print "\t$message\n";
 	}
 }
 
 # Output an error message and exit.
-sub error {
-	my $message=shift;
-
+sub error { my $message=shift;
 	warning($message);
 	exit 1;
 }
 
 # Output a warning.
-sub warning {
-	my $message=shift;
-	
+sub warning { my $message=shift;
 	print STDERR basename($0).": $message\n";
 }
 
 # Returns the basename of the argument passed to it.
-sub basename {
-	my $fn=shift;
-
-	$fn=~s/\/$//g; # ignore trailing slashes
+sub basename { my $fn=shift;
 	$fn=~s:^.*/(.*?)$:$1:;
 	return $fn;
 }
 
 # Returns the directory name of the argument passed to it.
-sub dirname {
-	my $fn=shift;
-	
-	$fn=~s/\/$//g; # ignore trailing slashes
+sub dirname { my $fn=shift;
 	$fn=~s:^(.*)/.*?$:$1:;
 	return $fn;
 }
 
-# Pass in a number, will return true iff the current compatibility level
-# is less than or equal to that number.
+# Pass in a number, will return true iff the current compatability level
+# is equal to that number.
 sub compat {
 	my $num=shift;
 	
@@ -245,30 +198,22 @@ sub compat {
 	if (defined $ENV{DH_COMPAT}) {
 		$c=$ENV{DH_COMPAT};
 	}
-	elsif (-e 'debian/compat') {
-		# Try the file..
-		open (COMPAT_IN, "debian/compat") || error "debian/compat: $!";
-		$c=<COMPAT_IN>;
-		chomp $c;
-	}
 
 	if ($c > $max_compat) {
-		error("Sorry, but $max_compat is the highest compatibility level of debhelper currently supported.");
+		error("Sorry, but $max_compat is the highest compatability level of debhelper currently supported.");
 	}
 
-	return ($c <= $num);
+	return ($c == $num);
 }
 
 # Pass it a name of a binary package, it returns the name of the tmp dir to
 # use, for that package.
-sub tmpdir {
-	my $package=shift;
-
+sub tmpdir { my $package=shift;
 	if ($dh{TMPDIR}) {
 		return $dh{TMPDIR};
 	}
 	elsif (compat(1) && $package eq $dh{MAINPACKAGE}) {
-		# This is for back-compatibility with the debian/tmp tradition.
+		# This is for back-compatability with the debian/tmp tradition.
 		return "debian/tmp";
 	}
 	else {
@@ -277,39 +222,28 @@ sub tmpdir {
 }
 
 # Pass this the name of a binary package, and the name of the file wanted
-# for the package, and it will return the actual existing filename to use.
-#
-# It tries several filenames:
-#   * debian/package.filename.buildarch
-#   * debian/package.filename
-#   * debian/file (if the package is the main package)
-sub pkgfile {
-	my $package=shift;
-	my $filename=shift;
-
-	if (-f "debian/$package.$filename.".buildarch()) {
-		return "debian/$package.$filename.".buildarch();
-	}
-	elsif (-f "debian/$package.$filename") {
+# for the package, and it will return the actual filename to use. For
+# example if the package is foo, and the file is somefile, it will look for
+# debian/somefile, and if found return that, otherwise, if the package is
+# the main package, it will look for debian/foo, and if found, return that.
+# Failing that, it will return nothing.
+sub pkgfile { my $package=shift; my $filename=shift;
+	if (-f "debian/$package.$filename") {
 		return "debian/$package.$filename";
 	}
 	elsif ($package eq $dh{MAINPACKAGE} && -f "debian/$filename") {
 		return "debian/$filename";
 	}
-	else {
-		return "";
-	}
+	return "";
 }
 
 # Pass it a name of a binary package, it returns the name to prefix to files
 # in debian for this package.
-sub pkgext {
-	my $package=shift;
-
-	if (compat(1) and $package eq $dh{MAINPACKAGE}) {
-		return "";
+sub pkgext { my $package=shift;
+	if ($package ne $dh{MAINPACKAGE}) {
+		return "$package.";
 	}
-	return "$package.";
+	return "";
 }
 
 # Returns 1 if the package is a native debian package, null otherwise.
@@ -318,31 +252,28 @@ sub pkgext {
 	# Caches return code so it only needs to run dpkg-parsechangelog once.
 	my %isnative_cache;
 	
-	sub isnative {
-		my $package=shift;
+	sub isnative { my $package=shift;
+		if (! defined $isnative_cache{$package}) {
+			# Make sure we look at the correct changelog.
+			my $isnative_changelog=pkgfile($package,"changelog");
+			if (! $isnative_changelog) {
+				$isnative_changelog="debian/changelog";
+			}
 
-		return $isnative_cache{$package} if defined $isnative_cache{$package};
-		
-		# Make sure we look at the correct changelog.
-		my $isnative_changelog=pkgfile($package,"changelog");
-		if (! $isnative_changelog) {
-			$isnative_changelog="debian/changelog";
-		}
-		# Get the package version.
-		my $version=`dpkg-parsechangelog -l$isnative_changelog`;
-		($dh{VERSION})=$version=~m/Version:\s*(.*)/m;
-		# Did the changelog parse fail?
-		if (! defined $dh{VERSION}) {
-			error("changelog parse failure");
-		}
+			# Get the package version.
+			my $version=`dpkg-parsechangelog -l$isnative_changelog`;
+			($dh{VERSION})=$version=~m/Version: (.*)/m;
 
-		# Is this a native Debian package?
-		if ($dh{VERSION}=~m/.*-/) {
-			return $isnative_cache{$package}=0;
+			# Is this a native Debian package?
+			if ($dh{VERSION}=~m/.*-/) {
+				$isnative_cache{$package}=0;
+			}
+			else {
+				$isnative_cache{$package}=1;
+			}
 		}
-		else {
-			return $isnative_cache{$package}=1;
-		}
+	
+		return $isnative_cache{$package};
 	}
 }
 
@@ -354,12 +285,7 @@ sub pkgext {
 # 2: script to add to
 # 3: filename of snippet
 # 4: sed to run on the snippet. Ie, s/#PACKAGE#/$PACKAGE/
-sub autoscript {
-	my $package=shift;
-	my $script=shift;
-	my $filename=shift;
-	my $sed=shift || "";
-
+sub autoscript { my $package=shift; my $script=shift; my $filename=shift; my $sed=shift || "";
 	# This is the file we will append to.
 	my $outfile="debian/".pkgext($package)."$script.debhelper";
 
@@ -378,175 +304,53 @@ sub autoscript {
 		}
 	}
 
+	# TODO: do this in perl, perhaps?
 	complex_doit("echo \"# Automatically added by ".basename($0)."\">> $outfile");
 	complex_doit("sed \"$sed\" $infile >> $outfile");
 	complex_doit("echo '# End automatically added section' >> $outfile");
 }
 
-# Removes a whole substvar line.
-sub delsubstvar {
-	my $package=shift;
-	my $substvar=shift;
-
-	my $ext=pkgext($package);
-	my $substvarfile="debian/${ext}substvars";
-
-	if (-e $substvarfile) {
-		complex_doit("grep -s -v '^${substvar}=' $substvarfile > $substvarfile.new || true");
-		doit("mv", "$substvarfile.new","$substvarfile");
-	}
-}
-				
-# Adds a dependency on some package to the specified
-# substvar in a package's substvar's file.
-sub addsubstvar {
-	my $package=shift;
-	my $substvar=shift;
-	my $deppackage=shift;
-	my $verinfo=shift;
-	my $remove=shift;
-
-	my $ext=pkgext($package);
-	my $substvarfile="debian/${ext}substvars";
-	my $str=$deppackage;
-	$str.=" ($verinfo)" if defined $verinfo && length $verinfo;
-
-	# Figure out what the line will look like, based on what's there
-	# now, and what we're to add or remove.
-	my $line="";
-	if (-e $substvarfile) {
-		my %items;
-		open(SUBSTVARS_IN, "$substvarfile") || error "read $substvarfile: $!";
-		while (<SUBSTVARS_IN>) {
-			chomp;
-			if (/^\Q$substvar\E=(.*)/) {
-				%items = map { $_ => 1} split(", ", $1);
-				
-				last;
-			}
-		}
-		close SUBSTVARS_IN;
-		if (! $remove) {
-			$items{$str}=1;
-		}
-		else {
-			delete $items{$str};
-		}
-		$line=join(", ", keys %items);
-	}
-	elsif (! $remove) {
-		$line=$str;
-	}
-
-	if (length $line) {
-		 complex_doit("(grep -s -v ${substvar} $substvarfile; echo ".escape_shell("${substvar}=$line").") > $substvarfile.new");
-		 doit("mv", "$substvarfile.new", $substvarfile);
-	}
-	else {
-		delsubstvar($package,$substvar);
-	}
-}
-
-# Reads in the specified file, one line at a time. splits on words, 
-# and returns an array of arrays of the contents.
-# If a value is passed in as the second parameter, then glob
-# expansion is done in the directory specified by the parameter ("." is
-# frequently a good choice).
-sub filedoublearray {
-	my $file=shift;
-	my $globdir=shift;
-
+# Reads in the specified file, one word at a time, and returns an array of
+# the result.
+sub filearray { my $file=shift;
 	my @ret;
-	open (DH_FARRAY_IN, $file) || error("cannot read $file: $1");
+	open (DH_FARRAY_IN,"<$file") || error("cannot read $file: $1");
 	while (<DH_FARRAY_IN>) {
-		my @line;
-		# Only do glob expansion in v3 mode.
-		#
-		# The tricky bit is that the glob expansion is done
-		# as if we were in the specified directory, so the
-		# filenames that come out are relative to it.
-		if (defined $globdir && ! compat(2)) {
-			for (map { glob "$globdir/$_" } split) {
-				s#^$globdir/##;
-				push @line, $_;
-			}
-		}
-		else {
-			@line = split;
-		}
-		push @ret, [@line];
+		push @ret,split(' ',$_);
 	}
 	close DH_FARRAY_IN;
 	
 	return @ret;
 }
 
-# Reads in the specified file, one word at a time, and returns an array of
-# the result. Can do globbing as does filedoublearray.
-sub filearray {
-	return map { @$_ } filedoublearray(@_);
-}
-
-# Passed a filename, returns true if -X says that file should be excluded.
-sub excludefile {
-        my $filename = shift;
-        foreach my $f (@{$dh{EXCLUDE}}) {
-                return 1 if $filename =~ /\Q$f\E/;
-        }
-        return 0;
-}
-
-# Returns the build architecture. (Memoized)
-{
-	my $arch;
-	
-	sub buildarch {
-  		return $arch if defined $arch;
-
-		$arch=`dpkg-architecture -qDEB_HOST_ARCH 2>/dev/null` || error($!);
-		chomp $arch;
-		return $arch;
-	}
-}
-
 # Returns a list of packages in the control file.
 # Must pass "arch" or "indep" or "same" to specify arch-dependant or
 # -independant or same arch packages. If nothing is specified, returns all
 # packages.
-sub GetPackages {
-	my $type=shift;
-	
+sub GetPackages { my $type=shift;
 	$type="" if ! defined $type;
 	
 	# Look up the build arch if we need to.
-	my $buildarch='';
+	my$buildarch='';
 	if ($type eq 'same') {
-		$buildarch=buildarch();
+		$buildarch=`dpkg --print-architecture` || error($!);
+		chomp $buildarch;
 	}
 
 	my $package="";
 	my $arch="";
 	my @list=();
-	my %seen;
-	open (CONTROL, 'debian/control') ||
+	open (CONTROL,"<debian/control") ||
 		error("cannot read debian/control: $!\n");
 	while (<CONTROL>) {
 		chomp;
 		s/\s+$//;
-		if (/^Package:\s*(.*)/) {
+		if (/^Package:\s+(.*)/) {
 			$package=$1;
-			# Detect duplicate package names in the same control file.
-			if (! $seen{$package}) {
-				$seen{$package}=1;
-			}
-			else {
-				error("debian/control has a duplicate entry for $package");
-			}
 		}
-		if (/^Architecture:\s*(.*)/) {
+		if (/^Architecture:\s+(.*)/) {
 			$arch=$1;
 		}
-		
 		if (!$_ or eof) { # end of stanza.
 			if ($package &&
 			    (($type eq 'indep' && $arch eq 'all') ||

@@ -2,7 +2,7 @@
 #
 # Debhelper option processing library.
 #
-# Joey Hess GPL copyright 1998-2002
+# Joey Hess GPL copyright 1998.
 
 package Debian::Debhelper::Dh_Getopt;
 use strict;
@@ -15,14 +15,6 @@ use Exporter;
 #@EXPORT=qw(&aparseopts); # FIXME: for some reason, this doesn't work.
 
 my (%options, %exclude_package);
-
-sub showhelp {
-	my $prog=basename($0);
-	print "Usage: $prog [options]\n\n";
-	print "  $prog is a part of debhelper. See debhelper(7)\n";
-	print "  and $prog(1) for complete usage instructions.\n"; 
-	exit(1);
-}
 
 # Passed an option name and an option value, adds packages to the list
 # of packages. We need this so the list will be built up in the right
@@ -101,7 +93,6 @@ sub parseopts {
 	
 		"r" => \$options{R_FLAG},
 		"no-restart-on-upgrade" => \$options{R_FLAG},
-		"no-start" => \$options{NO_START},
 	
 		"k" => \$options{K_FLAG},
 		"keep" => \$options{K_FLAG},
@@ -132,22 +123,11 @@ sub parseopts {
 		"sourcedir=s" => \$options{SOURCEDIR},
 		
 		"destdir=s" => \$options{DESTDIR},
-
-		"filename=s" => \$options{FILENAME},
 		
+		"number=i" => \$options{PRIORITY},	# deprecated
 		"priority=i" => \$options{PRIORITY},
 		
 		"flavor=s" => \$options{FLAVOR},
-
-		"autodest" => \$options{AUTODEST},
-
-		"h|help" => \&showhelp,
-
-		"mainpackage=s" => \$options{MAINPACKAGE},
-
-		"list-missing" => \$options{LIST_MISSING},
-		
-		"L|libpackage=s" => \$options{LIBPACKAGE},
 		
 		"<>" => \&NonOption,
 	);
@@ -167,9 +147,9 @@ sub parseopts {
 	# packages out, below.
 	if (! defined $options{DOPACKAGES} || ! @{$options{DOPACKAGES}}) {
 		if ($options{DOINDEP} || $options{DOARCH} || $options{DOSAME}) {
-			# User specified that all arch (in)dep package be
-			# built, and there are none of that type.
-			error("I have no package to build");
+				# User specified that all arch (in)dep package be
+				# built, and there are none of that type.
+				error("I have no package to build");
 		}
 		push @{$options{DOPACKAGES}},GetPackages();
 	}
@@ -184,26 +164,26 @@ sub parseopts {
 	}
 	@{$options{DOPACKAGES}}=@package_list;
 
+	# Generate EXCLUDE_FIND.
+	$options{EXCLUDE_FIND}='';
+	foreach (@{$options{EXCLUDE}}) {
+		$options{EXCLUDE_FIND}.="-regex .*".quotemeta($_).".* -or ";
+	}
+	$options{EXCLUDE_FIND}=~s/ -or $//;
+
 	# If there are no packages to act on now, it's an error.
 	if (! defined $options{DOPACKAGES} || ! @{$options{DOPACKAGES}}) {
 		error("I have no package to build");
 	}
 
-	if (defined $options{U_PARAMS}) {
-	        # Split the U_PARAMS up into an array.
-        	my $u=$options{U_PARAMS};
-        	undef $options{U_PARAMS};
-                push @{$options{U_PARAMS}}, split(/\s+/,$u);
-        }
-
 	# Anything left in @ARGV is options that appeared after a --
-	# These options are added to the U_PARAMS array, while the
-	# non-option values we collected replace them in @ARGV;
-	push @{$options{U_PARAMS}}, @ARGV;
+	# These options are added to U_PARAMS, while the non-option
+	# values we collected replace them in @ARGV;
+	$options{U_PARAMS}.=join(' ', @ARGV);
 	@ARGV=@{$options{ARGV}} if exists $options{ARGV};
 
 	return %options;
-}
+}	
 
 sub import {
 	# Enable bundling of short command line options.
