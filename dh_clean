@@ -14,9 +14,8 @@ for PACKAGE in $DH_DOPACKAGES; do
 done
 doit "rm -f debian/files* debian/*.debhelper $*"
 
-# Remove other temp files. doit isn't smart enough to handle this, so I echo
-# by hand (sigh).
+# Remove other temp files.
 doit "find . \( -name '#*#' -o -name '*~' -o -name DEADJOE -o -name '*.orig' \
 	-o -name '*.rej' -o -name '*.bak' -o -name '.*.orig' \
 	-o -name '.*.rej' -o -name .SUMS -o -name TAGS -o -name core \
-	-o -size 0 \) -exec rm -f {} \;"
+	\) -exec rm -f {} \;"

@@ -1,3 +1,5 @@
 dh_compress: doesn't verbose echo that it's cd'd to $TMP. 
 dh_installdirs, dh_md5sums: uses ../.. to cd back to original location, but
 	we don't know that $TMP is 2 levels deep.
+dh_compress: refers to ../compress (meaning debian/compress), but we don't
+know that this will work - exp if $TMP is not under debian/.
