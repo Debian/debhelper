@@ -13,8 +13,15 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	my @filelist;
 	my $ff;
 
-	# Generate a list of all ELF binaries in the package.
-	foreach $file (split(/\n/,`find $TMP -type f \\( -perm +111 -or -name "*.so*" \\)`)) {
+	# Generate a list of ELF binaries in the package, ignoring any
+	# we were told to exclude.
+	if (! defined($dh{EXCLUDE_FIND}) || $dh{EXCLUDE_FIND} eq '') {
+		$find_options="";
+	}
+	else {
+		$find_options="! \\( $dh{EXCLUDE_FIND} \\)";
+	}
+	foreach $file (split(/\n/,`find $TMP -type f \\( -perm +111 -or -name "*.so*" \\) $find_options`)) {
 		# TODO: this is slow, optimize. Ie, file can run once on multiple files..
 		$ff=`file "$file"`;
 		if ($ff=~m/ELF/ && $ff!~/statically linked/) {
@@ -27,6 +34,6 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	}
 
 	if (@filelist) {
-		doit("dpkg-shlibdeps","-Tdebian/$EXT\substvars",@{$dh{U_PARAMS}},@filelist);
+		doit("dpkg-shlibdeps","-Tdebian/$EXT\substvars",@{$dh{U_PARAMS}},'-dDepends',@filelist);
 	}
 }
