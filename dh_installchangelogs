@@ -47,6 +47,8 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			# HTML changelog
 			doit("install","-o","root","-g","root","-p","-m644",
 				$upstream,"$TMP/usr/doc/$PACKAGE/changelog.html");
+			doit("ln", "-sf", 'changelog.html',
+				"$TMP/usr/doc/$PACKAGE/changelog");
 		}
 		else {
 			doit("install","-o","root","-g","root","-p","-m644",

@@ -27,10 +27,11 @@ Here is a sample debian/compress file that causes dh_compress to compress
 the same files as it would by default. This is a good starting point for
 customization of what files are compressed:
 .PP
- find usr/info usr/share/info usr/man usr/share/man usr/X11*/man usr/share/X11*/man -type f
+ find usr/info usr/share/info usr/man usr/share/man usr/X11*/man -type f
  find usr/doc usr/share/doc -type f \\ 
  	\\( -size +4k -or -name "changelog*" \\) \\
- 	! -name "*.htm*" ! -name "*.gif" ! -iname "*.gz" \\
+ 	\\( -name changelog.html -or ! -name "*.htm*" \\) \\
+ 	! -name "*.gif" ! -iname "*.gz" \\
  	! -iname "*.taz" ! -iname "*.tgz" ! -iname "*.z" \\
  	! -name "copyright"
 .SH OPTIONS
