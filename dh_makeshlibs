@@ -94,7 +94,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		my $major;
 	
 		chomp;
-		$need_ldconfig=1;
 		# The second evil regexp is for db3, whose author should
 		# be shot.
 		if (m#.*/([^/]*)\.so\.(\d*)\.?# || m#.*/([^/]*)-([^\s/]+)\.so$#) {
@@ -121,6 +120,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 		if (defined($library) && defined($major) && defined($deps) &&
 		    $library ne '' && $major ne '' && $deps ne '') {
+		    	$need_ldconfig=1;
 		    	# Prevent duplicate lines from entering the file.
 		    	my $line="$library $major $deps";
 			if (! $seen{$line}) {
