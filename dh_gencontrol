@@ -19,7 +19,9 @@ dh_gencontrol is a debhelper program that is responsible for generating
 control files, and installing them into the DEBIAN directory with the
 proper permissions.
 
-This program is merely a wrapper around L<dpkg-gencontrol(1)>.
+This program is merely a wrapper around L<dpkg-gencontrol(1)>, which calls
+it once for each package being acted on, and passes in some additional
+useful flags including "-isp".
 
 =head1 OPTIONS
 
