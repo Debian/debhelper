@@ -16,7 +16,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	open (FIND, "find $TMP -type f -name '*.so.*' |");
 	while (<FIND>) {
 		chomp;
-		($library, $major)=m#.*/(.*)\.so\.(\d*)\.#;
+		($library, $major)=m#.*/(.*)\.so\.(\d*)\.?#;
 		if (defined($dh{M_PARAMS}) && $dh{M_PARAMS} ne '') {
 			$major=$dh{M_PARAMS};
 		}

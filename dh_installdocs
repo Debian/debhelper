@@ -27,6 +27,8 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 
 	if (@docs) {
 		doit("cp","-a",@docs,"$TMP/usr/doc/$PACKAGE/");
+		doit("chmod","-R","go=rX","$TMP/usr/doc");
+		doit("chmod","-R","u+rw","$TMP/usr/doc");
 	}
 
 	# .Debian is correct, according to policy, but I'm easy.

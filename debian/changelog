@@ -1,3 +1,17 @@
+debhelper (1.2.16) unstable; urgency=low
+
+  * dh_installchangelogs: now detects html changelogs and installs them as
+    changelog.html.gz, to comply with latest policy (which I disagree with
+    BTW).
+  * manpages: updated policy version numbers.
+  * dh_installdocs: behavior change: all docs are now installed mode 644.
+    I have looked and it doesn't seem this will actually affect any packages
+    in debian. This is useful only if you want to use dh_installdocs and not
+    dh_fixperms, and that's the only time this behavior change will have any
+    effect, either. (#30118)
+
+ -- Joey Hess <joeyh@master.debian.org>  Thu,  3 Dec 1998 23:31:56 -0800
+
 debhelper (1.2.15) unstable; urgency=low
 
   * Just a re-upload, last upload failed for some obscure reason.

@@ -42,7 +42,13 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	doit("install","-p","-m644",$changelog,"$TMP/usr/doc/$PACKAGE/$changelog_name");
 
 	if ($upstream) {
-		doit("install","-p","-m644",$upstream,"$TMP/usr/doc/$PACKAGE/changelog");
+		if ($upstream=~m/\.html?$/i) {
+			# HTML changelog
+			doit("install","-p","-m644",$upstream,"$TMP/usr/doc/$PACKAGE/changelog.html");
+		}
+		else {
+			doit("install","-p","-m644",$upstream,"$TMP/usr/doc/$PACKAGE/changelog");
+		}
 		if ($dh{K_FLAG}) {
 			# Install symlink to original name of the upstream changelog file.
 			# Use basename in case original file was in a subdirectory or something.
