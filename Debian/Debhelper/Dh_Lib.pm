@@ -388,7 +388,7 @@ sub addsubstvar {
 	my $ext=pkgext($package);
 	my $substvarfile="debian/${ext}substvars";
 	my $str=$deppackage;
-	$str.=" ($verinfo)" if length $verinfo;
+	$str.=" ($verinfo)" if defined $verinfo && length $verinfo;
 
 	# Figure out what the line will look like, based on what's there
 	# now, and what we're to add or remove.
