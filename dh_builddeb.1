@@ -1,39 +1,33 @@
-.TH DH_BUILDDEB 1
+.TH DH_BUILDDEB 1 "" "Debhelper Commands" "Debhelper Commands"
 .SH NAME
 dh_builddeb \- build debian packages
 .SH SYNOPSIS
 .B dh_builddeb
-.I "[-v] [-a] [-i] [-ppackage]"
+.I "[debhelper options] [--destdir=directory] [-uparams]"
 .SH "DESCRIPTION"
 dh_builddeb simply calls
 .BR dpkg (8)
 to build a .deb package or packages.
 .SH OPTIONS
 .TP
-.B \-v
-Verbose mode; show all commands that modify the package build directory, etc.
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
 .TP
-.B \-a
-Build all architecture dependent packages.
+.B --destdir=directory
+Use this if you want the generated .deb files to be put in a directory other
+than the default of ".."
 .TP
-.B \-i
-Build all architecture independent packages.
-.TP
-.B \-ppackage
-Build the package named "package".
-.SH NOTES
-The
-.B \-a
-.B \-i
-and
-.B \-p
-arguments are cumulative. If none are specified, then all packages listed in
-the control file will be built.
+.B \-uparams
+Pass "params" to 
+.BR dpkg-deb (1)
+when it is used to build the package.
 .SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
-.BR /usr/doc/debhelper/README
+.BR debhelper (1)
 .SH AUTHOR
 Joey Hess <joeyh@master.debian.org>

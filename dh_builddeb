@@ -1,7 +1,17 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
-# Build the .deb package, assuming all the files are set up in debian/tmp.
+# Build the .deb package, assuming all the files are set up.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-source dh_lib
-doit "dpkg --build debian/tmp .."
+BEGIN { push @INC, "debian", "/usr/share/debhelper" }
+use Dh_Lib;
+init();
+
+# Set the default destination directory.
+if (! defined $dh{DESTDIR}) {
+	$dh{DESTDIR}='..';
+}
+
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	doit("dpkg","--build",$TMP,$dh{DESTDIR},@{$dh{U_PARAMS}});
+}
