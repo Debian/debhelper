@@ -17,7 +17,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	foreach $file (split(/\n/,`find $TMP -type f \\( -perm +111 -or -name "*.so*" \\)`)) {
 		# TODO: this is slow, optimize. Ie, file can run once on multiple files..
 		$ff=`file "$file"`;
-		if ($ff=~m/ELF/) {
+		if ($ff=~m/ELF/ && ! $ff=~/statically linked/) {
 			push @filelist,$file;
 		}
 	}
