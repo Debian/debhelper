@@ -1,10 +1,19 @@
+makefontdir() {
+    ENCDIR=/usr/lib/X11/fonts/encodings
+    if [ -d $ENCDIR -a -d $ENCDIR/large ]; then
+	/usr/bin/X11/mkfontdir -e $ENCDIR -e $ENCDIR/large "$@"
+    else
+	/usr/bin/X11/mkfontdir "$@"
+    fi
+}
+
 fontdirs="#FONTDIRS#"
 updatecmds="#UPDATECMDS#"
 
 for currentdir in $fontdirs; do
 	longdir=/usr/lib/X11/fonts/$currentdir
 	if [ -d $longdir ]; then
-		for file in fonts.dir fonts.alias; do
+		for file in fonts.dir fonts.alias encodings.dir; do
 			rm -f $longdir/$file
 		done
 		if [ $(find $longdir| wc -l) -eq 1 ]; then

@@ -1,3 +1,12 @@
+makefontdir() {
+    ENCDIR=/usr/lib/X11/fonts/encodings
+    if [ -d $ENCDIR -a -d $ENCDIR/large ]; then
+	/usr/bin/X11/mkfontdir -e $ENCDIR -e $ENCDIR/large "$@"
+    else
+	/usr/bin/X11/mkfontdir "$@"
+    fi
+}
+
 if [ "$1" = "configure" ]; then
 	fontdirs="#FONTDIRS#"
 	updatecmds="#UPDATECMDS#"
