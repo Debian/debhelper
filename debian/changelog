@@ -1,3 +1,16 @@
+debhelper (2.1.21) unstable; urgency=low
+
+  * dh_movefiles: no longer does the symlink ordering hack, as
+    this is supported by dpkg itself now. Added a dependancy on
+    dpkg-dev >= 1.7.0 to make sure this doesn't break anything.
+  * While I'm updating for dpkg 1.7.0, I removed the -ldirectory hack
+    from dh_shlibdeps; dpkg-shlibdeps has its own much more brutal hack to
+    make this work. The switch is ignored now for backwards compatability.
+  * dh_suidregister will be deprecated soon -- dpkg-statoverride is a
+    much better way.
+
+ -- Joey Hess <joeyh@debian.org>  Mon,  6 Nov 2000 15:14:49 -0800
+
 debhelper (2.1.20) unstable; urgency=low
 
   * dh_suidregister: do not unregister on purge, since it will have already

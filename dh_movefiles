@@ -61,13 +61,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			$file=$_;
 			$ret=1 if (! -e $file && ! -l $file);
 			$file=~s:^\Q$sourcedir\E/+::;
-			complex_doit("(cd $sourcedir >/dev/null ; find $file ! -type d -and ! -type l -print || true) >> debian/movelist");
-		}
-		foreach (@filelist) {
-			$file=$_;
-			$ret=1 if (! -e $file && ! -l $file);
-			$file=~s:^\Q$sourcedir\E/+::;
-			complex_doit("(cd $sourcedir >/dev/null ; find $file ! -type d -and -type l -print || true) >> debian/movelist");
+			complex_doit("(cd $sourcedir >/dev/null ; find $file ! -type d -print || true) >> debian/movelist");
 		}
 		complex_doit("(cd $sourcedir >/dev/null ; tar --create --remove-files --files-from=../movelist --file -) | (cd $TMP >/dev/null ;tar xpf -)");
 		doit("rm","-f","debian/movelist");
