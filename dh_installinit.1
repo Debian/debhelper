@@ -3,7 +3,7 @@
 dh_installinit \- install init scripts into package build directories
 .SH SYNOPSIS
 .B dh_installinit
-.I "[debhelper options] [--init-script=scriptname] [-n] [-r] [-d] [-uparams]"
+.I "[debhelper options] [--init-script=scriptname] [-n] [-r] [-d] [-uparams] -- [params]"
 .SH "DESCRIPTION"
 dh_installinit is a debhelper program that is responsible for installing
 init scripts into package build directories. 
@@ -37,6 +37,8 @@ for daemons with names ending in "d". (Note: this takes precedence over
 the --init-script parameter described below.)
 .TP
 .B \-uparams, \--update-rcd-params=params
+.TP
+.B \-\- params
 Pass "params" to 
 .BR update-rc.d (8)
 If not specified, "defaults" will be passed to

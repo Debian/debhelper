@@ -1,3 +1,18 @@
+debhelper (2.0.74) unstable; urgency=low
+
+  * dh_suidregister: Die with understandable error message if asked to
+    act on files that don't exist.
+  * dh_installchangelogs: to comply with policy, if it's told to act on a
+    html changelog, it installs it as changelog.html.gz and dumps a plain
+    text version to changelog.gz. The dumping is done with lynx. 
+    (Closes: #51099)
+  * Dh_Getopt.pm: Modified it so any options specified after -- are added to
+    U_PARAMS. This means that instead of passing '-u"something nasty"' to
+    dh_gencontrol and the like, you can pass '-- something nasty' without
+    fiddling to get the quoting right, etc.
+
+ -- Joey Hess <joeyh@master.debian.org>  Tue, 23 Nov 1999 11:36:15 -0800
+
 debhelper (2.0.73) unstable; urgency=low
 
   * Actually, debhelper build-depends on perl-5.005.

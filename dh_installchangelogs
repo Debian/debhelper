@@ -43,21 +43,23 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		"$TMP/usr/share/doc/$PACKAGE/$changelog_name");
 
 	if ($upstream) {
+		my $link_to;
 		if ($upstream=~m/\.html?$/i) {
 			# HTML changelog
 			doit("install","-o","root","-g","root","-p","-m644",
 				$upstream,"$TMP/usr/share/doc/$PACKAGE/changelog.html");
-			doit("ln", "-sf", 'changelog.html',
-				"$TMP/usr/share/doc/$PACKAGE/changelog");
+			complex_doit("lynx -dump $upstream > $TMP/usr/share/doc/$PACKAGE/changelog");
+			$link_to='changelog.html';
 		}
 		else {
 			doit("install","-o","root","-g","root","-p","-m644",
 				$upstream,"$TMP/usr/share/doc/$PACKAGE/changelog");
+			$link_to='changelog';				
 		}
 		if ($dh{K_FLAG}) {
 			# Install symlink to original name of the upstream changelog file.
 			# Use basename in case original file was in a subdirectory or something.
-			doit("ln","-sf","changelog","$TMP/usr/share/doc/$PACKAGE/".Dh_Lib::basename($upstream));
+			doit("ln","-sf",$link_to,"$TMP/usr/share/doc/$PACKAGE/".Dh_Lib::basename($upstream));
 		}
 	}
 }

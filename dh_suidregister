@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # If no parameters are given, and no debian/suid files exists, scan for 
 # suid/sgid files and suidregister them. 
@@ -6,53 +6,71 @@
 # If there are parameters, or there is a debian/suid, register the files
 # listed there.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
+BEGIN { push @INC, "debian", "/usr/share/debhelper" }
+use Dh_Lib;
+init();
 
-for PACKAGE in $DH_DOPACKAGES; do
-	TMP=`tmpdir $PACKAGE`
-	EXT=`pkgext $PACKAGE`
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$suid=pkgfile($PACKAGE,"suid");
 
-	files=""
+	@files=();
+	if ($suid) {
+		@files=filearray($suid);
+	}
 
-	if [ -e debian/${EXT}suid ]; then
-		files=`tr "\n" " " < debian/${EXT}suid`
-	fi
+	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+		push @files, @ARGV;
+	}
 
-	if [ "$PACKAGE" = "$MAINPACKAGE" -a "$*" ]; then
-		files="$* $files"
-	fi
-
-	if [ ! "$files" -a ! -e debian/${EXT}suid ]; then
+	if (! @files && ! $suid) {
 		# No files specified (and no empty debian/suid file), so
 		# guess what files to process.
-		files=`find debian/$TMP -type f -perm +6000`
+		@files=split(/\n/,`find $TMP -type f -perm +6000`);
 
 		# We will strip the debian working directory off of the
 		# filenames.
-		tostrip="debian/$TMP/"
-	else
+		$tostrip="$TMP/";
+	}
+	else {
 		# We will strip leading /'s, so the user can feed this
 		# program either absolute filenames, or relative filenames,
 		# and it will do the right thing either way.
-		tostrip="/"
-	fi
+		$tostrip="/";
+	}
 
-	if [ "$files" ]; then
-		for file in $files; do
-			# Strip leading $tostrip from $file. If not there,
-			# leave $file untouched.
-			if [ `expr "$file" : "$tostrip\\(.*\\)"` ]; then
-				file=`expr "$file" : "$tostrip\\(.*\\)"`
-			fi
-			
-			# Create the sed string that will be used to 
-			# fill in the blanks in the autoscript files.
-			# Fill with the owner, group, and perms of the file.
-			sedstr=`find debian/$TMP/$file -printf "s:#FILE#:$file:;s/#PACKAGE#/$PACKAGE/;s/#OWNER#/%u/;s/#GROUP#/%g/;s/#PERMS#/%m/"`
-			
-			autoscript "postinst" "postinst-suid" "$sedstr"
-			autoscript "postrm" "postrm-suid" "$sedstr"
-		done
-	fi
-done
+	foreach $file (@files) {
+		# Strip leading $tostrip from $file.
+		$file=~s/^$tostrip//;
+
+		if (! -e "$TMP/$file") {
+			error("\"$TMP/$file\" does not exist.");
+		}
+		
+		# Create the sed string that will be used to 
+		# fill in the blanks in the autoscript files.
+		# Fill with the owner, group, and perms of the file.
+		(undef,undef,$mode,undef,$uid,$gid,undef) = stat("$TMP/$file");
+		# Now come up with the user and group names for the uid and gid.
+		$user=getpwuid($uid);
+		if (! defined $user) {
+			warning("$file has odd uid $uid, not in /etc/passwd");
+			$user=$uid;
+		}
+		$group=getgrgid($gid);
+		if (! defined $group) {
+			warning("$file has odd gid $gid not in /etc/group");
+			$group=$gid;
+		}
+		# Note that I have to print mode in ocal, stripping file type.
+		$sedstr=sprintf("s:#FILE#:$file:;s/#PACKAGE#/$PACKAGE/;s/#OWNER#/$user/;s/#GROUP#/$group/;s/#PERMS#/%#o/",
+			        $mode & 07777);
+
+		autoscript($PACKAGE,"postinst","postinst-suid",$sedstr);
+		autoscript($PACKAGE,"postrm","postrm-suid","$sedstr");
+		
+		if ( -e "$TMP/$file") {
+			doit("chmod","a-s","$TMP/$file");
+		}
+	}
+}

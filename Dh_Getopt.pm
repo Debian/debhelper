@@ -50,6 +50,11 @@ sub AddExclude { my($option,$value)=@_;
 	push @{$options{EXCLUDE}},$value;
 }
 
+# This collects non-options values.
+sub NonOption {
+	push @{$options{ARGV}}, @_;
+}
+
 # Parse options and return a hash of the values.
 sub parseopts {
 	undef %options;
@@ -122,6 +127,8 @@ sub parseopts {
 		"number=s" => \$options{number},
 		
 		"flavor=s" => \$options{flavor},
+		
+		"<>" => \&NonOption,
 	);
 
 	if (!$ret) {
@@ -167,6 +174,12 @@ sub parseopts {
 	if (! defined $options{DOPACKAGES} || ! @{$options{DOPACKAGES}}) {
 		error("I have no package to build");
 	}
+
+	# Anything left in @ARGV is options that appeared after a --
+	# These options are added to U_PARAMS, while the non-option
+	# values we collected replace them in @ARGV;
+	$options{U_PARAMS}.=join(' ', @ARGV);
+	@ARGV=@{$options{ARGV}} if exists $options{ARGV};
 
 	return %options;
 }	
