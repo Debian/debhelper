@@ -13,7 +13,7 @@ filelist () {
 	if [ "$compress" ]; then
 		# The config file is a sh script that outputs the files to be compressed
 		# (typically using find).
-		sh $olddir/$compress 2>/dev/null
+		sh $olddir/$compress 2>/dev/null || true
 	else
 		# By default fall back on what the policy manual says to compress.
 		find usr/info usr/man usr/X11*/man -type f ! -name "*.gz" 2>/dev/null || true
