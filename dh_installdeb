@@ -60,5 +60,8 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		if (-z "$TMP/DEBIAN/conffiles") {
 			doit("rm", "-f", "$TMP/DEBIAN/conffiles");
 		}
+		else {
+			doit("chmod", 644, "$TMP/DEBIAN/conffiles");
+		}
 	}
 }
