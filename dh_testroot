@@ -1,10 +1,11 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Checks to make sure you are root.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-source dh_lib
+BEGIN { push @INC, "debian", "/usr/share/debhelper" }
+use Dh_Lib;
+init();
 
-if  [ "`whoami`" != root ]; then
-	error "You must run this as root."
-fi
+if ($< != 0) {
+	error("You must run this as root.");
+}
