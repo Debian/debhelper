@@ -145,7 +145,7 @@ sub make_debug {
 	my $tmp=shift;
 	my $desttmp=shift;
 
-	my ($base_file)=$file=~/^$tmp(.*)/;
+	my ($base_file)=$file=~/^\Q$tmp\E(.*)/;
 	my $debug_path=$desttmp."/usr/lib/debug/".$base_file;
 	my $debug_dir=dirname($debug_path);
 	if (! -d $debug_dir) {
