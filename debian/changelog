@@ -1,3 +1,13 @@
+debhelper (1.2.12) unstable; urgency=low
+
+  * examples/*: moved dh_makeshlibs call to before dh_installdeb call.
+    (#29762). This is just so if you replace dh_makeshlibs with something
+    that generates debian/shlibs, it still gets installed properly.
+  * dh_suidregister: use names instead of uid's and gid's, at request of
+    suidregister maintainer (#29802).
+
+ -- Joey Hess <joeyh@master.debian.org>  Sat, 21 Nov 1998 13:13:10 -0800
+
 debhelper (1.2.11) unstable; urgency=low
 
   * dh_movefiles: if given absolute filenames to move (note that that is

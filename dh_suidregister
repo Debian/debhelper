@@ -47,8 +47,11 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		# fill in the blanks in the autoscript files.
 		# Fill with the owner, group, and perms of the file.
 		(undef,undef,$mode,undef,$uid,$gid,undef) = stat("$TMP/$file");
+		# Now come up with the user and group names for the uid and gid.
+		$user=getpwuid($uid);
+		$group=getgrgid($gid);
 		# Note that I have to print mode in ocal, stripping file type.
-		$sedstr=sprintf("s:#FILE#:$file:;s/#PACKAGE#/$PACKAGE/;s/#OWNER#/$uid/;s/#GROUP#/$gid/;s/#PERMS#/%#o/",
+		$sedstr=sprintf("s:#FILE#:$file:;s/#PACKAGE#/$PACKAGE/;s/#OWNER#/$user/;s/#GROUP#/$group/;s/#PERMS#/%#o/",
 			        $mode & 07777);
 
 		autoscript($PACKAGE,"postinst","postinst-suid",$sedstr);
