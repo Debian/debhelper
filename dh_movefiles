@@ -43,7 +43,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	# Now we need to expand wildcards in @tomove.
 	# This is only necessary in pre-v3 land -- as of v3, the
 	# expension is automatically done by filearray().
-	if (@tomove && ! Debian::Debhelper::Dh_Lib::compat(3)) {
+	if (@tomove && Debian::Debhelper::Dh_Lib::compat(2)) {
 		@filelist=();
 		foreach (@tomove) {
 			push @filelist, glob("$sourcedir/$_");

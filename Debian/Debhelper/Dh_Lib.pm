@@ -354,7 +354,7 @@ sub filearray {
 		# The tricky bit is that the glob expansion is done
 		# as if we were in the specified directory, so the
 		# filenames that come out are relative to it.		
-		if (defined $globdir && compat(3)) {
+		if (defined $globdir && ! compat(2)) {
 			for (map { glob "$globdir/$_" } split) {
 				s#^$globdir/##;
 				push @ret, $_;
