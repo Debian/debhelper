@@ -35,9 +35,10 @@ if (! $dh{D_FLAG}) {
 	# (The \s+ is important, \s won't work because find would get null
 	# parameters). Note that you _don't_ quote wildcards used by find
 	# in here.
-	doit(split(/\s+/,"find . ( -name #*# -o -name *~ -o -name DEADJOE
-		-o -name *.orig -o -name *.rej -o -name *.bak
-		-o -name .*.orig -o -name .*.rej -o -name .SUMS
-		-o -name TAGS -o -name core -o ( -path */.deps/* -a -name *.P )
+	doit(split(/\s+/,"find . -type f -a
+	        ( -name #*# -o -name *~ -o -name DEADJOE
+		 -o -name *.orig -o -name *.rej -o -name *.bak
+		 -o -name .*.orig -o -name .*.rej -o -name .SUMS
+		 -o -name TAGS -o -name core -o ( -path */.deps/* -a -name *.P )
 		) -exec rm -f {} ;"));
 }
