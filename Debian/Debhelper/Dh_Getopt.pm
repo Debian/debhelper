@@ -146,6 +146,8 @@ sub parseopts {
 
 		"list-missing" => \$options{LIST_MISSING},
 		
+		"L|libpackage=s" => \$options{LIBPACKAGE},
+		
 		"<>" => \&NonOption,
 	);
 
