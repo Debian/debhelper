@@ -141,6 +141,8 @@ sub parseopts {
 		"autodest" => \$options{AUTODEST},
 
 		"h|help" => \&showhelp,
+
+		"mainpackage=s" => \$options{MAINPACKAGE},
 		
 		"<>" => \&NonOption,
 	);

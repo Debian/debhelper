@@ -53,8 +53,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	# Generate and install control file.
-	doit("dpkg-gencontrol","-l$changelog","-isp","-p$package",
-		     "-Tdebian/${ext}substvars", "-P$tmp",@{$dh{U_PARAMS}});
+	my @command="dpkg-gencontrol";
+	if (GetPackages() > 1) {
+		push @command, "-p$package";
+	}
+	doit(@command, "-l$changelog", "-isp", "-Tdebian/${ext}substvars", 
+		"-P$tmp",@{$dh{U_PARAMS}});
 
 	# This chmod is only necessary if the user sets the umask to
 	# something odd.

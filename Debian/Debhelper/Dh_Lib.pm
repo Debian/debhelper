@@ -72,10 +72,13 @@ sub init {
 		$dh{NO_ACT}=1;
 	}
 
-	# Get the name of the main binary package (first one listed in
-	# debian/control).
 	my @allpackages=GetPackages();
-	$dh{MAINPACKAGE}=$allpackages[0];
+	# Get the name of the main binary package (first one listed in
+	# debian/control). Only if the main package was not set on the
+	# command line.
+	if (! exists $dh{MAINPACKAGE} || ! defined $dh{MAINPACKAGE}) {
+		$dh{MAINPACKAGE}=$allpackages[0];
+	}
 
 	# Check if packages to build have been specified, if not, fall back to
 	# the default, doing them all.
