@@ -13,8 +13,8 @@ use vars qw(@ISA @EXPORT %dh);
 @EXPORT=qw(&init &doit &complex_doit &verbose_print &error &warning &tmpdir
 	    &pkgfile &pkgext &pkgfilename &isnative &autoscript &filearray
 	    &filedoublearray &getpackages &basename &dirname &xargs %dh
-	    &compat &addsubstvar &delsubstvar &excludefile &is_udeb
-	    &udeb_filename);
+	    &compat &addsubstvar &delsubstvar &excludefile &package_arch
+	    &is_udeb &udeb_filename);
 
 my $max_compat=4;
 
@@ -612,6 +612,12 @@ sub getpackages {
 	return @list;
 }
 
+sub package_arch {
+	my $package=shift;
+	
+	return $package_arches{$package} eq 'all' ? "all" : buildarch();
+}
+
 sub is_udeb {
 	my $package=shift;
 	
@@ -621,7 +627,7 @@ sub is_udeb {
 sub udeb_filename {
 	my $package=shift;
 	
-	my $filearch=$package_arches{$package} eq 'all' ? "all" : buildarch();
+	my $filearch=package_arch($package);
 	isnative($package); # side effect
 	my $version=$dh{VERSION};
 	$version=~s/^[0-9]+://; # strip any epoch
