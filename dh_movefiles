@@ -56,21 +56,21 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		# Order the files. First all real files, then symlinks. 
 		# Putting symlinks last is a nice thing to do for library 
 		# packages and doesn't affect much of anything else.
-		doit("rm","-f","movelist");
+		doit("rm","-f","debian/movelist");
 		foreach (@filelist) {
 			$file=$_;
 			$ret=1 if (! -e $file && ! -l $file);
 			$file=~s:^$sourcedir/+::;
-			complex_doit("(cd $sourcedir >/dev/null ; find $file ! -type d -and ! -type l -print || true) >> movelist");
+			complex_doit("(cd $sourcedir >/dev/null ; find $file ! -type d -and ! -type l -print || true) >> debian/movelist");
 		}
 		foreach (@filelist) {
 			$file=$_;
 			$ret=1 if (! -e $file && ! -l $file);
 			$file=~s:^$sourcedir/+::;
-			complex_doit("(cd $sourcedir >/dev/null ; find $file ! -type d -and -type l -print || true) >> movelist");
+			complex_doit("(cd $sourcedir >/dev/null ; find $file ! -type d -and -type l -print || true) >> debian/movelist");
 		}
-		complex_doit("(cd $sourcedir >/dev/null ; tar --create --remove-files --files-from=../../movelist --file -) | (cd $TMP >/dev/null ;tar xpf -)");
-		doit("rm","-f","movelist");
+		complex_doit("(cd $sourcedir >/dev/null ; tar --create --remove-files --files-from=../movelist --file -) | (cd $TMP >/dev/null ;tar xpf -)");
+		doit("rm","-f","debian/movelist");
 	}
 }
 

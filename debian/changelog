@@ -1,3 +1,13 @@
+debhelper (2.0.99) unstable; urgency=low
+
+  * dh_installmodules will now install modiles even if etc/modutils already
+    exists (wasn't because of a logic error). Closes: #66289
+  * dh_movefiles now uses debian/movelist, rather than just movelist. This
+    is to fix an unlikely edge case involving a symlinked debian directory.
+    Closes: #66278
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 26 Jun 2000 14:24:12 -0700
+
 debhelper (2.0.98) unstable; urgency=low
 
   * dh_installdebconf: Automatically merge localized template
