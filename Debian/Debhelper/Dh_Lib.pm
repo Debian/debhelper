@@ -139,7 +139,8 @@ sub doit {
 	verbose_print(escape_shell(@_));
 
 	if (! $dh{NO_ACT}) {
-		system(@_) == 0 || error("command returned error code");
+		my $ret=system(@_);
+		$ret == 0 || error("command returned error code $ret");
 	}
 }
 
