@@ -75,7 +75,7 @@ binary-indep: build
 	./dh_installdirs usr/bin usr/share/debhelper \
 		$(PERLLIBDIR)/Debian/Debhelper
 
-	echo -e "package Debian::Debhelper::Dh_Version;\n\$$version='$(VERSION)';" > \
+	printf "package Debian::Debhelper::Dh_Version;\n\$$version='$(VERSION)';" > \
 		debian/debhelper/$(PERLLIBDIR)/Debian/Debhelper/Dh_Version.pm
 
 	find . -perm +111 -maxdepth 1 -type f -not -name "*.pl" \
