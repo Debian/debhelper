@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Add to postinst and postrm to register a window manager.
+# Add to postinst and prerm to register a window manager.
 
 use Debian::Debhelper::Dh_Lib;
 init();
@@ -32,7 +32,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	if (@wm && ! $dh{NOSCRIPTS}) {
 		foreach (@wm) {
 			autoscript($PACKAGE,"postinst","postinst-wm","s:#WM#:$_:;s/#PRIORITY#/$dh{PRIORITY}/",);
-			autoscript($PACKAGE,"postrm","postrm-wm","s:#WM#:$_:");
+			autoscript($PACKAGE,"prerm","prerm-wm","s:#WM#:$_:");
 		}
 	}
 }
