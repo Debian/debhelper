@@ -3,7 +3,7 @@
 # y revisada por Javier Fernández-Sanguino <jfs@computer.org>,
 # Santiago Vila <sanvila@unex.es> y Esteban Manchado <zoso@demiurgo.org>
 # Está basada en la página de manual original:
-# versión 1.6 del CVS de
+# versión 1.7 del CVS de
 # /cvs/debian-doc/manpages/english/debhelper/debhelper.pod
 
 =head1 NOMBRE
@@ -333,6 +333,16 @@ documentación y usar dh_link para crear el enlace (o crear el enlace a mano), y
 debhelper hará lo correcto: se dará cuenta de que es un enlace colgante y no
 tratará de instalar un fichero de copyright o changelog.
 
+=head2 udebs
+ 	 
+Debhelper incluye soporte para udebs. Para crear un udeb con debhelper, añada
+"XC-Package-Type: udeb" al párrafo del paquete binario en debian/control, y una
+dependencia de construcción en debhelper (>= 4.2). Debhelper tratará de crear
+udebs que cumplan con las normas del "debian-installer", haciendo que los
+ficheros de los paquetes terminen en ".udeb", no instalando ninguna
+documentación en un udeb, pasando de los scripts de preinst, postrm, prerm, y
+de configuración, etc.
+ 
 =head2 Otras notas
 
 En general si algún programa de debhelper necesita que exista un directorio bajo

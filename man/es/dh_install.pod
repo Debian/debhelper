@@ -1,15 +1,12 @@
 # (c) 2003 Software in the Public Interest
 # Esta traducción ha sido realizada por Rubén Porras Campo <nahoo@inicia.es>
 # Está basada en la página de manual original:
-# versión 1.4 del CVS de
+# versión 1.5 del CVS de
 # /cvs/debian-doc/manpages/english/debhelper/dh_install.pod
 
 =head1 NOMBRE
 
 dh_install - instala ficheros en los directorios de construcción del paquete
-
-
-=cut
 
 =head1 SINOPSIS
 
@@ -19,25 +16,25 @@ B<dh_install> [B<-X>I<elemento>] [B<--autodest>] [B<--sourcedir=>I<dir>] [S<I<op
 
 dh_install es un programa de debhelper que instala ficheros en los directorios
 de construcción del paquete. Hay muchas órdenes dh_install* que se encargan de
-instalar tipos de ficheros específicos como documentación, ejemplos, páginas del
-manual... , debe usarse siempre que sea posible, pues a menudo son más hábiles
-en una tarea particular. Entonces, dh_install, es útil para instalar el resto de
-las cosas para las cuales no se necesita ninguna habilidad especial. Es un
+instalar tipos de ficheros específicos, como documentación, ejemplos, páginas del
+manual... deben usarse siempre que sea posible, pues a menudo son más hábiles
+en estas tareas particulares. Entonces, dh_install, es útil para instalar el resto de
+las cosas para las cuales no se necesite ninguna habilidad especial. Es un
 reemplazo de la antigua orden dh_movefiles.
 
 Los ficheros debian/paquete.install listan los ficheros a instalar en cada
 paquete y el directorio donde deben instalarse. El formato es un conjunto de
 líneas, cada línea lista un fichero o ficheros a instalar, al final de ésta se
-encuentra el directorio donde se deben de instalar. El nombre de los ficheros (o
+encuentra el directorio donde se deben instalar. El nombre de los ficheros (o
 directorios) a instalar debe ser relativo al directorio actual, mientras que el
 directorio de instalación es relativo al directorio de construcción del
-paquete. Pueden usarse comodines en los nombres de los ficheros a instalar
-(desde v3 en adelante).
+paquete. Puede usarse comodines en los nombres de los ficheros a instalar
+(en modo v3 o superior).
 
 Este programa puede usarse de dos modos. Si solamente tiene uno o dos ficheros
 que el Makefile del desarrollador principal no instala por usted, puede usar
 dh_install para moverlos a su lugar. Por otro lado, quizá tenga un gran paquete
-que construya múltiples paquetes binarios. Puede usar el Makefile del
+que construye múltiples paquetes binarios. Puede usar el Makefile del
 desarrollador principal para instalarlo en debian/tmp, y después usar dh_install
 para copiar los directorios y ficheros desde ahí a los directorios de
 construcción del paquete correctos.
@@ -54,25 +51,26 @@ no se instalen.
 =item B<--autodest>
 
 Adivina el directorio donde instalar las cosas. Si se especifica no se deben
-listar los directorios destino en los ficheros debian/paquete.install o en la
+listar los directorios de destino en los ficheros debian/paquete.install o en la
 línea de órdenes. En vez de esto, dh_install lo adivinará del siguiente modo:
 
-Eliminará debian/tmp (o el sourcedir si este se proporciona) del principio del
-nombre, si está presente, e instala en nombre del directorio del nombre del
-fichero. Entonces, si el nombre del fichero es debian/tmp/usr/bin, el
-directorios será copiado a debian/paquete/usr/. Si el nombre del fichero es
-debian/tmp/etc/passwd, se copiará a debian/paquete/etc/.
+Si está presente elimina debian/tmp (o el "sourcedir", si se proporciona) del
+principio del nombre del fichero, y después lo instala en el directorio que
+forma parte del nombre del fichero. Esto es, si el nombre del fichero es
+debian/tmp/usr/bin, el directorio se copiará a debian/paquete/usr/. Si el nombre
+del fichero es debian/tmp/etc/passwd, se copiará a debian/paquete/etc/.
 
-Dese cuenta que si lista sólo un nombre en una líneas por si mismo en el fichero
-debian/paquete.install, sin ningún destino implícito, entonces dh_install
-automáticamente adivinará el destino, incluso si la no se ha usado esta opción.
+Dese cuenta que si lista exactamente un nombre o patrón de comodines en una
+línea en el fichero debian/paquete.install, sin ningún destino explícito,
+entonces dh_install adivinará automáticamente el destino, incluso si no se ha
+usado esta opción.
 
 =item B<--list-missing>
 
 Esta opción hace que dh_install lleve la cuenta de los ficheros que instala, y
 al final, compare esa lista con los ficheros en el directorio fuente. Si alguno
 de los ficheros (o enlaces simbólicos) en el directorio fuente no se instalaron
-en algún lugar, dará un aviso a través de stderr.
+en algún lugar, dará un aviso a través de la salida de error estándar.
 
 Esto puede ser útil si tiene un paquete grande y quiere asegurarse de que no se
 olvida de instalar ningún fichero nuevo añadido en una nueva versión del
@@ -102,9 +100,6 @@ Lista los ficheros (o directorios) a instalar y el lugar donde se instalarán.
 Los ficheros se instalarán en el primer paquete sobre el que actúe dh_install.
 
 =back
-
-
-=cut
 
 =head1 EJEMPLO
 
@@ -148,6 +143,3 @@ Joey Hess <joeyh@debian.org>
 =head1 TRADUCTOR
 
 Traducción de Rubén Porras Campo <debian-l10n-spanish@lists.debian.org>
-
-
-=cut

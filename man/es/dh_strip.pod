@@ -2,15 +2,12 @@
 # Esta traducción ha sido realizada por Rudy Godoy <rudy@kernel-panik.org>
 # y revisada por Rubén Porras <nahoo@inicia.es>
 # Está basada en la página de manual original:
-# versión 1.2 del CVS de
+# versión 1.5 del CVS de
 # /cvs/debian-doc/manpages/english/debhelper/dh_strip.pod
 
 =head1 NOMBRE
 
 dh_strip - ejecuta strip sobre ejecutables, bibliotecas compartidas y algunas bibliotecas estáticas
-
-
-=cut
 
 =head1 SINOPSIS
 
@@ -26,7 +23,7 @@ Este programa examina sus directorios de construcción de paquetes y trabaja
 en lo que debe eliminar. Usa L<file(1)> y permisos y nombres de ficheros 
 para detectar que ficheros son bibliotecas compartidas (*.so), binarios
 ejecutables, bibliotecas estáticas (lib*.a) y ficheros de depuración
-(lib*_g.a, debug/*.so), y elimina cuanto más sea posible. (Que no es
+(lib*_g.a, debug/*.so), y elimina cuanto más sea posible. (Que no es del
 todo para depuración de bibliotecas). En general parece hacer muy buenas
 suposiciones, y hará lo correcto en la mayoría de casos.
 
@@ -51,8 +48,8 @@ Esta opción indica a dh_strip que el paquete dado tiene asociado un paquete
 depuración de los ficheros del paquete, los guardará en ficheros independientes
 en el directorio de construcción para el paquete "-dbg".
 
-Por ejemplo, puede que tenga un paquete libtal, y quiera incluir un paquete
-libtal-dbg que contenga los símbolos de depuración. La orden "dh_strip
+Por ejemplo, usted puede tener un paquete llamado libtal, y quiera incluir un
+paquete libtal-dbg que contenga los símbolos de depuración. La orden "dh_strip
 --dbg-package=libtal" hará que dh_strip guarde los símbolos de depuración de
 usr/lib/libtal.so.0 en usr/lib/debug/usr/lib/libtal.so.0 en el directorio de
 construcción para libtal-dbg. Si está instalado libtal-dbg, gdb cargará
@@ -60,12 +57,18 @@ automáticamente los símbolos de depuración al depurar libtal.
 
 Esta opción puede estar repetida para listar más de un paquete.
 
+Note que si usted usa esta opción, su paquete deberá tener dependencia de
+construcción con binutils (>= 2.12.90.0.9).
+
 =item B<-k>, B<--keep-debug>
 
 Se mantendrán los símbolos de depuración, pero separados en un fichero
 independiente en usr/lib/debug/ en el directorio de construcción del
 paquete. --dbg-package es más fácil de usar que esta opción, pero esta opción es
 más flexible.
+
+Note que si usted usa esta opción, su paquete deberá tener dependencia de
+construcción con binutils (>= 2.12.90.0.9).
 
 =back
 
@@ -77,9 +80,6 @@ nada, conforme a las normas de Debian.
 =head1 CONFORME A
 
 Normas de Debian, versión 3.0.1
-
-
-=cut
 
 =head1 VÉASE TAMBIÉN
 
@@ -95,6 +95,3 @@ Joey Hess <joeyh@debian.org>
 =head1 TRADUCTOR
 
 Traducción de Rudy Godoy <debian-l10n-spanish@lists.debian.org>
-
-
-=cut
