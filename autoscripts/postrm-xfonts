@@ -10,18 +10,13 @@ makefontdir() {
 fontdirs="#FONTDIRS#"
 updatecmds="#UPDATECMDS#"
 
-for currentdir in $fontdirs; do
-	longdir=/usr/lib/X11/fonts/$currentdir
-	if [ -d $longdir ]; then
-		for file in fonts.dir fonts.alias encodings.dir; do
-			rm -f $longdir/$file
-		done
-		if [ $(find $longdir| wc -l) -eq 1 ]; then
-			rmdir -p $longdir
-		else
+if [ "$1" = "purge" -o "$1" = "remove" -o "$1" = "disappear" ]; then
+	for currentdir in $fontdirs; do
+		longdir=/usr/lib/X11/fonts/$currentdir
+		if [ -d $longdir ]; then
 			for currentcmd in $updatecmds; do
 				$currentcmd $longdir
 			done
 		fi
-	fi
-done
+	done
+fi
