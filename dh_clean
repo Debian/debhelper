@@ -15,7 +15,8 @@ done
 doit "rm -f debian/files* debian/*.debhelper $*"
 
 # Remove other temp files.
-doit "find . \( -name '#*#' -o -name '*~' -o -name DEADJOE -o -name '*.orig' \
+# Use complex_doit so we can properly escape things.
+complex_doit "find . \( -name '#*#' -o -name '*~' -o -name DEADJOE -o -name '*.orig' \
 	-o -name '*.rej' -o -name '*.bak' -o -name '.*.orig' \
 	-o -name '.*.rej' -o -name .SUMS -o -name TAGS -o -name core \
 	\) -exec rm -f {} \;"
