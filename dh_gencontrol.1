@@ -1,0 +1,36 @@
+.TH DH_GENCONTROL 1 "" "Debhelper Commands" "Debhelper Commands"
+.SH NAME
+dh_gencontrol \- generate and install control file
+.SH SYNOPSIS
+.B dh_gencontrol
+.I "[debhelper options] [-uparams]"
+.SH "DESCRIPTION"
+dh_gencontrol is a debhelper program that is responsible for generating 
+control files, and installing them into the DEBIAN directory with the proper
+permissions.
+.P
+This program is merely a wrapper around
+.BR dpkg-gencontrol (1)
+.SH OPTIONS
+.TP
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
+.TP
+.B \-uparams, \--dpkg-gencontrol-params=params
+Pass "params" to 
+.BR dpkg-gencontrol (1)
+.SH ENVIRONMENT
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
+.SH "SEE ALSO"
+.TP
+.BR debhelper (1)
+.TP
+.BR dpkg-shlibdeps (1)
+.SH "CONFORMS TO"
+Debian policy, version 2.5.0.0
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>

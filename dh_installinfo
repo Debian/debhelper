@@ -1,95 +1,39 @@
 #!/usr/bin/perl -w
+#
+# Reads debian/info, installs all files listed there into /usr/info
+# and puts appropriate commands into the postinst.
 
-=head1 NAME
-
-dh_installinfo - install and register info files
-
-=cut
-
-use strict;
-use Debian::Debhelper::Dh_Lib;
-
-=head1 SYNOPSIS
-
-B<dh_installinfo> [S<I<debhelper options>>] [B<-A>] [B<-n>] [S<I<file ...>>]
-
-=head1 DESCRIPTION
-
-dh_installinfo is a debhelper program that is responsible for installing
-info files and registering the files it installs with install-info.
-
-It determines some information about the info files by parsing them, in
-particular, it looks at the INFO-DIR-SECTION line to determine what section
-the info file belongs in.
-
-Any filenames specified as parameters will be installed into the first
-package dh_installinfo is told to act on. By default, this is the first
-binary package in debian/control, but if you use -p, -i, or -a flags, it
-will be the first package specified by those flags.
-
-Files named debian/package.info can list other files to be installed.
-
-dh_installinfo will automatically generate the postinst and prerm commands
-needed to interface with install-info, updating the info . See L<dh_installdeb(1)> for an
-explanation of how this works.
-
-=head1 OPTIONS
-
-=over 4
-
-=item B<-A>, B<--all>
-
-Install all files specified by command line parameters in ALL packages
-acted on.
-
-=item B<-n>, B<--noscripts>
-
-Do not modify postinst/prerm scripts.
-
-=item I<file ...>
-
-Install these info files into the first package acted on. (Or in
-all packages if -A is specified).
-
-=back
-
-=head1 NOTES
-
-Note that this command is not idempotent. "dh_clean -k" should be called
-between invocations of this command. Otherwise, it may cause multiple
-instances of the same text to be added to maintainer scripts.
-
-=cut
-
+BEGIN { push @INC, "debian", "/usr/share/debhelper" }
+use Dh_Lib;
 init();
 
-foreach my $package (@{$dh{DOPACKAGES}}) {
-	my $tmp=tmpdir($package);
-	my $file=pkgfile($package,"info");
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$file=pkgfile($PACKAGE,"info");
 
-	my @info;
+	undef @info;
 	
 	if ($file) {
-		@info=filearray($file, ".");
+		@info=filearray($file);
 	}
 
-	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
 		push @info, @ARGV;
 	}
 
 	if (@info) {
-		if ( ! -d "$tmp/usr/share/info") {
-			doit("install","-d","$tmp/usr/share/info");
+		if ( ! -d "$TMP/usr/info") {
+			doit("install","-d","$TMP/usr/info");
 		}
-		doit("cp",@info,"$tmp/usr/share/info");
-		doit("chmod","-R", "go=rX","$tmp/usr/share/info/");
-		doit("chmod","-R", "u+rw","$tmp/usr/share/info/");
+		doit("cp",@info,"$TMP/usr/info");
+		doit("chmod","-R", "go=rX","$TMP/usr/info/");
+		doit("chmod","-R", "u+rw","$TMP/usr/info/");
 	}
 
 	foreach $file (@info) {
 		# Only register with install-info if this is a head file in
 		# a tree of info files.
-		if ($file !~ /-\d+$/ && ! $dh{NOSCRIPTS}) {
+		if ($file=~/\.info$/ && ! $dh{NOSCRIPTS}) {
 			# Figure out what section this file goes in.
 			my $section='';
 			open (IN, "<$file") || die "$file: $!";
@@ -101,30 +45,17 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			}
 			close IN;
 			
-			my $fn="/usr/share/info/".basename($file);
+			my $fn="/usr/info/".Dh_Lib::basename($file);
 			
 			if ($section ne '') {
-				$section=~s:/:\\/:g; # allow / in section.
-				autoscript($package,"postinst","postinst-info",
+				autoscript($PACKAGE,"postinst","postinst-info",
 					"s/#SECTION#/$section/g;s:#FILE#:$fn:");
 			}
 			else {
-				autoscript($package,"postinst","postinst-info-nosection",
+				autoscript($PACKAGE,"postinst","postinst-info-nosection",
 					"s:#FILE#:$fn:");
 			}
-			autoscript($package,"prerm","prerm-info", "s:#FILE#:$fn:");
+			autoscript($PACKAGE,"prerm","prerm-info", "s:#FILE#:$fn:");
 		}
 	}
 }
-
-=head1 SEE ALSO
-
-L<debhelper(7)>
-
-This program is a part of debhelper.
-
-=head1 AUTHOR
-
-Joey Hess <joeyh@debian.org>
-
-=cut

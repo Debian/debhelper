@@ -1,0 +1,48 @@
+.TH DH_INSTALLEXAMPLES 1 "" "Debhelper Commands" "Debhelper Commands"
+.SH NAME
+dh_installexamples \- install example files into package build directories
+.SH SYNOPSIS
+.B dh_installexamples
+.I "[debhelper options] [-A] [file ...]"
+.SH "DESCRIPTION"
+dh_installexamples is a debhelper program that is responsible for installing
+examples into usr/doc/package/examples in package build directories.
+.P
+Any file names specified as parameters will be installed into the first 
+package dh_installexamples is told to act on. By default, this is the first 
+binary package in debian/control, but if you use -p, -i, or -a flags, it
+will be the first package specified by those flags.
+.P
+A file named debian/package.examples (debian/examples may be used for the
+first binary package in debian/control) can list other files to be installed.
+.SH OPTIONS
+.TP
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
+.TP
+.B \-A, \--all
+Install any files specified by command line parameters in ALL packages
+acted on.
+.TP
+.B file ...
+Install these files as examples into the first package acted on. (Or into all
+packages if -A is specified.)
+.SH NOTES
+Note that dh_installexamples will happily copy entire directory hierarchies if
+you ask it to (it uses cp -a internally). If it is asked to install a
+directory, it will install the complete contents of the directory.
+.SH ENVIRONMENT
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
+.SH "SEE ALSO"
+.BR debhelper (1)
+.SH BUGS
+It's impossible to specify filenames with spaces or other whitespace in them
+in debian/examples file. This is more a historical design flaw than a bug.
+.SH "CONFORMS TO"
+Debian policy, version 2.5.0.0
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>
