@@ -1,3 +1,14 @@
+debhelper (2.2.3) unstable; urgency=low
+
+  * If DH_COMPAT=3 is set, the following happens:
+    - Various debian/foo files like debian/docs, debian/examples, etc,
+      begin to support filename globbing. use \* to escape the wildcards of
+      course. I doubt this will bite anyone (Debian doesn't seem to contain 
+      files with "*" or "?" in their names..), but it is guarded by v3 just
+      to be sure. Closes: #34120, #37694, #39846, #46249
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 27 Nov 2000 20:43:26 -0800
+
 debhelper (2.2.2) unstable; urgency=low
 
   * dh_makeshlibs: corrected the evil db3-regex so it doesn't misfire on

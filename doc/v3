@@ -27,10 +27,10 @@ them.
 
 + Every file in etc/ is automatically flagged as a conffile by dh_installdeb.
 
-* Debhelper config files will support globbing via * and ?, when
-  appropriate. To turn this off and use those characters raw, just quote
-  them.
++ Debhelper config files support globbing via * and ?, when
+  appropriate. To turn this off and use those characters raw, just prefix
+  with a backspash.
 
-+ dh_makeshlibs will generate autoscript fragments for ldconfig. This will
-  require you call it before dh_installdeb.
-
++ dh_makeshlibs generates autoscript fragments for ldconfig. This will
+  require you call it before dh_installdeb. (Many old debian/rules scripts
+  call it after.)

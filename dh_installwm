@@ -10,7 +10,7 @@ if (! defined $dh{PRIORITY}) {
 }
 
 if (@ARGV) {
-	# This is here for backwards comatability. If the filename doesn't
+	# This is here for backwards compatability. If the filename doesn't
 	# include a path, assume it's in /usr/X11R6/bin.
 	if ($ARGV[0] !~ m:/:) {
 		$ARGV[0]="/usr/X11R6/bin/$ARGV[0]";
@@ -22,7 +22,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	$file=pkgfile($PACKAGE,"wm");
 
 	if ($file) {
-		@wm=filearray($file, $TMP);
+		@wm=filearray($file, '.');
 	}
 
 	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {

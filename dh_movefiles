@@ -41,7 +41,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	}
 
 	# Now we need to expand wildcards in @tomove.
-	# This is only necessary in pre-v3 land, as of v3, the
+	# This is only necessary in pre-v3 land -- as of v3, the
 	# expension is automatically done by filearray().
 	if (@tomove && ! Debian::Debhelper::Dh_Lib::compat(3)) {
 		@filelist=();
@@ -56,9 +56,6 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			doit("install","-d",$TMP);
 		}
 
-		# Order the files. First all real files, then symlinks. 
-		# Putting symlinks last is a nice thing to do for library 
-		# packages and doesn't affect much of anything else.
 		doit("rm","-f","debian/movelist");
 		foreach (@tomove) {
 			$file=$_;

@@ -90,7 +90,7 @@ sub init {
 sub escape_shell {
 	my $line=shift;
 	# This list is from _Unix in a Nutshell_. (except '#')
-	$line~s/([\s!"\$()*+#;<>?@\[\]\\`|~])/\\$1/g;
+	$line=~s/([\s!"\$()*+#;<>?@\[\]\\`|~])/\\$1/g;
 	return $line;
 }
 
@@ -339,18 +339,27 @@ sub autoscript {
 }
 
 # Reads in the specified file, one word at a time, and returns an array of
-# the result. Pass in a true value for the second parameter if the contents
-# of the file are filenames that can be glob expanded.
+# the result. If a value is passed in as the second parameter, then glob
+# expansion is done in the directory specified by the parameter ("." is
+# frequently a good choice).
 sub filearray {
 	my $file=shift;
-	my $doglob=shift || '';
+	my $globdir=shift;
 
 	my @ret;
-	open (DH_FARRAY_IN,"<$file") || error("cannot read $file: $1");
+	open (DH_FARRAY_IN, $file) || error("cannot read $file: $1");
 	while (<DH_FARRAY_IN>) {
 		# Only do glob expansion in v3 mode.
-		if ($doglob && compat(3)) {
-			push @ret, map glob, split;
+		#
+		# The tricky bit is that the glob expansion is done
+		# as if we were in the specified directory, so the
+		# filenames that come out are relative to it.		
+		if (defined $globdir && compat(3)) {
+			for (map { glob "$globdir/$_" } split) {
+				s#^$globdir/##;
+				push @ret, $_;
+				print "(--$_)\n";
+			}
 		}
 		else {
 			push @ret, split;
