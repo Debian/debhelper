@@ -11,7 +11,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_installdocs> [S<I<debhelper options>>] [B<-A>] [B<-n>] [S<I<file ...>>]
+B<dh_installdocs> [S<I<debhelper options>>] [B<-A>] [B<-n>] [B<-X>I<item>] [S<I<file ...>>]
 
 =head1 DESCRIPTION
 
@@ -26,7 +26,7 @@ debian/package.copyright.
 
 Any filenames specified as parameters will be installed into the first
 package dh_installdocs is told to act on. By default, this is the first
-binary package in debian/control, but if you use -p, -i, or -a flags, it
+binary package in debian/control, but if you use B<-p>, B<-i>, or B<-a> flags, it
 will be the first package specified by those flags.
 
 Also, debian/README.Debian (or debian/README.debian) and debian/TODO, if
@@ -66,20 +66,25 @@ acted on.
 
 Do not modify postinst/prerm scripts.
 
+=item B<-Xitem>, B<--exclude=item>
+
+Exclude files that contain "item" anywhere in their filename from
+being installed.
+
 =item I<file ...>
 
 Install these files as documentation into the first package acted on. (Or
-in all packages if -A is specified).
+in all packages if B<-A> is specified).
 
 =back
 
 =head1 NOTES
 
 Note that dh_installdocs will happily copy entire directory hierarchies if
-you ask it to (it uses cp -a internally). If it is asked to install a
+you ask it to (similar to cp -a). If it is asked to install a
 directory, it will install the complete contents of the directory.
 
-Note that this command is not idempotent. "dh_clean -k" should be called
+Note that this command is not idempotent. "dh_clean B<-k>" should be called
 between invocations of this command. Otherwise, it may cause multiple
 instances of the same text to be added to maintainer scripts.
 
@@ -108,7 +113,23 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	if (@docs) {
-		doit("cp", "-a",@docs,"$tmp/usr/share/doc/$package/");
+		my $exclude = '';
+		if ($dh{EXCLUDE_FIND}) {
+			$exclude = ' \( ! '.$dh{EXCLUDE_FIND}.' \)';
+		}
+		foreach my $doc (@docs) {
+			next if excludefile($doc);
+			if (-d $doc && $exclude) {
+			    my ($dir_basename) = basename($doc);
+			    # Pity there's no cp --exclude ..
+			    my $pwd=`pwd`;
+			    chomp $pwd;
+			    complex_doit("cd $doc/.. && find $dir_basename -type f$exclude -exec cp --parents -dp {} $pwd/$tmp/usr/share/doc/$package \\;");
+			}
+			else {
+				doit("cp","-a",$doc,"$tmp/usr/share/doc/$package");
+			}
+		}
 		doit("chown","-R","0.0","$tmp/usr/share/doc");
 		doit("chmod","-R","go=rX","$tmp/usr/share/doc");
 		doit("chmod","-R","u+rw","$tmp/usr/share/doc");
@@ -119,13 +140,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (! $readme_debian) {
 		$readme_debian=pkgfile($package,'README.debian');
 	}
-	if ($readme_debian) {
+	if ($readme_debian && ! excludefile($readme_debian)) {
 		doit("install","-g",0,"-o",0,"-m","644","-p","$readme_debian",
 			"$tmp/usr/share/doc/$package/README.Debian");
 	}
 
 	my $todo=pkgfile($package,'TODO');
-	if ($todo) {
+	if ($todo && ! excludefile($todo)) {
 		if (isnative($package)) {
 			doit("install","-g",0,"-o",0,"-m","644","-p",$todo,
 				"$tmp/usr/share/doc/$package/TODO");
@@ -147,7 +168,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (! $copyright && -e "debian/copyright") {
 			$copyright="debian/copyright";
 		}
-		if ($copyright) {
+		if ($copyright && ! excludefile($copyright)) {
 				doit("install","-g",0,"-o",0,"-m","644","-p",$copyright,
 					"$tmp/usr/share/doc/$package/copyright");
 		}

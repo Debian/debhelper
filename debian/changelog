@@ -1,3 +1,16 @@
+debhelper (3.4.8) unstable; urgency=low
+
+  * Thanks to Benjamin Drieu <benj@debian.org>, dh_installdocs -X now works.
+    I had to modify his patch to use cp --parents, since -P spews warnings
+    now. Also, I made it continue to use cp -a if nothing is excluded,
+    which is both faster, and means this patch is less likely to break
+    anything if it turns out to be buggy. Also, stylistic changes.
+    Closes: #40649
+  * Implemented -X for dh_installexamples as well.
+  * dh_clean -X substvars will also work now. Closes: #66890
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 17 Feb 2002 12:26:37 -0500
+
 debhelper (3.4.7) unstable; urgency=low
 
   * dh_perl: don't gripe if there is no substvar file. Closes: #133140

@@ -12,7 +12,8 @@ use vars qw(@ISA @EXPORT %dh);
 @ISA=qw(Exporter);
 @EXPORT=qw(&init &doit &complex_doit &verbose_print &error &warning &tmpdir
 	    &pkgfile &pkgext &isnative &autoscript &filearray &GetPackages
-	    &basename &dirname &xargs %dh &compat &addsubstvar &delsubstvar);
+	    &basename &dirname &xargs %dh &compat &addsubstvar &delsubstvar
+            &excludefile);
 
 my $max_compat=4;
 
@@ -199,7 +200,8 @@ sub warning {
 # Returns the basename of the argument passed to it.
 sub basename {
 	my $fn=shift;
-	
+
+	$fn=~s/\/$//g; # ignore trailing slashes
 	$fn=~s:^.*/(.*?)$:$1:;
 	return $fn;
 }
@@ -208,6 +210,7 @@ sub basename {
 sub dirname {
 	my $fn=shift;
 	
+	$fn=~s/\/$//g; # ignore trailing slashes
 	$fn=~s:^(.*)/.*?$:$1:;
 	return $fn;
 }
@@ -448,6 +451,15 @@ sub filearray {
 	close DH_FARRAY_IN;
 	
 	return @ret;
+}
+
+# Passed a filename, returns true if -X says that file should be excluded.
+sub excludefile {
+        my $filename = shift;
+        foreach my $f (@{$dh{EXCLUDE}}) {
+                return 1 if $filename =~ /\Q$f\E/;
+        }
+        return 0;
 }
 
 # Returns the build architecture. (Memoized)

@@ -11,7 +11,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_installexamples> [S<I<debhelper options>>] [B<-A>] [S<I<file ...>>]
+B<dh_installexamples> [S<I<debhelper options>>] [B<-A>] [B<-X>I<item>] [S<I<file ...>>]
 
 =head1 DESCRIPTION
 
@@ -40,12 +40,17 @@ acted on.
 Install these files as examples into the first package acted on. (Or into
 all packages if -A is specified.)
 
+=item B<-Xitem>, B<--exclude=item>
+
+Exclude files that contain "item" anywhere in their filename from
+being installed.
+
 =back
 
 =head1 NOTES
 
 Note that dh_installexamples will happily copy entire directory hierarchies
-if you ask it to (it uses cp -a internally). If it is asked to install a
+if you ask it to (similar to cp -a). If it is asked to install a
 directory, it will install the complete contents of the directory.
 
 =cut
@@ -65,13 +70,30 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
 		push @examples, @ARGV;
 	}
-
+	
 	if (@examples) {
 		if (! -d "$tmp/usr/share/doc/$package/examples") {
 			doit("install","-d","$tmp/usr/share/doc/$package/examples");
 		}
 		
-		doit("cp","-a",@examples,"$tmp/usr/share/doc/$package/examples");
+		my $exclude = '';
+		if ($dh{EXCLUDE_FIND}) {
+			$exclude = ' \( ! '.$dh{EXCLUDE_FIND}.' \)';
+		}
+		
+		foreach my $example (@examples) {
+			next if excludefile($example);
+			if (-d $example && $exclude) {
+				my ($dir_basename) = basename($example);
+				# Pity there's no cp --exclude ..
+				my $pwd=`pwd`;
+				chomp $pwd;
+				complex_doit("cd $example/.. && find $dir_basename -type f$exclude -exec cp --parents -dp {} $pwd/$tmp/usr/share/doc/$package/examples \\;");
+			}
+			else {
+				doit("cp", "-a", $example, "$tmp/usr/share/doc/$package/examples");
+			}
+		}
 	}
 }
 

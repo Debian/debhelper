@@ -62,10 +62,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $ext=pkgext($package);
 
 	if (! $dh{D_FLAG}) {
-		doit("rm","-f","debian/${ext}substvars");
+		doit("rm","-f","debian/${ext}substvars")
+			unless excludefile("debian/${ext}substvars");
 	}
 	
-	doit ("rm","-rf",$tmp);
+	doit ("rm","-rf",$tmp)
+		unless excludefile($tmp);
 }
 
 if (! $dh{D_FLAG}) {
@@ -74,7 +76,8 @@ if (! $dh{D_FLAG}) {
 	}
 
 	if (! $dh{K_FLAG}) {
-		doit("rm","-f","debian/files");
+		doit("rm","-f","debian/files")
+			unless excludefile("debian/files");
 	}
 
 	# These are all debhelper temp files, and so it is safe to 
