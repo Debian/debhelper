@@ -1,10 +1,13 @@
-.TH DEBHELPER 1 "" "Debhelper Commands" "Debhelper Commands"
-.SH NAME
-debhelper \- overview of the debhelper commands
-.SH SYNOPSIS
-.B dh_*
-.I "[-v] [-a] [-i] [-s] [--no-act] [-ppackage] [-Npackage] [-Ptmpdir]"
-.SH "DESCRIPTION"
+=head1 NAME
+
+debhelper - the debhelper tool suite
+
+=head1 SYNOPSIS
+
+  dh_* [-v] [-a] [-i] [-s] [--no-act] [-ppackage] [-Npackage] [-Ptmpdir]
+
+=head1 DESCRIPTION
+
 Debhelper is used to help you build a debian package. The philosophy behind
 debhelper is to provide a collection of small, simple, and easily
 understood tools that are used in debian/rules to automate various common
@@ -12,69 +15,86 @@ aspects of building a package. This means less work for you, the packager.
 It also, to some degree means that these tools can be changed if debian
 policy changes, and packages that use them will require only a rebuild to
 comply with the new policy.
-.P
+
 A typical debian/rules file that uses debhelper will call several debhelper
 commands in sequence. Debhelper commands are all named with a "dh_" prefix.
 Examples of rules files that use debhelper are in
-/usr/share/doc/debhelper/examples/ .
-.P
+F</usr/share/doc/debhelper/examples/>
+
 To create a new debian package using debhelper, you can just copy one of
 the sample rules files and edit it by hand. Or you can try the dh-make
-package, which contains a
-.BR dh_make (1)
-command that partially automates the process. For a more gentle
-introduction, the maint-guide debian package contains a
-tutorial about making your first package using debhelper.
-.SH "DEBHELPER COMMANDS"
+package, which contains a L<dh_make|dh_make(1)> command that partially
+automates the process. For a more gentle introduction, the maint-guide debian
+package contains a tutorial about making your first package using debhelper.
+
+=head1 DEBHELPER COMMANDS
+
 Here is the complete list of available debhelper commands. See their man
 pages for additional documentation.
+
+=over 4
+
 #LIST#
-.SH "DEBHELPER CONFIG FILES"
-Many debhelper commands make use of files in debian/ to control what they
-do. Besides the common debian/changelog and debian/control, which are
+
+=back
+
+=head1 DEBHELPER CONFIG FILES
+
+Many debhelper commands make use of files in F<debian/> to control what they
+do. Besides the common F<debian/changelog> and F<debian/control>, which are
 in all packages, not just those using debhelper, some additional files can
 be used to configure the behavior of specific debhelper commands. These
-files are typically named debian/<package>.foo (where <package> of course,
+files are typically named debian/package.foo (where "package" of course,
 is replaced with the package that is being acted on).
-.P
+
 For example,
-dh_installdocs uses files named debian/<package>.docs to list the documentation
+dh_installdocs uses files named debian/package.docs to list the documentation
 files it will install. See the man pages of individual commands for details
 about the names and formats of the files they use.
-.P
+
 Note that if a package is the first (or only) binary package listed in
-debian/control, debhelper will use debian/foo if no debian/<package>.foo
+debian/control, debhelper will use debian/foo if no debian/package.foo
 file can be found.
-.P
+
 In some rare cases, you may want to have different versions of these files
-for different architectures. If files named debian/<package>.foo.<arch>
-exist, where <arch> is the same as the output of "dpkg --print-architecture",
+for different architectures. If files named debian/package.foo.arch
+exist, where "arch" is the same as the output of "dpkg --print-architecture",
 then they will be used in preference to other, more general files.
-.P
+
 In many cases, these config files are used to specify various types of
 files. Documentation or example files to install, files to move, and so on.
 When appropriate, in cases like these, you can use standard shell wildcard
 characters ('?' and '*') in the files.
-.SH "SHARED DEBHELPER OPTIONS"
+
+=head1 SHARED DEBHELPER OPTIONS
+
 The following command line options are supported by all debhelper programs.
-.TP
-.B \-v, \--verbose
+
+=over 4
+
+=item B<-v>, B<--verbose>
+
 Verbose mode: show all commands that modify the package build directory.
-.TP
-.B \--no-act
+
+=item B<--no-act>
+
 Do not really do anything. If used with -v, the result is that the command
-will output a list of what it would have done.
-.TP
-.B \-a, \--arch
+will output what it would have done.
+
+=item B<-a>, B<--arch>
+
 Act on all architecture dependent packages.
-.TP
-.B \-i, \--indep
+
+=item B<-i>, B<--indep>
+
 Act on all architecture independent packages.
-.TP
-.B \-ppackage, \--package=package
+
+=item B<->I<ppackage>, B<--package=>I<package>
+
 Act on the package named "package".
-.TP
-.B \-s, \--same-arch
+
+=item B<-s>, B<--same-arch>
+
 This is a smarter version of the -a flag, that is used in some rare
 circumstances. It understands that if the control file lists "Architecture: i386"
 for the package, the package should not be acted on on other architectures. So
@@ -82,32 +102,46 @@ this flag makes the command act on all "Architecture: any" packages, as well
 as on any packages that have the current architecture explicitly specified.
 Contrast to the -a flag, which makes the command work on all packages that
 are not architecture independant.
-.TP
-.B \-Npackage, \--no-package=package
+
+=item B<-N>I<package>, B<--no-package=>I<package>
+
 Do not act on the specified package even if an -a, -i, or -p option lists
 the package as one that should be acted on.
-.TP
-.B \-Ptmpdir, \--tmpdir=tmpdir
+
+=item B<-P>I<tmpdir>, B<--tmpdir=>I<tmpdir>
+
 Use "tmpdir" for package build directory. The default is debian/<package>
-.SH "COMMON DEBHELPER OPTIONS"
+
+=back
+
+=head1 COMMON DEBHELPER OPTIONS
+
 The following command line options are supported by some debhelper programs.
-See the man page of each program for a complete explanation of what the
+See the man page of each program for a complete explanation of what each
 option does.
-.TP
-.B \-n
+
+=over 4
+
+=item B<-n>
+
 Do not modify postinst/postrm/etc scripts.
-.TP
-.B \-Xitem, \--exclude=item
+
+=item B<-X>I<item>, B<--exclude=>I<item>
+
 Exclude an item from processing. This option may be used multiple times,
 to exclude more than one thing.
-.TP
-.B \-A, \-all
+
+=item B<-A>, B<-all>
+
 Makes files or other items that are specified on the command line take effect
 in ALL packages acted on, not just the first.
-.SH NOTES
-.TP
-.B Multiple binary package support
-.RS
+
+=back
+
+=head1 NOTES
+
+=head2 Multiple binary package support
+
 If your source package generates more than one binary package, debhelper
 programs will default to acting on all binary packages when run. If your
 source package happens to generate one architecture dependent package, and
@@ -118,99 +152,98 @@ in the binary-indep debian/rules target.
 
 To facilitate this, as well as give you more control over which packages
 are acted on by debhelper programs, all debhelper programs accept the
-.B -a
-,
-.B -i
-,
-.B -p
-, and
-.B -s
-parameters. These parameters are cumulative. If none are given,
-debhelper programs default to acting on all packages listed in the control
-file.
-.P
-See
-.BR /usr/share/doc/debhelper/examples/rules.multi
-for an example of how to use this.
-.RE
-.TP
-.B Automatic generation of debian install scripts
-.RS
+B<-a>, B<-i>, B<-p>, and B<-s> parameters. These parameters are cumulative. 
+If none are given, debhelper programs default to acting on all packages listed
+in the control file.
+
+See F</usr/share/doc/debhelper/examples/rules.multi> for an example of how to
+use this in a package that generates multiple binary packages.
+
+=head2 Automatic generation of debian install scripts
+
 Some debhelper commands will automatically generate parts of debian install
 scripts. If you want these automatically generated things included in your
 debian install scripts, then you need to add "#DEBHELPER#" to your scripts,
 in the place the code should be added. "#DEBHELPER#" will be replaced by
 any auto-generated code when you run dh_installdeb.
-.P
+
 All scripts that automatically generate code in this way let it be disabled
 by the -n parameter (see above).
-.P
+
 Note that the inserted code will be shell code, so you cannot directly use
 it in a perl script. If you would like to embed it into a perl script, here
 is one way to do that (note that I made sure that $1, $2, etc are set with
 the set command):
+
   my $temp="set -e\\nset -- @ARGV\\n" . << 'EOF';
   #DEBHELPER#
   EOF
   system ($temp) / 256 == 0
   	or die "Problem with debhelper scripts: $!";
-.RE
-.TP
-.B Package build directories
-.RS
+
+=head2 Package build directories
+
 By default, all debhelper programs assume that the temporary directory used
-for assembling the tree of files in a package is debian/<packagename>.
-.P
+for assembling the tree of files in a package is debian/<package>.
+
 Sometimes, you might want to use some other temporary directory. This is
-supported by the
-.B -P
-flag. For example, "dh_installdocs -Pdebian/tmp", will use debian/tmp as the
-temporary directory. Note that if you use -P, the debhelper programs can only
-be acting on a single package at a time. So if you have a package that builds
-many binary packages, you will need to use the -p flag to specify which
-binary package the debhelper program will act on.
-.RE
-.TP
-.B Debhelper compatability levels
-.RS
+supported by the -P flag. For example, "dh_installdocs -Pdebian/tmp", will
+use debian/tmp as the temporary directory. Note that if you use -P, the 
+debhelper programs can only be acting on a single package at a time. So if 
+you have a package that builds many binary packages, you will need to also 
+use the -p flag to specify which binary package the debhelper program will
+act on.
+
+=head2 Debhelper compatability levels
+
 From time to time, major non-backwards-compatabile changes need to be made
 to debhelper, to keep it clean and well-designed as needs change and its
 author gains more experience. To prevent such major changes from breaking
 existing packages, the DH_COMPAT environment variable was introduced.
 DH_COMPAT may be set to a number, to determine which major revision of
 debhelper should be used. There are currently 3:
-.TP
-.B V1
+
+=over 4
+
+=item V1
+
 Setting DH_COMPAT=1 (or leaving it unset) causes debhelper to act in
 compatability mode. It will use debian/tmp as the package tree
 directory for the first binary package listed in the control file, while using
 debian/<package> for all other packages listed in the control file.
 This mode is deprecated.
-.TP
-.B V2
+
+=item V2
+
 Setting DH_COMPAT=2 causes debhelper to consitently use debian/<package>
-as the package tree directory for every package that is built. This
-mode is currently set by default in all the example rules files, and you
-are encouraged to use it.
-.TP
-.B V3
+as the package tree directory for every package that is built.
+
+=item V3
+
+This is the reccommended mode of operation.
 Setting DH_COMPAT=3 does everything V2 does, plus:
-.RS
-.TP
-.B *
+
+=over 8
+
+=item -
+
 Debhelper config files support globbing via * and ?, when appropriate. To
 turn this off and use those characters raw, just prefix with a backspash.
-.TP
-.B *
+
+=item -
+
 dh_makeshlibs makes the postinst and postrm scripts call ldconfig.
-.TP
-.B *
+
+=item 
+
 Every file in etc/ is automatically flagged as a conffile by dh_installdeb.
-.RE
-.RE
-.TP
-.B Doc directory symlinks
-.RS
+
+=back
+
+=back
+
+=head2 Doc directory symlinks
+
 Sometimes it is useful to make a package not contain a /usr/share/doc/package
 directory at all, instead placing just a dangling symlink in the binary
 package, that points to some other doc directory. Policy says this is ok if
@@ -219,51 +252,70 @@ accomplish this, just don't tell debhelper to install any documentation
 files into the package, and use dh_link to set up the symlink (or do it by
 hand), and debhelper should do the right thing: notice it is a dangling
 symlink and not try to install a copyright file or changelog.
-.RE
-.TP
-.B Other notes
-.RS
+
+=head2 Other notes
+
 In general, if any debhelper program needs a directory to exist under
 debian/, it will create it. I haven't bothered to document this in all the
-man pages, but for example, dh_installdeb knows to make debian/<foo>/DEBIAN/
+man pages, but for example, dh_installdeb knows to make debian/<package>/DEBIAN/
 before trying to put files there, dh_installmenu knows you need a
-debian/<foo>/usr/lib/menu/ before installing the menu files, etc.
-.P
-Note that if you are generating a debian package that has arch-indep and
+debian/<package>/usr/lib/menu/ before installing the menu files, etc.
+
+If you are generating a debian package that has arch-indep and
 arch-dependent portions, and you are using dh_movefiles to move the
 arch-indep files out of debian/tmp, you need to make sure that dh_movefiles
 does this even if only the arch-dependent package is being built (for
 ports to other architectures). I handle this in the example rules file
 "rules.multi" by calling dh_movefiles in the install target.
-.P
+
 Once your package uses debhelper to build, be sure to add
 debhelper to your Build-Depends line in debian/control.
-.RE
-.SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode.
-.TP
-.I DH_COMPAT
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item DH_VERBOSE
+
+Se to 1 to enable verbose mode. Debhelper will output every command it runs
+that modifies files on the build system.
+
+=item DH_COMPAT
+
 Specifies what compatability level debhelper should run at. See above.
-.TP
-.I DH_NO_ACT
-Enables no-act mode.
-.TP
-.I DH_OPTIONS
+
+=item DH_NO_ACT
+
+Se to 1 to enables no-act mode.
+
+=item DH_OPTIONS
+
 Anything in this variable will be prepended to the command line
 arguments of all debhelper commands. This in useful in some situations,
 for example, if you need to pass -p to all debhelper commands that will be
-run. If you use DH_OPTIONS, be sure to use "dh_testversion 1.1.17" - older
-debhelpers will ignore it and do things you don't want them to. One very
+run. If you use DH_OPTIONS, be sure to build depend on "debhelper >= 1.1.17" --
+older debhelpers will ignore it and do things you don't want them to. One very
 good way to set DH_OPTIONS is by using "Target-specific Variable Values" in
 your debian/rules file. See the make documentation for details on doing this.
-.SH "SEE ALSO"
-.TP
-.BR /usr/share/doc/debhelper/examples/
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item F</usr/share/doc/debhelper/examples/>
+
 A set of example debian/rules files that use debhelper.
-.TP
-.BR http://kitenet.net/programs/debhelper/
+
+=item http://kitenet.net/programs/debhelper/
+
 Debhelper web site.
-.SH AUTHOR
+
+=back
+
+=head1 AUTHOR
+
 Joey Hess <joeyh@debian.org>
+
+=cut

@@ -1,11 +1,37 @@
 #!/usr/bin/perl -w
-#
-# Checks to make sure we are building the package in the right directory.
-# Tests for the existance of debian/control, and for the existance
-# of any other files you specify on the command line.
+
+=head1 NAME
+
+dh_testdir - test directory before building debian package
+
+=cut
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_testdir [debhelper options] [file ...]
+
+=head1 DESCRIPTION
+
+dh_testdir tries to make sure that you are in the correct directory when
+building a debian package. It makes sure that the file debian/control
+exists, as well as any other files you specify. If not,
+it exits with an error.
+
+=head1 OPTIONS
+
+=over 4
+
+=item I<file ...>
+
+Test for the existence of these files too.
+
+=back
+
+=cut
+
 init();
 
 foreach my $file ('debian/control', @ARGV) {
@@ -13,3 +39,15 @@ foreach my $file ('debian/control', @ARGV) {
 		error("\"$file\" not found. Are you sure you are in the correct directory?");
 	}
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

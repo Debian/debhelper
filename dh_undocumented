@@ -1,13 +1,63 @@
 #!/usr/bin/perl -w
-#
-# Passed a list of undocumented man pages, generates symlinks to
-# undocumented.7.gz for those man pages.
-#
-# Also, it looks for debian/undocumented files for more lists of
-# undocumented man pages.
+
+=head1 NAME
+
+dh_undocumented - make symlinks to undocumented.7.gz man page
+
+=cut
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+ dh_undocumented [debhelper options] [-A] [manpage ...]
+
+=head1 DESCRIPTION
+
+dh_undocumented is a debhelper program that is responsible for making
+symlinks to L<undocumented(7)> for man pages that are not present in your
+package.
+
+The program takes a list of man pages that should be symlinked to
+L<undocumented(7)>. It examines the extension to see what section the man
+page belongs in. After figuring this out, it generates the necessary
+symlinks.
+
+The lists of man pages that need symlinks can be specified in two ways. Any
+man page names specified as
+parameters will be set up in the first package dh_undocumented is told
+to act on. By default, this is the first binary package in debian/control,
+but if you use -p, -i, or -a flags, it will be the first package specified
+by those flags.
+
+Also, a file named debian/package.undocumented can list other man page
+names to set up.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-A>, B<--all>
+
+Install undocumented man page symlinks for any man pages specified by
+command line parameters in ALL packages acted on. I doubt anyone will find
+this useful, it's here for consitency with other debhelper programs.
+
+=item I<manpage ...>
+
+Install undocumented man page symlinks for each of these man pages
+into the first package acted on. (Or in all packages acted on if -A is
+specified.)
+
+=back NOTES
+
+Note that Debian policy prohibits links to L<undocumented(7)> unless the
+package has an open bug report stating that it has no man page. You should
+really just write a man page instead; this program is an easy way out.
+
+=cut
+
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -34,11 +84,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (!$section) {
 			error("\"$file\" does not have an extension.");
 		}	
-		if ($file=~/.*\.\dx/) {
-			$dir="usr/X11R6/man/man$section";
-			$reldir="../../../share/man/man7/";
-		}
-		elsif ($section != 7) {
+		if ($section != 7) {
 			$dir="usr/share/man/man$section";
 			$reldir="../man7/";
 		}
@@ -53,3 +99,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("ln","-sf","${reldir}undocumented.7.gz","$tmp/$dir/$file.gz");
 	}
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut
