@@ -30,7 +30,7 @@ the line tells the directory it should be installed in. The name of the
 files (or directories) to install should be given relative to the current
 directory, while the installation directory is given relative to the
 package build directory. You may use wildcards in the names of the files to
-install.
+install (in v3 mode and above).
 
 This program may be used in one of two ways. If you just have a file or two
 that the upstream Makefile does not install for you, you can run dh_install
@@ -84,7 +84,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	my @install;
 	if ($file) {
-		@install=filedoublearray($file, ".");
+		@install=filedoublearray($file); # no globbing yet
 	}
 	
 	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
@@ -104,7 +104,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$dest=pop @$set;
 		}
 		
-		foreach my $src (@$set) {
+		foreach my $src (map { glob } @$set) { # glob now
 			next if excludefile($src);
 		
 			if (! defined $dest) {
