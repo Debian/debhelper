@@ -3,28 +3,28 @@
     debmake (wishlist bug #17043). I just never saw the point of that file..
   - Make dh_movefiles remove emptied directories after it's moved all the
     files out of them (wishlist bug #17111).
-* dh_fixperms: allow listing of files not to be touched (diffucult).
+* dh_fixperms: allow listing of files not to be touched (difficult).
 * add a dh_debstd, which mimics debstd, but uses debhelper tools internally.
-  Note thatthe idea here is not just another debstd. This program will have
+  Note that the idea here is not just another debstd. This program will have
   a -v switch, that lists all the other debhelper commands it needs to run to
   do what debstd had to do. The intent is to make it easy to switch from
   debstd to debhelper.
 * dh_compress: add --exclude "*.conf" type-thingy, since that's the change
-  you most often want to make to what it does, and a debian/conpress file is
+  you most often want to make to what it does, and a debian/compress file is
   overkill in those cases.
-* info support for debhelper (currently implmented, but I hate how I did it,
+* info support for debhelper (currently implemented, but I hate how I did it,
   so it's not in the package.) (wishlist bug #15717)
 * enhance dh_installmanpages so it associates binaries and man pages and
   installs the man pages into the correct areas to suit the binaries they
   document. I may need to make this only happen when a switch is given, to
-  preserve backward compatability.
+  preserve backward compatibility.
 * maybe make dh_installmanpages look at the .TH line of man pages whose
   filenames end in .man, to figure out what section they go it. This would
-  require a switch to turn on, for backwards compatability.
+  require a switch to turn on, for backwards compatibility.
 * All debhelper programs should be checked that they output files with the
   correct permissions no matter what the umask is set to. Currently, only
   those programs that run after dh_fixperms have been so checked. (Checking
   the rest is low priority, since dh_fixperms fixes any incorrect permissions
   they might have; still it would be nice to check them too, just to make
   debhelper more flexible.) One easy fix is to add umask 022 to dh_lib,
-  however, there may be unforseen ramifications of such a change.
+  however, there may be unforeseen ramifications of such a change.
