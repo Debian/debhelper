@@ -109,7 +109,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# Support for -X flag.
 	my $exclude = '';
 	if ($dh{EXCLUDE_FIND}) {
-		$exclude = ' -and ! \( '.$dh{EXCLUDE_FIND}.' \)';
+		$exclude = '-and ! \( '.$dh{EXCLUDE_FIND}.' \)';
 	}
 	
 	foreach my $set (@install) {
@@ -139,7 +139,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				# Pity there's no cp --exclude ..
 				my $pwd=`pwd`;
 				chomp $pwd;
-				complex_doit("cd $src/.. && find $dir_basename -type f$exclude -exec cp --parents -dp {} $pwd/$tmp/$dest/ \\;");
+				complex_doit("cd $src/.. && find $dir_basename \\( -type f -or -type l \\) $exclude -exec cp --parents -dp {} $pwd/$tmp/$dest/ \\;");
 			}
 			else {
 				doit("cp", "-a", $src, "$tmp/$dest/");
