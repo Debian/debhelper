@@ -114,6 +114,8 @@ sub parseopts {
 		"init-script=s" => \$options{INIT_SCRIPT},
 		
 		"sourcedir=s" => \$options{SOURCEDIR},
+		
+		"destdir=s" => \$options{DESTDIR},
 	);
 
 	if (!$ret) {

@@ -3,7 +3,7 @@
 dh_builddeb \- build debian packages
 .SH SYNOPSIS
 .B dh_builddeb
-.I "[debhelper options]"
+.I "[debhelper options] [--destdir=directory]"
 .SH "DESCRIPTION"
 dh_builddeb simply calls
 .BR dpkg (8)
@@ -14,6 +14,10 @@ to build a .deb package or packages.
 See
 .BR debhelper (1)
 for a list of options common to all debhelper commands.
+.TP
+.B --destdir=directory
+Use this if you want the generated .deb files to be put in a directory other
+than the default of ".."
 .SH ENVIRONMENT
 See
 .BR debhelper (1)

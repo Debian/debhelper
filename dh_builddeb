@@ -6,7 +6,12 @@ BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
 use Dh_Lib;
 init();
 
+# Set the default destination directory.
+if (! defined $dh{DESTDIR}) {
+	$dh{DESTDIR}='..';
+}
+
 foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	$TMP=tmpdir($PACKAGE);
-	doit("dpkg","--build",$TMP,"..");
+	doit("dpkg","--build",$TMP,$dh{DESTDIR});
 }
