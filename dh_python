@@ -98,8 +98,27 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	delsubstvar($package, "python:Depends");
 
-	# Check for current python dependencies
 	my @dirs = ("usr/lib/site-python", "usr/lib/$package", "usr/share/$package", "usr/lib/games/$package", "usr/share/games/$package", @ARGV );
+
+	my $dep_on_python = 0;
+	my $strong_dep = 0;
+	my $look_for_pythonXY = 1;
+
+	# First, the case of python-foo
+	if ($package =~ /^python-/) {
+		$dep_on_python = 1;
+		$strong_dep = 1;
+		my $pack = $package;
+		$pack =~ s/^python/python$python_version/;
+		if (grep { "$_" eq "$pack" } GetPackages()) {
+			addsubstvar($package, "python:Depends", $pack);
+		}
+		else {
+			push @dirs, "usr/lib/python$python_version/site-packages" ;
+			$look_for_pythonXY = 0;
+		}
+	}
+
 	@dirs = grep -d, map "$tmp/$_", @dirs;
 
 	my $deps = 0;
@@ -141,19 +160,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	# Dependencies on current python
-	my $dep_on_python = 0;
-	my $strong_dep = 0;
 	$dep_on_python = 1 if $deps;
 	$strong_dep = 1 if($deps & PY_MODULE);
-	if ($package =~ /^python-/) {
-		my $pack = $package;
-		$pack =~ s/^python/python$python_version/;
-		if (grep { "$_" eq "$pack" } GetPackages()) {
-			addsubstvar($package, "python:Depends", $pack);
-			$dep_on_python = 1;
-			$strong_dep = 1;
-		}
-	}
+
 	if ($dep_on_python) {
 		addsubstvar($package, "python:Depends", $python, ">= $python_version");
 		if ($strong_dep) {
@@ -168,13 +177,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# Look for specific pythonX.Y modules
 	foreach my $pyver (@python_allversions) {
 		my $pydir="/usr/lib/$pyver/site-packages";
-		if (grep -d,"$tmp$pydir") {
-			find sub {
-				return unless -f;
-				$verdeps{$pyver} |= PY_MODULE if /\.py$/;
-			}, "$tmp$pydir";
+		if ($look_for_pythonXY) {
+			if (grep -d,"$tmp$pydir") {
+				find sub {
+					return unless -f;
+					$verdeps{$pyver} |= PY_MODULE if /\.py$/;
+				}, "$tmp$pydir";
+			}
 		}
-		
+	
 		# Go for the dependencies
 		addsubstvar($package, "python:Depends", $pyver) if $verdeps{$pyver};
 
