@@ -104,6 +104,10 @@ if (! $dh{D_FLAG}) {
 		 -o -name .*.orig -o -name .*.rej -o -name .SUMS
 		 -o -name TAGS -o -name core -o ( -path */.deps/* -a -name *.P )
 		) $find_options -exec rm -f {} ;"));
+
+	# Stupid autoconf cache directory.
+	doit("rm", "-rf", "autom4te.cache")
+		unless excludefile("autom4te.cache");
 }
 
 doit('rm', '-rf', 'debian/tmp') if -x 'debian/tmp' && ! compat(1);
