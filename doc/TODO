@@ -3,11 +3,9 @@ list grows - I welcome patches to fix items on it!
 
 Bugs:
 
-* dh_installdocs fails if debian/docs is empty except for a blank line.
-  There are probably other instances of this. Debhelper should behave better
-  (#24686).
 * all commands should print a warning message if non-cumulative parameters
-  are given more than once (ie, two -u's to dh_gencontrol).
+  are given more than once (ie, two -u's to dh_gencontrol). (#22588)
+  (Bug currently under dispute, I think this is bogus).
 
 Wishlist items:
 
@@ -58,13 +56,16 @@ Depricated:
 
 * remove dh_installdebfiles, dh_du.
 	- need to wait a reasonable length of time. I'm currently planning
-	  on doing this after slink is released.
+	  on doing this after slink is released or one year after they were
+	  depricated, whichever comes first. Be sure to grep whole debian
+	  archive for alls to them before removing them, though!
 
 Long term goals:
 
-Convert selected debhelper commands (dh_installmanpages?) to be perl
-programs, for speed, ease of maintainence, and 8-bit cleanness.
+* Convert selected debhelper commands to be perl programs, for speed, ease
+  of maintainence, and 8-bit cleanness.
 
 Fixes to backport to 1.0 tree:
 
-* dh_installdocs used -m 655 for a TODO file.
+* dh_installdocs used -m 655 for a TODO file. (minor, dh_fixperms cleans up
+	after it)

@@ -7,12 +7,12 @@
 package Dh_Getopt;
 use strict;
 
-use Exporter;
-my @ISA=qw(Exporter);
-my @EXPORT=qw(&parseopts);
-
 use Dh_Lib;
 use Getopt::Long;
+use Exporter;
+#use vars qw{@ISA @EXPORT};
+#@ISA=qw(Exporter);
+#@EXPORT=qw(&aparseopts); # FIXME: for some reason, this doesn't work.
 
 my (%options, %exclude_package);
 
@@ -46,11 +46,6 @@ sub AddExclude { my($option,$value)=@_;
 	push @{$options{EXCLUDE}},$value;
 }
 
-sub import {
-	# Enable bundling of short command line options.
-	Getopt::Long::config("bundling");
-}
-
 # Parse options and return a hash of the values.
 sub parseopts {
 	undef %options;
@@ -72,8 +67,8 @@ sub parseopts {
 		"no-package=s" => \&ExcludePackage,
 	
 		"n" => \$options{NOSCRIPTS},
-#		"noscripts" => \$options(NOSCRIPTS},
-	
+		"noscripts" => \$options{NOSCRIPTS},
+
 		"x" => \$options{INCLUDE_CONFFILES}, # is -x for some unknown historical reason..
 		"include-conffiles" => \$options{INCLUDE_CONFFILES},
 	
@@ -120,18 +115,6 @@ sub parseopts {
 		$options{V_FLAG_SET}=1;
 	}
 	
-	# Check to see if DH_VERBOSE environment variable was set, if so,
-	# make sure verbose is on.
-	if ($ENV{DH_VERBOSE} ne undef) {
-		$options{VERBOSE}=1;
-	}
-	
-	# Check to see if DH_NO_ACT environment variable was set, if so, 
-	# make sure no act mode is on.
-	if ($ENV{DH_NO_ACT} ne undef) {
-		$options{NO_ACT}=1;
-	}
-
 	# Remove excluded packages from the list of packages to act on.
 	my @package_list;
 	my $package;
@@ -144,5 +127,10 @@ sub parseopts {
 	
 	return %options;
 }	
+
+sub import {
+	# Enable bundling of short command line options.
+	Getopt::Long::config("bundling");
+}		
 
 1

@@ -1,3 +1,18 @@
+debhelper (1.1.3) unstable; urgency=low
+
+  * dh_md5sums: -x was broken since version 1.1.1 - fixed.
+  * dh_lib: removed get_arch_indep_packages() function that hasn't been used
+    at all for a long while.
+  * Added Dh_Lib.pm, a translation of dh_lib into perl.
+  * dh_getopt.pl: moved most of it into new Dh_Getopt.pm module, rewriting
+    large chunks in the process.
+  * dh_installdocs: completly rewritten in perl. Now it's faster and it can
+    install many oddly named files it died on before.
+  * dh_installdocs: fixed a bug that installed TODO files mode 655 in native
+    debian packages.
+
+ -- Joey Hess <joeyh@master.debian.org>  Mon, 10 Aug 1998 15:01:15 -0700
+
 debhelper (1.1.2) unstable; urgency=low
 
   * dh_strip: added -X to specify files to not strip (#25590).

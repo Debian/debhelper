@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 #
 # Reads debian/docs, installs all files listed there into /usr/doc/$PACKAGE
 # Also installs the debian/copyright and debian/README.debian and debian/TODO
@@ -21,7 +21,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		@docs=filearray($file);
 	}
 
-	if (($PACKAGE = $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
 		push @docs, @ARGV;
 	}
 

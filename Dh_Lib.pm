@@ -5,9 +5,10 @@
 # Joey Hess, GPL copyright 1997, 1998.
 
 package Dh_Lib;
+use strict;
 
 use Exporter;
-use vars qw(%dh);
+use vars qw(@ISA @EXPORT %dh);
 @ISA=qw(Exporter);
 @EXPORT=qw(&init &doit &complex_doit &verbose_print &error &warning &tmpdir
 	    &pkgfile &pkgext &isnative &autoscript &filearray &GetPackages
@@ -18,6 +19,7 @@ sub init {
 	# if so, we need to pass this off to the resource intensive Getopt::Long,
 	# which I'd prefer to avoid loading at all if possible.
 	my $parseopt=undef;
+	my $arg;
 	foreach $arg (@ARGV) {
 		if ($arg=~m/^-/) {
 			$parseopt=1;
@@ -30,6 +32,18 @@ sub init {
 		%dh=Dh_Getopt::parseopts();
 	}
 
+	# Check to see if DH_VERBOSE environment variable was set, if so,
+	# make sure verbose is on.
+	if (defined $ENV{DH_VERBOSE} && $ENV{DH_VERBOSE} ne "") {
+		$dh{VERBOSE}=1;
+	}
+
+	# Check to see if DH_NO_ACT environment variable was set, if so, 
+	# make sure no act mode is on.
+	if (defined $ENV{DH_NO_ACT} && $ENV{DH_NO_ACT} ne "") {
+		$dh{NO_ACT}=1;
+	}
+
 	# Get the name of the main binary package (first one listed in
 	# debian/control).
 	my @allpackages=GetPackages();
@@ -37,17 +51,19 @@ sub init {
 
 	# Check if packages to build have been specified, if not, fall back to 
 	# the default, doing them all.
-	if (! @{$dh{DOPACKAGES}}) {
-		if ($dh{DH_DOINDEP} || $dh{DH_DOARCH}) {
-			error("I have no package to build.");
+	if (! defined $dh{DOPACKAGES} || ! @{$dh{DOPACKAGES}}) {
+		if ($dh{DOINDEP} || $dh{DOARCH}) {
+			# User specified that all arch (in)dep package be 
+			# built, and there are none of that type.
+			error("I have no package to build");
 		}
 		push @{$dh{DOPACKAGES}},@allpackages;
 	}
 
 	# Check to see if -P was specified. If so, we can only act on a single
 	# package.
-	if ($dh{TMPDIR} || $#{$dh{DOPACKAGES}} > 0) {
-		error("-P was specified, but multiple packages would be acted on.");
+	if ($dh{TMPDIR} && $#{$dh{DOPACKAGES}} > 0) {
+		error("-P was specified, but multiple packages would be acted on (".join(",",@{$dh{DOPACKAGES}}).").");
 	}
 
 	# Figure out which package is the first one we were instructed to build.
@@ -63,7 +79,7 @@ sub init {
 # Note that this cannot handle complex commands, especially anything
 # involving redirection. Use complex_doit instead.
 sub doit {
-	verbose_print(join(" ",,@_));
+	verbose_print(join(" ",@_));
 	
 	if (! $dh{NO_ACT}) {
 		system(@_) == 0
@@ -72,10 +88,18 @@ sub doit {
 	}
 }
 
-# This is an identical command to doit, except the parameters passed to it
-# can include complex shell stull like redirection and compound commands.
+# Run a command and display the command to stdout if verbose mode is on.
+# Use doit() if you can, instead of this function, because this function
+# forks a shell. However, this function can handle more complicated stuff
+# like redirection.
 sub complex_doit {
-	error("complex_doit() not yet supported");
+	verbose_print(join(" ",@_));
+	
+	if (! $dh{NO_ACT}) {
+		# The join makes system get a scalar so it forks off a shell.
+		system(join(" ",@_)) == 0
+			|| error("command returned error code");
+	}			
 }
 
 # Print something if the verbose flag is on.
@@ -93,9 +117,14 @@ sub error { my $message=shift;
 
 # Output a warning.
 sub warning { my $message=shift;
+	print STDERR basename().": $message\n";
+}
+
+# Returns the basename of the program.
+sub basename {
 	my $fn=$0;
 	$fn=~s:.*/(.*?):$1:;
-	print STDERR "$fn: $message\n";
+	return $fn;
 }
 
 # Pass it a name of a binary package, it returns the name of the tmp dir to
@@ -132,7 +161,7 @@ sub pkgfile { my $package=shift; my $filename=shift;
 # Pass it a name of a binary package, it returns the name to prefix to files
 # in debian for this package.
 sub pkgext { my $package=shift;
-	if ($package ne $MAINPACKAGE) {
+	if ($package ne $dh{MAINPACKAGE}) {
 		return "$package.";
 	}
 	return "";
@@ -173,40 +202,45 @@ sub pkgext { my $package=shift;
 # Only works if the script has #DEBHELPER# in it.
 #
 # Parameters:
-# 1: script to add to
-# 2: filename of snippet
-# 3: sed commands to run on the snippet. Ie, s/#PACKAGE#/$PACKAGE/
-sub autoscript {
+# 1: package
+# 2: script to add to
+# 3: filename of snippet
+# 4: sed to run on the snippet. Ie, s/#PACKAGE#/$PACKAGE/
+sub autoscript { my $package=shift; my $script=shift; my $filename=shift; my $sed=shift;
 	error "autoscript() not yet implemented (lazy, lazy!)";
-#	autoscript_script=$1
-#	autoscript_filename=$2
-#	autoscript_sed=$3
-#	autoscript_debscript=debian/`pkgext $PACKAGE`$autoscript_script.debhelper
-#
-#	if [ -e "$DH_AUTOSCRIPTDIR/$autoscript_filename" ]; then
-#		autoscript_filename="$DH_AUTOSCRIPTDIR/$autoscript_filename"
-#	else
-#		if [ -e "/usr/lib/debhelper/autoscripts/$autoscript_filename" ]; then
-#			autoscript_filename="/usr/lib/debhelper/autoscripts/$autoscript_filename"
-#		else
-#			error "/usr/lib/debhelper/autoscripts/$autoscript_filename does not exist"
-#		fi
-#	fi
-#
-#	complex_doit "echo \"# Automatically added by `basename $0`\" >> $autoscript_debscript"
-#	complex_doit "sed \"$autoscript_sed\" $autoscript_filename >> $autoscript_debscript"
-#	complex_doit "echo '# End automatically added section' >> $autoscript_debscript"
+
+	# This is the file we will append to.
+	my $outfile="debian/".pkgext($package)."$script.debhelper";
+
+	# Figure out what shell script snippet to use.
+	my $infile;
+	if ( -e "$main::ENV{DH_AUTOSCRIPTDIR}/$filename" ) {
+		$infile="$main::ENV{DH_AUTOSCRIPTDIR}/$filename";
+	}
+	else {
+		if ( -e "/usr/lib/debhelper/autoscripts/$filename" ) {
+			$infile="/usr/lib/debhelper/autoscripts/$filename";
+		}
+		else {
+			error("/usr/lib/debhelper/autoscripts/$filename does not exist");
+		}
+	}
+
+	# TODO: do this in perl, perhaps?
+	complex_doit("echo \"# Automatically added by ".basename().">> $outfile");
+	complex_doit("sed \"$sed\" $infile >> $outfile");
+	complex_doit("echo '# End automatically added section' >> $outfile");
 }
 
 # Reads in the specified file, one word at a time, and returns an array of
 # the result.
-sub filearray { $file=shift;
+sub filearray { my $file=shift;
 	my @ret;
 	open (DH_FARRAY_IN,"<$file") || error("cannot read $file: $1");
 	while (<DH_FARRAY_IN>) {
 		push @ret,split(/\s/,$_);
 	}
-	close DH_ARRAY;
+	close DH_FARRAY_IN;
 	
 	return @ret;
 }
@@ -214,10 +248,11 @@ sub filearray { $file=shift;
 # Returns a list of packages in the control file.
 # Must pass "arch" or "indep" to specify arch-dependant or -independant
 # packages. If nothing is specified, returns all packages.
-sub GetPackages { $type=shift;
-	my $package;
-	my $arch;
-	my @list;
+sub GetPackages { my $type=shift;
+	$type="" if ! defined $type;
+	my $package="";
+	my $arch="";
+	my @list=();
 	open (CONTROL,"<debian/control") || 
 		error("cannot read debian/control: $!\n");
 	while (<CONTROL>) {
@@ -235,8 +270,8 @@ sub GetPackages { $type=shift;
 			     ($type eq 'arch' && $arch ne 'all') ||
 			     ! $type)) {
 				push @list, $package;
-				undef $package;
-				undef $arch;
+				$package="";
+				$arch="";
 			}
 		}
 	}
