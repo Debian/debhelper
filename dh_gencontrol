@@ -52,9 +52,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("install","-o",0,"-g",0,"-d","$tmp/DEBIAN");
 	}
 
-	# Generate and install control file.
+	# Generate and install control file. Use complex_doit to allow for
+	# wild and wonderful U_PARAMS quoting.
 	doit("dpkg-gencontrol","-l$changelog","-isp","-p$package",
-		"-Tdebian/${ext}substvars","-P$tmp",@{$dh{U_PARAMS}});
+		     "-Tdebian/${ext}substvars","-P$tmp",@{$dh{U_PARAMS}});
 
 	# This chmod is only necessary if the user sets the umask to something odd.
 	doit("chmod","644","$tmp/DEBIAN/control");

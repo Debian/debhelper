@@ -75,21 +75,34 @@ sub init {
 	# This package gets special treatement: files and directories specified on
 	# the command line may affect it.
 	$dh{FIRSTPACKAGE}=${$dh{DOPACKAGES}}[0];
-
-	# Split the U_PARAMS up into an array.
-	my $u=$dh{U_PARAMS};
-	undef $dh{U_PARAMS};
-	if (defined $u) {
-		push @{$dh{U_PARAMS}}, split(/\s+/,$u);
-	}
 }
 
-# Escapes out shell metacharacters in a line of shell script.
+# Pass it an array containing the arguments of a shell command like would
+# be run by exec(). It turns that into a line like you might enter at the
+# shell, escaping metacharacters and quoting qrguments that contain spaces.
 sub escape_shell {
-	my $line=shift;
-	# This list is from _Unix in a Nutshell_. (except '#')
-	$line=~s/([\s!"\$()*+#;<>?@\[\]\\`|~])/\\$1/g;
-	return $line;
+	my @args=@_;
+	my $line="";
+	my @ret;
+	foreach my $word (@args) {
+		if ($word=~/\s/) {
+			# Escape only a few things since it will be quoted.
+			# Note we use double quotes because you cannot
+			# escape ' in qingle quotes, while " can be escaped
+			# in double.
+			# This does make -V"foo bar" turn into "-Vfoo bar",
+			# but that will be parsed identically by the shell
+			# anyway..
+			$word=~s/([\n`\$"\\])/\$1/g;
+			push @ret, "\"$word\"";
+		}
+		else {
+			# This list is from _Unix in a Nutshell_. (except '#')
+			$word=~s/([\s!"\$()*+#;<>?@\[\]\\`|~])/\\$1/g;
+			push @ret,$word;
+		}
+	}
+	return join(' ', @ret);
 }
 
 # Run a command, and display the command to stdout if verbose mode is on.
@@ -99,8 +112,8 @@ sub escape_shell {
 # Note that this cannot handle complex commands, especially anything
 # involving redirection. Use complex_doit instead.
 sub doit {
-	verbose_print(join(" ",map { escape_shell($_) } @_));
-	
+	verbose_print(escape_shell(@_));
+
 	if (! $dh{NO_ACT}) {
 		system(@_) == 0 || error("command returned error code");
 	}

@@ -177,10 +177,17 @@ sub parseopts {
 		error("I have no package to build");
 	}
 
+	if (defined $options{U_PARAMS}) {
+	        # Split the U_PARAMS up into an array.
+        	my $u=$options{U_PARAMS};
+        	undef $options{U_PARAMS};
+                push @{$options{U_PARAMS}}, split(/\s+/,$u);
+        }
+
 	# Anything left in @ARGV is options that appeared after a --
-	# These options are added to U_PARAMS, while the non-option
-	# values we collected replace them in @ARGV;
-	$options{U_PARAMS}.=join(' ', @ARGV);
+	# These options are added to the U_PARAMS array, while the
+	# non-option values we collected replace them in @ARGV;
+	push @{$options{U_PARAMS}}, @ARGV;
 	@ARGV=@{$options{ARGV}} if exists $options{ARGV};
 
 	return %options;

@@ -1,3 +1,19 @@
+debhelper (3.0.27) unstable; urgency=low
+
+  * Fixed issues with extended parameters to dh_gencontrol including spaces
+    and quotes. This was some histirical cruft that deals with splitting up
+    the string specified by -u, and it should not have applied to the set
+    of options after --. Now that it's fixed, any and all programs that
+    support a -- and options after it, do not require any special quoting
+    of the succeeding options. Quote just like you would in whatever
+    program those options go to. So, for example, 
+    dh_gencontrol -Vblah:Depends='foo, bar (>= 1.2)' will work just as you
+    would hope. This fix does NOT apply to -u; don't use -u if you must do
+    something complex. Closes: #89311
+  * Made escape_shell output a lot better.
+ 
+ -- Joey Hess <joeyh@debian.org>  Tue, 29 May 2001 17:54:19 -0400
+
 debhelper (3.0.26) unstable; urgency=low
 
   * Always include package name in maintainer script fragment filenames 
