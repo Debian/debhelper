@@ -25,13 +25,13 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 
 	# Fix up premissions in usr/doc, setting everything to not exectable
 	# by default, but leave examples directories alone.
-	complex_doit("find $TMP/usr/doc -type f $find_options ! -regex '.*/examples/.*' -print0",
+	complex_doit("find $TMP/usr/share/doc $TMP/usr/doc -type f $find_options ! -regex '.*/examples/.*' -print0",
 		"2>/dev/null | xargs -0r chmod 644");
-	complex_doit("find $TMP/usr/doc -type d $find_options -print0",
+	complex_doit("find $TMP/usr/share/doc $TMP/usr/doc -type d $find_options -print0",
 		"2>/dev/null | xargs -0r chmod 755");
 
 	# Executable man pages are a bad thing..
-	complex_doit("find $TMP/usr/man/ $TMP/usr/X11*/man/ -type f",
+	complex_doit("find $TMP/usr/share/man $TMP/usr/man/ $TMP/usr/X11*/man/ -type f",
 		"$find_options -print0 2>/dev/null | xargs -0r chmod 644");
 
 	# ..and so are executable shared and static libraries 
