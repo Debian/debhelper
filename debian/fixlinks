@@ -1,0 +1,9 @@
+#!/bin/sh -e
+# Clean up after cvs's dreadful symlink handling, by making all the symlinks
+# this package needs.
+ln -sf debian/rules Makefile
+ln -sf Dh_Lib.pm debian/Dh_Lib.pm
+ln -sf Dh_Getopt.pm debian/Dh_Getopt.pm
+ln -sf postinst-menu autoscripts/postrm-menu
+ln -sf postinst-modules autoscripts/postrm-modules
+ln -sf postinst-mime autoscripts/postrm-mime
