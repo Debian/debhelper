@@ -57,16 +57,21 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		}
 	}
 
-	# Support debian/package.copyright, but if not present, fall back
-	# on debian/copyright for all packages, not just the main binary
-	# package.
-	$copyright=pkgfile($PACKAGE,'copyright');
-	if (! $copyright && -e "debian/copyright") {
-		$copyright="debian/copyright";
-	}
-	if ($copyright) {
-			doit("install","-g",0,"-o",0,"-m","644","-p",$copyright,
-				"$TMP/usr/share/doc/$PACKAGE/copyright");
+	# If the "directory" is a dangling symlink, then don't install
+	# the copyright file. This is useful for multibinary packages 
+	# that share a doc directory.
+	if (-d "$TMP/usr/share/doc/$PACKAGE") {
+		# Support debian/package.copyright, but if not present, fall
+		# back on debian/copyright for all packages, not just the 
+		# main binary package.
+		$copyright=pkgfile($PACKAGE,'copyright');
+		if (! $copyright && -e "debian/copyright") {
+			$copyright="debian/copyright";
+		}
+		if ($copyright) {
+				doit("install","-g",0,"-o",0,"-m","644","-p",$copyright,
+					"$TMP/usr/share/doc/$PACKAGE/copyright");
+		}
 	}
 
 	# Add in the /usr/doc compatability symlinks code.

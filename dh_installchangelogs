@@ -36,6 +36,11 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	}
 
 	if (! -d "$TMP/usr/share/doc/$PACKAGE") {
+		# If it is a dangling symlink, then don't do anything.
+		# Think multi-binary packages that depend on each other and
+		# want to link doc dirs.
+		next if -l "$TMP/usr/share/doc/$PACKAGE";
+
 		doit("install","-d","$TMP/usr/share/doc/$PACKAGE");
 	}
 	doit("install","-o",0,"-g",0,"-p","-m644",$changelog,
