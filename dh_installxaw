@@ -41,8 +41,8 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 						$stanza=1;
 					}
 					elsif ($stanza) {
-						$install_opts.="'$data{program} $data{'link-name'} $data{wrapped}'";
-						$remove_opts.="'$data{'link-name'} $data{wrapped}'";
+						$install_opts.="'$data{program} $data{'link-name'} $data{wrapped}' ";
+						$remove_opts.="'$data{'link-name'} $data{wrapped}' ";
 						undef %data;
 						$stanza='';
 					}
@@ -51,8 +51,8 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			close IN;
 
 			if ($stanza) {
-				$install_opts.="'$data{program} $data{'link-name'} $data{wrapped}' ";
-				$remove_opts.="'$data{'link-name'} $data{wrapped}' ";
+				$install_opts.="'$data{program} $data{'link-name'} $data{wrapped}'";
+				$remove_opts.="'$data{'link-name'} $data{wrapped}'";
 			}
 			
 			autoscript($PACKAGE,"postinst","postinst-xaw",

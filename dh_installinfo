@@ -35,7 +35,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		# a tree of info files.
 		if ($file=~/\.info$/ && ! $dh{NOSCRIPTS}) {
 			# Figure out what section this file goes in.
-			my $section;
+			my $section='';
 			open (IN, "<$file") || die "$file: $!";
 			while (<IN>) {
 				if (/INFO-DIR-SECTION\s+(.*)/) {
@@ -53,7 +53,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			}
 			else {
 				autoscript($PACKAGE,"postinst","postinst-info-nosection",
-					"s/#FILE#/$fn/");
+					"s:#FILE#:$fn:");
 			}
 			autoscript($PACKAGE,"prerm","prerm-info", "s:#FILE#:$fn:");
 		}

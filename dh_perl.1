@@ -3,7 +3,7 @@
 dh_perl \- calculates perl scripts & modules dependencies
 .SH SYNOPSIS
 .B dh_perl
-.I "[debhelper options] [-k] [-d]"
+.I "[debhelper options] [-k] [-d] [library dirs ...]"
 .SH "DESCRIPTION"
 dh_perl is a debhelper program that is responsible for generating
 the perl:Depends substitutions and adding them to substvars files. 
@@ -36,6 +36,14 @@ the -d option to make
 .BR dh_perl 
 generate a dependency on the correct base package. This is only necessary
 for some modules that are included in the base system.
+.TP
+.B library dirs
+If your package does install perl modules in non-standard 
+directories, you can make
+.BR dh_perl
+check those directories by passing their names on the command line.
+.BR dh_perl
+will only check usr/lib/perl5 by default.
 .SH ENVIRONMENT
 See
 .BR debhelper (1)
