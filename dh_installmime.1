@@ -29,6 +29,10 @@ for a list of options common to all debhelper commands.
 Do not modify postinst/postrm scripts.
 .SH ENVIRONMENT
 See
+.SH NOTES
+Note that this command is not idempotent. "dh_clean -k" should be called
+between invocations of this command. Otherwise, it may cause multiple
+instances of the same text to be added to maintainer scripts.
 .BR debhelper (1)
 for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
