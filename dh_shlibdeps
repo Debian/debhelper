@@ -28,12 +28,11 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		}
 	}
 
-	if ($dh{L_PARAMS}) {
-		$ENV{'LD_LIBRARY_PATH'}=$dh{L_PARAMS};
-		verbose_print("LD_LIBRARY_PATH=$dh{L_PARAMS} \\");
-	}
-
 	if (@filelist) {
+		if ($dh{L_PARAMS}) {
+			$ENV{'LD_LIBRARY_PATH'}=$dh{L_PARAMS};
+			verbose_print("LD_LIBRARY_PATH=$dh{L_PARAMS} \\");
+		}
 		doit("dpkg-shlibdeps","-Tdebian/${EXT}substvars",@{$dh{U_PARAMS}},'-dDepends',@filelist);
 	}
 }
