@@ -19,7 +19,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	@tomove=();
 
         # debian/files has a different purpose, so ignore it.
-	if ( $files && $files != "debian/files" ) {
+	if ( $files && $files ne "debian/files" ) {
 		@tomove=filearray($files);
 	}
 	
