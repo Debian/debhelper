@@ -12,7 +12,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 		error "$TMP/DEBIAN/shlibs already exists."
 	fi
 
-	for file in `find $TMP -type f -name "*.so*" | tr "\n" " "` ; do
+	for file in `find $TMP -type f -name "*.so.*" | tr "\n" " "` ; do
 		LIBRARY=`expr $file : ".*/\(.*\)\.so\..*"` || true
 		LIB_VERSION=`expr $file : ".*/.*\.so\.\(.*\)"` || true
 		if [ -z "$DH_M_PARAMS" ]; then
@@ -24,17 +24,20 @@ for PACKAGE in $DH_DOPACKAGES; do
 		if [ ! -d "$TMP/DEBIAN" ] ; then
 			doit "install -d $TMP/DEBIAN"
 		fi
+		DEPS=$PACKAGE
 		if [ "$DH_V_FLAG_SET" ]; then
 			if [ "$DH_V_FLAG" ]; then
-				PACKAGE="$DH_V_FLAG"
+				DEPS="$DH_V_FLAG"
 			else
 				# Call isnative becuase it sets $VERSION
 				# as a side effect.
 				isnative || true
-				PACKAGE="$PACKAGE (>= $VERSION)"
+				DEPS="$PACKAGE (>= $VERSION)"
 			fi
 		fi
-		complex_doit "echo '$LIBRARY $MAJOR $PACKAGE' >>$TMP/DEBIAN/shlibs"
+		if [ "$LIBRARY" -a "$MAJOR" -a "$DEPS" ]; then
+			complex_doit "echo '$LIBRARY $MAJOR $DEPS' >>$TMP/DEBIAN/shlibs"
+		fi
 	done
 
 	if [ -e "$TMP/DEBIAN/shlibs" ]; then
