@@ -39,6 +39,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		$tostrip="/";
 	}
 
+	# Register files with suidregister.
 	foreach $file (@files) {
 		# Strip leading $tostrip from $file.
 		$file=~s/^$tostrip//;
@@ -68,7 +69,12 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 
 		autoscript($PACKAGE,"postinst","postinst-suid",$sedstr);
 		autoscript($PACKAGE,"postrm","postrm-suid","$sedstr");
-		
+	}
+
+	# Remove suid bits from files. This is delayed to this point, because
+	# of a situation with hard linked files if it is done earlier.
+	# See changelog for 2.0.77.
+	foreach $file (@files) {
 		if ( -e "$TMP/$file") {
 			doit("chmod","a-s","$TMP/$file");
 		}
