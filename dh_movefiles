@@ -11,7 +11,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_movefiles> [S<I<debhelper options>>] [B<--sourcedir=>I<dir>] [S<I<file ...>>]
+B<dh_movefiles> [S<I<debhelper options>>] [B<--sourcedir=>I<dir>] [B<-X>I<item>] S<I<file ...>>]
 
 =head1 DESCRIPTION
 
@@ -40,6 +40,11 @@ it move files out of some other directory. Since the entire contents of
 the sourcedir is moved, specifiying something like --sourcedir=/ is very
 unsafe, so to prevent mistakes, the sourcedir must be a relative filename;
 it cannot begin with a `/'.
+
+=item B<-Xitem>, B<--exclude=item>
+
+Exclude files that contain "item" anywhere in their filename from
+being installed.
 
 =item I<file ...>
 
@@ -126,7 +131,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				warning("$file not found (supposed to put it in $package)");
 			}
 			$file=~s:^\Q$sourcedir\E/+::;
-			complex_doit("(cd $sourcedir >/dev/null ; find $file ! -type d -print || true) >> debian/movelist");
+			my $cmd="(cd $sourcedir >/dev/null ; find $file ! -type d ";
+			if ($dh{EXCLUDE_FIND}) {
+				$cmd.="-a ! \\( $dh{EXCLUDE_FIND} \\) ";
+			}
+			$cmd.="-print || true) >> debian/movelist";
+			complex_doit($cmd);
 		}
 		my $pwd=`pwd`;
 		chomp $pwd;
