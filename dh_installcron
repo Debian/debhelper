@@ -1,9 +1,27 @@
 #!/usr/bin/perl -w
-#
-# Install cron scripts into the appropriate places.
+
+=head1 NAME
+
+dh_installcron - install cron scripts into etc/cron.*
+
+=cut
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_installcron [debhelper options]
+
+=head1 DESCRIPTION
+
+dh_installcron is a debhelper program that is responsible for installing
+cron scripts into etc/cron.*/ in package build directories. The files
+debian/package.cron.daily, debian/package.cron.weekly,
+debian/package.cron.monthly, and debian/package.cron.d are installed.
+
+=cut
+
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -26,3 +44,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("install","-m",644,$cron,"$tmp/etc/cron.d/$package");
 	}
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

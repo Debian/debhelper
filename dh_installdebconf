@@ -1,9 +1,61 @@
 #!/usr/bin/perl -w
-#
-# Integration with debconf.
+
+=head1 NAME
+
+dh_fixperms - fix permissions of files in package build directories
+
+=cut
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_installdebconf [debhelper options] [-n]
+
+=head1 DESCRIPTION
+
+dh_installdebconf is a debhelper program that is responsible for installing
+files used by the debconf package into package build directories.
+
+It also automatically generates the postrm commands needed to
+interface with debconf. See L<dh_installdeb(1)> for an explanation of how
+that works.
+
+Files named debian/package.config and debian/package.templates are
+installed into the DEBIAN directory in the package build directory.
+
+Note that if you use debconf, your package probably needs to depend on it.
+
+=head1 LOCALIZED TEMPLATE FILES
+
+Debconf also supports localized template files, and this program has some
+support to aid working with them. You may find it easiest to keep the
+translations in separate files, and merge them only at build time. See
+L<debconf-mergetemplate(1)> and L<debconf-getlang(1)> for details.
+
+This program will automatically call debconf-mergetemplate and merge 
+templates on the fly if it finds your template files are accompnied
+by translated files that have the same name as the template file, with a
+dot and a locale name repended.
+
+For example, if you have a German translation,
+debian/package.templates.de is merged with debian/package.templates.
+
+If you use this feature, your package should build-depend on debconf-utils.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-n>, B<--noscripts>
+
+Do not modify postrm script.
+
+=back
+
+=cut
+
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -22,11 +74,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	
 	if ($templates ne '') {
 		# Are there translated templates too?
-<<<<<<< dh_installdebconf
-		my @trans=glob("$templates.??", "$templates.??_??");
-=======
 		my @trans=(glob("$templates.??"), glob("$templates.??_??"));
->>>>>>> 1.5
 		if (@trans) {
 			complex_doit("debconf-mergetemplate @trans $templates > $tmp/DEBIAN/templates");
 			chmod 0644, "$tmp/DEBIAN/templates";
@@ -42,3 +90,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		autoscript($package,"postrm","postrm-debconf");
 	}
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

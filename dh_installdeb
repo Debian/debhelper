@@ -1,9 +1,47 @@
 #!/usr/bin/perl -w
-#
-# Install files from debian/ into the package's DEBIAN directory.
+
+=head1 NAME
+
+dh_installdeb - install files into the DEBIAN directory
+
+=cut
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_installdeb [debhelper options]
+
+=head1 DESCRIPTION
+
+dh_installdeb is a debhelper program that is responsible for installing
+files into the DEBIAN directories in package build directories with the
+correct permissions.
+
+dh_installdeb automatically installs the following files from debian/ into
+the DEBIAN directory:
+  package.postinst
+  package.preinst
+  package.postrm
+  package.prerm
+  package.shlibs
+  package.conffiles
+
+The postinst, preinst, postrm, and prerm are handled specially: If a
+corresponding file named debian/script.debhelper exists, the contents of that
+file are merged into the script as follows: If the script exists, then
+anywhere in it that "#DEBHELPER#" appears, the text of the .debhelper file is
+inserted. If the script does not exist, then a script is generated from
+the .debhelper file. The .debhelper files are created by other debhelper
+programs, such as L<dh_installmenu(1)>, and are shell script fragments.
+
+If DH_COMPAT is set to 3 or higher, all files in the etc/ directory in a
+package will automatically be flagged as conffiles by this program, so
+there is no need to list them manually in package.conffiles.
+
+=cut
+
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -66,3 +104,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 	}
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut
