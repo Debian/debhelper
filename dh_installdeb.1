@@ -1,9 +1,9 @@
-.TH DH_INSTALLDEBFILES 1
+.TH DH_INSTALLDEB 1 "" "Debhelper Commands" "Debhelper Commands"
 .SH NAME
 dh_installdeb \- install files into the DEBIAN directory
 .SH SYNOPSIS
 .B dh_installdeb
-.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir]"
+.I "[debhelper options]"
 .SH "DESCRIPTION"
 dh_installdeb is a debhelper program that is responsible for installing
 files into the DEBIAN directory in package build directories with the
@@ -34,41 +34,16 @@ programs, such as
 , and are shell script fragments.
 .SH OPTIONS
 .TP
-.B \-v, \--verbose
-Verbose mode; show all commands that modify the package build directory.
-.TP
-.B \-a, \--arch
-Install files for all architecture dependent packages.
-.TP
-.B \-i, \--indep
-Install files for all architecture independent packages.
-.TP
-.B \--no-act
-Do not really do anything. If used with -v, the result is that this command
-will output a list of what it would have done.
-.TP
-.B \-ppackage, \--package=package
-Install files for the package named "package".
-.TP
-.B \-Ptmpdir, \--tmpdir=tmpdir
-Use "tmpdir" for package build directory. 
-.SH NOTES
-The
-.B \-a
-.B \-i
-and
-.B \-p
-arguments are cumulative. If none are specified, then all packages listed in
-the control file will be effected.
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
 .SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode
-.TP
-.I DH_NO_ACT
-Enables no-act mode (see above).
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
-.BR /usr/doc/debhelper/README
+.BR debhelper (1)
 .SH "CONFORMS TO"
 Debian policy, version 2.3.0.0
 .SH AUTHOR

@@ -1,57 +1,34 @@
-.TH DH_INSTALLDEBFILES 1
+.TH DH_GENCONTROL 1 "" "Debhelper Commands" "Debhelper Commands"
 .SH NAME
 dh_gencontrol \- generate and install control file
 .SH SYNOPSIS
 .B dh_gencontrol
-.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir] [-uparams]"
+.I "[debhelper options] [-uparams]"
 .SH "DESCRIPTION"
-dh_gencontrol is a debhelper program that is responsible for generating and
-installing control files, and installing them into the DEBIAN directory with
-the proper permissions.
+dh_gencontrol is a debhelper program that is responsible for generating 
+control files, and installing them into the DEBIAN directory with the proper
+permissions.
 .P
 This program is merely a wrapper around
 .BR dpkg-gencontrol (1)
 .SH OPTIONS
 .TP
-.B \-v, \--verbose
-Verbose mode; show all commands that modify the package build directory.
-.TP
-.B \-a, \--arch
-Install files for all architecture dependent packages.
-.TP
-.B \-i, \--indep
-Install files for all architecture independent packages.
-.TP
-.B \--no-act
-Do not really do anything. If used with -v, the result is that this command
-will output a list of what it would have done.
-.TP
-.B \-ppackage, \--package=package
-Install files for the package named "package".
-.TP
-.B \-Ptmpdir, \--tmpdir=tmpdir
-Use "tmpdir" for package build directory. 
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
 .TP
 .B \-uparams, \--update-rcd-params=params
 Pass "params" to 
 .BR dpkg-gencontrol (1)
-.SH NOTES
-The
-.B \-a
-.B \-i
-and
-.B \-p
-arguments are cumulative. If none are specified, then all packages listed in
-the control file will be effected.
 .SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode
-.TP
-.I DH_NO_ACT
-Enables no-act mode (see above).
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
-.BR /usr/doc/debhelper/README
+.TP
+.BR debhelper (1)
+.TP
 .BR dpkg-shlibdeps (1)
 .SH "CONFORMS TO"
 Debian policy, version 2.3.0.0

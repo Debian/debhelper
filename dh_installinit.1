@@ -1,9 +1,9 @@
-.TH DH_INSTALLINIT 1
+.TH DH_INSTALLINIT 1 "" "Debhelper Commands" "Debhelper Commands"
 .SH NAME
 dh_installinit \- install init scripts into package build directories
 .SH SYNOPSIS
 .B dh_installinit
-.I "[-v] [-a] [-i] [--no-act] [--init-script=scriptname] [-ppackage] [-Ptmpdir] [-n] [-r] [-d] [-uparams]"
+.I "[debhelper options] [--init-script=scriptname] [-n] [-r] [-d] [-uparams]"
 .SH "DESCRIPTION"
 dh_installinit is a debhelper program that is responsible for installing
 init scripts into package build directories. 
@@ -19,24 +19,10 @@ by the packagename. (You may use debian/init for the first binary package
 listed in the control file.)
 .SH OPTIONS
 .TP
-.B \-v, \--verbose
-Verbose mode; show all commands that modify the package build directory.
-.TP
-.B \-a, \--arch
-Install init scripts into all architecture dependent packages.
-.TP
-.B \-i, \--indep
-Install init scripts into all architecture independent packages.
-.TP
-.B \--no-act
-Do not really do anything. If used with -v, the result is that this command
-will output a list of what it would have done.
-.TP
-.B \-ppackage, \--package=package
-Install init scripts into the package named "package".
-.TP
-.B \-Ptmpdir, \--tmpdir=tmpdir
-Use "tmpdir" for package build directory. 
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
 .TP
 .B \-n, \--noscripts
 Do not modify postinst/postrm/prerm scripts.
@@ -60,22 +46,11 @@ If not specified, "default" will be passed to
 Use "scriptname" as for the filename the init script is installed as in
 etc/init.d/ . This is useful if you need to have an init script with a name
 different from the package's name.
-.SH NOTES
-The
-.B \-a
-.B \-i
-and
-.B \-p
-arguments are cumulative. If none are specified, then all packages listed in
-the control file will be effected.
 .SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode
-.TP
-.I DH_NO_ACT
-Enables no-act mode (see above).
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
-.BR /usr/doc/debhelper/README
+.BR debhelper (1)
 .SH AUTHOR
 Joey Hess <joeyh@master.debian.org>

@@ -1,3 +1,17 @@
+debhelper (1.0.1) unstable; urgency=low
+
+  * Backported bug fixes from the 1.1 tree:
+  * dh_installdocs: used -m 655 for a TODO file. (minor, dh_fixperms cleans
+    up after it)
+  * dh_fixperms: had a problem with removing x bits on examples files
+  * dh_compress: since version 0.88 or so, dh_compress has bombed out if
+    a debian/compress file returned an error code. This was actually
+    unintentional - in fact, the debian/compress example in the man page
+    will fail this way if usr/info or usr/X11R6 is not present. Corrected
+    the program to not fail. (#26214)
+
+ -- Joey Hess <joeyh@master.debian.org>  Sun, 30 Aug 1998 22:21:26 -0700
+
 debhelper (1.0) stable unstable; urgency=low
 
   * 1.0 at last!

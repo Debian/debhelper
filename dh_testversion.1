@@ -1,8 +1,8 @@
-.TH DH_TESTROOT 1
+.TH DH_TESTVERSION 1 "" "Debhelper Commands" "Debhelper Commands"
 .SH NAME
 dh_testversion \- ensure that the correct version of debhelper is installed
 .SH SYNOPSIS
-.B dh_testversion [operator] [version]
+.B dh_testversion [debhelper options] [operator] [version]
 .SH "DESCRIPTION"
 dh_testversion compares the version of debhelper against the version you
 specify, and if the condition is not met, exits with an error message.
@@ -18,6 +18,11 @@ dh_autofixbugs cannot be found, so there is no need for you to use
 dh_testversion.
 .SH OPTIONS
 .TP
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
+.TP
 .B operator
 Optional comparison operator used in comparing the versions. If not 
 specified, ">=" is used. For descriptions of the comparison operators, see 
@@ -28,19 +33,19 @@ Version number to compare against the current version of debhelper. If not
 specified, dh_testversion does nothing.
 .SH EXAMPLES
 .TP
-.I dh_testversion 0.50
-Make sure debhelper version 0.50 or higher is installed.
+.I dh_testversion 1.0
+Make sure debhelper version 1.0 or higher is installed.
 .TP
-.I dh_testversion ge 0.50
-Another way to make sure debhelper version 0.50 or higher is installed.
+.I dh_testversion ge 1.0
+Another way to make sure debhelper version 1.0 or higher is installed.
 .TP
-.I dh_testversion le 0.50
-Make sure a version of debhelper less than version 0.50 is installed.
+.I dh_testversion lt 1.0
+Make sure a version of debhelper less than version 1.0 is installed.
 .SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode.
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
-.BR /usr/doc/debhelper/README
+.BR debhelper (1)
 .SH AUTHOR
 Joey Hess <joeyh@master.debian.org>

@@ -1,9 +1,9 @@
-.TH DH_FIXPERMS 1
+.TH DH_FIXPERMS 1 "" "Debhelper Commands" "Debhelper Commands"
 .SH NAME
 dh_fixperms \- fix permissions of files in package build directories
 .SH SYNOPSIS
 .B dh_fixperms
-.I "[-v] [-a] [-i] [-Xitem] [--no-act] [-ppackage] [-Ptmpdir]"
+.I "[debhelper options] [-Xitem]"
 .SH "DESCRIPTION"
 dh_fixperms is a debhelper program that is responsible for setting the
 permissions of files in package build directories to a sane state.
@@ -15,46 +15,21 @@ root, and it removes group and other write permission from all files.
 Finally, it removes execute permissions from any libraries that have it set.
 .SH OPTIONS
 .TP
-.B \-v, \--verbose
-Verbose mode; show all commands that modify the package build directory.
-.TP
-.B \-a, \--arch
-Fix permissions for all architecture dependent packages.
-.TP
-.B \-i, \--indep
-Fix permissions for all architecture independent packages.
-.TP
-.B \--no-act
-Do not really do anything. If used with -v, the result is that this command
-will output a list of what it would have done.
-.TP
-.B \-ppackage, \--package=package
-Fix permissions for the package named "package".
-.TP
-.B \-Ptmpdir, \--tmpdir=tmpdir
-Use "tmpdir" for package build directory. 
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
 .TP
 .B \-Xitem, \--exclude=item
 Exclude files that contain "item" anywhere in their filename from having
 their permissions changed. You may use this option multiple times to build 
 up a list of things to exclude.
-.SH NOTES
-The
-.B \-a
-.B \-i
-and
-.B \-p
-arguments are cumulative. If none are specified, then all packages listed in
-the control file will have their permissions fixed.
 .SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode
-.TP
-.I DH_NO_ACT
-Enables no-act mode (see above).
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
-.BR /usr/doc/debhelper/README
+.BR debhelper (1)
 .SH "CONFORMS TO"
 Debian policy, version 2.3.0.1
 .SH AUTHOR

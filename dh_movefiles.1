@@ -1,9 +1,9 @@
-.TH DH_MOVEFILES 1
+.TH DH_MOVEFILES 1 "" "Debhelper Commands" "Debhelper Commands"
 .SH NAME
 dh_movefiles \- moves files out of debian/tmp into subpackages
 .SH SYNOPSIS
 .B dh_movefiles
-.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir] [file ..]"
+.I "[debhelper options] [file ..]"
 .SH "DESCRIPTION"
 dh_movefiles is a debhelper program that is responsible for moving files out
 of debian/tmp and into other package build directories. This may be useful
@@ -22,46 +22,21 @@ symlinks. This is done becuase it tends to be a good thing to have symlinks
 last in debian packages, particularly in shared library packages.
 .SH OPTIONS
 .TP
-.B \-v, \--verbose
-Verbose mode; show all commands that modify the package build directory.
-.TP
-.B \-a, \--arch
-Move files for all architecture dependent packages.
-.TP
-.B \-i, \--indep
-Move files for all architecture independent packages.
-.TP
-.B \--no-act
-Do not really do anything. If used with -v, the result is that this command
-will output a list of what it would have done.
-.TP
-.B \-ppackage, \--package=package
-Move files for the package named "package".
-.TP
-.B \-Ptmpdir, \--tmpdir=tmpdir
-Use "tmpdir" for package build directory.
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
 .TP
 .B file ..
 Lists files to move. The filenames listed should be relative to debian/tmp/.
 You can also list directory names, and the whole directory will be moved. You
 can even use wildcards if you like. It is an error to list files here unless
 you use -p, -i, or -a to tell dh_movefiles which subpackage to put them in.
-.SH NOTES
-The
-.B \-a
-.B \-i
-and
-.B \-p
-arguments are cumulative. If none are specified, then all packages listed in
-the control file will be effected.
 .SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode
-.TP
-.I DH_NO_ACT
-Enables no-act mode (see above).
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
-.BR /usr/doc/debhelper/README
+.BR debhelper (1)
 .SH AUTHOR
 Joey Hess <joeyh@master.debian.org>

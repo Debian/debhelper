@@ -1,9 +1,9 @@
-.TH DH_SUIDREGISTER 1
+.TH DH_SUIDREGISTER 1 "" "Debhelper Commands" "Debhelper Commands"
 .SH NAME
 dh_suidregister \- set up package to register files with suidregister
 .SH SYNOPSIS
 .B dh_suidregister
-.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir] [-A] [file ...]"
+.I "[debhelper options] [-A] [file ...]"
 .SH "DESCRIPTION"
 dh_suidregister is a debhelper program that is responsible for modifying the
 postinst and postrm scripts of a package so the package will register files
@@ -23,29 +23,15 @@ If neither of these methods is used to specify files, dh_suidregister will
 scan the package build directory for files that have suid permissions, and
 will automatically register all files it finds.
 .P
-Note that this package modifies your postinst and postrm files. See
+Note that this program modifies your postinst and postrm files. See
 .BR dh_installdeb (1)
 for an explanation of how this works.
 .SH OPTIONS
 .TP
-.B \-v, \--verbose
-Verbose mode; show all commands that modify the package build directory.
-.TP
-.B \-a, \--arch
-Register files for all architecture dependent packages.
-.TP
-.B \-i, \--indep
-Register files for all architecture independent packages.
-.TP
-.B \--no-act
-Do not really do anything. If used with -v, the result is that this command
-will output a list of what it would have done.
-.TP
-.B \-ppackage, \--package=package
-Register files for the package named "package".
-.TP
-.B \-Ptmpdir, \--tmpdir=tmpdir
-Use "tmpdir" for package build directory. 
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
 .TP
 .B \-A, \--all
 Register any files specified by command line parameters in ALL packages
@@ -55,24 +41,14 @@ with other debhelper programs.
 .B file ...
 Register these files in the first package acted on. (Or in all packages if
 -A is specified.)
-.SH NOTES
-The
-.B \-a
-.B \-i
-and
-.B \-p
-arguments are cumulative. If none are specified, then all packages listed in
-the control file will be effected.
 .SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode
-.TP
-.I DH_NO_ACT
-Enables no-act mode (see above).
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
-.BR /usr/doc/debhelper/README
-,
+.TP
+.BR debhelper (1)
+.TP
 .BR suidregister (8)
 .SH AUTHOR
 Joey Hess <joeyh@master.debian.org>

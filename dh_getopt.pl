@@ -58,6 +58,11 @@ sub AddPackage { my($option,$value)=@_;
 	}
 }
 
+# Add a package to a list of packages that should not be acted on.
+sub ExcludePackage { my($option,$value)=@_;
+	$exclude_package{$value}=1;
+}
+
 # Add another item to the exclude list.
 sub AddExclude { my($option,$value)=@_;
 	push @exclude,$value;
@@ -80,7 +85,10 @@ $ret=GetOptions(
 	"arch" => \&AddPackage,
 
 	"p=s" => \&AddPackage,
-  "package=s" => \&AddPackage,
+        "package=s" => \&AddPackage,
+
+	"N=s" => \&ExcludePackage,
+	"no-package=s" => \&ExcludePackage,
 
 	"n" => \$noscripts,
 	"noscripts" => \$noscripts,
@@ -105,7 +113,7 @@ $ret=GetOptions(
 
 	"u=s", => \$u_params,
 	"update-rcd-params=s", => \$u_params,
-  "dpkg-shlibdeps-params=s", => \$u_params,
+        "dpkg-shlibdeps-params=s", => \$u_params,
 
 	"m=s", => \$major,
 	"major=s" => \$major,
@@ -149,12 +157,20 @@ foreach (@exclude) {
 }
 $exclude_find=~s/ -or $//;
 
+# Remove excluded packages from the list of packages to act on.
+undef @package_list;
+foreach $package (@packages) {
+	if (! $exclude_package{$package}) {
+		push @package_list, $package;	
+	}
+}
+
 # Now output everything, in a format suitable for a shell to eval it. 
 # Note the last line sets $@ in the shell to whatever arguements remain.
 print qq{
 DH_VERBOSE='$verbose'
 DH_NO_ACT='$no_act'
-DH_DOPACKAGES='@packages'
+DH_DOPACKAGES='@package_list'
 DH_DOINDEP='$indep'
 DH_DOARCH='$arch'
 DH_NOSCRIPTS='$noscripts'

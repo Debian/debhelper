@@ -1,9 +1,9 @@
-.TH DH_MAKESHLIBS 1
+.TH DH_MAKESHLIBS 1 "" "Debhelper Commands" "Debhelper Commands"
 .SH NAME
 dh_makeshlibs \- automatically create shlibs file
 .SH SYNOPSIS
 .B dh_makeshlibs
-.I "[-v] [-a] [-i] [--no-act] [-mmajor] [-Ptmpdir] [-ppackage] [-V[dependancies]]"
+.I "[debhelper options] [-mmajor] [-V[dependancies]]"
 .SH "DESCRIPTION"
 dh_makeshlibs is a debhelper program that automatically scans for shared
 libraries, and generates a shlibs file for the libraries it finds.
@@ -12,24 +12,10 @@ For this program to work, you cannot have already installed a DEBIAN/shlibs
 file. If such a file exits, the program will exit with an error.
 .SH OPTIONS
 .TP
-.B \-v, \--verbose
-Verbose mode; show all commands that modify the package build directory.
-.TP
-.B \-a, \--arch
-Generate shlibs files for all architecture dependent packages.
-.TP
-.B \-i, \--indep
-Generate shlibs files for all architecture independent packages.
-.TP
-.B \--no-act
-Do not really do anything. If used with -v, the result is that this command
-will output a list of what it would have done.
-.TP
-.B \-ppackage, \--package=package
-Generate shlibs file for the package named "package".
-.TP
-.B \-Ptmpdir, \--tmpdir=tmpdir
-Use "tmpdir" for package build directory. 
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
 .TP
 .B \-mmajor, \--major=major
 Instead of trying to guess the major number of the library from the filename
@@ -56,26 +42,15 @@ Assuming the current version of the package is 1.0-3, generates a shlibs
 file that looks something like:
   libfoobar 1 libfoobar1 (>= 1.0-3)
 .TP
-.B dh_makeshlibs \-V "libfoobar1 (>= 1.0)"
+.B dh_makeshlibs \-V "'libfoobar1 (>= 1.0)'"
 Generates a shlibs file that looks something like:
   libfoobar 1 libfoobar1 (>= 1.0)
-.SH NOTES
-The
-.B \-a
-.B \-i
-and
-.B \-p
-arguments are cumulative. If none are specified, then all packages listed in
-the control file will be effected.
 .SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode
-.TP
-.I DH_NO_ACT
-Enables no-act mode (see above).
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
-.BR /usr/doc/debhelper/README
+.BR debhelper (1)
 .SH BUGS
 There is no guarantee that the program will get the shlibs file right. For
 example, it may not correctly guess the major number of your package. In

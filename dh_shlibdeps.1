@@ -1,9 +1,9 @@
-.TH DH_INSTALLDEBFILES 1
+.TH DH_SHLIBDEPS 1 "" "Debhelper Commands" "Debhelper Commands"
 .SH NAME
 dh_shlibdeps \- calculate shared library dependancies
 .SH SYNOPSIS
 .B dh_shlibdeps
-.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir] [-uparams]"
+.I "[debhelper options] [-uparams]"
 .SH "DESCRIPTION"
 dh_shlibdeps is a debhelper program that is responsible for calculating
 shared library dependancies for all executables found in the package build
@@ -11,51 +11,25 @@ directory.
 .P
 This program is merely a wrapper around
 .BR dpkg-shlibdeps (1)
-that calls it once for each package listed in the control file. You may 
-prefer to simply run 
-.BR dpkg-shlibdeps (1)
-by hand.
+that calls it once for each package listed in the control file.
 .SH OPTIONS
 .TP
-.B \-v, \--verbose
-Verbose mode; show all commands that modify the package build directory.
-.TP
-.B \-a, \--arch
-Install files for all architecture dependent packages.
-.TP
-.B \-i, \--indep
-Install files for all architecture independent packages.
-.TP
-.B \--no-act
-Do not really do anything. If used with -v, the result is that this command
-will output a list of what it would have done.
-.TP
-.B \-ppackage, \--package=package
-Install files for the package named "package".
-.TP
-.B \-Ptmpdir, \--tmpdir=tmpdir
-Use "tmpdir" for package build directory. 
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
 .TP
 .B \-uparams, \--dpkg-shlibdeps-params=params
 Pass "params" to 
 .BR dpkg-shlibdeps (1)
-.SH NOTES
-The
-.B \-a
-.B \-i
-and
-.B \-p
-arguments are cumulative. If none are specified, then all packages listed in
-the control file will be effected.
 .SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode
-.TP
-.I DH_NO_ACT
-Enables no-act mode (see above).
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
-.BR /usr/doc/debhelper/README
+.TP
+.BR debhelper (1)
+.TP
 .BR dpkg-shlibdeps (1)
 .SH "CONFORMS TO"
 Debian policy, version 2.3.0.0

@@ -1,9 +1,9 @@
-.TH DH_CLEAN 1
+.TH DH_CLEAN 1 "" "Debhelper Commands" "Debhelper Commands"
 .SH NAME
 dh_clean \- clean up package build directories
 .SH SYNOPSIS
 .B dh_clean
-.I "[-v] [-a] [-i] [-k] [--no-act] [-ppackage] [-Ptmpdir] [file ...]"
+.I "[debhelper options] [-k] [file ...]"
 .SH "DESCRIPTION"
 dh_clean is a debhelper program that is responsible for cleaning up after a
 package is built. It removes the package build directories, and removes some
@@ -11,24 +11,10 @@ other files, such as debian/substvars, debian/files, DEADJOE, emacs backup
 files, etc.
 .SH OPTIONS
 .TP
-.B \-v, \--verbose
-Verbose mode; show all commands that modify the package build directory.
-.TP
-.B \-a, \--arch
-Clean up the package build directory for all architecture dependent packages.
-.TP
-.B \-i, \--indep
-Clean up the package build directory for all architecture independent packages.
-.TP
-.B \--no-act
-Do not really do anything. If used with -v, the result is that this command
-will output a list of what it would have done.
-.TP
-.B \-ppackage, \--package=package
-Clean up the package build directory for the package named "package".
-.TP
-.B \-Ptmpdir, \--tmpdir=tmpdir
-Use "tmpdir" for package build directory.
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
 .TP
 .B \-k, \--keep
 Do not delete debian/files. When do you want to use this? Anytime you have a
@@ -41,23 +27,12 @@ was built.
 .TP
 .B file ...
 Delete these files too.
-.SH NOTES
-The
-.B \-a
-.B \-i
-and
-.B \-p
-arguments are cumulative. If none are specified, then all packages listed in
-the control file will have their package build directories cleaned up.
 .SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode
-.TP
-.I DH_NO_ACT
-Enables no-act mode (see above).
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
-.BR /usr/doc/debhelper/README
+.BR debhelper (1)
 .SH BUGS
 Filenames with spaces in them will not currently be deleted when specified
 as parameters.

@@ -1,9 +1,9 @@
-.TH DH_INSTALLDIRS 1
+.TH DH_INSTALLDIRS 1 "" "Debhelper Commands" "Debhelper Commands"
 .SH NAME
 dh_installdirs \- create subdirectories in package build directories
 .SH SYNOPSIS
 .B dh_installdirs
-.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir] [-A] [dir ...]"
+.I "[debhelper options] [-A] [dir ...]"
 .SH "DESCRIPTION"
 dh_installdirs is a debhelper program that is responsible for creating
 subdirectories in package build directories.
@@ -21,50 +21,25 @@ Be sure to only use directory names relative to the package build
 directory. Ie, "/usr/bin" should not be used, use "usr/bin" instead.
 .SH OPTIONS
 .TP
-.B \-v, \--verbose
-Verbose mode; show all commands that modify the package build directory.
-.TP
-.B \-a, \--arch
-Create directories for all architecture dependent packages.
-.TP
-.B \-i, \--indep
-Create directories for all architecture independent packages.
-.TP
-.B \--no-act
-Do not really do anything. If used with -v, the result is that this command
-will output a list of what it would have done.
-.TP
-.B \-ppackage, \--package=package
-Create directories for the package named "package".
-.TP
-.B \-Ptmpdir, \--tmpdir=tmpdir
-Use "tmpdir" for package build directory. 
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
 .TP
 .B \-A, \--all
 Create any directories specified by command line parameters in ALL packages
-acted on.
+acted on, not just the first.
 .TP
 .B dir ...
 Create these directories in the package build directory of the first package
 acted on. (Or in all packages if -A is specified.)
-.SH NOTES
-The
-.B \-a
-.B \-i
-and
-.B \-p
-arguments are cumulative. If none are specified, then all packages listed in
-the control file will be effected.
 .SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode
-.TP
-.I DH_NO_ACT
-Enables no-act mode (see above).
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
-.BR /usr/doc/debhelper/README
+.BR debhelper (1)
 .SH BUGS
-Directories with spaces in them will not currently be installed.
+Directories with spaces in them will not currently be installed properly.
 .SH AUTHOR
 Joey Hess <joeyh@master.debian.org>

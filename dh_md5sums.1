@@ -1,9 +1,9 @@
-.TH DH_MD5SUMS 1
+.TH DH_MD5SUMS 1 "" "Debhelper Commands" "Debhelper Commands"
 .SH NAME
 dh_md5sums \- generate DEBIAN/md5sums file
 .SH SYNOPSIS
 .B dh_md5sums
-.I "[-x] [-v] [-a] [-i] [--no-act] [-Ptmpdir] [-ppackage]"
+.I "[debhelper options] [-x]"
 .SH "DESCRIPTION"
 dh_md5sums is a debhelper program that is responsible for generating
 a DEBIAN/md5sums file, which lists the md5sums of each file in the package.
@@ -14,44 +14,19 @@ All files in DEBIAN/ are omitted from the md5sums file, as are all conffiles
 The md5sums file is installed with proper permissions and ownerships.
 .SH OPTIONS
 .TP
-.B \-v, \--verbose
-Verbose mode; show all commands that modify the package build directory.
-.TP
-.B \-a, \--arch
-Generate md5sums files for all architecture dependent packages.
-.TP
-.B \-i, \--indep
-Generate md5sums files for all architecture independent packages.
-.TP
-.B \--no-act
-Do not really do anything. If used with -v, the result is that this command
-will output a list of what it would have done.
-.TP
-.B \-ppackage, \--package=package
-Generate md5sums file for the package named "package".
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
 .TP
 .B \-x, \--include-conffiles
 Include conffiles in the md5sums list. Note that this is redundant, and
 included elsewhere in debian packages.
-.TP
-.B \-Ptmpdir, \--tmpdir=tmpdir
-Use "tmpdir" for package build directory. 
-.SH NOTES
-The
-.B \-a
-.B \-i
-and
-.B \-p
-arguments are cumulative. If none are specified, then all packages listed in
-the control file will be effected.
 .SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode
-.TP
-.I DH_NO_ACT
-Enables no-act mode (see above).
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
-.BR /usr/doc/debhelper/README
+.BR debhelper (1)
 .SH AUTHOR
 Joey Hess <joeyh@master.debian.org>

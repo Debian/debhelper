@@ -1,9 +1,9 @@
-.TH DH_INSTALLMENU 1
+.TH DH_INSTALLMENU 1 "" "Debhelper Commands" "Debhelper Commands"
 .SH NAME
 dh_installmenu \- install debian menu files into package build directories
 .SH SYNOPSIS
 .B dh_installmenu
-.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir] [-n]"
+.I "[debhelper options] [-n]"
 .SH "DESCRIPTION"
 dh_installmenu is a debhelper program that is responsible for installing
 files used by the debian menu package into package build directories. 
@@ -25,45 +25,21 @@ For the first first binary package listed in the control file, you may use
 debian/menu and debian/menu-method instead.
 .SH OPTIONS
 .TP
-.B \-v, \--verbose
-Verbose mode; show all commands that modify the package build directory.
-.TP
-.B \-a, \--arch
-Install menu files into all architecture dependent packages.
-.TP
-.B \-i, \--indep
-Install menu files into all architecture independent packages.
-.TP
-.B \--no-act
-Do not really do anything. If used with -v, the result is that this command
-will output a list of what it would have done.
-.TP
-.B \-ppackage, \--package=package
-Install menu files into the package named "package".
-.TP
-.B \-Ptmpdir, \--tmpdir=tmpdir
-Use "tmpdir" for package build directory. 
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
 .TP
 .B \-n, \--noscripts
 Do not modify postinst/postrm scripts.
-.SH NOTES
-The
-.B \-a
-.B \-i
-and
-.B \-p
-arguments are cumulative. If none are specified, then all packages listed in
-the control file will be effected.
 .SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode
-.TP
-.I DH_NO_ACT
-Enables no-act mode (see above).
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
-.BR /usr/doc/debhelper/README
-,
+.TP
+.BR debhelper (1)
+.TP
 .BR menufile (5)
 .SH AUTHOR
 Joey Hess <joeyh@master.debian.org>
