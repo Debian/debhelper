@@ -12,7 +12,8 @@ It also automatically generates the postinst and postrm and prerm commands
 needed to set up the symlinks in /etc/rc*.d/ and to start and stop the init
 scripts.
 .P
-If a file named debian/package.init exists, then it is installed into
+If a file named debian/package.init (or debian/package.init.d for backwards
+compatability with debstd) exists, then it is installed into
 etc/init.d/package in the package build directory, with "package" replaced
 by the packagename. (You may use debian/init for the first binary package
 listed in the control file.)
@@ -46,7 +47,7 @@ Do not restart daemon on upgrade.
 .B \-d, \--remove-d
 Remove trailing "d" from the name of the package, and use the result for the
 filename the init script is installed as in etc/init.d/ . This may be useful
-for daemons with named ending in "d". (Note: this takes precidence over
+for daemons with names ending in "d". (Note: this takes precidence over
 the --init-script parameter described below.)
 .TP
 .B \-uparams, \--update-rcd-params=params

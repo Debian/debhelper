@@ -3,7 +3,7 @@
 dh_fixperms \- fix permissions of files in package build directories
 .SH SYNOPSIS
 .B dh_fixperms
-.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir]"
+.I "[-v] [-a] [-i] [-Xitem] [--no-act] [-ppackage] [-Ptmpdir]"
 .SH "DESCRIPTION"
 dh_fixperms is a debhelper program that is responsible for setting the
 permissions of files in package build directories to a sane state.
@@ -33,6 +33,11 @@ Fix permissions for the package named "package".
 .TP
 .B \-Ptmpdir, \--tmpdir=tmpdir
 Use "tmpdir" for package build directory. 
+.TP
+.B \-Xitem, \--exclude=item
+Exclude files that contain "item" anywhere in their filename from having
+their permissions changed. You may use this option multiple times to build 
+up a list of things to exclude.
 .SH NOTES
 The
 .B \-a

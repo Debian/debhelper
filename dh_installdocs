@@ -29,21 +29,21 @@ for PACKAGE in $DH_DOPACKAGES; do
 		doit "cp -a $docs $TMP/usr/doc/$PACKAGE/"
 	fi
 
-	# Install these files only into the main package by default.
-	if [ "$PACKAGE" = "$MAINPACKAGE" ]; then
-		if [ -f debian/README.debian ]; then
-			# .Debian is correct according to policy.
-			doit "install -m 644 -p debian/README.debian $TMP/usr/doc/$PACKAGE/README.Debian"
-		fi
-		if [ -f debian/README.Debian ]; then
-			doit "install -m 644 -p debian/README.Debian $TMP/usr/doc/$PACKAGE/"
-		fi
-		if [ -f debian/TODO ]; then
-			if isnative; then
-				doit "install -m 655 -p debian/TODO $TMP/usr/doc/$PACKAGE/TODO"
-			else
-				doit "install -m 644 -p debian/TODO $TMP/usr/doc/$PACKAGE/TODO.Debian"
-			fi
+	# .Debian is correct, according to policy.
+	readme_debian=`pkgfile $PACKAGE README.Debian`
+	if [ -z "$readme_debian" ]; then
+		readme_debian=`pkgfile $PACKAGE README.debian`
+	fi
+	if [ "$readme_debian" ]; then
+		doit "install -m 644 -p $readme_debian $TMP/usr/doc/$PACKAGE/README.Debian"
+	fi
+
+	todo=`pkgfile $PACKAGE TODO`
+	if [ "$todo" ]; then
+		if isnative; then
+			doit "install -m 655 -p $todo $TMP/usr/doc/$PACKAGE/TODO"
+		else
+			doit "install -m 644 -p $todo $TMP/usr/doc/$PACKAGE/TODO.Debian"
 		fi
 	fi
 

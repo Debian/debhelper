@@ -1,3 +1,36 @@
+debhelper (0.90) unstable; urgency=low
+
+  * I'd like to thank Len Pikulski and Igor Grobman at nothinbut.net for
+    providing me with free internet access on a moment's notice, so I could
+    get this package to you after hacking on it all over New England for the
+    past week. Thanks, guys!
+  .
+  * Added dh_debstd, which mimics the functionality of the debstd command.
+    It's not a complete nor an exact copy, and it's not so much intended to
+    be used in a debian/rules file, as it is to be run by hand when you are
+    converting a package from debstd to debhelper. "dh_debstd -v" will
+    output the sequence of debhelper commands that approximate what debstd
+    would do in the same situation.
+  * dh_debstd is completly untested, I don't have the source to any packages
+    that use debstd available. Once this is tested, I plan to release 
+    debhelper 1.0!
+  * Added a from-debstd document that gives a recipe to convert from debstd
+    to debhelper.
+  * dh_fixperms: can now use -X to exclude files from having their
+    permissions changed.
+  * dh_testroot: test for uid == 0, instead of username == root, becuase
+    some people enjoy changing root's name.
+  * dh_installinit: handle debian/init.d as well as debian/init files, 
+    for backwards compatability with debstd. Unlike with debstd, the two
+    files are treated identically.
+  * dh_lib, PROGRAMMING: added "warning" function.
+  * Minor man page fixes.
+  * dh_compress: don't bomb out if usr/doc/<package> is empty. (#23054)
+  * dh_compress, dh_installdirs: always cd into $TMP and back out, even if
+    --no-act is on. (#23054)
+
+ -- Joey Hess <joeyh@master.debian.org>  Mon,  1 Jun 1998 21:57:45 -0400
+
 debhelper (0.88) unstable; urgency=low
 
   * I had many hours on a train to hack on debhelper... enjoy!
@@ -66,7 +99,7 @@ debhelper (0.80) unstable; urgency=low
     Thanks to Bdale Garbee <bdale@gag.com> and Adam Heath 
     <adam.heath@usa.net> for help on the implementation.
   * dh_installchangelogs: use debian/package.changelog files if they exist
-    rather than debian.changelog. It appears some people do need per-package
+    rather than debian/changelog. It appears some people do need per-package
     changelogs.
   * dh_gencontrol: if debian/package.changelogs files exist, use them.
   * Above 2 changes close #20442.
