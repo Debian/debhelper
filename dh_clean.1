@@ -7,8 +7,10 @@ dh_clean \- clean up package build directories
 .SH "DESCRIPTION"
 dh_clean is a debhelper program that is responsible for cleaning up after a
 package is built. It removes the package build directories, and removes some
-other files, such as debian/substvars, debian/files, DEADJOE, emacs backup 
-files, any detritus left behind by other debhelper commands, etc.
+other files, such as debian/substvars, debian/files, and any detritus left
+behind by other debhelper commands. It also removes common files that
+should not appear in a debian diff:
+  #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS core .deps/* *.P
 .SH OPTIONS
 .TP
 .B debhelper options
