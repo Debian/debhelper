@@ -1,3 +1,12 @@
+debhelper (4.2.4) unstable; urgency=low
+
+  * dh_installdocs: ignore .EX files as produced by dh-make.
+  * dh_movefiles: if the file cannot be found, do not go ahead and try
+    to move it anyway, as this can produce unpredictable behavor with globs
+    passed in from the shell. See bug #234105
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 20 Feb 2004 10:43:33 -0500
+
 debhelper (4.2.3) unstable; urgency=low
 
   * dh_movefiles: use xargs -0 to safely remove files with whitespace,
