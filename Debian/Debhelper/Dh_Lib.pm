@@ -131,6 +131,7 @@ sub xargs {
 
         # The kernel can accept command lines up to 20k worth of characters.
 	my $command_max=20000; # LINUX SPECIFIC!!
+			# I could use POSIX::ARG_MAX, but that would be slow.
 
 	# Figure out length of static portion of command.
 	my $static_length=0;
@@ -353,12 +354,11 @@ sub filearray {
 		#
 		# The tricky bit is that the glob expansion is done
 		# as if we were in the specified directory, so the
-		# filenames that come out are relative to it.		
+		# filenames that come out are relative to it.
 		if (defined $globdir && ! compat(2)) {
 			for (map { glob "$globdir/$_" } split) {
 				s#^$globdir/##;
 				push @ret, $_;
-				print "(--$_)\n";
 			}
 		}
 		else {

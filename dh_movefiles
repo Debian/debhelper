@@ -50,6 +50,11 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		}
 		@tomove=@filelist;
 	}
+	else {
+		# However, filearray() does not add the sourcedir,
+		# which we need.
+		@tomove = map { "$sourcedir/$_" } @tomove;
+	}
 
 	if (@tomove) {
 		if (! -d $TMP) {
