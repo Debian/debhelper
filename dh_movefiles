@@ -44,13 +44,13 @@ for PACKAGE in $DH_DOPACKAGES; do
 		# moved.
 		doit "rm -f movelist"
 		for i in `(cd debian/tmp; echo $tomove)`; do
-			if [ ! -e "debian/tmp/$i" -o -L "debian/tmp/$i" ]; then
+			if [ ! -e "debian/tmp/$i" -a ! -L "debian/tmp/$i" ]; then
 				fail=1
 			fi
 			complex_doit "(cd debian/tmp ; find $i ! -type d -and ! -type l -print || true) >> movelist"
 		done
 		for i in `(cd debian/tmp; echo $tomove)`; do
-			if [ ! -e "debian/tmp/$i" -o -L "debian/tmp/$i" ]; then
+			if [ ! -e "debian/tmp/$i" -a ! -L "debian/tmp/$i" ]; then
 				fail=1
 			fi
 			complex_doit "(cd debian/tmp ; find $i ! -type d -and -type l -print || true) >> movelist"

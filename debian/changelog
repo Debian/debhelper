@@ -1,3 +1,18 @@
+debhelper (1.1.5) unstable; urgency=low
+
+  * dh_builddeb, dh_installchangelogs: converted to perl.
+  * dh_installdirs: converted to perl, getting rid of nasty chdir en-route.
+  * dh_installdirs: now you can use absolute directory names too if you
+    prefer.
+  * doc/PROGRAMMING: updated to cover new perl modules.
+  * Dh_Lib.pm: doit(): when printing out commands that have run, escape
+    metacharacters in the output. I probably don't escape out all the
+    characters I should, but this is just a convenience to the user anyway.
+  * dh_installdebfiles: it's been broken forever, I fixed it. Obviously
+    nobody uses it anymore, which is good, since it's deprected :-)
+
+ -- Joey Hess <joeyh@master.debian.org>  Tue, 11 Aug 1998 15:23:34 -0700
+
 debhelper (1.1.4) unstable; urgency=low
 
   * dh_movefiles: fixed bug introduced in 1.1.1 where it would fail in some
@@ -8,10 +23,10 @@ debhelper (1.1.4) unstable; urgency=low
   * Dh_Lib.pm: implemented complex_doit() and autoscript().
   * Made all perl code work with use strict and -w (well, except
     dh_getopt.pl, but that's a hack that'll go away one day).
-  * I didn't realize, but rewriting dh_installdocs in perl fixed bug #24686,
-    although this same problem applies to other debhelper programs... like
-    dh_installexamples, which had the same bug fixed when I rewrote it in
-    perl just now.
+  * I didn't realize, but rewriting dh_installdocs in perl fixed bug #24686
+    (blank lines in debian/docs file problem), although this same problem 
+    applies to other debhelper programs... like dh_installexamples, which had
+    the same bug fixed when I rewrote it in perl just now.
   * Dh_Lib.pm: accidentially didn't check DH_VERBOSE if commands were not
     passed any switches.
   * Dh_Getopt.pm: --noscripts was broken.
