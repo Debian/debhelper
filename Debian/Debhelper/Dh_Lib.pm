@@ -439,7 +439,8 @@ sub addsubstvar {
 	}
 
 	if (length $line) {
-		 complex_doit("echo '${substvar}=$line' >> $substvarfile");
+		 complex_doit("(grep -v ${substvar} $substvarfile 2>/dev/null; echo '${substvar}=$line') > $substvarfile.new");
+		 doit("mv", "$substvarfile.new", $substvarfile);
 	}
 }
 
