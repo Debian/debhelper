@@ -79,8 +79,6 @@ you don't miss installing newly added files in new upstream releases.
 Note that files that are excluded from being moved via the -X option are not
 warned about.
 
-You need to use the --sourcedir parameter for this one to be of much use.
-
 =item B<--sourcedir=dir>
 
 Makes all source files be found under dir. If this is specified, it is
@@ -173,6 +171,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 }
 
 if ($dh{LIST_MISSING}) {
+	
+	# . as srcdir makes no sense, so this is a special case.
+	if ($srcdir eq '.') {
+		$srcdir='debian/tmp';
+	}
+	
 	my @missing;
 	my $installed=join("|", @installed);
 	$installed=qr{^$installed$};

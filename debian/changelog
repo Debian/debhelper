@@ -1,3 +1,13 @@
+debhelper (4.1.21) unstable; urgency=low
+
+  * Make dh_install --list-missing honor -X excludes. Closes: #168739
+  * As a special case, if --sourcedir is not set (so is "."), make
+    --list-missing look only at what is in debian/tmp. This is gross, but
+    people have come to depend on that behavior, and that combination has no
+    other sane meaning. Closes: #168751
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 14 Nov 2002 10:56:21 -0500
+
 debhelper (4.1.20) unstable; urgency=low
 
   * typo in dh_shlibdeps(1), Closes: #167421
