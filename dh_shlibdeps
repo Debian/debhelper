@@ -80,7 +80,6 @@ information.
 
 init();
 
-# Add directory to library search path.
 if ($dh{L_PARAMS}) {
 	my @paths=();
 	# Add to existing paths, if set.
@@ -96,8 +95,6 @@ if ($dh{L_PARAMS}) {
 		}
 	}
 	$dh{L_PARAMS}=join(':', @paths);
-	$ENV{'LD_LIBRARY_PATH'}=$dh{L_PARAMS};
-	verbose_print("LD_LIBRARY_PATH=$dh{L_PARAMS}");
 }
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -127,8 +124,19 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (defined $dh{LIBPACKAGE} && length $dh{LIBPACKAGE}) {
 			@opts=("-L".tmpdir($dh{LIBPACKAGE}."/DEBIAN/shlibs"));
 		}
+		
+		my $ld_library_path_orig=$ENV{LD_LIBRARY_PATH};
+		if ($dh{L_PARAMS}) {
+			$ENV{LD_LIBRARY_PATH}=$dh{L_PARAMS};
+			verbose_print("LD_LIBRARY_PATH=$dh{L_PARAMS}");
+		}
+		
 		doit("dpkg-shlibdeps","-Tdebian/${ext}substvars",
 			@opts,@{$dh{U_PARAMS}},@filelist);
+
+		if ($dh{L_PARAMS}) {
+			$ENV{LD_LIBRARY_PATH}=$ld_library_path_orig;
+		}
 	}
 }
 
