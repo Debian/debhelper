@@ -1,12 +1,13 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Checks to make sure you are root.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use Dh_Lib;
+init();
 
 # Test for uid = 0, not username of root, becuase
 # some people rename root.
-if  [ "`id -u`" != 0 ]; then
-	error "You must run this as root."
-fi
+if ($< != 0) {
+	error("You must run this as root.");
+}

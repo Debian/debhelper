@@ -3,7 +3,7 @@
 dh_installchangelogs \- install changelogs into package build directories
 .SH SYNOPSIS
 .B dh_installchangelogs
-.I "[debhelper options] [upstream]"
+.I "[debhelper options] [-k] [upstream]"
 .SH "DESCRIPTION"
 dh_installchangelogs is a debhelper program that is responsible for installing
 changelogs into package build directories.
@@ -24,6 +24,13 @@ as usr/doc/package/changelog in the package build directory.
 See
 .BR debhelper (1)
 for a list of options common to all debhelper commands.
+.TP
+.B \-k, \--keep
+Keep the original name of the upstream changelog. This will be accomplished
+by installing the upstream changelog as "changelog", and making a symlink from
+that to the original name of the changelog file. This can be useful if the
+upstream changelog has an unusual name, or if other documentation in the
+package refers to the changelog file.
 .TP
 .B upstream
 Install this file as the upstream changelog.

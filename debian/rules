@@ -8,35 +8,30 @@
 export DH_AUTOSCRIPTDIR=autoscripts
 
 # Figure out the current debhelper version.
-VERSION=$(shell expr "`dpkg-parsechangelog 2>/dev/null`" : \
-	'.*Version: \(.*\).*Distribution:')
+VERSION=$(shell expr "`dpkg-parsechangelog 2>/dev/null |grep Version:`" : '.*Version: \(.*\)')
 
 export DH_VERBOSE=1
 
-test_files=dh_lib
-
 build:
-	./dh_testdir $(test_files)
-	sed "s/#DEBHELPER_VERSION#/$(VERSION)/" < dh_testversion.in \
-		> dh_testversion
-	chmod 755 dh_testversion
+# Nothing to do.
 
 clean:
-	./dh_testdir $(test_files)
+	./dh_testdir
 	./dh_testroot
-	./dh_clean dh_testversion
+	./dh_clean
 
 # Build architecture-dependent files here.
 binary-arch: build
-# We have nothing to do by default.
+# Nothing to do.
 
 # Build architecture-independent files here.
 binary-indep: build
-	./dh_testdir $(test_files)
+	./dh_testdir
 	./dh_testroot
 	./dh_clean -k
 	./dh_installdirs usr/bin usr/lib/debhelper
 
+	echo -e "package Dh_Version;\n\$$version='$(VERSION)';" > debian/tmp/usr/lib/debhelper/Dh_Version.pm
 	find . -perm +111 -maxdepth 1 -type f -not -name "*.pl" \
 		-exec install -p {} debian/tmp/usr/bin \;
 	cp -a dh_lib dh_getopt.pl *.pm debian/tmp/usr/lib/debhelper

@@ -1,3 +1,21 @@
+debhelper (1.1.10) unstable; urgency=low
+
+  * It's come to my attention that a few packages use filename globbing in
+    debian/{docs,examples,whatever} files and expect that to work. It used
+    to work before the perl conversion, but it was never _documented_, or
+    intented to work. If you use this in your packages, they are broken and
+    need fixing (and will refuse to build with current versions of debhelper).
+    I apologize for the inconvenience.
+
+  * dh_clean: fixed a bug, intorduced in version 1.1.8, where it didn't
+    remove debian/files properly.
+  * dh_shlibdeps, dh_testdir, dh_testroot, dh_testversion: converted to perl.
+  * Encode the version of debhelper in a sepererate file, so dh_testversion
+    doesn't have to be generated when a new version of debhelper is built.
+  * Removed bogus menu file.
+
+ -- Joey Hess <joeyh@master.debian.org>  Mon, 17 Aug 1998 14:15:17 -0700
+
 debhelper (1.1.9) unstable; urgency=low
 
   * dh_fixperms: has been removing the +x bits of all doc/*/examples/* files
