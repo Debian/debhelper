@@ -56,26 +56,6 @@ EOF
 system ($temp) / 256 == 0
 	or die "Problem with debhelper scripts: $!\n";
 
-Building a package that doesn't have a doc directory:
-----------------------------------------------------
-
-Policy says that if a package depends on some other package, and they build
-from the same source, the package can make its doc directory be a symlink to
-the doc directory of the package it depends on. If you want to do this with
-debhelper, do the following (assumes the package is foo-doc, which depends
-on foo):
-
-dh_link usr/share/doc/foo usr/share/doc/foo-doc \
-	usr/share/doc/foo usr/doc/foo-doc
-...
-dh_installdocs -N foo-doc
-dh_installexamples -N foo-doc
-dh_installchangelogs -N foo-doc
-
-So the dh_link actually sets up the symlinks. Then the three debhelper commands
-that normally write into doc directory are told not to act on package
-foo-doc. Voila!
-
 Other notes:
 -----------
 
