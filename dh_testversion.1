@@ -1,0 +1,51 @@
+.TH DH_TESTVERSION 1 "" "Debhelper Commands" "Debhelper Commands"
+.SH NAME
+dh_testversion \- ensure that the correct version of debhelper is installed
+.SH SYNOPSIS
+.B dh_testversion [debhelper options] [operator] [version]
+.SH "DESCRIPTION"
+dh_testversion compares the version of debhelper against the version you
+specify, and if the condition is not met, exits with an error message.
+.P
+You should use this in your debian/rules files if a new debhelper feature is
+introduced, and your package requires that feature to build correctly. Use
+debhelper's changelog to figure out the version you need.
+.P
+Be sure not to overuse dh_testversion. If debhelper version 9.5
+introduces a new dh_autofixbugs command, and your package uses it, then if
+someone tries to build it with debhelper 1.0, the build will fail anyway when
+dh_autofixbugs cannot be found, so there is no need for you to use
+dh_testversion.
+.SH OPTIONS
+.TP
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
+.TP
+.B operator
+Optional comparison operator used in comparing the versions. If not 
+specified, ">=" is used. For descriptions of the comparison operators, see 
+dpkg --help.
+.TP
+.B version
+Version number to compare against the current version of debhelper. If not
+specified, dh_testversion does nothing.
+.SH EXAMPLES
+.TP
+.I dh_testversion 1.0
+Make sure debhelper version 1.0 or higher is installed.
+.TP
+.I dh_testversion ge 1.0
+Another way to make sure debhelper version 1.0 or higher is installed.
+.TP
+.I dh_testversion lt 1.0
+Make sure a version of debhelper less than version 1.0 is installed.
+.SH ENVIRONMENT
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
+.SH "SEE ALSO"
+.BR debhelper (1)
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>
