@@ -50,7 +50,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 
 	# Run dpkg-shlibdeps to generate dependancies.
 	filelist=""
-	for file in `find debian/$TMP -type f \( -perm +111 \) -or -name "*.so.*" | tr "\n" " "` ; do
+	for file in `find debian/$TMP -type f \( -perm +111 -or -name "*.so*" \) | tr "\n" " "` ; do
 		case "`file $file`" in
 			*ELF*)
 				filelist="$file $filelist"
