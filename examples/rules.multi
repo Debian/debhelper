@@ -57,6 +57,7 @@ binary-indep: build install
 	dh_link -i
 	dh_compress -i
 	dh_fixperms -i
+	# You may want to make some executables suid here.
 	dh_suidregister -i
 	dh_installdeb -i
 	dh_gencontrol -i
@@ -81,6 +82,7 @@ binary-arch: build install
 	dh_link -a
 	dh_compress -a
 	dh_fixperms -a
+	# You may want to make some executables suid here.
 	dh_suidregister -a
 	dh_installdeb -a
 #	dh_makeshlibs -a

@@ -1,3 +1,19 @@
+debhelper (1.2.24) unstable; urgency=low
+
+  * dh_fixperms: linux 2.1.x and 2.2.x differ from earlier versions in that
+    they do not clear the suid bit on a file when the owner of that file
+    changes. It seems that fakeroot behaves the same as linux 2.1 here. I
+    was relying on the old behavior to get rid of suid and sgid bits on files.
+    Since this no longer happens implicitly, I've changed to clearing the
+    bits explicitly.
+  * There's also a small behavior change involved here. Before, dh_fixperms
+    did not clear suid permissions on files that were already owned by root.
+    Now it does.
+  * dh_fixperms.1: cleaned up the docs to mention that those bits are
+    cleared.
+
+ -- Joey Hess <joeyh@master.debian.org>  Fri, 15 Jan 1999 16:54:44 -0800
+
 debhelper (1.2.23) unstable; urgency=low
 
   * autoscripts/postrm-wm: use "=", not "==" (#31727).
