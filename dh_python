@@ -50,9 +50,8 @@ extra names on the command line are searched for binary (.so) modules.
 =item B<-V> I<version>
 
 If the .py files your package ships are meant to be used by a specific
-pythonX.Y version, you can set this option with the desired X.Y python
-version.
-Do not use if you ship modules in /usr/lib/site-python.
+pythonX.Y version, you can use this option to specify the desired version,
+such as 2.3. Do not use if you ship modules in /usr/lib/site-python.
 
 =item B<-n>, B<--noscripts>
 
@@ -99,6 +98,9 @@ my $usepython = "python$python_version";
 if($dh{V_FLAG_SET}) {
 	$usepython = $dh{V_FLAG};
 	$usepython =~ s/^/python/;
+	if (! grep { $_ eq $usepython } @python_allversions) {
+		error("Unknown python version $dh{V_FLAG}");
+	}
 }
 
 # Cleaning the paths given on the command line

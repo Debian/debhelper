@@ -2,7 +2,7 @@
 # Esta traducción ha sido realizada por Rudy Godoy <rudy@kernel-panik.org>
 # y revisada por Rubén Porras <nahoo@inicia.es>
 # Está basada en la página de manual original:
-# versión 1.2 del CVS de
+# versión 1.3 del CVS de
 # /cvs/debian-doc/manpages/english/debhelper/dh_makeshlibs.pod
 
 =head1 NOMBRE
@@ -29,7 +29,7 @@ compartidas.
 
 =item B<-m>I<mayor>, B<--major=>I<mayor>
 
-En lugar de tratar de adivinar el número mayor de la biblioteca con 
+En lugar de intentar adivinar el número mayor de la biblioteca usando
 objdump, usa el número mayor especificado después del parámetro -m. Esto
 es mucho menos útil de lo que era antiguamente cuando este programa
 buscaba los nombres de fichero de las bibliotecas en lugar de usar
@@ -41,20 +41,25 @@ objdump.
 
 Por omisión, el fichero shlibs generado por este programa no hace que los
 paquetes dependan de alguna versión particular del paquete que contiene la
-biblioteca compartida. Podría ser necesario para usted añadir alguna
-información de dependencia de versión al fichero shlibs. Si -V es especificado
-sin información de dependencia, la versión actual del paquete es conectada
-en una dependencia de la forma "nombre_de_paquete (>= versión_de_paquete)".
-Si -V es especificado con parámetros, los parámetros pueden ser usados para
-especificar la información de dependencia exacta necesitada (asegúrese de
-incluir el nombre del paquete).
+biblioteca compartida. Podría ser necesario para usted el añadir alguna
+información de dependencia de versión al fichero shlibs. Si se especifica
+«-V» sin información de dependencia, la versión actual de desarrollador 
+principal del paquete es conectada en una dependencia de la forma 
+«nombre_de_paquete (>= versión_de_paquete)». Tenga en cuenta que en los
+niveles de compatibilidad de debhelper anteriores a v4, también se incluye
+la parte debian del número de versión del paquete. Si se especifica «-V» 
+con parámetros, los parámetros pueden ser usados para especificar la 
+información de dependencia exacta requerida (asegúrese de incluir el nombre 
+del paquete).
 
-Tenga cuidado al usar -V sin ningún parámetro; ésta es una configuración
+Tenga cuidado al usar «-V» sin ningún parámetro; ésta es una configuración
 conservadora que siempre se asegura que las dependencias de bibliotecas
-compartidas de otros paquetes son al menos lo mas pequeñas que necesitan
-ser, de modo que si el desarrollador las malogra éstas no se romperán.
+compartidas de otros paquetes son al menos lo más pequeñas que necesitan
+ser (a menos que su biblioteca sea propensa a cambiar el ABI sin actualizar
+el número de versión del desarrollador principal), de modo que si el 
+desarrollador las malogra éstas no se romperán.
 Por otro lado los paquetes podrían terminar con dependencias muy rigurosas
-que harían difícil la actualización.
+que harían difícil su actualización.
 
 =item B<-n>, B<--noscripts>
 
@@ -69,19 +74,21 @@ directorio de ser tratados como bibliotecas compartidas.
 
 =head1 EJEMPLOS
 
- dh_makeshlibs
+=over 4
+
+=item dh_makeshlibs
 
 Asumiendo que este es un paquete llamado libfoobar1, genera un fichero shlibs 
 que se ve como:
  libfoobar 1 libfoobar1
 
- dh_makeshlibs -V
+=item dh_makeshlibs -V
 
-Asumiendo que la versión actual del paquete es 1.0-3, genera un fichero shlibs
+Asumiendo que la versión actual del paquete es 1.1-3, genera un fichero shlibs
 que se ve como:
- libfoobar 1 libfoobar1 (>= 1.0-3)
+ libfoobar 1 libfoobar1 (>= 1.1)
 
- dh_makeshlibs -V 'libfoobar1 (>= 1.0)'
+=item dh_makeshlibs -V 'libfoobar1 (>= 1.0)'
 
 Genera un fichero shlibs que se ve como:
   libfoobar 1 libfoobar1 (>= 1.0)
