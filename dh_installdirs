@@ -1,9 +1,52 @@
 #!/usr/bin/perl -w
-#
-# Reads debian/dirs, creates the directories listed there
+
+=head1 NAME
+
+dh_installdirs - create subdirectories in package build directories
+
+=cut
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_installdirs [debhelper options] [-A] [dir ...]
+
+=head1 DESCRIPTION
+
+dh_installdirs is a debhelper program that is responsible for creating
+subdirectories in package build directories.
+
+Any directory names specified as parameters will be created in the package
+build directory of the first package dh_installdirs is told to act on. By
+default, this is the first binary package in debian/control, but if you use
+-p, -i, or -a flags, it will be the first package specified by those flags.
+
+A file named debian/package.dirs can list other directories to be created.
+Separate the directory names with whitespace.
+
+Be sure to only use directory names relative to the package build
+directory. Ie, "/usr/bin" should not be used, use "usr/bin" instead.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-A>, B<--all>
+
+Create any directories specified by command line parameters in ALL packages
+acted on, not just the first.
+
+=item I<dir ...>
+
+Create these directories in the package build directory of the first
+package acted on. (Or in all packages if -A is specified.)
+
+=back
+
+=cut
+
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -40,3 +83,16 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("install","-d",@dirs);
 	}
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut
+

@@ -1,12 +1,90 @@
 #!/usr/bin/perl -w
-#
-# Reads debian/docs, installs all files listed there into
-# /usr/share/doc/$package
-# Also installs the debian/copyright and debian/README.debian and debian/TODO
-# and handles debian/doc-base.
+
+=head1 NAME
+
+dh_installdocs - install documentation into package build directories
+
+=cut
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_installdocs debhelper options] [-A] [-n] [file ...]
+
+=head1 DESCRIPTION
+
+dh_installdocs is a debhelper program that is responsible for installing
+documentation into usr/share/doc/package in package build directories.
+
+dh_installdocs automatically installs debian/copyright if it exists. If
+dh_installdocs is acting on multiple packages, debian/copyright files will be
+installed into all packages. However, if you need to have seperate copyright
+files for different binary packages, you can use files named
+debian/package.copyright.
+
+Any filenames specified as parameters will be installed into the first
+package dh_installdocs is told to act on. By default, this is the first
+binary package in debian/control, but if you use -p, -i, or -a flags, it
+will be the first package specified by those flags.
+
+Also, debian/README.Debian (or debian/README.debian) and debian/TODO, if
+they exist, will be installed into the first binary package listed in
+debian/control, if dh_installdocs is acting on that package. Note that
+debian/TODO will be installed named TODO.Debian, if the package is not a
+debian native package. Also note that README.debian is installed as
+README.Debian, for consitency. Note that debian/package.README.Debian and
+debian/package.TODO can be used to specify files for subpackages.
+
+Files named debian/package.docs can list other files to be installed.
+
+This program will automatically generate postinst and prerm commands to
+maintain a compatibility symlink, /usr/doc/package, to the documentation in
+/usr/share/doc/package. See L<dh_installdeb(1)> for an explanation of how
+this works.
+
+Files named debian/package.doc-base, will be installed as doc-base control
+files, and will make this program automatically generate the postinst and
+prerm commands needed to interface with the doc-base package. Note that the
+doc-id will be determined from the "Document:" entry in the
+doc-base control file in question.
+
+If your package needs to register more than one document, you need multiple
+files. To accomplish this, you can use files named debian/package.doc-base.*
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-A>, B<--all>
+
+Install all files specified by command line parameters in ALL packages
+acted on.
+
+=item B<-n>, B<--noscripts>
+
+Do not modify postinst/prerm scripts.
+
+=item I<file ...>
+
+Install these files as documentation into the first package acted on. (Or
+in all packages if -A is specified).
+
+=back
+
+=head1 NOTES
+
+Note that dh_installdocs will happily copy entire directory hierarchies if
+you ask it to (it uses cp -a internally). If it is asked to install a
+directory, it will install the complete contents of the directory.
+
+Note that this command is not idempotent. "dh_clean -k" should be called
+between invocations of this command. Otherwise, it may cause multiple
+instances of the same text to be added to maintainer scripts.
+
+=cut
+
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -128,3 +206,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 	}
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut
