@@ -1,3 +1,16 @@
+debhelper (2.0.56) unstable; urgency=low
+
+  * Fiddlesticks. The neat make trick I was using in rules.multi2 failed if
+    you try to build binary-indep and binary-arch targets in the same make
+    run. Make tries to be too smart. Modified the file so it will work,
+    though it's now uglier. Closes: 46287
+  * examples/*: It's important that one -not- use a install-stamp target.
+    Install should run every time binary-* calls it. Otherwise if a binary-*
+    target is called twice by hand, you get duplicate entries in the
+    maintainer script fragment files. Closes: #46313
+
+ -- Joey Hess <joeyh@master.debian.org>  Thu, 30 Sep 1999 12:01:40 -0700
+
 debhelper (2.0.55) unstable; urgency=low
 
   * Fixed quoting problem in examples/rules.multi (Closes: #46254)

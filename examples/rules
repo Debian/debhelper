@@ -20,7 +20,7 @@ build-stamp:
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp install-stamp
+	rm -f build-stamp
 
 	# Add here commands to clean up after the build process.
 	#-$(MAKE) clean
@@ -28,8 +28,7 @@ clean:
 
 	dh_clean
 
-install: install-stamp
-install-stamp: build-stamp
+install:
 	dh_testdir
 	dh_testroot
 	dh_clean -k
