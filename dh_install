@@ -198,14 +198,18 @@ if ($dh{LIST_MISSING} || $dh{FAIL_MISSING}) {
 	
 	my @missing;
 	my $installed=join("|", @installed);
-	$installed=qr{^$installed$};
+	$installed=qr{^($installed)$};
 	find(sub {
 		-f || -l || return;
 		$_="$File::Find::dir/$_";
-		push @missing, $_ unless /$installed/ || excludefile($_);
+		if (! /$installed/ && ! excludefile($_)) {
+			my $file=$_;
+			$file=~s/^\Q$srcdir\E\///;
+			push @missing, $file;
+		}
 	}, $srcdir);
 	if (@missing) {
-		warning "$_ exists in debian/tmp but not installed to anywhere" foreach @missing;
+		warning "$_ exists in debian/tmp but is not installed to anywhere" foreach @missing;
 		if ($dh{FAIL_MISSING}) {
 			error("missing files, aborting");
 		}
