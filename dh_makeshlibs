@@ -12,7 +12,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 
 	doit("rm", "-f", "$TMP/DEBIAN/shlibs");
 
-	open (FIND, "find $TMP -xtype f -name '*.so*' |");
+	open (FIND, "find $TMP -xtype f -name '*.so.*' |");
 	while (<FIND>) {
 		chomp;
 		($library, $major)=m#.*/(.*)\.so\.(\d*)\.?#;
