@@ -15,7 +15,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 				doit "strip --strip-unneeded $file"
 			;;
 			*ELF*executable*)
-				doit "strip --remove-section=comment --remove-section=note $file"
+				doit "strip --remove-section=.comment --remove-section=.note $file"
 			;;
 		esac
 	done
