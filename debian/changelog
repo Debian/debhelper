@@ -1,3 +1,15 @@
+debhelper (0.29) unstable; urgency=low
+
+  * dh_lib: don't expand text passed to doit() a second time. This fixes
+    #15624, and hopefully doesn't break anything else.
+  * A side effect of this (of interest only to the debhelper programmer) is
+    that doit() can no longer handle complex commands now. (ie, pipes, `;',
+    `&', etc separating multiple commands, or redirection)
+  * dh_makeshlibs, dh_md5sums, dh_installdebfiles, dh_du, dh_clean, 
+    dh_installdirs: don't pass complex commands to doit().
+
+ -- Joey Hess <joeyh@master.debian.org>  Thu,  4 Dec 1997 13:56:14 -0500
+
 debhelper (0.28) unstable; urgency=low
 
   * dh_makeshlibs: fixes type that caused the program to crash (#15536).

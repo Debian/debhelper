@@ -13,13 +13,13 @@ for PACKAGE in $DH_DOPACKAGES; do
 		doit "install -d $TMP/DEBIAN"
 	fi
 
-	doit "find $TMP/* -type f ! -regex '^$TMP/DEBIAN/.*' | sed s:$TMP:: | sort > $TMP/DEBIAN/allfiles"
+	complex_doit "find $TMP/* -type f ! -regex '^$TMP/DEBIAN/.*' | sed s:$TMP:: | sort > $TMP/DEBIAN/allfiles"
 	# Check if we should exclude conffiles.
 	if [ ! "$DH_EXCLUDE" -a -r $TMP/DEBIAN/conffiles ]; then
-		doit "sort $TMP/DEBIAN/conffiles | comm -13 - $TMP/DEBIAN/allfiles > $TMP/DEBIAN/allfiles.new"
+		complex_doit "sort $TMP/DEBIAN/conffiles | comm -13 - $TMP/DEBIAN/allfiles > $TMP/DEBIAN/allfiles.new"
 		doit "mv $TMP/DEBIAN/allfiles.new $TMP/DEBIAN/allfiles"
 	fi
-	doit "cd $TMP ; sed 's:^/::' < DEBIAN/allfiles | xargs md5sum > DEBIAN/md5sums ; cd ../.."
+	complex_doit "cd $TMP ; sed 's:^/::' < DEBIAN/allfiles | xargs md5sum > DEBIAN/md5sums ; cd ../.."
 	doit "chown root.root $TMP/DEBIAN/md5sums"
 	doit "rm -f $TMP/DEBIAN/allfiles"
 done

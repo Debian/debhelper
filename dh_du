@@ -14,6 +14,6 @@ for PACKAGE in $DH_DOPACKAGES; do
 	fi
 
 	# Note that the tabs in this next line are important.
-	doit "du -k $TMP | sed 's:	$TMP/:	:' | grep -v '	DEBIAN$' | grep -v '	$TMP$' >$TMP/DEBIAN/du"
+	complex_doit "du -k $TMP | sed 's:	$TMP/:	:' | grep -v '	DEBIAN$' | grep -v '	$TMP$' >$TMP/DEBIAN/du"
 	doit "chown root.root debian/tmp/DEBIAN/du"
 done
