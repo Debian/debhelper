@@ -13,7 +13,9 @@ my $lib_dir = 'usr/lib/perl5';
 # it points to, otherwise query perl directly.
 my $version=sprintf("%.3f", $]);
 if (defined $ENV{PERL}) {
-	$version=`$ENV{PERL} -e 'printf "%.3f", \$]'`;
+	# This is pretty gawd-aweful ugly, because we need "5.00[45]"
+	# and "5.[6789]" to be returned.
+	$version=`$ENV{PERL} -e '\$] < 5.006 ? printf "%.3f", \$] : printf "%vd\n", substr \$^V, 0, -1'`;
 }
 
 # Cleaning the paths given on the command line

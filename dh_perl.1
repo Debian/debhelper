@@ -10,9 +10,9 @@ the perl:Depends substitutions and adding them to substvars files.
 .P
 The program will look for the location of installed modules and will
 use this information to generate a dependency (at the present time
-it can only be perl5, perl5-thread, perl-5.00X or perl-5.00X-thread).
-The dependancy will be substituted into your package's control file wherever
-you place the token "${perl:Depends}".
+it can only be perl5, perl5-thread, perl-5.X or perl-5.X-thread).
+The dependancy will be substituted into your package's control file
+wherever you place the token "${perl:Depends}".
 .P
 It will also look at #! lines of perl scripts in order to be able
 to calculate a dependency for perl scripts and not only perl modules.
@@ -33,14 +33,14 @@ Keep .packlist files.
 .TP
 .B -d
 In some specific cases you may want to depend on a -base package
-(ie perl-5.00X-base or perl5-base). If so, you can pass
+(ie perl-5.6-base or perl5-base). If so, you can pass
 the -d option to make
 .BR dh_perl
 generate a dependency on the correct base package. This is only necessary
 for some modules that are included in the base system.
 .TP
 .B library dirs
-If your package does install perl modules in non-standard
+If your package installs perl modules in non-standard
 directories, you can make
 .BR dh_perl
 check those directories by passing their names on the command line.
