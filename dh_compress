@@ -22,7 +22,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	@files=();
 	# First of all, deal with any files specified right on the command line.
 	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
-		push @files,#ARGV;
+		push @files, @ARGV;
 	}
 	if ($compress) {
 		# The config file is a sh script that outputs the files to be compressed
