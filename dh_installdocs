@@ -115,7 +115,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (@docs) {
 		my $exclude = '';
 		if ($dh{EXCLUDE_FIND}) {
-			$exclude = ' \( ! '.$dh{EXCLUDE_FIND}.' \)';
+			$exclude = ' -and ! \( '.$dh{EXCLUDE_FIND}.' \)';
 		}
 		foreach my $doc (@docs) {
 			next if excludefile($doc);
