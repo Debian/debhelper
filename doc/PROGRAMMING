@@ -1,5 +1,5 @@
 This file documents things you should know to write a new debhelper program.
-Any program with a name that debins with dh_ should conform to these
+Any program with a name that begins with dh_ should conform to these
 guidelines (with the historical exception of dh_make).
 
 Standardization:
@@ -19,7 +19,7 @@ have a lot of noise output when all the debhelper commands in a debian/rules
 are run, so the important stuff is clearly visible.
 
 Debhelper programs should accept all options listed in the "SHARED
-DEBHELPER OPTIONS" section of debhelper(7), including and any long forms of
+DEBHELPER OPTIONS" section of debhelper(7), including any long forms of
 these options, like --verbose . If necessary, the options may be ignored.
 
 If debhelper commands need config files, they should use
@@ -31,13 +31,13 @@ information that appears in the config files, on their command lines, if
 possible, and apply that information to the first package they act on.
 
 Debhelper programs should never modify the debian/postinst, debian/prerm,
-etc scripts, instead, they can add lines to debian/postinst.debhelper, etc. 
+etc scripts. Instead, they can add lines to debian/postinst.debhelper, etc. 
 The autoscript() function (see below) is one easy way to do this.
 dh_installdeb is an exception, it will run after the other commands and
 merge these modifications into the actual postinst scripts.
 
 In general, files named debian/*.debhelper are internal to debhelper, and
-their expstence or use should not be relied on by external programs such as
+their existence or use should not be relied on by external programs such as
 the build process of a package.
 
 Debhelper programs should default to doing exactly what policy says to do.
@@ -148,7 +148,7 @@ The following keys are also set in the %dh hash when you call init():
 MAINPACKAGE	the name of the first binary package listed in
 		debian/control
 FIRSTPACKAGE	the first package we were instructed to act on. This package
-		typically gets special treatment, additional arguments
+		typically gets special treatment; additional arguments
 		specified on the command line may effect it.
 
 Functions:
