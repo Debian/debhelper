@@ -1,3 +1,12 @@
+debhelper (4.0.10) unstable; urgency=low
+
+  * Consistently use the which command instead of command -v or hardcoded
+    paths in autoscripts. Neither is in posix, but which is in debianutils, so
+    will always be available. command -v is not available in zsh.
+    Closes: #148172
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 26 May 2002 00:54:33 -0400
+
 debhelper (4.0.9) unstable; urgency=low
 
   * dh_install: glob relative to --sourcedir. Closes: #147908
