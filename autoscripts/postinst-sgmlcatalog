@@ -1,0 +1,7 @@
+if [ "$1" = "configure" ]; then
+	rm -f #CENTRALCAT#
+	for ordcat in #ORDCATS#; do
+		update-catalog --quiet --add #CENTRALCAT# ${ordcat}
+	done
+	update-catalog --quiet --add --super #CENTRALCAT#
+fi
