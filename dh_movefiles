@@ -1,0 +1,27 @@
+#!/bin/sh -e
+#
+# Move files out of debian/tmp, into subpackages.
+
+PATH=debian:$PATH:/usr/lib/debhelper
+. dh_lib
+
+for PACKAGE in $DH_DOPACKAGES; do
+	TMP=`tmpdir $PACKAGE`
+	files=`pkgfile $PACKAGE files`
+
+	move=""
+
+	# debian/files has a different purpose, so ignore it.
+	if [ "$files" -a "$files" != "debian/files" ]; then
+		if [ "$PACKAGE" = "$MAINPACKAGE" ]; then
+			error "I was asked to move some files from $PACKAGE into itself."
+		fi
+
+		if [ ! -d "$TMP" ]; then
+			doit "install -d $TMP"
+		fi
+
+		files=`pwd`/$files
+		complex_doit "(cd debian/tmp;tar --create --remove-files --file - "`cat $files`") | (cd $TMP;tar xpf -)"
+	fi
+done
