@@ -127,6 +127,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	
 	foreach my $set (@install) {
 		my $dest;
+		my $tmpdest=0;
 		
 		if (! defined $dh{AUTODEST} && @$set > 1) {
 			$dest=pop @$set;
@@ -144,6 +145,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				}
 				$dest=~s/^(.*\/)?\Q$strip\E//;
 				$dest=dirname($dest);
+				$tmpdest=1;
 			}
 			
 			# Make sure the destination directory exists.
@@ -173,6 +175,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			}
 			else {
 				doit("cp", "-a", $src, "$tmp/$dest/");
+			}
+
+			if ($tmpdest) {
+				$dest=undef;
 			}
 		}
 	}
