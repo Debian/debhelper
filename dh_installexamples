@@ -58,6 +58,8 @@ directory, it will install the complete contents of the directory.
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
+	next if is_udeb($package);
+
 	my $tmp=tmpdir($package);
 	my $file=pkgfile($package,"examples");
 	

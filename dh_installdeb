@@ -52,6 +52,16 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("install","-o",0,"-g",0,"-d","$tmp/DEBIAN");
 	}
 
+	if (is_udeb($package)) {
+		# For udebs, only do the postinst, and no #DEBHELPER#.
+		my $f=pkgfile($package,"postinst");
+		if ($f) {
+			doit("install", "-o", 0, "-g", 0, "-m", 755, 
+			     $f, "$tmp/DEBIAN/postinst");
+		}
+		next;		
+	}
+	
 	# Install debian install scripts.
 	# If any .debhelper files exist, add them into the scripts.
 	foreach my $file (qw{postinst preinst prerm postrm}) {

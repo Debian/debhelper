@@ -54,8 +54,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	# Generate and install control file.
 	my @command="dpkg-gencontrol";
-	if (GetPackages() > 1) {
+	if (getpackages() > 1) {
 		push @command, "-p$package";
+	}
+	if (is_udeb($package)) {
+		push @command, "-n".udeb_filename($package);
 	}
 	doit(@command, "-l$changelog", "-isp", "-Tdebian/${ext}substvars", 
 		"-P$tmp",@{$dh{U_PARAMS}});

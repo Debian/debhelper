@@ -29,18 +29,18 @@ sub showhelp {
 # order.
 sub AddPackage { my($option,$value)=@_;
 	if ($option eq 'i' or $option eq 'indep') {
-		push @{$options{DOPACKAGES}}, GetPackages('indep');
+		push @{$options{DOPACKAGES}}, getpackages('indep');
 		$options{DOINDEP}=1;
 	}
 	elsif ($option eq 'a' or $option eq 'arch') {
-		push @{$options{DOPACKAGES}}, GetPackages('arch');
+		push @{$options{DOPACKAGES}}, getpackages('arch');
 		$options{DOARCH}=1;
 	}
 	elsif ($option eq 'p' or $option eq 'package') {
 		push @{$options{DOPACKAGES}}, $value;
 	}
 	elsif ($option eq 's' or $option eq 'same-arch') {
-		push @{$options{DOPACKAGES}}, GetPackages('same');
+		push @{$options{DOPACKAGES}}, getpackages('same');
 		$options{DOSAME}=1;
 	}
 	else {
@@ -184,7 +184,7 @@ sub parseopts {
 			# built, and there are none of that type.
 			error("I have no package to build");
 		}
-		push @{$options{DOPACKAGES}},GetPackages();
+		push @{$options{DOPACKAGES}},getpackages();
 	}
 
 	# Remove excluded packages from the list of packages to act on.

@@ -83,7 +83,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("install","-o",0,"-g",0,"-d","$tmp/DEBIAN");
 	}
 
-	if ($config ne '') {
+	if (! is_udeb($package) && $config ne '') {
 		doit("install", "-o", 0, "-g", 0, "-m", 755, "-p",
 		     $config, "$tmp/DEBIAN/config");
 	}

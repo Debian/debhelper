@@ -63,7 +63,16 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		complex_doit("find $tmp -name $_ | xargs rm -rf")
 			foreach split(":", $ENV{DH_ALWAYS_EXCLUDE});
 	}
-	doit("dpkg-deb", @{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$dh{FILENAME});
+	if (! is_udeb($package)) {
+		doit("dpkg-deb", @{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$dh{FILENAME});
+	}
+	else {
+		my $filename=$dh{FILENAME};
+		if (! $filename) {
+			$filename="/".udeb_filename($package);
+		}
+		doit("dpkg-deb", @{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$filename);
+	}
 }
 
 =head1 SEE ALSO

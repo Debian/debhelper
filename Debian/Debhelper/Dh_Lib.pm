@@ -12,8 +12,9 @@ use vars qw(@ISA @EXPORT %dh);
 @ISA=qw(Exporter);
 @EXPORT=qw(&init &doit &complex_doit &verbose_print &error &warning &tmpdir
 	    &pkgfile &pkgext &pkgfilename &isnative &autoscript &filearray
-	    &filedoublearray &GetPackages &basename &dirname &xargs %dh
-	    &compat &addsubstvar &delsubstvar &excludefile);
+	    &filedoublearray &getpackages &basename &dirname &xargs %dh
+	    &compat &addsubstvar &delsubstvar &excludefile &is_udeb
+	    &udeb_filename);
 
 my $max_compat=4;
 
@@ -72,7 +73,7 @@ sub init {
 		$dh{NO_ACT}=1;
 	}
 
-	my @allpackages=GetPackages();
+	my @allpackages=getpackages();
 	# Get the name of the main binary package (first one listed in
 	# debian/control). Only if the main package was not set on the
 	# command line.
@@ -533,8 +534,14 @@ sub excludefile {
 # Must pass "arch" or "indep" or "same" to specify arch-dependant or
 # -independant or same arch packages. If nothing is specified, returns all
 # packages.
-sub GetPackages {
+# As a side effect, populates %package_arches and %package_types with the
+# types of all packages (not only those returned).
+my (%package_types, %package_arches);
+sub getpackages {
 	my $type=shift;
+
+	%package_types=();
+	%package_arches=();
 	
 	$type="" if ! defined $type;
 	
@@ -546,6 +553,7 @@ sub GetPackages {
 
 	my $package="";
 	my $arch="";
+	my $package_type;
 	my @list=();
 	my %seen;
 	open (CONTROL, 'debian/control') ||
@@ -562,12 +570,20 @@ sub GetPackages {
 			else {
 				error("debian/control has a duplicate entry for $package");
 			}
+			$package_type="deb";
 		}
 		if (/^Architecture:\s*(.*)/) {
 			$arch=$1;
 		}
+		if (/^X[BC]*-Package-Type:\s*(.*)/) {
+			$package_type=$1;
+		}
 		
 		if (!$_ or eof) { # end of stanza.
+			if ($package) {
+				$package_types{$package}=$package_type;
+				$package_arches{$package}=$arch;
+			}
 			if ($package &&
 			    (($type eq 'indep' && $arch eq 'all') ||
 			     ($type eq 'arch' && $arch ne 'all') ||
@@ -582,6 +598,20 @@ sub GetPackages {
 	close CONTROL;
 
 	return @list;
+}
+
+sub is_udeb {
+	my $package=shift;
+	
+	return $package_types{$package} eq 'udeb';
+}
+
+sub udeb_filename {
+	my $package=shift;
+	
+	my $filearch=$package_arches{$package} eq 'all' ? "all" : buildarch();
+	isnative($package); # side effect
+	return "${package}_$dh{VERSION}_$filearch.udeb";
 }
 
 1

@@ -1,3 +1,21 @@
+debhelper (4.2.0) unstable; urgency=low
+
+  * Added udeb support, as pioneered by di-packages-build. Understands
+    "XC-Package-Type: udeb" in debian/control. See debhelper(1) for
+    details.
+  * Dh_Lib: add and export is_udeb and udeb_filename
+  * dh_builddeb: name udebs with proper extension
+  * dh_gencontrol: pass -n and filename to dpkg-gencontrol
+  * dh_installdocs, dh_makeshlibs, dh_md5sums, dh_installchangelogs,
+    dh_installexamples, dh_installman, dh_installmanpages: skip udebs
+  * dh_shlibdeps: skip udebs. This may be temporary.
+  * dh_installdeb: do not process conffiles, shlibs, preinsts, postrms,
+    or prerms for udebs. Do not substiture #DEBHELPER# tokens in
+    postinst scripts for udebs.
+  * dh_installdebconf: skip config script for udebs, still do templates
+
+ -- Joey Hess <joeyh@debian.org>  Sun,  8 Feb 2004 22:51:57 -0500
+
 debhelper (4.1.90) unstable; urgency=low
 
   * dh_strip: Add note to man page that the detached debugging symbols options

@@ -46,6 +46,8 @@ being listed in the md5sums file.
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
+	next if is_udeb($package);
+	
 	my $tmp=tmpdir($package);
 
 	if (! -d "$tmp/DEBIAN") {

@@ -132,7 +132,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		$strong_dep = 1;
 		my $pack = $package;
 		$pack =~ s/^python/python$python_version/;
-		if (grep { "$_" eq "$pack" } GetPackages()) {
+		if (grep { "$_" eq "$pack" } getpackages()) {
 			addsubstvar($package, "python:Depends", $pack);
 		}
 	}
