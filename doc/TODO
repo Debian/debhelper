@@ -11,7 +11,6 @@ Bugs:
 
 Wishlist items:
 
-* Add emacsen support to debhelper. (#21401)
 * Make dh_movefiles remove emptied directories after it's moved all the
   files out of them (#17111).
 * info support for debhelper (currently implemented, but I hate how I did it,
@@ -59,3 +58,22 @@ Depricated:
 * remove dh_installdebfiles, dh_du.
 	- need to wait a reasonable length of time. I'm currently planning
 	  on doing this after slink is released.
+
+Long term goals:
+
+Convert selected and then selected debhelper commands (dh_installmanpages?)
+to be perl programs, for speed, ease of maintainence, and 8-bit cleanness.
+Tricky, because of the -v option -- they'd have to call external commands
+like install and cp, and log such calls if verbose was on. Maybe something
+like:
+
+doit {
+	system @_;
+	if ($DH_VERBOSE) {
+		print join " ", @_;
+	}
+}
+
+However, this will output commands that are incorrect if the filenames in
+them contain spaces or other weird characters. Hmm, maybe such things should
+just be escaped with \'s in the output?

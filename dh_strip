@@ -5,26 +5,38 @@
 PATH=debian:$PATH:/usr/lib/debhelper
 . dh_lib
 
+# This reads in a list of files, and excludes any that match what's in
+# DH_EXCLUDE_GREP.
+filelist_excluded () {
+	if [ "$DH_EXCLUDE_GREP" ]; then
+		# Use grep -F so we don't have to worry about regexp's.
+		grep -v -F "`(cd $TMP; echo "$DH_EXCLUDE_GREP" | tr "|" "\n")`"
+	else
+		# Just pass all files through.
+		cat
+	fi
+}
+
 for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
-	
+
 	# Handle executables and shared libraries.
-	for file in `find $TMP -type f \( -perm +111 -or -name "*.so*" \) 2>/dev/null` ; do
-		case "`file $file`" in
+	for file in `(cd $TMP; find -type f \( -perm +111 -or -name "*.so*" \) 2>/dev/null) | filelist_excluded` ; do
+		case "`file $TMP/$file`" in
 			*ELF*shared*)
-				doit "strip --strip-unneeded $file"
+				doit "strip --strip-unneeded $TMP/$file"
 			;;
 			*ELF*executable*)
-				doit "strip --remove-section=.comment --remove-section=.note $file"
+				doit "strip --remove-section=.comment --remove-section=.note $TMP/$file"
 			;;
 		esac
 	done
 
 	# Handle static libraries.
-	for file in `find $TMP -type f -name "lib*.a" 2>/dev/null` ; do
+	for file in `(cd $TMP; find -type f -name "lib*.a" 2>/dev/null) | filelist_excluded` ; do
 		# Don't strip debug libraries.
 		if ! expr "$file" : ".*_g\.a" >/dev/null ; then
-			doit "strip --strip-debug $file"
+			doit "strip --strip-debug $TMP/$file"
 		fi
 	done
 done
