@@ -14,8 +14,8 @@ Files named debian/package.files list the files to be moved, separated by
 whitespace. The filenames listed should be relative to debian/tmp/. You can
 also list directory names, and the whole directory will be moved. You can
 even use wildcards if you like. If you prefer, you can list the files to
-move on the command line. However, this will only work if the first package
-dh_movefiles is told to act on is a subpackage (ie, via -p).
+move on the command line and this will apply to the first package
+dh_movefiles is told to act on.
 .P
 The files will be moved in a special order: first all normal files, then all
 symlinks. This is done becuase it tends to be a good thing to have symlinks
@@ -39,7 +39,7 @@ will output a list of what it would have done.
 Move files for the package named "package".
 .TP
 .B \-Ptmpdir, \--tmpdir=tmpdir
-Use "tmpdir" for package build directory. 
+Use "tmpdir" for package build directory.
 .TP
 .B file ..
 Lists files to move. The filenames listed should be relative to debian/tmp/.
