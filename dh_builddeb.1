@@ -3,7 +3,7 @@
 dh_builddeb \- build debian packages
 .SH SYNOPSIS
 .B dh_builddeb
-.I "[debhelper options] [--destdir=directory] [-uparams] [-- params]"
+.I "[debhelper options] [--destdir=directory] [--name=filename] [-uparams] [-- params]"
 .SH "DESCRIPTION"
 dh_builddeb simply calls
 .BR dpkg (8)
@@ -19,10 +19,14 @@ for a list of options common to all debhelper commands.
 Use this if you want the generated .deb files to be put in a directory other
 than the default of ".."
 .TP
+.B --name=filename
+Use this if you want to force the generated .deb file to have a particular
+file name. Does not work well if more than one .deb is generated!
+.TP
 .B \-uparams
 .TP
 .B \-\- params
-Pass "params" to 
+Pass "params" to
 .BR dpkg-deb (1)
 when it is used to build the package.
 .SH ENVIRONMENT

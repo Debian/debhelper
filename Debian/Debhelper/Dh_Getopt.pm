@@ -123,6 +123,8 @@ sub parseopts {
 		"sourcedir=s" => \$options{SOURCEDIR},
 		
 		"destdir=s" => \$options{DESTDIR},
+
+		"filename=s" => \$options{FILENAME},
 		
 		"number=i" => \$options{PRIORITY},	# deprecated
 		"priority=i" => \$options{PRIORITY},
