@@ -121,6 +121,7 @@ sub testfile {
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 
+	@shared_libs=@executables=@static_libs=();
 	find(\&testfile,$tmp);
 
 	foreach (@shared_libs) {
