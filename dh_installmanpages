@@ -60,7 +60,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 	# Now the .so conversion.
 	for file in `find $TMP/usr/man $TMP/usr/X11*/man -type f -size -256c 2>/dev/null`
 	do
-		solink=expr "`head -1 $file`" : '\.so \(.*\)'
+		solink=`expr "\`head -1 $file\`" : '\.so \(.*\)'`
 		if [ "$solink" ]; then
 			doit "rm -f $file"
 			# The .so links include the subdir the page is in, 

@@ -64,7 +64,7 @@ use Getopt::Long;
 Getopt::Long::config("bundling");
 
 # Parse options.
-GetOptions(
+$ret=GetOptions(
 	"v" => \$verbose,
 	"verbose" => \$verbose,
 
@@ -112,6 +112,10 @@ GetOptions(
 
 	"init-script=s" => \$init_script,
 );
+
+if (!$ret) {
+	$parse_error="exiting with unknown option.";
+}
 
 # Check to see if -V was specified. If so, but no parameters were passed,
 # the variable will be defined but empty.
