@@ -27,7 +27,12 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		}
 		close CONFF;
 	}
-
+	
+	# See if we should exclude other files.
+	if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
+		$exclude.="! \\( $dh{EXCLUDE_FIND} \\) ";
+	}
+	
 	$olddir=getcwd();
 	complex_doit("cd $TMP ; find * -type f $exclude ! -regex '^DEBIAN/.*' -print0 | xargs -r0 md5sum > DEBIAN/md5sums ; cd $olddir");
 	# If the file's empty, no reason to waste inodes on it.

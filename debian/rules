@@ -41,6 +41,21 @@ binary-indep: build
 	./dh_installexamples examples/*
 	./dh_installmenu
 	./dh_installmanpages
+	# Fix up all man pages, filling in the modification time for them.
+	# Note this runs beofre the command below so debhelper.1 gets the right
+	# date on it.
+	perl -mPOSIX -e ' \
+		foreach $$f (@ARGV) { \
+		@data=stat($$f); \
+		$$date=POSIX::strftime("%d %B %Y",localtime($$data[9])); \
+		open (IN,$$f); \
+		@lines=<IN>; \
+		close IN; \
+		$$lines[0]=~s/1 ""/1 "$$date"/; \
+		open (OUT,">$$f"); \
+		print OUT @lines; \
+		close OUT; \
+	}' debian/tmp/usr/man/man1/*.1
 	# Fix up the debhelper.1 man page, substituting in a list of all
 	# debhelper commands. eek!
 	perl -ne ' \
@@ -48,13 +63,14 @@ binary-indep: build
 		$$collect.=".TP\n.BR $$_" if $$. eq 3 && /^dh_/; \
 		close(ARGV) if eof; \
 		END { \
-			open(I,"debhelper.1"); \
+			open(I,"debian/tmp/usr/man/man1/debhelper.1"); \
+			@lines=<I>; \
+			close I; \
 			open(O,">debian/tmp/usr/man/man1/debhelper.1"); \
-			while (<I>) { \
+			foreach (@lines) { \
 				s/#LIST#/$$collect/; \
 				print O; \
 			} \
-			close I; \
 			close O; \
 		}' *.1
 	./dh_installchangelogs
