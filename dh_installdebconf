@@ -28,6 +28,11 @@ installed into the DEBIAN directory in the package build directory.
 Note that if you use debconf, your package probably needs to depend on it
 (it will be added to ${misc:Depends} by this program).
 
+Note that for your config script to be called by dpkg, your postinst
+needs to source debconf's confmodule. dh_installdebconf does not
+install this statement into postinst automatically as it it too hard to
+do it right.
+
 =head1 LOCALIZED TEMPLATE FILES
 
 Debconf also supports localized template files, and this program has some
