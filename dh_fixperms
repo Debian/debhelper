@@ -1,9 +1,45 @@
 #!/usr/bin/perl -w
-#
-# Do some general file permission fixups.
+
+=head1 NAME
+
+dh_fixperms - fix permissions of files in package build directories
+
+=cut
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+dh_fixperms [debhelper options] [-Xitem]
+
+=head1 DESCRIPTION
+
+dh_fixperms is a debhelper program that is responsible for setting the
+permissions of files and directories in package build directories to a
+sane state -- a state that complies with Debian policy.
+
+dh_fixperms makes all files in usr/share/doc in the package build directory
+(excluding files in the examples/ directory) be mode 644. It also changes
+the permissions of all man pages to mode 644. It makes all files be owned by
+root, and it removes group and other write permission from all files.
+It removes execute permissions from any libraries that have it set. Finally,
+it removes the setuid and setgid bits from all files in the package.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-X>I<item>, B<--exclude>I<item>
+
+Exclude files that contain "item" anywhere in their filename from having
+their permissions changed. You may use this option multiple times to build
+up a list of things to exclude.
+
+=back
+
+=cut
+
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -37,3 +73,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		"\\( -name '*.so*' -or -name '*.la' -or -name '*.a' \\) $find_options -print0",
 		"2>/dev/null | xargs -0r chmod a-X");
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)|debhelper>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

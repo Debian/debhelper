@@ -1,11 +1,69 @@
 #!/usr/bin/perl -w
-#
-# Compresses files and makes sure that symlinks pointing to the 
-# compressed files get fixed.
+
+=head1 NAME
+
+dh_compress - compress files and fix symlinks in package build directories
+
+=cut
 
 use strict;
 use Cwd;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_compress [debhelper options] [-Xitem] [-A] [file ...]
+
+=head1 DESCRIPTION
+
+dh_compress is a debhelper program that is responsible for compressing
+the files in package build directories, and makes sure that any symlinks
+that pointed to the files before they were compressed are updated to point
+to the new files.
+
+By default, dh_compress compresses files that debian policy mandates should
+be compressed, namely all files in usr/share/info, usr/share/man,
+usr/X11R6/man, and all files in usr/share/doc that are larger than 4k in size,
+(except the copyright file, .html files and .gif files), and all changelog
+files. It skips any files that appear to be already compressed (based on their
+extensions).
+
+If a debian/package.compress file exists, however, it will be ran as a shell
+script, and all filenames that the shell script outputs will be compressed
+instead of the default files. The shell script will be run from
+inside the package build directory. Note though that using -X is a much
+better idea in general; you should only use a debian/package.compress file
+if you really have to.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-X>I<item>, B<--exclude=>I<item>
+
+Exclude files that contain "item" anywhere in their filename from being
+compressed. For example, -X.jpeg will exclude jpeg's from compression.
+You may use this option multiple times to build up a list of things to
+exclude. You can accomplish the same thing by using a debian/compress file,
+but this is easier.
+
+=item B<-A>, B<--all>
+
+Compress all files specified by command line parameters in ALL packages
+acted on.
+
+=item I<file ...>
+
+Add these files to the list of files to compress.
+
+=back
+
+=head1 CONFORMS TO
+
+Debian policy, version 3.0
+
+=cut
+
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -117,3 +175,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 	}
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)|debhelper>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut
