@@ -106,12 +106,22 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			my ($section)=$basename=~m/.*\.([1-9])/;
 			
 			my $destdir="$TMP/usr/$extdir/man/man$section/";
+			
+			# Handle translated man pages.
+			my $instname=$basename;
+			my ($langcode)=$basename=~m/.*\.([a-z][a-z])\.([1-9])/;
+			if (defined $langcode && $langcode ne '') {
+				$destdir="$TMP/usr/$extdir/man/$langcode/man$section/";
+				$instname=~s/\.$langcode\./\./;
+			}
+			
 			$destdir=~tr:/:/:s; # just for looks
+			
 			if (! -e "$destdir/$basename" && !-l "$destdir/$basename") {
 				if (! -d $destdir) {
 					doit "install","-d",$destdir;
 				}
-				doit "install","-p","-m644",$page,$destdir;
+				doit "install","-p","-m644",$page,$destdir.$instname;
 			}
 		}
 	}
