@@ -144,6 +144,10 @@ if ($ENV{DH_NO_ACT} ne undef) {
 
 $exclude=join ' ', @exclude;
 $exclude_grep=join '|', @exclude;
+foreach (@exclude) {
+	$exclude_find.="-regex .*".quotemeta($_).".* -or ";
+}
+$exclude_find=~s/ -or $//;
 
 # Now output everything, in a format suitable for a shell to eval it. 
 # Note the last line sets $@ in the shell to whatever arguements remain.
@@ -157,6 +161,7 @@ DH_NOSCRIPTS='$noscripts'
 DH_INCLUDE_CONFFILES='$include'
 DH_EXCLUDE='$exclude'
 DH_EXCLUDE_GREP='$exclude_grep'
+DH_EXCLUDE_FIND='$exclude_find'
 DH_D_FLAG='$d_flag'
 DH_R_FLAG='$r_flag'
 DH_K_FLAG='$k_flag'
