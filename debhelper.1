@@ -12,6 +12,7 @@ document those options and to document debhelper as a whole. For additional
 options, and documentation for each individual command, see the commands' own
 man pages.
 .SH "SHARED DEBHLPER OPTIONS"
+The following command line options are supported by all debhelper programs.
 .TP
 .B \-v, \--verbose
 Verbose mode: show all commands that modify the package build directory.
@@ -44,6 +45,20 @@ the package as one that should be acted on.
 .TP
 .B \-Ptmpdir, \--tmpdir=tmpdir
 Use "tmpdir" for package build directory. 
+.SH "COMMON DEBHELPER OPTIONS"
+The following command line options are supported by some debhelper programs.
+See the man page of each program for a complete explination of what the
+option does.
+.TP
+.B \-n
+Do not modify postinst/postrm/etc scripts.
+.TP
+.B \-Xitem, \--exclude=item
+Exclude an item from processing.
+.TP
+.B \-A, \-all
+Makes files or other items that are specified on the command line take effect
+in ALL packages acted on, not just the first.
 .SH NOTES
 .TP
 .B Multiple binary package support
