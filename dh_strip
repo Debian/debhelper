@@ -62,11 +62,13 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	foreach (@shared_libs) {
 		# Note that all calls to strip on shared libs
 		# *must* inclde the --strip-unneeded.
-		doit("strip","--remove-section=.comment","--remove-section=.note","--strip-unneeded",$_);
+		doit("strip","--remove-section=.comment",
+			"--remove-section=.note","--strip-unneeded",$_);
 	}
 	
 	foreach (@executables) {
-		doit("strip","--remove-section=.comment","--remove-section=.note",$_);
+		doit("strip","--remove-section=.comment",
+			"--remove-section=.note",$_);
 	}
 
 	foreach (@static_libs) {
