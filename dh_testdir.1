@@ -1,0 +1,28 @@
+.TH DH_TESTDIR 1 "" "Debhelper Commands" "Debhelper Commands"
+.SH NAME
+dh_testdir \- test directory before building debian package
+.SH SYNOPSIS
+.B dh_testdir
+.I "[debhelper options] [file ...]"
+.SH "DESCRIPTION"
+dh_testdir tries to make sure that you are in the correct directory when
+building a debian package. It makes sure that the file debian/control
+exists, as well as any other files you specify. If not,
+it exits with an error.
+.SH OPTIONS
+.TP
+.B [debhelper options]
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
+.TP
+.B file ...
+Test for the existence of these files.
+.SH ENVIRONMENT
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
+.SH "SEE ALSO"
+.BR debhelper (1)
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>
