@@ -1,16 +1,20 @@
 #!/usr/bin/perl
 use Test;
-plan(tests => 3);
+plan(tests => 4);
 
 # It used to not make absolute links in this situation, and it should.
 # #37774
 system("./dh_link","etc/foo","usr/lib/bar");
-ok("/etc/foo",readlink("debian/tmp/usr/lib/bar"));
+ok("/etc/foo",readlink("debian/debhelper/usr/lib/bar"));
 
 # let's make sure it makes simple relative links ok.
 system("./dh_link","usr/bin/foo","usr/bin/bar");
-ok("foo",readlink("debian/tmp/usr/bin/bar"));
+ok("foo",readlink("debian/debhelper/usr/bin/bar"));
 
 # ok, more complex relative links.
 system("./dh_link","usr/lib/1","usr/bin/2");
-ok("../lib/1",readlink("debian/tmp/usr/bin/2"));
+ok("../lib/1",readlink("debian/debhelper/usr/bin/2"));
+
+# this was bug #40159. Absolute links passes to dh_link.
+system("./dh_link","/etc/X11/dfm/system.dfmext","usr/share/dfm/dfmext");
+ok("/etc/X11/dfm/system.dfmext",readlink("debian/debhelper/usr/share/dfm/dfmext"));
