@@ -100,7 +100,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		@install=filedoublearray($file); # no globbing yet
 	}
 	
-	$srcdir = $dh{SOURCEDIR} if defined $dh{SOURCEDIR};
+	$srcdir = $dh{SOURCEDIR}."/" if defined $dh{SOURCEDIR};
 	
 	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
 		push @install, [@ARGV];
@@ -118,8 +118,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (! defined $dh{AUTODEST} && @$set > 1) {
 			$dest=pop @$set;
 		}
-		
-		foreach my $src (map { glob } @$set) { # glob now
+		# glob now, relative to srcdir
+		foreach my $src (map { glob "$srcdir/$_" } @$set) { 
 			next if excludefile($src);
 		
 			if (! defined $dest) {
@@ -128,8 +128,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				$dest=~s/^(.*\/)?debian\/tmp//;
 				$dest=dirname($dest);
 			}
-			
-			$src = "$srcdir/$src"; # do this now, to avoid the parsing above
 			
 			# Make sure the destination directory exists.
 			if (! -e "$tmp/$dest") {
