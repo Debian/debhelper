@@ -42,3 +42,5 @@ if (! $dh{D_FLAG}) {
 		 -o -name TAGS -o -name core -o ( -path */.deps/* -a -name *.P )
 		) -exec rm -f {} ;"));
 }
+
+doit('rm', '-rf', 'debian/tmp') if -x 'debian/tmp';

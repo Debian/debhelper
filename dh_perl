@@ -8,6 +8,7 @@ use Dh_Lib;
 init();
 
 my $perl = $ENV{PERL} || '/usr/bin/perl';
+my $ext = '';
 
 # Figure out the version of perl. If $ENV{PERL} is set, query the perl binary
 # it points to, otherwise query perl directly.
@@ -15,6 +16,10 @@ my $version=sprintf("%.3f", $]);
 if (defined $ENV{PERL}) {
 	$version=`$ENV{PERL} -e 'printf "%.3f", \$]'`;
 }
+
+# If -d is given, then we'll try to depend on one of the perl-5.00X-base 
+# package instead of perl-5.00X
+$ext='-base' if ($dh{'D_FLAG'});
 
 foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	$TMP=tmpdir($PACKAGE);
@@ -33,7 +38,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			$v = $1;
 			$arch = $2;
 			check_module_version ($v, $version);
-			$v .= '-thread' if ($arch =~ /-thread/);
+			$v .= '-thread' if ($arch =~ /-thread/); 
 			$dep_arch = add_deps ($dep_arch, "perl-$v");
 		} elsif ($file =~ m<^$TMP/usr/lib/perl5/(\d.\d{3})/>) {
 			$v = $1;
@@ -44,7 +49,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	}
 
 	if ($found and not $dep_arch) {
-		$dep = "perl5";
+		$dep = "perl5$ext";
 	} elsif ($dep_arch) {
 		$dep = $dep_arch;
 	}
@@ -89,6 +94,9 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 
 sub add_deps {
 	my ($dep, $new) = @_;
+	
+        # If the $new-base package can exist then add $ext to $new
+	$new = "$new$ext" if ($new =~ m/^(?:perl5|perl-\d\.\d{3})$/);
 	
 	# If $new = perl5 or perl5-thread check if perl-X.XXX(-thread)?
 	# is not already in the dependencies
