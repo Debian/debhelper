@@ -3,7 +3,7 @@
 dh_movefiles \- moves files out of debian/tmp into subpackages
 .SH SYNOPSIS
 .B dh_movefiles
-.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir]"
+.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir] [file ..]"
 .SH "DESCRIPTION"
 dh_movefiles is a debhelper program that is responsible for moving files out
 of debian/tmp and into other package build directories. This may be useful
@@ -13,7 +13,9 @@ you need to break that up into subpackages.
 Files named debian/package.files list the files to be moved, separated by
 whitespace. The filenames listed should be relative to debian/tmp/. You can
 also list directory names, and the whole directory will be moved. You can
-even use wildcards if you like.
+even use wildcards if you like. If you prefer, you can list the files to
+move on the command line. However, this will only work if the first package
+dh_movefiles is told to act on is a subpackage (ie, via -p).
 .P
 The files will be moved in a special order: first all normal files, then all
 symlinks. This is done becuase it tends to be a good thing to have symlinks
@@ -38,6 +40,12 @@ Move files for the package named "package".
 .TP
 .B \-Ptmpdir, \--tmpdir=tmpdir
 Use "tmpdir" for package build directory. 
+.TP
+.B file ..
+Lists files to move. The filenames listed should be relative to debian/tmp/.
+You can also list directory names, and the whole directory will be moved. You
+can even use wildcards if you like. It is an error to list files here unless
+you use -p, -i, or -a to tell dh_movefiles which subpackage to put them in.
 .SH NOTES
 The
 .B \-a

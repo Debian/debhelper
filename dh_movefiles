@@ -13,17 +13,26 @@ for PACKAGE in $DH_DOPACKAGES; do
 		error "debian/tmp does not exist"
 	fi
 
-	# debian/files has a different purpose, so ignore it.
-	if [ "$files" -a "$files" != "debian/files" ]; then
-#		if [ "$TMP" = "debian/tmp" ]; then
-#			error "I was asked to move some files from debian/tmp to debian/tmp."
-#		fi
+	tomove=""
 
+        # debian/files has a different purpose, so ignore it.
+	if [ "$files" -a "$files" != "debian/files" ]; then
+		tomove=`cat $files`
+	fi
+	
+	if [ \( "$PACKAGE" = "$DH_FIRSTPACKAGE" -o "$DH_PARAMS_ALL" \) \
+	     -a "$*" ]; then
+		tomove="$* $tomove"
+	fi
+
+	if [ "$tomove" -a "$PACKAGE" = "$MAINPACKAGE" ]; then
+		error "I was asked to move files from debian/tmp to debian/tmp."
+	fi
+
+	if [ "$tomove" ]; then
 		if [ ! -d "$TMP" ]; then
 			doit "install -d $TMP"
 		fi
-
-		files=`pwd`/$files
 
 		# Order the files. First all real files, then symlinks. 
 		# Putting symlinks last is a nice thing to do for library 
@@ -34,10 +43,10 @@ for PACKAGE in $DH_DOPACKAGES; do
 		# The filelist is used, so even very weird filenames can be
 		# moved.
 		doit "rm -f movelist"
-		for i in `(cd debian/tmp ; echo \`cat $files\`)`; do
+		for i in `(cd debian/tmp; echo $tomove)`; do
 			complex_doit "(cd debian/tmp ; find $i ! -type d -and ! -type l -print) >> movelist"
 		done
-		for i in `(cd debian/tmp ; echo \`cat $files\`)`; do
+		for i in `(cd debian/tmp; echo $tomove)`; do
 			complex_doit "(cd debian/tmp ; find $i ! -type d -and -type l -print) >> movelist"
 		done
 		complex_doit "(cd debian/tmp;tar --create --remove-files --files-from=../../movelist --file -) | (cd $TMP;tar xpf -)"
