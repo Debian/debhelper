@@ -49,7 +49,7 @@ sub AddExclude { my($option,$value)=@_;
 # Parse options and return a hash of the values.
 sub parseopts {
 	undef %options;
-
+	
 	my $ret=GetOptions(
 		"v" => \$options{VERBOSE},
 		"verbose" => \$options{VERBOSE},
@@ -109,11 +109,23 @@ sub parseopts {
 	if (!$ret) {
 		error("unknown option; aborting");
 	}
-
+	
 	# Check to see if -V was specified. If so, but no parameters were
 	# passed, the variable will be defined but empty.
 	if (defined($options{V_FLAG})) {
 		$options{V_FLAG_SET}=1;
+	}
+	
+	# If we have not been given any packages to act on, assume they
+	# want us to act on them all. Note we have to do this before excluding
+	# packages out, below.
+	if (! defined $options{DOPACKAGES} || ! @{$options{DOPACKAGES}}) {
+		if ($options{DOINDEP} || $options{DOARCH}) {
+				# User specified that all arch (in)dep package be
+				# built, and there are none of that type.
+				error("I have no package to build");
+		}
+		push @{$options{DOPACKAGES}},GetPackages();
 	}
 	
 	# Remove excluded packages from the list of packages to act on.
@@ -125,7 +137,12 @@ sub parseopts {
 		}
 	}
 	@{$options{DOPACKAGES}}=@package_list;
-	
+
+	# If there are no packages to act on now, it's an error.
+	if (! defined $options{DOPACKAGES} || ! @{$options{DOPACKAGES}}) {
+		error("I have no package to build");
+	}
+
 	return %options;
 }	
 

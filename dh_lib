@@ -136,6 +136,11 @@ autoscript() {
 
 # Argument processing and global variable initialization is below.
 
+# If DH_OPTIONS is set, prepend it to the command line.
+if [ "$DH_OPTIONS" ]; then
+	set -- $DH_OPTIONS $@
+fi
+
 # Check to see if an argument on the command line starts with a dash.
 # if so, we need to pass this off to the resource intensive perl.
 for arg; do

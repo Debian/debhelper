@@ -24,7 +24,9 @@ for PACKAGE in $DH_DOPACKAGES; do
 	for file in `(cd $TMP; find -type f \( -perm +111 -or -name "*.so*" \) 2>/dev/null) | filelist_excluded` ; do
 		case "`file $TMP/$file`" in
 			*ELF*shared*)
-				doit "strip --strip-unneeded $TMP/$file"
+				# Note that all calls to strip on shared libs
+				# *must* inclde the --strip-unneeded.
+				doit "strip --remove-section=.comment --remove-section=.note --strip-unneeded $TMP/$file"
 			;;
 			*ELF*executable*)
 				doit "strip --remove-section=.comment --remove-section=.note $TMP/$file"

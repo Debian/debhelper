@@ -1,3 +1,18 @@
+debhelper (1.1.17) unstable; urgency=low
+
+  * dh_strip: on Richard Braakman's advice, strip the .comment and .note
+    sections of shared libraries.
+  * Added DH_OPTIONS environment variable - anything in it will be treated
+    as additional command line arguments by all debhelper commands. This in
+    useful in some situations, for example, if you need to pass -p to all
+    debhelper commands that will be run. If you use DH_OPTIONS, be sure to
+    use dh_testversion 1.1.17 - older debhelpers will ignore it and do
+    things you don't want them to.
+  * Made -N properly exclude packages when no -i, -a, or -p flags are
+    present. It didn't before, which was a bug.
+
+ -- Joey Hess <joeyh@master.debian.org>  Mon,  7 Sep 1998 17:33:19 -0700
+
 debhelper (1.1.16) unstable; urgency=low
 
   * dh_fixperms: remove execute bits from static libraries as well as 

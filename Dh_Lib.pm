@@ -15,6 +15,11 @@ use vars qw(@ISA @EXPORT %dh);
 	    %dh);
 
 sub init {
+	# If DH_OPTIONS is set, prepend it @ARGV.
+	if (defined($ENV{DH_OPTIONS})) {
+		unshift @ARGV,split(/\s+/,$ENV{DH_OPTIONS});
+	}
+
 	# Check to see if an argument on the command line starts with a dash.
 	# if so, we need to pass this off to the resource intensive Getopt::Long,
 	# which I'd prefer to avoid loading at all if possible.
