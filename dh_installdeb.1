@@ -11,16 +11,17 @@ correct permissions.
 .P
 dh_installdeb automatically installs the following files from debian/ into
 the DEBIAN directory:
-.IP postinst
-.IP preinst
-.IP postrm
-.IP prerm
-.IP shlibs
-.IP conffiles
+ 	postinst
+ 	preinst
+ 	postrm
+ 	prerm
+ 	shlibs
+ 	conffiles
 .P
 (For packages other than the first binary package listed in debian/control,
-prefix these filenames with then name of the "package.", for example, 
-"foo.postinst".)
+you must prefix these filenames with then name of the "package.", for example,
+"foo.postinst". You can also prefix the filenames the same way for the first
+binary package, for consitency.)
 .P
 The files postinst, preinst, postrm, and prerm are handled specially: If a
 corresponding file named debian/script.debhelper exists, the contents of that 
@@ -30,7 +31,7 @@ inserted. If the script does not exist, then a script is generated from
 the .debhelper file. The .debhelper files are created by other debhelper 
 programs, such as 
 .BR dh_installmenu (1)
-, and are shell scripts.
+, and are shell script fragments.
 .SH OPTIONS
 .TP
 .B \-v

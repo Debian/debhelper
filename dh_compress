@@ -15,10 +15,10 @@ for PACKAGE in $DH_DOPACKAGES; do
 	olddir=`pwd`
 	doit "cd $TMP"
 
-	if [ -f $olddir/${EXT}compress ]; then
+	if [ -f $olddir/debian/${EXT}compress ]; then
 		# The config file is a sh script that outputs the files to be compressed
 		# (typically using find).
-		files=`sh $olddir/${EXT}compress 2>/dev/null`
+		files=`sh $olddir/debian/${EXT}compress 2>/dev/null`
 	else
 		# By default fall back on what the policy manual says to compress.
 		files=`

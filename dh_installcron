@@ -7,14 +7,14 @@ PATH=debian:$PATH:/usr/lib/debhelper
 
 for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
-	EXT=`pkgext $PACKAGE`
 
 	for type in daily weekly monthly; do
-		if [ -e debian/${EXT}cron.$type ]; then
+		cron=`pkgfile $PACKAGE cron.$type`
+		if [ "$cron" ]; then
 			if [ ! -d $TMP/etc/cron.$type ]; then
 				doit "install -o root -g root -d $TMP/etc/cron.$type"
 			fi
-			doit "install debian/${EXT}cron.$type $TMP/etc/cron.$type/$PACKAGE"
+			doit "install "$cron" $TMP/etc/cron.$type/$PACKAGE"
 		fi
 	done
 done

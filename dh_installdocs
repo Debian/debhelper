@@ -8,7 +8,7 @@ PATH=debian:$PATH:/usr/lib/debhelper
 
 for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
-	EXT=`pkgext $PACKAGE`
+	file=`pkgfile $PACKAGE docs`
 
 	if [ ! -d $TMP/usr/doc/$PACKAGE ]; then
 		doit "install -d $TMP/usr/doc/$PACKAGE"
@@ -16,8 +16,8 @@ for PACKAGE in $DH_DOPACKAGES; do
 
 	docs=""
 
-	if [ -e debian/${EXT}docs ]; then
-		docs=`tr "\n" " " < debian/${EXT}docs`
+	if [ "$file" ]; then
+		docs=`tr "\n" " " < $file`
 	fi
 
 	if [ \( "$PACKAGE" = "$DH_FIRSTPACKAGE" -o "$DH_PARAMS_ALL" \) \
@@ -47,7 +47,14 @@ for PACKAGE in $DH_DOPACKAGES; do
 		fi
 	fi
 
-	if [ -f debian/copyright ]; then
-			doit "install -m 644 -p debian/copyright $TMP/usr/doc/$PACKAGE/"
+	# Support debian/package.copyright, but if not present, fall back
+	# on debian/copyright for all packages, not just the main binary
+	# package.
+	copyright=`pkgfile $PACKAGE copyright`
+	if [ ! "$copyright" -a -e debian/copyright ]; then
+		copyright=debian/copyright
+	fi
+	if [ "$copyright" ]; then
+			doit "install -m 644 -p $copyright $TMP/usr/doc/$PACKAGE/copyright"
 	fi
 done

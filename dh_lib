@@ -44,11 +44,25 @@ tmpdir() {
 	fi
 }
 
+# Pass this the name of a binary package, and the name of the file wanted
+# for the package, and it will return the actual filename to use. For
+# example if the package is foo, and the file is somefile, it will look for 
+# debian/somefile, and if found return that, otherwise, it will look for
+# debian/foo, and if found, return that. Failing that, it will return
+# nothing.
+pkgfile() {
+	if [ -e "debian/$1.$2" ]; then
+		echo "debian/$1.$2"
+	elif [ "$1" = "$MAINPACKAGE" -a -e "debian/$2" ]; then
+		echo "debian/$2"
+	fi
+}
+
 # Pass it a name of a binary package, it returns the name to prefix to files
 # in debian for this package.
 pkgext() {
 	if [ "$1" != "$MAINPACKAGE" ]; then
-		echo "$PACKAGE."
+	echo "$PACKAGE."
 	fi
 }
 

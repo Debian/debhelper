@@ -8,9 +8,11 @@ PATH=debian:$PATH:/usr/lib/debhelper
 
 for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
-	EXT=`pkgext $PACKAGE`
+	substvars=`pkgfile $PACKAGE substvars`
+	if [ "$substvars" ]; then
+		doit "rm -f debian/$substvars"
+	fi
 	doit "rm -rf $TMP"
-	doit "rm -f debian/${EXT}substvars"
 done
 doit "rm -f debian/*.debhelper $*"
 if [ ! "$DH_K_FLAG" ]; then

@@ -14,9 +14,9 @@ fi
 
 for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
-	EXT=`pkgext $PACKAGE`
+	init=`pkgfile $PACKAGE init`
 
-	if [ -e debian/${EXT}init ]; then
+	if [ "$init" ]; then
 		if [ ! -d $TMP/etc/init.d ]; then
 			doit "install -d $TMP/etc/init.d"
 		fi
@@ -34,7 +34,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 		else
 			script=$PACKAGE
 		fi
-		doit "install -p -m755 debian/${EXT}init $TMP/etc/init.d/$script"
+		doit "install -p -m755 $init $TMP/etc/init.d/$script"
 
 		# This is set by the -u "foo" command line switch, it's
 		# the parameters to pass to update-rc.d. If not set, 
