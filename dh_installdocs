@@ -1,60 +1,61 @@
-#!/bin/sh -e
+#!/usr/bin/perl
 #
 # Reads debian/docs, installs all files listed there into /usr/doc/$PACKAGE
 # Also installs the debian/copyright and debian/README.debian and debian/TODO
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use Dh_Lib;
+init();
 
-for PACKAGE in $DH_DOPACKAGES; do
-	TMP=`tmpdir $PACKAGE`
-	file=`pkgfile $PACKAGE docs`
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$file=pkgfile($PACKAGE,"docs");
 
-	if [ ! -d $TMP/usr/doc/$PACKAGE ]; then
-		doit "install -d $TMP/usr/doc/$PACKAGE"
-	fi
+	if ( ! -d "$TMP/usr/doc/$PACKAGE") {
+		doit("install","-d","$TMP/usr/doc/$PACKAGE");
+	}
 
-	docs=""
+	undef @docs;
 
-	if [ "$file" ]; then
-		docs=`tr "\n" " " < $file`
-	fi
+	if ($file) {
+		@docs=filearray($file);
+	}
 
-	if [ \( "$PACKAGE" = "$DH_FIRSTPACKAGE" -o "$DH_PARAMS_ALL" \) \
-	     -a "$*" ]; then
-		docs="$* $docs"
-	fi
+	if (($PACKAGE = $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+		push @docs, @ARGV;
+	}
 
-	if [ "$docs" ]; then
-		doit "cp -a $docs $TMP/usr/doc/$PACKAGE/"
-	fi
+	if (@docs) {
+		doit("cp","-a",@docs,"$TMP/usr/doc/$PACKAGE/");
+	}
 
-	# .Debian is correct, according to policy.
-	readme_debian=`pkgfile $PACKAGE README.Debian`
-	if [ -z "$readme_debian" ]; then
-		readme_debian=`pkgfile $PACKAGE README.debian`
-	fi
-	if [ "$readme_debian" ]; then
-		doit "install -m 644 -p $readme_debian $TMP/usr/doc/$PACKAGE/README.Debian"
-	fi
+	# .Debian is correct, according to policy, but I'm easy.
+	$readme_debian=pkgfile($PACKAGE,'README.Debian');
+	if (! $readme_debian) {
+		$readme_debian=pkgfile($PACKAGE,'README.debian');
+	}
+	if ($readme_debian) {
+		doit("install","-m","644","-p","$readme_debian","$TMP/usr/doc/$PACKAGE/README.Debian");
+	}
 
-	todo=`pkgfile $PACKAGE TODO`
-	if [ "$todo" ]; then
-		if isnative; then
-			doit "install -m 655 -p $todo $TMP/usr/doc/$PACKAGE/TODO"
-		else
-			doit "install -m 644 -p $todo $TMP/usr/doc/$PACKAGE/TODO.Debian"
-		fi
-	fi
+	$todo=pkgfile($PACKAGE,'TODO');
+	if ($todo) {
+		if (isnative()) {
+			doit("install","-m","644","-p",$todo,"$TMP/usr/doc/$PACKAGE/TODO");
+		}
+		else {
+			doit("install","-m","644","-p",$todo,"$TMP/usr/doc/$PACKAGE/TODO.Debian");
+		}
+	}
 
 	# Support debian/package.copyright, but if not present, fall back
 	# on debian/copyright for all packages, not just the main binary
 	# package.
-	copyright=`pkgfile $PACKAGE copyright`
-	if [ ! "$copyright" -a -e debian/copyright ]; then
-		copyright=debian/copyright
-	fi
-	if [ "$copyright" ]; then
-			doit "install -m 644 -p $copyright $TMP/usr/doc/$PACKAGE/copyright"
-	fi
-done
+	$copyright=pkgfile($PACKAGE,'copyright');
+	if (! $copyright && -e "debian/copyright") {
+		$copyright="debian/copyright";
+	}
+	if ($copyright) {
+			doit("install","-m","644","-p",$copyright,"$TMP/usr/doc/$PACKAGE/copyright");
+	}
+}

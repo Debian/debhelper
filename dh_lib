@@ -134,42 +134,6 @@ autoscript() {
 	complex_doit "echo '# End automatically added section' >> $autoscript_debscript"
 }
 
-# Sets 2 global variables, INDEP_PACKAGES is all the arch-independant
-# packages, ARCH_PACKAGES is the arch-dependant packages.
-get_arch_indep_packages() {
-	INDEP_PACKAGES=""
-	ARCH_PACKAGES=""
-	
-	# First, get the list of all binary packages.
-        # Notice we want the list in reverse order, thus the tac.
-	PACKAGES=`grep ^Package: debian/control | cut -d " " -f 2 | tac | tr "\n" " "`
-	# Remove trailing space.
-	PACKAGES=`expr "$PACKAGES" : '\(.*\) '`
-	# Loop on the list of architectures.
-	for ARCH in `grep ^Architecture: debian/control | cut -d " " -f 2` ; do
-		# Pull the last package off the list.
-		THISPKG=`expr "$PACKAGES" : '.* \(.*\)'` || true
-		if [ ! "$THISPKG" ]; then
-			THISPKG=$PACKAGES
-		fi
-		PACKAGES=`expr "$PACKAGES" : '\(.*\) .*'` || true
-	
-		if [ ! "$THISPKG" ]; then
-			error "debian/control invalid - too many Architecture lines or too few Package lines"
-		fi
-
-		if [ "$ARCH" = "all" ]; then
-			INDEP_PACKAGES="$INDEP_PACKAGES $THISPKG"
-		else
-			ARCH_PACKAGES="$ARCH_PACKAGES $THISPKG"
-		fi
-	done
-
-	if [ "$PACKAGES" ]; then
-		error "debian/control invalid - too many Architecure lines or too few Package lines"
-	fi
-}
-
 # Argument processing and global variable initialization is below.
 
 # Check to see if an argument on the command line starts with a dash.

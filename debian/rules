@@ -16,11 +16,6 @@ export DH_VERBOSE=1
 test_files=dh_lib
 
 build:
-	# Important symlinks.
-	cd autoscripts && ln -sf postinst-menu postrm-menu
-	cd debian && ln -sf ../dh_lib dh_lib
-	cd debian && ln -sf ../dh_getopt.pl dh_getopt.pl
-
 	./dh_testdir $(test_files)
 	sed "s/#DEBHELPER_VERSION#/$(VERSION)/" < dh_testversion.in \
 		> dh_testversion
@@ -44,7 +39,7 @@ binary-indep: build
 
 	find . -perm +111 -maxdepth 1 -type f -not -name "*.pl" \
 		-exec install -p {} debian/tmp/usr/bin \;
-	cp -a dh_lib dh_getopt.pl debian/tmp/usr/lib/debhelper
+	cp -a dh_lib dh_getopt.pl *.pm debian/tmp/usr/lib/debhelper
 	cp -a autoscripts debian/tmp/usr/lib/debhelper
 
 	./dh_installdocs doc/TODO doc/README doc/PROGRAMMING doc/from-debstd
