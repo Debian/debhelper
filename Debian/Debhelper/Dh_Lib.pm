@@ -52,7 +52,10 @@ sub init {
 	if ($dh{EXCLUDE}) {
 		$dh{EXCLUDE_FIND}='';
 		foreach (@{$dh{EXCLUDE}}) {
-			$dh{EXCLUDE_FIND}.="-regex ".escape_shell(".*$_.*")." -or ";
+			my $x=$_;
+			$x=escape_shell($x);
+			$x=~s/\./\\\\./g;
+			$dh{EXCLUDE_FIND}.="-regex .\\*$x.\\* -or ";
 		}
 		$dh{EXCLUDE_FIND}=~s/ -or $//;
 	}
