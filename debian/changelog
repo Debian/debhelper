@@ -1,9 +1,16 @@
-debhelper (0.79) frozen; urgency=low
+debhelper (0.80) unstable; urgency=low
 
-  * Reupload to get it into frozen. No changes since version 0.75 
-    except bugfixes.
+  * Moved under cvs (so I can fork a stable and an unstable version).
+  * dh_movefiles: first move real files, then move symlinks. (#18220)
+    Thanks to Bdale Garbee <bdale@gag.com> and Adam Heath 
+    <adam.heath@usa.net> for help on the implementation.
+  * dh_installchangelogs: use debian/package.changelog files if they exist
+    rather than debian.changelog. It appears some people do need per-package
+    changelogs.
+  * dh_gencontrol: if debian/package.changelogs files exist, use them.
+  * Above 2 changes close #20442.
 
- -- Joey Hess <joeyh@master.debian.org>  Thu,  2 Apr 1998 16:10:55 -0800
+ -- Joey Hess <joeyh@master.debian.org>  Mon, 30 Mar 1998 20:54:26 -0800
 
 debhelper (0.78) frozen unstable; urgency=low
 

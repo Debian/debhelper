@@ -31,6 +31,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 		#
 		# (The echo is in here to expand wildcards. Note that ls
 		# won't work properly.)
+		tomove=""
 		for i in `(cd debian/tmp ; echo \`cat $files\`)`; do
 			tomove="`(cd debian/tmp ; \
 				find $i ! -type d -and ! -type l -print)` \
