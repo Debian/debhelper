@@ -122,7 +122,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# Support for -X flag.
 	my $exclude = '';
 	if ($dh{EXCLUDE_FIND}) {
-		$exclude = '-and ! \( '.$dh{EXCLUDE_FIND}.' \)';
+		$exclude = '! \( '.$dh{EXCLUDE_FIND}.' \)';
 	}
 	
 	foreach my $set (@install) {
@@ -166,7 +166,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				# Pity there's no cp --exclude ..
 				my $pwd=`pwd`;
 				chomp $pwd;
-				complex_doit("cd $src/.. && find $dir_basename \\( -type f -or -type l \\) $exclude -exec cp --parents -dp {} $pwd/$tmp/$dest/ \\;");
+				complex_doit("cd $src/.. && find $dir_basename $exclude \\( -type f -or -type l \\) -exec cp --parents -dp {} $pwd/$tmp/$dest/ \\;");
+				# cp is annoying so I need a separate pass
+				# just for empty directories
+				complex_doit("cd $src/.. && find $dir_basename $exclude \\( -type d -and -empty \\) -exec cp --parents -a {} $pwd/$tmp/$dest/ \\;");
 			}
 			else {
 				doit("cp", "-a", $src, "$tmp/$dest/");
@@ -191,7 +194,7 @@ if ($dh{LIST_MISSING}) {
 		push @missing, $_ unless /$installed/ || excludefile($_);
 	}, $srcdir);
 	if (@missing) {
-		warning "$_ not installed" foreach @missing;
+		warning "$_ exists in debian/tmp but not installed to anywhere" foreach @missing;
 	}
 }
 
