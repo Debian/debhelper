@@ -21,7 +21,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	undef @docs;
 
 	if ($file) {
-		@docs=filearray($file);
+		@docs=filearray($file, ".");
 	}
 
 	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {

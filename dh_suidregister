@@ -15,7 +15,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 
 	@files=();
 	if ($suid) {
-		@files=filearray($suid);
+		@files=filearray($suid, $TMP);
 	}
 
 	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {

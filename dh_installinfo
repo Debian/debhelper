@@ -13,7 +13,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	undef @info;
 	
 	if ($file) {
-		@info=filearray($file);
+		@info=filearray($file, ".");
 	}
 
 	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {

@@ -29,7 +29,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 
         # debian/files has a different purpose, so ignore it.
 	if ( $files && $files ne "debian/files" ) {
-		@tomove=filearray($files);
+		@tomove=filearray($files, $sourcedir);
 	}
 	
 	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
@@ -40,24 +40,27 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		error("I was asked to move files from $sourcedir to $sourcedir. Perhaps you should set DH_COMAPT=2?");
 	}
 
-	if (@tomove) {
-		if (! -d $TMP) {
-			doit("install","-d",$TMP);
-		}
-		# Now we need to expand wildcards in @tomove.
+	# Now we need to expand wildcards in @tomove.
+	# This is only necessary in pre-v3 land, as of v3, the
+	# expension is automatically done by filearray().
+	if (@tomove && ! Debian::Debhelper::Dh_Lib::compat(3)) {
 		@filelist=();
 		foreach (@tomove) {
 			push @filelist, glob("$sourcedir/$_");
 		}
+		@tomove=@filelist;
+	}
 
-		# If the globs expended to nothing, we are done.
-		next unless @filelist;
+	if (@tomove) {
+		if (! -d $TMP) {
+			doit("install","-d",$TMP);
+		}
 
 		# Order the files. First all real files, then symlinks. 
 		# Putting symlinks last is a nice thing to do for library 
 		# packages and doesn't affect much of anything else.
 		doit("rm","-f","debian/movelist");
-		foreach (@filelist) {
+		foreach (@tomove) {
 			$file=$_;
 			$ret=1 if (! -e $file && ! -l $file);
 			$file=~s:^\Q$sourcedir\E/+::;
