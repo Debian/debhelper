@@ -89,7 +89,7 @@ sub testfile {
 	}
 	
 	# Is it a static library, and not a debug library?
-	if (m/lib.*\.a/ && ! m/.*_g\.a/) {
+	if (m/lib.*\.a$/ && ! m/.*_g\.a$/) {
 		push @static_libs, $fn;
 		return;
 	}
