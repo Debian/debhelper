@@ -1,0 +1,218 @@
+#!/bin/sh -e
+#
+# Script to be called from debian/rules to setup all the debian specifc
+# required files
+# Christoph Lameter, <clameter@debian.org> October 10, 1996
+#
+# All the parameters are documentation files to be installed.
+# (but doc files can also be listed in debian/docs)
+#
+# This has been gutted and extensively rewritten to function as a debhelper
+# command by Joey Hess.
+
+# Pre-parse command line before we load dh_lib, becuase we use a
+# different style of arguments.
+for i;do
+  case "$i" in
+  -p) PERMS=1
+    ;;
+  -u) UNDOC=1
+    ;;
+  -s) SUMS=1
+    ;;
+  -m) NOAUTOMAN=1
+    ;;
+  -c) NOCOMPRESS=1
+    ;;
+  *) collect="$collect$i "
+    ;;
+  esac
+done
+set -- $collect
+
+PATH=debian:$PATH:/usr/lib/debhelper
+. dh_lib
+
+# Tolerate old style debstd invocations
+if [ "$DH_FIRSTPACKAGE" = "$1" ]; then
+	shift
+fi
+
+# Subroutines
+
+# debinit handles the installation of an init.d script
+# Parameters:
+# $1= name in /etc/init.d
+# $2 = scriptname
+# $3 = package name
+# $4 = extra params for debhelper
+debinit() {
+	PPACKAGE=$3
+	SCRIPT=$1
+
+	INITPARAMS=`grep "^FLAGS=" $2` || true
+	if [ "$INITPARAMS" != "" ]; then
+		INITPARAMS=`expr "$INITPARAMS" : 'FLAGS="\(.*\)"'` || true
+		if [ "$INITPARAMS" ]; then
+			INITPARAMS="--update-rcd-params='$INITPARAMS'"
+		fi
+	fi
+
+	if grep -q NO_RESTART_ON_UPGRADE $2; then
+		doit "dh_installinit --no-restart-on-upgrade -p$PPACKAGE $INITPARAMS --init-script=$SCRIPT $4"
+	  else
+		doit "dh_installinit -p$PPACKAGE $INITPARAMS --init-script=$SCRIPT $4"
+	fi
+}
+
+# Package specific things
+#
+# The first parameter is the package name
+# The second parameter is the directory name of the temp directory
+# The third parameter is the prefix for all configuration files to be processed
+package()
+{
+	local i
+	local X Y
+	CPACKAGE=$1
+	CTEMP=$2
+
+	# Deal with scripts in etc directories
+	if [ -f $3/rc.boot ]; then
+		warning "file $3/rc.boot was ignored."
+	fi
+
+	# etc files that could need some tweaking
+	for i in services inittab crontab protocols profile shells rpc shells \
+		syslog.conf conf.modules modules aliases diversions inetd.conf \
+		X11/Xresources X11/config X11/window-managers X11/xinit purge ; do
+		if [ -f $3$i ]; then
+			warning "file $3$i was ignored."
+		fi
+	done
+
+	if [ -f $3init.d ]; then
+		debinit $1 $3init.d $1 ""
+	fi
+
+	# The case of a daemon without the final d
+	if [ -f $3init ]; then
+		X=`expr $1 : '\(.*\)d$'` || true  
+		if [ "$X" ]; then
+			debinit $X $3init $1 "--remove-d"
+		fi
+	fi
+
+	if [ -f $3info ]; then
+		warning "debhelper does not yet support info files, so $3info was ignored."
+	fi
+
+	X=`find $2 -type f -perm +111 2>/dev/null | tr "\n" " "`
+	for i in $X; do
+		BINPATH="`expr "$i" : "$2/\(.*\)/.*"`"
+		BINNAME="`expr "$i" : "$2/.*/\(.*\)"`"
+
+		# Check if manpages exist
+		case "$BINPATH" in
+			DEBIAN|etc/rc.boot|usr/lib/cgi-bin|etc/init.d|etc/cron.*|usr/lib/lib*|usr/lib/*) SECTION=""
+				;;
+			sbin|usr/sbin) SECTION="8"
+				;;
+			usr/X11R6/bin) SECTION="1x"
+				;;
+			bin|usr/bin) SECTION="1"
+				;;
+			usr/games) SECTION="6"
+				;;
+			*)  SECTION=""
+				;;
+		esac
+		if [ "$SECTION" ]; then
+			Y=`find $2/usr/man $2/usr/X11R6/man -name "$BINNAME.*" 2>/dev/null` || true
+			if [ "$Y" = "" ]; then
+				if [ "$UNDOC" ]; then
+					doit "dh_undocumented -p$CPACKAGE $BINNAME.$SECTION"
+				fi
+			fi
+		fi
+	done
+}
+
+packages() {
+	local i
+	BASE=$1
+	shift
+	for i in $*; do
+		package $i debian/$i "debian/$i."
+		if [ -x debian/$i.prebuild ]; then
+			warning "file debian/$i.prebuild ignored"
+		fi
+	done
+
+	if [ -f debian/clean ]; then
+		warning "file debian/clean ignored"
+	fi
+	package $BASE debian/tmp "debian/"
+}
+
+# Special case of changelog
+if [ "$1" ]; then
+	if echo "$1" | egrep -qi "change|news|history" ; then
+		changelogfile=$1
+		shift
+	fi
+fi
+
+doit "dh_installdirs" # here just to make the debian/tmp, etc directories.
+doit "dh_installdocs $*"
+doit "dh_installexamples"
+doit "dh_installchangelogs $changelogfile"
+doit "dh_installmenu"
+doit "dh_installcron"
+
+# Manpage scan
+if [ "$NOAUTOMAN" = "" ]; then
+	doit "dh_installmanpages -p$DH_FIRSTPACKAGE"
+fi
+
+packages $DH_DOPACKAGES
+
+doit "dh_movefiles"
+doit "dh_strip"
+
+if [ ! "$nocompress" ]; then
+	doit "dh_compress"
+fi
+
+doit "dh_fixperms"
+doit "dh_suidregister"
+doit "dh_shlibdeps"
+doit "dh_gencontrol"
+doit "dh_makeshlibs"
+
+# Check to see if the install scripts have #DEBHELPER# in them, if not,
+# warn.
+for PACKAGE in $DH_DOPACKAGES; do
+	for file in postinst postrm preinst prerm; do
+		f="`pkgfile $PACKAGE $file`"
+		if [ "$f" ]; then
+			filelist="$filelist$f "
+		fi
+	done
+done
+if [ "$filelist" ]; then
+	warning "The following scripts do not contain \"#DEBHELPER#\" in them,"
+	warning "and so debhelper will not automatically add commands to them:"
+	warning "$filelist"
+fi
+
+doit "dh_installdeb"
+
+if [ "$SUMS" = "" ]; then
+	doit "dh_md5sums"
+fi
+
+# This causes the main binary package to be built, which
+# real debstd does not do. Shouldn't be a problem though,
+# if that package gets built twice.
+doit "dh_builddeb"
