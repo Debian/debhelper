@@ -88,7 +88,9 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		# Skip all files listed on command line.
 		my $install=1;
 		foreach $skip (@ARGV) {
-			if ($basename eq $skip) {
+			# Look at basename of what's on connect line
+			# for backwards compatability.
+			if ($basename eq Dh_Lib::basename($skip)) {
 				$install=undef;
 				last;
 			}
