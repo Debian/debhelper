@@ -12,7 +12,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_install> [B<-X>I<item>] [B<--autodest>] [B<--list-missing>] [B<--sourcedir=>I<dir>] [S<I<debhelper options>>] [S<I<file [...] dest>>]
+B<dh_install> [B<-X>I<item>] [B<--autodest>] [B<--sourcedir=>I<dir>] [S<I<debhelper options>>] [S<I<file [...] dest>>]
 
 =head1 DESCRIPTION
 
@@ -78,6 +78,11 @@ you don't miss installing newly added files in new upstream releases.
 
 Note that files that are excluded from being moved via the -X option are not
 warned about.
+
+=item B<--fail-missing>
+
+This option is like --list-missing, except if a file was missed, it will
+not only list the missing files, but also fail with a nonzero exit code. 
 
 =item B<--sourcedir=dir>
 
@@ -154,7 +159,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			}
 
 			# Keep track of what's installed.
-			if ($dh{LIST_MISSING}) {
+			if ($dh{LIST_MISSING} || $dh{FAIL_MISSING}) {
 				# Kill any extra slashes. Makes the
 				# @installed stuff more robust.
 				$src=~y:/:/:s;
@@ -184,8 +189,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 }
 
-if ($dh{LIST_MISSING}) {
-	
+if ($dh{LIST_MISSING} || $dh{FAIL_MISSING}) {
 	# . as srcdir makes no sense, so this is a special case.
 	if ($srcdir eq '.') {
 		$srcdir='debian/tmp';
@@ -201,6 +205,9 @@ if ($dh{LIST_MISSING}) {
 	}, $srcdir);
 	if (@missing) {
 		warning "$_ exists in debian/tmp but not installed to anywhere" foreach @missing;
+		if ($dh{FAIL_MISSING}) {
+			error("missing files, aborting");
+		}
 	}
 }
 

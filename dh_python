@@ -75,7 +75,7 @@ my $python = 'python';
 # The current python major version
 my $python_major;
 my $python_version = `$python -V 2>&1`;
-if ("$python_version" eq "") {
+if (! defined $python_version || $python_version eq "") {
 	error("Python is not installed, aborting. (Probably forgot to Build-Depend on python.)");
 }
 elsif ($python_version =~ m/^Python\s+(\d+)\.(\d+)(\.\d+)*/) {

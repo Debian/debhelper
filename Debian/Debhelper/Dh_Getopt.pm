@@ -146,6 +146,8 @@ sub parseopts {
 		"mainpackage=s" => \$options{MAINPACKAGE},
 
 		"list-missing" => \$options{LIST_MISSING},
+
+		"fail-missing" => \$options{FAIL_MISSING},
 		
 		"L|libpackage=s" => \$options{LIBPACKAGE},
 		
