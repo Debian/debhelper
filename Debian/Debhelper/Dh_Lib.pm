@@ -422,17 +422,19 @@ sub addsubstvar {
 	}
 }
 
-# Reads in the specified file, one word at a time, and returns an array of
-# the result. If a value is passed in as the second parameter, then glob
+# Reads in the specified file, one line at a time. splits on words, 
+# and returns an array of arrays of the contents.
+# If a value is passed in as the second parameter, then glob
 # expansion is done in the directory specified by the parameter ("." is
 # frequently a good choice).
-sub filearray {
+sub filedoublearray {
 	my $file=shift;
 	my $globdir=shift;
 
 	my @ret;
 	open (DH_FARRAY_IN, $file) || error("cannot read $file: $1");
 	while (<DH_FARRAY_IN>) {
+		my @line;
 		# Only do glob expansion in v3 mode.
 		#
 		# The tricky bit is that the glob expansion is done
@@ -441,16 +443,23 @@ sub filearray {
 		if (defined $globdir && ! compat(2)) {
 			for (map { glob "$globdir/$_" } split) {
 				s#^$globdir/##;
-				push @ret, $_;
+				push @line, $_;
 			}
 		}
 		else {
-			push @ret, split;
+			@line = split;
 		}
+		push @ret, [@line];
 	}
 	close DH_FARRAY_IN;
 	
 	return @ret;
+}
+
+# Reads in the specified file, one word at a time, and returns an array of
+# the result. Can do globbing as does filedoublearray.
+sub filearray {
+	return map { @$_ } filedoublearray(@_);
 }
 
 # Passed a filename, returns true if -X says that file should be excluded.

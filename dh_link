@@ -7,6 +7,7 @@ dh_link - create symlinks in package build directories
 =cut
 
 use strict;
+use File::Find;
 use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
@@ -40,6 +41,9 @@ dh_link will generate symlinks that comply with debian policy - absolute
 when policy says they should be absolute, and relative links with as short
 a path as possible. It will also create any subdirectories it needs to to put
 the symlinks in.
+
+dh_link also scans the package build tree for existing symlinks which do not
+conform to debian policy, and corrects them (v4 only).
 
 =head1 OPTIONS
 
@@ -98,6 +102,29 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		error("parameters list a link without a destination.");
 	}
 
+	# v4 only
+	if (! compat(3)) {
+		# Scan for existing links and add them to @links, so they
+		# are recreated policy conformant.
+		find(
+			sub {
+				return unless -l;
+				my $dir=$File::Find::dir;
+				$dir=~s/^\Q$tmp\E//;
+				my $target = readlink($_);
+				if ($target=~/^\//) {
+					push @links, $target;
+				}
+				else {
+					push @links, "$dir/$target";
+				}
+				push @links, "$dir/$_";
+				doit("rm","-f",$_);
+				
+			},
+			$tmp);
+	}
+	
 	while (@links) {
 		my $dest=pop @links;
 		my $src=pop @links;

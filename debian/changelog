@@ -1,3 +1,42 @@
+debhelper (4.0.0) unstable; urgency=low
+
+  * dh_movefiles has long been a sore point in debhelper. Inherited
+    from debstd, its interface and implementation suck, and I have maintained
+    it while never really deigning to use it. Now there is a remplacment:
+    dh_install, which ...
+    - copies files, doesn't move them. Closes: #75360, #82649
+    - doesn't have that whole annoying debian/package.files vs. debian/files
+      mess, as it uses debian/install.
+    - supports copying empty subdirs. Closes: #133037
+    - doesn't use tar, thus no error reproting problems. Closes: #112538
+    - files are listed relative to the pwd, debian/tmp need not be used at
+      all, so no globbing issues. Closes: #100404
+    - supports -X. Closes: #116902
+    - the whole concept of moving files out of a directory is gone, so this
+      bug doesn't really apply. Closes: #120026
+    - This is exactly what Bill Allombert asked for in #117383, even though I
+      designed it seemingly independantly. Thank you Bill! Closes: #117383
+  * Made debhelper's debian/rules a lot simpler by means of the above.
+  * Updated example rules file to use dh_install. Also some reordering and
+    other minor changes.
+  * dh_movefiles is lightly deprecated, and when you run into its bugs and
+    bad design, you are incouraged to just use dh_install instead.
+  * dh_fixperms: in v4 only, make all files in bin/ dirs +x. Closes: #119039
+  * dh_fixperms: in v4 only, make all files in etc/init.d executable (of
+    course there's -X ..)    
+  * dh_link: in v4 only, finds existing, non-policy-conformant symlinks
+    and corrects them. This has the side effect of making dh_link idempotent.
+  * Added a -h/--help option. This seems very obvious, but it never occured to
+    me before..
+  * use v4 for building debhelper itself
+  * v4 mode is done, you may now use it without fear of it changing.
+    (This idea of this upload is to get v4 into woody so people won't run into
+    many issues backporting from sarge to woody later on. Packages targeted
+    for woody should continue to use whatever compatability level they are
+    using.)
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 11 Apr 2002 17:28:57 -0400
+
 debhelper (3.4.14) unstable; urgency=low
 
   * Fixed an uninitialized value warning, Closes: #141729

@@ -3,7 +3,7 @@
 # I run the most current ones.
 #
 # This is _not_ a good example of a debhelper rules file, but I didn't need
-# to tell you that; just see the 25 lines of inlined perl below.. 
+# to tell you that; just see the chunk of inlined perl below.. 
 # See examples/ for some good examples.
 
 # Ensure that builds are self-hosting, which means I have to use the .pm
@@ -18,9 +18,6 @@ export DH_AUTOSCRIPTDIR=autoscripts
 VERSION=$(shell expr "`dpkg-parsechangelog 2>/dev/null |grep Version:`" : '.*Version: \(.*\)')
 
 PERLLIBDIR=$(shell perl -MConfig -e 'print $$Config{vendorlib}')
-
-# Debug
-#export DH_VERBOSE=1
 
 build: test build-stamp
 build-stamp:
@@ -46,12 +43,15 @@ build-stamp:
 	# Turn all executables into man pages.
 	find . -type f -perm +1 -maxdepth 1 -name "dh_*" \
 		-exec pod2man -c Debhelper -r "$(VERSION)" {} {}.1 \;
+	printf "package Debian::Debhelper::Dh_Version;\n\$$version='$(VERSION)';" > \
+		Debian/Debhelper/Dh_Version.pm
+
 	touch build-stamp
 
 clean:
 	./dh_testdir
 	./dh_testroot
-	-./dh_clean *.1 *-stamp
+	-./dh_clean *.1 *-stamp Debian/Debhelper/Dh_Version.pm
 
 test: test-stamp
 test-stamp:
@@ -69,24 +69,12 @@ binary-indep: build
 	./dh_testdir
 	./dh_testroot
 	./dh_clean -k
-	./dh_installdirs usr/bin usr/share/debhelper \
-		$(PERLLIBDIR)/Debian/Debhelper
-
-	printf "package Debian::Debhelper::Dh_Version;\n\$$version='$(VERSION)';" > \
-		debian/debhelper/$(PERLLIBDIR)/Debian/Debhelper/Dh_Version.pm
-
-	find . -perm +111 -maxdepth 1 -type f -not -name "*.pl" \
-		-exec install -p {} debian/debhelper/usr/bin \;
-	cp -a Debian/Debhelper/*.pm \
-		debian/debhelper/$(PERLLIBDIR)/Debian/Debhelper/
-	cp -a autoscripts debian/debhelper/usr/share/debhelper
-	rm -rf debian/debhelper/usr/share/debhelper/autoscripts/CVS
-
-	./dh_installdocs `find doc -type f | grep -v CVS`
-	./dh_installexamples `find examples -type f | grep -v CVS`
-	./dh_installmenu
+	./dh_install -X .1 dh_* usr/bin
+	./dh_install Debian/Debhelper/*.pm $(PERLLIBDIR)/Debian/Debhelper/
+	./dh_install autoscripts usr/share/debhelper
+	./dh_installdocs doc
+	./dh_installexamples examples/*
 	./dh_installman *.1
-	./dh_installinfo
 	./dh_installchangelogs
 	./dh_shlibdeps
 	./dh_link

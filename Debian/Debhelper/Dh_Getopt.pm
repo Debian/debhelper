@@ -2,7 +2,7 @@
 #
 # Debhelper option processing library.
 #
-# Joey Hess GPL copyright 1998.
+# Joey Hess GPL copyright 1998-2002
 
 package Debian::Debhelper::Dh_Getopt;
 use strict;
@@ -15,6 +15,14 @@ use Exporter;
 #@EXPORT=qw(&aparseopts); # FIXME: for some reason, this doesn't work.
 
 my (%options, %exclude_package);
+
+sub showhelp {
+	my $prog=basename($0);
+	print "Usage: $prog [options]\n\n";
+	print "  $prog is a part of debhelper. See debhelper(1)\n";
+	print "  and $prog(1) for complete usage instructions.\n"; 
+	exit(1);
+}
 
 # Passed an option name and an option value, adds packages to the list
 # of packages. We need this so the list will be built up in the right
@@ -129,6 +137,10 @@ sub parseopts {
 		"priority=i" => \$options{PRIORITY},
 		
 		"flavor=s" => \$options{FLAVOR},
+
+		"autodest" => \$options{AUTODEST},
+
+		"h|help" => \&showhelp,
 		
 		"<>" => \&NonOption,
 	);

@@ -39,26 +39,26 @@ install: build
 	# Add here commands to install the package into debian/tmp.
 	#$(MAKE) prefix=`pwd`/debian/tmp/usr install
 
-	dh_movefiles
+	dh_install
 
 # Build architecture-independent files here.
 binary-indep: build install
 	dh_testdir -i
 	dh_testroot -i
-#	dh_installdebconf -i
+	dh_installchangelogs -i
 	dh_installdocs -i
 	dh_installexamples -i
-	dh_installmenu -i
+#	dh_installmenu -i
+#	dh_installdebconf -i
 #	dh_installlogrotate -i
 #	dh_installemacsen -i
 #	dh_installpam -i
 #	dh_installmime -i
 #	dh_installinit -i
-	dh_installcron -i
-	dh_installman -i
-	dh_installinfo -i
+#	dh_installcron -i
+#	dh_installinfo -i
 #	dh_undocumented -i
-	dh_installchangelogs -i
+	dh_installman -i
 	dh_link -i
 	dh_compress -i
 	dh_fixperms -i
@@ -72,20 +72,20 @@ binary-indep: build install
 binary-arch: build install
 	dh_testdir -a
 	dh_testroot -a
-#	dh_installdebconf -a
+	dh_installchangelogs -a
 	dh_installdocs -a
 	dh_installexamples -a
 	dh_installmenu -a
+#	dh_installdebconf -a
 #	dh_installlogrotate -a
 #	dh_installemacsen -a
 #	dh_installpam -a
 #	dh_installmime -a
 #	dh_installinit -a
-	dh_installcron -a
-	dh_installman -a
-	dh_installinfo -a
+#	dh_installcron -a
+#	dh_installinfo -a
 #	dh_undocumented -a
-	dh_installchangelogs -a
+	dh_installman -a
 	dh_strip -a
 	dh_link -a
 	dh_compress -a

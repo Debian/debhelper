@@ -1,0 +1,146 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dh_install - install files into package build directories
+
+=cut
+
+use strict;
+use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+B<dh_install> [B<-X>I<item>] [S<I<debhelper options>>] [S<I<file [...] dest>>]
+
+=head1 DESCRIPTION
+
+dh_install is a debhelper program that handles installing files into package
+build directories. There are many dh_install* commands that handle installing
+specific types of files such as documentation, examples, man pages, and so on,
+and they should be used when possible as they often have extra intelligence for
+those particular tasks. dh_install, then, is useful for installing everything
+else, for which no particular intelligence is needed. It is a replacement for
+the old dh_movefiles command.
+
+Files named debian/package.install list the files to install into each
+package and where they should be installed to. The format is a set of
+lines, where each line lists a file or files to install, and at the end of
+the line tells the directory it should be installed in. The name of the
+files (or directories) to install should be given relative to the current
+directory, while the installation directory is given relative to the
+package build directory. You may use wildcards in the names of the files to
+install.
+
+This program may be used in one of two ways. If you just have a file or two
+that the upstream Makefile does not install for you, you can run dh_install
+on them to move them into place. On the other hand, maybe you have a large
+package that builds multiple binary packages. You can use the upstream Makefile
+to install it all into debian/tmp, and then use dh_install to copy
+directories and files from there into the proper package build directories.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-Xitem>, B<--exclude=item>
+
+Exclude files that contain "item" anywhere in their filename from
+being installed.
+
+=item B<--autodest>
+
+Guess as the destination directory to install things to. If this is
+specified, you should not list destination directories in
+debian/package.install files or on the command line. Instead, dh_install
+will guess as follows:
+
+Strip off debian/tmp from the front of the filename, of it is present, and
+install into the dirname of the filename. So if the filename is
+debian/tmp/usr/bin, then that directory will be copied to 
+debian/package/usr/. If the filename is debian/tmp/etc/passwd, it will be 
+copied to debian/package/etc/.
+
+Note that if you list only a filename on a line by itself in a
+debian/package.install file, with no explicit destination, then dh_install
+will automatically guess the destination even if this flag is not set.
+
+=item I<file [...] dest>
+
+Lists files (or directories) to install and where to install them to.
+The files will be installed into the first package dh_install acts on.
+
+=back
+
+=cut
+
+init();
+
+my $ret=0;
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $file=pkgfile($package,"install");
+
+	my @install;
+	if ($file) {
+		@install=filedoublearray($file, ".");
+	}
+	
+	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+		push @install, [@ARGV];
+	}
+
+	# Support for -X flag.
+	my $exclude = '';
+	if ($dh{EXCLUDE_FIND}) {
+		$exclude = ' -and ! \( '.$dh{EXCLUDE_FIND}.' \)';
+	}
+	
+	foreach my $set (@install) {
+		my $dest;
+		
+		if (! defined $dh{AUTODEST} && @$set > 1) {
+			$dest=pop @$set;
+		}
+		
+		foreach my $src (@$set) {
+			next if excludefile($src);
+		
+			if (! defined $dest) {
+				# Guess at destination directory.
+				$dest=$src;
+				$dest=~s/^(.*\/)?debian\/tmp//;
+				$dest=dirname($dest);
+			}
+			
+			# Make sure the destination directory exists.
+			if (! -e "$tmp/$dest") {
+				doit("install","-d","$tmp/$dest");
+			}
+
+			if (-d $src && $exclude) {
+				my ($dir_basename) = basename($src);
+				# Pity there's no cp --exclude ..
+				my $pwd=`pwd`;
+				chomp $pwd;
+				complex_doit("cd $src/.. && find $dir_basename -type f$exclude -exec cp --parents -dp {} $pwd/$tmp/$dest/ \\;");
+			}
+			else {
+				doit("cp", "-a", $src, "$tmp/$dest/");
+			}
+		}
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

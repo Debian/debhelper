@@ -30,16 +30,6 @@ Wishlist items:
 
   This needs more thought.
   
-* All debhelper programs should be checked that they output files with the
-  correct permissions no matter what the umask is set to. Currently, only
-  those programs that run after dh_fixperms have been so checked. (Checking
-  the rest is low priority, since dh_fixperms fixes any incorrect permissions
-  they might have; still it would be nice to check them too, just to make
-  debhelper more flexible.) One easy fix is to add umask 022 to dh_lib,
-  however, there may be unforeseen ramifications of such a change.
-* All programs should also make sure the files they install are owned by
-  root.root. Situation is currently the same as with permissions above, plus
-  dh_installchangelogs is fixed.
 * Support use of environment variables in data taken from user, ie, in
   debian/dirs. The problem with doing this is that we really want to allow
   any filenames in that input, even those that look like environment
@@ -53,16 +43,6 @@ Wishlist items:
 * Add a switch to dh_installdeb to allow it to do user defined
   substitutions. OTOH, maybe it's better if people just sed
   postinst.in before debhelper gets it's hands on it... (#25235)
-
-v4:
-
-See debhelper's man page for what's implemented so far.
-
-These items are planned:
-
-* Maybe make dh_fixperms make all files in bin/ dirs +x. (#119039)
-* Make dh_link find existing, non-policy-comformant symlinks, and correct
-  them.
 
 Deprecated:
 
@@ -79,3 +59,4 @@ Deprecated:
 * dh_installxaw. xaw replacments are dying, nothing uses it validly (bugs
   filed on the few packages that use it by accident). Remove as soon as
   nothing uses it, or by april 2002.
+* dh_movefiles. I won't hold my breath.

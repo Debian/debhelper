@@ -41,7 +41,7 @@ install: build
 	# Add here commands to install the package into debian/tmp.
 	#$(MAKE) prefix=`pwd`/debian/tmp/usr install
 
-	dh_movefiles
+	dh_install
 
 # This single target is used to build all the packages, all at once, or
 # one at a time. So keep in mind: any options passed to commands here will
@@ -50,20 +50,21 @@ install: build
 binary-common:
 	dh_testdir
 	dh_testroot
-#	dh_installdebconf
+	dh_installchangelogs
 	dh_installdocs
 	dh_installexamples
 	dh_installmenu
+#	dh_installdebconf
 #	dh_installlogrotate
 #	dh_installemacsen
 #	dh_installpam
 #	dh_installmime
 #	dh_installinit
 #	dh_installman
-	dh_installcron
-	dh_installinfo
+#	dh_installcron
+#	dh_installinfo
 #	dh_undocumented
-	dh_installchangelogs
+	dh_installman
 	dh_strip
 	dh_link
 	dh_compress
