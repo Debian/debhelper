@@ -97,14 +97,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			open (IN, $page) or die "$page: $!";
 		}
 		while (<IN>) {
-			if (/^\.TH\s+[^ 	]+\s+(\d+[^ 	]*)\s/) {
+			if (/^\.TH\s+\S+\s+(\d+\S*)\s/) {
 				$section=$1;
 				last;
 			}
 		}
 		# Failing that, we can try to get it from the filename.
 		if (! $section) {
-			($section)=$basename=~m/.*\.([1-9][^ ]*)/;
+			($section)=$basename=~m/.*\.([1-9]\S*)/;
 		}
 
 		# Now get the numeric component of the section.
