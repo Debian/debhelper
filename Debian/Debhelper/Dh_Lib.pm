@@ -19,6 +19,9 @@ my $max_compat=4;
 sub init {
 	# If DH_OPTIONS is set, prepend it @ARGV.
 	if (defined($ENV{DH_OPTIONS})) {
+		# Ignore leading/trailing whitespace.
+		$ENV{DH_OPTIONS}=~s/^\s+//;
+		$ENV{DH_OPTIONS}=~s/\s+$//;
 		unshift @ARGV,split(/\s+/,$ENV{DH_OPTIONS});
 	}
 
