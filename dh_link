@@ -107,7 +107,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		$dest=~s:^/::;
 
 		# Make sure the directory the link will be in exists.
-		my $basedir=Debian::Debhelper::Dh_Lib::dirname("$tmp/$dest");
+		my $basedir=dirname("$tmp/$dest");
 		if (! -e $basedir) {
 			doit("install","-d",$basedir);
 		}

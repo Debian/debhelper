@@ -112,9 +112,9 @@ sub find_so_man {
 	if ($l=~m/\.so\s+(.*)/) {
 		my $solink=$1;
 		# This test is here to prevent links like ... man8/../man8/foo.8
-		if (Debian::Debhelper::Dh_Lib::basename($File::Find::dir) eq
-		    Debian::Debhelper::Dh_Lib::dirname($solink)) {
-			$solink=Debian::Debhelper::Dh_Lib::basename($solink);
+		if (basename($File::Find::dir) eq
+		    dirname($solink)) {
+			$solink=basename($solink);
 		}
 		else {
 			$solink="../$solink";
