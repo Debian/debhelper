@@ -1,9 +1,26 @@
 #!/usr/bin/perl -w
-#
-# Install logrotate config files.
+
+=head1 NAME
+
+dh_installlogrotate - install logrotate config files
+
+=cut
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_logrotate [debhelper options]
+
+=head1 DESCRIPTION
+
+dh_installlogrotate is a debhelper program that is responsible for installing
+logrotate config files into etc/logrotate.d in package build directories.
+Files named debian/package.logrotate are installed.
+
+=cut
+
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -17,3 +34,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("install","-m",644,$file,"$tmp/etc/logrotate.d/$package");
 	}
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

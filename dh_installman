@@ -1,11 +1,64 @@
 #!/usr/bin/perl -w
-#
-# Reads debian/manpages, installs all man pages there into appropriate
-# man page directory tree.
+
+=head1 NAME
+
+dh_installman - install man pages into package build directories
+
+=cut
 
 use strict;
 use File::Find;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_installman [debhelper options] [manpage ...]
+
+=head1 DESCRIPTION
+
+dh_installman is a debhelper program that is responsible for installing
+man pages into the correct locations in package build directories. You tell
+it what man pages go in your package(s), and it figures out where to
+install them based on the section field in their .TH line and their filename
+extention.
+
+Any man page filenames specified as parameters will be installed into the
+first package dh_installman is told to act on. By default, this is the
+first binary package in debian/control, but if you use -p, -i, or -a flags,
+it will be the first package specified by those flags.
+
+Files named debian/package.manpages can list other man pages to be
+installed.
+
+After the man page installation step, dh_installman will check to see if
+any of the man pages in the temporary directories of any of the packages it
+is acting on contain ".so" links. If so, it changes them to symlinks.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-A>, B<--all>
+
+Install all files specified by command line parameters in ALL packages
+acted on.
+
+=item I<manpage ...>
+
+Install these man pages into the first package acted on. (Or in all
+packages if -A is specified).
+
+=back
+
+=head1 NOTES
+
+An older version of this program, L<dh_installmanpages(1)>, is still used
+by some packages, and so is still included in debhelper.
+It is, however, deprecated, due to its counterintuiitive and inconsistent
+interface. Use this program instead.
+
+=cut
+
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -127,3 +180,15 @@ sub find_so_man {
 		push @sodests,$solink;
 	}
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

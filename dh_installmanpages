@@ -1,14 +1,66 @@
 #!/usr/bin/perl -w
-#
-# Automatically find and install man pages. However, do not install any man 
-# pages listed on the command line.
-# Also change man pages with .so commands in them into symlinks.
-#
-# This is a little bit (hah!) DWIMish, but still very handy.
+
+=head1 NAME
+
+dh_installmanpages - old-style man page installer
+
+=cut
 
 use strict;
 use File::Find;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_installmanpages [debhelper options] [file ...]
+
+=head1 DESCRIPTION
+
+dh_installmanpages is a debhelper program that is responsible for
+automatically installing man pages into usr/share/man/ and usr/X11R6/man/
+in package build directories.
+
+This is a DWIM-style program, with an interface unlike the rest of
+debhelper. You are encouraged to use L<dh_installman(1)> instead.
+
+dh_installmanpages scans the current directory and all subdirectories for
+filenames that look like man pages. (Note that only real files are looked
+at; symlinks are ignored.) It uses L<file(1)> to verify that the files are
+in the correct format. Then, based on the files' extensions, it installs 
+them into the correct man directory.
+
+All filenames specified as parameters will be skipped by dh_installmanpages.
+This is useful if by default it installs some man pages that you do not
+want to be installed.
+
+After the man page installation step, dh_installmanpages will check to see
+if any of the man pages are ".so" links. If so, it changes them to symlinks.
+
+=head1 OPTIONS
+
+=over 4
+
+=item I<file ...>
+
+Do not install these files as man pages, even if they look like valid man
+pages.
+
+=back
+
+=head1 BUGS
+
+dh_installmanpages will install the man pages it finds into B<all> packages
+you tell it to act on, since it can't tell what package the man
+pages belong in. This is almost never what you really want (use -p to work
+around this, or use the much better L<dh_installman(1)> program instead).
+
+Files ending in I<.man> will be ignored.
+
+Files specified as parameters that contain spaces in their filenames will
+not be processed properly.
+
+=cut
+
 init();
 
 # Check if a file is a man page, for use by File::Find.
@@ -140,3 +192,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit "ln","-sf",$sodest,$sofile;
 	}
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

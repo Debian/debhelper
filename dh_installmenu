@@ -1,15 +1,47 @@
 #!/usr/bin/perl -w
-#
-# Integration with debian menu system:
-#
-# If debian/menu file exists, save it to $tmp/usr/lib/menu/$package
-# If debian/menu-method file exists, save it to 
-# $tmp/etc/menu-methods/$package
-#
-# Also, add to postinst and postrm.
+
+=head1 NAME
+
+dh_installmenu - install debian menu files into package build directories
+
+=cut
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_installmenu [debhelper options] [-n]
+
+=head1 DESCRIPTION
+
+dh_installmenu is a debhelper program that is responsible for installing
+files used by the debian menu package into package build directories.
+
+It also automatically generates the postinst and postrm commands needed to
+interface with the debian menu package. See L<dh_installdeb(1)> for an
+explanation of how this works.
+
+If a file named debian/package.menu exists, then it is installed into
+usr/lib/menu/package in the package build directory. This is a debian menu
+file.
+
+If a file named debian/package.menu-method exits, then it is installed into
+etc/menu-methods/package in the package build directory. This is a debian
+menu method file.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-n>, B<--noscripts>
+
+Do not modify postinst/postrm scripts.
+
+=back
+
+=cut
+
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -43,3 +75,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 	}
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

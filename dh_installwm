@@ -1,9 +1,61 @@
 #!/usr/bin/perl -w
-#
-# Add to postinst and prerm to register a window manager.
+
+=head1 NAME
+
+dh_installwm - register a window manager
+
+=cut
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_installwm [debhelper options] [-n] [--priority=n] [wm ...]
+
+=head1 DESCRIPTION
+
+dh_installwm is a debhelper program that is responsible for
+generating the postinst and postrm commands that register a window manager
+with L<update-alternatives(8)>
+
+Any window manager programs specified as parameters will be registered in
+the first package dh_installwm is told to act on. By default, this is the
+first binary package in debian/control, but if you use -p, -i, or -a flags,
+it will be the first package specified by those flags.
+
+Files named debian/package.wm can list other window manager programs to
+register.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--priority=>I<n>
+
+Set the priority of the window manager. Default is 20, which is too low for
+most window managers; see the Debian Policy document for instructions on
+calculating the correct value.
+
+=item B<-n>, B<--noscripts>
+
+Do not modify postinst/postrm scripts. Turns this command into a no-op.
+
+=item I<wm ...>
+
+The commands used to run the window manager or window managers you want to
+register.
+
+=head1 NOTES
+
+Note that this command is not idempotent. "dh_clean -k" should be called
+between invocations of this command. Otherwise, it may cause multiple
+instances of the same text to be added to maintainer scripts.
+
+=back
+
+=cut
+
 init();
 
 if (! defined $dh{PRIORITY}) {
@@ -39,3 +91,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 }
 
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut
