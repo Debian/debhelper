@@ -1,0 +1,104 @@
+.TH DEBHELPER 1 "" "Debhelper Commands" "Debhelper Commands"
+.SH NAME
+debhelper \- overview of the debhelper commands
+.SH SYNOPSIS
+.B dh_*
+.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Npackage] [-Ptmpdir]"
+.SH "DESCRIPTION"
+Debhelper is a collection of programs that can be used in debian/rules files
+to automate common tasks related to building debian binary packages. All the
+debhelper commands accept a set of options, and this man page is here to
+document those options and to document debhelper as a whole. For additional 
+options, and documentation for each individual command, see the commands' own
+man pages.
+.SH "SHARED DEBHLPER OPTIONS"
+.TP
+.B \-v, \--verbose
+Verbose mode: show all commands that modify the package build directory.
+.TP
+.B \--no-act
+Do not really do anything. If used with -v, the result is that the command
+will output a list of what it would have done.
+.TP
+.B \-a, \--arch
+Act on all architecture dependent packages.
+.TP
+.B \-i, \--indep
+Act on all architecture independent packages.
+.TP
+.B \-ppackage, \--package=package
+Act on the package named "package".
+.TP
+.B \-Npackage, \--no-package=package
+Do not act on the specified package even if an -a, -i, or -p option lists
+the package as one that should be acted on.
+.TP
+.B \-Ptmpdir, \--tmpdir=tmpdir
+Use "tmpdir" for package build directory. 
+.SH NOTES
+.TP
+.B Multiple binary package support
+.RS
+If your source package generates more than one binary package, debhelper
+programs will default to acting on all binary packages when run. If your
+source package happens to generate one architecture dependent package, and
+another architecture independent package, this is not the correct behavior,
+because you need to generate the architecture dependent packages in the
+binary-arch debian/rules target, and the architecture independent packages
+in the binary-indep debian/rules target.
+
+To facilitate this, as well as give you more control over which packages
+are acted on by debhelper programs, all debhelper programs accept the 
+.B -a
+,
+.B -i
+, and 
+.B -p
+parameters. These parameters are cumulative. If none are given,
+debhelper programs default to acting on all packages listed in the control
+file.
+.P
+See
+.BR /usr/doc/debhelper/examples/rules.multi
+for an example of how to use this.
+.RE
+.TP
+.B Package build directories
+.RS
+By default, all debhelper programs assume that the temporary directory used
+for assembling the tree of files in a package is debian/tmp for the first
+package listed in debian/control, and debian/<packagename> for each
+additional package.
+.P
+Sometimes, you might want to use some other temporary directory. This is
+supported by the
+.B -P
+flag. For example, "dh_installdocs -Pdebian/tmp", will use debian/tmp as the
+temporary directory. Note that if you use -P, the debhelper programs can only
+be acting on a single package at a time. So if you have a package that builds
+many binary packages, you will need to use the -p flag to specify which
+binary package the debhelper program will act on.
+.RE
+.TP
+.B Other notes
+In general, if any debhelper program needs a directory to exist under
+debian/, it will create it. I haven't bothered to document this in all the
+man pages, but for example, dh_installdeb knows to make debian/tmp/DEBIAN/
+before trying to put files there, dh_installmenu knows you need a
+debian/tmp/usr/lib/menu/ before installing the menu files, etc.
+.SH ENVIRONMENT
+.TP
+.I DH_VERBOSE
+Enables verbose mode.
+.TP
+.I DH_NO_ACT
+Enables no-act mode.
+.SH "SEE ALSO"
+.TP
+.BR /usr/doc/debhelper/README
+An introduction to debhelper.
+.TP
+.BR /usr/doc/debhelper/examples/
+A set of example debian/rules files that use debhelper.
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>

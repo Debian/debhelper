@@ -1,0 +1,34 @@
+#!/bin/sh -e
+#
+# Registration with emacsen-common.
+
+PATH=debian:$PATH:/usr/lib/debhelper
+. dh_lib
+
+for PACKAGE in $DH_DOPACKAGES; do
+	TMP=`tmpdir $PACKAGE`
+
+	emacsen_install=`pkgfile $PACKAGE emacsen-install`
+	emacsen_remove=`pkgfile $PACKAGE emacsen-remove`
+
+	if [ "$emacsen_install" ]; then
+		if [ ! -d "$TMP/usr/lib/emacsen-common/packages/install" ]; then
+			doit "install -d $TMP/usr/lib/emacsen-common/packages/install"
+		fi
+		doit "install $emacsen_install $TMP/usr/lib/emacsen-common/packages/install/$PACKAGE"
+	fi
+
+	if [ "$emacsen_remove" ]; then
+		if [ ! -d "$TMP/usr/lib/emacsen-common/packages/remove" ]; then
+			doit "install -d $TMP/usr/lib/emacsen-common/packages/remove"
+		fi
+		doit "install $emacsen_remove $TMP/usr/lib/emacsen-common/packages/remove/$PACKAGE"
+	fi
+
+	if [ "$emacsen_install" -o "$emacsen_remove" ]; then
+		if [ ! "$DH_NOSCRIPTS" ]; then
+			autoscript "postinst" "postinst-emacsen"
+			autoscript "prerm" "prerm-emacsen"
+		fi
+	fi	
+done
