@@ -62,51 +62,45 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			doit("install","-m","644","-p",$copyright,"$TMP/usr/doc/$PACKAGE/copyright");
 	}
 	
-	# Handle doc-base files. There are two filename formats, the usual plus
-	# an extended format (debian/package.doc-base.<doc-id>). Have to
-	# come up with good document-id's too.
+	# Handle doc-base files. There are two filename formats, the usual
+	# plus an extended format (debian/package.*).
 	my %doc_ids;
 	
 	opendir(DEB,"debian/") || error("can't read debian directory: $!");
-	foreach (grep {/^\Q$PACKAGE\E\.doc-base\..*$/} readdir(DEB)) {
-		$id=$_;
-		$id=~s/\.doc-base\./-/;
-		$doc_ids{$id}="debian/$_";
+	# If this is the main package, we need to handle unprefixed filenames.
+	# For all packages, we must support both the usual filename format plus
+	# that format with a period an something appended.
+	my $regexp="\Q$PACKAGE\E\.";
+	if ($PACKAGE eq $dh{MAINPACKAGE}) {
+		$regexp="(|$regexp)";
+	}
+	foreach my $fn (grep {/^${regexp}doc-base(\..*)?$/} readdir(DEB)) {
+		# Parse the file to get the doc id.
+		open (IN, "debian/$fn") || die "Cannot read debian/$fn.";
+		while (<IN>) {
+			if (/^Document:\s+(.*)/) {
+				$doc_ids{$fn}=$1;
+				last;
+			}
+		}
+		close IN;
 	}
 	closedir(DEB);
-	
-	# These next lines handle the format debian/doc-base.<doc-id>, 
-	# which is in for completeness.
-	if ($PACKAGE eq $dh{MAINPACKAGE}) {
-		opendir(DEB,"debian/") || error("can't read debian directory: $!");
-		foreach (grep {/^doc-base\..*$/} readdir(DEB)) {
-			$id=$_;
-			$id=~s/doc-base\./$PACKAGE-/;
-			$doc_ids{$id}="debian/$_";
-		}
-		closedir(DEB);
-	}
-	
-	# And this handles the normal format of course.
-	$file=pkgfile($PACKAGE,"doc-base");
-	if ($file ne '') {
-		$doc_ids{$PACKAGE}=$file;
-	}
 	
 	if (%doc_ids) {
 		if (! -d "$TMP/usr/share/doc-base/") {
 			doit("install","-d","$TMP/usr/share/doc-base/");
 		}
 	}
-	foreach $doc_id (keys %doc_ids) {
-		doit("install","-m644","-p",$doc_ids{$doc_id},
-		     "$TMP/usr/share/doc-base/$doc_id");
+	foreach my $fn (keys %doc_ids) {
+		doit("install","-m644","-p","debian/$fn",
+		     "$TMP/usr/share/doc-base/$doc_ids{$fn}");
 		if (! $dh{NOSCRIPTS}) {
 			autoscript($PACKAGE,"postinst","postinst-doc-base",
-				"s/#DOC-ID#/$doc_id/",
+				"s/#DOC-ID#/$doc_ids{$fn}/",
 			);
 			autoscript($PACKAGE,"prerm","prerm-doc-base",
-				"s/#DOC-ID#/$doc_id/",
+				"s/#DOC-ID#/$doc_ids{$fn}/",
 			);
 		}
 	}
