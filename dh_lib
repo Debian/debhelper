@@ -82,13 +82,18 @@ pkgext() {
 # Caches return code so it only needs to run dpkg-parsechangelog once.
 isnative() {
 	if [ -z "$DH_ISNATIVE" ]; then
+		# Make sure we look at the correct changelog.
+		isnative_changelog=`pkgfile $PACKAGE changelog`
+		if [ ! "$isnative_changelog" ]; then
+			isnative_changelog=debian/changelog
+		fi
 		# Get the package version.
 		# Note that the 2>/dev/null is because a bug in dpkg-parsechangelog makes it
 		# output a bogus error message to stderr.
 		# If it actually has a real error, then the expr will fail, and this whole
 		# script will come crashing to a halt, which is good enough to inform
 		# the user something's wrong. :-)
-		VERSION=`expr "\`dpkg-parsechangelog 2>/dev/null\`" : \
+		VERSION=`expr "\`dpkg-parsechangelog -l$isnative_changelog 2>/dev/null\`" : \
 			'.*Version: \(.*\).*Distribution:'`
 		# Is this a native Debian package?
 		if expr "$VERSION" : '.*-' >/dev/null; then

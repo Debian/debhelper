@@ -1,3 +1,17 @@
+debhelper (0.97) unstable; urgency=low
+
+  * doc/from-debstd: fixed a typo.
+  * examples/*: install-stamp no longer depends on phony build targey; now 
+    install-stamp depends on build-stamp instead (#24234).
+  * dh_fixperms: applied patch from Herbert Xu <herbert@gondor.apana.org.au>
+    to fix bad uses of the find command, so it should now work on packages 
+    with files with spaces in them (#22005). It's also much cleaner. Thanks,
+    Herbert!
+  * dh_getopt.pl, doc/PROGRAMMING: added DH_EXCLUDE_FIND, to make the above
+    fix work.
+
+ -- Joey Hess <joeyh@master.debian.org>  Sun,  5 Jul 1998 18:09:25 -0700
+
 debhelper (0.96) unstable; urgency=low
 
   * dh_movefiles: fixed serious breakage introduced in the last version.
