@@ -49,7 +49,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			
 			if ($section ne '') {
 				autoscript($PACKAGE,"postinst","postinst-info",
-					"s/#SECTION#/$section/;s:#FILE#:$fn:");
+					"s/#SECTION#/$section/g;s:#FILE#:$fn:");
 			}
 			else {
 				autoscript($PACKAGE,"postinst","postinst-info-nosection",
