@@ -1,0 +1,80 @@
+.TH DH_INSTALLDOCS 1 "" "Debhelper Commands" "Debhelper Commands"
+.SH NAME
+dh_installdocs \- install documentation into package build directories
+.SH SYNOPSIS
+.B dh_installdocs
+.I "[debhelper options] [-A] [-n] [file ...]"
+.SH "DESCRIPTION"
+dh_installdocs is a debhelper program that is responsible for installing
+documentation into usr/doc/package in package build directories.
+.P
+dh_installdocs automatically installs debian/copyright if it exists. If
+dh_installdocs is acting on multiple packages, debian/copyright files will be
+installed into all packages. However, if you need to have seperate copyright
+files for different binary packages, you can use files named 
+debian/package.copyright.
+.P
+Any filenames specified as parameters will be installed into the first
+package dh_installdocs is told to act on. By default, this is the first 
+binary package in debian/control, but if you use -p, -i, or -a flags, it 
+will be the first package specified by those flags.
+.P
+Also, debian/README.Debian (or debian/README.debian) and debian/TODO, if 
+they exist, will be installed into the first binary package listed in 
+debian/control, if dh_installdocs is acting on that package. Note that 
+debian/TODO will be installed named TODO.Debian, if the package is not a 
+debian native package. Also note that README.debian is installed as
+README.Debian, for consitency. Note that debian/package.README.Debian and
+debian/package.TODO can be used to specify files for subpackages.
+.P
+A file named debian/package.docs (debian/docs may be used for the first
+binary package in debian/control) can list other files to be installed.
+.P
+A file named debian/package.doc-base (debian/doc-base may be used for the
+first binary package in debian/control), if it exists, will be installed as 
+a doc-base control file, and will make this program automatically generate the
+postinst and prerm commands needed to interface with the doc-base package. See
+.BR dh_installdeb (1)
+for an explanation of how this works.
+Note that the doc-id will be determined from the doc-base control file 
+in question.
+.PP
+If your package needs to register more
+than one document, you need multiple files. To accomplish this, you can use
+files named debian/package.doc-base.*
+.SH OPTIONS
+.TP
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
+.TP
+.B \-A, \--all
+Install all files specified by command line parameters in ALL packages
+acted on.
+.TP
+.B \-n, \--noscripts
+Do not modify postinst/prerm scripts.
+.TP
+.B file ...
+Install these files as documentation into the first package acted on. (Or in
+all packages if -A is specified).
+.SH NOTES
+Note that dh_installdocs will happily copy entire directory hierarchies if
+you ask it to (it uses cp -a internally). If it is asked to install a
+directory, it will install the complete contents of the directory.
+.SH ENVIRONMENT
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
+.SH "SEE ALSO"
+.BR debhelper (1)
+.TP
+.BR install-docs (8)
+.SH BUGS
+It's impossible to specify filenames with spaces or other whitespace in them
+in debian/docs file. This is more a historical design flaw than a bug.
+.SH "CONFORMS TO"
+Debian policy, version 2.5.0.0
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>

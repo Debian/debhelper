@@ -1,0 +1,62 @@
+.TH DH_INSTALLINIT 1 "" "Debhelper Commands" "Debhelper Commands"
+.SH NAME
+dh_installinit \- install init scripts into package build directories
+.SH SYNOPSIS
+.B dh_installinit
+.I "[debhelper options] [--init-script=scriptname] [-n] [-r] [-d] [-uparams]"
+.SH "DESCRIPTION"
+dh_installinit is a debhelper program that is responsible for installing
+init scripts into package build directories. 
+.P
+It also automatically generates the postinst and postrm and prerm commands 
+needed to set up the symlinks in /etc/rc*.d/ and to start and stop the init
+scripts.
+.P
+If a file named debian/package.init (or debian/package.init.d for backwards
+compatibility with debstd) exists, then it is installed into
+etc/init.d/package in the package build directory, with "package" replaced
+by the packagename. (You may use debian/init for the first binary package
+listed in the control file.)
+.SH OPTIONS
+.TP
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
+.TP
+.B \-n, \--noscripts
+Do not modify postinst/postrm/prerm scripts.
+.TP
+.B \-r, \--no-restart-on-upgrade
+Do not restart daemon on upgrade.
+.TP
+.B \-d, \--remove-d
+Remove trailing "d" from the name of the package, and use the result for the
+filename the init script is installed as in etc/init.d/ . This may be useful
+for daemons with names ending in "d". (Note: this takes precedence over
+the --init-script parameter described below.)
+.TP
+.B \-uparams, \--update-rcd-params=params
+Pass "params" to 
+.BR update-rc.d (8)
+If not specified, "defaults" will be passed to
+.BR update-rc.d (8)
+.TP
+.B \--init-script=scriptname
+Use "scriptname" as for the filename the init script is installed as in
+etc/init.d/ . This is useful if you need to have an init script with a name
+different from the package's name. Note that if you use this parameter,
+dh_installinit will look to see if a file in the debian/ directory exists
+that looks like "scriptname" or "package.scriptname" and if so will install
+it as the inist script in preference to the files it normally installs. This
+feature is really only useful if you need a single package to install more
+than one init script.
+.SH ENVIRONMENT
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
+.SH "SEE ALSO"
+.BR debhelper (1),
+.BR update_rc.d (8)
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>
