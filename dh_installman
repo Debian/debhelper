@@ -184,7 +184,7 @@ sub find_so_man {
 	open (SOTEST,$_) || die "$_: $!";
 	my $l=<SOTEST>;
 	close SOTEST;
-	if ($l=~m/\.so\s+(.*)/) {
+	if ($l=~m/\.so\s+(.*)\s*/) {
 		my $solink=$1;
 		# This test is here to prevent links like ... man8/../man8/foo.8
 		if (basename($File::Find::dir) eq
