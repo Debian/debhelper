@@ -30,19 +30,6 @@ Wishlist items:
 
   This needs more thought.
   
-* Support use of environment variables in data taken from user, ie, in
-  debian/dirs. The problem with doing this is that we really want to allow
-  any filenames in that input, even those that look like environment
-  variables. However, it may be worth adding a switch to make it parse
-  environment variables. (#20964)
-* It's possible to speed up debhelper by having it cache some values that
-  multiple commands call. One way to do this would be to write dh_cache,
-  that generates the cache. The catch is that if the user runs that program,
-  they are stating that they don't do anything later to invalidate the cache,
-  without calling dh_cache again. (#23792)
-* Add a switch to dh_installdeb to allow it to do user defined
-  substitutions. OTOH, maybe it's better if people just sed
-  postinst.in before debhelper gets its hands on it... (#25235)
 * install-info, as of dpkg 1.10, parses the info file for section if
   --section is not given. So I should be able to stop parsing it myself for
   section, after dpkg 1.10 has been around long enough.

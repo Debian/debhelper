@@ -169,14 +169,18 @@ use this in a package that generates multiple binary packages.
 
 =head2 Automatic generation of debian install scripts
 
-Some debhelper commands will automatically generate parts of debian install
-scripts. If you want these automatically generated things included in your
-debian install scripts, then you need to add "#DEBHELPER#" to your scripts,
-in the place the code should be added. "#DEBHELPER#" will be replaced by
-any auto-generated code when you run dh_installdeb.
+Some debhelper commands will automatically generate parts of debian
+maintainer scripts. If you want these automatically generated things
+included in your existing debian maintainer scripts, then you need to add
+"#DEBHELPER#" to your scripts, in the place the code should be added.
+"#DEBHELPER#" will be replaced by any auto-generated code when you run
+dh_installdeb. 
 
-All scripts that automatically generate code in this way let it be disabled
-by the -n parameter (see above).
+If a script does not exist at all and debhelper needs to add something to
+it, then debhelper will create the complete script.
+
+All debhelper commands that automatically generate code in this way let it
+be disabled by the -n parameter (see above).
 
 Note that the inserted code will be shell code, so you cannot directly use
 it in a perl script. If you would like to embed it into a perl script, here
@@ -324,15 +328,13 @@ man pages, but for example, dh_installdeb knows to make debian/<package>/DEBIAN/
 before trying to put files there, dh_installmenu knows you need a
 debian/<package>/usr/lib/menu/ before installing the menu files, etc.
 
-If you are generating a debian package that has arch-indep and
-arch-dependent portions, and you are using dh_movefiles to move the
-arch-indep files out of debian/tmp, you need to make sure that dh_movefiles
-does this even if only the arch-dependent package is being built (for
-ports to other architectures). I handle this in the example rules file
-"rules.multi" by calling dh_movefiles in the install target.
-
 Once your package uses debhelper to build, be sure to add
-debhelper to your Build-Depends line in debian/control.
+debhelper to your Build-Depends line in debian/control. You should
+build-depend on a verson of debhelper equal to (or greater than) the
+debhelper compatability level your package uses. So if your package used
+compatability level 4:
+
+  Build-Depends: debhelper (>= 4)
 
 =head1 ENVIRONMENT
 
@@ -385,7 +387,7 @@ your package is built.
 
 A set of example debian/rules files that use debhelper.
 
-=item http://kitenet.net/programs/debhelper/
+=item L<http://kitenet.net/programs/debhelper/>
 
 Debhelper web site.
 

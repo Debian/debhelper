@@ -12,7 +12,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_strip> [S<I<debhelper options>>] [B<-X>I<item>] [item]
+B<dh_strip> [S<I<debhelper options>>] [B<-X>I<item>]
 
 =head1 DESCRIPTION
 
@@ -20,8 +20,17 @@ dh_strip is a debhelper program that is responsible for stripping
 executables, shared libraries, and static libraries that are not used for
 debugging.
 
-It assumes that files that have names like lib*_g.a are static libraries
-used in debugging, and will not strip them.
+This program examines your package build directories and works out what
+to strip on its own. It uses L<file(1)> and file permisions and filenames
+to figure out what files are shared libraries (*.so), executable binaries,
+and static (lib*.a) and debugging libraries (lib*_g.a, debug/*.so), and
+strips each as much as is possible. (Which is not at all for debugging
+libraries.) In general it seems to make very good guesses, and will do the
+right thing in almost all cases.
+
+Since it is very hard to automatically guess if a file is a
+module, and hard to determine how to strip a module, dh_strip does not
+currently deal with stripping binary modules such as .o files.
 
 =head1 OPTIONS
 
@@ -77,6 +86,9 @@ sub testfile {
 	foreach my $f (@{$dh{EXCLUDE}}) {
 		return if ($fn=~m/\Q$f\E/);
 	}
+
+	# Is it a debug library in a debug subdir?
+	return if $fn=~m/debug\/.*\.so/;
 
 	# Does its filename look like a shared library?
 	if (m/.*\.so.*?/) {
