@@ -25,9 +25,9 @@ else, for which no particular intelligence is needed. It is a replacement for
 the old dh_movefiles command.
 
 Files named debian/package.install list the files to install into each
-package and where they should be installed to. The format is a set of
-lines, where each line lists a file or files to install, and at the end of
-the line tells the directory it should be installed in. The name of the
+package and the directory they should be installed to. The format is a set
+of lines, where each line lists a file or files to install, and at the end
+of the line tells the directory it should be installed in. The name of the
 files (or directories) to install should be given relative to the current
 directory, while the installation directory is given relative to the
 package build directory. You may use wildcards in the names of the files to
@@ -36,8 +36,8 @@ install (in v3 mode and above).
 This program may be used in one of two ways. If you just have a file or two
 that the upstream Makefile does not install for you, you can run dh_install
 on them to move them into place. On the other hand, maybe you have a large
-package that builds multiple binary packages. You can use the upstream Makefile
-to install it all into debian/tmp, and then use dh_install to copy
+package that builds multiple binary packages. You can use the upstream
+Makefile to install it all into debian/tmp, and then use dh_install to copy
 directories and files from there into the proper package build directories.
 
 =head1 OPTIONS
@@ -225,6 +225,12 @@ If you want a libfoo-dev package too, debian/libfoo-dev.install might contain:
   usr/lib/libfoo*.so
   usr/share/man/man3
 
+=head1 LIMITIATIONS
+
+dh_install cannot rename files or directories, it can only install them
+with the names they already have into wherever you want in the package
+build tree.
+  
 =head1 SEE ALSO
 
 L<debhelper(7)>
