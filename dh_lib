@@ -5,20 +5,20 @@
 # function.
 # Unfortunatly, this function doesn't work if your command uses redirection,
 # you will have to call verbose_echo by hand then.
-function doit() {
+doit() {
 	verbose_echo "$*"
 	$*
 }
 
 # Echo something if the verbose flag is on.
-function verbose_echo() {
+verbose_echo() {
 	if [ "$DH_VERBOSE" ]; then
 		echo "	$*"
 	fi
 }
 
 # Echo an error message and exit.
-function error() {
+error() {
 	echo `basename $0`": $1" >&2
 	exit 1
 }
@@ -26,7 +26,7 @@ function error() {
 # Pass it a name of a binary package, it returns the name of the tmp dir to
 # use, for that package, relative to debian/
 # This is for back-compatability with the debian/tmp tradition.
-function tmpdir() {
+tmpdir() {
 	if [ "$1" = "$MAINPACKAGE" ]; then
 		echo tmp
 	else
@@ -36,7 +36,7 @@ function tmpdir() {
 
 # Pass it a name of a binary package, it returns the name to prefix to files
 # in debian for this package.
-function pkgext() {
+pkgext() {
 	if [ "$1" != "$MAINPACKAGE" ]; then
 		echo "$PACKAGE."
 	fi
@@ -49,7 +49,7 @@ function pkgext() {
 # 1: script to add to
 # 2: filename of snippet
 # 3: sed commands to run on the snippet. Ie, s/#PACKAGE#/$PACKAGE/
-function autoscript() {
+autoscript() {
 	autoscript_script=$1
 	autoscript_filename=$2
 	autoscript_sed=$3

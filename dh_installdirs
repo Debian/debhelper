@@ -1,0 +1,39 @@
+#!/bin/sh -e
+#
+# Reads debian/dirs, creates the directories listed there there
+
+PATH=debian:$PATH:/usr/lib/debhelper
+. dh_lib
+
+for PACKAGE in $DH_DOPACKAGES; do
+	TMP=`tmpdir $PACKAGE`
+	EXT=`pkgext $PACKAGE`
+
+	if [ ! -d $TMP/usr/doc/$PACKAGE ]; then
+		doit "install -d $TMP/usr/doc/$PACKAGE"
+	fi
+
+	dirs=""
+
+	if [ -e debian/${EXT}dirs ]; then
+		dirs=`tr "\n" " " < debian/${EXT}dirs`
+	fi
+
+	if [ "$PACKAGE" = "$MAINPACKAGE" -a "$*" ]; then
+		dirs="$* $dirs"
+	fi
+
+	if [ "$dirs" ]; then
+		# Check to see if any of the dirs are absolute.
+		for dir in "$dirs" ; do
+			if expr "$dir" : "/" >/dev/null ; then
+				error "Absolute directory name \"$dir\" specified."
+			fi
+		done
+		# Create dirs.
+		verbose_echo "cd $TMP && install -d $dirs && cd ../.."
+		cd $TMP
+		install -d $dirs
+		cd ../..
+	fi
+done

@@ -1,0 +1,51 @@
+#!/bin/sh -e
+#
+# Passed a list of undocumented man pages, generates symlinks to
+# undocumented.7 for those man pages.
+#
+# Also, it looks for debian/undocumented files for more lists of
+# undocumented man pages.
+
+PATH=debian:$PATH:/usr/lib/debhelper
+. dh_lib
+
+for PACKAGE in $DH_DOPACKAGES; do
+        TMP=`tmpdir $PACKAGE`
+	EXT=`pkgext $PACKAGE`
+
+	undoc=""
+
+	if [ -e debian/${EXT}undocumented ]; then
+		undoc=`tr "\n" " " < debian/${EXT}undocumented`
+	fi
+
+	if [ "$PACKAGE" = "$MAINPACKAGE" -a "$*" ]; then
+		undoc="$* $undoc"
+	fi
+
+	if [ "$undoc" ]; then
+		for file in $undoc; do
+			# Remove .gz extention from the filename, if present.
+			if [ `expr "$file" : '\(.*\).gz'` ]; then
+				file=`expr "$file" : '\(.*\).gz'`
+			fi
+
+			# Determine what directory the file belongs in,
+			# /usr/man, or /usr/X11R6/man.
+			section=`expr "$file" : '.*\.\([123456789]\)'`
+			if [ `expr "$file" : '.*\.[123456789]\(x\)'` ] ; then
+				dir=usr/X11R6/man/man$section
+				reldir=../../../man
+			else
+				dir=usr/man/man$section
+				reldir=..
+			fi
+
+			if [ ! -d debian/$TMP/$dir ]; then
+				doit "install -d debian/$TMP/$dir"
+			fi
+
+			doit ln -s $reldir/man7/undocumented.7.gz debian/$TMP/$dir/$file.gz
+		done
+	fi
+done

@@ -1,0 +1,70 @@
+.TH DH_INSTALLINIT 1
+.SH NAME
+dh_installinit \- install init scripts into package build directories
+.SH SYNOPSIS
+.B dh_installinit
+.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir] [-n] [-r] [-d] [-u params]"
+.SH "DESCRIPTION"
+dh_installmenu is a debhelper program that is responsible for installing
+init scripts into package build directories. 
+.P
+It also automatically generates the postinst and postrm and prerm commands 
+needed to set up the symlinks in /etc/rc*.d/ and to start and stop the init
+scripts.
+.P
+If a file named debian/init exists, then it is installed into
+etc/init.d/package in the package build directory (with "package" replaced
+by the package name, unless the -d flag is specified, see below)
+.P
+For packages other than the first binary package listed in
+the control file, use debian/package.init instead (replace "package" with 
+the name of the package.)
+.SH OPTIONS
+.TP
+.B \-v
+Verbose mode; show all commands that modify the package build directory.
+.TP
+.B \-a
+Install init scripts into all architecture dependent packages.
+.TP
+.B \-i
+Install init scripts into all architecture independent packages.
+.TP
+.B \-ppackage
+Install init scripts into the package named "package".
+.TP
+.B \-Ptmpdir
+Use "tmpdir" for package build directory. 
+.TP
+.B \-n
+Do not modify postinst/postrm/prerm scripts.
+.TP
+.B \-r
+Do not restart daemon on upgrade.
+.TP
+.B \-d
+Remove trailing "d" from the name of the package, and use the result for the
+filename the init script is installed as in etc/init.d/ . This may be useful
+for daemons with named ending in "d".
+.TP
+.B \-u params
+Pass "params" to 
+.BR update-rc.d (8)
+If not specified, "default" will be passed to
+.BR update-rc.d (8)
+.SH NOTES
+The
+.B \-a
+.B \-i
+and
+.B \-p
+arguments are cumulative. If none are specified, then all packages listed in
+the control file will be effected.
+.SH ENVIRONMENT
+.TP
+.I DH_VERBOSE
+Enables verbose mode
+.SH "SEE ALSO"
+.BR /usr/doc/debhelper/README
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>

@@ -1,0 +1,59 @@
+.TH DH_INSTALLDIRS 1
+.SH NAME
+dh_installdirs \- create subdirectories in package build directories
+.SH SYNOPSIS
+.B dh_installdirs
+.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir] [dir ...]"
+.SH "DESCRIPTION"
+dh_installdirs is a debhelper program that is responsible for creating
+subdirectories in package build directories.
+.P
+Any directory names specified as parameters will be created in the package
+build directory of the first binary package listed in debian/control, if 
+dh_installdirs is acting on that package.
+.P
+A file named debian/dirs (for the first binary package in debian/control),
+or debian/package.dirs (for each additional package in debian/control) can
+list other directories to be created. Seperate the directory names with
+whitespace.
+.P
+Be sure to only use directory names relative to the package build
+directory. Ie, "/usr/bin" should not be used, use "usr/bin" instead.
+.SH OPTIONS
+.TP
+.B \-v
+Verbose mode; show all commands that modify the package build directory.
+.TP
+.B \-a
+Create directories for all architecture dependent packages.
+.TP
+.B \-i
+Create directories for all architecture independent packages.
+.TP
+.B \-ppackage
+Create directories for the package named "package".
+.TP
+.B \-Ptmpdir
+Use "tmpdir" for package build directory. 
+.TP
+.B dir ...
+Create these directories in the package build directory of the first binary 
+package listed in debian/control, if we are acting on that package.
+.SH NOTES
+The
+.B \-a
+.B \-i
+and
+.B \-p
+arguments are cumulative. If none are specified, then all packages listed in
+the control file will be effected.
+.SH ENVIRONMENT
+.TP
+.I DH_VERBOSE
+Enables verbose mode
+.SH "SEE ALSO"
+.BR /usr/doc/debhelper/README
+.SH BUGS
+Directories with spaces in them will not currently be installed.
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>

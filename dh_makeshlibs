@@ -1,0 +1,30 @@
+#!/bin/sh -e
+#
+# Automatically generate shlibs files.
+
+PATH=debian:$PATH:/usr/lib/debhelper
+. dh_lib
+
+for PACKAGE in $DH_DOPACKAGES; do
+	TMP=`tmpdir $PACKAGE`
+
+	if [ -e "debian/$TMP/DEBIAN/shlibs" ]; then
+		error "debian/$TMP/DEBIAN/shlibs already exists."
+	fi
+
+	for file in `find debian/$TMP -type f -name "*.so*" | tr "\n" " "` ; do
+		LIBRARY=`expr $file : ".*/\(.*\)\.so\..*"` || true
+		VERSION=`expr $file : ".*/.*\.so\.\(.*\)"` || true
+		MAJOR=`expr $VERSION : "\([0-9]*\)\."` || true
+		LIBSTUB=`expr $file : "\(.*\/.*\.so\)\..*"` || true
+		if [ ! -d "debian/$TMP/DEBIAN" ] ; then
+			doit "install -d debian/$TMP/DEBIAN"
+		fi
+		verbose_echo "echo \"$LIBRARY $MAJOR $PACKAGE\" >>debian/$TMP/DEBIAN/shlibs"
+		echo "$LIBRARY $MAJOR $PACKAGE" >>debian/$TMP/DEBIAN/shlibs
+	done
+
+	if [ -e "debian/$TMP/DEBIAN/shlibs" ]; then
+		doit "chown root.root debian/$TMP/DEBIAN/shlibs"
+	fi
+done

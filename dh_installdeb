@@ -1,0 +1,46 @@
+#!/bin/sh -e
+#
+# Install files from debian/ into the package's DEBIAN directory.
+
+PATH=debian:$PATH:/usr/lib/debhelper
+. dh_lib
+
+for PACKAGE in $DH_DOPACKAGES; do
+	TMP=`tmpdir $PACKAGE`
+	EXT=`pkgext $PACKAGE`
+
+	if [ ! -d $TMP/DEBIAN ]; then
+		doit "install -o root -g root -d $TMP/DEBIAN"
+	fi
+
+	# Install debian install scripts.
+	# If any .debhelper files exist, add them into the scripts.
+	for file in postinst preinst prerm postrm; do
+		if [ -f debian/$EXT$file ]; then
+			# Add this into the script, where it has #DEBHELPER#
+			if [ -f debian/$EXT$file.debhelper ]; then
+				complex_doit "perl -pe 's~#DEBHELPER#~qx{cat debian/$EXT$file.debhelper}~eg' < debian/$EXT$file > $TMP/DEBIAN/$file"
+				doit "chown root.root $TMP/DEBIAN/$file"
+				doit "chmod 755 $TMP/DEBIAN/$file"
+			else
+				doit "install -o root -g root -p debian/$EXT$file $TMP/DEBIAN/$file"
+			fi
+		else
+			# Auto-generate script header and add .debhelper
+			# content to it.
+			if [ -f debian/$EXT$file.debhelper ]; then
+				complex_doit "echo '#!/bin/sh -e' > $TMP/DEBIAN/$file"
+				complex_doit "cat debian/$EXT$file.debhelper >> $TMP/DEBIAN/$file"
+				doit "chown root.root $TMP/DEBIAN/$file"
+				doit "chmod 755 $TMP/DEBIAN/$file"
+			fi
+		fi
+	done
+
+	# Install non-executable files
+	for file in shlibs conffiles; do
+		if [ -f debian/$EXT$file ]; then
+			doit "install -o root -g root -m 644 -p debian/$EXT$file $TMP/DEBIAN/$file"
+		fi                                               
+	done
+done

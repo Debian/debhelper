@@ -1,0 +1,68 @@
+.TH DH_UNDOCUMENTED 1
+.SH NAME
+dh_undocumented \- make symlinks to undocumented.7 man page
+.SH SYNOPSIS
+.B dh_undocumented
+.I "[-v] [-a] [-i] [-ppackage] [manpage ...]"
+.SH "DESCRIPTION"
+dh_undocumented is a debhelper program that is responsible for making
+symlinks to the
+.BR undocumented (7)
+man page for man pages that are not present in your package.
+.P
+The program takes a list of man pages that should be symlinked to
+.BR undocumented (7)
+It determines what directory the man pages should be placed in by examining
+their extentions - pages ending in "x" go into /usr/X11R6/man/, while pages
+that end in anything else go in /usr/man/. It also examines the extention to
+see what section the man page belongs in. After figuring this out, it
+generates the necessary symlinks to
+.BR undocumented (7)
+, placing the sylinks in the package build directory.
+.P
+The lists of man pages that need 
+.BR undocumented (7)
+symlinks can be specified in two ways. Any man page names specified as 
+parameters will be set up in the first binary package listed in 
+debian/control, if dh_installdocs is acting on that package. 
+Also, if a file named debian/undocumented (for the first binary package in 
+debian/control), or debian/package.undocumented (for each additional package 
+in debian/control) can list other man page names to set up.
+.SH OPTIONS
+.TP
+.B \-v
+Verbose mode; show all commands that modify the package build directory.
+.TP
+.B \-a
+Install undocumented man page symlinks for all architecture dependent packages.
+.TP
+.B \-i
+Install undocumented man page symlinks for all architecture independent packages.
+.TP
+.B \-ppackage
+Install undocumented man page symlinks for the package named "package".
+.TP
+.B manpage ...
+Install undocumented man page symlinks for each of these man pages
+into the first binary package listed in debian/control, if we are acting on 
+that package.
+.SH NOTES
+The
+.B \-a
+.B \-i
+and
+.B \-p
+arguments are cumulative. If none are specified, then all packages listed in
+the control file will be effected.
+.SH ENVIRONMENT
+.TP
+.I DH_VERBOSE
+Enables verbose mode
+.SH "SEE ALSO"
+.BR /usr/doc/debhelper/README
+,
+.BR undocumented (7)
+.SH "CONFORMS TO"
+Debian policy, version 2.3.0.0
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>

@@ -1,0 +1,46 @@
+.TH DH_MOVEFILES 1
+.SH NAME
+dh_movefiles \- moves files out of debian/tmp into subpackages
+.SH SYNOPSIS
+.B dh_movefiles
+.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir]"
+.SH "DESCRIPTION"
+dh_movefiles is a debhelper program that is responsible for moving files out
+of debian/tmp and into other package build directories. This may be useful
+if your package has a Makefile that installs everything into debian/tmp, and
+you need to break that up into subpackages.
+.P
+Files named debian/package.files list the files to be moved, separated by
+whitespace.
+.SH OPTIONS
+.TP
+.B \-v
+Verbose mode; show all commands that modify the package build directory.
+.TP
+.B \-a
+Move files for all architecture dependent packages.
+.TP
+.B \-i
+Move files for all architecture independent packages.
+.TP
+.B \-ppackage
+Move files for the package named "package".
+.TP
+.B \-Ptmpdir
+Use "tmpdir" for package build directory. 
+.SH NOTES
+The
+.B \-a
+.B \-i
+and
+.B \-p
+arguments are cumulative. If none are specified, then all packages listed in
+the control file will be effected.
+.SH ENVIRONMENT
+.TP
+.I DH_VERBOSE
+Enables verbose mode
+.SH "SEE ALSO"
+.BR /usr/doc/debhelper/README
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>

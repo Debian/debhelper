@@ -1,0 +1,58 @@
+#!/bin/sh -e
+#
+# If no parameters are given, and no debian/suid files exists, scan for 
+# suid/sgid files and suidregister them. 
+#
+# If there are parameters, or there is a debian/suid, register the files
+# listed there.
+
+PATH=debian:$PATH:/usr/lib/debhelper
+. dh_lib
+
+for PACKAGE in $DH_DOPACKAGES; do
+	TMP=`tmpdir $PACKAGE`
+	EXT=`pkgext $PACKAGE`
+
+	files=""
+
+	if [ -e debian/${EXT}suid ]; then
+		files=`tr "\n" " " < debian/${EXT}suid`
+	fi
+
+	if [ "$PACKAGE" = "$MAINPACKAGE" -a "$*" ]; then
+		files="$* $files"
+	fi
+
+	if [ ! "$files" -a ! -e debian/${EXT}suid ]; then
+		# No files specified (and no empty debian/suid file), so
+		# guess what files to process.
+		files=`find debian/$TMP -type f -perm +6000`
+
+		# We will strip the debian working directory off of the
+		# filenames.
+		tostrip="debian/$TMP/"
+	else
+		# We will strip leading /'s, so the user can feed this
+		# program either absolute filenames, or relative filenames,
+		# and it will do the right thing either way.
+		tostrip="/"
+	fi
+
+	if [ "$files" ]; then
+		for file in $files; do
+			# Strip leading $tostrip from $file. If not there,
+			# leave $file untouched.
+			if [ `expr "$file" : "$tostrip\\(.*\\)"` ]; then
+				file=`expr "$file" : "$tostrip\\(.*\\)"`
+			fi
+			
+			# Create the sed string that will be used to 
+			# fill in the blanks in the autoscript files.
+			# Fill with the owner, group, and perms of the file.
+			sedstr=`find debian/$TMP/$file -printf "s:#FILE#:$file:;s/#PACKAGE#/$PACKAGE/;s/#OWNER#/%u/;s/#GROUP#/%g/;s/#PERMS#/%m/"`
+			
+			autoscript "postinst" "postinst-suid" "$sedstr"
+			autoscript "postrm" "postrm-suid" "$sedstr"
+		done
+	fi
+done

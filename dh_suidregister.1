@@ -1,0 +1,62 @@
+.TH DH_SUIDREGISTER 1
+.SH NAME
+dh_suidregister \- set up package to register files with suidregister
+.SH SYNOPSIS
+.B dh_suidregister
+.I "[-v] [-a] [-i] [-ppackage] [file ...]"
+.SH "DESCRIPTION"
+dh_suidregister is a debhelper program that is responsible for modifying the
+postinst and postrm scripts of a package so the package will register files
+with 
+.BR suidregister (1)
+when it is installed.
+.P
+Any files specified as parameters will be registered, if dh_suidregister is
+acting on the first binary package listed in debian/control.
+.P
+The files debian/suid (for the first binary package in debian/control) or 
+debian/package.suid (for  each  additional package in debian/control) can 
+list other files to be registered.
+.P
+If neither of these methods is used to specify files, dh_suidregister will
+scan the package build directory for files that have suid permissions, and
+will automatically register all files it finds.
+.P
+Note that this package modifies your postinst and postrm files. See
+.BR dh_installdebfiles (1)
+for an explination of how this works.
+.SH OPTIONS
+.TP
+.B \-v
+Verbose mode; show all commands that modify the package build directory.
+.TP
+.B \-a
+Register files for all architecture dependent packages.
+.TP
+.B \-i
+Register files for all architecture independent packages.
+.TP
+.B \-ppackage
+Register files for the package named "package".
+.TP
+.B file ...
+Register these files in the first binary package listed in debian/control, 
+if we are acting on that package.
+.SH NOTES
+The
+.B \-a
+.B \-i
+and
+.B \-p
+arguments are cumulative. If none are specified, then all packages listed in
+the control file will be effected.
+.SH ENVIRONMENT
+.TP
+.I DH_VERBOSE
+Enables verbose mode
+.SH "SEE ALSO"
+.BR /usr/doc/debhelper/README
+,
+.BR suidregister (1)
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>

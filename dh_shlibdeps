@@ -1,0 +1,24 @@
+#!/bin/sh -e
+#
+# Find dependancies. Simple dpkg-shlibdeps wrapper.
+
+PATH=debian:$PATH:/usr/lib/debhelper
+. dh_lib
+
+for PACKAGE in $DH_DOPACKAGES; do
+	TMP=`tmpdir $PACKAGE`
+	EXT=`pkgext $PACKAGE`
+
+	# Run dpkg-shlibdeps to generate dependancies.
+	filelist=""
+	for file in `find $TMP -type f \( -perm +111 -or -name "*.so*" \) | tr "\n" " "` ; do
+		case "`file $file`" in
+			*ELF*)
+				filelist="$file $filelist"
+			;;
+		esac
+	done
+	if [ "$filelist" ]; then
+		doit "dpkg-shlibdeps -Tdebian/${EXT}substvars $DH_U_PARAMS $filelist"
+	fi
+done
