@@ -51,6 +51,22 @@ pkgext() {
 	fi
 }
 
+# Returns 1 if the package is a native debian package, null otherwise.
+isnative() {
+	# Get the package version.
+	# Note that the 2>/dev/null is because a bug in dpkg-parsechangelog makes it
+	# output a bogus error message to stderr.
+	# If it actually has a real error, then the expr will fail, and this whole
+	# script will come crashing to a halt, which is good enough to inform
+	# the user something's wrong. :-)
+	VERSION=`expr "\`dpkg-parsechangelog 2>/dev/null\`" : \
+		'.*Version: \(.*\).*Distribution:'`
+	# Is this a native Debian package?
+	if expr "$VERSION" : '.*-' >/dev/null; then
+		return 1
+	fi
+}
+
 # Automatically add a shell script snippet to a debian script.
 # Only works if the script has #DEBHELPER# in it.
 #
@@ -141,21 +157,8 @@ for i; do
 	esac
 done
 
-# Get the package version.
-# Note that the 2>/dev/null is because a bug in dpkg-parsechangelog makes it
-# output a bogus error message to stderr.
-# If it actually has a real error, then the expr will fail, and this whole
-# script will come crashing to a halt, which is good enough to inform
-# the user something's wrong. :-)
-VERSION=`expr "\`dpkg-parsechangelog 2>/dev/null\`" : '.*Version: \(.*\).*Distribution:'`
-
 # Get the name of the main binary package.
 MAINPACKAGE=`grep ^Package: debian/control | cut -d " " -f 2 | head -1`
-
-# Is this a native Debian package?
-if ! expr "$VERSION" : '.*-' >/dev/null; then
-       	NATIVE=1
-fi
 
 if [ "$DH_DOINDEP" -o "$DH_DOARCH" ]; then
 	# Figure out all the binary packages to be produced, by looking at the

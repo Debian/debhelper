@@ -32,7 +32,8 @@ for PACKAGE in $DH_DOPACKAGES; do
 
 			# Determine what directory the file belongs in,
 			# /usr/man, or /usr/X11R6/man.
-			section=`expr "$file" : '.*\.\([123456789]\)'`
+			section=`expr "$file" : '.*\.\([123456789]\)'` \
+				|| error "\"$file\" does not have an extention."
 			if [ `expr "$file" : '.*\.[123456789]\(x\)'` ] ; then
 				dir=usr/X11R6/man/man$section
 				reldir=../../../man
