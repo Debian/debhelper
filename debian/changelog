@@ -1,3 +1,21 @@
+debhelper (2.0.40) unstable; urgency=low
+
+  * FHS complience. Patch from Johnie Ingram <johnie@netgod.net>.
+    For the most part, this was a straight-forward substitution,
+    dh_installmanpages needed a non-obvious change though.
+  * Closes: #42489, #42587, #41732.
+  * dh_installdocs: Adds code to postinst and prerm as specified in
+    http://www.debian.org/Lists-Archives/debian-ctte-9908/msg00038.html,
+    to make /usr/doc/<package> a compatability symlink to
+    /usr/share/doc/<package>. Note that currently if something exists in
+    /usr/doc/<package> when the postinst is run, it will silently not make
+    the symlink. I'm considering more intellingent handing of this case.
+  * Note that if you build a package with this version of debhelper, it will
+    use /usr/share/man, /usr/share/doc, and /usr/share/info. You may need to
+    modify other files in your package that reference the old locations.
+
+ -- Joey Hess <joeyh@master.debian.org>  Sun,  5 Sep 1999 21:06:11 -0700
+
 debhelper (2.0.30) unstable; urgency=low
 
   * It turns out it's possible to set up make variables that are specific to

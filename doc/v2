@@ -3,14 +3,20 @@ being worked on, and will change in drastic ways without notice. To keep
 this from breaking packages, debhelper will continue to operate in v1
 compatability mode by default.
 
-To enable debhelper v2 features (do this with *caution*), set DH_COMPAT=2
+To enable debhelper v2 features (do this with *caution*), set DH_COMPAT=2 in
+your debian/rules. Also, it is a very good idea to add a call to your
+debian/rules like this:
+	dh_testversion 2
+To ensure that your package won't be built with some old version of
+debhelper that ignores the DH_COMPAT flag.
+
 Here are the changes I'm planning to make to debhelper for v2, based on
 prior discussion on debian-devel.
 
 Items marked with a + are done. All others will happen as soon as I can code
 them.
 
-* Standardize on the name used for the temporary build directory of a
++ Standardize on the name used for the temporary build directory of a
   package. Currently it's debian/tmp/ for the first package and 
   debian/<package>/ for other packages of a multi-binary package. I've
   decided after much agonizing to to use debian/<package>. The main thing this
@@ -39,9 +45,9 @@ them.
 * dh_movefiles should delete empty directories after it's moved all files
   out of them. (#17111)  
 
-* debian/README will be installed as /usr/doc/<package>/README in native
-  packages, and as README.Debian in non-native packages. This is consistent
-  with the handing of debian/TODO and debian/changelog. (#34628)
+* debian/README will be installed as /usr/share/doc/<package>/README in
+  native packages, and as README.Debian in non-native packages. This is
+  consistent with the handing of debian/TODO and debian/changelog. (#34628)
 
 * There will be no change to the names of debhelper config files used, I've
   decided against debian/<package>/* and the like, because although those

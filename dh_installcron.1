@@ -1,44 +1,30 @@
-.TH DH_INSTALLCRON 1
+.TH DH_INSTALLCRON 1 "" "Debhelper Commands" "Debhelper Commands"
 .SH NAME
 dh_installcron \- install cron scripts into etc/cron.*
 .SH SYNOPSIS
 .B dh_installcron
-.I "[-v] [-a] [-i] [-ppackage]"
+.I "[debhelper options]"
 .SH "DESCRIPTION"
 dh_installcron is a debhelper program that is responsible for installing
-cron scripts into etc/cron.* in package build directories. The files 
-debian/cron.daily, debian/cron.weekly, and debian/cron.monthly are
-installed. If your package generates multiple binary packages, you can also
-use filenames like debian/package.cron.daily, where "package" is replaced
-with the name of the binary package this cron script goes into.
+cron scripts into etc/cron.* in package build directories. The files
+debian/cron.daily, debian/cron.weekly, debian/cron.monthly, and debian/cron.d
+are installed. If your package generates multiple binary packages (or if you
+just prefer to do it), you can also use filenames like 
+debian/package.cron.daily, where "package" is replaced with the name of the 
+binary package this cron script goes into.
 .SH OPTIONS
 .TP
-.B \-v
-Verbose mode; show all commands that modify the package build directory.
-.TP
-.B \-a
-Install cron files for all architecture dependent packages.
-.TP
-.B \-i
-Install cron files for all architecture independent packages.
-.TP
-.B \-ppackage
-Install cron files for the package named "package".
-.SH NOTES
-The
-.B \-a
-.B \-i
-and
-.B \-p
-arguments are cumulative. If none are specified, then all packages listed in
-the control file will be effected.
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
 .SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
-.BR /usr/doc/debhelper/README
+.BR debhelper (1)
 .SH "CONFORMS TO"
-Debian policy, version 2.3.0.0
+Debian policy, version 3.0.1
 .SH AUTHOR
 Joey Hess <joeyh@master.debian.org>

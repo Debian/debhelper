@@ -69,7 +69,7 @@ binary-indep: link-stamp build
 		open (OUT,">$$f"); \
 		print OUT @lines; \
 		close OUT; \
-	}' debian/debhelper/usr/man/man1/*.1
+	}' debian/debhelper/usr/share/man/man1/*.1
 	# Fix up the debhelper.1 man page, substituting in a list of all
 	# debhelper commands. eek!
 	perl -ne ' \
@@ -77,10 +77,10 @@ binary-indep: link-stamp build
 		$$collect.=".TP\n.BR $$_" if $$. eq 3 && /^dh_/; \
 		close(ARGV) if eof; \
 		END { \
-			open(I,"debian/debhelper/usr/man/man1/debhelper.1"); \
+			open(I,"debian/debhelper/usr/share/man/man1/debhelper.1"); \
 			@lines=<I>; \
 			close I; \
-			open(O,">debian/debhelper/usr/man/man1/debhelper.1"); \
+			open(O,">debian/debhelper/usr/share/man/man1/debhelper.1"); \
 			foreach (@lines) { \
 				s/#LIST#/$$collect/; \
 				print O; \

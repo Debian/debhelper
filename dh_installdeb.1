@@ -1,9 +1,9 @@
-.TH DH_INSTALLDEBFILES 1
+.TH DH_INSTALLDEB 1 "" "Debhelper Commands" "Debhelper Commands"
 .SH NAME
 dh_installdeb \- install files into the DEBIAN directory
 .SH SYNOPSIS
 .B dh_installdeb
-.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir]"
+.I "[debhelper options]"
 .SH "DESCRIPTION"
 dh_installdeb is a debhelper program that is responsible for installing
 files into the DEBIAN directory in package build directories with the
@@ -11,16 +11,17 @@ correct permissions.
 .P
 dh_installdeb automatically installs the following files from debian/ into
 the DEBIAN directory:
-.IP postinst
-.IP preinst
-.IP postrm
-.IP prerm
-.IP shlibs
-.IP conffiles
+ 	postinst
+ 	preinst
+ 	postrm
+ 	prerm
+ 	shlibs
+ 	conffiles
 .P
 (For packages other than the first binary package listed in debian/control,
-prefix these filenames with then name of the "package.", for example, 
-"foo.postinst".)
+you must prefix these filenames with then name of the "package.", for example,
+"foo.postinst". You can also prefix the filenames the same way for the first
+binary package, for consitency.)
 .P
 The files postinst, preinst, postrm, and prerm are handled specially: If a
 corresponding file named debian/script.debhelper exists, the contents of that 
@@ -30,38 +31,20 @@ inserted. If the script does not exist, then a script is generated from
 the .debhelper file. The .debhelper files are created by other debhelper 
 programs, such as 
 .BR dh_installmenu (1)
-, and are shell scripts.
+, and are shell script fragments.
 .SH OPTIONS
 .TP
-.B \-v
-Verbose mode; show all commands that modify the package build directory.
-.TP
-.B \-a
-Install files for all architecture dependent packages.
-.TP
-.B \-i
-Install files for all architecture independent packages.
-.TP
-.B \-ppackage
-Install files for the package named "package".
-.TP
-.B \-Ptmpdir
-Use "tmpdir" for package build directory. 
-.SH NOTES
-The
-.B \-a
-.B \-i
-and
-.B \-p
-arguments are cumulative. If none are specified, then all packages listed in
-the control file will be effected.
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
 .SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
-.BR /usr/doc/debhelper/README
+.BR debhelper (1)
 .SH "CONFORMS TO"
-Debian policy, version 2.3.0.0
+Debian policy, version 3.0.1
 .SH AUTHOR
 Joey Hess <joeyh@master.debian.org>

@@ -2,12 +2,15 @@ Source: debhelper
 Section: devel
 Priority: optional
 Maintainer: Joey Hess <joeyh@master.debian.org>
-Standards-Version: 2.1.1.0
+Standards-Version: 3.0.1.1
 
 Package: debhelper
 Architecture: all
+Depends: perl5 | perl (>= 5.004), fileutils (>= 3.16-4), file (>= 3.23-1)
+Suggests: dh-make
 Description: helper programs for debian/rules
  A collection of programs that can be used in a debian/rules file to
- automate common tasks. Programs are included to install various files into
- your package, compress files, fix file permissions, integrate your package
- with the debian menu system, etc.
+ automate common tasks related to building binary debian packages. Programs
+ are included to install various files into your package, compress files, fix
+ file permissions, integrate your package with the debian menu system,
+ suidmanager, doc-base, etc.

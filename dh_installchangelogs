@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Installs debian/changelog. If another filename is passed to it, installs
 # that file as the upstream changelog.
@@ -7,26 +7,57 @@
 # if so, the debian changelog is just installed as "changelog", and it is an 
 # error to specify an upstream changelog on the command line.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-source dh_lib
+BEGIN { push @INC, "debian", "/usr/share/debhelper" }
+use Dh_Lib;
+init();
 
-UPSTREAM=$1
+$upstream=shift;
 
-if [ "$NATIVE" -a "$UPSTREAM" ]; then
-	error "Cannot specify an upstream changelog for a native package."
-fi
+if (isnative($dh{MAINPACKAGE}) && defined $upstream) {
+	error("Cannot specify an upstream changelog for a native debian package.");
+}
 
-if [ "$NATIVE" ]; then
-	CHANGELOG_NAME=changelog
-else
-	CHANGELOG_NAME=changelog.Debian
-fi
+if (isnative($dh{MAINPACKAGE})) {
+	$changelog_name='changelog';
+}
+else {
+	$changelog_name='changelog.Debian';
+}
 
-if [ ! -d debian/tmp/usr/doc/$PACKAGE ]; then
-	doit "install -d debian/tmp/usr/doc/$PACKAGE"
-fi
-doit "install -p -m644 debian/changelog debian/tmp/usr/doc/$PACKAGE/$CHANGELOG_NAME"
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$changelog=pkgfile($PACKAGE,"changelog");
 
-if [ "$UPSTREAM" ]; then
-	doit "install -p -m644 $UPSTREAM debian/tmp/usr/doc/$PACKAGE/changelog"
-fi
+	if (!$changelog) {
+		$changelog="debian/changelog";
+	}
+
+	if (! -e $changelog) {
+		error("could not find changelog $changelog");
+	}
+
+	if (! -d "$TMP/usr/share/doc/$PACKAGE") {
+		doit("install","-d","$TMP/usr/share/doc/$PACKAGE");
+	}
+	doit("install","-o","root","-g","root","-p","-m644",$changelog,
+		"$TMP/usr/share/doc/$PACKAGE/$changelog_name");
+
+	if ($upstream) {
+		if ($upstream=~m/\.html?$/i) {
+			# HTML changelog
+			doit("install","-o","root","-g","root","-p","-m644",
+				$upstream,"$TMP/usr/share/doc/$PACKAGE/changelog.html");
+			doit("ln", "-sf", 'changelog.html',
+				"$TMP/usr/share/doc/$PACKAGE/changelog");
+		}
+		else {
+			doit("install","-o","root","-g","root","-p","-m644",
+				$upstream,"$TMP/usr/share/doc/$PACKAGE/changelog");
+		}
+		if ($dh{K_FLAG}) {
+			# Install symlink to original name of the upstream changelog file.
+			# Use basename in case original file was in a subdirectory or something.
+			doit("ln","-sf","changelog","$TMP/usr/share/doc/$PACKAGE/".Dh_Lib::basename($upstream));
+		}
+	}
+}

@@ -1,17 +1,31 @@
 Debhelper is a collection of programs that can be used in debian/rules files
-to automate common tasks. For further documentation, see the man pages for
-dh_* commands.
+to automate common tasks related to building debian binary packages. For 
+further documentation, see the man pages for dh_* commands. For an overview 
+of debhelper, including a list of all the available commands, see the
+debhelper(1) man page.
 
 To help you get started, I've included examples of debian/rules files
-that use debhelper commands extensively. See /usr/doc/debhelper/examples/ . 
-These files are also useful as they give one good order you can run the 
-various debhelper scripts in (though other variations are possible).
+that use debhelper commands extensively. See 
+/usr/share/doc/debhelper/examples/ . These files are also useful as they give
+one good order you can run the various debhelper scripts in (though other
+variations are possible).
+
+For a more gentle introduction, the maint-guide debian package contains a
+tutorial about making your first package using Debhelper.
+
+Debhelper v2:
+------------
+
+Debhelper v2 is a major new version of Debhelper, still under development.
+Debhelper will continue to work in v1 compatability mode for now, if you're
+interested in trying the new versiln, read the file named "v2".
+
 
 Starting a new package:
 ----------------------
 
 You can just use the example rules files and do the rest of the new package
-set up by hand, or you could try the new dh-make package, which contains a
+set up by hand, or you could try the dh-make package, which contains a
 "dh_make" command that is similar to debmake, and tries to automate the
 process.
 
@@ -34,67 +48,24 @@ by the -n parameter.
 
 Note that it will be shell code, so you cannot directly use it in a perl 
 script. If you would like to embed it into a perl script, here is one way to
-do that:
+do that (note that I made sure that $1, $2, etc are set with the set command):
 
-print << `EOF`
+my $temp="set -e\nset -- @ARGV\n" . << 'EOF';
 #DEBHELPER#
 EOF
-
-
-Notes on multiple binary packages:
----------------------------------
-
-If your source package generates more than one binary package, debhelper
-programs will default to acting on all binary packages when run. If your
-source package happens to generate one architecture dependent package, and
-another architecture independent package, this is not the correct behavior,
-because you need to generate the architecture dependent packages in the
-binary-arch debian/rules target, and the architecture independent packages
-in the binary-indep debian/rules target.
-
-To facilitate this, as well as give you more control over which packages
-are acted on by debhelper programs, all debhelper programs accept the
-following parameters:
-
--a		Act on architecture dependent packages
--i		Act on architecture independent packages
--ppackage	Act on the package named "package" (may be repeated multiple
-		times)
-
-These parameters are cumulative. If none are given, the tools default to
-affecting all packages.
-
-See examples/rules.multi for an example of how to use this.
-
-Package build directories -- debian/tmp, etc:
---------------------------------------------
-
-By default, all debhelper programs assume that the temporary directory used
-for assembling the tree of files in a package is debian/tmp for the first
-package listed in debian/control, and debian/<packagename> for each
-additional package.
-
-Sometimes, you might want to use some other temporary directory. This is
-supported by the -P flag. The directory to use is specified after -P, for
-example, "dh_installdocs -Pdebian/tmp", will use debian/tmp as the temporary
-directory. Note that if you use -P, the debhelper programs can only be
-acting on a single package at a time. So if you have a package that builds
-many binary packages, you will need to use the -p flag to specify which
-binary package the debhelper program will act on. For example:
-
-	dh_installdocs -pfoolib1 -Pdebian/tmp-foolib1
-	dh_installdocs -pfoolib1-dev -Pdebian/tmp-foolib1-dev
-	dh_installdocs -pfoolib-bin -Pdebian/tmp-foolib-bin
-
-This uses debian/tmp-<package> as the package build directory.
+system ($temp) / 256 == 0
+	or die "Problem with debhelper scripts: $!\n";
 
 Other notes:
 -----------
 
-* In general, if any debhelper program needs a directory to exist under
-  debian/, it will create it. I haven't bothered to document this in all the
-  man pages, but for example, dh_installdeb knows to make debian/tmp/DEBIAN/
-  before trying to put files there, dh_installmenu knows you need a
-  debian/tmp/usr/lib/menu/ before installing the menu files, etc.
+Note that if you are generating a debian package that has arch-indep and
+arch-dependent portions, and you are using dh_movefiles to move the
+arch-indep files out of debian/tmp, you need to make sure that dh_movefiles
+does this even if only the arch-dependent package is being built (for ports
+to other architectures). I handle this in debian/rules.multi by calling
+dh_movefiles in the install target.
+
+Debhelper's home page is at http://kitenet.net/programs/debhelper/
 
 -- Joey Hess <joeyh@master.debian.org>

@@ -1,21 +1,31 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Reads debian/examples, installs all files listed there into
-# /usr/doc/$PACKAGE/examples
+# /usr/share/doc/$PACKAGE/examples
 
-PATH=debian:$PATH:/usr/lib/debhelper
-source dh_lib
+BEGIN { push @INC, "debian", "/usr/share/debhelper" }
+use Dh_Lib;
+init();
 
-if [ -e debian/examples ]; then
-	examples=`cat debian/examples | tr "\n" " "`
-fi
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$file=pkgfile($PACKAGE,"examples");
+	
+	undef @examples;
+	
+	if ($file) {
+		@examples=filearray($file);
+	}	
 
-if [ "$examples" -o $@ ]; then
-	if [ ! -d debian/tmp/usr/doc/$PACKAGE/examples ]; then
-		doit "install -d debian/tmp/usr/doc/$PACKAGE/examples"
-	fi
+	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+		push @examples, @ARGV;
+	}
 
-	for file in $examples $@; do
-		doit "cp -a $file debian/tmp/usr/doc/$PACKAGE/examples/"
-	done
-fi
+	if (@examples) {
+		if (! -d "$TMP/usr/share/doc/$PACKAGE/examples") {
+			doit("install","-d","$TMP/usr/share/doc/$PACKAGE/examples");
+		}
+		
+		doit("cp","-a",@examples,"$TMP/usr/share/doc/$PACKAGE/examples");
+	}
+}

@@ -1,9 +1,9 @@
-.TH DH_UNDOCUMENTED 1
+.TH DH_UNDOCUMENTED 1 "" "Debhelper Commands" "Debhelper Commands"
 .SH NAME
-dh_undocumented \- make symlinks to undocumented.7 man page
+dh_undocumented \- make symlinks to undocumented.7.gz man page
 .SH SYNOPSIS
 .B dh_undocumented
-.I "[-v] [-a] [-i] [-ppackage] [manpage ...]"
+.I "[debhelper options [-A] [manpage ...]"
 .SH "DESCRIPTION"
 dh_undocumented is a debhelper program that is responsible for making
 symlinks to the
@@ -13,56 +13,50 @@ man page for man pages that are not present in your package.
 The program takes a list of man pages that should be symlinked to
 .BR undocumented (7)
 It determines what directory the man pages should be placed in by examining
-their extentions - pages ending in "x" go into /usr/X11R6/man/, while pages
-that end in anything else go in /usr/man/. It also examines the extention to
-see what section the man page belongs in. After figuring this out, it
+their extensions - pages ending in "x" go into /usr/X11R6/man/, while pages
+that end in anything else go in /usr/share/man/. It also examines the extention
+to see what section the man page belongs in. After figuring this out, it
 generates the necessary symlinks to
 .BR undocumented (7)
 , placing the sylinks in the package build directory.
 .P
 The lists of man pages that need 
 .BR undocumented (7)
-symlinks can be specified in two ways. Any man page names specified as 
-parameters will be set up in the first binary package listed in 
-debian/control, if dh_installdocs is acting on that package. 
-Also, if a file named debian/undocumented (for the first binary package in 
-debian/control), or debian/package.undocumented (for each additional package 
-in debian/control) can list other man page names to set up.
+symlinks can be specified in two ways. Any man page names specified as
+parameters will be set up in the first package dh_undocumented is told
+to act on. By default, this is the first binary package in debian/control, 
+but if you use -p, -i, or -a flags, it will be the first package specified 
+by those flags.
+Also, a file named debian/package.undocumented (or debian/undocumented, for 
+the first binary package in debian/control) can list other man page names to
+set up.
 .SH OPTIONS
 .TP
-.B \-v
-Verbose mode; show all commands that modify the package build directory.
 .TP
-.B \-a
-Install undocumented man page symlinks for all architecture dependent packages.
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
 .TP
-.B \-i
-Install undocumented man page symlinks for all architecture independent packages.
-.TP
-.B \-ppackage
-Install undocumented man page symlinks for the package named "package".
+.B \-A, \--all
+Install undocumented man page symlinks for any man pages specified by 
+command line parameters in ALL packages acted on. I doubt anyone will find
+this useful, it's here for consitency with other debhelper programs.
 .TP
 .B manpage ...
 Install undocumented man page symlinks for each of these man pages
-into the first binary package listed in debian/control, if we are acting on 
-that package.
-.SH NOTES
-The
-.B \-a
-.B \-i
-and
-.B \-p
-arguments are cumulative. If none are specified, then all packages listed in
-the control file will be effected.
+into the first package acted on. (Or in all packages acted on if -A is
+specified.)
 .SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
-.BR /usr/doc/debhelper/README
-,
+.TP
+.BR debhelper (1)
+.TP
 .BR undocumented (7)
 .SH "CONFORMS TO"
-Debian policy, version 2.3.0.0
+Debian policy, version 3.0.1
 .SH AUTHOR
 Joey Hess <joeyh@master.debian.org>
