@@ -40,13 +40,12 @@ by the -n parameter.
 
 Note that it will be shell code, so you cannot directly use it in a perl 
 script. If you would like to embed it into a perl script, here is one way to
-do that (note the tricky use of backquotes) (also note that I made sure that
-$1, $2, etc are set with the set command):
+do that (note that I made sure that $1, $2, etc are set with the set command):
 
-print << `EOF`;
-set -- @ARGV
+my $temp="set -- @ARGV\n" . << `EOF`;
 #DEBHELPER#
 EOF
+system $temp;
 
 Other notes:
 -----------
