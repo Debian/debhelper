@@ -37,8 +37,8 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		# extentions. ".gz", ".z", ".taz", ".tgz", "-gz", "-z", "_z"
 		
 		push @files, split(/\n/,`
-			find usr/info usr/man usr/X11*/man -type f ! -name "*.gz" 2>/dev/null || true;
-			find usr/doc -type f \\( -size +4k -or -name "changelog*" \\) \\
+			find usr/info usr/share/info usr/man usr/share/man usr/X11*/man usr/share/X11*/man -type f ! -name "*.gz" 2>/dev/null || true;
+			find usr/doc usr/share/doc -type f \\( -size +4k -or -name "changelog*" \\) \\
 				! -name "*.htm*" ! -name "*.gif" ! -iname "*.gz" \\
 				! -iname "*.taz" ! -iname "*.tgz" ! -iname "*.z" \\
 				! -iname "*-gz" ! -iname "*-z" ! -iname "*_z" \\
