@@ -54,6 +54,10 @@ for PACKAGE in $DH_DOPACKAGES; do
 			
 			autoscript "postinst" "postinst-suid" "$sedstr"
 			autoscript "postrm" "postrm-suid" "$sedstr"
+			
+			if [ -e "$TMP/$file" ]; then
+				doit "chmod a-s $TMP/$file"
+			fi
 		done
 	fi
 done

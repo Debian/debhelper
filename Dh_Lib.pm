@@ -230,19 +230,18 @@ sub pkgext { my $package=shift;
 # 2: script to add to
 # 3: filename of snippet
 # 4: sed to run on the snippet. Ie, s/#PACKAGE#/$PACKAGE/
-sub autoscript { my $package=shift; my $script=shift; my $filename=shift; my $sed=shift;
-	error "autoscript() not yet implemented (lazy, lazy!)";
-
+sub autoscript { my $package=shift; my $script=shift; my $filename=shift; my $sed=shift || "";
 	# This is the file we will append to.
 	my $outfile="debian/".pkgext($package)."$script.debhelper";
 
 	# Figure out what shell script snippet to use.
 	my $infile;
-	if ( -e "$main::ENV{DH_AUTOSCRIPTDIR}/$filename" ) {
-		$infile="$main::ENV{DH_AUTOSCRIPTDIR}/$filename";
+	if (defined($ENV{DH_AUTOSCRIPTDIR}) && 
+	    -e "$ENV{DH_AUTOSCRIPTDIR}/$filename") {
+		$infile="$ENV{DH_AUTOSCRIPTDIR}/$filename";
 	}
 	else {
-		if ( -e "/usr/lib/debhelper/autoscripts/$filename" ) {
+		if (-e "/usr/lib/debhelper/autoscripts/$filename") {
 			$infile="/usr/lib/debhelper/autoscripts/$filename";
 		}
 		else {
@@ -251,7 +250,7 @@ sub autoscript { my $package=shift; my $script=shift; my $filename=shift; my $se
 	}
 
 	# TODO: do this in perl, perhaps?
-	complex_doit("echo \"# Automatically added by ".basename($0).">> $outfile");
+	complex_doit("echo \"# Automatically added by ".basename($0)."\">> $outfile");
 	complex_doit("sed \"$sed\" $infile >> $outfile");
 	complex_doit("echo '# End automatically added section' >> $outfile");
 }

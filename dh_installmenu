@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Integration with debian menu system:
 #
@@ -8,37 +8,38 @@
 #
 # Also, add to postinst and postrm.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use Dh_Lib;
+init();
 
-for PACKAGE in $DH_DOPACKAGES; do
-	TMP=`tmpdir $PACKAGE`
-	menu=`pkgfile $PACKAGE menu`
-	menu_method=`pkgfile $PACKAGE menu-method`
-
-	if [ "$menu" ]; then
-		if [ ! -d $TMP/usr/lib/menu ]; then
-			doit "install -d $TMP/usr/lib/menu"
-		fi
-		doit "install -p -m644 $menu $TMP/usr/lib/menu/$PACKAGE"
-
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$menu=pkgfile($PACKAGE,"menu");
+	$menu_method=pkgfile($PACKAGE,"menu-method");
+	
+	if ($menu ne '') {
+		if (! -d "$TMP/usr/lib/menu") {
+			doit("install","-d","$TMP/usr/lib/menu");
+		}
+		doit("install","-p","-m644",$menu,"$TMP/usr/lib/menu/$PACKAGE");
+		
 		# Add the scripts if a menu-method file doesn't exist.
 		# The scripts for menu-method handle everything these do, too.
-		if [ ! "$menu_method" -a ! "$DH_NOSCRIPTS" ]; then
-			autoscript "postinst" "postinst-menu"
-			autoscript "postrm" "postrm-menu"
-		fi
-	fi
+		if ($menu_method eq "" && ! $dh{NOSCRIPTS}) {
+			autoscript($PACKAGE,"postinst","postinst-menu");
+			autoscript($PACKAGE,"postrm","postrm-menu")
+		}
+	}
 
-	if [ "$menu_method" ]; then
-		if [ ! -d $TMP/etc/menu-methods ]; then
-			doit "install -d $TMP/etc/menu-methods"
-		fi
-		doit "install -p $menu_method $TMP/etc/menu-methods/$PACKAGE"
+	if ($menu_method ne '') {
+		if (!-d "$TMP/etc/menu-methods") {
+			doit("install","-d","$TMP/etc/menu-methods");
+		}
+		doit("install","-p",$menu_method,"$TMP/etc/menu-methods/$PACKAGE");
 
-		if [ ! "$DH_NOSCRIPTS" ]; then
-			autoscript "postinst" "postinst-menu-method" "s/#PACKAGE#/$PACKAGE/"
-			autoscript "postrm" "postrm-menu-method" "s/#PACKAGE#/$PACKAGE/"
-		fi
-	fi
-done
+		if (! $dh{NOSCRIPTS}) {
+			autoscript($PACKAGE,"postinst","postinst-menu-method","s/#PACKAGE#/$PACKAGE/");
+			autoscript($PACKAGE,"postrm","postrm-menu-method","s/#PACKAGE#/$PACKAGE/");
+		}
+	}
+}

@@ -1,3 +1,13 @@
+debhelper (1.1.24) unstable; urgency=low
+
+  * dh_suidregister: remove suid/sgid bits from all files registered. The
+    reason is this: if you're using suidmanager, and you want a file that
+    ships suid to never be suid on your system, shipping it suid in the .deb
+    will create a window where it is suid before suidmanager fixes it's
+    permissions. This change should be transparent to users and developers.
+
+ -- Joey Hess <joeyh@master.debian.org>  Tue, 27 Oct 1998 18:19:48 -0800
+
 debhelper (1.1.23) unstable; urgency=low
 
   * dh_clean: At the suggestion of James Troup <james@nocrew.org> now deletes

@@ -1,27 +1,35 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Generate a DEBIAN/md5sums file, that lists the md5sums of all files in the
 # package.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
+use Cwd;
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use Dh_Lib;
+init();
 
-for PACKAGE in $DH_DOPACKAGES; do
-	TMP=`tmpdir $PACKAGE`
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
 
-	if [ ! -d "$TMP/DEBIAN" ]; then
-		doit "install -d $TMP/DEBIAN"
-	fi
+	if (! -d "$TMP/DEBIAN") {
+		doit("install","-d","$TMP/DEBIAN");
+	}
 
 	# Check if we should exclude conffiles.
-	if [ ! "$DH_INCLUDE" -a -r $TMP/DEBIAN/conffiles ]; then
-		# Generate exclude regexp. Using perl here may be overkill,
-		# but it does insure conffiles with spaces in them work.
-		exclude=`perl -ne 'chomp; s/^\///; print "! -path \"$_\" "' $TMP/DEBIAN/conffiles`
-	fi
+	my $exclude="";
+	if (! $dh{INCLUDE} && -r "$TMP/DEBIAN/conffiles") {
+		# Generate exclude regexp.
+		open (CONFF,"$TMP/DEBIAN/conffiles");
+		while (<CONFF>) {
+			chomp;
+			s/^\///;
+			$exclude.="! -path \"$_\" ";
+		}
+		close CONFF;
+	}
 
-	olddir=`pwd`
-	complex_doit "cd $TMP ; find * -type f $exclude ! -regex '^DEBIAN/.*' -print0 | xargs -0 md5sum > DEBIAN/md5sums ; cd $olddir"
-	doit "chmod 644 $TMP/DEBIAN/md5sums"
-	doit "chown root.root $TMP/DEBIAN/md5sums"
-done
+	$olddir=getcwd();
+	complex_doit("cd $TMP ; find * -type f $exclude ! -regex '^DEBIAN/.*' -print0 | xargs -0 md5sum > DEBIAN/md5sums ; cd $olddir");
+	doit("chmod",644,"$TMP/DEBIAN/md5sums");
+	doit("chown","root.root","$TMP/DEBIAN/md5sums");
+}

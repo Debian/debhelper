@@ -26,6 +26,10 @@ will automatically register all files it finds.
 Note that this program modifies your postinst and postrm files. See
 .BR dh_installdeb (1)
 for an explanation of how this works.
+.P
+Also note that all files registered by this program will *not* be suid in the
+resulting .deb file. The postinst of the package will set their permissions
+(even if the user doesn't have suidmanager installed).
 .SH OPTIONS
 .TP
 .B debhelper options
