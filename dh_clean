@@ -81,6 +81,15 @@ if (! $dh{D_FLAG}) {
 		doit("rm","-f","debian/files");
 	}
 
+	# Remove some files that were left around by older versions of
+	# debhelper, just in case someone upgrades in the middle of a
+	# build.
+	doit("rm","-f","debian/substvars",
+		"debian/postinst.debhelper",
+		"debian/postrm.debhelper",
+		"debian/preinst.debhelper",
+		"debian/prerm.debhelper");
+
 	# See if some files that would normally be deleted are excluded.
 	my $find_options='';
 	if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
