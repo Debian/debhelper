@@ -53,7 +53,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	# Check if we should exclude conffiles.
 	my $exclude="";
-	if (! $dh{INCLUDE} && -r "$tmp/DEBIAN/conffiles") {
+	if (! $dh{INCLUDE_CONFFILES} && -r "$tmp/DEBIAN/conffiles") {
 		# Generate exclude regexp.
 		open (CONFF,"$tmp/DEBIAN/conffiles");
 		while (<CONFF>) {
