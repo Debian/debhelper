@@ -38,6 +38,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 	done
 
 	if [ -e "$TMP/DEBIAN/shlibs" ]; then
+		doit "chmod 644 $TMP/DEBIAN/shlibs"
 		doit "chown root.root $TMP/DEBIAN/shlibs"
 	fi
 done

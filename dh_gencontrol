@@ -15,5 +15,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 
 	# Generate and install control file.
 	doit "dpkg-gencontrol -p$PACKAGE -Tdebian/${EXT}substvars -P$TMP $DH_U_PARAMS"
+	# This chmod is only necessary if the user sets the umask to something odd.
+	doit "chmod 644 $TMP/DEBIAN/control"
 	doit "chown root.root $TMP/DEBIAN/control"
 done

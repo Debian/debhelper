@@ -3,49 +3,13 @@
 dh_du \- generate DEBIAN/du file
 .SH SYNOPSIS
 .B dh_du
-.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir]"
 .SH "DESCRIPTION"
-dh_du is a debhelper program that is responsible for generating
-a DEBIAN/du file, which lists the disk usage of directories in the package.
-This file isn't used by anything yet, but it could be helpful for a future
-debian installer program.
+dh_du is a debhelper program that was responsible for generating
+a DEBIAN/du file, which listed the disk usage of directories in the package.
 .P
-The du file is installed with proper permissions and ownerships.
-.SH OPTIONS
-.TP
-.B \-v, \--verbose
-Verbose mode; show all commands that modify the package build directory.
-.TP
-.B \-a, \--arch
-Generate du files for all architecture dependent packages.
-.TP
-.B \-i, \--indep
-Generate du files for all architecture independent packages.
-.TP
-.B \--no-act
-Do not really do anything. If used with -v, the result is that this command
-will output a list of what it would have done.
-.TP
-.B \-ppackage, \--package=package
-Generate du file for the package named "package".
-.TP
-.B \-Ptmpdir, \--tmpdir=tmpdir
-Use "tmpdir" for package build directory. 
-.SH NOTES
-The
-.B \-a
-.B \-i
-and
-.B \-p
-arguments are cumulative. If none are specified, then all packages listed in
-the control file will be effected.
-.SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode
-.TP
-.I DH_NO_ACT
-Enables no-act mode (see above).
+This program is now depricated, and does nothing, after a decision by the
+debian developers that du control files should not exit. It will simply
+output a warning message now.
 .SH "SEE ALSO"
 .BR /usr/doc/debhelper/README
 .SH AUTHOR

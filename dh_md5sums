@@ -21,6 +21,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 	fi
 	olddir=`pwd`
 	complex_doit "cd $TMP ; sed 's:^/::' < DEBIAN/allfiles | xargs md5sum > DEBIAN/md5sums ; cd $olddir"
+	doit "chmod 644 $TMP/DEBIAN/md5sums"
 	doit "chown root.root $TMP/DEBIAN/md5sums"
 	doit "rm -f $TMP/DEBIAN/allfiles"
 done

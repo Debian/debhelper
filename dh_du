@@ -2,18 +2,22 @@
 #
 # Generate a DEBIAN/du file, that lists the disk usage of the directories in 
 # the package.
+#
+# No longer - it was decided these files are a bad idea.
 
 PATH=debian:$PATH:/usr/lib/debhelper
 . dh_lib
 
-for PACKAGE in $DH_DOPACKAGES; do
-	TMP=`tmpdir $PACKAGE`
+echo "* Note: dh_du does nothing and is deprecated. Remove it from debian/rules." >&2
 
-	if [ ! -d "$TMP/DEBIAN" ]; then
-		doit "install -d $TMP/DEBIAN"
-	fi
-
-	# Note that the tabs in this next line are important.
-	complex_doit "du -k $TMP | sed 's:	$TMP/:	:' | grep -v '	DEBIAN$' | grep -v '	$TMP$' >$TMP/DEBIAN/du"
-	doit "chown root.root $TMP/DEBIAN/du"
-done
+#for PACKAGE in $DH_DOPACKAGES; do
+#	TMP=`tmpdir $PACKAGE`
+#
+#	if [ ! -d "$TMP/DEBIAN" ]; then
+#		doit "install -d $TMP/DEBIAN"
+#	fi
+#
+#	# Note that the tabs in this next line are important.
+#	complex_doit "du -k $TMP | sed 's:	$TMP/:	:' | grep -v '	DEBIAN$' | grep -v '	$TMP$' >$TMP/DEBIAN/du"
+#	doit "chown root.root $TMP/DEBIAN/du"
+#done

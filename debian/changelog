@@ -1,3 +1,16 @@
+debhelper (0.63) unstable; urgency=low
+
+  * Removed some debugging output from dh_installmanpages.
+  * du_du: no longer does anything, becuase it has been decided on
+    debian-policy that du control files are bad.
+  * examples/*: removed dh_du calls.
+  * debian/rules: removed dh_du call.
+  * Modified dh_gencontrol, dh_makeshlibs, and dh_md5sums to generate files 
+    with the correct permissions even if the umask is set to unusual 
+    values. (#18283)
+
+ -- Joey Hess <joeyh@master.debian.org>  Mon, 16 Feb 1998 23:34:36 -0800
+
 debhelper (0.62) unstable; urgency=low
 
   * dh_installmanpages: if the man page filename ends in 'x', install it in

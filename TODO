@@ -23,3 +23,10 @@
 * maybe make dh_installmanpages look at the .TH line of man pages whose
   filenames end in .man, to figure out what section they go it. This would
   require a switch to turn on, for backwards compatability.
+* All debhelper programs should be checked that they output files with the
+  correct permissions no matter what the umask is set to. Currently, only
+  those programs that run after dh_fixperms have been so checked. (Checking
+  the rest is low priority, since dh_fixperms fixes any incorrect permissions
+  they might have; still it would be nice to check them too, just to make
+  debhelper more flexible.) One easy fix is to add umask 022 to dh_lib,
+  however, there may be unforseen ramifications of such a change.
