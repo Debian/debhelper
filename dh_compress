@@ -23,10 +23,9 @@ to the new files.
 
 By default, dh_compress compresses files that debian policy mandates should
 be compressed, namely all files in usr/share/info, usr/share/man,
-usr/X11R6/man, and all files in usr/share/doc that are larger than 4k in size,
-(except the copyright file, .html files and .gif files), and all changelog
-files. It skips any files that appear to be already compressed (based on their
-extensions).
+usr/X11R6/man, files in usr/share/doc that are larger than 4k in size,
+(except the copyright file, .html files, and files that appear to be already
+compressed based on their extensions), and all changelog files.
 
 If a debian/package.compress file exists, however, it will be ran as a shell
 script, and all filenames that the shell script outputs will be compressed
@@ -97,9 +96,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			find usr/info usr/share/info usr/man usr/share/man usr/X11*/man -type f ! -name "*.gz" 2>/dev/null || true;
 			find usr/doc usr/share/doc -type f \\( -size +4k -or -name "changelog*" \\) \\
 				\\( -name changelog.html -or ! -iname "*.htm*" \\) \\
-				! -iname "*.gif" ! -iname "*.png" ! -iname "*.jpg" ! -iname "*.jpeg" ! -iname "*.gz" \\
-				! -iname "*.taz" ! -iname "*.tgz" ! -iname "*.z" ! -iname "*.bz2" \\
-				! -iname "*-gz" ! -iname "*-z" ! -iname "*_z" \\
+				! -iname "*.gif" ! -iname "*.png" ! -iname "*.jpg" \\
+				! -iname "*.jpeg" ! -iname "*.gz" ! -iname "*.taz" \\
+				! -iname "*.tgz" ! -iname "*.z" ! -iname "*.bz2" \\
+				! -iname "*-gz"  ! -iname "*-z" ! -iname "*_z" \\
+				! -iname "*.jar" ! -iname "*.zip" \\
 				! -name "copyright" 2>/dev/null || true
 		`);
 	}
