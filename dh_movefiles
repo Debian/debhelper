@@ -130,13 +130,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				$ret=1;
 				warning("$file not found (supposed to put it in $package)");
 			}
-			$file=~s:^\Q$sourcedir\E/+::;
-			my $cmd="(cd $sourcedir >/dev/null ; find $file ! -type d ";
-			if ($dh{EXCLUDE_FIND}) {
-				$cmd.="-a ! \\( $dh{EXCLUDE_FIND} \\) ";
+			else {
+				$file=~s:^\Q$sourcedir\E/+::;
+				my $cmd="(cd $sourcedir >/dev/null ; find $file ! -type d ";
+				if ($dh{EXCLUDE_FIND}) {
+					$cmd.="-a ! \\( $dh{EXCLUDE_FIND} \\) ";
+				}
+				$cmd.="-print || true) >> debian/movelist";
+				complex_doit($cmd);
 			}
-			$cmd.="-print || true) >> debian/movelist";
-			complex_doit($cmd);
 		}
 		my $pwd=`pwd`;
 		chomp $pwd;
