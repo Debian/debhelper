@@ -255,8 +255,14 @@ sub compat {
 	elsif (-e 'debian/compat') {
 		# Try the file..
 		open (COMPAT_IN, "debian/compat") || error "debian/compat: $!";
-		$c=<COMPAT_IN>;
-		chomp $c;
+		my $l=<COMPAT_IN>;
+		if (! defined $l || ! length $l) {
+			warning("debian/compat is empty, assuming level $c");
+		}
+		else {
+			chomp $l;
+			$c=$l
+		}
 	}
 
 	if ($c > $max_compat) {
