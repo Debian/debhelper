@@ -74,14 +74,14 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 
 	next unless $dep;
 
-	if (-e "debian/$EXT\subtsvars") {
-		open (IN, "<debian/$EXT\subtsvars");
+	if (-e "debian/$EXT\substvars") {
+		open (IN, "<debian/$EXT\substvars");
 		my @lines=grep { ! /^perl:Depends=/ } <IN>;
 		close IN;
-		open (OUT, ">debian/$EXT\subtsvars");
+		open (OUT, ">debian/$EXT\substvars");
 		print OUT @lines;
 	} else {
-		open (OUT, ">debian/$EXT\subtsvars");
+		open (OUT, ">debian/$EXT\substvars");
 	}
 	print OUT "perl:Depends=$dep\n";
 	close OUT;

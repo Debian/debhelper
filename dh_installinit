@@ -9,34 +9,36 @@ init();
 
 foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	$TMP=tmpdir($PACKAGE);
-	# Debstd used either name, so do we for back-compatability.
-	$init=pkgfile($PACKAGE,"init") || pkgfile($PACKAGE,"init.d");
+
+	# Figure out what filename to install it as.
+	my $script;
+	if ($dh{D_FLAG}) {
+		# -d on the command line sets D_FLAG. We will 
+		# remove a trailing 'd' from the package name and 
+		# use that as the name.
+		$script=$PACKAGE;
+		if ($script=~m/(.*)d$/) {
+			$script=$1;
+		}
+		else {
+			warning("\"$PACKAGE\" has no final d' in its name, but -d was specified.");
+		}
+	}       
+	elsif ($dh{INIT_SCRIPT}) {
+		$script=$dh{INIT_SCRIPT};
+	}
+	else {
+		$script=$PACKAGE;
+	}       
+
+	$init=pkgfile($PACKAGE,$script) || pkgfile($PACKAGE,"init") ||
+	      pkgfile($PACKAGE,"init.d");
 
 	if ($init ne '') {
 		if (! -d "$TMP/etc/init.d") {
 			doit("install","-d","$TMP/etc/init.d");
 		}
 
-		# Figure out what filename to install it as.
-		my $script;
-		if ($dh{D_FLAG}) {
-			# -d on the command line sets D_FLAG. We will 
-			# remove a trailing 'd' from the package name and 
-			# use that as the name.
-			$script=$PACKAGE;
-			if ($script=~m/(.*)d$/) {
-				$script=$1;
-			}
-			else {
-				warning("\"$PACKAGE\" has no final `d' in its name, but -d was specified.");
-			}
-		}	
-		elsif ($dh{INIT_SCRIPT}) {
-			$script=$dh{INIT_SCRIPT};
-		}
-		else {
-			$script=$PACKAGE;
-		}	
 		doit("install","-p","-m755",$init,"$TMP/etc/init.d/$script");
 
 		# This is set by the -u "foo" command line switch, it's
