@@ -29,6 +29,8 @@ package's control file wherever you place the token "${python:Depends}".
 If some modules need to be byte-compiled at build time, appropriate
 postinst and prerm scripts will be generated.
 
+If you use this program, your package should build-depend on python.
+
 =head1 OPTIONS
 
 =over 4
@@ -60,13 +62,16 @@ init();
 my $python = 'python';
 
 # The current python major version
-my $python_version;
 my $python_major;
-if(`$python -V 2>&1` =~ m/^Python\s+(\d+)\.(\d+)\.\d+\n$/) {
+my $python_version = `$python -V 2>&1`;
+if ("$python_version" eq "") {
+	error("Python is not installed, aborting. (Probably forgot to Build-Depend on python.)");
+}
+elsif ($python_version =~ m/^Python\s+(\d+)\.(\d+)\.\d+\n$/) {
 	$python_version = "$1.$2" ;
 	$python_major = $1 ;
 } else { 
-	error("Cannot obtain python version.");
+	error("Unable to parse python version out of \"$python_version\".");
 }
 
 # The next python version
@@ -128,7 +133,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				return unless -f;
 				$has_module = 1 if /\.py$/;
 			}, "$tmp/$curdir" ;
-			if($has_module) {
+			if ($has_module) {
 				$deps |= PY_MODULE;
 				$dirlist="$dirlist /$curdir";
 			}
@@ -140,18 +145,18 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $strong_dep = 0;
 	$dep_on_python = 1 if $deps;
 	$strong_dep = 1 if($deps & PY_MODULE);
-	if($package =~ /^python-/) {
+	if ($package =~ /^python-/) {
 		my $pack = $package;
 		$pack =~ s/^python/python$python_version/;
-		if(grep { "$_" eq "$pack" } @{$dh{DOPACKAGES}}) {
+		if (grep { "$_" eq "$pack" } GetPackages()) {
 			addsubstvar($package, "python:Depends", $pack);
 			$dep_on_python = 1;
 			$strong_dep = 1;
 		}
 	}
-	if($dep_on_python) {
+	if ($dep_on_python) {
 		addsubstvar($package, "python:Depends", $python, ">= $python_version");
-		if($strong_dep) {
+		if ($strong_dep) {
 			addsubstvar($package, "python:Depends", $python, "<< $python_nextversion");
 		} else {
 			addsubstvar($package, "python:Depends", $python, "<< $python_nextmajor");
@@ -174,20 +179,20 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		addsubstvar($package, "python:Depends", $pyver) if $verdeps{$pyver};
 
 		# And now, the postinst and prerm stuff
-		if($pyver eq "python$python_version") {
-			if($verdeps{$pyver} & PY_MODULE) {
+		if ($pyver eq "python$python_version") {
+			if ($verdeps{$pyver} & PY_MODULE) {
 				$pydir = $pydir.$dirlist;
 			} else {
 				$pydir = $dirlist;
 			}
 			$verdeps{$pyver} |= PY_MODULE if($deps & PY_MODULE);
 		}
-		if($verdeps{$pyver} & PY_MODULE) {
+		if ($verdeps{$pyver} & PY_MODULE) {
 			autoscript($package,"postinst","postinst-python","s%#PYVER#%$pyver%;s%#DIRLIST#%$pydir%");
 			$need_prerm = 1;
 		}
 	}
-	if($need_prerm) {
+	if ($need_prerm) {
 		autoscript($package,"prerm","prerm-python","s%#PACKAGE#%$package%");
 	}
 }

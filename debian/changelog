@@ -1,3 +1,14 @@
+debhelper (4.1.29) unstable; urgency=low
+
+  * List binary-common in .PHONY in rules.multi2. Closes: #173278
+  * Cleaned up error message if python is not installed. Closes: #173524
+  * dh_python: Bug fix from Josselin Mouette for case of building an arch
+    indep python package depending on a arch dependent package. However, I
+    used GetPackages() rather than add yet another control file parser.
+    Untested.
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 18 Dec 2002 21:20:41 -0500
+
 debhelper (4.1.28) unstable; urgency=low
 
   * Fix dh_install to install empty directories even if it is excluding some
