@@ -32,8 +32,8 @@ for PACKAGE in $DH_DOPACKAGES; do
 		doit "chmod 644 $files"
 	fi
 
-	# ..so are executable shared libraries.
-	files=`find $TMP -perm -5 -type f -name "*.so*" | tr "\n" " "` || true
+	# ..and so are executable shared libraries (and .la files from libtool)
+	files=`find $TMP -perm -5 -type f \( -name "*.so*" -or -name "*.la" \) | tr "\n" " "` || true
 	if [ "$files" ]; then
 		doit "chmod a-X $files"
 	fi
