@@ -23,6 +23,9 @@ debhelper (3.0.0) unstable; urgency=low
     a man page being in /usr/share/man is going to break many programs.
     Closes: #81853 (I hope the bug submitter doesn't care that
     dh_installmanpages still puts stuff in the X11R6/man directory.)
+  * dh_suidregister: re-enabled. Aj thinks that requiring people to stop
+    using it is unacceptable. Who am I to disagree with a rc bug report?
+    Closes: #84910
   * Updated to current perl coding standards (use strict, lower-case
     variable names, pod man pages).
   * Since with the fixing of the man page installer issue, my checklist for
@@ -35,6 +38,7 @@ debhelper (3.0.0) unstable; urgency=low
 *** build all my packages using new version, and ditching dh_installmanpages
     mainly as a regression test..
 *** fix aj's bug, sigh ***
+*** dh_installinit should install defaults files ***
 
  -- Joey Hess <joeyh@debian.org>  Thu,  8 Feb 2001 14:29:58 -0800
 
