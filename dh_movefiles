@@ -127,7 +127,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 		my $pwd=`pwd`;
 		chomp $pwd;
-		complex_doit("(cd $sourcedir >/dev/null ; tar --create --remove-files --files-from=$pwd/movelist --file -) | (cd $tmp >/dev/null ;tar xpf -)");
+		complex_doit("(cd $sourcedir >/dev/null ; tar --create --remove-files --files-from=$pwd/debian/movelist --file -) | (cd $tmp >/dev/null ;tar xpf -)");
 		doit("rm","-f","debian/movelist");
 	}
 }
