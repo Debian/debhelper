@@ -59,13 +59,16 @@ system ($temp) / 256 == 0
 Other notes:
 -----------
 
-Note that if you are generating a debian package that has arch-indep and
-arch-dependent portions, and you are using dh_movefiles to move the
-arch-indep files out of debian/tmp, you need to make sure that dh_movefiles
-does this even if only the arch-dependent package is being built (for ports
-to other architectures). I handle this in debian/rules.multi by calling
-dh_movefiles in the install target.
+* Note that if you are generating a debian package that has arch-indep and
+  arch-dependent portions, and you are using dh_movefiles to move the
+  arch-indep files out of debian/tmp, you need to make sure that dh_movefiles
+  does this even if only the arch-dependent package is being built (for ports
+  to other architectures). I handle this in debian/rules.multi by calling
+  dh_movefiles in the install target.
 
-Debhelper's home page is at http://kitenet.net/programs/debhelper/
+* Once your package uses debhelper to build, be sure to add   
+  debhelper to your Build-Depends line in debian/control.
+
+* Debhelper's home page is at http://kitenet.net/programs/debhelper/
 
 -- Joey Hess <joeyh@master.debian.org>
