@@ -5,7 +5,7 @@ for currentdir in $fontdirs; do
 	longdir=/usr/lib/X11/fonts/$currentdir
 	if [ -d $longdir ]; then
 		for file in fonts.dir fonts.alias; do
-			rm -f $file
+			rm -f $longdir/$file
 		done
 		if [ $(find $longdir| wc -l) -eq 1 ]; then
 			rmdir -p $longdir
