@@ -1,3 +1,11 @@
+debhelper (1.2.49) unstable; urgency=low
+
+  * dh_fixperms: if called with -X, was attempting to change permissions of
+    even symlinks. This could have even caused it to follow the symlinks and
+    modify files on the build system in some cases. Ignores them now. (#35102)
+
+ -- Joey Hess <joeyh@master.debian.org>  Wed, 24 Mar 1999 13:21:49 -0800
+
 debhelper (1.2.48) unstable; urgency=low
 
   * dh_fixperms.1: improved documentation. (#34968)
