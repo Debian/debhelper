@@ -3,7 +3,7 @@
 dh_clean \- clean up package build directories
 .SH SYNOPSIS
 .B dh_clean
-.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir] [file ...]"
+.I "[-v] [-a] [-i] [-k] [-ppackage] [-Ptmpdir] [file ...]"
 .SH "DESCRIPTION"
 dh_clean is a debhelper program that is responsible for cleaning up after a
 package is built. It removes the package build directories, and removes some
@@ -25,6 +25,15 @@ Clean up the package build directory for the package named "package".
 .TP
 .B \-Ptmpdir
 Use "tmpdir" for package build directory.
+.TP
+.B \-k
+Do not delete debian/files. When do you want to use this? Anytime you have a
+debian/rules that has 2 binary targets that build different .deb packages;
+for example, one target is binary-arch, and the other is binary-indep, or
+one target builds the shared library, and the other the -dev package. If you
+didn't use -k in these cases, then debian/files would be deleted in the
+middle, and your changes file will only contain the last binary package that
+was built.
 .TP
 .B file ...
 Delete these files too.

@@ -27,7 +27,7 @@ binary-arch: build
 binary-indep: build
 	./dh_testdir $(test_files)
 	./dh_testroot
-	./dh_clean
+	./dh_clean -k
 	./dh_installdirs usr/bin usr/lib/debhelper
 
 	find . -perm +111 -maxdepth 1 -type f \
@@ -44,7 +44,6 @@ binary-indep: build
 	./dh_fixperms
 	./dh_suidregister
 	./dh_installdeb
-	./dh_shlibdeps
 	./dh_gencontrol
 	./dh_du
 	./dh_md5sums

@@ -1,3 +1,15 @@
+debhelper (0.33) unstable; urgency=low
+
+  * examples/*: use prefix, instead of PREFIX, becuase autoconf uses that.
+    Also, use `pwd`/debian/tmp, instead of debian/tmp.
+  * Always substitute #DEBHELPER# in maintainer scripts, even if it expands
+    to nothing, for neatness and to save a few bytes. #15863
+  * dh_clean: added -k parameter to not delete debian/files. #15789
+  * examples/*: use dh_clean -k in the binary targets of all rules files,
+    for safety.
+
+ -- Joey Hess <joeyh@master.debian.org>  Thu, 11 Dec 1997 19:05:41 -0500
+
 debhelper (0.32) unstable; urgency=low
 
   * Split dh_installdebfiles into 3 programs (dh_installdeb, dh_shlibdeps,
