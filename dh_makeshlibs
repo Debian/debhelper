@@ -46,6 +46,12 @@ dependancy that looks like "packagename (>= packageversion)". If -V is
 specified with parameters, the parameters can be used to specify the exact
 dependancy information needed (be sure to include the package name).
 
+Beware of using -V without any parameters; this is a conservative setting
+that always ensures that other packages' shared library dependencies are at
+least as tight as they need to be, so that if the maintainer screws up then
+they won't break. The flip side is that packages might end up with
+dependencies that are too tight and so find it harder to be upgraded.
+
 =item B<-n>, B<--noscripts>
 
 Do not modify postinst/postrm scripts.
