@@ -1,3 +1,13 @@
+debhelper (1.2.25) unstable; urgency=low
+
+  * autoscripts/*menu*: It turns out that "command" is like test -w, it will
+    still return true if update-menus is not executable. This can
+    legitimatly happen if you are upgrading the menu package, and it makes
+    postinsts that use command fail. Reverted to using test -x. Packages
+    built with debhelper >= 1.2.21 that use menus should be rebuilt.
+
+ -- Joey Hess <joeyh@master.debian.org>  Sat, 16 Jan 1999 13:47:16 -0800
+
 debhelper (1.2.24) unstable; urgency=low
 
   * dh_fixperms: linux 2.1.x and 2.2.x differ from earlier versions in that
