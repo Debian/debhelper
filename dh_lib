@@ -141,9 +141,13 @@ for i; do
 	esac
 done
 
-# Get the package version from the changelog.
-LINE=`head -1 debian/changelog`
-VERSION=`expr "$LINE" : '.* (\(.*\))'`
+# Get the package version.
+# Note that the 2>/dev/null is because a bug in dpkg-parsechangelog makes it
+# output a bogus error message to stderr.
+# If it actually has a real error, then the expr will fail, and this whole
+# script will come crashing to a halt, which is good enough to inform
+# the user something's wrong. :-)
+VERSION=`expr "\`dpkg-parsechangelog 2>/dev/null\`" : '.*Version: \(.*\).*Distribution:'`
 
 # Get the name of the main binary package.
 MAINPACKAGE=`grep ^Package: debian/control | cut -d " " -f 2 | head -1`
