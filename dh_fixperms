@@ -12,6 +12,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 	if [ -d $TMP ]; then
 		doit "chown -R root.root $TMP"
 		doit "chmod -R go=rX $TMP"
+		doit "chmod -R u+rw $TMP"
 	fi
 
 	# Fix up premissions in usr/doc, setting everything to not exectable
