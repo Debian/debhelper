@@ -68,6 +68,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 		autoscript($package, "postinst", "postinst-xfonts",
 			"s:#CMDS#:".join("\n", @cmds).":;");
+		autoscript($package, "postrm", "postrm-xfonts",
+			"s:#CMDS#:".join("\n", @cmds).":;");
 	}
 }
 
