@@ -1,3 +1,17 @@
+debhelper (4.0.4) unstable; urgency=low
+
+  * Set DH_ALWAYS_EXCLUDE=CVS and debhelper will exclude CVS directories
+    from processing by any command that takes a -X option, and dh_builddeb 
+    will also go in and rm -rf any that still sneak into the build tree.
+  * dh_install: A patch from Eric Dorland <eric@debian.org> adds support for
+    --sourcedir, which allows debian/package.files files to be moved over to
+    debian/package.install, and just work. Closes: #146847
+  * dh_movefiles: don't do file tests in no-act mode. Closes: #144573
+  * dh_installdebconf: pass --drop-old-templates to debconf-mergetemplate.
+    Means debhelper has to depend on debconf-utils 1.1.1.
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 18 May 2002 21:38:03 -0400
+
 debhelper (4.0.3) unstable; urgency=low
 
   * Corrects misbuild with CVS dirs in deb. Closes: #146576

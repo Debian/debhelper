@@ -31,14 +31,14 @@ Note that if you use debconf, your package probably needs to depend on it
 =head1 LOCALIZED TEMPLATE FILES
 
 Debconf also supports localized template files, and this program has some
-support to aid working with them. You may find it easiest to keep the
-translations in separate files, and merge them only at build time. See
+support to aid working with them. It is best to keep the translations in
+separate files, and merge them only at build time. See 
 L<debconf-mergetemplate(1)> and L<debconf-getlang(1)> for details.
 
 This program will automatically call debconf-mergetemplate and merge 
 templates on the fly if it finds your template files are accompanied
 by translated files that have the same name as the template file, with a
-dot and a locale name repended.
+dot and a locale name prepended.
 
 For example, if you have a German translation,
 debian/package.templates.de is merged with debian/package.templates.
@@ -84,7 +84,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# Are there translated templates too?
 		my @trans=(glob("$templates.??"), glob("$templates.??_??"));
 		if (@trans) {
-			complex_doit("debconf-mergetemplate @extraparams @trans $templates > $tmp/DEBIAN/templates");
+			complex_doit("debconf-mergetemplate --drop-old-templates @extraparams @trans $templates > $tmp/DEBIAN/templates");
 			chmod 0644, "$tmp/DEBIAN/templates";
 			chown 0, 0, "$tmp/DEBIAN/templates";
 		}

@@ -121,7 +121,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("rm","-f","debian/movelist");
 		foreach (@tomove) {
 			my $file=$_;
-			if (! -e $file && ! -l $file) {
+			if (! -e $file && ! -l $file && ! $dh{NO_ACT}) {
 				$ret=1;
 				warning("$file not found (supposed to put it in $package)");
 			}

@@ -59,6 +59,9 @@ else {
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
+	if (exists $ENV{DH_ALWAYS_EXCLUDE} && length $ENV{DH_ALWAYS_EXCLUDE}) {
+		complex_doit("find $tmp -name $ENV{DH_ALWAYS_EXCLUDE} | xargs rm -rf");
+	}
 	doit("dpkg","--build",$tmp,"$dh{DESTDIR}$dh{FILENAME}",@{$dh{U_PARAMS}});
 }
 

@@ -177,13 +177,6 @@ sub parseopts {
 	}
 	@{$options{DOPACKAGES}}=@package_list;
 
-	# Generate EXCLUDE_FIND.
-	$options{EXCLUDE_FIND}='';
-	foreach (@{$options{EXCLUDE}}) {
-		$options{EXCLUDE_FIND}.="-regex .*".quotemeta($_).".* -or ";
-	}
-	$options{EXCLUDE_FIND}=~s/ -or $//;
-
 	# If there are no packages to act on now, it's an error.
 	if (! defined $options{DOPACKAGES} || ! @{$options{DOPACKAGES}}) {
 		error("I have no package to build");
@@ -203,7 +196,7 @@ sub parseopts {
 	@ARGV=@{$options{ARGV}} if exists $options{ARGV};
 
 	return %options;
-}	
+}
 
 sub import {
 	# Enable bundling of short command line options.

@@ -354,6 +354,19 @@ older debhelpers will ignore it and do things you don't want them to. One very
 good way to set DH_OPTIONS is by using "Target-specific Variable Values" in
 your debian/rules file. See the make documentation for details on doing this.
 
+=item DH_ALWAYS_EXCLUDE
+
+If set, this adds the value the variable is set to to the -X options of all
+commands that support the -X option. Moreover, dh_builddeb will rm -rf
+anything that matches the value in your package build tree.
+
+This can be useful if you are doing a build from a CVS source tree, in
+which case setting DH_ALWAYS_EXCLUDE=CVS will prevent any CVS directories
+from sneaking into the package you build. Or, if a package has a source
+tarball that (unwisely) includes CVS directories, you might want to export
+DH_ALWAYS_EXCLUDE=CVS in debian/rules, to make it take effect wherever
+your package is built.
+
 =back
 
 =head1 SEE ALSO

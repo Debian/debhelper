@@ -43,6 +43,20 @@ sub init {
 		%dh=Debian::Debhelper::Dh_Getopt::parseopts();
 	}
 
+	# Another way to set excludes.
+	if (exists $ENV{DH_ALWAYS_EXCLUDE} && length $ENV{DH_ALWAYS_EXCLUDE}) {
+		push @{$dh{EXCLUDE}}, $ENV{DH_ALWAYS_EXCLUDE};
+	}
+	
+	# Generate EXCLUDE_FIND.
+	if ($dh{EXCLUDE}) {
+		$dh{EXCLUDE_FIND}='';
+		foreach (@{$dh{EXCLUDE}}) {
+			$dh{EXCLUDE_FIND}.="-regex ".escape_shell(".*$_.*")." -or ";
+		}
+	}
+	$dh{EXCLUDE_FIND}=~s/ -or $//;
+	
 	# Check to see if DH_VERBOSE environment variable was set, if so,
 	# make sure verbose is on.
 	if (defined $ENV{DH_VERBOSE} && $ENV{DH_VERBOSE} ne "") {
@@ -92,7 +106,7 @@ sub escape_shell {
 		if ($word=~/\s/) {
 			# Escape only a few things since it will be quoted.
 			# Note we use double quotes because you cannot
-			# escape ' in qingle quotes, while " can be escaped
+			# escape ' in single quotes, while " can be escaped
 			# in double.
 			# This does make -V"foo bar" turn into "-Vfoo bar",
 			# but that will be parsed identically by the shell
