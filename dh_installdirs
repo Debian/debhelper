@@ -9,8 +9,8 @@ for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
 	EXT=`pkgext $PACKAGE`
 
-	if [ ! -d $TMP/usr/doc/$PACKAGE ]; then
-		doit "install -d $TMP/usr/doc/$PACKAGE"
+	if [ ! -d $TMP ]; then
+		doit "install -d $TMP"
 	fi
 
 	dirs=""

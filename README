@@ -125,4 +125,13 @@ binary package the debhelper program will act on. For example:
 
 This uses debian/tmp-<package> as the package build directory.
 
+Miscellaneous notes:
+-------------------
+
+Some of the dh_* programs (dh_installdirs in particular, I have not checked
+the rest), will let you pass $PACKAGE to them and it will be expanded into
+the package name they are operating on. For example:
+
+	dh_installdirs -a 'usr/doc/$PACKAGE'
+
 -- Joey Hess <joeyh@master.debian.org>
