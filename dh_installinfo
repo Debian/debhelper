@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
 #
-# Reads debian/info, installs all files listed there into /usr/info
+# Reads debian/info, installs all files listed there into /usr/share/info
 # and puts appropriate commands into the postinst.
 
-BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+BEGIN { push @INC, "debian", "/usr/share/debhelper" }
 use Dh_Lib;
 init();
 
@@ -22,12 +22,12 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	}
 
 	if (@info) {
-		if ( ! -d "$TMP/usr/info") {
-			doit("install","-d","$TMP/usr/info");
+		if ( ! -d "$TMP/usr/share/info") {
+			doit("install","-d","$TMP/usr/share/info");
 		}
-		doit("cp",@info,"$TMP/usr/info");
-		doit("chmod","-R", "go=rX","$TMP/usr/info/");
-		doit("chmod","-R", "u+rw","$TMP/usr/info/");
+		doit("cp",@info,"$TMP/usr/share/info");
+		doit("chmod","-R", "go=rX","$TMP/usr/share/info/");
+		doit("chmod","-R", "u+rw","$TMP/usr/share/info/");
 	}
 
 	foreach $file (@info) {
@@ -35,7 +35,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		# a tree of info files.
 		if ($file=~/\.info$/ && ! $dh{NOSCRIPTS}) {
 			# Figure out what section this file goes in.
-			my $section;
+			my $section='';
 			open (IN, "<$file") || die "$file: $!";
 			while (<IN>) {
 				if (/INFO-DIR-SECTION\s+(.*)/) {
@@ -45,15 +45,15 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			}
 			close IN;
 			
-			my $fn="/usr/info/".Dh_Lib::basename($file);
+			my $fn="/usr/share/info/".Dh_Lib::basename($file);
 			
 			if ($section ne '') {
 				autoscript($PACKAGE,"postinst","postinst-info",
-					"s/#SECTION#/$section/;s:#FILE#:$fn:");
+					"s/#SECTION#/$section/g;s:#FILE#:$fn:");
 			}
 			else {
 				autoscript($PACKAGE,"postinst","postinst-info-nosection",
-					"s/#FILE#/$fn/");
+					"s:#FILE#:$fn:");
 			}
 			autoscript($PACKAGE,"prerm","prerm-info", "s:#FILE#:$fn:");
 		}
