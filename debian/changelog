@@ -1,3 +1,13 @@
+debhelper (2.1.23) unstable; urgency=low
+
+  * dh_makeshlibs: Also scan files named "*.so*", not just "*.so.*",
+    but only if they are files. This should make it more usable with
+    rather stupidly broken libraries like db3, which do not encode the
+    major version in their filenames. However, it cannot guess the major
+    version of such libraries, so -m must be used.
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 11 Nov 2000 17:24:58 -0800
+
 debhelper (2.1.22) unstable; urgency=low
 
   * Fixed dh_perl to work with perl 5.6, Closes: #76508
