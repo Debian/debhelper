@@ -271,7 +271,7 @@ sub pkgext { my $package=shift;
 
 			# Get the package version.
 			my $version=`dpkg-parsechangelog -l$isnative_changelog`;
-			($dh{VERSION})=$version=~m/Version: (.*)/m;
+			($dh{VERSION})=$version=~m/Version:\s*(.*)/m;
 
 			# Did the changelog parse fail?
 			if (! defined $dh{VERSION}) {
@@ -371,10 +371,10 @@ sub GetPackages { my $type=shift;
 	while (<CONTROL>) {
 		chomp;
 		s/\s+$//;
-		if (/^Package:\s+(.*)/) {
+		if (/^Package:\s*(.*)/) {
 			$package=$1;
 		}
-		if (/^Architecture:\s+(.*)/) {
+		if (/^Architecture:\s*(.*)/) {
 			$arch=$1;
 		}
 		if (!$_ or eof) { # end of stanza.
