@@ -64,6 +64,7 @@ binary-indep: build install
 	# You may want to make some executables suid here.
 	dh_suidregister -i
 	dh_installdeb -i
+#	dh_perl -i
 	dh_gencontrol -i
 	dh_md5sums -i
 	dh_builddeb -i
@@ -91,6 +92,7 @@ binary-arch: build install
 	dh_suidregister -a
 	dh_installdeb -a
 #	dh_makeshlibs -a
+#	dh_perl -a
 	dh_shlibdeps -a
 	dh_gencontrol -a
 	dh_md5sums -a
