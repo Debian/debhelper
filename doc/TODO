@@ -48,6 +48,14 @@ Wishlist items:
 * Add a switch to dh_installdeb to allow it to do user defined
   substitutions. OTOH, maybe it's better if people just sed
   postinst.in before debhelper gets it's hands on it... (#25235)
+* objdump -p can get the soname of a library, try using that in dh_shlibs
+  instead of parsing filenames.
+* to suport foo-doc -> foo symlinks in /usr/share/doc, make
+  dh_installdocs/changelogs check to see if the doc dir is a symlink to a
+  directory. If so, dh_installdocs does not install copyright, and
+  dh_installchangelogs does nothing, but everything else dh_installdocs would
+  do is still done. This means that you need to use dh_link and dh_installdirs
+  to set up the link and directory.
 
 Deprecated:
 
