@@ -15,9 +15,9 @@ for PACKAGE in $DH_DOPACKAGES; do
 
 	# debian/files has a different purpose, so ignore it.
 	if [ "$files" -a "$files" != "debian/files" ]; then
-		if [ "$TMP" = "debian/tmp" ]; then
-			error "I was asked to move some files from debian/tmp to debian/tmp."
-		fi
+#		if [ "$TMP" = "debian/tmp" ]; then
+#			error "I was asked to move some files from debian/tmp to debian/tmp."
+#		fi
 
 		if [ ! -d "$TMP" ]; then
 			doit "install -d $TMP"
@@ -31,17 +31,15 @@ for PACKAGE in $DH_DOPACKAGES; do
 		#
 		# (The echo is in here to expand wildcards. Note that 'ls'
 		# won't work properly.)
-		tomove=""
+		# The filelist is used, so even very weird filenames can be
+		# moved.
+		doit "rm -f movelist"
 		for i in `(cd debian/tmp ; echo \`cat $files\`)`; do
-tomove="`(cd debian/tmp ;\
-find $i ! -type d -and ! -type l -print)`\
-$tomove\
-`(cd debian/tmp ;\
-find $i ! -type d -and -type l -print)`"
+			complex_doit "(cd debian/tmp ; find $i ! -type d -and ! -type l -print) >> movelist"
 		done
-		
-		# Use a filelist, so very weird filenames can be moved.
-		complex_doit "echo '$tomove' > movelist"
+		for i in `(cd debian/tmp ; echo \`cat $files\`)`; do
+			complex_doit "(cd debian/tmp ; find $i ! -type d -and -type l -print) >> movelist"
+		done
 		complex_doit "(cd debian/tmp;tar --create --remove-files --files-from=../../movelist --file -) | (cd $TMP;tar xpf -)"
 		doit "rm -f movelist"
 	fi
