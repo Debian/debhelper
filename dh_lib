@@ -37,6 +37,11 @@ error() {
 	exit 1
 }
 
+# Output a warning.
+warning() {
+	echo `basename $0`": $1" >&2
+}
+
 # Pass it a name of a binary package, it returns the name of the tmp dir to
 # use, for that package.
 # This is for back-compatability with the debian/tmp tradition.

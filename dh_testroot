@@ -5,6 +5,8 @@
 PATH=debian:$PATH:/usr/lib/debhelper
 . dh_lib
 
-if  [ "`whoami`" != root ]; then
+# Test for uid = 0, not username of root, becuase
+# some people rename root.
+if  [ "`id -u`" != 0 ]; then
 	error "You must run this as root."
 fi

@@ -16,10 +16,10 @@ filelist () {
 		sh $olddir/$compress 2>/dev/null
 	else
 		# By default fall back on what the policy manual says to compress.
-		find usr/info usr/man usr/X11*/man -type f ! -name "*.gz" 2>/dev/null
+		find usr/info usr/man usr/X11*/man -type f ! -name "*.gz" 2>/dev/null || true
 		find usr/doc -type f \( -size +4k -or -name "changelog*" \) \
 			! -name "*.htm*" ! -name "*.gif" ! -name "*.gz" \
-			! -name "copyright" 2>/dev/null
+			! -name "copyright" 2>/dev/null || true
 	fi
 }
 
@@ -39,7 +39,9 @@ for PACKAGE in $DH_DOPACKAGES; do
 	# Run the file name gathering commands from within the directory
 	# structure that will be effected.
 	olddir=`pwd`
-	doit "cd $TMP"
+	# Can't use doit here, that breaks --no-act mode.
+	verbose_echo "cd $TMP"
+	cd "$TMP"
 
 	# Get the list of files to compress.
 	if [ "$DH_EXCLUDE_GREP" ]; then
@@ -56,7 +58,8 @@ for PACKAGE in $DH_DOPACKAGES; do
 	fi
 
 	# Change back to old pwd.
-	doit "cd $olddir"
+	verbose_echo "cd $olddir"
+	cd "$olddir"
 
 	# Fix up symlinks that were pointing to the uncompressed files.
 	for file in `find $TMP -type l`; do

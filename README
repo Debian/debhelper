@@ -18,57 +18,7 @@ process.
 Converting from debstd to debhelper:
 -----------------------------------
 
-Debhelper is designed to be mostly backwards compatible to debstd. I say
-mostly because I haven't made debhelper handle everything that debstd does
-yet, and in a few cases, it does things differently (and I hope, better).
-
-In general, you can switch over to using debhelper as follows. In your
-debian/rules, where you used to have some lines that read something like:
-
-	debstd CHANGES TODO README
-	dpkg-gencontrol
-	dpkg --build debian/tmp ..
-
-Remove that and replace it with something like:
-
-	dh_installdocs TODO README
-	dh_installexamples
-	dh_installmenu
-	dh_installcron
-	dh_installmanpages
-	dh_installchangelogs CHANGES
-	dh_movefiles
-	dh_strip
-	dh_compress
-	dh_fixperms
-	dh_suidregister
-	dh_installdeb
-	dh_shlibdeps
-	dh_gencontrol
-	dh_makeshlibs
-	dh_md5sums
-	dh_builddeb
-
-Notice that the parameters sent to debstd get split up among the dh_*
-programs. The upstream changelog is passed to dh_installchangelogs, and the
-docs are passed to dh_installdocs.
-
-Debstd has many switches, that turn off different parts of it. So if you 
-were using debstd -m to tell it not to automatically install manpages,
-for example, you can just comment out the dh_installmanpages line.
-
-Finally, debstd automatically modified postinst, postrm, etc scripts. Some
-of the debhelper apps do that too, but they do it differently. Debstd just
-appends its commands to the end of the script. Debhelper requires that you
-insert a tag into your scripts, that will tell debhelper where to insert
-commands. So if you have postinst, postrm, etc scripts, add a line reading
-"#DEBHELPER#" to the end of them.
-
-Once you think it's all set up properly, do a test build of your package. If 
-it works ok, I recommend that you compare the new package and the old 
-debstd-generated package very closely. Pay special attention to the postinst, 
-postrm, etc scripts.
-
+See the file "from-debstd" for documentation on how to do this.
 
 Automatic generation of debian install scripts:
 ----------------------------------------------
@@ -115,7 +65,6 @@ These parameters are cumulative. If none are given, the tools default to
 affecting all packages.
 
 See examples/rules.multi for an example of how to use this.
-
 
 Package build directories -- debian/tmp, etc:
 --------------------------------------------

@@ -10,6 +10,12 @@ for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
 	init=`pkgfile $PACKAGE init`
 
+	# This is for backwards compatability with debstd, which used either
+	# name.
+	if [ ! "$init" ]; then
+		init=`pkgfile $PACKAGE init.d`
+	fi
+
 	if [ "$init" ]; then
 		if [ ! -d $TMP/etc/init.d ]; then
 			doit "install -d $TMP/etc/init.d"

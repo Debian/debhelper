@@ -1,3 +1,15 @@
+debhelper (0.88) unstable; urgency=low
+
+  * I had many hours on a train to hack on debhelper... enjoy!
+  * dh_compress: always pass -f to gzip, to force compression.
+  * dh_compress: added -X switch, to make it easy to specify files to
+    exclude, without all the bother of a debian/compress script. You can
+    use -X multiple times, too.
+  * PROGRAMMING, dh_getopt.pl: DH_EXCLUDE is now a variable set by the
+    --exclude (-X) switch. -x now sets DH_INCLUDE_CONFFILES.
+
+ -- Joey Hess <joeyh@master.debian.org>  Sun, 17 May 1998 11:26:09 -0700
+
 debhelper (0.87) unstable; urgency=low
 
   * dh_strip: strip .comment and .note, not comment and note, when stripping
