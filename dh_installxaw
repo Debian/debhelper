@@ -15,6 +15,9 @@ B<dh_installxaw> [S<I<debhelper options>>] [B<-n>]
 
 =head1 DESCRIPTION
 
+Warning: The xaw-wrappers package has been removed from debian, and so this
+program is deprecated, and due to be removed soon.
+
 dh_installxaw is a debhelper program that is responsible for installing
 xaw wrappers config files into package build directories.
 
@@ -44,6 +47,8 @@ instances of the same text to be added to maintainer scripts.
 =cut
 
 init();
+
+warning("The xaw-wrappers package has been removed from debian, and so this program is deprecated, and due to be removed soon.");
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);

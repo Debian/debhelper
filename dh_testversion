@@ -63,7 +63,10 @@ elsif ($#ARGV eq 0) {
 	$ver=shift;
 }
 
+warning("This program is deprecated, you should use build dependencies instead.");
+
 if (defined $compare and defined $ver) {
+	warning("Something like: \"Build-Depends: debhelper ($compare $ver)\"");
 	system('dpkg','--compare-versions',$Debian::Debhelper::Dh_Version::version,$compare,$ver) == 0 ||
 		error("debhelper version $Debian::Debhelper::Dh_Version::version is installed, but a version $compare $ver is needed to build this package.");
 }

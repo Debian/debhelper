@@ -53,21 +53,32 @@ Wishlist items:
 * Add a switch to dh_installdeb to allow it to do user defined
   substitutions. OTOH, maybe it's better if people just sed
   postinst.in before debhelper gets it's hands on it... (#25235)
+* dh_installdocs needs -X support, which probably means going with tar
+  instead of cp -a. Ugh.
+
+v4:
+
+These items are part of v4 already:
+
+* dhmakeshlibs -V omits the debian part of the version number from the
+  generated dependancy in the shlibs file
+
+These items are planned:
+
+* Maybe make dh_fixperms make all files in bin/ dirs +x. (#119039)
 
 Deprecated:
 
 * DH_COMPAT 1. Can be removed once all packages are seen to be using 2 or
   higher. I won't hold my breath.
-* Also, grep the entire archive for all dh_* command lines, and check to
-  see what other switches are not being used, and maybe remove some of
-  them. I'd also like to depercate/remove debian/compress files, -X is
+* Also, grep the entire archive for all dh_* command lines (I do this now),
+  and check to see what other switches are not being used, and maybe remove
+  some of them. I'd also like to depercate/remove debian/compress files, -X is
   a better idea.
 * dh_suidregister. Once nothing in the archive uses it.
 * dh_installmanpages. Only mildly deprecated right now. Once dh_installman
   catches on, make it emit a warning, and then wait for it to go away.
-* dh_testversion. Only mildly deprecated right now. Make it emit a warning
-  by jan 2002, and remove as soon as nothing uses it.
+* dh_testversion. Remove as soon as nothing uses it.
 * dh_installxaw. xaw replacments are dying, nothing uses it validly (bugs
-  filed on the few packages that use it by accident). Make it omit a
-  warning by jan 2002 and remove as soon as nothing uses it, or by april
-  2002.
+  filed on the few packages that use it by accident). Remove as soon as
+  nothing uses it, or by april 2002.

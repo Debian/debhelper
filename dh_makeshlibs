@@ -136,7 +136,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				# Call isnative becuase it sets $dh{VERSION}
 				# as a side effect.
 				isnative($package);
-				$deps="$package (>= $dh{VERSION})";
+				my $version = $dh{VERSION};
+				# Old compatability levels include the
+				# debian revision, while new do not.
+				if (! compat(3)) {
+					# Remove debian version, if any.
+					$version =~ s/-[^-]+$//;
+				}
+				$deps="$package (>= $version)";
 			}
 		}
 		if (defined($library) && defined($major) && defined($deps) &&

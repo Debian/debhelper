@@ -14,7 +14,7 @@ use vars qw(@ISA @EXPORT %dh);
 	    &pkgfile &pkgext &isnative &autoscript &filearray &GetPackages
 	    &basename &dirname &xargs %dh &compat);
 
-my $max_compat=3;
+my $max_compat=4;
 
 sub init {
 	# If DH_OPTIONS is set, prepend it @ARGV.

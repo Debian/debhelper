@@ -1,3 +1,25 @@
+debhelper (3.4.0) unstable; urgency=low
+
+  * Began work on v4 support (and thus the large version number jump), and it
+    is only for the very brave right now since I will unhesitatingly break
+    compatability in v4 mode as I'm developing it. Currently, updating to v4
+    mode will only make dh_makeshlibs -V generate shared library deps that
+    omit the debian part of the version number. The reasoning behind this
+    change is that the debian revision should not typically break binary
+    compatability, that existing use of -V is causing too tight versioned
+    deps, and that if you do need to include the debian revision for some
+    reason, you can always write it out by hand. Closes: #101497
+  * dh_testversion is deprecated -- use build deps instead. A warning message
+    is now output when it runs. Currently used by: 381 packages.
+  * dh_installxaw is deprecated -- xaw-wrappers in no longer in the
+    distribution. A warning message is now output when it runs. Currently used
+    by: 3 packages (bugs filed).
+  * Added referneces to menufile in dh_installmenu man page. Closes: #127978
+    (dh_make is not a part of debhelper, if you want it changed, file a bug on
+    dh-make.)
+    
+ -- Joey Hess <joeyh@debian.org>  Sat,  5 Jan 2002 22:45:09 -0500
+
 debhelper (3.0.54) unstable; urgency=low
 
   * Added a version to the perl build dep, Closes: #126677
