@@ -40,13 +40,14 @@ passed to dpkg-shlibdeps. This will make their dependancies be ignored.
 This may be useful in some situations, but use it with caution. This option
 may be used more than once to exclude more than one thing.
 
-=item B<-l>I<directory>
+=item B<-l>I<directory>[:directory:directory:..]
 
-Before dpkg-shlibdeps is run, LD_LIBRARY_PATH will be set to the specified
-directory. This is useful for multi-binary packages where a library
-is built in one package and another package contains binaries linked
-against said library. Relative paths will be made absolute for the
-benefit of dpkg-shlibdeps.
+Before dpkg-shlibdeps is run, LD_LIBRARY_PATH will be set to the 
+specified directory (or directories -- separate with colons). This is
+useful for multi-binary packages where a library is built in one
+package and another package contains binaries linked against said
+library. Relative paths will be made absolute for the benefit of
+dpkg-shlibdeps.
 
 =back
 
@@ -77,10 +78,17 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	if (@filelist) {
 		if ($dh{L_PARAMS}) {
-			# Force the path absolute.
-			unless ($dh{L_PARAMS}=~m:^/:) {
-				$dh{L_PARAMS}=getcwd()."/$dh{L_PARAMS}";
+			my @paths=();
+			foreach (split(/:/, $dh{L_PARAMS})) {
+				# Force the path absolute.
+				if (m:^/:) {
+					push @paths, $_;
+				}
+				else {
+					push @paths, getcwd()."/$_";
+				}
 			}
+			$dh{L_PARAMS}=join(':', @paths);
 			$ENV{'LD_LIBRARY_PATH'}=$dh{L_PARAMS};
 			verbose_print("LD_LIBRARY_PATH=$dh{L_PARAMS} \\");
 		}
