@@ -11,31 +11,18 @@ that pointed to the files before they were compressed are updated to point
 to the new files.
 .P
 By default, dh_compress compresses files that debian policy mandates should
-be compressed, namely all files in usr/share/info, usr/share/man, 
+be compressed, namely all files in usr/share/info, usr/share/man,
 usr/X11R6/man, and all files in usr/share/doc that are larger than 4k in size,
-(except the copyright file, .html files and .gif files), and all changelog 
+(except the copyright file, .html files and .gif files), and all changelog
 files. It skips any files that appear to be already compressed (based on their
 extensions).
 .P
-If a debian/package.compress file exists (debian/compress may be used for the
-first binary package in debian/control), however, it will be ran as a shell
+If a debian/package.compress file exists, however, it will be ran as a shell
 script, and all filenames that the shell script outputs will be compressed
 instead of the default files. Note that the shell script will be run from
 inside the package build directory. Note though that using -X is a much
-better idea in general; you should only use a debian/compress file if you
-really have to.
-.SH EXAMPLE
-Here is a sample debian/compress file that causes dh_compress to compress
-the same files as it would by default. This is a good starting point for
-customization of what files are compressed:
-.PP
- find usr/info usr/share/info usr/man usr/share/man usr/X11*/man -type f ! -name "*.gz"
- find usr/doc usr/share/doc -type f \\ 
- 	\\( -size +4k -or -name "changelog*" \\) \\
- 	\\( -name changelog.html -or ! -iname "*.htm*" \\) \\
- 	! -iname "*.gif" ! -iname "*.png" ! -iname "*.jpg" ! -iname "*.jpeg" ! -iname "*.gz" \\
- 	! -iname "*.taz" ! -iname "*.tgz" ! -iname "*.z" \\
- 	! -name "copyright"
+better idea in general; you should only use a debian/package.compress file if
+you really have to.
 .SH OPTIONS
 .TP
 .B debhelper options
@@ -56,11 +43,6 @@ acted on.
 .TP
 .B file ...
 Add these files to the list of files to compress.
-.SH NOTES
-The debian/compress file applies to the first binary package listed in your
-control file. For the other packages, you can make files named
-debian/package.compress, where "package" is the name of the package they 
-apply to. (This works for the first binary package too.)
 .SH ENVIRONMENT
 See
 .BR debhelper (1)

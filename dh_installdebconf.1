@@ -8,16 +8,13 @@ dh_installdebconf \- install debconf files into package build directories
 dh_installdebconf is a debhelper program that is responsible for installing
 files used by the debconf package into package build directories.
 .P
-It also automatically generates the postrm commands needed to 
-interface with debconf. See 
+It also automatically generates the postrm commands needed to
+interface with debconf. See
 .BR dh_installdeb (1)
 for an explanation of how this works.
 .P
 Files named debian/package.config and debian/package.templates are installed
 into the DEBIAN directory in the package build directory.
-.P
-For the first first binary package listed in the control file, you may use
-debian/config and debian/templates instead.
 .P
 Note that if you use debconf, your package probably needs to depend on it.
 .SH "LOCALIZED TEMPLATE FILES"
@@ -27,14 +24,14 @@ translations in separate files, and merge them only at build time. See
 .BR debconf-mergetemplate (1)
 for details.
 .P
-This program will automatically call 
+This program will automatically call
 .BR debconf-mergetemplate (1)
 and merge templates on the fly if it finds your template files are accompnied
 by translated files that have the same name as the template file, with a
 dot and two letters prepended.
 .P
 For example, if you have a German translation,
-debian/templates.de is merged with debian/templates.
+debian/package.templates.de is merged with debian/package.templates.
 .P
 If you use this feature, your package should build-depend on debconf-utils.
 .SH OPTIONS

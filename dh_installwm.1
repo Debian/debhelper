@@ -11,12 +11,11 @@ with
 .BR update-alternatives (8)
 .P
 Any windowmanager filenames specified as parameters will be registered in
-the first package dh_installwm is told to ast on. By default, this is the
+the first package dh_installwm is told to act on. By default, this is the
 first binary package in debian/control, but if you use -p, -i, or -a flags, it
 will be the first package specified by those flags.
 .P
-A file named debian/package.wm (debian/wm may be used for the
-first binary package in debian/control) can list other window manager to
+Files named debian/package.wm can list other window managers programs to
 register.
 .SH OPTIONS
 .TP
@@ -35,10 +34,6 @@ Do not modify postinst/postrm scripts. Turns this command into a no-op.
 .TP
 .B wmfilename
 The filename of the window manager you wish to register.
-.SH NOTES
-Note that this command will set up postinst and postrm scripts for every
-package it acts on. It's wise to limit its action to a single package with,
-for example, the -p switch.
 .SH ENVIRONMENT
 See
 .BR debhelper (1)

@@ -6,17 +6,15 @@ dh_installinit \- install init scripts into package build directories
 .I "[debhelper options] [--init-script=scriptname] [-n] [-r] [-d] [-uparams] -- [params]"
 .SH "DESCRIPTION"
 dh_installinit is a debhelper program that is responsible for installing
-init scripts into package build directories. 
+init scripts into package build directories.
 .P
-It also automatically generates the postinst and postrm and prerm commands 
+It also automatically generates the postinst and postrm and prerm commands
 needed to set up the symlinks in /etc/rc*.d/ and to start and stop the init
 scripts.
 .P
-If a file named debian/package.init (or debian/package.init.d for backwards
-compatibility with debstd) exists, then it is installed into
+If a file named debian/package.init exists, then it is installed into
 etc/init.d/package in the package build directory, with "package" replaced
-by the packagename. (You may use debian/init for the first binary package
-listed in the control file.)
+by the package name.
 .SH OPTIONS
 .TP
 .B debhelper options
@@ -39,7 +37,7 @@ the --init-script parameter described below.)
 .B \-uparams, \--update-rcd-params=params
 .TP
 .B \-\- params
-Pass "params" to 
+Pass "params" to
 .BR update-rc.d (8)
 If not specified, "defaults" will be passed to
 .BR update-rc.d (8)
@@ -50,7 +48,7 @@ etc/init.d/ . This is useful if you need to have an init script with a name
 different from the package's name. Note that if you use this parameter,
 dh_installinit will look to see if a file in the debian/ directory exists
 that looks like "scriptname" or "package.scriptname" and if so will install
-it as the inist script in preference to the files it normally installs. This
+it as the init script in preference to the files it normally installs. This
 feature is really only useful if you need a single package to install more
 than one init script.
 .SH ENVIRONMENT

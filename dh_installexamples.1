@@ -8,13 +8,12 @@ dh_installexamples \- install example files into package build directories
 dh_installexamples is a debhelper program that is responsible for installing
 examples into usr/share/doc/package/examples in package build directories.
 .P
-Any file names specified as parameters will be installed into the first 
-package dh_installexamples is told to act on. By default, this is the first 
+Any file names specified as parameters will be installed into the first
+package dh_installexamples is told to act on. By default, this is the first
 binary package in debian/control, but if you use -p, -i, or -a flags, it
 will be the first package specified by those flags.
 .P
-A file named debian/package.examples (debian/examples may be used for the
-first binary package in debian/control) can list other files to be installed.
+Files named debian/package.examples can list other files to be installed.
 .SH OPTIONS
 .TP
 .B debhelper options
@@ -41,7 +40,8 @@ for a list of environment variables that affect all debhelper commands.
 .BR debhelper (1)
 .SH BUGS
 It's impossible to specify filenames with spaces or other whitespace in them
-in debian/examples file. This is more a historical design flaw than a bug.
+in debian/package.examples file. This is more a historical design flaw than a
+bug.
 .SH "CONFORMS TO"
 Debian policy, version 3.0.1
 .SH AUTHOR

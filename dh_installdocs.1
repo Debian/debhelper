@@ -11,24 +11,23 @@ documentation into usr/share/doc/package in package build directories.
 dh_installdocs automatically installs debian/copyright if it exists. If
 dh_installdocs is acting on multiple packages, debian/copyright files will be
 installed into all packages. However, if you need to have seperate copyright
-files for different binary packages, you can use files named 
+files for different binary packages, you can use files named
 debian/package.copyright.
 .P
 Any filenames specified as parameters will be installed into the first
-package dh_installdocs is told to act on. By default, this is the first 
-binary package in debian/control, but if you use -p, -i, or -a flags, it 
+package dh_installdocs is told to act on. By default, this is the first
+binary package in debian/control, but if you use -p, -i, or -a flags, it
 will be the first package specified by those flags.
 .P
-Also, debian/README.Debian (or debian/README.debian) and debian/TODO, if 
-they exist, will be installed into the first binary package listed in 
-debian/control, if dh_installdocs is acting on that package. Note that 
-debian/TODO will be installed named TODO.Debian, if the package is not a 
+Also, debian/README.Debian (or debian/README.debian) and debian/TODO, if
+they exist, will be installed into the first binary package listed in
+debian/control, if dh_installdocs is acting on that package. Note that
+debian/TODO will be installed named TODO.Debian, if the package is not a
 debian native package. Also note that README.debian is installed as
 README.Debian, for consitency. Note that debian/package.README.Debian and
 debian/package.TODO can be used to specify files for subpackages.
 .P
-A file named debian/package.docs (debian/docs may be used for the first
-binary package in debian/control) can list other files to be installed.
+Files named debian/package.docs can list other files to be installed.
 .P
 This program will automatically generate postinst and prerm commands to
 maintain a compatability symlink, /usr/doc/package, to the documentation in
@@ -36,10 +35,9 @@ maintain a compatability symlink, /usr/doc/package, to the documentation in
 .BR dh_installdeb (1)
 for an explanation of how this works.
 .P
-A file named debian/package.doc-base (debian/doc-base may be used for the
-first binary package in debian/control), if it exists, will be installed as 
-a doc-base control file, and will make this program automatically generate the
-postinst and prerm commands needed to interface with the doc-base package. See
+Files named debian/package.doc-base, will be installed as doc-base control
+files, and will make this program automatically generate the postinst and
+prerm commands needed to interface with the doc-base package. See
 .BR dh_installdeb (1)
 for an explanation of how this works.
 Note that the doc-id will be determined from the "Document:" entry in the
@@ -83,7 +81,7 @@ between invocations of this command. Otherwise, it may cause multiple
 instances of the same text to be added to maintainer scripts.
 .SH BUGS
 It's impossible to specify filenames with spaces or other whitespace in them
-in debian/docs file. This is more a historical design flaw than a bug.
+in debian/package.docs file. This is more a historical design flaw than a bug.
 .SH "CONFORMS TO"
 Debian policy, version 3.0.1
 .SH AUTHOR

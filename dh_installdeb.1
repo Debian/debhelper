@@ -11,25 +11,20 @@ correct permissions.
 .P
 dh_installdeb automatically installs the following files from debian/ into
 the DEBIAN directory:
- 	postinst
- 	preinst
- 	postrm
- 	prerm
- 	shlibs
- 	conffiles
+ 	package.postinst
+ 	package.preinst
+ 	package.postrm
+ 	package.prerm
+ 	package.shlibs
+ 	package.conffiles
 .P
-(For packages other than the first binary package listed in debian/control,
-you must prefix these filenames with then name of the "package.", for example,
-"foo.postinst". You can also prefix the filenames the same way for the first
-binary package, for consitency.)
-.P
-The files postinst, preinst, postrm, and prerm are handled specially: If a
-corresponding file named debian/script.debhelper exists, the contents of that 
-file are merged into the script as follows: If the script exists, then 
+The postinst, preinst, postrm, and prerm are handled specially: If a
+corresponding file named debian/script.debhelper exists, the contents of that
+file are merged into the script as follows: If the script exists, then
 anywhere in it that "#DEBHELPER#" appears, the text of the .debhelper file is
-inserted. If the script does not exist, then a script is generated from 
-the .debhelper file. The .debhelper files are created by other debhelper 
-programs, such as 
+inserted. If the script does not exist, then a script is generated from
+the .debhelper file. The .debhelper files are created by other debhelper
+programs, such as
 .BR dh_installmenu (1)
 , and are shell script fragments.
 .SH OPTIONS

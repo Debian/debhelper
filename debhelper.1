@@ -7,7 +7,7 @@ debhelper \- overview of the debhelper commands
 .SH "DESCRIPTION"
 Debhelper is used to help you build a debian package. The philospohy behind
 debhelper is to provide a collection of small, simple, and easily
-understood tools that are used in debian/rules to automate various common 
+understood tools that are used in debian/rules to automate various common
 aspects of building a package. This means less work for you, the packager.
 It also, to some degree means that these tools can be changed if debian
 policy changes, and packages that use them will require only a rebuild to
@@ -20,7 +20,7 @@ Examples of rules files that use debhelper are in
 .P
 To create a new debian package using debhelper, you can just copy one of
 the sample rules files and edit it by hand. Or you can try the dh-make
-package, which contains a 
+package, which contains a
 .BR dh_make (1)
 command that partially automates the process. For a more gentle
 introduction, the maint-guide debian package contains a
@@ -29,6 +29,27 @@ tutorial about making your first package using debhelper.
 Here is the complete list of available debhelper commands. See their man
 pages for additional documentation.
 #LIST#
+.SH "DEBHELPER CONFIG FILES"
+Many debhelper commands make use of files in debian/ to control what they
+do. Besides the common debian/changelog and debian/control, which are
+in all packages, not just those using debhelper, some additional files can
+be used to configure the behavior of specific debhelper commands. These
+files are typically named debian/<package>.foo (where <package> of course,
+is replaced with the package that is being acted on).
+.P
+For example,
+dh_installdocs uses files named debian/<package>.docs to list the documentation
+files it will install. See the man pages of individual commands for details
+about the names and formats of the files they use.
+.P
+Note that if a package is the first (or only) binary package listed in
+debian/control, debhelper will use debian/foo if no debian/<package>.foo
+file can be found.
+.P
+In some rare cases, you may want to have different versions of these files
+for different architectures. If files named debian/<package>.foo.<arch>
+exist, where <arch> is the same as the output of "dpkg --print-architecture",
+then they will be used in preference to other, more general files.
 .SH "SHARED DEBHLPER OPTIONS"
 The following command line options are supported by all debhelper programs.
 .TP
@@ -91,7 +112,7 @@ binary-arch debian/rules target, and the architecture independent packages
 in the binary-indep debian/rules target.
 
 To facilitate this, as well as give you more control over which packages
-are acted on by debhelper programs, all debhelper programs accept the 
+are acted on by debhelper programs, all debhelper programs accept the
 .B -a
 ,
 .B -i
@@ -187,7 +208,7 @@ Note that if you are generating a debian package that has arch-indep and
 arch-dependent portions, and you are using dh_movefiles to move the
 arch-indep files out of debian/tmp, you need to make sure that dh_movefiles
 does this even if only the arch-dependent package is being built (for
-ports to other architectures). I handle this in the example rules file 
+ports to other architectures). I handle this in the example rules file
 "rules.multi" by calling dh_movefiles in the install target.
 .P
 Once your package uses debhelper to build, be sure to add

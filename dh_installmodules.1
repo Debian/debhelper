@@ -8,15 +8,14 @@ dh_installmodules \- register modules with modutils
 dh_installmodules is a debhelper program that is responsible for registering
 kernel modules with modutils.
 .P
-A file named debian/package.modules (debian/modules may be used for the first
-binary package in debian/control) will be installed as etc/modutils/package
+Files named debian/package.modules will be installed as etc/modutils/package
 in the package build directory.
 .P
 Then postinst and postrm commands are automatically generated to register
 the modules when the package is installed. See
 .BR dh_installdeb (1)
 for an explanation of how this works. Note that this will be done for any
-package this program acts on which has either the above-mentioned file, or 
+package this program acts on which has either the above-mentioned file, or
 has .o files in /lib/modules.
 .SH OPTIONS
 .TP

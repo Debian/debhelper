@@ -222,19 +222,28 @@ sub tmpdir { my $package=shift;
 }
 
 # Pass this the name of a binary package, and the name of the file wanted
-# for the package, and it will return the actual filename to use. For
-# example if the package is foo, and the file is somefile, it will look for
-# debian/somefile, and if found return that, otherwise, if the package is
-# the main package, it will look for debian/foo, and if found, return that.
-# Failing that, it will return nothing.
-sub pkgfile { my $package=shift; my $filename=shift;
-	if (-f "debian/$package.$filename") {
+# for the package, and it will return the actual existing filename to use.
+#
+# It tries several filenames:
+#   * debian/package.filename.buildarch
+#   * debian/package.filename
+#   * debian/file (if the package is the main package)
+sub pkgfile {
+	my $package=shift;
+	my $filename=shift;
+
+	if (-f "debian/$package.$filename.".buildarch()) {
+		return "debian/$package.$filename".buildarch();
+	}
+	elsif (-f "debian/$package.$filename") {
 		return "debian/$package.$filename";
 	}
 	elsif ($package eq $dh{MAINPACKAGE} && -f "debian/$filename") {
 		return "debian/$filename";
 	}
-	return "";
+	else {
+		return "";
+	}
 }
 
 # Pass it a name of a binary package, it returns the name to prefix to files
@@ -328,6 +337,19 @@ sub filearray { my $file=shift;
 	return @ret;
 }
 
+# Returns the build architecture. (Memoized)
+{
+	my $arch;
+	
+	sub buildarch {
+  		return $arch if defined $arch;
+
+		$arch=`dpkg --print-architecture` || error($!);
+		chomp $arch;
+		return $arch;
+	}
+}
+
 # Returns a list of packages in the control file.
 # Must pass "arch" or "indep" or "same" to specify arch-dependant or
 # -independant or same arch packages. If nothing is specified, returns all
@@ -336,10 +358,9 @@ sub GetPackages { my $type=shift;
 	$type="" if ! defined $type;
 	
 	# Look up the build arch if we need to.
-	my$buildarch='';
+	my $buildarch='';
 	if ($type eq 'same') {
-		$buildarch=`dpkg --print-architecture` || error($!);
-		chomp $buildarch;
+		$buildarch=buildarch();
 	}
 
 	my $package="";

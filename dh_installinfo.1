@@ -9,12 +9,11 @@ dh_installinfo is a debhelper program that is responsible for installing
 info files and registering them with install-info.
 .P
 Any filenames specified as parameters will be installed into the first
-package dh_installinfo is told to act on. By default, this is the first 
-binary package in debian/control, but if you use -p, -i, or -a flags, it 
+package dh_installinfo is told to act on. By default, this is the first
+binary package in debian/control, but if you use -p, -i, or -a flags, it
 will be the first package specified by those flags.
 .P
-A file named debian/package.info (debian/info may be used for the first
-binary package in debian/control) can list other files to be installed.
+Files named debian/package.info can list other files to be installed.
 .P
 dh_installinfo will automatically generate the postinst and prerm commands
 needed to interface with install-info. See
@@ -51,7 +50,7 @@ between invocations of this command. Otherwise, it may cause multiple
 instances of the same text to be added to maintainer scripts.
 .SH BUGS
 It's impossible to specify filenames with spaces or other whitespace in them
-in debian/info file. This is more a historical design flaw than a bug.
+in debian/package.info files. This is more a historical design flaw than a bug.
 .SH "CONFORMS TO"
 Debian policy, version 3.0.1
 .SH AUTHOR
