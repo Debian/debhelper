@@ -43,7 +43,7 @@ binary-indep: link-stamp build
 	./dh_installdirs usr/bin usr/share/debhelper \
 		usr/lib/perl5/Debian/Debhelper
 
-	echo -e "package Dh_Version;\n\$$version='$(VERSION)';" > \
+	echo -e "package Debian::Debhelper::Dh_Version;\n\$$version='$(VERSION)';" > \
 		debian/debhelper/usr/lib/perl5/Debian/Debhelper/Dh_Version.pm
 	find . -perm +111 -maxdepth 1 -type f -not -name "*.pl" \
 		-exec install -p {} debian/debhelper/usr/bin \;
