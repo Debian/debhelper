@@ -383,6 +383,10 @@ sub filearray {
 	}
 }
 
+sub getcontrol {
+	return $ENV{DH_CONTROL} || 'debian/control';
+}
+
 # Returns a list of packages in the control file.
 # Must pass "arch" or "indep" or "same" to specify arch-dependant or
 # -independant or same arch packages. If nothing is specified, returns all
@@ -401,8 +405,8 @@ sub GetPackages {
 	my $package="";
 	my $arch="";
 	my @list=();
-	open (CONTROL,"<debian/control") ||
-		error("cannot read debian/control: $!\n");
+	open (CONTROL, getcontrol()) ||
+		error("cannot read ".getcontrol().": $!\n");
 	while (<CONTROL>) {
 		chomp;
 		s/\s+$//;

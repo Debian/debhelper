@@ -7,7 +7,7 @@
 use Debian::Debhelper::Dh_Lib;
 init();
 
-foreach $file ('debian/control',@ARGV) {
+foreach $file (Debian::Debhelper::Dh_Lib::getcontrol(),@ARGV) {
 	if (! -e $file) {
 		error("\"$file\" not found. Are you sure you are in the correct directory?");
 	}
