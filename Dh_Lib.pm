@@ -15,6 +15,8 @@ use vars qw(@ISA @EXPORT %dh);
 	    &xargs
 	    %dh);
 
+my $max_compat=2;
+
 sub init {
 	# If DH_OPTIONS is set, prepend it @ARGV.
 	if (defined($ENV{DH_OPTIONS})) {
@@ -196,7 +198,11 @@ sub compat {
 	if (defined $ENV{DH_COMPAT}) {
 		$c=$ENV{DH_COMPAT};
 	}
-	
+
+	if ($c > $max_compat) {
+		error("Sorry, but $max_compat is the highest compatability level of debhelper currently supported.");
+	}
+
 	return ($c == $num);
 }
 
