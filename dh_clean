@@ -43,4 +43,4 @@ if (! $dh{D_FLAG}) {
 		) -exec rm -f {} ;"));
 }
 
-doit('rm', '-rf', 'debian/tmp') if -x 'debian/tmp';
+doit('rm', '-rf', 'debian/tmp') if -x 'debian/tmp' && ! compat(1);

@@ -40,13 +40,13 @@ binary-indep: build
 	./dh_testdir
 	./dh_testroot
 	./dh_clean -k
-	./dh_installdirs usr/bin usr/lib/debhelper
+	./dh_installdirs usr/bin usr/share/debhelper
 
-	echo -e "package Dh_Version;\n\$$version='$(VERSION)';" > debian/debhelper/usr/lib/debhelper/Dh_Version.pm
+	echo -e "package Dh_Version;\n\$$version='$(VERSION)';" > debian/debhelper/usr/share/debhelper/Dh_Version.pm
 	find . -perm +111 -maxdepth 1 -type f -not -name "*.pl" \
 		-exec install -p {} debian/debhelper/usr/bin \;
-	cp -a Dh_*.pm debian/debhelper/usr/lib/debhelper
-	cp -a autoscripts debian/debhelper/usr/lib/debhelper
+	cp -a Dh_*.pm debian/debhelper/usr/share/debhelper
+	cp -a autoscripts debian/debhelper/usr/share/debhelper
 
 	./dh_installdocs doc/*
 	./dh_installexamples examples/*
