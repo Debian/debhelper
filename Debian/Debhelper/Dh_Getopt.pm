@@ -19,7 +19,7 @@ my (%options, %exclude_package);
 sub showhelp {
 	my $prog=basename($0);
 	print "Usage: $prog [options]\n\n";
-	print "  $prog is a part of debhelper. See debhelper(1)\n";
+	print "  $prog is a part of debhelper. See debhelper(7)\n";
 	print "  and $prog(1) for complete usage instructions.\n"; 
 	exit(1);
 }

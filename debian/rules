@@ -23,7 +23,7 @@ build: test build-stamp
 build-stamp:
 	# Generate the main man page. All the perl cruft is to get a list
 	# of debhelper commands with short descriptions into the man page.
-	pod2man -c Debhelper -r "$(VERSION)" debhelper.pod | \
+	pod2man --section=7 -c Debhelper -r "$(VERSION)" debhelper.pod | \
 	perl -e ' \
 		undef $$/; \
 		foreach (@ARGV) { \
@@ -39,7 +39,7 @@ build-stamp:
 		        	s/#LIST#/$$collect/; \
 				print; \
 			}; \
-		}' `find . -type f -perm +1 -maxdepth 1 -name "dh_*" | sort` > debhelper.1
+		}' `find . -type f -perm +1 -maxdepth 1 -name "dh_*" | sort` > debhelper.7
 	# Turn all executables into man pages.
 	find . -type f -perm +1 -maxdepth 1 -name "dh_*" \
 		-exec pod2man -c Debhelper -r "$(VERSION)" {} {}.1 \;
@@ -74,7 +74,7 @@ binary-indep: build
 	./dh_install autoscripts usr/share/debhelper
 	./dh_installdocs doc/*
 	./dh_installexamples examples/*
-	./dh_installman *.1
+	./dh_installman *.1 *.7
 	./dh_installchangelogs
 	./dh_shlibdeps
 	./dh_link
