@@ -1,0 +1,58 @@
+#!/bin/sh -e
+#
+# Install debian/init[.d], and set up the postinst and postrm for init
+# scripts.
+
+PATH=debian:$PATH:/usr/lib/debhelper
+. dh_lib
+
+for PACKAGE in $DH_DOPACKAGES; do
+	TMP=`tmpdir $PACKAGE`
+	EXT=`pkgext $PACKAGE`
+
+	if [ -e debian/${EXT}init ]; then
+		if [ ! -d $TMP/etc/init.d ]; then
+			doit "install -d $TMP/etc/init.d"
+		fi
+
+		# Figure out what filename to install it as.
+		if [ "$DH_D_FLAG" ]; then
+			# -d on the command line sets DH_D_FLAG. We will 
+			# remove a trailing 'd' from the package name and 
+			# use that as the name.
+			script=`expr $PACKAGE : '\(.*\)d$'` || true
+			if [ ! "$script" ]; then
+				echo `basename $0`" warning: \"$PACKAGE\" has no final -d, but -d was specified."
+				script=$PACKAGE
+			fi
+		else
+			script=$PACKAGE
+		fi
+		doit "install -p -m755 debian/${EXT}init $TMP/etc/init.d/$script"
+
+		# This is set by the -u "foo" command line switch, it's
+		# the parameters to pass to update-rc.d. If not set, 
+		# we have to say "defaults".
+		if [ "$DH_U_PARAMS" = "" ]; then
+			DH_U_PARAMS="defaults"
+		fi
+
+		# -r on the command line sets DH_R_FLAG. If it's set, there
+		# is no restart on upgrade.
+		if [ ! "$DH_NOSCRIPTS" ]; then
+			if [ "$DH_R_FLAG" ]; then
+				autoscript "postinst" "postinst-init-norestart" \
+					"s/#SCRIPT#/$script/;s/#INITPARMS#/$DH_U_PARAMS/"
+				autoscript "postrm" "postrm-init" \
+					"s/#SCRIPT#/$script/;s/#INITPARMS#/$DH_U_PARAMS/"
+			else
+				autoscript "postinst" "postinst-init" \
+					"s/#SCRIPT#/$script/;s/#INITPARMS#/$DH_U_PARAMS/"
+				autoscript "postrm" "postrm-init" \
+					"s/#SCRIPT#/$script/;s/#INITPARMS#/$DH_U_PARAMS/"
+				autoscript "prerm" "prerm-init" \
+					"s/#SCRIPT#/$script/;s/#INITPARMS#/$DH_U_PARAMS/"
+			fi
+		fi
+	fi
+done

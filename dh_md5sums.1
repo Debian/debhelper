@@ -1,0 +1,45 @@
+.TH DH_MD5SUMS 1
+.SH NAME
+dh_md5sums \- generate DEBIAN/md5sums file
+.SH SYNOPSIS
+.B dh_md5sums
+.I "[-v] [-a] [-i] [-ppackage]"
+.SH "DESCRIPTION"
+dh_md5sums is a debhelper program that is responsible for generating
+a DEBIAN/md5sums file, which lists the md5sums of each file in the package.
+.P
+All files in DEBIAN/ are omitted from the md5sums file.
+.P
+The md5sums file is installed with proper permissions and ownerships.
+.SH OPTIONS
+.TP
+.B \-v
+Verbose mode; show all commands that modify the package build directory.
+.TP
+.B \-a
+Generate md5sums files for all architecture dependent packages.
+.TP
+.B \-i
+Generate md5sums files for all architecture independent packages.
+.TP
+.B \-ppackage
+Generate md5sums file for the package named "package".
+.SH NOTES
+The
+.B \-a
+.B \-i
+and
+.B \-p
+arguments are cumulative. If none are specified, then all packages listed in
+the control file will be effected.
+.SH ENVIRONMENT
+.TP
+.I DH_VERBOSE
+Enables verbose mode
+.SH BUGS
+It would be better if it did not include md5sums of conffiles, since this
+info is duplicated elsewhere.
+.SH "SEE ALSO"
+.BR /usr/doc/debhelper/README
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>

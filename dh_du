@@ -1,0 +1,19 @@
+#!/bin/sh -e
+#
+# Generate a DEBIAN/du file, that lists the disk usage of the directories in 
+# the package.
+
+PATH=debian:$PATH:/usr/lib/debhelper
+. dh_lib
+
+for PACKAGE in $DH_DOPACKAGES; do
+	TMP=`tmpdir $PACKAGE`
+
+	if [ ! -d "debian/$TMP/DEBIAN" ]; then
+		doit "install -d debian/$TMP/DEBIAN"
+	fi
+
+	verbose_echo "du -k debian/$TMP | sed \"s:	debian/$TMP/:	:\" | grep -v \"	DEBIAN$\" | grep -v \"	debian/$TMP$\" > debian/$TMP/DEBIAN/du"
+	du -k debian/$TMP | sed "s:	debian/$TMP/:	:" | grep -v "	DEBIAN$" | grep -v "	debian/$TMP$" >debian/$TMP/DEBIAN/du
+	doit "chown root.root debian/tmp/DEBIAN/du"
+done

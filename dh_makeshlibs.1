@@ -1,0 +1,47 @@
+.TH DH_MAKESHLIBS 1
+.SH NAME
+dh_makeshlibs \- automatically create shlibs file
+.SH SYNOPSIS
+.B dh_makeshlibs
+.I "[-v] [-a] [-i] [-ppackage]"
+.SH "DESCRIPTION"
+dh_makeshlibs is a debhelper program that automatically scans for shared
+libraries, and generates a shlibs file for the libraries it finds.
+.P
+For this program to work, you cannot have already installed a DEBIAN/shlibs
+file. If such a file exits, the program will exit with an error.
+.SH OPTIONS
+.TP
+.B \-v
+Verbose mode; show all commands that modify the package build directory.
+.TP
+.B \-a
+Generate shlibs files for all architecture dependent packages.
+.TP
+.B \-i
+Generate shlibs files for all architecture independent packages.
+.TP
+.B \-ppackage
+Generate shlibs file for the package named "package".
+.SH NOTES
+The
+.B \-a
+.B \-i
+and
+.B \-p
+arguments are cumulative. If none are specified, then all packages listed in
+the control file will be effected.
+.SH ENVIRONMENT
+.TP
+.I DH_VERBOSE
+Enables verbose mode
+.SH "SEE ALSO"
+.BR /usr/doc/debhelper/README
+.SH BUGS
+There is no guarentee that the program will get the shlibs file right. For
+example, it may not correctly guess the major number of your package. In
+casews like these (and perhaps in general, just to be safe), it is better to
+create a debian/shlibs file by hand.
+This is a "do what I Mean" type program - you have been warned!
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>

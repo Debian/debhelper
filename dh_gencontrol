@@ -1,0 +1,19 @@
+#!/bin/sh -e
+#
+# Generate and install the control file. Simple dpkg-gencontrol wrapper.
+
+PATH=debian:$PATH:/usr/lib/debhelper
+. dh_lib
+
+for PACKAGE in $DH_DOPACKAGES; do
+	TMP=`tmpdir $PACKAGE`
+	EXT=`pkgext $PACKAGE`
+
+	if [ ! -d $TMP/DEBIAN ]; then
+		doit "install -o root -g root -d $TMP/DEBIAN"
+	fi
+
+	# Generate and install control file.
+	doit "dpkg-gencontrol -p$PACKAGE -Tdebian/${EXT}substvars -P$TMP $DH_U_PARAMS"
+	doit "chown root.root $TMP/DEBIAN/control"
+done
