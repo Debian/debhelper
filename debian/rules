@@ -3,7 +3,9 @@
 # I run the most current ones. That's also why there is a symlink to the 
 # current Dh_lib.pm and the current Dh_getopt.pm in this debian/ directory.
 #
-# This is _not_ a good example of a debhelper rules file.
+# This is _not_ a good example of a debhelper rules file, but I didn't need
+# to tell you that; just see the 25 lines of inlined perl below.. See
+# examples/ for some good examples.
 
 # If any automatic script generation is done in building this package, 
 # be sure to use the new templates from this package.
@@ -49,8 +51,8 @@ binary-indep: link-stamp build
 	cp -a autoscripts debian/debhelper/usr/share/debhelper
 	rm -rf debian/debhelper/usr/share/debhelper/autoscripts/CVS
 
-	./dh_installdocs `echo doc/* | sed s/CVS//`
-	./dh_installexamples `echo examples/* | sed s/CVS//`
+	./dh_installdocs `find doc/ -type f | grep -v CVS`
+	./dh_installexamples `find doc -type f | grep -v CVS`
 	./dh_installmenu
 	./dh_installmanpages
 	./dh_installinfo
