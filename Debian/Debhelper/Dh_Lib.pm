@@ -500,7 +500,7 @@ sub excludefile {
 	sub buildarch {
   		return $arch if defined $arch;
 
-		$arch=`dpkg --print-architecture` || error($!);
+		$arch=`dpkg-architecture -qDEB_HOST_ARCH 2>/dev/null` || error($!);
 		chomp $arch;
 		return $arch;
 	}
