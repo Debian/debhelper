@@ -1,11 +1,13 @@
-debhelper (3.0.41) unstable; urgency=low
+debhelper (3.0.42) unstable; urgency=low
 
-  * Clean up old substvars.debhelper files, although debhelper doesn't
-    generate them now, it used to and they may still be lurking in build
-    trees. Closes: #106514
-  * Fixed a typo. Closes: #106532
+  * dh_movefiles: Typo, Closes: #106532
+  * Use -x to test for existance of init scripts, rather then -e since
+    we'll be running them, Closes: #109692
+  * dh_clean: remove debian/*.debhelper. No need to name files 
+    specifically; any file matching that is a debhelper temp file. 
+    Closes: #106514, #85520
 
- -- Joey Hess <joeyh@debian.org>  Wed, 25 Jul 2001 17:04:21 -0400
+ -- Joey Hess <joeyh@debian.org>  Thu, 23 Aug 2001 15:47:35 -0400
 
 debhelper (3.0.40) unstable; urgency=low
 

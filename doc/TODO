@@ -40,10 +40,6 @@ Wishlist items:
 * All programs should also make sure the files they install are owned by
   root.root. Situation is currently the same as with permissions above, plus
   dh_installchangelogs is fixed.
-* Need a way to make dh_strip not strip any static libs. Also, it'd be nice
-  if there were options to dh_strip, dh_compress, etc, to allow inclusion of
-  directories and exclusion of files based on filename globbing. (Request from
-  Matthias Klose <doko@cs.tu-berlin.de>)
 * Support use of environment variables in data taken from user, ie, in
   debian/dirs. The problem with doing this is that we really want to allow
   any filenames in that input, even those that look like environment
@@ -53,12 +49,10 @@ Wishlist items:
   multiple commands call. One way to do this would be to write dh_cache,
   that generates the cache. The catch is that if the user runs that program,
   they are stating that they don't do anything later to invalidate the cache,
-  without calling ch_cache again. (#23792)
+  without calling dh_cache again. (#23792)
 * Add a switch to dh_installdeb to allow it to do user defined
   substitutions. OTOH, maybe it's better if people just sed
   postinst.in before debhelper gets it's hands on it... (#25235)
-* objdump -p can get the soname of a library, try using that in dh_shlibs
-  instead of parsing filenames.
 
 Deprecated:
 

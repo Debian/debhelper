@@ -1,4 +1,4 @@
-if [ -e "/etc/init.d/#SCRIPT#" ]; then
+if [ -x "/etc/init.d/#SCRIPT#" ]; then
 	update-rc.d #SCRIPT# #INITPARMS# >/dev/null
 	if [ "$1" = "configure" ]; then
 		if [ -z "$2" -o "$2" = "<unknown>" ]; then
