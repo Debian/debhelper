@@ -92,6 +92,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# Are there old-style translated templates?
 		my @trans=(glob("$templates.??"), glob("$templates.??_??"));
 
+		umask(0022); # since I do a redirect below
+		
 		# Look for po directory.
 		if (-d "debian/po") {
 			if (@trans) {

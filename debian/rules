@@ -88,9 +88,10 @@ binary-indep: build
 
 # Update the debhelper web page. Not intended for use by anyone except the
 # author.
+DIR=/home/web/kitenet.net/programs/debhelper
 installhook:
-	cp debian/changelog /home/pub/programs/debhelper/CHANGES
-	echo -n $(VERSION) > /home/pub/programs/debhelper/LATEST-VERSION-IS
+	cp debian/changelog $(DIR)/CHANGES
+	echo -n $(VERSION) > $(DIR)/LATEST-VERSION-IS
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary dist
