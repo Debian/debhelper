@@ -132,5 +132,13 @@ binary package the debhelper program will act on. For example:
 
 This uses debian/tmp-<package> as the package build directory.
 
+Other notes:
+-----------
+
+* In general, if any debhelper program needs a directory to exist under
+  debian/, it will create it. I haven't bothered to document this in all the
+  man pages, but for example, dh_installdeb knows to make debian/tmp/DEBIAN/
+  before trying to put files there, dh_installmenu knows you need a
+  debian/tmp/usr/lib/menu/ before installing the menu files, etc.
 
 -- Joey Hess <joeyh@master.debian.org>

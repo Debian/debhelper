@@ -13,8 +13,8 @@ for PACKAGE in $DH_DOPACKAGES; do
 
 	# debian/files has a different purpose, so ignore it.
 	if [ "$files" -a "$files" != "debian/files" ]; then
-		if [ "$PACKAGE" = "$MAINPACKAGE" ]; then
-			error "I was asked to move some files from $PACKAGE into itself."
+		if [ "$TMP" = "debian/tmp" ]; then
+			error "I was asked to move some files from debian/tmp to debian/tmp."
 		fi
 
 		if [ ! -d "$TMP" ]; then
