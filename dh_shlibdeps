@@ -2,6 +2,7 @@
 #
 # Find dependancies. Simple dpkg-shlibdeps wrapper.
 
+use Cwd;
 use Debian::Debhelper::Dh_Lib;
 init();
 
@@ -30,6 +31,10 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 
 	if (@filelist) {
 		if ($dh{L_PARAMS}) {
+			# Force the path absolute.
+			unless ($dh{L_PARAMS}=~m:^/:) {
+				$dh{L_PARAMS}=getcwd()."/$dh{L_PARAMS}";
+			}
 			$ENV{'LD_LIBRARY_PATH'}=$dh{L_PARAMS};
 			verbose_print("LD_LIBRARY_PATH=$dh{L_PARAMS} \\");
 		}

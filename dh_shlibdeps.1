@@ -37,8 +37,8 @@ Before
 is run, LD_LIBRARY_PATH will be set to the specified directory.
 This is useful for multi-binary packages where a library
 is built in one package and another package contains binaries linked
-against said library. Note that the paths used must be absolute or
-dpkg-shlibdeps will become confused.
+against said library. Relative paths will be made absolute for the
+benefit of dpkg-shlibdeps.
 .SH ENVIRONMENT
 See
 .BR debhelper (1)
