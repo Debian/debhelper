@@ -1,3 +1,13 @@
+debhelper (2.1.9) unstable; urgency=low
+
+  * dh_installmodules: corrected the code added to maintainer scripts so it
+    does not call depmod -a. update-modules (which it always called)_
+    handles calling depmod if doing so is appropriate. Packages built with
+    proir versions probably have issues on systems with non-modular
+    kernels, and should be rebuilt. Closes: #71841
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 17 Sep 2000 14:40:45 -0700
+
 debhelper (2.1.8) unstable; urgency=low
 
   * Fixed a stupid typo. Closes: #69750
