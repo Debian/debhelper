@@ -42,10 +42,11 @@ Note that it will be shell code, so you cannot directly use it in a perl
 script. If you would like to embed it into a perl script, here is one way to
 do that (note that I made sure that $1, $2, etc are set with the set command):
 
-my $temp="set -- @ARGV\n" . << `EOF`;
+my $temp="set -e\nset -- @ARGV\n" . << 'EOF';
 #DEBHELPER#
 EOF
-system $temp;
+system ($temp) / 256 == 0
+	or die "Problem with debhelper scripts: $!\n";
 
 Other notes:
 -----------
