@@ -20,9 +20,7 @@ registering OMF files that it finds in package build trees with
 ScrollKeeper.
 
 This command automatically adds maintainer script snippets for registering
-and unregistering files with ScrollKeeper (unless B<-n> is used). A
-dependency on scrollkeeper will be added to C<${misc:Depends}>, so be sure
-your package uses that variable in F<debian/control>. See
+and unregistering files with ScrollKeeper (unless B<-n> is used). See
 L<dh_installdeb(1)> for an explantion of Debhelper maintainer script
 snippets.
 
@@ -70,8 +68,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				autoscript($package,"postinst","postinst-scrollkeeper");
 				autoscript($package,"postrm","postrm-scrollkeeper");
 			}
-			# scrollkeeper use xml catalogs so we require 0.3.14-5+.
-			addsubstvar($package, "misc:Depends", "scrollkeeper", ">= 0.3.14-5");
 		}
 	}
 }

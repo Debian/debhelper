@@ -21,12 +21,15 @@ dh_installmodules is a debhelper program that is responsible for
 registering kernel modules with modutils.
 
 Files named debian/package.modules will be installed as
-etc/modutils/package in the package build directory.
+etc/modutils/package in the package build directory. This is for use by
+modutils. Files named debian/package.modprobe will be installed in
+etc/modprobe.d/package in the package build directory, to be used by
+module-init-tools's version of modprobe.
 
 Then postinst and postrm commands are automatically generated to register
 the modules when the package is installed. See L<dh_installdeb(1)> for an
 explanation of how this works. Note that this will be done for any
-package this program acts on which has either the above-mentioned file, or
+package this program acts on which has either a package.modules file, or
 has .o or .ko files in /lib/modules.
 
 =head1 OPTIONS
@@ -68,21 +71,29 @@ sub find_kernel_modules {
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
-	my $file=pkgfile($package,"modules");
+	my $modutils_file=pkgfile($package,"modules");
+	my $modprobe_file=pkgfile($package,"modprobe");
 
 	if (! -e $tmp) {
 		doit("install","-d",$tmp);
 	}
 
-	if ($file) {
+	if ($modutils_file) {
 		if (! -e "$tmp/etc/modutils") {
 			doit("install","-d","$tmp/etc/modutils");
 		}
-		doit("install","-m","0644",$file,"$tmp/etc/modutils/".pkgfilename($package));
+		doit("install","-m","0644",$modutils_file,"$tmp/etc/modutils/".pkgfilename($package));
 	}
 
+	if ($modprobe_file) {
+		if (! -e "$tmp/etc/modprobe.d") {
+			doit("install","-d","$tmp/etc/modprobe.d");
+		}
+		doit("install","-m","0644",$modprobe_file,"$tmp/etc/modprobe.d/".pkgfilename($package));
+	}
+	
 	if (! $dh{NOSCRIPTS} &&
-	    ($file || find_kernel_modules("$tmp/lib/modules"))) {
+	    ($modutils_file || find_kernel_modules("$tmp/lib/modules"))) {
 			autoscript($package,"postinst","postinst-modules","s/#PACKAGE#/$package/");
 			autoscript($package,"postrm","postrm-modules","s/#PACKAGE#/$package/");
 	}

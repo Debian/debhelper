@@ -21,22 +21,36 @@ GConf schemas.
 It automatically generates the postinst and prerm fragments needed
 to register and unregister the schemas in etc/gconf/schemas.
 These fragements will use gconftool-2, so the package should depend on
-gconf2. This rogram will add an apprioriate dependency to ${misc:Depends}.
+gconf2. This program will add an appropriate dependency to ${misc:Depends}.
+
+The postinst script will also signal gconfd-2 so that the newly installed
+schemas are available straight away.
 
 =cut
 
 init();
 
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
+	my $old_schemas_dir = "$tmp/etc/gconf/schemas";
+	my $new_schemas_dir = "$tmp/usr/share/gconf/schemas";
 
-	if (-d "$tmp/etc/gconf/schemas") {
+	# Migrate schemas from /etc/gconf/schemas to /usr/share/gconf/schemas
+	if (-d $old_schemas_dir) {
+		doit("mkdir -p $new_schemas_dir") unless -d $new_schemas_dir;
+		doit("mv $old_schemas_dir/*.schemas $new_schemas_dir/");
+		doit("rmdir --ignore-fail-on-non-empty $old_schemas_dir");
+	}
+
+	if (-d "$new_schemas_dir") {
 		# Get a list of the schemas
-		my $schemas = `find debian/$package/etc/gconf/schemas -type f -name \*.schemas -printf '%P '`;
+		my $schemas = `find $new_schemas_dir -type f -name \*.schemas -printf '%P '`;
 		if ($schemas ne '') {
 			autoscript($package,"postinst","postinst-gconf","s%#SCHEMAS#%$schemas%");
 			autoscript($package,"prerm","prerm-gconf","s%#SCHEMAS#%$schemas%");
-			addsubstvar($package, "misc:Depends", "gconf2 (>= 2.4.0)");
+			autoscript($package,"postrm","postrm-gconf","s%#SCHEMAS#%$schemas%");
+			addsubstvar($package, "misc:Depends", "gconf2 (>= 2.6.2-1)");
 		}
 	}
 }

@@ -76,6 +76,39 @@ the X man page foo.1x
 
 =cut
 
+# This expand_path expands all path "." and ".." components, but doesn't
+# resolve symbolic links.
+sub expand_path {
+	my $start = @_ ? shift : '.';
+	my @pathname = split(m:/+:,$start);
+
+	my $entry;
+	my @respath;
+	foreach $entry (@pathname) {
+		if ($entry eq '.' || $entry eq '') {
+			# Do nothing
+		}
+		elsif ($entry eq '..') {
+			if ($#respath == -1) {
+				# Do nothing
+			}
+			else {
+				pop @respath;
+			}
+		}
+		else {
+			push @respath, $entry;
+		}
+	}
+
+	my $result;
+	foreach $entry (@respath) {
+		$result .= '/' . $entry;
+	}
+	return $result;
+}
+
+
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -126,9 +159,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	
 	while (@links) {
 		my $dest=pop @links;
-		my $src=pop @links;
+		my $src=expand_path(pop @links);
 
-		# Relavatize src and dest.
 		$src=~s:^/::;
 		$dest=~s:^/::;
 

@@ -1,6 +1,28 @@
 debhelper (4.2.13) UNRELEASED; urgency=low
 
   * Spanish man page updates from Ruben Porras. Closes: #247382
+  * dh_gconf: gconf schemas moved to /usr/share/gconf/schemas. Relocate
+    schemas from /etc/gconf/schemas. (Josselin Mouette)
+  * dh_gconf: kill gconfd-2 so that the newly installed schemas
+    are available straight away. (Josselin Mouette)
+  * dh_gconf: fix bashism in restart of gconfd-2
+  * dh_gconf: fix innaccuracy in man page; gconfd-2 is HUPPed, not
+    killed.
+  * dh_scrollkeeper: stop adding scrollkeeper to misc:Depends, since
+    the postinst will not run it if it's not installed, and a single run after
+    it's installed is sufficient to find all documents. Closes: #256745
+  * dh_fixperms: make .ali files mode 444 to prevent recompilation by GNAT.
+    For speed, only scan for .ali files in usr/lib/ada. Closes: #245211
+  * dh_python: check to make sure compileall.py is available before running it
+    in the postinst. Closes: #253112
+  * dh_installmodules: install debian/package.modprobe into etc/modprobe.d/
+    for module-init-tools. These files can sometimes need to differ from the
+    etc/modutils/ files. Closes: #204336, #234495
+  * dh_installmanpages is now deprecated.
+  * Add a test case for bug #244157, and fixed the inverted ok() parameters
+    in the others, and added a few new tests.
+  * dh_link: applied GOTO Masanori's patch to fix conversion of existing
+    relative symlinks between top level directories. Closes: #244157
 
  -- Joey Hess <joeyh@debian.org>  Tue,  6 Jul 2004 12:52:30 -0400
 
