@@ -1,7 +1,10 @@
 if [ "$1" = purge ]; then
+	OLD_DIR=/etc/gconf/schemas
 	SCHEMA_FILES="#SCHEMAS#"
-	for SCHEMA in $SCHEMA_FILES; do
-		rm -f /etc/gconf/schemas/$SCHEMA
-	done
-	rmdir -p --ignore-fail-on-non-empty /etc/gconf/schemas
+	if [ -d $OLD_DIR ]; then
+		for SCHEMA in $SCHEMA_FILES; do
+			rm -f $OLD_DIR/$SCHEMA
+		done
+		rmdir -p --ignore-fail-on-non-empty $OLD_DIR
+	fi
 fi

@@ -40,7 +40,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (-d $old_schemas_dir) {
 		doit("mkdir -p $new_schemas_dir") unless -d $new_schemas_dir;
 		doit("mv $old_schemas_dir/*.schemas $new_schemas_dir/");
-		doit("rmdir --ignore-fail-on-non-empty $old_schemas_dir");
+		doit("rmdir -p --ignore-fail-on-non-empty $old_schemas_dir");
 	}
 
 	if (-d "$new_schemas_dir") {
