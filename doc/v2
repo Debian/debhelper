@@ -1,0 +1,58 @@
+Debhelper v2 is a major new revision of debhelper. Currently, v2 is still
+being worked on, and will change in drastic ways without notice. To keep
+this from breaking packages, debhelper will continue to operate in v1
+compatability mode by default.
+
+To enable debhelper v2 features (do this with *caution*), set DH_COMPAT=2
+Here are the changes I'm planning to make to debhelper for v2, based on
+prior discussion on debian-devel.
+
+Items marked with a + are done. All others will happen as soon as I can code
+them.
+
+* Standardize on the name used for the temporary build directory of a
+  package. Currently it's debian/tmp/ for the first package and 
+  debian/<package>/ for other packages of a multi-binary package. I've
+  decided after much agonizing to to use debian/<package>. The main thing this
+  has going for it is it means lots of multi-binary packages need only small
+  alterations, since they already use debian/<package> for making most of
+  thier .deb's anyway. I eliminated the other ideas for these reasons:
+  	- debian/tmp/<package>: debian/tmp already has history behind it,
+			        changing how it's used would be confusing.
+	- debian/build/<package>: confusing (is the code compiled there?)
+	- debian/tmp-<package>, debian/package-<tmp>: too long, little gain
+
+* dh_installmanpages will be made into a non-DWIM program, so you'll have to
+  specify all man pages to install and possibly where to put them. This may
+  look something like:
+  	dh_installmanpages -x xterm.1 xfoo.1 xbar.man
+	dh_installmanpages --section=8 su.man
+  Ok, there's a _little_ DWIM left in there, it'll be smart enough to munge
+  the .man filenames properly. It'll probably just assume all man pages have
+  an  extention, and delete that extentation, and add the correct one.
+
+* dh_movefiles will use a name other than debian/<package>.files for the
+  list of what to move, because it can't use debian/files for the first
+  package, since that file is already used elsewhere. It'll use
+  debian/<package>.move
+
+* dh_movefiles should delete empty directories after it's moved all files
+  out of them. (#17111)  
+
+* debian/README will be installed as /usr/doc/<package>/README in native
+  packages, and as README.Debian in non-native packages. This is consistent
+  with the handing of debian/TODO and debian/changelog. (#34628)
+
+* There will be no change to the names of debhelper config files used, I've
+  decided against debian/<package>/* and the like, because although those
+  subdirs do work, they're not allowed by the packaging manual, and they'd
+  make source unpacking by hand a lot harder. I will leave these files
+  completly as they are now. However, I will remove most of the language
+  documenting that debian/<foo> works, and will deprecate that usage.
+  debian/<package>.<foo> will be preferred even in single binary packages.
+
+* Every file in etc/ will be automatically be flagged as a conffile.
+
+* Debhelper config files will support globbing via * and ?, when
+  appropriate. To turn this off and use those changarcters raw, just quote
+  them.

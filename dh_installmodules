@@ -1,0 +1,28 @@
+#!/usr/bin/perl -w
+#
+# Register modules with modutils.
+
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use Dh_Lib;
+init();
+
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$file=pkgfile($PACKAGE,"modules");
+
+	if (! -e $TMP) {
+		doit("install","-d",$TMP);
+	}
+
+	if ($file) {
+		if (! -e "$TMP/etc/modutils") {
+			doit("install","-d","$TMP/etc/modutils");
+			doit("cp","-m0644",$file,"$TMP/etc/modutils/$PACKAGE");
+		}
+		
+		if (! $dh{NOSCRIPTS}) {
+			autoscript($PACKAGE,"postinst","postinst-modules","s/#PACKAGE#/$PACKAGE/");
+			autoscript($PACKAGE,"postrm","postrm-modules","s/#PACKAGE#/$PACKAGE/");
+		}
+	}
+}

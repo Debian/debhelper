@@ -1,0 +1,131 @@
+#!/usr/bin/perl -w
+#
+# Find dependencies on perl stuff
+# Remove .packlist files
+
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use Dh_Lib;
+init();
+
+my $perl = $ENV{'PERL'} || '/usr/bin/perl';
+$version=sprintf("%.3f", $]);
+
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$EXT=pkgext($PACKAGE);
+
+	my ($file, $v, $arch);
+	my $dep_arch = '';
+	my $dep = '';
+	my $found = 0;
+
+	# Look for perl modules and check where they are installed
+	if (-d "$TMP/usr/lib/perl5") {
+	    foreach $file (split(/\n/,`find $TMP/usr/lib/perl5 -type f -name "*.pm"`)) {
+	        $found++;
+		if ($file =~ m<^$TMP/usr/lib/perl5/(\d\.\d{3})/([^/]+)/>) {
+			$v = $1;
+			$arch = $2;
+			check_module_version ($v, $version);
+			$v .= '-thread' if ($arch =~ /-thread/);
+			$dep_arch = add_deps ($dep_arch, "perl-$v");
+		} elsif ($file =~ m<^$TMP/usr/lib/perl5/(\d.\d{3})/>) {
+			$v = $1;
+			check_module_version ($v, $version);
+			$dep_arch = add_deps ($dep_arch, "perl-$v");
+		}
+	    }
+	}
+
+	if ($found and not $dep_arch) {
+		$dep = "perl5";
+	} elsif ($dep_arch) {
+		$dep = $dep_arch;
+	}
+
+	# Look for perl scripts
+	my ($ff, $newdep);
+	foreach $file (split(/\n/,`find $TMP -type f \\( -name "*.pl" -or -perm +111 \\)`)) {
+		$ff=`file -b $file`;
+		if ($ff =~ /perl/) {
+			$newdep = dep_from_script ($file);
+			$dep = add_deps ($dep, $newdep) if $newdep;
+		}
+	}
+
+	# Remove .packlist files and eventually some empty directories
+	if (not $dh{'K_FLAG'}) {
+		foreach $file (split(/\n/,`find $TMP -type f -name .packlist`))
+		{
+			unlink($file);
+			# Get the directory name
+			while ($file =~ s#/[^/]+$##){
+				last if (not -d $file);
+				last if (not rmdir $file);
+			}
+		}
+	}
+
+	next unless $dep;
+
+	if (-e "debian/$EXT\subtsvars") {
+		open (IN, "<debian/$EXT\subtsvars");
+		my @lines=grep { ! /^perl:Depends=/ } <IN>;
+		close IN;
+		open (OUT, ">debian/$EXT\subtsvars");
+		print OUT @lines;
+	} else {
+		open (OUT, ">debian/$EXT\subtsvars");
+	}
+	print OUT "perl:Depends=$dep\n";
+	close OUT;
+}
+
+sub add_deps {
+	my ($dep, $new) = @_;
+	
+	# If $new = perl5 or perl5-thread check if perl-X.XXX(-thread)?
+	# is not already in the dependencies
+	if ($new eq "perl5") {
+		return $dep if ($dep =~ m/(^|\s)perl-5\.\d{3}(\s|,|$)/);
+	} elsif ($new eq "perl5-thread") {
+		return $dep if ($dep =~ m/(^|\s)perl-5\.\d{3}-thread(\s|,|$)/);
+	}
+	
+	if (not $dep) {
+		$dep = $new;
+	} else {
+		$dep .= ", $new" unless ($dep =~ m/(^|\s)$new(\s|,|$)/);
+	}
+
+	return $dep;
+}
+
+sub check_module_version {
+	my ($v1, $v2) = @_;
+	unless ($v1 eq $v2) {
+		warning("A module has been found in perl-$v1 arch directory. But perl-$v2 is the perl currently used ...\n");
+	}
+}
+
+sub dep_from_script {
+	my $file = shift;
+	my ($line, $perl, $dep);
+	open (SCRIPT, "<$file") || die "Can't open $file: $!\n";
+	$line = <SCRIPT>;
+	close (SCRIPT);
+	if ($line =~ m<^#!\s*/usr/bin/(perl\S*)(?:\s+|$)>) {
+		$perl = $1;
+		if ($perl eq "perl") {
+			$dep = "perl5";
+		} elsif ($perl eq "perl-thread") {
+			$dep = "perl5-thread";
+		} elsif ($perl =~ m/^perl-\d\.\d{3}(?:-thread)?$/) {
+			$dep = $perl;
+		} elsif ($perl =~ m/^perl(\d\.\d{3})(\d\d)$/) {
+			# Should never happen but ...
+			$dep = "perl-$1 (=$1.$2)";
+		}
+	}
+	return $dep;
+}
