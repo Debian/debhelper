@@ -12,6 +12,7 @@ dh_fixperms makes all files in usr/doc in the package build directory
 (excluding files in the examples/ directory) be mode 644. It also changes 
 the permissions of all man pages to mode 644. It makes all files be owned by 
 root, and it removes group and other write permission from all files.
+Finally, it removes execute permissions from any libraries that have it set.
 .SH OPTIONS
 .TP
 .B \-v
@@ -43,6 +44,6 @@ Enables verbose mode
 .SH "SEE ALSO"
 .BR /usr/doc/debhelper/README
 .SH "CONFORMS TO"
-Debian policy, version 2.3.0.0
+Debian policy, version 2.3.0.1
 .SH AUTHOR
 Joey Hess <joeyh@master.debian.org>

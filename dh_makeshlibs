@@ -14,15 +14,25 @@ for PACKAGE in $DH_DOPACKAGES; do
 
 	for file in `find $TMP -type f -name "*.so*" | tr "\n" " "` ; do
 		LIBRARY=`expr $file : ".*/\(.*\)\.so\..*"` || true
-		VERSION=`expr $file : ".*/.*\.so\.\(.*\)"` || true
+		LIB_VERSION=`expr $file : ".*/.*\.so\.\(.*\)"` || true
 		if [ -z "$DH_M_PARAMS" ]; then
-			MAJOR=`expr $VERSION : "\([0-9]*\)\."` || true
+			MAJOR=`expr $LIB_VERSION : "\([0-9]*\)\."` || true
 		else
 			MAJOR="$DH_M_PARAMS"
 		fi
 #		LIBSTUB=`expr $file : "\(.*\/.*\.so\)\..*"` || true
 		if [ ! -d "$TMP/DEBIAN" ] ; then
 			doit "install -d $TMP/DEBIAN"
+		fi
+		if [ "$DH_V_FLAG" ]; then
+			if [ "$*" ]; then
+				PACKAGE="$*"
+			else
+				# Call isnative becuase it sets $VERSION
+				# as a side effect.
+				isnative
+				PACKAGE="$PACKAGE (>= $VERSION)"
+			fi
 		fi
 		complex_doit "echo '$LIBRARY $MAJOR $PACKAGE' >>$TMP/DEBIAN/shlibs"
 	done

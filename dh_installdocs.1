@@ -3,7 +3,7 @@
 dh_installdocs \- install documentation into package build directories
 .SH SYNOPSIS
 .B dh_installdocs
-.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir] [file ...]"
+.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir] [-A] [file ...]"
 .SH "DESCRIPTION"
 dh_installdocs is a debhelper program that is responsible for installing
 documentation into usr/doc/package in package build directories.
@@ -43,8 +43,13 @@ Install files for the package named "package".
 .B \-Ptmpdir
 Use "tmpdir" for package build directory. 
 .TP
+.B \-A
+Install all files specified by command line parameters in ALL packages
+acted on.
+.TP
 .B file ...
-Install these files as documentation into the first package acted on.
+Install these files as documentation into the first package acted on. (Or in
+all packages if -A is specified).
 .SH NOTES
 The
 .B \-a

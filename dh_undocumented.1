@@ -3,7 +3,7 @@
 dh_undocumented \- make symlinks to undocumented.7.gz man page
 .SH SYNOPSIS
 .B dh_undocumented
-.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir] [manpage ...]"
+.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir] [-A] [manpage ...]"
 .SH "DESCRIPTION"
 dh_undocumented is a debhelper program that is responsible for making
 symlinks to the
@@ -47,9 +47,15 @@ Install undocumented man page symlinks for the package named "package".
 .B \-Ptmpdir
 Use "tmpdir" for package build directory. 
 .TP
+.B \-A
+Install undocumented man page symlinks for any man pages specified by 
+command line parameters in ALL packages acted on. I doubt anyone will find
+this useful, it's here for consitency with other debhelper programs.
+.TP
 .B manpage ...
 Install undocumented man page symlinks for each of these man pages
-into the first package acted on.
+into the first package acted on. (Or in all packages acted on if -A is
+specified.)
 .SH NOTES
 The
 .B \-a

@@ -19,7 +19,8 @@ for PACKAGE in $DH_DOPACKAGES; do
 		dirs=`tr "\n" " " < debian/${EXT}dirs`
 	fi
 
-	if [ "$PACKAGE" = "$DH_FIRSTPACKAGE" -a "$*" ]; then
+	if [ \( "$PACKAGE" = "$DH_FIRSTPACKAGE" -o "$DH_PARAMS_ALL" \) \
+	     -a "$*" ]; then
 		dirs="$* $dirs"
 	fi
 

@@ -10,6 +10,7 @@ doit() {
 	eval '$@'
 }
 
+
 # This is an identical command to doit, except the parameter passed to it
 # are evaled with double quotes. This version can handle compound commands.
 complex_doit() {
@@ -52,6 +53,7 @@ pkgext() {
 }
 
 # Returns 1 if the package is a native debian package, null otherwise.
+# As a side effect, sets $VERSION to the version of this package.
 # Caches return code so it only needs to run dpkg-parsechangelog once.
 isnative() {
 	if [ -z "$DH_ISNATIVE" ]; then
@@ -141,7 +143,7 @@ get_arch_indep_packages() {
 # Argument processing and global variable initialization is below.
 
 # Parse command line.
-set -- `getopt xvidrnakp:P:u:m: $*`
+set -- `getopt xvidrnakVAp:P:u:m: $*`
 
 for i; do
 	case "$i"
@@ -200,6 +202,14 @@ for i; do
 		-m)
 			DH_M_PARAMS="$2"
 			shift
+			shift
+			;;
+		-V)
+			DH_V_FLAG=1
+			shift
+			;;
+		-A)
+			DH_PARAMS_ALL=1
 			shift
 			;;
 		--)

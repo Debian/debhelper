@@ -3,7 +3,7 @@
 dh_installdirs \- create subdirectories in package build directories
 .SH SYNOPSIS
 .B dh_installdirs
-.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir] [dir ...]"
+.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir] [-A] [dir ...]"
 .SH "DESCRIPTION"
 dh_installdirs is a debhelper program that is responsible for creating
 subdirectories in package build directories.
@@ -37,9 +37,13 @@ Create directories for the package named "package".
 .B \-Ptmpdir
 Use "tmpdir" for package build directory. 
 .TP
+.B \-A
+Create any directories specified by command line parameters in ALL packages
+acted on.
+.TP
 .B dir ...
 Create these directories in the package build directory of the first package
-acted on.
+acted on. (Or in all packages if -A is specified.)
 .SH NOTES
 The
 .B \-a
