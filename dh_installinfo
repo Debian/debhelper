@@ -105,6 +105,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			
 			if ($section ne '') {
 				$section=~s:/:\\/:g; # allow / in section.
+				$section=~s/\&/\\&/g; # escape sed specials
+				$section=~s/(\\[0-9])/\\\\$1/g; # more sed specials
 				autoscript($package,"postinst","postinst-info",
 					"s/#SECTION#/$section/g;s:#FILE#:$fn:");
 			}
