@@ -80,9 +80,11 @@ binary-common:
 	dh_builddeb
 
 # Build architecture independant packages using the common target.
-# (Comment this out if you have none to build.)
-binary-indep: DH_OPTIONS=-i
-binary-indep: build install binary-common
+# (Uncomment the next two lines and comment out the third if you have
+# such packages)
+#binary-indep: DH_OPTIONS=-i
+#binary-indep: build install binary-common
+binary-indep:
 
 # Build architecture dependant packages using the common target.
 binary-arch: DH_OPTIONS=-a

@@ -66,7 +66,17 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			doit("install","-m","644","-p",$copyright,
 				"$TMP/usr/share/doc/$PACKAGE/copyright");
 	}
-	
+
+	# Add in the /usr/doc compatability symlinks code.
+	if (! $dh{NOSCRIPTS}) {
+		autoscript($PACKAGE,"postinst","postinst-doc",
+			"s/#PACKAGE#/$PACKAGE/g",
+		);
+		autoscript($PACKAGE,"prerm","prerm-doc",
+			"s/#PACKAGE#/$PACKAGE/g",
+		);
+	}
+
 	# Handle doc-base files. There are two filename formats, the usual
 	# plus an extended format (debian/package.*).
 	my %doc_ids;
@@ -108,16 +118,5 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 				"s/#DOC-ID#/$doc_ids{$fn}/",
 			);
 		}
-	}
-
-
-	# Add in the /usr/doc compatability symlinks code.
-	if (! $dh{NOSCRIPTS}) {
-		autoscript($PACKAGE,"postinst","postinst-doc",
-			"s/#PACKAGE#/$PACKAGE/g",
-		);
-		autoscript($PACKAGE,"prerm","prerm-doc",
-			"s/#PACKAGE#/$PACKAGE/g",
-		);
 	}
 }
