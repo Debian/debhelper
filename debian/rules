@@ -17,26 +17,26 @@ VERSION=$(shell expr "`dpkg-parsechangelog 2>/dev/null |grep Version:`" : '.*Ver
 
 export DH_VERBOSE=1
 
-build:
+build: link-stamp
 	# Run regression tests.
 	$(MAKE) test
 
-clean:
+clean: link-stamp
 	./dh_testdir
 	./dh_testroot
-	./dh_clean
+	./dh_clean link-stamp
 
-test:
+test: link-stamp
 	./dh_clean
 	DH_VERSION=10 perl -MTest::Harness -e 'runtests grep { ! /CVS/ } @ARGV' t/*
 	./dh_clean
 
 # Build architecture-dependent files here.
-binary-arch: build
+binary-arch: link-stamp build
 # Nothing to do.
 
 # Build architecture-independent files here.
-binary-indep: build
+binary-indep: link-stamp build
 	./dh_testdir
 	./dh_testroot
 	./dh_clean -k
@@ -99,7 +99,7 @@ binary-indep: build
 # Install in the proper location on my ftp server and web server. Not intended
 # for use by anyone except the author.
 OLD_VER=$(shell perl -e '<>;<>;while(<>){last if /^ --/};<>;$$_=<>;print m/\((.*?)\)/'<debian/changelog)
-dist:
+dist: link-stamp
 	dpkg-buildpackage -rfakeroot -tc
 	if [ `hostname` = 'kite' ] ; then \
 		cp ../debhelper_$(VERSION).tar.gz ../../public; \
@@ -115,6 +115,25 @@ dist:
 		gzip -9f /home/ftp/pub/code/debhelper/diffs/debhelper-$(VERSION).diff; \
 		cd /tmp; rm -f debhelper-$(OLD-VER); \
         fi
+
+link-stamp:
+	sh -e debian/fixlinks
+	touch link-stamp
+
+# This is for local use - it tags the current code with the debian version
+# number, then commits the current code using the contents of the changelog
+# as the cvs changelog, then increments the version number
+commit:
+	cvs -Q commit -m "dpkg-parsechangelog | grep '^  '"
+	cvs -Q tag rel-$(shell dpkg-parsechangelog | grep ^Version: \
+		|cut -d " " -f 2 |tr '.' '-')
+	$(MAKE) new
+	
+new:
+	# Update w/o editing.
+	EDITOR=true dch -i 2>/dev/null
+	# Dch has to change the bloody directory name. Feh.
+	mv . ../debhelper
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary dist
