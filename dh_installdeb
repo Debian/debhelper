@@ -10,7 +10,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	$EXT=pkgext($PACKAGE);
 
 	if (! -d "$TMP/DEBIAN") {
-		doit("install","-o","root","-g","root","-d","$TMP/DEBIAN");
+		doit("install","-o",0,"-g",0,"-d","$TMP/DEBIAN");
 	}
 
 	# Install debian install scripts.
@@ -29,7 +29,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 				# script.
 				complex_doit("sed s/#DEBHELPER#// < $f > $TMP/DEBIAN/$file");
 			}
-			doit("chown","root.root","$TMP/DEBIAN/$file");
+			doit("chown","0.0","$TMP/DEBIAN/$file");
 			doit("chmod",755,"$TMP/DEBIAN/$file");
 		}
 		else {
@@ -38,7 +38,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			if (-f "debian/$EXT$file.debhelper") {
 				complex_doit("echo '#!/bin/sh -e' > $TMP/DEBIAN/$file");
 				complex_doit("cat debian/$EXT$file.debhelper >> $TMP/DEBIAN/$file");
-				doit("chown","root.root","$TMP/DEBIAN/$file");
+				doit("chown","0.0","$TMP/DEBIAN/$file");
 				doit("chmod",755,"$TMP/DEBIAN/$file");
 			}
 		}
@@ -48,7 +48,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	foreach $file (qw{shlibs conffiles}) {
 		$f=pkgfile($PACKAGE,$file);
 		if ($f) {
-			doit("install","-o","root","-g","root","-m",644,"-p",$f,"$TMP/DEBIAN/$file");
+			doit("install","-o",0,"-g",0,"-m",644,"-p",$f,"$TMP/DEBIAN/$file");
 		}
 	}
 }

@@ -11,11 +11,11 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	$templates=pkgfile($PACKAGE,"templates");
 
 	if (! -d "$TMP/DEBIAN") {
-		doit("install","-o","root","-g","root","-d","$TMP/DEBIAN");
+		doit("install","-o",0,"-g",0,"-d","$TMP/DEBIAN");
 	}
 
 	if ($config ne '') {
-		doit("install", "-o", "root", "-g", "root", "-m", 755, "-p",
+		doit("install", "-o", 0, "-g", 0, "-m", 755, "-p",
 		     $config, "$TMP/DEBIAN/config");
 	}
 	
@@ -28,7 +28,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			chown 0, 0, "$TMP/DEBIAN/templates";
 		}
 		else {
-			doit("install", "-o", "root", "-g", "root", "-m", 644, "-p",
+			doit("install", "-o", 0, "-g", 0, "-m", 644, "-p",
 			     $templates, "$TMP/DEBIAN/templates");
 		}
 	}

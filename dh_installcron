@@ -11,8 +11,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		$cron=pkgfile($PACKAGE,"cron.$type");
 		if ($cron) {
 			if (! -d "$TMP/etc/cron.$type") {
-				doit("install","-o","root","-g","root","-d",
-				     "$TMP/etc/cron.$type");
+				doit("install","-o",0,"-g",0,"-d","$TMP/etc/cron.$type");
 			}
 			doit("install",$cron,"$TMP/etc/cron.$type/$PACKAGE");
 		}
@@ -21,8 +20,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	$cron=pkgfile($PACKAGE,"cron.d");
 	if ($cron) {
 		if (! -d "$TMP/etc/cron.d") {
-			doit("install","-o","root","-g","root","-d",
-			     "$TMP/etc/cron.d");
+			doit("install","-o",0,"-g",0,"-d","$TMP/etc/cron.d");
 		}	
 		doit("install","-m",644,$cron,"$TMP/etc/cron.d/$PACKAGE");
 	}

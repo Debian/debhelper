@@ -38,20 +38,20 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	if (! -d "$TMP/usr/share/doc/$PACKAGE") {
 		doit("install","-d","$TMP/usr/share/doc/$PACKAGE");
 	}
-	doit("install","-o","root","-g","root","-p","-m644",$changelog,
+	doit("install","-o",0,"-g",0,"-p","-m644",$changelog,
 		"$TMP/usr/share/doc/$PACKAGE/$changelog_name");
 
 	if ($upstream) {
 		my $link_to;
 		if ($upstream=~m/\.html?$/i) {
 			# HTML changelog
-			doit("install","-o","root","-g","root","-p","-m644",
+			doit("install","-o",0,"-g",0,"-p","-m644",
 				$upstream,"$TMP/usr/share/doc/$PACKAGE/changelog.html");
 			complex_doit("lynx -dump $upstream > $TMP/usr/share/doc/$PACKAGE/changelog");
 			$link_to='changelog.html';
 		}
 		else {
-			doit("install","-o","root","-g","root","-p","-m644",
+			doit("install","-o",0,"-g",0,"-p","-m644",
 				$upstream,"$TMP/usr/share/doc/$PACKAGE/changelog");
 			$link_to='changelog';				
 		}
