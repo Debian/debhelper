@@ -55,6 +55,26 @@ dpkg-shlibdeps.
 
 init();
 
+# Add directory to library search path.
+if ($dh{L_PARAMS}) {
+	my @paths=();
+	# Add to existing paths, if set.
+	push @paths, $ENV{'LD_LIBRARY_PATH'}
+		if exists $ENV{'LD_LIBRARY_PATH'};
+	foreach (split(/:/, $dh{L_PARAMS})) {
+		# Force the path absolute.
+		if (m:^/:) {
+			push @paths, $_;
+		}
+		else {
+			push @paths, getcwd()."/$_";
+		}
+	}
+	$dh{L_PARAMS}=join(':', @paths);
+	$ENV{'LD_LIBRARY_PATH'}=$dh{L_PARAMS};
+	verbose_print("LD_LIBRARY_PATH=$dh{L_PARAMS}");
+}
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $ext=pkgext($package);
@@ -77,24 +97,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	if (@filelist) {
-		if ($dh{L_PARAMS}) {
-			my @paths=();
-			# Add to existing paths, if set.
-			push @paths, $ENV{'LD_LIBRARY_PATH'}
-				if exists $ENV{'LD_LIBRARY_PATH'};
-			foreach (split(/:/, $dh{L_PARAMS})) {
-				# Force the path absolute.
-				if (m:^/:) {
-					push @paths, $_;
-				}
-				else {
-					push @paths, getcwd()."/$_";
-				}
-			}
-			$dh{L_PARAMS}=join(':', @paths);
-			$ENV{'LD_LIBRARY_PATH'}=$dh{L_PARAMS};
-			verbose_print("LD_LIBRARY_PATH=$dh{L_PARAMS} \\");
-		}
 		doit("dpkg-shlibdeps","-Tdebian/${ext}substvars",@{$dh{U_PARAMS}},'-dDepends',@filelist);
 	}
 }
