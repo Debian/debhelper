@@ -1,3 +1,18 @@
+debhelper (4.1.81) unstable; urgency=low
+
+  * Removed the no upstream changelog for debian packages test.
+    Even though it has personally saved me many times, debhelper is not
+    intended to check packages for mistakes, and apparently it makes sense
+    for some "native" packages to have a non-Debian changelog.
+    Closes: #216099
+  * If a native package has an upstream changelog, call the debian/changelog
+    changelog.Debian.
+  * postinst-menu-method: always chmod menu-method executable even if
+    update-menus is not. Closes: #220576
+  * dh_installmenu: do not ship menu-methods executable.
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 30 Nov 2003 13:16:14 -0500
+
 debhelper (4.1.80) unstable; urgency=low
 
   * Add the Spanish manpages I missed last time. Closes: #218718
