@@ -5,25 +5,30 @@
 PATH=debian:$PATH:/usr/lib/debhelper
 source dh_lib
 
-# General things..
-if [ -d debian/tmp ]; then
-	doit "chown -R root.root debian/tmp"
-	doit "chmod -R go=rX debian/tmp"
-fi
+for PACKAGE in $DH_DOPACKAGES; do
+	TMP=`tmpdir $PACKAGE`
+	EXT=`pkgext $PACKAGE`
 
-# Fix up premissions in /usr/doc, setting everything to not exectable
-# by default.
-files=`find debian/tmp/usr/doc -type f 2>/dev/null | tr "\n" " "` || true
-if [ "$files" ]; then
-	doit "chmod 644 $files"
-fi
-files=`find debian/tmp/usr/doc -type d 2>/dev/null | tr "\n" " "` || true
-if [ "$files" ]; then
-	doit "chmod 755 $files"
-fi
+	# General things..
+	if [ -d debian/$TMP ]; then
+		doit "chown -R root.root debian/$TMP"
+		doit "chmod -R go=rX debian/$TMP"
+	fi
 
-# Executable man pages is just not done.
-files=`find debian/tmp/usr/man/ debian/tmp/usr/X11*/man/ -type f 2>/dev/null | tr "\n" " "` || true
-if [ "$files" ]; then
-	doit "chmod 644 $files"
-fi
+	# Fix up premissions in usr/doc, setting everything to not exectable
+	# by default.
+	files=`find debian/$TMP/usr/doc -type f 2>/dev/null | tr "\n" " "` || true
+	if [ "$files" ]; then
+		doit "chmod 644 $files"
+	fi
+	files=`find debian/$TMP/usr/doc -type d 2>/dev/null | tr "\n" " "` || true
+	if [ "$files" ]; then
+		doit "chmod 755 $files"
+	fi
+
+	# Executable man pages are a bad thing.
+	files=`find debian/$TMP/usr/man/ debian/$TMP/usr/X11*/man/ -type f 2>/dev/null | tr "\n" " "` || true
+	if [ "$files" ]; then
+		doit "chmod 644 $files"
+	fi
+done

@@ -1,0 +1,68 @@
+.TH DH_COMPRESS 1
+.SH NAME
+dh_compress \- compress files and fix symlinks in package build directories
+.SH SYNOPSIS
+.B dh_compress
+.I "[-v] [-a] [-i] [-ppackage]"
+.SH "DESCRIPTION"
+dh_compress is a debhelper program that is responsible for compressing
+the files in package build directories, and makes sure that any symlinks
+that pointed to the files before they were compressed are updated to point
+to the new files.
+.P
+By default, dh_compress compresses files that debian policy mandates should
+be compressed, namely all files in usr/info, usr/man, usr/X11R6/man, and
+all files in usr/doc that are larger than 4k in size, except
+the copyright file, .html files and .gif files.
+.P
+If a debian/compress file exits, however, it will be ran as a shell script,
+and all filenames that the shell script outputs will be compressed instead
+of the default files. Note that the shell script will be run from inside the
+package build directory.
+.SH EXAMPLE
+Here is a sample debian/compress file that causes dh_compress to compress
+the same files as it would by default. This is a good starting point for
+customization of what files are compressed:
+.PP
+ find usr/info usr/man usr/X11*/man -type f
+ find usr/doc -type f -size +4k \\
+ 	! -name "*.htm*" ! -name "*.gif" \\
+ 	! -name "copyright"
+.SH OPTIONS
+.TP
+.B \-v
+Verbose mode; show all commands that modify the package build directory.
+.TP
+.B \-a
+Compress files for all architecture dependent packages.
+.TP
+.B \-i
+Compress files for all architecture independent packages.
+.TP
+.B \-ppackage
+Compress files for the package named "package".
+.SH NOTES
+The
+.B \-a
+.B \-i
+and
+.B \-p
+arguments are cumulative. If none are specified, then all packages listed in
+the control file will have their files compressed.
+.P
+The debian/compress file applies to the first binary package listed in your
+control file. For the other packages, you can make files named
+debian/package.compress, where "package" is the name of the package they 
+apply to.
+.SH ENVIRONMENT
+.TP
+.I DH_VERBOSE
+Enables verbose mode
+.SH "SEE ALSO"
+.BR /usr/doc/debhelper/README
+.SH BUGS
+Filenames with spaces in them may not properly be compressed.
+.SH "CONFORMS TO"
+Debian policy, version 2.3.0.0
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>

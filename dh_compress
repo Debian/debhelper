@@ -6,35 +6,47 @@
 PATH=debian:$PATH:/usr/lib/debhelper
 source dh_lib
 
-# The config file is a sh script that outputs the files to be compressed
-# (typically using find).
-if [ -f debian/compress ]; then
-	files=`sh debian/compress 2>/dev/null`
-else
-	# By default fall back on what the policy manual says to compress.
-	files=`
-		find debian/tmp/usr/info debian/tmp/usr/man \
-			debian/tmp/usr/X11*/man -type f 2>/dev/null ;
-		find debian/tmp/usr/doc -type f -size +4k \
-			! -name "*.htm*" ! -name "*.gif" \
-			! -name "debian/tmp/usr/doc/*/copyright" 2>/dev/null
-	`
-fi
+for PACKAGE in $DH_DOPACKAGES; do
+	TMP=`tmpdir $PACKAGE`
+	EXT=`pkgext $PACKAGE`
 
-if [ "$files" ]; then
-	# This is just a cosmetic fix.
-	files=`echo $files | tr "\n" " "`	
+	# Run the file name gatering commands from within the directory
+	# structure that will be effected.
+	olddir=`pwd`
+	cd debian/$TMP
 
-	doit "gzip -9 $files" || true
-fi
-
-# Fix up symlinks that were pointing to the uncompressed files.
-for file in `find debian/tmp -type l`; do
-	DIRECTORY=`expr $file : "\(.*\)/[^/]*"`
-	NAME=`expr $file : ".*/\([^/]*\)"`
-	LINKVAL=`ls -l $DIRECTORY/$NAME | awk '{ print $11;}'`
-	if [ ! -e $DIRECTORY/$LINKVAL -a -f $DIRECTORY/$LINKVAL.gz ]; then
-		doit "rm $DIRECTORY/$NAME"
-		doit "ln -s $LINKVAL.gz $DIRECTORY/$NAME.gz"
+	if [ -f debian/${EXT}compress ]; then
+		# The config file is a sh script that outputs the files to be compressed
+		# (typically using find).
+		files=`sh debian/${EXT}compress 2>/dev/null`
+	else
+		# By default fall back on what the policy manual says to compress.
+		files=`
+			find usr/info usr/man usr/X11*/man -type f 2>/dev/null ;
+			find usr/doc -type f -size +4k \
+				! -name "*.htm*" ! -name "*.gif" \
+				! -name "copyright" 2>/dev/null
+		`
 	fi
+
+	if [ "$files" ]; then
+		# This is just a cosmetic fix.
+		files=`echo $files | tr "\n" " "`	
+	
+		doit "gzip -9 $files" || true
+	fi
+
+	# Change back to old pwd.
+	cd $olddir
+
+	# Fix up symlinks that were pointing to the uncompressed files.
+	for file in `find debian/$TMP -type l`; do
+		DIRECTORY=`expr $file : "\(.*\)/[^/]*"`
+		NAME=`expr $file : ".*/\([^/]*\)"`
+		LINKVAL=`ls -l $DIRECTORY/$NAME | awk '{ print $11;}'`
+		if [ ! -e $DIRECTORY/$LINKVAL -a -f $DIRECTORY/$LINKVAL.gz ]; then
+			doit "rm $DIRECTORY/$NAME"
+			doit "ln -s $LINKVAL.gz $DIRECTORY/$NAME.gz"
+		fi
+	done
 done

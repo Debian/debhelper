@@ -1,0 +1,46 @@
+.TH DH_CLEAN 1
+.SH NAME
+dh_clean \- clean up package build directories
+.SH SYNOPSIS
+.B dh_clean
+.I "[-v] [-a] [-i] [-ppackage] [file ...]"
+.SH "DESCRIPTION"
+dh_clean is a debhelper program that is responsible for cleaning up after a
+package is built. It removes the package build directories, and removes some
+other files, such as debian/substvars, debian/files, DEADJOE, emacs backup 
+files, etc.
+.SH OPTIONS
+.TP
+.B \-v
+Verbose mode; show all commands that modify the package build directory.
+.TP
+.B \-a
+Clean up the package build directory for all architecture dependent packages.
+.TP
+.B \-i
+Clean up the package build directory for all architecture independent packages.
+.TP
+.B \-ppackage
+Clean up the package build directory for the package named "package".
+.TP
+.B file ...
+Delete these files too.
+.SH NOTES
+The
+.B \-a
+.B \-i
+and
+.B \-p
+arguments are cumulative. If none are specified, then all packages listed in
+the control file will have thier package build directories cleaned up.
+.SH ENVIRONMENT
+.TP
+.I DH_VERBOSE
+Enables verbose mode
+.SH "SEE ALSO"
+.BR /usr/doc/debhelper/README
+.SH BUGS
+Filenames with spaces in them will not currently be deleted when specified
+as parameters.
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>

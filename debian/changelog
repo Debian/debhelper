@@ -1,3 +1,29 @@
+debhelper (0.2) unstable; urgency=low
+
+  * Moved out of unstable, it still has rough edges and incomplete bits, but
+    is ready for general use.
+  * Added man pages for all commands.
+  * Multiple binary package support.
+  * Support for specifying exactly what set of binary packages to act on,
+    by group (arch or noarch), and by package name.
+  * dh_clean: allow specification of additional files to remove as
+    parameters.
+  * dh_compress: fixed it to not compress doc/package/copyright
+  * dh_installmanpage: allow listing of man pages that should not be 
+    auto-installed as parameters.
+  * dh_installdebfiles: make sure all installed files have proper ownerships
+    and permissions.
+  * dh_installdebfiles: only pass ELF files to dpkg-shlibdeps, and pass .so
+    files.
+  * Added a README.
+  * dh_compress: changed behavior - debian/compress script is now run inside
+    the package build directory it is to act on.
+  * Added dh_lib symlink in debian/ so the debhelper apps used in this
+    package's debian/rules always use the most up-to-date db_lib.
+  * Changed dh_cleantmp commands in the examples rules files to dh_clean.
+
+ -- Joey Hess <joeyh@master.debian.org>  Tue, 23 Sep 1997 12:26:12 -0400
+
 debhelper (0.1) experimental; urgency=low
 
   * First release. This is a snapshot of my work so far, and it not yet

@@ -1,0 +1,45 @@
+.TH DH_STRIP 1
+.SH NAME
+dh_strip \- strip executables, shared libraries, and some static libraries.
+.SH SYNOPSIS
+.B dh_strip
+.I "[-v] [-a] [-i] [-ppackage]"
+.SH "DESCRIPTION"
+dh_strip is a debhelper program that is responsible for stripping
+executables, shared libraries, and static libraries that are not used for
+debugging.
+.P
+It assumes that files that have names like lib*_g.a are static libraries
+used in debugging, and will not strip them.
+.SH OPTIONS
+.TP
+.B \-v
+Verbose mode; show all commands that modify the package build directory.
+.TP
+.B \-a
+Strip files in all architecture dependent packages.
+.TP
+.B \-i
+Strip files in all architecture independent packages (likely, this is
+pointless :-).
+.TP
+.B \-ppackage
+Strip files for the package named "package".
+.SH NOTES
+The
+.B \-a
+.B \-i
+and
+.B \-p
+arguments are cumulative. If none are specified, then all packages listed in
+the control file will have their files stripped.
+.SH ENVIRONMENT
+.TP
+.I DH_VERBOSE
+Enables verbose mode
+.SH "SEE ALSO"
+.BR /usr/doc/debhelper/README
+.SH "CONFORMS TO"
+Debian policy, version 2.3.0.0
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>

@@ -1,0 +1,24 @@
+.TH DH_INSTALLDOCS 1
+.SH NAME
+dh_testroot \- ensure that a package is built as root
+.SH SYNOPSIS
+.B dh_testroot
+.I "[-v]"
+.SH "DESCRIPTION"
+dh_testroot simply checks to see if you are root. If not, it exits with an
+error. Debian packages must be built as root, though you can use
+.BR fakeroot (1)
+to work around this.
+.SH OPTIONS
+.TP
+.B \-v
+Verbose mode; show all commands that modify the package build directory.
+This currently has no effect.
+.SH ENVIRONMENT
+.TP
+.I DH_VERBOSE
+Enables verbose mode.
+.SH "SEE ALSO"
+.BR /usr/doc/debhelper/README
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>

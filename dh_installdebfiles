@@ -6,30 +6,42 @@
 PATH=debian:$PATH:/usr/lib/debhelper
 source dh_lib
 
-if [ ! -d debian/tmp/DEBIAN ]; then
-	doit "install -d debian/tmp/DEBIAN"
-fi
+for PACKAGE in $DH_DOPACKAGES; do
+	TMP=`tmpdir $PACKAGE`
+	EXT=`pkgext $PACKAGE`
 
-# Install executable files.
-for file in postinst preinst prerm postrm; do
-	if [ -f debian/$file ]; then
-		doit "install -p debian/$file debian/tmp/DEBIAN"
+	if [ ! -d debian/$TMP/DEBIAN ]; then
+		doit "install -o root -g root -d debian/$TMP/DEBIAN"
 	fi
+
+	# Install executable files.
+	for file in postinst preinst prerm postrm; do
+		if [ -f debian/$EXT$file ]; then
+			doit "install -o root -g root -p debian/$EXT$file debian/$TMP/DEBIAN"
+		fi
+	done
+
+	# Install non-executable files
+	for file in shlibs conffiles; do
+		if [ -f debian/$EXT$file ]; then
+			doit "install -o root -g root -m 644 -p debian/$EXT$file debian/$TMP/DEBIAN"
+		fi                                               
+	done
+
+	# Run dpkg-shlibdeps to generate dependancies.
+	filelist=""
+	for file in `find debian/$TMP -type f \( -perm +111 \) -or -name "*.so.*" | tr "\n" " "` ; do
+		case "`file $file`" in
+			*ELF*)
+				filelist="$file $filelist"
+			;;
+		esac
+	done
+	if [ "$filelist" ]; then
+		doit "dpkg-shlibdeps -Tdebian/${EXT}substvars $filelist"
+	fi
+
+	# Generate and install control file.
+	doit "dpkg-gencontrol -p$PACKAGE -Tdebian/${EXT}substvars -Pdebian/$TMP"
+	doit "chown root.root debian/$TMP/DEBIAN/control"
 done
-
-# Install non-executable files
-for file in shlibs conffiles; do
-	if [ -f debian/$file ]; then
-		doit "install -m 644 -p debian/$file debian/tmp/DEBIAN"
-	fi                                               
-done
-
-# Run dpkg-shlibdeps to generate dependancies.
-# This ends up running dpkg-shlibdeps on scripts, but that is no big deal.
-files=`find debian/tmp -type f -perm +111 | tr "\n" " "`
-if [ "$files" ]; then
-	doit "dpkg-shlibdeps $files"
-fi
-
-# Generate and install control file.
-doit "dpkg-gencontrol -p$PACKAGE"

@@ -1,26 +1,45 @@
 #!/bin/sh -e
 #
-# Reads debian/docs, and looks at files listed on command line, installs all 
-# files listed there into /usr/doc/$PACKAGE
+# Reads debian/docs, installs all files listed there into /usr/doc/$PACKAGE
 # Also installs the debian/copyright and debian/README.debian and debian/TODO
 
 PATH=debian:$PATH:/usr/lib/debhelper
 source dh_lib
 
-if [ ! -d debian/tmp/usr/doc/$PACKAGE ]; then
-	doit "install -d debian/tmp/usr/doc/$PACKAGE"
-fi
+for PACKAGE in $DH_DOPACKAGES; do
+	TMP=`tmpdir $PACKAGE`
+	EXT=`pkgext $PACKAGE`
 
-if [ -e debian/docs ]; then
-	docs=`cat debian/docs | tr "\n" " "`
-fi
+	if [ ! -d debian/$TMP/usr/doc/$PACKAGE ]; then
+		doit "install -d debian/$TMP/usr/doc/$PACKAGE"
+	fi
 
-for file in $docs $@; do
-	doit "cp -a $file debian/tmp/usr/doc/$PACKAGE/"
-done
+	docs=""
 
-for file in copyright README.debian TODO ; do
-	if [ -f debian/$file ]; then
-		doit "install -m 644 -p debian/$file debian/tmp/usr/doc/$PACKAGE/"
+	if [ -e debian/${EXT}docs ]; then
+		docs=`cat debian/${EXT}docs | tr "\n" " "`
+	fi
+
+	if [ "$PACKAGE" = "$MAINPACKAGE" -a "$*" ]; then
+		docs="$* $docs"
+	fi
+
+	if [ "$docs" ]; then
+		for file in $docs; do
+			doit "cp -a $file debian/$TMP/usr/doc/$PACKAGE/"
+		done
+	fi
+
+	# Install these files only into the main package by default.
+	if [ "$PACKAGE" = "$MAINPACKAGE" ]; then
+		for file in README.debian TODO ; do
+			if [ -f debian/$file ]; then
+				doit "install -m 644 -p debian/$file debian/$TMP/usr/doc/$PACKAGE/"
+			fi
+		done
+	fi
+
+	if [ -f debian/copyright ]; then
+			doit "install -m 644 -p debian/copyright debian/$TMP/usr/doc/$PACKAGE/"
 	fi
 done

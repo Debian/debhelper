@@ -1,6 +1,9 @@
 #!/usr/bin/make -f
 # Sample debian/rules that uses debhelper. GNU copyright 1997 by Joey Hess.
 
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
 build: build-stamp
 build-stamp:
 	dh_testdir
@@ -11,20 +14,20 @@ build-stamp:
 clean:
 	dh_testdir
 	dh_testroot
-	dh_cleantmp
+	rm -f build-stamp
+	dh_clean
 	# Add here commands to clean up after the build process.
 	#-$(MAKE) distclean
-	rm -f build-stamp
 
 # Build architecture-independent files here.
 binary-indep: build
-	# We have nothing to do by default.
+# We have nothing to do by default.
 
 # Build architecture-dependent files here.
 binary-arch: build
 	dh_testdir
 	dh_testroot
-	dh_cleantmp
+	dh_clean
 	# Add here commands to install the files into debian/tmp
 	#$(MAKE) PREFIX=debian/tmp install
 	dh_installdocs

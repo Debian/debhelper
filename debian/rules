@@ -2,6 +2,8 @@
 # Note that I have to refer to debhelper programs witrh ./, to make sure
 # I run the most current ones.
 
+export DH_VERBOSE=1
+
 test_files=dh_lib
 
 build:
@@ -14,7 +16,7 @@ clean:
 
 # Build architecture-dependent files here.
 binary-arch: build
-	# We have nothing to do by default.
+# We have nothing to do by default.
 
 # Build architecture-independent files here.
 binary-indep: build
@@ -28,7 +30,7 @@ binary-indep: build
 	install -d debian/tmp/usr/lib/debhelper
 	cp dh_lib debian/tmp/usr/lib/debhelper
 
-	./dh_installdocs TODO
+	./dh_installdocs TODO README
 	./dh_installexamples examples/*
 #	./dh_installmenu
 	./dh_installmanpages

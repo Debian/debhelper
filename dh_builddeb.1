@@ -1,0 +1,39 @@
+.TH DH_BUILDDEB 1
+.SH NAME
+dh_builddeb \- build debian packages
+.SH SYNOPSIS
+.B dh_builddeb
+.I "[-v] [-a] [-i] [-ppackage]"
+.SH "DESCRIPTION"
+dh_builddeb simply calls
+.BR dpkg (8)
+to build a .deb package or packages.
+.SH OPTIONS
+.TP
+.B \-v
+Verbose mode; show all commands that modify the package build directory, etc.
+.TP
+.B \-a
+Build all architecture dependent packages.
+.TP
+.B \-i
+Build all architecture independent packages.
+.TP
+.B \-ppackage
+Build the package named "package".
+.SH NOTES
+The
+.B \-a
+.B \-i
+and
+.B \-p
+arguments are cumulative. If none are specified, then all packages listed in
+the control file will be built.
+.SH ENVIRONMENT
+.TP
+.I DH_VERBOSE
+Enables verbose mode
+.SH "SEE ALSO"
+.BR /usr/doc/debhelper/README
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>

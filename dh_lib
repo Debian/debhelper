@@ -1,7 +1,8 @@
 # Library functions for debhelper programs.
 
 # Run a command, and display the command to stdout if verbose mode is on.
-# All commands that edit debian/tmp should be ran via this function.
+# All commands that modifiy files in debian/$TMP should be ran via this 
+# function.
 function doit() {
 	verbose_echo "$1"
 	$1
@@ -20,20 +21,29 @@ function error() {
 	exit 1
 }
 
+# Pass it a name of a binary package, it returns the name of the tmp dir to
+# use, for that package, relative to debian/
+# This is for back-compatability with the debian/tmp tradition.
+function tmpdir() {
+	if [ "$1" = "$MAINPACKAGE" ]; then
+		echo tmp
+	else
+		echo "$PACKAGE"
+	fi
+}
+
+# Pass it a name of a binary package, it returns the name to prefix to files
+# in debian for this package.
+function pkgext() {
+	if [ "$1" != "$MAINPACKAGE" ]; then
+		echo "$PACKAGE."
+	fi
+}
+
 # Argument processing and global variable initialization is below.
 
-# Get the package name and version from the changelog.
-LINE=`head -1 debian/changelog`
-PACKAGE=`expr "$LINE" : '\(.*\) (.*)'`
-VERSION=`expr "$LINE" : '.* (\(.*\))'`
-
-# Is this a native Debian package?
-if ! expr "$VERSION" : '.*-' >/dev/null; then
-       	NATIVE=1
-fi
-
 # Parse command line.
-set -- `getopt v $*` 
+set -- `getopt viap: $*`
 
 for i; do
 	case "$i"
@@ -42,9 +52,81 @@ for i; do
 			DH_VERBOSE=1
 			shift
 			;;
+		-i)
+			DH_DOINDEP=1
+			shift
+			;;
+		-a)
+			DH_DOARCH=1
+			shift
+			;;
+		-p)
+			DH_DOPACKAGES="$DH_DOPACKAGES $2"
+			shift
+			shift
+			;;
 		--)
 			shift
 			break
 			;;
 	esac
 done
+
+# Get the package version from the changelog.
+LINE=`head -1 debian/changelog`
+VERSION=`expr "$LINE" : '.* (\(.*\))'`
+
+# Get the name of the main binary package.
+MAINPACKAGE=`grep ^Package: debian/control | cut -d " " -f 2 | head -1`
+
+# Is this a native Debian package?
+if ! expr "$VERSION" : '.*-' >/dev/null; then
+       	NATIVE=1
+fi
+
+if [ "$DH_DOINDEP" -o "$DH_DOARCH" ]; then
+	# Figure out all the binary packages to be produced, by looking at the
+	# control file. Break it into 2 lists, INDEP_PACKAGES and ARCH_PACKAGES.
+	#
+	# First, get the list of all binary packages.
+	PACKAGES=`grep ^Package: debian/control | cut -d " " -f 2 | tr "\n" " "`
+	# Remove trailing space.
+	PACKAGES=`expr "$PACKAGES" : '\(.*\) '`
+	# Loop on the list of architectures. Note that we tac the result to reverse
+	# it, becuase we are going through the list of packages in reverse.
+	for ARCH in `grep ^Architecture: debian/control | tac | cut -d " " -f 2` ; do
+		THISPKG=`expr "$PACKAGES" : '.* \(.*\)'` || true
+		if [ ! "$THISPKG" ]; then
+			THISPKG=$PACKAGES
+		fi
+	        PACKAGES=`expr "$PACKAGES" : '\(.*\) .*'` || true
+		if [ ! "$THISPKG" ]; then
+			error "debian/control invalid - too many Architecture lines or too few Package lines"
+		fi
+		if [ "$ARCH" = "all" ]; then
+			INDEP_PACKAGES="$INDEP_PACKAGES $THISPKG"
+		else
+			ARCH_PACKAGES="$ARCH_PACKAGES $THISPKG"
+		fi
+	done
+
+	if [ "$PACKAGES" ]; then
+		error "debian/control invalid - too many Architecure lines or too few Package lines"
+	fi
+	if [ "$DH_DOINDEP" ]; then
+		DH_DOPACKAGES="$DH_DOPACKAGES $INDEP_PACKAGES"
+	fi
+	if [ "$DH_DOARCH" ]; then
+		DH_DOPACKAGES="$DH_DOPACKAGES $ARCH_PACKAGES"
+	fi
+fi
+
+# Check if packages to build have been specified, if not, fall back to 
+# the default, doing them all. Note that DH_DOPACKAGES may have a leading
+# space and be empty otherwise.
+if [ ! "$DH_DOPACKAGES" -o "$DH_DOPACKAGES" = " " ]; then
+	if [ "$DH_DOINDEP" -o "$DH_DOARCH" ]; then
+		error "I have no package to build."
+	fi
+	DH_DOPACKAGES=`grep ^Package: debian/control | cut -d " " -f 2`
+fi

@@ -1,16 +1,19 @@
 #!/bin/sh -e
 #
-# Automatically find and install man pages.
+# Automatically find and install man pages. However, do not install any man 
+# pages listed on the command line.
 # This is a little bit DWIMish, but still very handy.
 
 PATH=debian:$PATH:/usr/lib/debhelper
 source dh_lib
 
-# Note: this was mostly copied from debstd, and not verified to work.
-# Find all filenames that look like man pages.
-for file in `find * -name "*.[1-9]*" ! -name "*.ex" ! -name "*.in"`; do
-	# Make sure they arn't alreadt in debian/tmp
-	if ! expr $file : 'debian/tmp/.*' >/dev/null; then
+for PACKAGE in $DH_DOPACKAGES; do
+        TMP=`tmpdir $PACKAGE`
+
+	# Find all filenames that look like man pages.
+	# .ex files are examples installed by deb-make, we don't want those, or
+	# .in files, which are from configure.
+	for file in `find * -name "*.[1-9]*" ! -name "*.ex" ! -name "*.in" | grep -v ^debian/$TMP`; do
 		# Make sure file thinks they are man pages.
 		if file $file|grep -q roff; then
 			if echo $file|grep -q /; then
@@ -18,14 +21,25 @@ for file in `find * -name "*.[1-9]*" ! -name "*.ex" ! -name "*.in"`; do
 			else
 				NAME=$file
 			fi
-			SECTION=man`expr $NAME : '.*\.\([123456789]\)'`
-			if [ ! -e debian/tmp/usr/man/$SECTION/$NAME -a \
-			     ! -e debian/tmp/usr/X11*/man/$SECTION/$NAME ]; then
-				if [ ! -d debian/tmp/usr/man/$SECTION ]; then
-					doit "install -d debian/tmp/usr/man/$SECTION"
+			# Look at the command line and check if we should
+			# install the file.
+			install=1
+			for notinstall in $@; do
+				if [ "$NAME" = "$notinstall" -o \
+				     "$file" = "$notinstall" ]; then
+					install=""
 				fi
-				doit "install -p -m644 $file debian/tmp/usr/man/$SECTION/$NAME"
+			done
+			if [ "$install" ]; then
+				SECTION=man`expr $NAME : '.*\.\([123456789]\)'`
+				if [ ! -e debian/$TMP/usr/man/$SECTION/$NAME -a \
+				     ! -e debian/$TMP/usr/X11*/man/$SECTION/$NAME ]; then
+					if [ ! -d debian/$TMP/usr/man/$SECTION ]; then
+						doit "install -d debian/$TMP/usr/man/$SECTION"
+					fi
+					doit "install -p -m644 $file debian/$TMP/usr/man/$SECTION/$NAME"
+				fi
 			fi
 		fi
-	fi
+	done
 done

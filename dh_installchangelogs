@@ -13,7 +13,7 @@ source dh_lib
 UPSTREAM=$1
 
 if [ "$NATIVE" -a "$UPSTREAM" ]; then
-	error "Cannot specify an upstream changelog for a native package."
+	error "Cannot specify an upstream changelog for a native debian package."
 fi
 
 if [ "$NATIVE" ]; then
@@ -22,11 +22,15 @@ else
 	CHANGELOG_NAME=changelog.Debian
 fi
 
-if [ ! -d debian/tmp/usr/doc/$PACKAGE ]; then
-	doit "install -d debian/tmp/usr/doc/$PACKAGE"
-fi
-doit "install -p -m644 debian/changelog debian/tmp/usr/doc/$PACKAGE/$CHANGELOG_NAME"
+for PACKAGE in $DH_DOPACKAGES; do
+	TMP=`tmpdir $PACKAGE`
 
-if [ "$UPSTREAM" ]; then
-	doit "install -p -m644 $UPSTREAM debian/tmp/usr/doc/$PACKAGE/changelog"
-fi
+	if [ ! -d debian/$TMP/usr/doc/$PACKAGE ]; then
+		doit "install -d debian/$TMP/usr/doc/$PACKAGE"
+	fi
+	doit "install -p -m644 debian/changelog debian/$TMP/usr/doc/$PACKAGE/$CHANGELOG_NAME"
+
+	if [ "$UPSTREAM" ]; then
+		doit "install -p -m644 $UPSTREAM debian/$TMP/usr/doc/$PACKAGE/changelog"
+	fi
+done
