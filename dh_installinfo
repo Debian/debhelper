@@ -48,6 +48,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			my $fn="/usr/share/info/".Dh_Lib::basename($file);
 			
 			if ($section ne '') {
+				$section=~s:/:\\/:g; # allow / in section.
 				autoscript($PACKAGE,"postinst","postinst-info",
 					"s/#SECTION#/$section/g;s:#FILE#:$fn:");
 			}
