@@ -91,8 +91,18 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# objdump is anything actually added.
 	open (FIND, "find $tmp -type f -name '*.so*' |");
 	while (<FIND>) {
-		my ($library, $major) = 
-			`objdump -p $_` =~ m/\s+SONAME\s+(.+)\.so\.(.+)/;
+		my ($library, $major);
+		my $objdump=`objdump -p $_`;
+		if ($objdump=~m/\s+SONAME\s+(.+)\.so\.(.+)/) {
+			# proper soname format
+			$library=$1;
+			$major=$2;
+		}
+		elsif ($objdump=~m/\s+SONAME\s+(.+)-(.+)\.so/) {
+			# idiotic crap soname format
+			$library=$1;
+			$major=$2;
+		}
 
 		if (defined($dh{M_PARAMS}) && $dh{M_PARAMS} ne '') {
 			$major=$dh{M_PARAMS};
