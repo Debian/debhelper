@@ -1,3 +1,12 @@
+debhelper (3.0.23) unstable; urgency=low
+
+  * dh_shlibdeps: the -l switch now just adds to LD_LIBRARY_PATH, if it is
+    already set. Newer fakeroots set it, and clobbering their settings 
+    breaks things since they LD_PRELOAD a library that is specified in the
+    LD_LIBRARY_PATH. (blah) Closes: #97494
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 14 May 2001 22:32:23 -0400
+
 debhelper (3.0.22) unstable; urgency=low
 
   * dh_installinfo: doc enchancement, Closes: #97515

@@ -42,7 +42,7 @@ may be used more than once to exclude more than one thing.
 
 =item B<-l>I<directory>[:directory:directory:..]
 
-Before dpkg-shlibdeps is run, LD_LIBRARY_PATH will be set to the 
+Before dpkg-shlibdeps is run, LD_LIBRARY_PATH will have added to it the 
 specified directory (or directories -- separate with colons). This is
 useful for multi-binary packages where a library is built in one
 package and another package contains binaries linked against said
@@ -79,6 +79,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (@filelist) {
 		if ($dh{L_PARAMS}) {
 			my @paths=();
+			# Add to existing paths, if set.
+			push @paths, $ENV{'LD_LIBRARY_PATH'}
+				if exists $ENV{'LD_LIBRARY_PATH'}
 			foreach (split(/:/, $dh{L_PARAMS})) {
 				# Force the path absolute.
 				if (m:^/:) {
