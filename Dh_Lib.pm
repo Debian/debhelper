@@ -74,7 +74,8 @@ sub init {
 
 # Escapes out shell metacharacters in a word of shell script.
 sub escape_shell { my $word=shift;
-	$word=~s/([\s><&!\[\]\{\}\(\)\$])/\\$1/g;
+	# This list is from )Unix in a Nutshell_. (except '#')
+	$word=~s/([-\s!"$()*+#;<>?@\[\]\\`|~])/\\$1/g;
 	return $word;
 }
 

@@ -37,6 +37,7 @@ install-stamp: build-stamp
 	# Add here commands to install the package into debian/tmp.
 	#$(MAKE) prefix=`pwd`/debian/tmp/usr install
 
+	dh_movefiles
 	touch install-stamp
 
 # Build architecture-independent files here.
@@ -44,7 +45,6 @@ binary-indep: build install
 #	dh_testversion
 	dh_testdir -i
 	dh_testroot -i
-	dh_movefiles -i
 	dh_installdocs -i
 	dh_installexamples -i
 	dh_installmenu -i
@@ -67,7 +67,6 @@ binary-arch: build install
 #	dh_testversion
 	dh_testdir -a
 	dh_testroot -a
-	dh_movefiles -a
 	dh_installdocs -a
 	dh_installexamples -a
 	dh_installmenu -a
