@@ -1,3 +1,14 @@
+debhelper (2.0.100) unstable; urgency=low
+
+  * Modified all postinst script fragments to only run when called with
+    "configure". I looked at the other possibilities, and I don't think any
+    of the supported stuff should be called if the postist is called for
+    error unwinds. Closes: #66673
+  * Implemented dh_clean -X, to allow specification of files to not delete,
+    Closes: #66670
+
+ -- Joey Hess <joeyh@debian.org>  Wed,  5 Jul 2000 17:02:40 -0700
+
 debhelper (2.0.99) unstable; urgency=low
 
   * dh_installmodules will now install modiles even if etc/modutils already

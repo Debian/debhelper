@@ -30,6 +30,14 @@ if (! $dh{D_FLAG}) {
 		doit("rm","-f","debian/files");
 	}
 
+	# See if some files that would normally be deleted are excluded.
+	if (! defined($dh{EXCLUDE_FIND}) || $dh{EXCLUDE_FIND} eq '') {
+		$find_options="";
+	}
+	else {
+		$find_options="-a ! ( $dh{EXCLUDE_FIND} )";
+	}
+
 	# Remove other temp files.
 	# (The \s+ is important, \s won't work because find would get null
 	# parameters). Note that you _don't_ quote wildcards used by find
@@ -39,7 +47,7 @@ if (! $dh{D_FLAG}) {
 		 -o -name *.orig -o -name *.rej -o -name *.bak
 		 -o -name .*.orig -o -name .*.rej -o -name .SUMS
 		 -o -name TAGS -o -name core -o ( -path */.deps/* -a -name *.P )
-		) -exec rm -f {} ;"));
+		) $find_options -exec rm -f {} ;"));
 }
 
 doit('rm', '-rf', 'debian/tmp')

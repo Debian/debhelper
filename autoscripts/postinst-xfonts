@@ -1,8 +1,10 @@
-fontdirs="#FONTDIRS#"
-updatecmds="#UPDATECMDS#"
-
-for dir in $fontdirs; do
-	for currentcmd in $updatecmds; do
-		$currentcmd /usr/lib/X11/fonts/$dir
+if [ "$1" = "configure" ]; then
+	fontdirs="#FONTDIRS#"
+	updatecmds="#UPDATECMDS#"
+	
+	for dir in $fontdirs; do
+		for currentcmd in $updatecmds; do
+			$currentcmd /usr/lib/X11/fonts/$dir
+		done
 	done
-done
+fi

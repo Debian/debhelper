@@ -3,7 +3,7 @@
 dh_clean \- clean up package build directories
 .SH SYNOPSIS
 .B dh_clean
-.I "[debhelper options] [-k] [-d] [file ...]"
+.I "[debhelper options] [-k] [-d] [file ...] [-Xitem]"
 .SH "DESCRIPTION"
 dh_clean is a debhelper program that is responsible for cleaning up after a
 package is built. It removes the package build directories, and removes some
@@ -28,6 +28,11 @@ was built.
 .B \-d, \--dirs-only
 Only clean the package build directories, do not clean up any other files at
 all.
+.TP
+.B \-Xitem, \--exclude=item
+Exclude files that contain "item" anywhere in their filename from being
+deleted, even if they would normally be deleted. You may use this option
+multiple times to build up a list of things to exclude.
 .TP
 .B file ...
 Delete these files too.
