@@ -63,7 +63,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# Merge in user-specified substvars file with debhelper generated
 	# one.
 	my $substvars=pkgfile($package,"substvars");
-	if (-e $substvars) {
+	if ($substvars) {
 		complex_doit("cat $substvars >> debian/${ext}substvars.debhelper");
 	}
 
