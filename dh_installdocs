@@ -40,7 +40,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 
 	$todo=pkgfile($PACKAGE,'TODO');
 	if ($todo) {
-		if (isnative()) {
+		if (isnative($PACKAGE)) {
 			doit("install","-m","644","-p",$todo,"$TMP/usr/doc/$PACKAGE/TODO");
 		}
 		else {
