@@ -13,9 +13,8 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	$TMP=tmpdir($PACKAGE);
 	$file=pkgfile($PACKAGE,"docs");
 
-	# If this is a dangling symlink, leave it. The maintainer
-	# better know what they're doing.
-	if ( ! -d "$TMP/usr/share/doc/$PACKAGE" && 
+	# If this is a symlink, leave it alone.
+	if ( ! -d "$TMP/usr/share/doc/$PACKAGE" &&
 	     ! -l "$TMP/usr/share/doc/$PACKAGE") {
 		doit("install","-g","root","-o","root","-d","$TMP/usr/share/doc/$PACKAGE");
 	}
