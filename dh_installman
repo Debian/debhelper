@@ -141,7 +141,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# redirect to appropriate directory, stripping the code.
 		my ($langcode)=$basename=~m/.*\.([a-z][a-z](?:_[A-Z][A-Z])?)\.(?:[1-9]|man)/;
 		if (defined $langcode && $langcode ne '') {
-			$destdir="$tmp/usr/share/man/$langcode/man$section/";
+			$destdir="$tmp/usr/share/man/$langcode/man$realsection/";
 			# Strip the language code from the instname.
 			$instname=~s/\.$langcode$//;
 		}
