@@ -20,6 +20,8 @@ export DH_COMPAT=3
 # Figure out the current debhelper version.
 VERSION=$(shell expr "`dpkg-parsechangelog 2>/dev/null |grep Version:`" : '.*Version: \(.*\)')
 
+PERLLIBDIR=$(shell perl -MConfig -e 'print $$Config{vendorlib}')
+
 # Debug
 #export DH_VERBOSE=1
 
@@ -71,14 +73,15 @@ binary-indep: build
 	./dh_testroot
 	./dh_clean -k
 	./dh_installdirs usr/bin usr/share/debhelper \
-		usr/lib/perl5/Debian/Debhelper
+		$(PERLLIBDIR)/Debian/Debhelper
 
 	echo -e "package Debian::Debhelper::Dh_Version;\n\$$version='$(VERSION)';" > \
-		debian/debhelper/usr/lib/perl5/Debian/Debhelper/Dh_Version.pm
+		debian/debhelper/$(PERLLIBDIR)/Debian/Debhelper/Dh_Version.pm
+
 	find . -perm +111 -maxdepth 1 -type f -not -name "*.pl" \
 		-exec install -p {} debian/debhelper/usr/bin \;
 	cp -a Debian/Debhelper/*.pm \
-		debian/debhelper/usr/lib/perl5/Debian/Debhelper/
+		debian/debhelper/$(PERLLIBDIR)/Debian/Debhelper/
 	cp -a autoscripts debian/debhelper/usr/share/debhelper
 	rm -rf debian/debhelper/usr/share/debhelper/autoscripts/CVS
 
@@ -91,6 +94,7 @@ binary-indep: build
 	./dh_link
 	./dh_compress
 	./dh_fixperms
+	./dh_perl
 	./dh_installdeb
 	./dh_gencontrol
 	./dh_md5sums
