@@ -15,10 +15,11 @@ be compressed, namely all files in usr/info, usr/man, usr/X11R6/man, and
 all files in usr/doc that are larger than 4k in size, except
 the copyright file, .html files and .gif files, and all changelog files.
 .P
-If a debian/compress file exits, however, it will be ran as a shell script,
-and all filenames that the shell script outputs will be compressed instead
-of the default files. Note that the shell script will be run from inside the
-package build directory.
+If a debian/package.compress file exists (debian/compress may be used for the
+first binary package in debian/control), however, it will be ran as a shell
+script, and all filenames that the shell script outputs will be compressed
+instead of the default files. Note that the shell script will be run from
+inside the package build directory.
 .SH EXAMPLE
 Here is a sample debian/compress file that causes dh_compress to compress
 the same files as it would by default. This is a good starting point for

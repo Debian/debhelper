@@ -78,7 +78,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	}
 
 	if (@f) {
-		doit("gzip","-9f",@f);
+		xargs(\@f,"gzip","-9f");
 	}
 	
 	# Now change over any files we can that used to be hard links so

@@ -12,6 +12,7 @@ use vars qw(@ISA @EXPORT %dh);
 @ISA=qw(Exporter);
 @EXPORT=qw(&init &doit &complex_doit &verbose_print &error &warning &tmpdir
 	    &pkgfile &pkgext &isnative &autoscript &filearray &GetPackages
+	    &xargs
 	    %dh);
 
 sub init {
@@ -119,6 +120,41 @@ sub complex_doit {
 		system(join(" ",@_)) == 0
 			|| error("command returned error code");
 	}			
+}
+
+# Run a command that may have a huge number of arguments, like xargs does.
+# Pass in a reference to an array containing the arguments, and then other
+# parameters that are the command and any parameters that should be passed to
+# it each time.
+sub xargs {
+	my $args=shift;
+
+        # The kernel can accept command lines up to 20k worth of characters.
+	my $command_max=20000;
+
+	# Figure out length of static portion of command.
+	my $static_length=0;
+	foreach (@_) {
+		$static_length+=length($_)+1;
+	}
+	
+	my @collect=();
+	my $length=$static_length;
+	foreach (@$args) {
+		if (length($_) + 1 + $static_length > $command_max) {
+			error("This command is greater than the maximum command size allowed by the kernel, and cannot be split up further. What on earth are you doing? \"@_ $_\"");
+		}
+		$length+=length($_) + 1;
+		if ($length < $command_max) {
+			push @collect, $_;
+		}
+		else {
+			doit(@_,@collect) if $#collect > -1;
+			@collect=();
+			$length=$static_length;
+		}
+	}
+	doit(@_,@collect) if $#collect > -1;
 }
 
 # Print something if the verbose flag is on.
