@@ -1,0 +1,32 @@
+#!/bin/sh -e
+#
+# Installs debian/changelog. If another filename is passed to it, installs
+# that file as the upstream changelog.
+#
+# Looks at debian/control to determine if this is a native debian package,
+# if so, the debian changelog is just installed as "changelog", and it is an 
+# error to specify an upstream changelog on the command line.
+
+PATH=debian:$PATH:/usr/lib/debhelper
+source dh_lib
+
+UPSTREAM=$1
+
+if [ "$NATIVE" -a "$UPSTREAM" ]; then
+	error "Cannot specify an upstream changelog for a native package."
+fi
+
+if [ "$NATIVE" ]; then
+	CHANGELOG_NAME=changelog
+else
+	CHANGELOG_NAME=changelog.Debian
+fi
+
+if [ ! -d debian/tmp/usr/doc/$PACKAGE ]; then
+	doit "install -d debian/tmp/usr/doc/$PACKAGE"
+fi
+doit "install -p -m644 debian/changelog debian/tmp/usr/doc/$PACKAGE/$CHANGELOG_NAME"
+
+if [ "$UPSTREAM" ]; then
+	doit "install -p -m644 $UPSTREAM debian/tmp/usr/doc/$PACKAGE/changelog"
+fi

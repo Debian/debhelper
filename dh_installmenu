@@ -1,0 +1,24 @@
+#!/bin/sh -e
+#
+# Integration with debian menu system:
+#
+# If debian/menu file exists, save it to debian/tmp/usr/lib/menu/$PACKAGE
+# If debian/menu-method file exists, save it to 
+# debian/tmp/etc/menu-methods/$PACKAGE
+
+PATH=debian:$PATH:/usr/lib/debhelper
+source dh_lib
+
+if [ -e debian/menu ]; then
+	if [ ! -d debian/tmp/usr/lib/menu ]; then
+		doit "install -d debian/tmp/usr/lib/menu"
+	fi
+	doit "install -p -m644 debian/menu debian/tmp/usr/lib/menu/$PACKAGE"
+fi
+
+if [ -e debian/menu-method ]; then
+	if [ ! -d debian/tmp/etc/menu-methods ]; then
+		doit "install -d debian/tmp/etc/menu-methods"
+	fi
+	doit "install -p debian/menu-method debian/tmp/etc/menu-methods/$PACKAGE"
+fi

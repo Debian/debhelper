@@ -1,0 +1,7 @@
+#!/bin/sh -e
+#
+# Build the .deb package, assuming all the files are set up in debian/tmp.
+
+PATH=debian:$PATH:/usr/lib/debhelper
+source dh_lib
+doit "dpkg --build debian/tmp .."

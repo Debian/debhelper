@@ -1,0 +1,42 @@
+#!/usr/bin/make -f
+# Note that I have to refer to debhelper programs witrh ./, to make sure
+# I run the most current ones.
+
+test_files=dh_lib
+
+build:
+	./dh_testdir $(test_files)
+
+clean:
+	./dh_testdir $(test_files)
+	./dh_testroot
+	./dh_clean
+
+# Build architecture-dependent files here.
+binary-arch: build
+	# We have nothing to do by default.
+
+# Build architecture-independent files here.
+binary-indep: build
+	./dh_testdir $(test_files)
+	./dh_testroot
+	./dh_clean
+
+	install -d debian/tmp/usr/bin
+	find . -perm +111 -maxdepth 1 -type f \
+		-exec install -p {} debian/tmp/usr/bin \;
+	install -d debian/tmp/usr/lib/debhelper
+	cp dh_lib debian/tmp/usr/lib/debhelper
+
+	./dh_installdocs TODO
+	./dh_installexamples examples/*
+#	./dh_installmenu
+	./dh_installmanpages
+	./dh_installchangelogs
+	./dh_compress
+	./dh_installdebfiles
+	./dh_fixperms
+	./dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary

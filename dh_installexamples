@@ -1,0 +1,21 @@
+#!/bin/sh -e
+#
+# Reads debian/examples, installs all files listed there into
+# /usr/doc/$PACKAGE/examples
+
+PATH=debian:$PATH:/usr/lib/debhelper
+source dh_lib
+
+if [ -e debian/examples ]; then
+	examples=`cat debian/examples | tr "\n" " "`
+fi
+
+if [ "$examples" -o $@ ]; then
+	if [ ! -d debian/tmp/usr/doc/$PACKAGE/examples ]; then
+		doit "install -d debian/tmp/usr/doc/$PACKAGE/examples"
+	fi
+
+	for file in $examples $@; do
+		doit "cp -a $file debian/tmp/usr/doc/$PACKAGE/examples/"
+	done
+fi

@@ -1,0 +1,10 @@
+#!/bin/sh -e
+#
+# Checks to make sure you are root.
+
+PATH=debian:$PATH:/usr/lib/debhelper
+source dh_lib
+
+if  [ "`whoami`" != root ]; then
+	error "You must run this as root."
+fi

@@ -1,0 +1,35 @@
+#!/bin/sh -e
+#
+# Install files from debian/ into the package's DEBIAN directory.
+# Also generates the control file.
+
+PATH=debian:$PATH:/usr/lib/debhelper
+source dh_lib
+
+if [ ! -d debian/tmp/DEBIAN ]; then
+	doit "install -d debian/tmp/DEBIAN"
+fi
+
+# Install executable files.
+for file in postinst preinst prerm postrm; do
+	if [ -f debian/$file ]; then
+		doit "install -p debian/$file debian/tmp/DEBIAN"
+	fi
+done
+
+# Install non-executable files
+for file in shlibs conffiles; do
+	if [ -f debian/$file ]; then
+		doit "install -m 644 -p debian/$file debian/tmp/DEBIAN"
+	fi                                               
+done
+
+# Run dpkg-shlibdeps to generate dependancies.
+# This ends up running dpkg-shlibdeps on scripts, but that is no big deal.
+files=`find debian/tmp -type f -perm +111 | tr "\n" " "`
+if [ "$files" ]; then
+	doit "dpkg-shlibdeps $files"
+fi
+
+# Generate and install control file.
+doit "dpkg-gencontrol -p$PACKAGE"

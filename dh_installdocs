@@ -1,0 +1,26 @@
+#!/bin/sh -e
+#
+# Reads debian/docs, and looks at files listed on command line, installs all 
+# files listed there into /usr/doc/$PACKAGE
+# Also installs the debian/copyright and debian/README.debian and debian/TODO
+
+PATH=debian:$PATH:/usr/lib/debhelper
+source dh_lib
+
+if [ ! -d debian/tmp/usr/doc/$PACKAGE ]; then
+	doit "install -d debian/tmp/usr/doc/$PACKAGE"
+fi
+
+if [ -e debian/docs ]; then
+	docs=`cat debian/docs | tr "\n" " "`
+fi
+
+for file in $docs $@; do
+	doit "cp -a $file debian/tmp/usr/doc/$PACKAGE/"
+done
+
+for file in copyright README.debian TODO ; do
+	if [ -f debian/$file ]; then
+		doit "install -m 644 -p debian/$file debian/tmp/usr/doc/$PACKAGE/"
+	fi
+done
