@@ -17,6 +17,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			doit("chown","-R","root.root",$TMP);
 			doit("chmod","-R","go=rX",$TMP);
 			doit("chmod","-R","u+rw",$TMP);
+			doit("chmod","-R","a-s",$TMP);
 		}
 
 		$find_options="";
@@ -29,6 +30,8 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			2>/dev/null | xargs -0r chmod go=rX");
 		complex_doit("find $TMP ! \\( $dh{EXCLUDE_FIND} \\) -print0 \
 			2>/dev/null | xargs -0r chmod u+rw");
+		complex_doit("find $TMP ! \\( $dh{EXCLUDE_FIND} \\) -print0 \
+			2>/dev/null | xargs -0r chmod a-s");
 
 		$find_options="! \\( $dh{EXCLUDE_FIND} \\)";
 	}
