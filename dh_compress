@@ -28,8 +28,8 @@ filelist () {
 # Call only if DH_EXCLUDE_GREP is non-empty.
 filelist_excluded () {
 	# Use grep -F so we don't have to worry about regexp's.
-	filelist | grep -v -F \
-		"`echo "$DH_EXCLUDE_GREP" | tr "|" "\n"`"
+	(filelist | grep -v -F \
+		"`echo "$DH_EXCLUDE_GREP" | tr "|" "\n"`") || true
 }
 
 for PACKAGE in $DH_DOPACKAGES; do
