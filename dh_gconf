@@ -45,7 +45,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	if (-d "$new_schemas_dir") {
 		# Get a list of the schemas
-		my $schemas = `find $new_schemas_dir -type f -name \*.schemas -printf '%P '`;
+		my $schemas = `find $new_schemas_dir -type f -name \\*.schemas -printf '%P '`;
 		if ($schemas ne '') {
 			autoscript($package,"postinst","postinst-gconf","s%#SCHEMAS#%$schemas%");
 			autoscript($package,"prerm","prerm-gconf","s%#SCHEMAS#%$schemas%");
