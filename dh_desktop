@@ -25,19 +25,19 @@ fragements to call F<update-desktop-database>.
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
-  my $tmp=tmpdir($package);
+	y $tmp=tmpdir($package);
 
-  # Only run if there are .desktop files installed
-  if (-d "$tmp/usr/share/applications") {
-    # Get a list of the desktop files
-    my $desktop_files = `find debian/$package/ -type f -name \*.desktop -printf '%p\n'`;
-    # If there actually were some desktop files...
-    if ($desktop_files && ! $dh{NOSCRIPTS}) {
-      # Don't add a dependency on desktop-file-utils as it may not be needed
-      autoscript($package,"postinst","postinst-desktop");
-      autoscript($package,"postrm","postrm-desktop");
-    }
-  }
+	if (-d "$tmp/usr/share/applications") {
+		# Get a list of the desktop files that are in
+		# usr/share/applications and thus might need
+		# update-desktop-database be called. Other desktop
+		# files don't.
+		my $desktop_files = `find $tmp/usr/share/applications -type f -name \*.desktop -printf '%p\n'`;
+		if ($desktop_files && ! $dh{NOSCRIPTS}) {
+			autoscript($package,"postinst","postinst-desktop");
+			autoscript($package,"postrm","postrm-desktop");
+		}
+	}
 }
 
 =head1 SEE ALSO
