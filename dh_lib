@@ -182,6 +182,6 @@ fi
 
 # Check to see if -P was specified. If so, we can only act on a single
 # package.
-if [ "$DH_TMPDIR" ] && echo "$DH_DOPACKAGES" | grep -q " "; then
+if [ "$DH_TMPDIR" ] && echo "$DH_DOPACKAGES" | egrep -q '.+ .+' ; then
 	error "-P was specified, but multiple packages would be acted on."
 fi

@@ -28,15 +28,14 @@ binary-indep: build
 	./dh_testdir $(test_files)
 	./dh_testroot
 	./dh_clean
+	./dh_installdirs usr/bin usr/lib/debhelper
 
-	install -d debian/tmp/usr/bin
 	find . -perm +111 -maxdepth 1 -type f \
 		-exec install -p {} debian/tmp/usr/bin \;
-	install -d debian/tmp/usr/lib/debhelper
 	cp dh_lib debian/tmp/usr/lib/debhelper
 	cp -a autoscripts debian/tmp/usr/lib/debhelper
 
-	./dh_installdocs TODO README
+	./dh_installdocs TODO README BUGS
 	./dh_installexamples examples/*
 	./dh_installmenu
 	./dh_installmanpages
