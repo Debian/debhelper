@@ -36,27 +36,20 @@ merge these modifications into the actual postinst scripts.
 
 There are always exceptions. Just ask me.
 
-Introducing dh_lib and Dh_Lib.pm:
---------------------------------
+Introducing Dh_Lib.pm:
+---------------------
 
-dh_lib/Dh_lib.pm is the library used by all debhelper programs to parse
-their arguments and set some useful variables. It's not mandatory that your
-program use dh_lib/Dh_lib.pm, but it will make it a lot easier to keep it in
-sync with the rest of debhelper if it does, so this is highly encouraged.
-There are two versions of this library - dh_lib is a shell library, while
-Dh_Lib.pm is a perl module.
+Dh_lib.pm is the library used by all debhelper programs to parse their
+arguments and set some useful variables. It's not mandatory that your
+program use Dh_lib.pm, but it will make it a lot easier to keep it in sync
+with the rest of debhelper if it does, so this is highly encouraged.
 
-Typically, you invoke dh_lib like this if your debhelper program is a shell
-script:
+(There used to be a version of Dh_lib.pm that was a library of functions for
+shell scripts. If you want to write a debhelper command that is a shell
+script, I can dig up that old library for you. Only the perl one is
+supported now, though.)
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
-
-The path statement is there to make your program look first in debian/ for
-dh_lib (so users can install a modified version there if necessary), then the
-rest of the path, then the canonical location of dh_lib, /usr/lib/debhelper.
-
-If you are writing a perl program instead, use Dh_lib.pm like this:
+Use Dh_lib.pm like this:
 
 BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
 use Dh_Lib;
@@ -65,25 +58,19 @@ init();
 The BEGIN block is there to make perl look for the module in all the right
 places.
 
-Notice the init() function in the perl version. dh_lib automatically parses
-the command line and does some other initialization tasks. Dh_Lib.pm
-requires you to run init() to accomplish the same task.
+The init() function in the perl version. This causes Dh_lib to
+parse the command line and do some other initialization tasks.
 
 Argument processing:
 -------------------
 
 All debhelper programs should respond to certain arguments, such as -v, -i,
--a, and -p. To help you make this work right, dh_lib/Dh_Lib.pm handles 
-argument processing.
-
-As soon as dh_lib loads, it processes any arguments that have been passed to
-your program. On the other hand, you need to call init() in Dh_Lib.pm before
-it will parse arguments.
+-a, and -p. To help you make this work right, Dh_Lib.pm handles argument
+processing. Just call init().
 
 After argument processing, some global variables are used to hold the
-results; program can use them later. If using dh_lib, prefix DH_ to the name
-of each of these variables to get the name of the environment variable that
-is set. If using Dh_lib.pm, these variables are in the %dh hash.
+results; programs can use them later. These variables are elements of the
+%dh hash.
 
 switch		variable	description
 -v		VERBOSE		should the program verbosely output what it is
@@ -99,10 +86,7 @@ switch		variable	description
 				package's postinst, postrm, etc scripts.
 -X		EXCLUDE		exclude a something from processing (you
 				decide what this means for your program)
-				(In Dh_Lib.pm, this is an array)
-		EXCLUDE_GREP	same as DH_EXCLUDE, except all items are
-				separated by '|' characters, instead of spaces,
-				handy for egrep -v (only available to dh_lib)
+				(This is an array)
                 EXCLUDE_FIND	same as DH_EXCLUDE, except all items are put
 				into a string in a way that they will make
 				find find them. (Use ! in front to negate
@@ -117,7 +101,7 @@ switch		variable	description
 				package is being acted on)
 -u		U_PARAMS	will be set to a string, that is typically
 				parameters your program passes on to some
-				other program. (In Dh_Lib.pm, this is an array)
+				other program. (This is an array)
 -m		M_PARAMS	will be set to a string, you decide what it
 				means to your program
 -V		V_FLAG		will be set to a string, you decide what it
@@ -141,38 +125,32 @@ If you need a new command line option, just ask me, and I will add it.
 Global variables:
 ----------------
 
-If using dh_lib, the following variables are also set as soon as you load
-the library:
+The following keys are also set in the %dh hash when you call init():
 
 MAINPACKAGE	the name of the first binary package listed in
 		debian/control
-DH_FIRSTPACKAGE	the first package we were instructed to act on. This package
+FIRSTPACKAGE	the first package we were instructed to act on. This package
 		typically gets special treatment, additional arguments
 		specified on the command line may effect it.
-
-If using Dh_Lib.pm, these are only set after init(), and they are named
-$dh{MAINPACKAGE} and $dh{FIRSTPACKAGE}, instead.
 
 Functions:
 ---------
 
-dh_lib/Dh_Lib.pm also contains a number of functions you may find useful.
-Note that the functions calling conventions are slightly different between
-the two versions of the library.
+Dh_Lib.pm also contains a number of functions you may find useful.
 
 doit()
-	Pass this function a string (dh_lib) or array (Dh_Lib.pm) that is a 
-	shell command. It will run the command (unless DH_NO_ACT is set), and
-	if DH_VERBOSE is set, it will also output the command to stdout. You
+	Pass this function an array that is a 
+	shell command. It will run the command (unless $dh{NO_ACT} is set), and
+	if $dh{VERBOSE} is set, it will also output the command to stdout. You
 	should use this function for almost all commands your program performs
 	that manipulate files in the package build directories.
 complex_doit()
 	Pass this function a string that is a shell command, it will run it
 	similarly to how doit() does. You can pass more complicated commands 
-	to this (ie, commands involving piping redirection)
-verbose_echo()   (dh_lib)
-verbose_print()  (Dh_Lib.pm)
-	Pass this command a string, and it will echo it if DH_VERBOSE is set.
+	to this (ie, commands involving piping redirection), however, you 
+	have to worry about things like escaping shell metacharacters.
+verbose_print()
+	Pass this command a string, and it will echo it if $dh{VERBOSE} is set.
 error()
 	Pass this command a string, it will output it to standard error and
 	exit.
@@ -191,20 +169,20 @@ pkgfile()
 	debian/ directory, so there can be one config file per binary
 	package. The convention is that the files are named
 	debian/package.filename, and debian/filename is also allowable for
-	the MAINPACKAGE. If the file does not exist, nothing is returned.
+	the $dh{MAINPACKAGE}. If the file does not exist, nothing is returned.
 pkgext()
 	Pass this command the name of a binary package, and it will return
 	the name to prefix to files in debian/ for this package. For the
-	MAINPACKAGE, it returns nothing (there is no prefix), for the other
+	$dh{MAINPACKAGE}, it returns nothing (there is no prefix), for the other
 	packages, it returns "package.".
 isnative()
 	Pass this command the name of a package, it returns 1 if the package
 	is a native debian package.
-	As a side effect, VERSION is set to the version number of the
+	As a side effect, $dh{VERSION} is set to the version number of the
 	package.
 autoscript()
 	Pass parameters:
-	 - package to be affected (Dh_Lib.pm only)
+	 - binary package to be affected
 	 - script to add to
 	 - filename of snippet
 	 - sed commands to run on the snippet. Ie, s/#PACKAGE#/$PACKAGE/

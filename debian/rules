@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # Note that I have to refer to debhelper programs with ./, to make sure
 # I run the most current ones. That's also why there is a symlink to the 
-# current dh_lib and the current dh_getopt.pl in this debian/ directory.
+# current Dh_lib.pm and the current Dh_getopt.pm in this debian/ directory.
 
 # If any automatic script generation is done in building this package, 
 # be sure to use the new templates from this package.
@@ -34,7 +34,7 @@ binary-indep: build
 	echo -e "package Dh_Version;\n\$$version='$(VERSION)';" > debian/tmp/usr/lib/debhelper/Dh_Version.pm
 	find . -perm +111 -maxdepth 1 -type f -not -name "*.pl" \
 		-exec install -p {} debian/tmp/usr/bin \;
-	cp -a dh_lib dh_getopt.pl *.pm debian/tmp/usr/lib/debhelper
+	cp -a *.pm debian/tmp/usr/lib/debhelper
 	cp -a autoscripts debian/tmp/usr/lib/debhelper
 
 	./dh_installdocs doc/TODO doc/README doc/PROGRAMMING doc/from-debstd

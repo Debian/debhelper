@@ -1,82 +1,74 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Compresses files and makes sure that symlinks pointing to the 
 # compressed files get fixed.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
+use Cwd;
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use Dh_Lib;
+init();
 
-# Returns a list of all the files that we want to compress,
-# (ignoring any files we were asked to exclude on the command
-# line). Assumes we are already in the temp directory.
-filelist () {
-	# First of all, deal with any files specified right on the command line.
-        if [ \( "$PACKAGE" = "$DH_FIRSTPACKAGE" -o "$DH_PARAMS_ALL" \) \
-             -a "$*" ]; then
-	     	# Convert to having each file on its own line
-		# so grep will work.
-		echo "$*" | tr " " "\n"
-	fi
-
-	if [ "$compress" ]; then
-		# The config file is a sh script that outputs the files to be compressed
-		# (typically using find).
-		sh $olddir/$compress 2>/dev/null || true
-	else
-		# By default fall back on what the policy manual says to compress.
-		find usr/info usr/man usr/X11*/man -type f ! -name "*.gz" 2>/dev/null || true
-		find usr/doc -type f \( -size +4k -or -name "changelog*" \) \
-			! -name "*.htm*" ! -name "*.gif" ! -name "*.gz" \
-			! -name "copyright" 2>/dev/null || true
-	fi
-}
-
-# Returns a list of all the files we want to compress,
-# after taking command line exclusions into account.
-# Call only if DH_EXCLUDE_GREP is non-empty.
-filelist_excluded () {
-	# Use grep -F so we don't have to worry about regexp's.
-	(filelist "$*" | grep -v -F \
-		"`echo "$DH_EXCLUDE_GREP" | tr "|" "\n"`") || true
-}
-
-for PACKAGE in $DH_DOPACKAGES; do
-	TMP=`tmpdir $PACKAGE`
-	compress=`pkgfile $PACKAGE compress`
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$compress=pkgfile($PACKAGE,"compress");
 
 	# Run the file name gathering commands from within the directory
 	# structure that will be effected.
-	olddir=`pwd`
-	# Can't use doit here, that breaks --no-act mode.
-	verbose_echo "cd $TMP"
-	cd "$TMP"
+	$olddir=getcwd();
+	chdir($TMP) || error("Can't cd to $TMP: $!");
 
-	# Get the list of files to compress.
-	if [ "$DH_EXCLUDE_GREP" ]; then
-		files=`filelist_excluded $*`
-	else
-		files=`filelist $*`
-	fi
+	# Figure out what files to compress.
+	@files=();
+	# First of all, deal with any files specified right on the command line.
+	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+		push @files,#ARGV;
+	}
+	if ($compress) {
+		# The config file is a sh script that outputs the files to be compressed
+		# (typically using find).
+		push @files, split(/\n/,`sh $olddir/$compress 2>/dev/null`);
+	}
+	else {
+		# By default, fall back to what the policy manual says to compress.
+		push @files, split(/\n/,`
+			find usr/info usr/man usr/X11*/man -type f ! -name "*.gz" 2>/dev/null || true;
+			find usr/doc -type f \\( -size +4k -or -name "changelog*" \\) \\
+				! -name "*.htm*" ! -name "*.gif" ! -name "*.gz" \\
+				! -name "copyright" 2>/dev/null || true
+		`);
+	}
 
-	if [ "$files" ]; then
-		# This is just a cosmetic fix.
-		files=`echo $files | tr "\n" " "`
-	
-		doit "gzip -f9 $files" || true
-	fi
+	# Exclude files from compression.
+	if (@files && defined($dh{EXCLUDE}) && $dh{EXCLUDE}) {
+		@new=();
+		foreach (@files) {
+			$ok=1;
+			foreach $x (@{$dh{EXCLUDE}}) {
+				if (/\Q$x\E/) {
+					$ok='';
+					last;
+				}
+			}
+			push @new,$_ if $ok;
+		}
+		@files=@new;
+	}
 
-	# Change back to old pwd.
-	verbose_echo "cd $olddir"
-	cd "$olddir"
+	if (@files) {
+		doit("gzip","-9f",@files);
+	}
+
+	chdir($olddir);
 
 	# Fix up symlinks that were pointing to the uncompressed files.
-	for file in `find $TMP -type l`; do
-		DIRECTORY=`expr $file : "\(.*\)/[^/]*"`
-		NAME=`expr $file : ".*/\([^/]*\)"`
-		LINKVAL=`ls -l $DIRECTORY/$NAME | awk '{ print $11;}'`
-		if [ ! -e $DIRECTORY/$LINKVAL -a -f $DIRECTORY/$LINKVAL.gz ]; then
-			doit "rm $DIRECTORY/$NAME"
-			doit "ln -s $LINKVAL.gz $DIRECTORY/$NAME.gz"
-		fi
-	done
-done
+	open (FIND,"find $TMP -type l |");
+	while (<FIND>) {
+		chomp;
+		($directory)=m:(.*)/:;
+		$linkval=readlink($_);
+		if (! -e "$directory/$linkval" && -e "$directory/$linkval.gz") {
+			doit("rm","-f",$_);
+			doit("ln","-sf","$linkval.gz","$_.gz");
+		}
+	}
+}
