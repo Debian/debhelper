@@ -125,7 +125,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				doit("cp","-a",$doc,"$tmp/usr/share/doc/$package");
 			}
 		}
-		doit("chown","-R","0.0","$tmp/usr/share/doc");
+		doit("chown","-R","0:0","$tmp/usr/share/doc");
 		doit("chmod","-R","go=rX","$tmp/usr/share/doc");
 		doit("chmod","-R","u+rw","$tmp/usr/share/doc");
 	}

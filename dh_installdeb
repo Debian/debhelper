@@ -67,7 +67,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				# script.
 				complex_doit("sed s/#DEBHELPER#// < $f > $tmp/DEBIAN/$file");
 			}
-			doit("chown","0.0","$tmp/DEBIAN/$file");
+			doit("chown","0:0","$tmp/DEBIAN/$file");
 			doit("chmod",755,"$tmp/DEBIAN/$file");
 		}
 		else {
@@ -76,7 +76,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			if (-f "debian/$ext$file.debhelper") {
 				complex_doit("printf '#!/bin/sh\nset -e\n' > $tmp/DEBIAN/$file");
 				complex_doit("cat debian/$ext$file.debhelper >> $tmp/DEBIAN/$file");
-				doit("chown","0.0","$tmp/DEBIAN/$file");
+				doit("chown","0:0","$tmp/DEBIAN/$file");
 				doit("chmod",755,"$tmp/DEBIAN/$file");
 			}
 		}
