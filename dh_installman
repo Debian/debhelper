@@ -61,6 +61,9 @@ interface. Use this program instead.
 
 init();
 
+my @sofiles;
+my @sodests;
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $file=pkgfile($package,"manpages");
@@ -137,8 +140,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	# Now the .so conversion.
-	my @sofiles;
-	my @sodests;
+	@sofiles=@sodests=();
 	foreach my $dir (qw{usr/share/man usr/X11R6/man}) {
 		if (-e "$tmp/$dir") {
 			find(\&find_so_man, "$tmp/$dir");
@@ -152,8 +154,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 }
 
 # Check if a file is a .so man page, for use by File::Find.
-my @sofiles;
-my @sodests;
 sub find_so_man {
 	# The -s test is becuase a .so file tends to be small. We don't want
 	# to open every man page. 1024 is arbitrary.

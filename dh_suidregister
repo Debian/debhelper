@@ -56,7 +56,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		@files=split(/\n/,`find $tmp -type f -perm +6000`);
 
 		# Strip the debian working directory off of the filenames.
-		$tostrip="tmp/";
+		$tostrip="$tmp/";
 	}
 	else {
 		# We will strip leading /'s, so the user can feed this
@@ -73,7 +73,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# Create the sed string that will be used to
 		# fill in the blanks in the autoscript files.
 		# Fill with the owner, group, and perms of the file.
-		my (undef,undef,$mode,undef,$uid,$gid,undef) = stat("$tmp/$file");
+		my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = stat("$tmp/$file");
 		# Now come up with the user and group names for the uid and
 		# gid.
 		my $user=getpwuid($uid);
