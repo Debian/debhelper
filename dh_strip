@@ -6,6 +6,11 @@ use File::Find;
 use Debian::Debhelper::Dh_Lib;
 init();
 
+# This variable can be used to turn off stripping (see Policy).
+if (defined $ENV{DEB_BUILD_OPTIONS} && $ENV{DEB_BUILD_OPTIONS} =~ /nostrip/) {
+	exit;
+}
+
 # Check if a file is an elf binary, shared library, or static library,
 # for use by File::Find. It'll fill the following 3 arrays with anything
 # it finds:
