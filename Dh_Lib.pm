@@ -131,12 +131,11 @@ sub error { my $message=shift;
 
 # Output a warning.
 sub warning { my $message=shift;
-	print STDERR basename().": $message\n";
+	print STDERR basename($0).": $message\n";
 }
 
-# Returns the basename of the program.
-sub basename {
-	my $fn=$0;
+# Returns the basename of the argument passed to it.
+sub basename { my $fn=shift;
 	$fn=~s:.*/(.*?):$1:;
 	return $fn;
 }
@@ -241,7 +240,7 @@ sub autoscript { my $package=shift; my $script=shift; my $filename=shift; my $se
 	}
 
 	# TODO: do this in perl, perhaps?
-	complex_doit("echo \"# Automatically added by ".basename().">> $outfile");
+	complex_doit("echo \"# Automatically added by ".basename($0).">> $outfile");
 	complex_doit("sed \"$sed\" $infile >> $outfile");
 	complex_doit("echo '# End automatically added section' >> $outfile");
 }
