@@ -50,11 +50,13 @@ Create a file named "destination" as a link to a file named "source". Do
 this in the package build directory of the first package acted on.
 (Or in all packages if -A is specified.)
 .SH EXAMPLES
-.TP
-.B dh_link usr/share/man/man1/foo.1 usr/share/man/man1/bar.1
+ dh_link usr/share/man/man1/foo.1 usr/share/man/man1/bar.1
+.P
 Make bar.1 be a symlink to foo.1
-.TP
-.B dh_link var/lib/foo usr/lib/foo usr/X11R6/man/man1/foo.1x usr/share/man/man1/bar.1
+.P
+ dh_link var/lib/foo usr/lib/foo \\
+  usr/X11R6/man/man1/foo.1x usr/share/man/man1/bar.1
+.P
 Make /usr/lib/foo/ be a link to /var/lib/foo/, and bar.1 be a symlink to the
 X man page foo.1x
 .SH ENVIRONMENT
