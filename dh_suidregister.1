@@ -45,6 +45,10 @@ with other debhelper programs.
 .B file ...
 Register these files in the first package acted on. (Or in all packages if
 -A is specified.)
+.SH NOTES
+dh_suidregister does not make anything suid. It merely records the
+permissions binaries already have. If you need to make something suid, you
+must do so manually before calling dh_suidregister.
 .SH ENVIRONMENT
 See
 .BR debhelper (1)
