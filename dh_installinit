@@ -3,11 +3,12 @@
 # Install debian/init[.d], and set up the postinst and postrm for init
 # scripts.
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 init();
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
 
 	# Figure out what filename to install it as.
 	my $script;
@@ -15,30 +16,30 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		# -d on the command line sets D_FLAG. We will 
 		# remove a trailing 'd' from the package name and 
 		# use that as the name.
-		$script=$PACKAGE;
+		$script=$package;
 		if ($script=~m/(.*)d$/) {
 			$script=$1;
 		}
 		else {
-			warning("\"$PACKAGE\" has no final d' in its name, but -d was specified.");
+			warning("\"$package\" has no final d' in its name, but -d was specified.");
 		}
 	}       
 	elsif ($dh{INIT_SCRIPT}) {
 		$script=$dh{INIT_SCRIPT};
 	}
 	else {
-		$script=$PACKAGE;
+		$script=$package;
 	}       
 
-	$init=pkgfile($PACKAGE,$script) || pkgfile($PACKAGE,"init") ||
-	      pkgfile($PACKAGE,"init.d");
+	my $init=pkgfile($package,$script) || pkgfile($package,"init") ||
+	      pkgfile($package,"init.d");
 
 	if ($init ne '') {
-		if (! -d "$TMP/etc/init.d") {
-			doit("install","-d","$TMP/etc/init.d");
+		if (! -d "$tmp/etc/init.d") {
+			doit("install","-d","$tmp/etc/init.d");
 		}
 
-		doit("install","-p","-m755",$init,"$TMP/etc/init.d/$script");
+		doit("install","-p","-m755",$init,"$tmp/etc/init.d/$script");
 
 		# This is set by the -u "foo" command line switch, it's
 		# the parameters to pass to update-rc.d. If not set,
@@ -55,19 +56,19 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			# -r on the command line sets R_FLAG. If it's set, there
 			# is no restart on upgrade.
 			if ($dh{R_FLAG}) {
-				autoscript($PACKAGE,"postinst", "postinst-init-norestart",
+				autoscript($package,"postinst", "postinst-init-norestart",
 					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
-				autoscript($PACKAGE,"postrm","postrm-init",
+				autoscript($package,"postrm","postrm-init",
 					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
-				autoscript($PACKAGE,"prerm","prerm-init-norestart",
+				autoscript($package,"prerm","prerm-init-norestart",
 					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
 			}
 			else {
-				autoscript($PACKAGE,"postinst","postinst-init",
+				autoscript($package,"postinst","postinst-init",
 					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
-				autoscript($PACKAGE,"postrm","postrm-init",
+				autoscript($package,"postrm","postrm-init",
 					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
-				autoscript($PACKAGE,"prerm","prerm-init",
+				autoscript($package,"prerm","prerm-init",
 					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
 			}
 		}

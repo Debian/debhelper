@@ -3,14 +3,33 @@ list grows - I welcome patches to fix items on it!
 
 Wishlist items:
 
-* Make dh_* "use strict".
-* enhance dh_installmanpages so it associates binaries and man pages and
-  installs the man pages into the correct areas to suit the binaries they
-  document. I may need to make this only happen when a switch is given, to
-  preserve backward compatibility. (#16933, #17061)
-* maybe make dh_installmanpages look at the .TH line of man pages whose
-  filenames end in .man, to figure out what section they go it. This would
-  require a switch to turn on, for backwards compatibility.
+* All debhelper programs should only accept the options they are documented
+  to accept (rather than accepting all debhelper options). They should
+  be able to print breif usage summaries.
+
+  I think this calls for a restucturing. Make a Debhelper.pm class. Each
+  program subclasses the class. The class provides command line parsing,
+  useful functions, and so on. Skeleton of a debhelper command would then
+  be:
+
+  use base qw{Debhelper};
+
+  sub startup {
+  	# Add initialization stuff here.
+  }
+
+  sub perpackage {
+  	my $package=shift;
+
+  	# Stuff to do for each package here.
+  }
+
+  sub fini {
+  	# And final stuff here, if any.
+  }
+
+  This needs more thought.
+  
 * All debhelper programs should be checked that they output files with the
   correct permissions no matter what the umask is set to. Currently, only
   those programs that run after dh_fixperms have been so checked. (Checking
@@ -50,3 +69,7 @@ Deprecated:
   them. I'd also like to depercate/remove debian/compress files, -X is
   a better idea.
 * dh_suidmanager. Once nothing in the archive uses it.
+* dh_installmanpages. Only mildly deprecated right now. Once dh_installman
+  catches on, make it emit a warning, and then wait for it to go away.
+* dh_testversion. Only mildly deprecated right now. Make it emit a warning
+  by jan 2002, and remove as soon as nothing uses it.

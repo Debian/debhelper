@@ -2,16 +2,18 @@
 #
 # Install logrotate config files.
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 init();
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
-	$file=pkgfile($PACKAGE,"logrotate");
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $file=pkgfile($package,"logrotate");
+
 	if ($file) {
-		if (! -d "$TMP/etc/logrotate.d") {
-			doit("install","-o",0,"-g",0,"-d","$TMP/etc/logrotate.d");
+		if (! -d "$tmp/etc/logrotate.d") {
+			doit("install","-o",0,"-g",0,"-d","$tmp/etc/logrotate.d");
 		}
-		doit("install","-m",644,$file,"$TMP/etc/logrotate.d/$PACKAGE");
+		doit("install","-m",644,$file,"$tmp/etc/logrotate.d/$package");
 	}
 }

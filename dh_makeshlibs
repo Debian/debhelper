@@ -2,19 +2,23 @@
 #
 # Automatically generate shlibs files.
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 init();
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
 
 	my %seen;
 	my $need_ldconfig = 0;
 
-	doit("rm", "-f", "$TMP/DEBIAN/shlibs");
+	doit("rm", "-f", "$tmp/DEBIAN/shlibs");
 
-	open (FIND, "find $TMP -xtype f -name '*.so*' |");
+	open (FIND, "find $tmp -xtype f -name '*.so*' |");
 	while (<FIND>) {
+		my $library;
+		my $major;
+	
 		chomp;
 		$need_ldconfig=1;
 		# The second evil regexp is for db3, whose author should
@@ -26,10 +30,10 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		if (defined($dh{M_PARAMS}) && $dh{M_PARAMS} ne '') {
 			$major=$dh{M_PARAMS};
 		}
-		if (! -d "$TMP/DEBIAN") {
-			doit("install","-d","$TMP/DEBIAN");
+		if (! -d "$tmp/DEBIAN") {
+			doit("install","-d","$tmp/DEBIAN");
 		}
-		$deps=$PACKAGE;
+		my $deps=$package;
 		if ($dh{V_FLAG_SET}) {
 			if ($dh{V_FLAG} ne '') {
 				$deps=$dh{V_FLAG};
@@ -37,8 +41,8 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			else {
 				# Call isnative becuase it sets $dh{VERSION}
 				# as a side effect.
-				isnative($PACKAGE);
-				$deps="$PACKAGE (>= $dh{VERSION})";
+				isnative($package);
+				$deps="$package (>= $dh{VERSION})";
 			}
 		}
 		if (defined($library) && defined($major) && defined($deps) &&
@@ -47,21 +51,20 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		    	my $line="$library $major $deps";
 			if (! $seen{$line}) {
 				$seen{$line}=1;
-				complex_doit("echo '$line' >>$TMP/DEBIAN/shlibs");
+				complex_doit("echo '$line' >>$tmp/DEBIAN/shlibs");
 			}
 		}
 	}
 	close FIND;
 
 	# New as of dh_v3.
-	if (! Debian::Debhelper::Dh_Lib::compat(2) && 
-	    ! $dh{NOSCRIPTS} && $need_ldconfig) {
-		autoscript($PACKAGE,"postinst","postinst-makeshlibs");
-		autoscript($PACKAGE,"postrm","postrm-makeshlibs");
+	if (! compat(2) && ! $dh{NOSCRIPTS} && $need_ldconfig) {
+		autoscript($package,"postinst","postinst-makeshlibs");
+		autoscript($package,"postrm","postrm-makeshlibs");
 	}
 
-	if (-e "$TMP/DEBIAN/shlibs") {
-		doit("chmod",644,"$TMP/DEBIAN/shlibs");
-		doit("chown","0.0","$TMP/DEBIAN/shlibs");
+	if (-e "$tmp/DEBIAN/shlibs") {
+		doit("chmod",644,"$tmp/DEBIAN/shlibs");
+		doit("chown","0.0","$tmp/DEBIAN/shlibs");
 	}
 }

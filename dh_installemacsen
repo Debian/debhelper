@@ -2,6 +2,7 @@
 #
 # Registration with emacsen-common.
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 init();
 
@@ -12,40 +13,40 @@ if (! defined $dh{FLAVOR}) {
 	$dh{FLAVOR}='emacs';
 }
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
 
-	$emacsen_install=pkgfile($PACKAGE,"emacsen-install");
-	$emacsen_remove=pkgfile($PACKAGE,"emacsen-remove");
-	$emacsen_startup=pkgfile($PACKAGE,"emacsen-startup");
+	my $emacsen_install=pkgfile($package,"emacsen-install");
+	my $emacsen_remove=pkgfile($package,"emacsen-remove");
+	my $emacsen_startup=pkgfile($package,"emacsen-startup");
 
 	if ($emacsen_install ne '') {
-		if (! -d "$TMP/usr/lib/emacsen-common/packages/install") {
-			doit("install","-d","$TMP/usr/lib/emacsen-common/packages/install");
+		if (! -d "$tmp/usr/lib/emacsen-common/packages/install") {
+			doit("install","-d","$tmp/usr/lib/emacsen-common/packages/install");
 		}
-		doit("install","-m0755",$emacsen_install,"$TMP/usr/lib/emacsen-common/packages/install/$PACKAGE");
+		doit("install","-m0755",$emacsen_install,"$tmp/usr/lib/emacsen-common/packages/install/$package");
 	}
 
 	if ($emacsen_remove ne '') {
-		if (! -d "$TMP/usr/lib/emacsen-common/packages/remove") {
-			doit("install","-d","$TMP/usr/lib/emacsen-common/packages/remove");
+		if (! -d "$tmp/usr/lib/emacsen-common/packages/remove") {
+			doit("install","-d","$tmp/usr/lib/emacsen-common/packages/remove");
 		}
-		doit("install","-m0755","$emacsen_remove","$TMP/usr/lib/emacsen-common/packages/remove/$PACKAGE");
+		doit("install","-m0755","$emacsen_remove","$tmp/usr/lib/emacsen-common/packages/remove/$package");
 	}
 	
 	if ($emacsen_startup ne '') {
-		if (! -d "$TMP/etc/$dh{FLAVOR}/site-start.d/") {
-			doit("install","-d","$TMP/etc/$dh{FLAVOR}/site-start.d/");
+		if (! -d "$tmp/etc/$dh{FLAVOR}/site-start.d/") {
+			doit("install","-d","$tmp/etc/$dh{FLAVOR}/site-start.d/");
 		}
-		doit("install","-m0644",$emacsen_startup,"$TMP/etc/$dh{FLAVOR}/site-start.d/$dh{PRIORITY}$PACKAGE.el");
+		doit("install","-m0644",$emacsen_startup,"$tmp/etc/$dh{FLAVOR}/site-start.d/$dh{PRIORITY}$package.el");
 	}
 
 	if ($emacsen_install ne '' || $emacsen_remove ne '') {
 		if (! $dh{NOSCRIPTS}) {
-			autoscript($PACKAGE,"postinst","postinst-emacsen",
-				"s/#PACKAGE#/$PACKAGE/");
-			autoscript($PACKAGE,"prerm","prerm-emacsen",
-				"s/#PACKAGE#/$PACKAGE/");
+			autoscript($package,"postinst","postinst-emacsen",
+				"s/#PACKAGE#/$package/");
+			autoscript($package,"prerm","prerm-emacsen",
+				"s/#PACKAGE#/$package/");
 		}
 	}
 }	

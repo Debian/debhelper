@@ -12,7 +12,7 @@ use vars qw(@ISA @EXPORT %dh);
 @ISA=qw(Exporter);
 @EXPORT=qw(&init &doit &complex_doit &verbose_print &error &warning &tmpdir
 	    &pkgfile &pkgext &isnative &autoscript &filearray &GetPackages
-	    &xargs %dh);
+	    &basename &xargs %dh &compat);
 
 my $max_compat=3;
 

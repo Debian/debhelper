@@ -2,22 +2,23 @@
 #
 # Mime support.
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 init();
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
-	$mime=pkgfile($PACKAGE,"mime");
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $mime=pkgfile($package,"mime");
 	
 	if ($mime ne '') {
-		if (! -d "$TMP/usr/lib/mime/packages") {
-			doit("install","-d","$TMP/usr/lib/mime/packages");
+		if (! -d "$tmp/usr/lib/mime/packages") {
+			doit("install","-d","$tmp/usr/lib/mime/packages");
 		}
-		doit("install","-p","-m644",$mime,"$TMP/usr/lib/mime/packages/$PACKAGE");
+		doit("install","-p","-m644",$mime,"$tmp/usr/lib/mime/packages/$package");
 
 		if (! $dh{NOSCRIPTS}) {
-			autoscript($PACKAGE,"postinst","postinst-mime");
-			autoscript($PACKAGE,"postrm","postrm-mime")
+			autoscript($package,"postinst","postinst-mime");
+			autoscript($package,"postrm","postrm-mime")
 		}
 	}
 }

@@ -2,6 +2,7 @@
 #
 # Register modules with modutils.
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 use File::Find;
 init();
@@ -16,24 +17,24 @@ sub find_kernel_modules {
 	return @results > 0;
 }
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
-	$file=pkgfile($PACKAGE,"modules");
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $file=pkgfile($package,"modules");
 
-	if (! -e $TMP) {
-		doit("install","-d",$TMP);
+	if (! -e $tmp) {
+		doit("install","-d",$tmp);
 	}
 
 	if ($file) {
-		if (! -e "$TMP/etc/modutils") {
-			doit("install","-d","$TMP/etc/modutils");
+		if (! -e "$tmp/etc/modutils") {
+			doit("install","-d","$tmp/etc/modutils");
 		}
-		doit("install","-m","0644",$file,"$TMP/etc/modutils/$PACKAGE");
+		doit("install","-m","0644",$file,"$tmp/etc/modutils/$package");
 	}
 
 	if (! $dh{NOSCRIPTS} &&
-	    ($file || find_kernel_modules("$TMP/lib/modules"))) {
-			autoscript($PACKAGE,"postinst","postinst-modules","s/#PACKAGE#/$PACKAGE/");
-			autoscript($PACKAGE,"postrm","postrm-modules","s/#PACKAGE#/$PACKAGE/");
+	    ($file || find_kernel_modules("$tmp/lib/modules"))) {
+			autoscript($package,"postinst","postinst-modules","s/#PACKAGE#/$package/");
+			autoscript($package,"postrm","postrm-modules","s/#PACKAGE#/$package/");
 	}
 }

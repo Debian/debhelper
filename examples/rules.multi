@@ -10,7 +10,7 @@
 #export DH_VERBOSE=1
 
 # This is the debhelper compatibility version to use.
-export DH_COMPAT=2
+export DH_COMPAT=3
 
 build: build-stamp
 build-stamp:
@@ -46,7 +46,6 @@ install: build
 
 # Build architecture-independent files here.
 binary-indep: build install
-	dh_testversion 2
 	dh_testdir -i
 	dh_testroot -i
 #	dh_installdebconf -i
@@ -59,7 +58,7 @@ binary-indep: build install
 #	dh_installmime -i
 #	dh_installinit -i
 	dh_installcron -i
-#	dh_installmanpages -i
+	dh_installman -i
 	dh_installinfo -i
 #	dh_undocumented -i
 	dh_installchangelogs -i
@@ -87,7 +86,7 @@ binary-arch: build install
 #	dh_installmime -a
 #	dh_installinit -a
 	dh_installcron -a
-#	dh_installmanpages -a
+	dh_installman -a
 	dh_installinfo -a
 #	dh_undocumented -a
 	dh_installchangelogs -a

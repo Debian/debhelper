@@ -3,22 +3,23 @@
 # Generate a DEBIAN/md5sums file, that lists the md5sums of all files in the
 # package.
 
+use strict;
 use Cwd;
 use Debian::Debhelper::Dh_Lib;
 init();
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
 
-	if (! -d "$TMP/DEBIAN") {
-		doit("install","-d","$TMP/DEBIAN");
+	if (! -d "$tmp/DEBIAN") {
+		doit("install","-d","$tmp/DEBIAN");
 	}
 
 	# Check if we should exclude conffiles.
 	my $exclude="";
-	if (! $dh{INCLUDE} && -r "$TMP/DEBIAN/conffiles") {
+	if (! $dh{INCLUDE} && -r "$tmp/DEBIAN/conffiles") {
 		# Generate exclude regexp.
-		open (CONFF,"$TMP/DEBIAN/conffiles");
+		open (CONFF,"$tmp/DEBIAN/conffiles");
 		while (<CONFF>) {
 			chomp;
 			s/^\///;
@@ -32,14 +33,14 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		$exclude.="! \\( $dh{EXCLUDE_FIND} \\) ";
 	}
 	
-	$olddir=getcwd();
-	complex_doit("cd $TMP >/dev/null ; find * -type f $exclude ! -regex '^DEBIAN/.*' -print0 | xargs -r0 md5sum > DEBIAN/md5sums ; cd $olddir >/dev/null");
+	my $olddir=getcwd();
+	complex_doit("cd $tmp >/dev/null ; find * -type f $exclude ! -regex '^DEBIAN/.*' -print0 | xargs -r0 md5sum > DEBIAN/md5sums ; cd $olddir >/dev/null");
 	# If the file's empty, no reason to waste inodes on it.
-	if (-z "$TMP/DEBIAN/md5sums") {
-		doit("rm","-f","$TMP/DEBIAN/md5sums");
+	if (-z "$tmp/DEBIAN/md5sums") {
+		doit("rm","-f","$tmp/DEBIAN/md5sums");
 	}
 	else {
-		doit("chmod",644,"$TMP/DEBIAN/md5sums");
-		doit("chown","0.0","$TMP/DEBIAN/md5sums");
+		doit("chmod",644,"$tmp/DEBIAN/md5sums");
+		doit("chown","0.0","$tmp/DEBIAN/md5sums");
 	}
 }

@@ -1,86 +1,87 @@
 #!/usr/bin/perl -w
 #
 # Reads debian/docs, installs all files listed there into
-# /usr/share/doc/$PACKAGE
+# /usr/share/doc/$package
 # Also installs the debian/copyright and debian/README.debian and debian/TODO
 # and handles debian/doc-base.
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 init();
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
-	$file=pkgfile($PACKAGE,"docs");
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $file=pkgfile($package,"docs");
 
 	# If this is a symlink, leave it alone.
-	if ( ! -d "$TMP/usr/share/doc/$PACKAGE" &&
-	     ! -l "$TMP/usr/share/doc/$PACKAGE") {
-		doit("install","-g",0,"-o",0,"-d","$TMP/usr/share/doc/$PACKAGE");
+	if ( ! -d "$tmp/usr/share/doc/$package" &&
+	     ! -l "$tmp/usr/share/doc/$package") {
+		doit("install","-g",0,"-o",0,"-d","$tmp/usr/share/doc/$package");
 	}
 
-	undef @docs;
+	my @docs;
 
 	if ($file) {
 		@docs=filearray($file, ".");
 	}
 
-	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
 		push @docs, @ARGV;
 	}
 
 	if (@docs) {
-		doit("cp", "-a",@docs,"$TMP/usr/share/doc/$PACKAGE/");
-		doit("chown","-R","0.0","$TMP/usr/share/doc");
-		doit("chmod","-R","go=rX","$TMP/usr/share/doc");
-		doit("chmod","-R","u+rw","$TMP/usr/share/doc");
+		doit("cp", "-a",@docs,"$tmp/usr/share/doc/$package/");
+		doit("chown","-R","0.0","$tmp/usr/share/doc");
+		doit("chmod","-R","go=rX","$tmp/usr/share/doc");
+		doit("chmod","-R","u+rw","$tmp/usr/share/doc");
 	}
 
 	# .Debian is correct, according to policy, but I'm easy.
-	$readme_debian=pkgfile($PACKAGE,'README.Debian');
+	my $readme_debian=pkgfile($package,'README.Debian');
 	if (! $readme_debian) {
-		$readme_debian=pkgfile($PACKAGE,'README.debian');
+		$readme_debian=pkgfile($package,'README.debian');
 	}
 	if ($readme_debian) {
 		doit("install","-g",0,"-o",0,"-m","644","-p","$readme_debian",
-			"$TMP/usr/share/doc/$PACKAGE/README.Debian");
+			"$tmp/usr/share/doc/$package/README.Debian");
 	}
 
-	$todo=pkgfile($PACKAGE,'TODO');
+	my $todo=pkgfile($package,'TODO');
 	if ($todo) {
-		if (isnative($PACKAGE)) {
+		if (isnative($package)) {
 			doit("install","-g",0,"-o",0,"-m","644","-p",$todo,
-				"$TMP/usr/share/doc/$PACKAGE/TODO");
+				"$tmp/usr/share/doc/$package/TODO");
 		}
 		else {
 			doit("install","-g",0,"-o",0,"-m","644","-p",$todo,
-				"$TMP/usr/share/doc/$PACKAGE/TODO.Debian");
+				"$tmp/usr/share/doc/$package/TODO.Debian");
 		}
 	}
 
 	# If the "directory" is a dangling symlink, then don't install
 	# the copyright file. This is useful for multibinary packages 
 	# that share a doc directory.
-	if (-d "$TMP/usr/share/doc/$PACKAGE") {
+	if (-d "$tmp/usr/share/doc/$package") {
 		# Support debian/package.copyright, but if not present, fall
 		# back on debian/copyright for all packages, not just the 
 		# main binary package.
-		$copyright=pkgfile($PACKAGE,'copyright');
+		my $copyright=pkgfile($package,'copyright');
 		if (! $copyright && -e "debian/copyright") {
 			$copyright="debian/copyright";
 		}
 		if ($copyright) {
 				doit("install","-g",0,"-o",0,"-m","644","-p",$copyright,
-					"$TMP/usr/share/doc/$PACKAGE/copyright");
+					"$tmp/usr/share/doc/$package/copyright");
 		}
 	}
 
 	# Add in the /usr/doc compatability symlinks code.
 	if (! $dh{NOSCRIPTS}) {
-		autoscript($PACKAGE,"postinst","postinst-doc",
-			"s/#PACKAGE#/$PACKAGE/g",
+		autoscript($package,"postinst","postinst-doc",
+			"s/#PACKAGE#/$package/g",
 		);
-		autoscript($PACKAGE,"prerm","prerm-doc",
-			"s/#PACKAGE#/$PACKAGE/g",
+		autoscript($package,"prerm","prerm-doc",
+			"s/#PACKAGE#/$package/g",
 		);
 	}
 
@@ -92,8 +93,8 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	# If this is the main package, we need to handle unprefixed filenames.
 	# For all packages, we must support both the usual filename format plus
 	# that format with a period an something appended.
-	my $regexp="\Q$PACKAGE\E\.";
-	if ($PACKAGE eq $dh{MAINPACKAGE}) {
+	my $regexp="\Q$package\E\.";
+	if ($package eq $dh{MAINPACKAGE}) {
 		$regexp="(|$regexp)";
 	}
 	foreach my $fn (grep {/^${regexp}doc-base(\..*)?$/} readdir(DEB)) {
@@ -110,18 +111,18 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	closedir(DEB);
 	
 	if (%doc_ids) {
-		if (! -d "$TMP/usr/share/doc-base/") {
-			doit("install","-g",0,"-o",0,"-d","$TMP/usr/share/doc-base/");
+		if (! -d "$tmp/usr/share/doc-base/") {
+			doit("install","-g",0,"-o",0,"-d","$tmp/usr/share/doc-base/");
 		}
 	}
 	foreach my $fn (keys %doc_ids) {
 		doit("install","-g",0,"-o",0,"-m644","-p","debian/$fn",
-		     "$TMP/usr/share/doc-base/$doc_ids{$fn}");
+		     "$tmp/usr/share/doc-base/$doc_ids{$fn}");
 		if (! $dh{NOSCRIPTS}) {
-			autoscript($PACKAGE,"postinst","postinst-doc-base",
+			autoscript($package,"postinst","postinst-doc-base",
 				"s/#DOC-ID#/$doc_ids{$fn}/",
 			);
-			autoscript($PACKAGE,"prerm","prerm-doc-base",
+			autoscript($package,"prerm","prerm-doc-base",
 				"s/#DOC-ID#/$doc_ids{$fn}/",
 			);
 		}

@@ -2,39 +2,38 @@
 #
 # Do some general file permission fixups.
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 init();
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
 
-	if (! defined($dh{EXCLUDE_FIND}) || $dh{EXCLUDE_FIND} eq '') {
-		$find_options="";
-	}
-	else {
+	my $find_options='';
+	if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
 		$find_options="! \\( $dh{EXCLUDE_FIND} \\)";
 	}
 
 	# General permissions fixing.
-	complex_doit("find $TMP $find_options -print0",
+	complex_doit("find $tmp $find_options -print0",
 		"2>/dev/null | xargs -0r chown --no-dereference 0.0");
-	complex_doit("find $TMP ! -type l $find_options -print0",
+	complex_doit("find $tmp ! -type l $find_options -print0",
 		"2>/dev/null | xargs -0r chmod go=rX,u+rw,a-s");
 		
 	# Fix up premissions in usr/share/doc, setting everything to not
 	# executable by default, but leave examples directories alone.
-	complex_doit("find $TMP/usr/share/doc $TMP/usr/doc -type f $find_options ! -regex '.*/examples/.*' -print0",
+	complex_doit("find $tmp/usr/share/doc $tmp/usr/doc -type f $find_options ! -regex '.*/examples/.*' -print0",
 		"2>/dev/null | xargs -0r chmod 644");
-	complex_doit("find $TMP/usr/share/doc $TMP/usr/doc -type d $find_options -print0",
+	complex_doit("find $tmp/usr/share/doc $tmp/usr/doc -type d $find_options -print0",
 		"2>/dev/null | xargs -0r chmod 755");
 
 	# Executable man pages are a bad thing..
-	complex_doit("find $TMP/usr/share/man $TMP/usr/man/ $TMP/usr/X11*/man/ -type f",
+	complex_doit("find $tmp/usr/share/man $tmp/usr/man/ $tmp/usr/X11*/man/ -type f",
 		"$find_options -print0 2>/dev/null | xargs -0r chmod 644");
 
 	# ..and so are executable shared and static libraries 
 	# (and .la files from libtool)
-	complex_doit("find $TMP -perm -5 -type f",
+	complex_doit("find $tmp -perm -5 -type f",
 		"\\( -name '*.so*' -or -name '*.la' -or -name '*.a' \\) $find_options -print0",
 		"2>/dev/null | xargs -0r chmod a-X");
 }

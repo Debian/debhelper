@@ -2,6 +2,7 @@
 #
 # Add to postinst and prerm to register a window manager.
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 init();
 
@@ -17,22 +18,23 @@ if (@ARGV) {
 	}
 }
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-#	$TMP=tmpdir($PACKAGE);
-	$file=pkgfile($PACKAGE,"wm");
+foreach my $package (@{$dh{DOPACKAGES}}) {
+#	my $tmp=tmpdir($package);
+	my $file=pkgfile($package,"wm");
 
+	my @wm;
 	if ($file) {
 		@wm=filearray($file, '.');
 	}
 
-	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
 		push @wm, @ARGV;
 	}
 
 	if (@wm && ! $dh{NOSCRIPTS}) {
 		foreach (@wm) {
-			autoscript($PACKAGE,"postinst","postinst-wm","s:#WM#:$_:;s/#PRIORITY#/$dh{PRIORITY}/",);
-			autoscript($PACKAGE,"prerm","prerm-wm","s:#WM#:$_:");
+			autoscript($package,"postinst","postinst-wm","s:#WM#:$_:;s/#PRIORITY#/$dh{PRIORITY}/",);
+			autoscript($package,"prerm","prerm-wm","s:#WM#:$_:");
 		}
 	}
 }

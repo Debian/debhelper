@@ -14,7 +14,6 @@ export PERL5LIB=.
 # be sure to use the new templates from this package.
 export DH_AUTOSCRIPTDIR=autoscripts
 
-# Living dangerously :-)
 export DH_COMPAT=3
 
 # Figure out the current debhelper version.
@@ -60,7 +59,7 @@ binary-indep: build
 	./dh_installdocs `find doc -type f | grep -v CVS`
 	./dh_installexamples `find examples -type f | grep -v CVS`
 	./dh_installmenu
-	./dh_installmanpages
+	./dh_installman *.1
 	./dh_installinfo
 	# Fix up all man pages, filling in the modification time for them.
 	# Note this runs before the command below so debhelper.1 gets the right

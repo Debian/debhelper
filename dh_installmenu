@@ -2,43 +2,44 @@
 #
 # Integration with debian menu system:
 #
-# If debian/menu file exists, save it to $TMP/usr/lib/menu/$PACKAGE
+# If debian/menu file exists, save it to $tmp/usr/lib/menu/$package
 # If debian/menu-method file exists, save it to 
-# $TMP/etc/menu-methods/$PACKAGE
+# $tmp/etc/menu-methods/$package
 #
 # Also, add to postinst and postrm.
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 init();
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
-	$menu=pkgfile($PACKAGE,"menu");
-	$menu_method=pkgfile($PACKAGE,"menu-method");
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $menu=pkgfile($package,"menu");
+	my $menu_method=pkgfile($package,"menu-method");
 	
 	if ($menu ne '') {
-		if (! -d "$TMP/usr/lib/menu") {
-			doit("install","-d","$TMP/usr/lib/menu");
+		if (! -d "$tmp/usr/lib/menu") {
+			doit("install","-d","$tmp/usr/lib/menu");
 		}
-		doit("install","-p","-m644",$menu,"$TMP/usr/lib/menu/$PACKAGE");
+		doit("install","-p","-m644",$menu,"$tmp/usr/lib/menu/$package");
 		
 		# Add the scripts if a menu-method file doesn't exist.
 		# The scripts for menu-method handle everything these do, too.
 		if ($menu_method eq "" && ! $dh{NOSCRIPTS}) {
-			autoscript($PACKAGE,"postinst","postinst-menu");
-			autoscript($PACKAGE,"postrm","postrm-menu")
+			autoscript($package,"postinst","postinst-menu");
+			autoscript($package,"postrm","postrm-menu")
 		}
 	}
 
 	if ($menu_method ne '') {
-		if (!-d "$TMP/etc/menu-methods") {
-			doit("install","-d","$TMP/etc/menu-methods");
+		if (!-d "$tmp/etc/menu-methods") {
+			doit("install","-d","$tmp/etc/menu-methods");
 		}
-		doit("install","-p",$menu_method,"$TMP/etc/menu-methods/$PACKAGE");
+		doit("install","-p",$menu_method,"$tmp/etc/menu-methods/$package");
 
 		if (! $dh{NOSCRIPTS}) {
-			autoscript($PACKAGE,"postinst","postinst-menu-method","s/#PACKAGE#/$PACKAGE/");
-			autoscript($PACKAGE,"postrm","postrm-menu-method","s/#PACKAGE#/$PACKAGE/");
+			autoscript($package,"postinst","postinst-menu-method","s/#PACKAGE#/$package/");
+			autoscript($package,"postrm","postrm-menu-method","s/#PACKAGE#/$package/");
 		}
 	}
 }

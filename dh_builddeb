@@ -2,6 +2,7 @@
 #
 # Build the .deb package, assuming all the files are set up.
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 init();
 
@@ -17,7 +18,7 @@ else {
 	$dh{FILENAME}="/$dh{FILENAME}";
 }
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
-	doit("dpkg","--build",$TMP,"$dh{DESTDIR}$dh{FILENAME}",@{$dh{U_PARAMS}});
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	doit("dpkg","--build",$tmp,"$dh{DESTDIR}$dh{FILENAME}",@{$dh{U_PARAMS}});
 }

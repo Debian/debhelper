@@ -2,38 +2,39 @@
 #
 # Integration with debconf.
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 init();
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
-	$config=pkgfile($PACKAGE,"config");
-	$templates=pkgfile($PACKAGE,"templates");
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $config=pkgfile($package,"config");
+	my $templates=pkgfile($package,"templates");
 
-	if (! -d "$TMP/DEBIAN") {
-		doit("install","-o",0,"-g",0,"-d","$TMP/DEBIAN");
+	if (! -d "$tmp/DEBIAN") {
+		doit("install","-o",0,"-g",0,"-d","$tmp/DEBIAN");
 	}
 
 	if ($config ne '') {
 		doit("install", "-o", 0, "-g", 0, "-m", 755, "-p",
-		     $config, "$TMP/DEBIAN/config");
+		     $config, "$tmp/DEBIAN/config");
 	}
 	
 	if ($templates ne '') {
 		# Are there translated templates too?
 		my @trans=(glob("$templates.??"), glob("$templates.??_??"));
 		if (@trans) {
-			complex_doit("debconf-mergetemplate @trans $templates > $TMP/DEBIAN/templates");
-			chmod 0644, "$TMP/DEBIAN/templates";
-			chown 0, 0, "$TMP/DEBIAN/templates";
+			complex_doit("debconf-mergetemplate @trans $templates > $tmp/DEBIAN/templates");
+			chmod 0644, "$tmp/DEBIAN/templates";
+			chown 0, 0, "$tmp/DEBIAN/templates";
 		}
 		else {
 			doit("install", "-o", 0, "-g", 0, "-m", 644, "-p",
-			     $templates, "$TMP/DEBIAN/templates");
+			     $templates, "$tmp/DEBIAN/templates");
 		}
 	}
 
 	if (($config ne ''|| $templates ne '') && ! $dh{NOSCRIPTS}) {
-		autoscript($PACKAGE,"postrm","postrm-debconf");
+		autoscript($package,"postrm","postrm-debconf");
 	}
 }

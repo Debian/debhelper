@@ -3,30 +3,31 @@
 # Reads debian/info, installs all files listed there into /usr/share/info
 # and puts appropriate commands into the postinst.
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 init();
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
-	$file=pkgfile($PACKAGE,"info");
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $file=pkgfile($package,"info");
 
-	undef @info;
+	my @info;
 	
 	if ($file) {
 		@info=filearray($file, ".");
 	}
 
-	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
 		push @info, @ARGV;
 	}
 
 	if (@info) {
-		if ( ! -d "$TMP/usr/share/info") {
-			doit("install","-d","$TMP/usr/share/info");
+		if ( ! -d "$tmp/usr/share/info") {
+			doit("install","-d","$tmp/usr/share/info");
 		}
-		doit("cp",@info,"$TMP/usr/share/info");
-		doit("chmod","-R", "go=rX","$TMP/usr/share/info/");
-		doit("chmod","-R", "u+rw","$TMP/usr/share/info/");
+		doit("cp",@info,"$tmp/usr/share/info");
+		doit("chmod","-R", "go=rX","$tmp/usr/share/info/");
+		doit("chmod","-R", "u+rw","$tmp/usr/share/info/");
 	}
 
 	foreach $file (@info) {
@@ -44,18 +45,18 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			}
 			close IN;
 			
-			my $fn="/usr/share/info/".Debian::Debhelper::Dh_Lib::basename($file);
+			my $fn="/usr/share/info/".basename($file);
 			
 			if ($section ne '') {
 				$section=~s:/:\\/:g; # allow / in section.
-				autoscript($PACKAGE,"postinst","postinst-info",
+				autoscript($package,"postinst","postinst-info",
 					"s/#SECTION#/$section/g;s:#FILE#:$fn:");
 			}
 			else {
-				autoscript($PACKAGE,"postinst","postinst-info-nosection",
+				autoscript($package,"postinst","postinst-info-nosection",
 					"s:#FILE#:$fn:");
 			}
-			autoscript($PACKAGE,"prerm","prerm-info", "s:#FILE#:$fn:");
+			autoscript($package,"prerm","prerm-info", "s:#FILE#:$fn:");
 		}
 	}
 }

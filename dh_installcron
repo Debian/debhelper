@@ -2,26 +2,27 @@
 #
 # Install cron scripts into the appropriate places.
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 init();
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
-	foreach $type (qw{daily weekly monthly}) {
-		$cron=pkgfile($PACKAGE,"cron.$type");
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	foreach my $type (qw{daily weekly monthly}) {
+		my $cron=pkgfile($package,"cron.$type");
 		if ($cron) {
-			if (! -d "$TMP/etc/cron.$type") {
-				doit("install","-o",0,"-g",0,"-d","$TMP/etc/cron.$type");
+			if (! -d "$tmp/etc/cron.$type") {
+				doit("install","-o",0,"-g",0,"-d","$tmp/etc/cron.$type");
 			}
-			doit("install",$cron,"$TMP/etc/cron.$type/$PACKAGE");
+			doit("install",$cron,"$tmp/etc/cron.$type/$package");
 		}
 	}
 	# Seperate because this needs to be mode 644.
-	$cron=pkgfile($PACKAGE,"cron.d");
+	my $cron=pkgfile($package,"cron.d");
 	if ($cron) {
-		if (! -d "$TMP/etc/cron.d") {
-			doit("install","-o",0,"-g",0,"-d","$TMP/etc/cron.d");
+		if (! -d "$tmp/etc/cron.d") {
+			doit("install","-o",0,"-g",0,"-d","$tmp/etc/cron.d");
 		}	
-		doit("install","-m",644,$cron,"$TMP/etc/cron.d/$PACKAGE");
+		doit("install","-m",644,$cron,"$tmp/etc/cron.d/$package");
 	}
 }

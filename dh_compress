@@ -3,24 +3,25 @@
 # Compresses files and makes sure that symlinks pointing to the 
 # compressed files get fixed.
 
+use strict;
 use Cwd;
 use Debian::Debhelper::Dh_Lib;
 init();
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
-	$compress=pkgfile($PACKAGE,"compress");
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $compress=pkgfile($package,"compress");
 
 	# Run the file name gathering commands from within the directory
 	# structure that will be effected.
-	$olddir=getcwd();
-	verbose_print("cd $TMP");
-	chdir($TMP) || error("Can't cd to $TMP: $!");
+	my $olddir=getcwd();
+	verbose_print("cd $tmp");
+	chdir($tmp) || error("Can't cd to $tmp: $!");
 
 	# Figure out what files to compress.
-	@files=();
+	my @files;
 	# First of all, deal with any files specified right on the command line.
-	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
 		push @files, @ARGV;
 	}
 	if ($compress) {
@@ -29,12 +30,12 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		push @files, split(/\n/,`sh $olddir/$compress 2>/dev/null`);
 	}
 	else {
-		# By default, fall back to what the policy manual says to compress.
-		# Note that all the excludes of odd things like _z are because
-		# gzip refuses to compress such files, assumming they are zip files.
-		# I looked at the gzip source to get the complete list of such
-		# extensions: ".gz", ".z", ".taz", ".tgz", "-gz", "-z", "_z"
-		
+		# By default, fall back to what the policy manual says to
+		# compress. Note that all the excludes of odd things like _z 
+		# are because gzip refuses to compress such files, assumming
+		# they are zip files. I looked at the gzip source to get the
+		# complete list of such extensions: ".gz", ".z", ".taz", 
+		# ".tgz", "-gz", "-z", "_z"
 		push @files, split(/\n/,`
 			find usr/info usr/share/info usr/man usr/share/man usr/X11*/man -type f ! -name "*.gz" 2>/dev/null || true;
 			find usr/doc usr/share/doc -type f \\( -size +4k -or -name "changelog*" \\) \\
@@ -48,10 +49,10 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 
 	# Exclude files from compression.
 	if (@files && defined($dh{EXCLUDE}) && $dh{EXCLUDE}) {
-		@new=();
+		my @new=();
 		foreach (@files) {
-			$ok=1;
-			foreach $x (@{$dh{EXCLUDE}}) {
+			my $ok=1;
+			foreach my $x (@{$dh{EXCLUDE}}) {
 				if (/\Q$x\E/) {
 					$ok='';
 					last;
@@ -67,8 +68,9 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	# space in the end.
 	my @f=();
 	my %hardlinks;
+	my %seen;
 	foreach (@files) {
-		($dev, $inode, undef, $nlink)=stat($_);
+		my ($dev, $inode, undef, $nlink)=stat($_);
 		if ($nlink > 1) {
 			if (! $seen{"$inode.$dev"}) {
 				$seen{"$inode.$dev"}=$_;
@@ -104,11 +106,11 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	chdir($olddir);
 
 	# Fix up symlinks that were pointing to the uncompressed files.
-	open (FIND,"find $TMP -type l |");
+	open (FIND,"find $tmp -type l |");
 	while (<FIND>) {
 		chomp;
-		($directory)=m:(.*)/:;
-		$linkval=readlink($_);
+		my ($directory)=m:(.*)/:;
+		my $linkval=readlink($_);
 		if (! -e "$directory/$linkval" && -e "$directory/$linkval.gz") {
 			doit("rm","-f",$_);
 			doit("ln","-sf","$linkval.gz","$_.gz");

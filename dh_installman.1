@@ -1,0 +1,55 @@
+.TH DH_INSTALLMAN 1 "" "Debhelper Commands" "Debhelper Commands"
+.SH NAME
+dh_installman \- install man pages into package build directories
+.SH SYNOPSIS
+.B dh_installman
+.I "[debhelper options] [manpage ...]"
+.SH "DESCRIPTION"
+dh_installman is a debhelper program that is responsible for installing
+man pages into the correct locations in package build directories. You tell
+it what man pages go in your package(s), and it figure out where to install
+them based on the section field in their .TH line and their filename
+extention.
+.P
+Any man page filenames specified as parameters will be installed into the
+first package dh_installman is told to act on. By default, this is the
+first binary package in debian/control, but if you use -p, -i, or -a flags,
+it will be the first package specified by those flags.
+.P
+Files named debian/package.manpages can list other man pages to be installed.
+.P
+After the man page installation step, dh_installman will check to see if
+any of the man pages in the temporary directories of any of the packages it
+is acting on contain ".so" links. If so, it changes them to symlinks.
+.SH OPTIONS
+.TP
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
+.TP
+.B \-A, \--all
+Install all files specified by command line parameters in ALL packages
+acted on.
+.TP
+.B manpage ...
+Install these man pages into the first package acted on. (Or in all packages
+if -A is specified).
+.SH NOTES
+An older version of this program,
+.BR dh_installmanpages (1)
+, is still used by some packages, and so is still included in debhelper.
+It is, however, deprecated, due to its counterintuiitive and inconsistent
+interface. Use this program instead.
+.SH ENVIRONMENT
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
+.SH "SEE ALSO"
+.BR debhelper (1)
+.SH BUGS
+It's impossible to specify filenames with spaces or other whitespace in
+them in debian/package.manpages file. This is more a historical design
+flaw than a bug.
+.SH AUTHOR
+Joey Hess <joeyh@debian.org>

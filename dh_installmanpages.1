@@ -1,6 +1,6 @@
 .TH DH_INSTALLMANPAGES 1 "" "Debhelper Commands" "Debhelper Commands"
 .SH NAME
-dh_installmanpages \- install man pages into package build directories
+dh_installmanpages \- old-style man page installer
 .SH SYNOPSIS
 .B dh_installmanpages
 .I "[debhelper options] [file ...]"
@@ -8,6 +8,11 @@ dh_installmanpages \- install man pages into package build directories
 dh_installmanpages is a debhelper program that is responsible for
 automatically installing man pages into usr/share/man/ and usr/X11R6/man/ in
 package build directories.
+.P
+This is a DWIM-style program, with an interface unlike the rest of
+debhelper. You are encouraged to use
+.BR dh_installman (1)
+instead.
 .P
 dh_installmanpages scans the current directory and all subdirectories for
 filenames that look like man pages. (Note that only real files are looked
@@ -43,6 +48,7 @@ See
 for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
 .BR debhelper (1)
+.BR dh_installman (1)
 .SH BUGS
 Man pages with the extension
 .B .man

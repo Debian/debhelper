@@ -1,0 +1,129 @@
+#!/usr/bin/perl -w
+#
+# Reads debian/manpages, installs all man pages there into appropriate
+# man page directory tree.
+
+use strict;
+use File::Find;
+use Debian::Debhelper::Dh_Lib;
+init();
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $file=pkgfile($package,"manpages");
+	my @manpages;
+
+	if ($file) {
+		@manpages=filearray($file, ".");
+	}
+
+	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+		push @manpages, @ARGV;
+	}
+
+	foreach my $page (@manpages) {
+		my $basename=Debian::Debhelper::Dh_Lib::basename($page);
+
+		# Support compressed pages.
+		my $gz='';
+		if ($basename=~m/(.*)(\.gz)/) {
+			$basename=$1;
+			$gz=$2;
+		}
+
+		my $section;
+		# See if there is a .TH entry in the man page. If so,
+		# we'll pull the section field from that.
+		if ($gz) {
+			open (IN, "zcat $page|") or die "$page: $!";
+		}
+		else {
+			open (IN, $page) or die "$page: $!";
+		}
+		while (<IN>) {
+			if (/^\.TH\s+[^ 	]+\s+(\d+[^ 	]*)\s/) {
+				$section=$1;
+				last;
+			}
+		}
+		# Failing that, we can try to get it from the filename.
+		if (! $section) {
+			($section)=$basename=~m/.*\.([1-9][^ ]*)/;
+		}
+
+		# Now get the numeric component of the section.
+		my ($realsection)=$section=~m/^(\d)/ if defined $section;
+		
+		# If there is no numeric section, bail.
+		if (! $realsection) {
+			error("Could not determine section for $page");
+		}
+		
+		my $destdir="$tmp/usr/share/man/man$realsection/";
+		# Translated man pages are typically specified by adding the
+		# language code to the filename, so detect that and
+		# redirect to appropriate directory.
+		my ($langcode)=$basename=~m/.*\.([a-z][a-z](?:_[A-Z][A-Z])?)\.(?:[1-9]|man)/;
+		if (defined $langcode && $langcode ne '') {
+			$destdir="$tmp/usr/share/man/$langcode/man$section/";
+		}
+		$destdir=~tr:/:/:s; # just for looks
+
+		# Get the man page's name -- everything up to the last dot.
+		my ($instname)=$basename=~m/^(.*)\./;
+	
+		if (! -e "$destdir/$instname.$section" && 
+		    ! -l "$destdir/$instname.$section") {
+			if (! -d $destdir) {
+				doit "install","-d",$destdir;
+			}
+			doit "install","-p","-m644",$page,
+				"$destdir$instname.$section$gz";
+		}
+		
+	}
+
+	# Now the .so conversion.
+	my @sofiles;
+	my @sodests;
+	foreach my $dir (qw{usr/share/man usr/X11R6/man}) {
+		if (-e "$tmp/$dir") {
+			find(\&find_so_man, "$tmp/$dir");
+		}
+	}
+	foreach my $sofile (@sofiles) {
+		my $sodest=shift(@sodests);
+		doit "rm","-f",$sofile;
+		doit "ln","-sf",$sodest,$sofile;
+	}
+}
+
+# Check if a file is a .so man page, for use by File::Find.
+my @sofiles;
+my @sodests;
+sub find_so_man {
+	# The -s test is becuase a .so file tends to be small. We don't want
+	# to open every man page. 1024 is arbitrary.
+	if (! -f $_ || -s $_ > 1024) {
+		return;
+	}
+
+	# Test first line of file for the .so thing.
+	open (SOTEST,$_);
+	my $l=<SOTEST>;
+	close SOTEST;
+	if ($l=~m/\.so\s+(.*)/) {
+		my $solink=$1;
+		# This test is here to prevent links like ... man8/../man8/foo.8
+		if (Debian::Debhelper::Dh_Lib::basename($File::Find::dir) eq
+		    Debian::Debhelper::Dh_Lib::dirname($solink)) {
+			$solink=Debian::Debhelper::Dh_Lib::basename($solink);
+		}
+		else {
+			$solink="../$solink";
+		}
+	
+		push @sofiles,"$File::Find::dir/$_";
+		push @sodests,$solink;
+	}
+}

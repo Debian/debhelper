@@ -3,14 +3,15 @@
 # Generate symlinks in debian packages, reading debian/links. The
 # file contains pairs of files and symlinks.
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 init();
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
-	$file=pkgfile($PACKAGE,"links");
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $file=pkgfile($package,"links");
 
-	undef @links;
+	my @links;
 	if ($file) {
 		@links=filearray($file);
 	}
@@ -21,7 +22,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		error("$file lists a link without a destination.");
 	}
 
-	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
 		push @links, @ARGV;
 	}
 
@@ -31,15 +32,15 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	}
 
 	while (@links) {
-		$dest=pop @links;
-		$src=pop @links;
+		my $dest=pop @links;
+		my $src=pop @links;
 
 		# Relavatize src and dest.
 		$src=~s:^/::;
 		$dest=~s:^/::;
 
 		# Make sure the directory the link will be in exists.
-		$basedir=Debian::Debhelper::Dh_Lib::dirname("$TMP/$dest");
+		my $basedir=Debian::Debhelper::Dh_Lib::dirname("$tmp/$dest");
 		if (! -e $basedir) {
 			doit("install","-d",$basedir);
 		}
@@ -47,11 +48,12 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		# Policy says that if the link is all within one toplevel
 		# directory, it should be relative. If it's between
 		# top level directories, leave it absolute.
-		@src_dirs=split(m:/+:,$src);
-		@dest_dirs=split(m:/+:,$dest);
+		my @src_dirs=split(m:/+:,$src);
+		my @dest_dirs=split(m:/+:,$dest);
 		if ($src_dirs[0] eq $dest_dirs[0]) {
 		    	# Figure out how much of a path $src and $dest
 			# share in common.
+			my $x;
 			for ($x=0; $x<$#src_dirs && $src_dirs[$x] eq $dest_dirs[$x]; $x++) {}
 			# Build up the new src.
 			$src="";
@@ -68,6 +70,6 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			$src="/$src";
 		}
 		
-		doit("ln","-sf",$src,"$TMP/$dest");
+		doit("ln","-sf",$src,"$tmp/$dest");
 	}
 }

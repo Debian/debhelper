@@ -194,11 +194,19 @@ mode is currently set by default in all the example rules files, and you
 are encouraged to use it.
 .TP
 .B V3
-Setting DH_COMPAT=3 will make debhelper start using new v3 features as
-they are implemented. This will cause its behavior to change without
-notice, and so may break packages that use it. See the file
-"/usr/share/doc/debhelper/v3" for more information about planned
-changes.
+Setting DH_COMPAT=3 does everything V2 does, plus:
+.RS
+.TP
+.B *
+Debhelper config files support globbing via * and ?, when appropriate. To
+turn this off and use those characters raw, just prefix with a backspash.
+.TP
+.B *
+dh_makeshlibs makes the postinst and postrm scripts call ldconfig.
+.TP
+.B *
+Every file in etc/ is automatically flagged as a conffile by dh_installdeb.
+.RE
 .RE
 .TP
 .B Doc directory symlinks

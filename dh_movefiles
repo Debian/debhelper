@@ -2,49 +2,48 @@
 #
 # Move files out of debian/tmp, into subpackages.
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 init();
 
-$ret=0;
+my $ret=0;
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
-	$files=pkgfile($PACKAGE,"files");
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $files=pkgfile($package,"files");
 
+	my $sourcedir="debian/tmp";
 	if ($dh{SOURCEDIR}) {
 		if ($dh{SOURCEDIR}=~m:^/:) {
 			error("The sourcedir must be a relative filename, not starting with `/'.");
 		}
 		$sourcedir=$dh{SOURCEDIR};
 	}
-	else {
-		$sourcedir="debian/tmp";
-	}
 
 	if (! -d $sourcedir) {
 		error("$sourcedir does not exist.");
 	}
 
-	@tomove=();
+	my @tomove;
 
         # debian/files has a different purpose, so ignore it.
-	if ( $files && $files ne "debian/files" ) {
+	if ($files && $files ne "debian/files" ) {
 		@tomove=filearray($files, $sourcedir);
 	}
 	
-	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
 		push @tomove, @ARGV;
 	}
 
-	if (@tomove && $TMP eq $sourcedir) {
+	if (@tomove && $tmp eq $sourcedir) {
 		error("I was asked to move files from $sourcedir to $sourcedir. Perhaps you should set DH_COMAPT=2?");
 	}
 
 	# Now we need to expand wildcards in @tomove.
 	# This is only necessary in pre-v3 land -- as of v3, the
 	# expension is automatically done by filearray().
-	if (@tomove && Debian::Debhelper::Dh_Lib::compat(2)) {
-		@filelist=();
+	if (@tomove && compat(2)) {
+		my @filelist=();
 		foreach (@tomove) {
 			push @filelist, glob("$sourcedir/$_");
 		}
@@ -57,13 +56,13 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	}
 
 	if (@tomove) {
-		if (! -d $TMP) {
-			doit("install","-d",$TMP);
+		if (! -d $tmp) {
+			doit("install","-d",$tmp);
 		}
 
 		doit("rm","-f","debian/movelist");
 		foreach (@tomove) {
-			$file=$_;
+			my $file=$_;
 			if (! -e $file && ! -l $file) {
 				$ret=1;
 				warning("$file not found");
@@ -71,7 +70,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			$file=~s:^\Q$sourcedir\E/+::;
 			complex_doit("(cd $sourcedir >/dev/null ; find $file ! -type d -print || true) >> debian/movelist");
 		}
-		complex_doit("(cd $sourcedir >/dev/null ; tar --create --remove-files --files-from=../movelist --file -) | (cd $TMP >/dev/null ;tar xpf -)");
+		complex_doit("(cd $sourcedir >/dev/null ; tar --create --remove-files --files-from=../movelist --file -) | (cd $tmp >/dev/null ;tar xpf -)");
 		doit("rm","-f","debian/movelist");
 	}
 }

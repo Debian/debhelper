@@ -7,25 +7,24 @@
 # if so, the debian changelog is just installed as "changelog", and it is an 
 # error to specify an upstream changelog on the command line.
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 init();
 
-$upstream=shift;
+my $upstream=shift;
 
 if (isnative($dh{MAINPACKAGE}) && defined $upstream) {
 	error("Cannot specify an upstream changelog for a native debian package.");
 }
 
+my $changelog_name="changelog.Debian";
 if (isnative($dh{MAINPACKAGE})) {
 	$changelog_name='changelog';
 }
-else {
-	$changelog_name='changelog.Debian';
-}
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
-	$changelog=pkgfile($PACKAGE,"changelog");
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $changelog=pkgfile($package,"changelog");
 
 	if (!$changelog) {
 		$changelog="debian/changelog";
@@ -35,35 +34,35 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		error("could not find changelog $changelog");
 	}
 
-	if (! -d "$TMP/usr/share/doc/$PACKAGE") {
+	if (! -d "$tmp/usr/share/doc/$package") {
 		# If it is a dangling symlink, then don't do anything.
 		# Think multi-binary packages that depend on each other and
 		# want to link doc dirs.
-		next if -l "$TMP/usr/share/doc/$PACKAGE";
+		next if -l "$tmp/usr/share/doc/$package";
 
-		doit("install","-d","$TMP/usr/share/doc/$PACKAGE");
+		doit("install","-d","$tmp/usr/share/doc/$package");
 	}
 	doit("install","-o",0,"-g",0,"-p","-m644",$changelog,
-		"$TMP/usr/share/doc/$PACKAGE/$changelog_name");
+		"$tmp/usr/share/doc/$package/$changelog_name");
 
 	if ($upstream) {
 		my $link_to;
 		if ($upstream=~m/\.html?$/i) {
 			# HTML changelog
 			doit("install","-o",0,"-g",0,"-p","-m644",
-				$upstream,"$TMP/usr/share/doc/$PACKAGE/changelog.html");
-			complex_doit("lynx -dump $upstream > $TMP/usr/share/doc/$PACKAGE/changelog");
+				$upstream,"$tmp/usr/share/doc/$package/changelog.html");
+			complex_doit("lynx -dump $upstream > $tmp/usr/share/doc/$package/changelog");
 			$link_to='changelog.html';
 		}
 		else {
 			doit("install","-o",0,"-g",0,"-p","-m644",
-				$upstream,"$TMP/usr/share/doc/$PACKAGE/changelog");
-			$link_to='changelog';				
+				$upstream,"$tmp/usr/share/doc/$package/changelog");
+			$link_to='changelog';
 		}
 		if ($dh{K_FLAG}) {
 			# Install symlink to original name of the upstream changelog file.
 			# Use basename in case original file was in a subdirectory or something.
-			doit("ln","-sf",$link_to,"$TMP/usr/share/doc/$PACKAGE/".Debian::Debhelper::Dh_Lib::basename($upstream));
+			doit("ln","-sf",$link_to,"$tmp/usr/share/doc/$package/".basename($upstream));
 		}
 	}
 }

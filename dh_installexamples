@@ -1,30 +1,31 @@
 #!/usr/bin/perl -w
 #
 # Reads debian/examples, installs all files listed there into
-# /usr/share/doc/$PACKAGE/examples
+# /usr/share/doc/$package/examples
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 init();
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
-	$file=pkgfile($PACKAGE,"examples");
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $file=pkgfile($package,"examples");
 	
-	undef @examples;
+	my @examples;
 	
 	if ($file) {
 		@examples=filearray($file, ".");
 	}	
 
-	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
 		push @examples, @ARGV;
 	}
 
 	if (@examples) {
-		if (! -d "$TMP/usr/share/doc/$PACKAGE/examples") {
-			doit("install","-d","$TMP/usr/share/doc/$PACKAGE/examples");
+		if (! -d "$tmp/usr/share/doc/$package/examples") {
+			doit("install","-d","$tmp/usr/share/doc/$package/examples");
 		}
 		
-		doit("cp","-a",@examples,"$TMP/usr/share/doc/$PACKAGE/examples");
+		doit("cp","-a",@examples,"$tmp/usr/share/doc/$package/examples");
 	}
 }

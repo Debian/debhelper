@@ -67,6 +67,10 @@ all packages if -A is specified).
 Note that dh_installdocs will happily copy entire directory hierarchies if
 you ask it to (it uses cp -a internally). If it is asked to install a
 directory, it will install the complete contents of the directory.
+.P
+Note that this command is not idempotent. "dh_clean -k" should be called
+between invocations of this command. Otherwise, it may cause multiple
+instances of the same text to be added to maintainer scripts.
 .SH ENVIRONMENT
 See
 .BR debhelper (1)
@@ -75,10 +79,6 @@ for a list of environment variables that affect all debhelper commands.
 .BR debhelper (1)
 .TP
 .BR install-docs (8)
-.SH NOTES
-Note that this command is not idempotent. "dh_clean -k" should be called
-between invocations of this command. Otherwise, it may cause multiple
-instances of the same text to be added to maintainer scripts.
 .SH BUGS
 It's impossible to specify filenames with spaces or other whitespace in them
 in debian/package.docs file. This is more a historical design flaw than a bug.

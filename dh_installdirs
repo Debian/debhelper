@@ -2,35 +2,36 @@
 #
 # Reads debian/dirs, creates the directories listed there
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 init();
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
-	$file=pkgfile($PACKAGE,"dirs");
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $file=pkgfile($package,"dirs");
 
-	if (! -e $TMP) {
-		doit("install","-d",$TMP);
+	if (! -e $tmp) {
+		doit("install","-d",$tmp);
 	}
 
-	undef @dirs;
+	my @dirs;
 
 	if ($file) {
 		@dirs=filearray($file)
 	}
 
-	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
 		push @dirs, @ARGV;
 	}	
 
 	if (@dirs) {
-		# Stick the $TMP onto the front of all the dirs.
+		# Stick the $tmp onto the front of all the dirs.
 		# This is necessary, for 2 reasons, one to make them 
 		# be in the right directory, but more importantly, it 
 		# protects against the danger of absolute dirs being
 		# specified.
 		@dirs=map {
-				$_="$TMP/$_";
+				$_="$tmp/$_";
 				tr:/:/:s; # just beautification.
 				$_
 			  } @dirs;
