@@ -58,16 +58,16 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# to call.
 		my @cmds;
 		foreach my $f (@fontdirs) {
+			# This must come before update-fonts-dir.
+			push @cmds, "update-fonts-scale $f"
+				if -f "$tmp/etc/X11/fonts/$f/$package.scale";
 			push @cmds, "update-fonts-dir $f";
 			push @cmds, "update-fonts-alias $f"
 				if -f "$tmp/etc/X11/fonts/$f/$package.alias";
-			# This must come _before_ mkfontdir, thus the unshift.
-			unshift @cmds, "update-fonts-scale $f"
-				if -f "$tmp/etc/X11/fonts/$f/$package.scale";
 		}
 
 		autoscript($package, "postinst", "postinst-xfonts",
-			"s:#CMDS#:".join("\n", @cmds).":;");
+			"s:#CMDS#:".join("\n", map { "\t$_" } @cmds).":;");
 		autoscript($package, "postrm", "postrm-xfonts",
 			"s:#CMDS#:".join("\n", @cmds).":;");
 	}
