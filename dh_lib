@@ -77,7 +77,7 @@ autoscript() {
 # Argument processing and global variable initialization is below.
 
 # Parse command line.
-set -- `getopt vianp: $*`
+set -- `getopt xvianp: $*`
 
 for i; do
 	case "$i"
@@ -101,6 +101,10 @@ for i; do
 			;;
 		-n)
 			DH_NOSCRIPTS=1
+			shift
+			;;
+		-x)	
+			DH_EXCLUDE=1
 			shift
 			;;
 		--)

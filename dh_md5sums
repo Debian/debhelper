@@ -13,10 +13,17 @@ for PACKAGE in $DH_DOPACKAGES; do
 		doit "install -d debian/$TMP/DEBIAN"
 	fi
 
-	doit "cd debian/$TMP"
 	# Doit isn't smart enough to hande this next command so echo by hand. (sigh)
-	verbose_echo 'md5sum `find * -type f ! -regex "^DEBIAN/.*"` > DEBIAN/md5sums </dev/null'
-	md5sum `find * -type f ! -regex "^DEBIAN/.*"` >DEBIAN/md5sums </dev/null
-	doit "chown root.root DEBIAN/md5sums"
-	doit "cd ../.."
+	verbose_echo 'find debian/$TMP/* -type f ! -regex "^debian/$TMP/DEBIAN/.*" | sed s:debian/$TMP/:: | sort > debian/$TMP/DEBIAN/allfiles'
+	find debian/$TMP/* -type f ! -regex "^debian/$TMP/DEBIAN/.*" | sed s:debian/$TMP:: | sort > debian/$TMP/DEBIAN/allfiles
+	# Check if we should exclude conffiles.
+	if [ ! "$DH_EXCLUDE" -a -r debian/$TMP/DEBIAN/conffiles ]; then
+		verbose_echo "sort debian/$TMP/DEBIAN/conffiles | comm -13 - debian/$TMP/DEBIAN/allfiles > debian/$TMP/DEBIAN/allfiles.new"
+		sort debian/$TMP/DEBIAN/conffiles | comm -13 - debian/$TMP/DEBIAN/allfiles > debian/$TMP/DEBIAN/allfiles.new
+		doit "mv debian/$TMP/DEBIAN/allfiles.new debian/$TMP/DEBIAN/allfiles"
+	fi
+	verbose_echo "cd debian/$TMP ; sed 's:^/::' < DEBIAN/allfiles | xargs md5sum > DEBIAN/md5sums ; cd ../.."
+	cd debian/$TMP ; sed 's:^/::' < DEBIAN/allfiles | xargs md5sum > DEBIAN/md5sums ; cd ../..
+	doit "chown root.root debian/$TMP/DEBIAN/md5sums"
+	doit "rm -f debian/$TMP/DEBIAN/allfiles"
 done
