@@ -16,7 +16,7 @@ use Debian::Debhelper::Dh_Lib;
 =head1 DESCRIPTION
 
 dh_installinfo is a debhelper program that is responsible for installing
-info files and registering them with install-info.
+info files and registering the files it installs with install-info.
 
 It determines some information about the info files by parsing them, in
 particular, it looks at the INFO-DIR-SECTION line to determine what section
@@ -30,7 +30,7 @@ will be the first package specified by those flags.
 Files named debian/package.info can list other files to be installed.
 
 dh_installinfo will automatically generate the postinst and prerm commands
-needed to interface with install-info. See L<dh_installdeb(1)> for an
+needed to interface with install-info, updating the info . See L<dh_installdeb(1)> for an
 explanation of how this works.
 
 =head1 OPTIONS
