@@ -6,6 +6,32 @@
 PATH=debian:$PATH:/usr/lib/debhelper
 . dh_lib
 
+# Returns a list of all the files that we want to compress,
+# (ignoring any files we were asked to exclude on the command
+# line). Assummes we are already in the temp directory.
+filelist () {
+	if [ "$compress" ]; then
+		# The config file is a sh script that outputs the files to be compressed
+		# (typically using find).
+		sh $olddir/$compress 2>/dev/null
+	else
+		# By default fall back on what the policy manual says to compress.
+		find usr/info usr/man usr/X11*/man -type f ! -name "*.gz" 2>/dev/null
+		find usr/doc -type f \( -size +4k -or -name "changelog*" \) \
+			! -name "*.htm*" ! -name "*.gif" ! -name "*.gz" \
+			! -name "copyright" 2>/dev/null
+	fi
+}
+
+# Returns a list of all the files we want to compress,
+# after taking command line exclusions into account.
+# Call only if DH_EXCLUDE_GREP is non-empty.
+filelist_excluded () {
+	# Use grep -F so we don't have to worry about regexp's.
+	filelist | grep -v -F \
+		"`echo "$DH_EXCLUDE_GREP" | tr "|" "\n"`"
+}
+
 for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
 	compress=`pkgfile $PACKAGE compress`
@@ -15,26 +41,18 @@ for PACKAGE in $DH_DOPACKAGES; do
 	olddir=`pwd`
 	doit "cd $TMP"
 
-	if [ "$compress" ]; then
-		# The config file is a sh script that outputs the files to be compressed
-		# (typically using find).
-		files=`sh $olddir/$compress 2>/dev/null ; true`
+	# Get the list of files to compress.
+	if [ "$DH_EXCLUDE_GREP" ]; then
+		files=`filelist_excluded`
 	else
-		# By default fall back on what the policy manual says to compress.
-		files=`
-			find usr/info usr/man usr/X11*/man -type f ! -name "*.gz" 2>/dev/null ;
-			find usr/doc -type f \( -size +4k -or -name "changelog*" \) \
-				! -name "*.htm*" ! -name "*.gif" ! -name "*.gz" \
-				! -name "copyright" 2>/dev/null ;
-			true
-			`
+		files=`filelist`
 	fi
 
 	if [ "$files" ]; then
 		# This is just a cosmetic fix.
-		files=`echo $files | tr "\n" " "`	
+		files=`echo $files | tr "\n" " "`
 	
-		doit "gzip -9 $files" || true
+		doit "gzip -f9 $files" || true
 	fi
 
 	# Change back to old pwd.

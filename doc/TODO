@@ -3,12 +3,11 @@
     debmake (wishlist bug #17043). I just never saw the point of that file..
   - Make dh_movefiles remove emptied directories after it's moved all the
     files out of them (wishlist bug #17111).
-* dh_fixperms: allow listing of files not to be touched (difficult).
-* add a dh_debstd, which mimics debstd, but uses debhelper tools internally.
-  Note that the idea here is not just another debstd. This program will have
-  a -v switch, that lists all the other debhelper commands it needs to run to
-  do what debstd had to do. The intent is to make it easy to switch from
-  debstd to debhelper.
+* something should add ldconfig calls properly to the postinst of packages
+  that contain shared libraries. maybe dh_makeshlibs? But it wasn't designed
+  to do that originally, and even worse, it is often run after
+  dh_installdeb, so the fragements wouldn't go into the postinst. So maybe a
+  new script is called for.
 * info support for debhelper (currently implemented, but I hate how I did it,
   so it's not in the package.) (wishlist bug #15717)
 * enhance dh_installmanpages so it associates binaries and man pages and

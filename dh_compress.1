@@ -3,7 +3,7 @@
 dh_compress \- compress files and fix symlinks in package build directories
 .SH SYNOPSIS
 .B dh_compress
-.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir]"
+.I "[-v] [-a] [-i] [-X] [--no-act] [-ppackage] [-Ptmpdir]"
 .SH "DESCRIPTION"
 dh_compress is a debhelper program that is responsible for compressing
 the files in package build directories, and makes sure that any symlinks
@@ -49,6 +49,13 @@ Compress files for the package named "package".
 .TP
 .B \-Ptmpdir, \--tmpdir=tmpdir
 Use "tmpdir" for package build directory. 
+.TP
+.B \-X=item, \--exclude=item
+Exclude files that contain "item" anywhere in their filename from being
+compressed. For example, -X=.jpeg will exclude jpeg's from compression.
+You may use this option multiple times to build up a list of things to
+exclude. You can accomplish the same thing by using a debian/compress file,
+but this is easier.
 .SH NOTES
 The
 .B \-a

@@ -1,0 +1,72 @@
+.TH DH_DEBSTD 1
+.SH NAME
+dh_debstd \- mimic debstd with debhelper commands
+.SH SYNOPSIS
+.B dh_debstd
+.I "[-v] [--no-act] [-m] [-c] [-u] [-s] [[changelog] file ...]"
+.SH "DESCRIPTION"
+dh_debstd is a debhelper command that mimics the behavior of debstd, by
+calling other debhelper commands. Its behavior is not a complete nor an
+exact copy of what debstd does, but it should be close enough to be usable.
+.P
+dh_debstd is not intended to really be used in building an official debian
+package. Instead, it is intended to help you convert your package that uses
+debstd over to debhelper. If you run dh_debstd with the same parameters you
+passed to debstd, and use the --verbose and --no-act flags, you can see what
+debhelper commands dh_debstd runs, and copy those commands into debian/rules
+to get a start on converting to debhelper.
+.P
+See
+.BR debstd (1)
+for a complete description of what this program does.
+.SH "DEBHELPER STYLE OPTIONS"
+.TP
+.B \-v, \--verbose
+Verbose mode; show all commands that modify the package build directory.
+.TP
+.B \--no-act
+Do not really do anything. If used with -v, the result is that this command
+will output a list of what it would have done.
+.SH "DEBSTD STYLE OPTIONS"
+.TP
+.B \-m
+Switch off automatic man page installation.
+.TP
+.B \-c
+Switch off automatic file compression.
+.TP
+.B \-u
+Enable generation of symlinks to undocumented(7) man page.
+.TP
+.B \-s
+Switch off md5sum file generation.
+.TP
+.B changelog
+Install this file as the upstream changelog. Only happens if it's name
+contains "change", "news", or "history" (not case sensative).
+.TP
+.B file ...
+Install these files as documentation.
+.SH NOTES
+Unlike debstd, dh_debstd does not automatically modify maintainer scripts
+such as the postinst, posrm, etc. To get those scripts to be modified, you
+have to place "#DEBHELPER#" in them at the location you want debhelper to
+insert commands. To help you remember to do that, a warning message will be
+generated if dh_debstd notices scripts without "#DEBHELPER#" in them.
+.SH ENVIRONMENT
+.TP
+.I DH_VERBOSE
+Enables verbose mode
+.TP
+.I DH_NO_ACT
+Enables no-act mode (see above).
+.SH "SEE ALSO"
+.BR /usr/doc/debhelper/from-debstd
+,
+.BR debstd (1)
+.SH BUGS
+It doesn't completly mimic debstd. Some things debstd handles are not supported
+by debhelper. With the exception of buildinfo.Debian files, everything that
+is not supported will generate a warning message.
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>

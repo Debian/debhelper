@@ -15,7 +15,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 
 	complex_doit "find $TMP/* -type f ! -regex '^$TMP/DEBIAN/.*' | sed s:$TMP:: | sort > $TMP/DEBIAN/allfiles"
 	# Check if we should exclude conffiles.
-	if [ ! "$DH_EXCLUDE" -a -r $TMP/DEBIAN/conffiles ]; then
+	if [ ! "$DH_INCLUDE" -a -r $TMP/DEBIAN/conffiles ]; then
 		complex_doit "sort $TMP/DEBIAN/conffiles | comm -13 - $TMP/DEBIAN/allfiles > $TMP/DEBIAN/allfiles.new"
 		doit "mv $TMP/DEBIAN/allfiles.new $TMP/DEBIAN/allfiles"
 	fi

@@ -58,6 +58,11 @@ sub AddPackage { my($option,$value)=@_;
 	}
 }
 
+# Add another item to the exclude list.
+sub AddExclude { my($option,$value)=@_;
+	push @exclude,$value;
+}
+
 use Getopt::Long;
 
 # Enable bundling of short command line options.
@@ -82,7 +87,10 @@ $ret=GetOptions(
 
 	"x" => \$include, # is -x for some unknown historical reason..
 	"include-conffiles" => \$include,
-	
+
+	"X=s" => \&AddExclude,
+	"exclude=s" => \&AddExclude,
+
 	"d" => \$d_flag,
 	"remove-d" => \$d_flag,
 
@@ -134,6 +142,9 @@ if ($ENV{DH_NO_ACT} ne undef) {
 	$no_act=1;
 }
 
+$exclude=join ' ', @exclude;
+$exclude_grep=join '|', @exclude;
+
 # Now output everything, in a format suitable for a shell to eval it. 
 # Note the last line sets $@ in the shell to whatever arguements remain.
 print qq{
@@ -143,7 +154,9 @@ DH_DOPACKAGES='@packages'
 DH_DOINDEP='$indep'
 DH_DOARCH='$arch'
 DH_NOSCRIPTS='$noscripts'
-DH_EXCLUDE='$include'
+DH_INCLUDE_CONFFILES='$include'
+DH_EXCLUDE='$exclude'
+DH_EXCLUDE_GREP='$exclude_grep'
 DH_D_FLAG='$d_flag'
 DH_R_FLAG='$r_flag'
 DH_K_FLAG='$k_flag'
