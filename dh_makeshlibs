@@ -11,7 +11,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-  dh_makeshlibs [debhelper options] [-mmajor] [-V[dependancies]] [-n]
+  dh_makeshlibs [debhelper options] [-mmajor] [-V[dependancies]] [-n] [-Xitem]
 
 =head1 DESCRIPTION
 
@@ -48,6 +48,11 @@ information needed (be sure to include the package name).
 =item B<-n>, B<--noscripts>
 
 Do not modify postinst/postrm scripts.
+
+=item B<-X>I<item>, B<--exclude=>I<item>
+
+Exclude files that contain "item" anywhere in their filename from
+being treated as shared libraries.
 
 =back
 
@@ -89,7 +94,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# packages. This may have a few false positives, which is ok,
 	# because only if we can get a library name and a major number from
 	# objdump is anything actually added.
-	open (FIND, "find $tmp -type f -name '*.so*' |");
+	my $exclude='';
+	if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
+		$exclude="! \\( $dh{EXCLUDE_FIND} \\) ";
+	}
+	open (FIND, "find $tmp -type f -name '*.so*' $exclude |");
 	while (<FIND>) {
 		my ($library, $major);
 		my $objdump=`objdump -p $_`;
