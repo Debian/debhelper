@@ -1,3 +1,21 @@
+debhelper (2.0.30) unstable; urgency=low
+
+  * It turns out it's possible to set up make variables that are specific to
+    a single target of a Makefile. This works tremendously well with
+    DH_OPTIONS: no need to put "-i" or "-pfoo" after every debhelper command
+    anymore.
+  * debhelper.1: mentioned above technique.
+  * examples/rules.multi: use the above method to get rid of -i's and -a's.
+  * examples/rules.multi2: new file, example of a multi-binary package that
+    works for arch-indep and arch-dependant packages, and also allows
+    building of single binary packages independntly, via binary-<package>
+    targets. It accomplishes all this using only one list of debhelper
+    commands.
+  * examples/*: removed source and diff targets. They've been obsolete for 2
+    years -- or is it 3? No need for a nice error message on failure anymore.
+
+ -- Joey Hess <joeyh@master.debian.org>  Fri,  3 Sep 1999 11:28:24 -0700
+
 debhelper (2.0.29) unstable; urgency=low
 
   * dh_shlibdeps: Fixed quoting problem that made it fail on weird file names.

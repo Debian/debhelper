@@ -1,40 +1,115 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Compresses files and makes sure that symlinks pointing to the 
 # compressed files get fixed.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-source dh_lib
+use Cwd;
+BEGIN { push @INC, "debian", "/usr/share/debhelper" }
+use Dh_Lib;
+init();
 
-# The config file is a sh script that outputs the files to be compressed
-# (typically using find).
-if [ -f debian/compress ]; then
-	files=`sh debian/compress 2>/dev/null`
-else
-	# By default fall back on what the policy manual says to compress.
-	files=`
-		find debian/tmp/usr/info debian/tmp/usr/man \
-			debian/tmp/usr/X11*/man -type f 2>/dev/null ;
-		find debian/tmp/usr/doc -type f -size +4k \
-			! -name "*.htm*" ! -name "*.gif" \
-			! -name "debian/tmp/usr/doc/*/copyright" 2>/dev/null
-	`
-fi
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$compress=pkgfile($PACKAGE,"compress");
 
-if [ "$files" ]; then
-	# This is just a cosmetic fix.
-	files=`echo $files | tr "\n" " "`	
+	# Run the file name gathering commands from within the directory
+	# structure that will be effected.
+	$olddir=getcwd();
+	verbose_print("cd $TMP");
+	chdir($TMP) || error("Can't cd to $TMP: $!");
 
-	doit "gzip -9 $files" || true
-fi
+	# Figure out what files to compress.
+	@files=();
+	# First of all, deal with any files specified right on the command line.
+	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+		push @files,#ARGV;
+	}
+	if ($compress) {
+		# The config file is a sh script that outputs the files to be compressed
+		# (typically using find).
+		push @files, split(/\n/,`sh $olddir/$compress 2>/dev/null`);
+	}
+	else {
+		# By default, fall back to what the policy manual says to compress.
+		# Note that all the excludes of odd things like _z are because
+		# gzip refuses to compress such files, assumming they are zip files.
+		# I looked at the gzip source to get the complete list of such
+		# extentions: ".gz", ".z", ".taz", ".tgz", "-gz", "-z", "_z"
+		
+		push @files, split(/\n/,`
+			find usr/info usr/share/info usr/man usr/share/man usr/X11*/man -type f ! -name "*.gz" 2>/dev/null || true;
+			find usr/doc usr/share/doc -type f \\( -size +4k -or -name "changelog*" \\) \\
+				\\( -name changelog.html -or ! -name "*.htm*" \\) \\
+				! -name "*.gif" ! -iname "*.gz" \\
+				! -iname "*.taz" ! -iname "*.tgz" ! -iname "*.z" \\
+				! -iname "*-gz" ! -iname "*-z" ! -iname "*_z" \\
+				! -name "copyright" 2>/dev/null || true
+		`);
+	}
 
-# Fix up symlinks that were pointing to the uncompressed files.
-for file in `find debian/tmp -type l`; do
-	DIRECTORY=`expr $file : "\(.*\)/[^/]*"`
-	NAME=`expr $file : ".*/\([^/]*\)"`
-	LINKVAL=`ls -l $DIRECTORY/$NAME | awk '{ print $11;}'`
-	if [ ! -e $DIRECTORY/$LINKVAL -a -f $DIRECTORY/$LINKVAL.gz ]; then
-		doit "rm $DIRECTORY/$NAME"
-		doit "ln -s $LINKVAL.gz $DIRECTORY/$NAME.gz"
-	fi
-done
+	# Exclude files from compression.
+	if (@files && defined($dh{EXCLUDE}) && $dh{EXCLUDE}) {
+		@new=();
+		foreach (@files) {
+			$ok=1;
+			foreach $x (@{$dh{EXCLUDE}}) {
+				if (/\Q$x\E/) {
+					$ok='';
+					last;
+				}
+			}
+			push @new,$_ if $ok;
+		}
+		@files=@new;
+	}
+	
+	# Look for files with hard links. If we are going to compress both,
+	# we can preserve the hard link across the compression and save
+	# space in the end.
+	my @f=();
+	my %hardlinks;
+	foreach (@files) {
+		($dev, $inode, undef, $nlink)=stat($_);
+		if ($nlink > 1) {
+			if (! $seen{"$inode.$dev"}) {
+				$seen{"$inode.$dev"}=$_;
+				push @f, $_;
+			}
+			else {
+				# This is a hardlink.
+				$hardlinks{$_}=$seen{"$inode.$dev"};
+			}
+		}
+		else {
+			push @f, $_;
+		}
+	}
+
+	if (@f) {
+		xargs(\@f,"gzip","-9f");
+	}
+	
+	# Now change over any files we can that used to be hard links so
+	# they are again.
+	foreach (keys %hardlinks) {
+		# Remove old file.
+	    	doit("rm","-f","$_");
+		# Make new hardlink.
+		doit("ln","$hardlinks{$_}.gz","$_.gz");
+	}
+
+	verbose_print("cd $olddir");
+	chdir($olddir);
+
+	# Fix up symlinks that were pointing to the uncompressed files.
+	open (FIND,"find $TMP -type l |");
+	while (<FIND>) {
+		chomp;
+		($directory)=m:(.*)/:;
+		$linkval=readlink($_);
+		if (! -e "$directory/$linkval" && -e "$directory/$linkval.gz") {
+			doit("rm","-f",$_);
+			doit("ln","-sf","$linkval.gz","$_.gz");
+		}
+	}
+}

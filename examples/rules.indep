@@ -1,56 +1,77 @@
 #!/usr/bin/make -f
-# Sample debian/rules that uses debhelper. GNU copyright 1997 by Joey Hess.
-# This version is for packages that are architecure independant.
+# Sample debian/rules that uses debhelper. 
+# GNU copyright 1997 to 1999 by Joey Hess.
+#
+# This version is for packages that are architecture independent.
 
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+# This is the debhelper compatability version to use.
+export DH_COMPAT=1
+
 build: build-stamp
 build-stamp:
 	dh_testdir
-	# Add here commands to compile the pacckage.
+
+	# Add here commands to compile the package.
 	#$(MAKE)
+
 	touch build-stamp
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp
+	rm -f build-stamp install-stamp
+
 	# Add here commands to clean up after the build process.
+	#-$(MAKE) clean
 	#-$(MAKE) distclean
+
 	dh_clean
 
-# Build architecture-independent files here.
-binary-indep: build
+install: install-stamp
+install-stamp: build-stamp
 	dh_testdir
 	dh_testroot
-	dh_clean
+	dh_clean -k
 	dh_installdirs
-        # Add here commands to install the files into debian/tmp
-        #$(MAKE) PREFIX=debian/tmp install
+
+	# Add here commands to install the package into debian/tmp.
+	#$(MAKE) prefix=`pwd`/debian/tmp/usr install
+
+	touch install-stamp
+
+# Build architecture-independent files here.
+binary-indep: build install
+#	dh_testversion
+	dh_testdir
+	dh_testroot
 	dh_installdocs
 	dh_installexamples
 	dh_installmenu
+#	dh_installemacsen
+#	dh_installpam
 #	dh_installinit
 	dh_installcron
 #	dh_installmanpages
+	dh_installinfo
 #	dh_undocumented
 	dh_installchangelogs
+	dh_link
 	dh_compress
 	dh_fixperms
+	# You may want to make some executables suid here.
 	dh_suidregister
 	dh_installdeb
+#	dh_perl
 	dh_gencontrol
-	dh_du
 	dh_md5sums
 	dh_builddeb
 
 # Build architecture-dependent files here.
-binary-arch: build
+binary-arch: build install
 # We have nothing to do by default.
 
-source diff:
-	@echo >&2 'source and diff are obsolete - use dpkg-source -b'; false
-
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary
+.PHONY: build clean binary-indep binary-arch binary install

@@ -1,10 +1,9 @@
 #!/usr/bin/make -f
-# Sample debian/rules that uses debhelper. 
-# GNU copyright 1997 by Joey Hess.
+# Sample debian/rules that uses debhelper.
+# GNU copyright 1997 to 1999 by Joey Hess.
 #
-# This version is for a hypothetical package that builds an
-# architecture-dependant package, as well as an architecture-independent
-# package.
+# This version is for a multibinary package. It also allows you to build any
+# of the binary packages independantly, via binary-<package> targets.
 
 # Uncomment this to turn on verbose mode. 
 #export DH_VERBOSE=1
@@ -35,9 +34,8 @@ clean:
 
 	dh_clean
 
-install: install-stamp
-install-stamp: DH_OPTIONS=
-install-stamp: build-stamp
+install: DH_OPTIONS=
+install:
 	dh_testdir
 	dh_testroot
 	dh_clean -k
@@ -49,10 +47,11 @@ install-stamp: build-stamp
 	dh_movefiles
 	touch install-stamp
 
-# Build architecture-independent files here.
-# Pass -i to all debhelper commands in this target to reduce clutter.
-binary-indep: DH_OPTIONS="-i"
-binary-indep: build install
+# This single target is used to build all the packages, all at once, or
+# one at a time. So keep in mind: any options passed to commands here will
+# affect _all_ packages. Anything you want to only affect one package
+# should be put in another target, such as the install target.
+binary-common:
 	# Need this version of debhelper for DH_OPTIONS to work.
 	dh_testversion 1.1.17
 	dh_testdir
@@ -71,46 +70,27 @@ binary-indep: build install
 	dh_link
 	dh_compress
 	dh_fixperms
-	# You may want to make some executables suid here.
 	dh_suidregister
-	dh_installdeb
-#	dh_perl
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
-
-# Build architecture-dependent files here.
-# Pass -a to all debhelper commands in this target to reduce clutter.
-binary-indep: DH_OPTIONS="-a"
-binary-arch: build install
-	# Need this version of debhelper for DH_OPTIONS to work.
-	dh_testversion 1.1.17
-	dh_testdir
-	dh_testroot
-	dh_installdocs
-	dh_installexamples
-	dh_installmenu
-#	dh_installemacsen
-#	dh_installpam
-#	dh_installinit
-	dh_installcron
-#	dh_installmanpages
-	dh_installinfo
-#	dh_undocumented
-	dh_installchangelogs
-	dh_strip
-	dh_link
-	dh_compress
-	dh_fixperms
-	# You may want to make some executables suid here.
-	dh_suidregister
-	dh_installdeb
 #	dh_makeshlibs
+	dh_installdeb
 #	dh_perl
 	dh_shlibdeps
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
+
+# Build architecture independant packages using the common target.
+# (Comment this out if you have none to build.)
+binary-indep: DH_OPTIONS=-i
+binary-arch: build install binary-common
+
+# Build architecture dependant packages using the common target.
+binary-arch: DH_OPTIONS=-a
+binary-arch: build install binary-common
+
+# Any other binary targets build just one binary package at a time.
+binary-%: build install
+	make -f debian/rules binary-common DH_OPTIONS=-p$*
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
