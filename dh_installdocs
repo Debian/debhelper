@@ -62,17 +62,52 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			doit("install","-m","644","-p",$copyright,"$TMP/usr/doc/$PACKAGE/copyright");
 	}
 	
-	# Handle doc-base files.
+	# Handle doc-base files. There are two filename formats, the usual plus
+	# an extended format (debian/package.doc-base.<doc-id>). Have to
+	# come up with good document-id's too.
+	my %doc_ids;
+	
+	opendir(DEB,"debian/") || error("can't read debian directory: $!");
+	foreach (grep {/^$PACKAGE\.doc-base\..*$/} readdir(DEB)) {
+		$id=$_;
+		$id=~s/\.doc-base\./-/;
+		$doc_ids{$id}="debian/$_";
+	}
+	closedir(DEB);
+	
+	# These next lines handle the format debian/doc-base.<doc-id>, 
+	# which is in for completeness.
+	if ($PACKAGE eq $dh{MAINPACKAGE}) {
+		opendir(DEB,"debian/") || error("can't read debian directory: $!");
+		foreach (grep {/^doc-base\..*$/} readdir(DEB)) {
+			$id=$_;
+			$id=~s/doc-base\./$PACKAGE-/;
+			$doc_ids{$id}="debian/$_";
+		}
+		closedir(DEB);
+	}
+	
+	# And this handles the normal format of course.
 	$file=pkgfile($PACKAGE,"doc-base");
-	if ($file) {
+	if ($file ne '') {
+		$doc_ids{$PACKAGE}=$file;
+	}
+	
+	if (%doc_ids) {
 		if (! -d "$TMP/usr/share/doc-base/") {
 			doit("install","-d","$TMP/usr/share/doc-base/");
 		}
-		doit("install","-p","-m644",$file,
-		     "$TMP/usr/share/doc-base/$PACKAGE");
+	}
+	foreach $doc_id (keys %doc_ids) {
+		doit("install","-m644","-p",$doc_ids{$doc_id},
+		     "$TMP/usr/share/doc-base/$doc_id");
 		if (! $dh{NOSCRIPTS}) {
-			autoscript($PACKAGE,"postinst","postinst-doc-base");
-			autoscript($PACKAGE,"prerm","prerm-doc-base")
+			autoscript($PACKAGE,"postinst","postinst-doc-base",
+				"s/#DOC-ID#/$doc_id/",
+			);
+			autoscript($PACKAGE,"prerm","prerm-doc-base",
+				"s/#DOC-ID#/$doc_id/",
+			);
 		}
 	}
 }

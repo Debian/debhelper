@@ -38,6 +38,12 @@ interface with the doc-base package. See
 .BR dh_installdeb (1)
 for an explanation of how this works. Note that the package name will be
 used as the doc-base document id.
+.PP
+If your package needs to register more
+than one document, you need multiple files. To accomplish this, you can use
+files named debian/package.doc-base.docid. The "docid" on the end is a
+string that is combined with the package name to generate a unique doc-base
+document id.
 .SH OPTIONS
 .TP
 .B debhelper options

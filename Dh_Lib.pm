@@ -261,7 +261,7 @@ sub filearray { my $file=shift;
 	my @ret;
 	open (DH_FARRAY_IN,"<$file") || error("cannot read $file: $1");
 	while (<DH_FARRAY_IN>) {
-		push @ret,split(/\s/,$_);
+		push @ret,split(' ',$_);
 	}
 	close DH_FARRAY_IN;
 	

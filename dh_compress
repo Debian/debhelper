@@ -59,7 +59,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	# we can preserve the hard link across the compression and save
 	# space in the end.
 	my @f=();
-	my %hardlinks={};
+	my %hardlinks;
 	foreach (@files) {
 		($dev, $inode, undef, $nlink)=stat($_);
 		if ($nlink > 1) {

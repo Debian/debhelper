@@ -84,6 +84,7 @@ sub parseopts {
 	
 		"d" => \$options{D_FLAG},
 		"remove-d" => \$options{D_FLAG},
+		"dirs-only" => \$options{D_FLAG},
 	
 		"r" => \$options{R_FLAG},
 		"no-restart-on-upgrade" => \$options{R_FLAG},
