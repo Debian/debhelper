@@ -1,3 +1,20 @@
+debhelper (4.1.68) unstable; urgency=low
+
+  * Remove duplicate packages from DOPACKAGES after argument processing.
+    Closes: #112950
+  * dh_compress: deal with links pointing to links pointing to compressed
+    files, no matter what order find returns them. Closes: #204169
+  * dh_installmodules, dh_installpam, dh_installcron, dh_installinit,
+    dh_installogrotate: add --name= option, that can be used to specify
+    the name to use for the file(s) installed by these commands. For example,
+    dh_installcron --name=foo will install debian/package.foo.cron.daily to
+    etc/cron.daily/foo. Closes: #138202, #101003, #68545, #148844
+    (Thanks to Thomas Hood for connecting these bug reports.)
+  * dh_installinit: deprecated --init-script option in favor of the above.
+  * Add dh_installppp. Closes: #43403
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 22 Aug 2003 15:27:36 -0400
+
 debhelper (4.1.67) unstable; urgency=low
 
   * dh_python: Another patch, for pythonX.Y-foo packages.

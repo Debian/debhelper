@@ -149,6 +149,8 @@ sub parseopts {
 		
 		"L|libpackage=s" => \$options{LIBPACKAGE},
 		
+		"name=s" => \$options{NAME},
+		
 		"<>" => \&NonOption,
 	);
 
@@ -173,13 +175,19 @@ sub parseopts {
 		}
 		push @{$options{DOPACKAGES}},GetPackages();
 	}
-	
+
 	# Remove excluded packages from the list of packages to act on.
+	# Also unique the list, in case some options were specified that
+	# added a package to it twice.
 	my @package_list;
 	my $package;
+	my %packages_seen;
 	foreach $package (@{$options{DOPACKAGES}}) {
 		if (! $exclude_package{$package}) {
-			push @package_list, $package;	
+			if (! exists $packages_seen{$package}) {
+				$packages_seen{$package}=1;
+				push @package_list, $package;	
+			}
 		}
 	}
 	@{$options{DOPACKAGES}}=@package_list;

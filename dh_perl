@@ -85,8 +85,7 @@ use constant PM_MODULE => 2;
 use constant XS_MODULE => 4;
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
-	my $tmp = tmpdir($package);
-	my $ext = pkgext($package);
+	my $tmp=tmpdir($package);
 
 	delsubstvar($package, "perl:Depends"); # for idempotency
 	

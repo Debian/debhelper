@@ -166,16 +166,24 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	chdir($olddir);
 
 	# Fix up symlinks that were pointing to the uncompressed files.
-	open (FIND,"find $tmp -type l |");
-	while (<FIND>) {
-		chomp;
-		my ($directory)=m:(.*)/:;
-		my $linkval=readlink($_);
-		if (! -e "$directory/$linkval" && -e "$directory/$linkval.gz") {
-			doit("rm","-f",$_);
-			doit("ln","-sf","$linkval.gz","$_.gz");
+	my %links = map { chomp; $_ => 1 } `find $tmp -type l`;
+	my $changed;
+	# Keep looping through looking for broken links until no more
+	# changes are made. This is done in case there are links pointing
+	# to links, pointing to compressed files.
+	do {
+		$changed = 0;
+		foreach my $link (keys %links) {
+			my ($directory) = $link =~ m:(.*)/:;
+			my $linkval = readlink($link);
+			if (! -e "$directory/$linkval" && -e "$directory/$linkval.gz") {
+				doit("rm","-f",$link);
+				doit("ln","-sf","$linkval.gz","$link.gz");
+				delete $links{$link};
+				$changed++;
+			}
 		}
-	}
+	} while $changed;
 }
 
 =head1 SEE ALSO

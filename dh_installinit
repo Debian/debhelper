@@ -11,7 +11,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_installinit> [S<I<debhelper options>>] [B<--init-script=>I<scriptname>] [B<-n>] [B<-r>] [B<-d>] [S<B<--> I<params>>]
+B<dh_installinit> [S<I<debhelper options>>] [B<--name=>I<name>] [B<-n>] [B<-r>] [B<-d>] [S<B<--> I<params>>]
 
 =head1 DESCRIPTION
 
@@ -62,16 +62,24 @@ described below.)
 Pass "params" to L<update-rc.d(8)>. If not specified, "defaults" will be
 passed to L<update-rc.d(8)>.
 
+=item B<--name=>I<name>
+
+Use "name" as the filename the the init script is installed as in
+etc/init.d/ (and also use it as the filename for the defaults file, if it
+is installed). When this parameter is used, dh_installinit looks for and
+installs files named debian/package.name.init and debian/package.name.default,
+instead of the usual debian/package.init and debian/pacage.default.
+
 =item B<--init-script=>I<scriptname>
 
-Use "scriptname" as for the filename the init script is installed as in
+Use "scriptname" as the filename the init script is installed as in
 etc/init.d/ (and also use it as the filename for the defaults file, if it
-is installed). This is useful if you need to have an init script with a name
-different from the package's name. Note that if you use this parameter,
-dh_installinit will look to see if a file in the debian/ directory exists
-that looks like "package.scriptname" and if so will install it as the init
-script in preference to the files it normally installs. This feature is really
-only useful if you need a single package to install more than one init script.
+is installed). If you use this parameter, dh_installinit will look to see
+if a file in the debian/ directory exists that looks like
+"package.scriptname" and if so will install it as the init script in
+preference to the files it normally installs.
+
+This parameter is deprecated, use the --name parameter instead.
 
 =back
 
@@ -90,7 +98,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	# Figure out what filename to install it as.
 	my $script;
-	if ($dh{D_FLAG}) {
+	if (defined $dh{NAME}) {
+		$script=$dh{NAME};
+	}
+	elsif ($dh{D_FLAG}) {
 		# -d on the command line sets D_FLAG. We will 
 		# remove a trailing 'd' from the package name and 
 		# use that as the name.
@@ -108,7 +119,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	else {
 		$script=$package;
 	}       
-
+	
 	my $init=pkgfile($package,$script) || pkgfile($package,"init") ||
 	      pkgfile($package,"init.d");
 	my $default=pkgfile($package,'default');

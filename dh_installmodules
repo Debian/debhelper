@@ -13,7 +13,7 @@ use File::Find;
 
 =head1 SYNOPSIS
 
-B<dh_installmodules> [S<I<debhelper options>>] [B<-n>]
+B<dh_installmodules> [S<I<debhelper options>>] [B<-n>] [B<--name=>I<name>]
 
 =head1 DESCRIPTION
 
@@ -36,6 +36,13 @@ has .o files in /lib/modules.
 =item B<-n>, B<--noscripts>
 
 Do not modify postinst/postrm scripts.
+
+=item B<--name=>I<name>
+
+Use "name" as the filename the the modules file is installed in
+etc/modutils/. When this parameter is used, dh_installmodules looks for and
+installs files named debian/package.name.modules instead of the usual
+debian/package.modules.
 
 =back
 
@@ -71,7 +78,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (! -e "$tmp/etc/modutils") {
 			doit("install","-d","$tmp/etc/modutils");
 		}
-		doit("install","-m","0644",$file,"$tmp/etc/modutils/$package");
+		doit("install","-m","0644",$file,"$tmp/etc/modutils/".pkgfilename($package));
 	}
 
 	if (! $dh{NOSCRIPTS} &&

@@ -11,9 +11,9 @@ use Exporter;
 use vars qw(@ISA @EXPORT %dh);
 @ISA=qw(Exporter);
 @EXPORT=qw(&init &doit &complex_doit &verbose_print &error &warning &tmpdir
-	    &pkgfile &pkgext &isnative &autoscript &filearray &filedoublearray
-	    &GetPackages &basename &dirname &xargs %dh &compat &addsubstvar
-	    &delsubstvar &excludefile);
+	    &pkgfile &pkgext &pkgfilename &isnative &autoscript &filearray
+	    &filedoublearray &GetPackages &basename &dirname &xargs %dh
+	    &compat &addsubstvar &delsubstvar &excludefile);
 
 my $max_compat=4;
 
@@ -283,10 +283,18 @@ sub tmpdir {
 #   * debian/package.filename.buildarch
 #   * debian/package.filename
 #   * debian/file (if the package is the main package)
+# If --name was specified then tonly the first two are tried, and they must
+# have the name after the pacage name:
+#   * debian/package.name.filename.buildarch
+#   * debian/package.name.filename
 sub pkgfile {
 	my $package=shift;
 	my $filename=shift;
 
+	if (defined $dh{NAME}) {
+		$filename="$dh{NAME}.$filename";
+	}
+	
 	if (-f "debian/$package.$filename.".buildarch()) {
 		return "debian/$package.$filename.".buildarch();
 	}
@@ -302,7 +310,7 @@ sub pkgfile {
 }
 
 # Pass it a name of a binary package, it returns the name to prefix to files
-# in debian for this package.
+# in debian/ for this package.
 sub pkgext {
 	my $package=shift;
 
@@ -310,6 +318,18 @@ sub pkgext {
 		return "";
 	}
 	return "$package.";
+}
+
+# Pass it the name of a binary package, it returns the name to install
+# files by in eg, etc. Normally this is the same, but --name can override
+# it.
+sub pkgfilename {
+	my $package=shift;
+
+	if (defined $dh{NAME}) {
+		return $dh{NAME};
+	}
+	return $package;
 }
 
 # Returns 1 if the package is a native debian package, null otherwise.

@@ -11,13 +11,25 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_installlogrotate> [S<I<debhelper options>>]
+B<dh_installlogrotate> [S<I<debhelper options>>] [B<--name=>I<name>]
 
 =head1 DESCRIPTION
 
 dh_installlogrotate is a debhelper program that is responsible for installing
 logrotate config files into etc/logrotate.d in package build directories.
 Files named debian/package.logrotate are installed.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--name=>I<name>
+
+Look for files named debian/package.name.logrotate and install them as
+etc/logrotate.d/name, instead of using the usual files and installing them
+as the package name.
+
+=back
 
 =cut
 
@@ -31,7 +43,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (! -d "$tmp/etc/logrotate.d") {
 			doit("install","-o",0,"-g",0,"-d","$tmp/etc/logrotate.d");
 		}
-		doit("install","-m",644,$file,"$tmp/etc/logrotate.d/$package");
+		doit("install","-m",644,$file,"$tmp/etc/logrotate.d/".pkgfilename($package));
 	}
 }
 

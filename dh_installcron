@@ -11,7 +11,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_installcron> [S<B<debhelper options>>]
+B<dh_installcron> [S<B<debhelper options>>] [B<--name=>I<name>]
 
 =head1 DESCRIPTION
 
@@ -19,6 +19,18 @@ dh_installcron is a debhelper program that is responsible for installing
 cron scripts into etc/cron.*/ in package build directories. The files
 debian/package.cron.daily, debian/package.cron.weekly,
 debian/package.cron.monthly, and debian/package.cron.d are installed.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--name=>I<name>
+
+Look for files named debian/package.name.cron.* and install them as
+etc/cron.*/name, instead of using the usual files and installing them
+as the package name.
+
+=back
 
 =cut
 
@@ -32,7 +44,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			if (! -d "$tmp/etc/cron.$type") {
 				doit("install","-o",0,"-g",0,"-d","$tmp/etc/cron.$type");
 			}
-			doit("install",$cron,"$tmp/etc/cron.$type/$package");
+			doit("install",$cron,"$tmp/etc/cron.$type/".pkgfilename($package));
 		}
 	}
 	# Seperate because this needs to be mode 644.
@@ -41,7 +53,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (! -d "$tmp/etc/cron.d") {
 			doit("install","-o",0,"-g",0,"-d","$tmp/etc/cron.d");
 		}	
-		doit("install","-m",644,$cron,"$tmp/etc/cron.d/$package");
+		doit("install","-m",644,$cron,"$tmp/etc/cron.d/".pkgfilename($package));
 	}
 }
 
