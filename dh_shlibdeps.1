@@ -28,7 +28,8 @@ Pass "params" to
 .B \-Xitem, \--exclude=item 
 Exclude files that contain "item" anywhere in their filename from being
 passed to dpkg-shlibdeps. This will make their dependancies be ignored.
-This may be useful in some situations, but use it with caution.
+This may be useful in some situations, but use it with caution. This option
+may be used more than once to exclude more than one thing.
 .TP
 .B \-ldirectory
 Before
@@ -36,7 +37,8 @@ Before
 is run, LD_LIBRARY_PATH will be set to the specified directory.
 This is useful for multi-binary packages where a library
 is built in one package and another package contains binaries linked
-against said library.
+against said library. Note that the paths used must be absolute or
+dpkg-shlibdeps will become confused.
 .SH ENVIRONMENT
 See
 .BR debhelper (1)
