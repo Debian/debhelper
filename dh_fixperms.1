@@ -1,0 +1,38 @@
+.TH DH_FIXPERMS 1 "" "Debhelper Commands" "Debhelper Commands"
+.SH NAME
+dh_fixperms \- fix permissions of files in package build directories
+.SH SYNOPSIS
+.B dh_fixperms
+.I "[debhelper options] [-Xitem]"
+.SH "DESCRIPTION"
+dh_fixperms is a debhelper program that is responsible for setting the
+permissions of files and directories in package build directories to a
+sane state -- a state that complies with Debian policy.
+.P
+dh_fixperms makes all files in usr/doc in the package build directory
+(excluding files in the examples/ directory) be mode 644. It also changes 
+the permissions of all man pages to mode 644. It makes all files be owned by 
+root, and it removes group and other write permission from all files.
+It removes execute permissions from any libraries that have it set. Finally,
+it removes the setuid and setgid bits from all files in the package.
+.SH OPTIONS
+.TP
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
+.TP
+.B \-Xitem, \--exclude=item
+Exclude files that contain "item" anywhere in their filename from having
+their permissions changed. You may use this option multiple times to build 
+up a list of things to exclude.
+.SH ENVIRONMENT
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
+.SH "SEE ALSO"
+.BR debhelper (1)
+.SH "CONFORMS TO"
+Debian policy, version 2.5.0.0
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>
