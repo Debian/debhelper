@@ -1,24 +1,28 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Find dependancies. Simple dpkg-shlibdeps wrapper.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
+BEGIN { push @INC, "debian", "/usr/share/debhelper" }
+use Dh_Lib;
+init();
 
-for PACKAGE in $DH_DOPACKAGES; do
-	TMP=`tmpdir $PACKAGE`
-	EXT=`pkgext $PACKAGE`
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$EXT=pkgext($PACKAGE);
 
-	# Run dpkg-shlibdeps to generate dependancies.
-	filelist=""
-	for file in `find $TMP -type f \( -perm +111 -or -name "*.so*" \) | tr "\n" " "` ; do
-		case "`file $file`" in
-			*ELF*)
-				filelist="$file $filelist"
-			;;
-		esac
-	done
-	if [ "$filelist" ]; then
-		doit "dpkg-shlibdeps -Tdebian/${EXT}substvars $DH_U_PARAMS $filelist"
-	fi
-done
+	my @filelist;
+	my $ff;
+
+	# Generate a list of all ELF binaries in the package.
+	foreach $file (split(/\n/,`find $TMP -type f \\( -perm +111 -or -name "*.so*" \\)`)) {
+		# TODO: this is slow, optimize. Ie, file can run once on multiple files..
+		$ff=`file "$file"`;
+		if ($ff=~m/ELF/) {
+			push @filelist,$file;
+		}
+	}
+
+	if (@filelist) {
+		doit("dpkg-shlibdeps","-Tdebian/$EXT\substvars",@{$dh{U_PARAMS}},@filelist);
+	}
+}
