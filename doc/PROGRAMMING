@@ -1,6 +1,4 @@
 This file documents things you should know to write a new debhelper program.
-Any program with a name that begins with dh_ should conform to these
-guidelines (with the historical exception of dh_make).
 
 Standardization:
 ---------------
@@ -13,14 +11,14 @@ pollute the name space too much.
 
 Debhelper programs should never output anything to standard output except
 error messages, important warnings, and the actual commands they run that
-modify files under debian/ (this last only if they are passed -v, and if you
-output the commands, you should indent them with 1 tab). This is so we don't
-have a lot of noise output when all the debhelper commands in a debian/rules
-are run, so the important stuff is clearly visible.
+modify files under debian/ and debian/tmp, etc (this last only if they are
+passed -v, and if you output the commands, you should indent them with 1 tab). 
+This is so we don't have a lot of noise output when all the debhelper commands
+in a debian/rules are run, so the important stuff is clearly visible.
 
-Debhelper programs should accept all options listed in the "SHARED
-DEBHELPER OPTIONS" section of debhelper(7), including any long forms of
-these options, like --verbose . If necessary, the options may be ignored.
+Debhelper programs should accept the options, -v, -i, -a, -p, --no-act, and
+-P, and any long forms of these options, like --verbose . If necessary, the
+options may be ignored.
 
 If debhelper commands need config files, they should use
 debian/package.filename as the name of the config file (replace filename
@@ -31,25 +29,19 @@ information that appears in the config files, on their command lines, if
 possible, and apply that information to the first package they act on.
 
 Debhelper programs should never modify the debian/postinst, debian/prerm,
-etc scripts. Instead, they can add lines to debian/postinst.debhelper, etc. 
+etc scripts, instead, they can add lines to debian/postinst.debhelper, etc. 
 The autoscript() function (see below) is one easy way to do this.
 dh_installdeb is an exception, it will run after the other commands and
 merge these modifications into the actual postinst scripts.
-
-In general, files named debian/*.debhelper are internal to debhelper, and
-their existence or use should not be relied on by external programs such as
-the build process of a package.
-
-Debhelper programs should default to doing exactly what policy says to do.
 
 There are always exceptions. Just ask me.
 
 Introducing Dh_Lib.pm:
 ---------------------
 
-Dh_Lib.pm is the library used by all debhelper programs to parse their
+Dh_lib.pm is the library used by all debhelper programs to parse their
 arguments and set some useful variables. It's not mandatory that your
-program use Dh_Lib.pm, but it will make it a lot easier to keep it in sync
+program use Dh_lib.pm, but it will make it a lot easier to keep it in sync
 with the rest of debhelper if it does, so this is highly encouraged.
 
 (There used to be a version of Dh_lib.pm that was a library of functions for
@@ -57,16 +49,17 @@ shell scripts. If you want to write a debhelper command that is a shell
 script, I can dig up that old library for you. Only the perl one is
 supported now, though.)
 
-Use Dh_Lib.pm like this:
+Use Dh_lib.pm like this:
 
-use Debian::Debhelper::Dh_Lib
+BEGIN { push @INC, "debian", "/usr/share/debhelper" }
+use Dh_Lib;
 init();
 
 The BEGIN block is there to make perl look for the module in all the right
 places.
 
-The init() function causes Dh_lib to parse the command line and do some other
-initialization tasks.
+The init() function in the perl version. This causes Dh_lib to
+parse the command line and do some other initialization tasks.
 
 Argument processing:
 -------------------
@@ -85,10 +78,10 @@ switch		variable	description
 --no-act	NO_ACT		should the program not actually do anything?
 -i,-a,-p,-N	DOPACKAGES	a space delimited list of the binary packages
 				to act on (in Dh_Lib.pm, this is an array)
--i		DOINDEP		set if we're acting on binary independent
-				packages
--a		DOARCH		set if we're acting on binary dependent
-				packages
+-i,-p,-N	DOINDEP		a space delimited list of the binary independent
+				packages to act on
+-a,-p,-N	DOARCH		a space delimited list of the binary dependent
+				packages to act on
 -n		NOSCRIPTS	if set, do not make any modifications to the 
 				package's postinst, postrm, etc scripts.
 -X		EXCLUDE		exclude a something from processing (you
@@ -111,8 +104,6 @@ switch		variable	description
 				other program. (This is an array)
 -m		M_PARAMS	will be set to a string, you decide what it
 				means to your program
--l		L_PARAMS	will be set to a string, you decide what it
-				means to your program
 -V		V_FLAG		will be set to a string, you decide what it
 				means to your program
 -V		V_FLAG_SET	will be 1 if -V was specified, even if no
@@ -129,11 +120,9 @@ switch		variable	description
 				dh_movefiles will ever use this)
 --destdir	DESTDIR		will be set to a string (probably only
 				dh_builddeb will ever use this)
---filename	FILENAME	will be set to a string
 --flavor	FLAVOR		will be set to a string (probably only
 				dh_installemacsen will ever use this)
---number	PRIORITY	will be set to a number (deprecated)
---priority	PRIORITY	will be set to a number
+--number	NUMBER		will be set to a number
 
 Any additional command line parameters that do not start with "-" will be 
 ignored, and you can access them later just as you normally would.
@@ -148,7 +137,7 @@ The following keys are also set in the %dh hash when you call init():
 MAINPACKAGE	the name of the first binary package listed in
 		debian/control
 FIRSTPACKAGE	the first package we were instructed to act on. This package
-		typically gets special treatment; additional arguments
+		typically gets special treatment, additional arguments
 		specified on the command line may effect it.
 
 Functions:
@@ -156,34 +145,35 @@ Functions:
 
 Dh_Lib.pm also contains a number of functions you may find useful.
 
-doit(@command)
+doit()
 	Pass this function an array that is a 
 	shell command. It will run the command (unless $dh{NO_ACT} is set), and
 	if $dh{VERBOSE} is set, it will also output the command to stdout. You
 	should use this function for almost all commands your program performs
 	that manipulate files in the package build directories.
-complex_doit($command)
+complex_doit()
 	Pass this function a string that is a shell command, it will run it
 	similarly to how doit() does. You can pass more complicated commands 
 	to this (ie, commands involving piping redirection), however, you 
 	have to worry about things like escaping shell metacharacters.
-verbose_print($message)
+verbose_print()
 	Pass this command a string, and it will echo it if $dh{VERBOSE} is set.
-error($errormsg)
+error()
 	Pass this command a string, it will output it to standard error and
 	exit.
-warning($message)
+warning()
 	Pass this command a string, and it will output it to standard error
 	as a warning message.
-tmpdir($dir)
+tmpdir()
 	Pass this command the name of a binary package, it will return the
 	name of the tmp directory that will be used as this package's
-	package build directory. Typically, this will be "debian/package".
-compat($num)
-	Pass this command a number, and if the current compatibility level
-	is less than or equal to that number, it will return true.
-	Looks at DH_COMPAT to get the compatibility level.
-pkgfile($package, $basename)
+	package build directory. Typically, this will be "debian/tmp" or
+	"debian/package".
+compat()
+	Pass this command a number, and if the current compatability level
+	equals that number, it will return true. Looks at DH_COMPAT to get
+	the compatability level.
+pkgfile()
 	Pass this command the name of a binary package, and the base name of a
 	file, and it will return the actual filename to use. This is used
 	for allowing debhelper programs to have configuration files in the
@@ -191,17 +181,17 @@ pkgfile($package, $basename)
 	package. The convention is that the files are named
 	debian/package.filename, and debian/filename is also allowable for
 	the $dh{MAINPACKAGE}. If the file does not exist, nothing is returned.
-pkgext($package)
+pkgext()
 	Pass this command the name of a binary package, and it will return
 	the name to prefix to files in debian/ for this package. For the
 	$dh{MAINPACKAGE}, it returns nothing (there is no prefix), for the other
 	packages, it returns "package.".
-isnative($package)
+isnative()
 	Pass this command the name of a package, it returns 1 if the package
 	is a native debian package.
 	As a side effect, $dh{VERSION} is set to the version number of the
 	package.
-autoscript($package, $scriptname, $snippetname, $sedcommands)
+autoscript()
 	Pass parameters:
 	 - binary package to be affected
 	 - script to add to
@@ -210,29 +200,5 @@ autoscript($package, $scriptname, $snippetname, $sedcommands)
 	   (optional)
 	This command automatically adds shell script snippets to a debian
 	maintainer script (like the postinst or prerm).
-dirname($pathname)
-	Return directory part of pathname.
-basename($pathname)
-	Return base of pathname,
-addsubstvar($package, $substvar, $deppackage, $verinfo, $remove)
-	This function adds a dependency on some package to the specified
-	substvar in a package's substvar's file. It needs all these
-	parameters:
-	- binary package that gets the item
-	- name of the substvar to add the item to
-	- the package that will be depended on
-	- version info for the package (optional) (ie: ">= 1.1")
-	- if this last parameter is passed, the thing that would be added
-	  is removed instead. This can be useful to ensure that a debhelper
-	  command is idempotent. Note that without this parameter, if you
-	  call the function twice with the same values it will only add one
-	  item to the substvars file.
-delsubstvar($package, $substvar)
-	This function removes the entire line for the substvar from the
-	package's shlibs file.
-excludefile($filename)
-	This function returns true if -X has been used to ask for the file
-	to be excluded.
 
--- Joey Hess <joeyh@debian.org>
-
+-- Joey Hess <joeyh@master.debian.org>
