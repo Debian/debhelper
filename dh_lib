@@ -74,7 +74,7 @@ autoscript() {
 # Argument processing and global variable initialization is below.
 
 # Parse command line.
-set -- `getopt xvianp:P: $*`
+set -- `getopt xvidrnap:P:u: $*`
 
 for i; do
 	case "$i"
@@ -104,8 +104,21 @@ for i; do
 			DH_EXCLUDE=1
 			shift
 			;;
+		-d)
+			DH_D_FLAG=1
+			shift
+			;;
+		-r)
+			DH_R_FLAG=1
+			shift
+			;;
 		-P)
 			DH_TMPDIR="$2"
+			shift
+			shift
+			;;
+		-u)
+			DH_U_PARAMS="$2"
 			shift
 			shift
 			;;

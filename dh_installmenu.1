@@ -3,10 +3,10 @@
 dh_installmenu \- install debian menu files into package build directories
 .SH SYNOPSIS
 .B dh_installmenu
-.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir]"
+.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir] [-n]"
 .SH "DESCRIPTION"
 dh_installmenu is a debhelper program that is responsible for installing
-fils used by the debian menu package into package build directories. 
+files used by the debian menu package into package build directories. 
 .P
 It also automatically generates the postinst and postrm commands needed to 
 interface with the debian menu package. See 
@@ -38,11 +38,11 @@ Install menu files into all architecture independent packages.
 .B \-ppackage
 Install menu files into the package named "package".
 .TP
-.B \-n
-Do not automatically generate code.
-.TP
 .B \-Ptmpdir
 Use "tmpdir" for package build directory. 
+.TP
+.B \-n
+Do not modify postinst/postrm scripts.
 .SH NOTES
 The
 .B \-a
