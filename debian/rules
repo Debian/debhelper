@@ -54,7 +54,7 @@ binary-indep: build
 # Install in the proper location on my ftp server and web server. Not intended
 # for use by anyone except the author.
 OLD_VER=$(shell perl -e '<>;<>;while(<>){last if /^ --/};<>;$$_=<>;print m/\((.*?)\)/'<debian/changelog)
-localdist:
+dist:
 	dpkg-buildpackage -rfakeroot -tc
 	if [ `hostname` = 'kite' ] ; then \
 		cp ../debhelper_$(VERSION).tar.gz ../../public; \

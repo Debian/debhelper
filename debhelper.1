@@ -3,7 +3,7 @@
 debhelper \- overview of the debhelper commands
 .SH SYNOPSIS
 .B dh_*
-.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Npackage] [-Ptmpdir]"
+.I "[-v] [-a] [-i] [-s] [--no-act] [-ppackage] [-Npackage] [-Ptmpdir]"
 .SH "DESCRIPTION"
 Debhelper is a collection of programs that can be used in debian/rules files
 to automate common tasks related to building debian binary packages. All the
@@ -29,6 +29,15 @@ Act on all architecture independent packages.
 .B \-ppackage, \--package=package
 Act on the package named "package".
 .TP
+.B \-s, \--same-arch
+This is a smarter version of the -a flag, that is used in some rare
+circumstances. It understands that if the control file lists "Architecture: i386"
+for the package, the package should not be acted on on other architectures. So
+this flag makes the command act on all "Architecture: any" packages, as well
+as on any packages that have the current architecture explicitly specified.
+Constrast to the -a flag, which makes the command work on all packages that
+are not architecture independant.
+.TP
 .B \-Npackage, \--no-package=package
 Do not act on the specified package even if an -a, -i, or -p option lists
 the package as one that should be acted on.
@@ -52,8 +61,10 @@ are acted on by debhelper programs, all debhelper programs accept the
 .B -a
 ,
 .B -i
-, and 
+,
 .B -p
+, and
+.B -s
 parameters. These parameters are cumulative. If none are given,
 debhelper programs default to acting on all packages listed in the control
 file.

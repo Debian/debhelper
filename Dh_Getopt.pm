@@ -31,6 +31,10 @@ sub AddPackage { my($option,$value)=@_;
 	elsif ($option eq 'p' or $option eq 'package') {
 		push @{$options{DOPACKAGES}}, $value;
 	}
+	elsif ($option eq 's' or $option eq 'same-arch') {
+		push @{$options{DOPACKAGES}}, GetPackages('same');
+		$options{DOSAME}=1;
+	}
 	else {
 		error("bad option $option - should never happen!\n");
 	}
@@ -62,6 +66,9 @@ sub parseopts {
 	
 		"p=s" => \&AddPackage,
 	        "package=s" => \&AddPackage,
+	
+		"s" => \&AddPackage,
+		"same-arch" => \&AddPackage,
 	
 		"N=s" => \&ExcludePackage,
 		"no-package=s" => \&ExcludePackage,
@@ -120,7 +127,7 @@ sub parseopts {
 	# want us to act on them all. Note we have to do this before excluding
 	# packages out, below.
 	if (! defined $options{DOPACKAGES} || ! @{$options{DOPACKAGES}}) {
-		if ($options{DOINDEP} || $options{DOARCH}) {
+		if ($options{DOINDEP} || $options{DOARCH} || $options{DOSAME}) {
 				# User specified that all arch (in)dep package be
 				# built, and there are none of that type.
 				error("I have no package to build");

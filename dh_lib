@@ -167,7 +167,7 @@ MAINPACKAGE=`grep ^Package: debian/control | cut -d " " -f 2 | head -1`
 # Check if packages to build have been specified, if not, fall back to 
 # the default, doing them all.
 if [ ! "$DH_DOPACKAGES" ]; then
-	if [ "$DH_DOINDEP" -o "$DH_DOARCH" ]; then
+	if [ "$DH_DOINDEP" -o "$DH_DOARCH" -o "$DH_DOSAME" ]; then
 		error "I have no package to build."
 	fi
 	DH_DOPACKAGES=`grep ^Package: debian/control | cut -d " " -f 2 | tr "\n" " "`

@@ -21,8 +21,8 @@ sub init {
 	}
 
 	# Check to see if an argument on the command line starts with a dash.
-	# if so, we need to pass this off to the resource intensive Getopt::Long,
-	# which I'd prefer to avoid loading at all if possible.
+	# if so, we need to pass this off to the resource intensive 
+	# Getopt::Long, which I'd prefer to avoid loading at all if possible.
 	my $parseopt=undef;
 	my $arg;
 	foreach $arg (@ARGV) {
@@ -54,10 +54,10 @@ sub init {
 	my @allpackages=GetPackages();
 	$dh{MAINPACKAGE}=$allpackages[0];
 
-	# Check if packages to build have been specified, if not, fall back to 
+	# Check if packages to build have been specified, if not, fall back to
 	# the default, doing them all.
 	if (! defined $dh{DOPACKAGES} || ! @{$dh{DOPACKAGES}}) {
-		if ($dh{DOINDEP} || $dh{DOARCH}) {
+		if ($dh{DOINDEP} || $dh{DOARCH} || $dh{DOSAME}) {
 			# User specified that all arch (in)dep package be 
 			# built, and there are none of that type.
 			error("I have no package to build");
@@ -270,14 +270,23 @@ sub filearray { my $file=shift;
 }
 
 # Returns a list of packages in the control file.
-# Must pass "arch" or "indep" to specify arch-dependant or -independant
-# packages. If nothing is specified, returns all packages.
+# Must pass "arch" or "indep" or "same" to specify arch-dependant or
+# -independant or same arch packages. If nothing is specified, returns all
+# packages.
 sub GetPackages { my $type=shift;
 	$type="" if ! defined $type;
+	
+	# Look up the build arch if we need to.
+	my$buildarch='';
+	if ($type eq 'same') {
+		$buildarch=`dpkg --print-architecture` || error($!);
+		chomp $buildarch;
+	}
+
 	my $package="";
 	my $arch="";
 	my @list=();
-	open (CONTROL,"<debian/control") || 
+	open (CONTROL,"<debian/control") ||
 		error("cannot read debian/control: $!\n");
 	while (<CONTROL>) {
 		chomp;
@@ -292,6 +301,7 @@ sub GetPackages { my $type=shift;
 			if ($package &&
 			    (($type eq 'indep' && $arch eq 'all') ||
 			     ($type eq 'arch' && $arch ne 'all') ||
+			     ($type eq 'same' && ($arch eq 'any' || $arch =~ /\b$buildarch\b/)) ||
 			     ! $type)) {
 				push @list, $package;
 				$package="";
