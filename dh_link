@@ -58,12 +58,11 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			for (1..$#dest_dirs - $x) {
 				$src.="../";
 			}
-			# The + 1 is here to include the actual filename.
-			for (1..$#src_dirs - $x + 1) {
+			for ($x .. $#src_dirs) {
 				$src.=$src_dirs[$_]."/";
 			}
 			$src=~s:/$::;
-		}	
+		}
 		
 		doit("ln","-sf",$src,"$TMP/$dest");
 	}
