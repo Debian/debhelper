@@ -12,11 +12,15 @@ for PACKAGE in $DH_DOPACKAGES; do
 	doit "rm -rf $TMP"
 	doit "rm -f debian/${EXT}substvars"
 done
-doit "rm -f debian/files* debian/*.debhelper $*"
+doit "rm -f debian/*.debhelper $*"
+if [ ! "$DH_K_FLAG" ]; then
+	doit "rm -f debian/files*"
+fi
 
 # Remove other temp files.
 # Use complex_doit so we can properly escape things.
-complex_doit "find . \( -name '#*#' -o -name '*~' -o -name DEADJOE -o -name '*.orig' \
-	-o -name '*.rej' -o -name '*.bak' -o -name '.*.orig' \
-	-o -name '.*.rej' -o -name .SUMS -o -name TAGS -o -name core \
+complex_doit "find . \( -name '#*#' -o -name '*~' -o -name DEADJOE \
+	-o -name '*.orig' -o -name '*.rej' -o -name '*.bak' \
+	-o -name '.*.orig' -o -name '.*.rej' -o -name .SUMS \
+	-o -name TAGS -o -name core \
 	\) -exec rm -f {} \;"

@@ -3,70 +3,27 @@
 dh_installdebfiles \- install files into the DEBIAN directory
 .SH SYNOPSIS
 .B dh_installdebfiles
-.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir]"
 .SH "DESCRIPTION"
 dh_installdebfiles is a debhelper program that is responsible for installing
 files into the DEBIAN directory in package build directories with the
-correct permissions.
+correct permissions, canculating shared library dependancies, and creating a
+control file.
 .P
-dh_installdocs automatically installs the following files from debian/ into
-the DEBIAN directory:
-.IP postinst
-.IP preinst
-.IP postrm
-.IP prerm
-.IP shlibs
-.IP conffiles
+This program is depricated. It is now merely a wrapper around three other
+programs, and you may replace any calls to this program by:
 .P
-(For packages other than the first binary package listed in debian/control,
-prefix these filenames with then name of the "package.", for example, 
-"foo.postinst".)
-.P
-The files postinst, preinst, postrm, and prerm are handled specially: If a
-corresponding file named debian/script.debhelper exists, the contents of that 
-file are merged into the script as follows: If the script exists, then 
-anywhere in it that "#DEBHELPER#" appears, the text of the .debhelper file is
-inserted. If the script does not exist, then a script is generated from 
-the .debhelper file. The .debhelper files are created by other debhelper 
-programs, such as 
-.BR dh_installmenu (1)
-, and are shell scripts.
-.P
-In addition, it will generate a DEBIAN/control file, by running
-.BR dpkg-shlibdeps (1)
-and
-.BR dpkg-gencontrol (1)
+  dh_installdeb
+  dh_shlibdeps
+  dh_gencontrol
+.SH WARNING
+This program will be removed at some time in the furture.
 .SH OPTIONS
-.TP
-.B \-v
-Verbose mode; show all commands that modify the package build directory.
-.TP
-.B \-a
-Install files for all architecture dependent packages.
-.TP
-.B \-i
-Install files for all architecture independent packages.
-.TP
-.B \-ppackage
-Install files for the package named "package".
-.TP
-.B \-Ptmpdir
-Use "tmpdir" for package build directory. 
-.SH NOTES
-The
-.B \-a
-.B \-i
-and
-.B \-p
-arguments are cumulative. If none are specified, then all packages listed in
-the control file will be effected.
-.SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode
+Any options passed to this program will be sent to each of the 3 programs
+listed above.
 .SH "SEE ALSO"
 .BR /usr/doc/debhelper/README
-.SH "CONFORMS TO"
-Debian policy, version 2.3.0.0
+.BR dh_installdeb (1)
+.BR dh_shlibdeps (1)
+.BR dh_gencontrol (1)
 .SH AUTHOR
 Joey Hess <joeyh@master.debian.org>

@@ -27,10 +27,10 @@ binary-indep: build
 binary-arch: build
 	dh_testdir
 	dh_testroot
-	dh_clean
+	dh_clean -k
 	dh_installdirs
 	# Add here commands to install the files into debian/tmp
-	#$(MAKE) PREFIX=debian/tmp install
+	#$(MAKE) prefix=`pwd`/debian/tmp install
 	dh_installdocs
 	dh_installexamples
 	dh_installmenu

@@ -82,7 +82,7 @@ autoscript() {
 # Argument processing and global variable initialization is below.
 
 # Parse command line.
-set -- `getopt xvidrnap:P:u: $*`
+set -- `getopt xvidrnakp:P:u: $*`
 
 for i; do
 	case "$i"
@@ -118,6 +118,10 @@ for i; do
 			;;
 		-r)
 			DH_R_FLAG=1
+			shift
+			;;
+		-k)
+			DH_K_FLAG=1
 			shift
 			;;
 		-P)

@@ -17,14 +17,17 @@ for PACKAGE in $DH_DOPACKAGES; do
 	# If any .debhelper files exist, add them into the scripts.
 	for file in postinst preinst prerm postrm; do
 		if [ -f debian/$EXT$file ]; then
-			# Add this into the script, where it has #DEBHELPER#
 			if [ -f debian/$EXT$file.debhelper ]; then
+				# Add this into the script, where it has
+				# #DEBHELPER#
 				complex_doit "perl -pe 's~#DEBHELPER#~qx{cat debian/$EXT$file.debhelper}~eg' < debian/$EXT$file > $TMP/DEBIAN/$file"
-				doit "chown root.root $TMP/DEBIAN/$file"
-				doit "chmod 755 $TMP/DEBIAN/$file"
 			else
-				doit "install -o root -g root -p debian/$EXT$file $TMP/DEBIAN/$file"
+				# Just get rid of any #DEBHELOPER# in the 
+				# script.
+				complex_doit "sed s/#DEBHELPER#// < debian/$EXT$file > $TMP/DEBIAN/$file"
 			fi
+			doit "chown root.root $TMP/DEBIAN/$file"
+			doit "chmod 755 $TMP/DEBIAN/$file"
 		else
 			# Auto-generate script header and add .debhelper
 			# content to it.
