@@ -1,3 +1,15 @@
+debhelper (2.0.77) unstable; urgency=low
+
+  * dh_suidregister: Fixed a rather esoteric bug: If a file had multiple
+    hard links, and was suid, suidregister detected all the hard links as
+    files that need to be registered. It looped, registering the first
+    link, and then removing its suid bit. This messed up the registration
+    of the other had links, since their permissions were now changed,
+    leading to unpredictable results. The fix is to just not remove suid
+    bits until all files have been registered. 
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 30 Nov 1999 00:26:42 -0800
+
 debhelper (2.0.76) unstable; urgency=low
 
   * dh_installmanpages:
