@@ -1,6 +1,8 @@
 PYTHON=#PYVER#
-DIRLIST="#DIRLIST#"
-for i in $DIRLIST ; do
-	$PYTHON -O /usr/lib/$PYTHON/compileall.py -q $i
-	$PYTHON /usr/lib/$PYTHON/compileall.py -q $i
-done
+if which $PYTHON >/dev/null 2>&1; then
+	DIRLIST="#DIRLIST#"
+	for i in $DIRLIST ; do
+		$PYTHON -O /usr/lib/$PYTHON/compileall.py -q $i
+		$PYTHON /usr/lib/$PYTHON/compileall.py -q $i
+	done
+fi
