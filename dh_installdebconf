@@ -20,8 +20,17 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	}
 	
 	if ($templates ne '') {
-		doit("install", "-o", "root", "-g", "root", "-m", 644, "-p",
-		     $templates, "$TMP/DEBIAN/templates");
+		# Are there translated templates too?
+		my @trans=glob("$templates.??");
+		if (@trans) {
+			complex_doit("debconf-mergetemplate @trans $templates > $TMP/DEBIAN/templates");
+			chmod 0644, "$TMP/DEBIAN/templates";
+			chown 0, 0, "$TMP/DEBIAN/templates";
+		}
+		else {
+			doit("install", "-o", "root", "-g", "root", "-m", 644, "-p",
+			     $templates, "$TMP/DEBIAN/templates");
+		}
 	}
 
 	if (($config ne ''|| $templates ne '') && ! $dh{NOSCRIPTS}) {
