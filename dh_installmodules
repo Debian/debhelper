@@ -27,7 +27,7 @@ Then postinst and postrm commands are automatically generated to register
 the modules when the package is installed. See L<dh_installdeb(1)> for an
 explanation of how this works. Note that this will be done for any
 package this program acts on which has either the above-mentioned file, or
-has .o files in /lib/modules.
+has .o or .ko files in /lib/modules.
 
 =head1 OPTIONS
 
@@ -56,13 +56,13 @@ instances of the same text to be added to maintainer scripts.
 
 init();
 
-# Returns true if there are any .o files in the passed directory.
+# Returns true if there are any .o or .ko files in the passed directory.
 sub find_kernel_modules {
 	my $searchdir=shift;
 	my @results=();
 
 	return unless -d $searchdir;
-	find(sub { push @results, $_ if /\.o$/ }, $searchdir);
+	find(sub { push @results, $_ if /\.k?o$/ }, $searchdir);
 	return @results > 0;
 }
 
