@@ -11,9 +11,9 @@ use Exporter;
 use vars qw(@ISA @EXPORT %dh);
 @ISA=qw(Exporter);
 @EXPORT=qw(&init &doit &complex_doit &verbose_print &error &warning &tmpdir
-	    &pkgfile &pkgext &isnative &autoscript &filearray &GetPackages
-	    &basename &dirname &xargs %dh &compat &addsubstvar &delsubstvar
-            &excludefile);
+	    &pkgfile &pkgext &isnative &autoscript &filearray &filedoublearray
+	    &GetPackages &basename &dirname &xargs %dh &compat &addsubstvar
+	    &delsubstvar &excludefile);
 
 my $max_compat=4;
 

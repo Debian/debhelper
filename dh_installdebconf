@@ -11,7 +11,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_installdebconf> [S<I<debhelper options>>] [B<-n>]
+B<dh_installdebconf> [S<I<debhelper options>>] [B<-n>] [S<B<--> I<params>>]
 
 =head1 DESCRIPTION
 
@@ -51,11 +51,20 @@ debian/package.templates.de is merged with debian/package.templates.
 
 Do not modify postrm script.
 
+=item B<--> I<params>
+
+Pass the params to debconf-mergetemplate.
+
 =back
 
 =cut
 
 init();
+
+my @extraparams;
+if (defined($dh{U_PARAMS})) {
+	@extraparams=@{$dh{U_PARAMS}};
+}
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
@@ -75,7 +84,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# Are there translated templates too?
 		my @trans=(glob("$templates.??"), glob("$templates.??_??"));
 		if (@trans) {
-			complex_doit("debconf-mergetemplate @trans $templates > $tmp/DEBIAN/templates");
+			complex_doit("debconf-mergetemplate @extraparams @trans $templates > $tmp/DEBIAN/templates");
 			chmod 0644, "$tmp/DEBIAN/templates";
 			chown 0, 0, "$tmp/DEBIAN/templates";
 		}
