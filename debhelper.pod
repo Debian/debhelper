@@ -47,10 +47,12 @@ be used to configure the behavior of specific debhelper commands. These
 files are typically named debian/package.foo (where "package" of course,
 is replaced with the package that is being acted on).
 
-For example,
-dh_installdocs uses files named debian/package.docs to list the documentation
-files it will install. See the man pages of individual commands for details
-about the names and formats of the files they use.
+For example, dh_installdocs uses files named debian/package.docs to list
+the documentation files it will install. See the man pages of individual
+commands for details about the names and formats of the files they use.
+Generally, these files will list files to act on, one file per line. Some
+programs in debhelper use pairs of files and destinations or slightly more
+complicated formats.
 
 Note that if a package is the first (or only) binary package listed in
 debian/control, debhelper will use debian/foo if no debian/package.foo

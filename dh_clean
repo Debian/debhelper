@@ -17,9 +17,9 @@ B<dh_clean> [S<I<debhelper options>>] [B<-k>] [B<-d>] [B<-X>I<item>] [S<I<file .
 
 dh_clean is a debhelper program that is responsible for cleaning up after a
 package is built. It removes the package build directories, and removes some
-other files, such as debian/substvars, debian/files, and any detritus left
-behind by other debhelper commands (debian/*.debhelper). It also removes
-common files that should not appear in a debian diff:
+other files including debian/files, and any detritus left behind by other
+debhelper commands. It also removes common files that should not appear in a
+debian diff:
   #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS core .deps/* *.P
 
 =head1 OPTIONS
@@ -64,6 +64,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (! $dh{D_FLAG}) {
 		doit("rm","-f","debian/${ext}substvars")
 			unless excludefile("debian/${ext}substvars");
+		
+		# These are all debhelper temp files, and so it is safe to 
+		# wildcard them.
+		complex_doit("rm -f debian/$ext*.debhelper");
 	}
 	
 	doit ("rm","-rf",$tmp)
@@ -80,15 +84,6 @@ if (! $dh{D_FLAG}) {
 			unless excludefile("debian/files");
 	}
 
-	# These are all debhelper temp files, and so it is safe to 
-	# wildcard them.
-	complex_doit("rm -f debian/*.debhelper");
-
-	# Remove some files that were left around by older versions of
-	# debhelper.
-	doit("rm","-f","debian/substvars")
-		unless excludefile("debian/substvars");
-	
 	# See if some files that would normally be deleted are excluded.
 	my $find_options='';
 	if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {

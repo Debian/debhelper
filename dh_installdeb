@@ -29,11 +29,11 @@ the DEBIAN directory:
   package.conffiles
 
 The postinst, preinst, postrm, and prerm are handled specially: If a
-corresponding file named debian/script.debhelper exists, the contents of that
-file are merged into the script as follows: If the script exists, then
-anywhere in it that "#DEBHELPER#" appears, the text of the .debhelper file is
-inserted. If the script does not exist, then a script is generated from
-the .debhelper file. The .debhelper files are created by other debhelper
+corresponding file named debian/package.script.debhelper exists, the contents
+of that file are merged into the script as follows: If the script exists,
+then anywhere in it that "#DEBHELPER#" appears, the text of the .debhelper
+file is inserted. If the script does not exist, then a script is generated
+from the .debhelper file. The .debhelper files are created by other debhelper
 programs, such as L<dh_installmenu(1)>, and are shell script fragments.
 
 In V3 compatibility mode and higher, all files in the etc/ directory in a
