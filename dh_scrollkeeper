@@ -71,7 +71,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			# of the content. First, the OMF files
 			foreach my $file (@omf_files) {
 				chomp $file;
-				doit("perl", "-i", "-pe", "'s,http://scrollkeeper.sourceforge.net/dtds/scrollkeeper-omf-1.0/scrollkeeper-omf.dtd,/usr/share/xml/scrollkeeper/dtds/scrollkeeper-omf.dtd, if \$. < 10'", $file);
+				doit("perl", "-i", "-pe", 's,http://scrollkeeper.sourceforge.net/dtds/scrollkeeper-omf-1.0/scrollkeeper-omf.dtd,/usr/share/xml/scrollkeeper/dtds/scrollkeeper-omf.dtd, if $. < 10', $file);
 			}
 			# I could be cunning and parse the OMF for the DocBook
 			# files. That is far too much effort. Find to the
@@ -80,7 +80,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			foreach my $xmlpath (@xml_paths) {
 				foreach my $file (`find $tmp/$xmlpath -type f -name \*.xml -printf '%p\n'`) {
 					chomp $file;
-					doit("perl", "-i", "-pe", "'s,http://www.oasis-open.org/docbook/xml/([^/]+)/docbookx.dtd,/usr/share/sgml/docbook/dtd/xml/\\1/docbookx.dtd, if \$. < 10'", $file);
+					doit("perl", "-i", "-pe", 's,http://www.oasis-open.org/docbook/xml/([^/]+)/docbookx.dtd,/usr/share/sgml/docbook/dtd/xml/\\1/docbookx.dtd, if $. < 10', $file);
 				}
 			}
 		
