@@ -209,7 +209,7 @@ sub dirname {
 	return $fn;
 }
 
-# Pass in a number, will return true iff the current compatability level
+# Pass in a number, will return true iff the current compatibility level
 # is less than or equal to that number.
 sub compat {
 	my $num=shift;
@@ -220,7 +220,7 @@ sub compat {
 	}
 
 	if ($c > $max_compat) {
-		error("Sorry, but $max_compat is the highest compatability level of debhelper currently supported.");
+		error("Sorry, but $max_compat is the highest compatibility level of debhelper currently supported.");
 	}
 
 	return ($c <= $num);
@@ -235,7 +235,7 @@ sub tmpdir {
 		return $dh{TMPDIR};
 	}
 	elsif (compat(1) && $package eq $dh{MAINPACKAGE}) {
-		# This is for back-compatability with the debian/tmp tradition.
+		# This is for back-compatibility with the debian/tmp tradition.
 		return "debian/tmp";
 	}
 	else {
