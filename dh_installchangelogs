@@ -30,7 +30,7 @@ not a native debian package, then this upstream changelog will be installed
 as usr/share/doc/package/changelog in the package build directory. If the
 changelog is a html file (determined by file extension), it will be
 installed as usr/share/doc/package/changelog.html instead, and will be
-converted to plain text with lynx to generate
+converted to plain text with html2text to generate
 usr/share/doc/package/changelog.
 
 =head1 OPTIONS
@@ -100,7 +100,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			# HTML changelog
 			doit("install","-o",0,"-g",0,"-p","-m644",
 				$upstream,"$tmp/usr/share/doc/$package/changelog.html");
-			complex_doit("lynx -dump $upstream > $tmp/usr/share/doc/$package/changelog");
+			doit("html2text","-nobs","-o","$tmp/usr/share/doc/$package/changelog",$upstream);
 			$link_to='changelog.html';
 		}
 		else {
