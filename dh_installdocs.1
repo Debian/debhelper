@@ -31,19 +31,17 @@ A file named debian/package.docs (debian/docs may be used for the first
 binary package in debian/control) can list other files to be installed.
 .P
 A file named debian/package.doc-base (debian/doc-base may be used for the
-first binary package in debian/control), if it exists, will make
-dh_installdocs use that file as a doc-base control file, and will
-automatically generate the postinst and prerm commands needed to
-interface with the doc-base package. See
+first binary package in debian/control), if it exists, will be installed as 
+a doc-base control file, and will make this program automatically generate the
+postinst and prerm commands needed to interface with the doc-base package. See
 .BR dh_installdeb (1)
-for an explanation of how this works. Note that the package name will be
-used as the doc-base document id.
+for an explanation of how this works.
+Note that the doc-id will be determined from the doc-base control file 
+in question.
 .PP
 If your package needs to register more
 than one document, you need multiple files. To accomplish this, you can use
-files named debian/package.doc-base.docid. The "docid" on the end is a
-string that is combined with the package name to generate a unique doc-base
-document id.
+files named debian/package.doc-base.*
 .SH OPTIONS
 .TP
 .B debhelper options
