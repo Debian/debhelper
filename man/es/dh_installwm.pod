@@ -1,0 +1,70 @@
+# (c) 2003 Software in the Public Interest
+# Esta traducción ha sido realizada por Rubén Porras Campo <nahoo@inicia.es>
+# Está basada en la página de manual original:
+# versión 1.1 del CVS de
+# /cvs/debian-doc/manpages/english/debhelper/dh_installwm.pod
+
+=head1 NOMBRE
+
+dh_installwm - registra un gestor de ventanas
+
+=head1 SINOPSIS
+
+B<dh_installwm> [S<I<opciones debhelper>>] [B<-n>] [B<--priority=>I<n>] [S<I<gestor ...>>]
+
+=head1 DESCRIPCIÓN
+
+dh_installwm es un programa de debhelper responsable de generar las órdenes de
+postinst y postrm que registran un gestor de ventanas con
+L<update-alternatives(8)>
+
+Cualquier gestor de ventanas especificado como parámetro se registrará en el
+primer paquete sobre el que actúe dh_installwm. Por omisión, es el primer
+paquete binario en debian/control, pero si usa las opciones -p, -i, o -a,
+será el primer paquete especificado por estas opciones.
+
+Ficheros llamados debian/paquete.wm pueden listar otros gestores de ventanas a
+registrar.
+
+=head1 OPCIONES
+
+=over 4
+
+=item B<--priority=>I<n>
+
+Establece la prioridad del gestor de ventanas. De forma predeterminada es 20,
+demasiado baja para la mayoría de gestores de ventanas; lea el documento Normas
+de Debian para instrucciones acerca de como calcular el valor correcto.
+
+=item B<-n>, B<--noscripts>
+
+No modifica los scripts de postinst/postrm. Si se especifica esta orden no hace
+nada.
+
+=item I<gestor ...>
+
+Las órdenes usadas para ejecutar el gestor o gestores de ventanas que quiere
+registrar.
+
+=head1 NOTAS
+
+Esta orden no es idempotente. Debe llamarse a "dh_clean -k" entre invocaciones
+de esta orden. De otro modo, puede causar que los scripts de mantenimiento
+contengan partes duplicadas.
+
+=back
+
+=head1 VÉASE TAMBIÉN
+
+L<debhelper(7)>
+
+Este programa es parte de debhelper.
+
+=head1 AUTOR
+
+Joey Hess <joeyh@debian.org>
+
+
+=head1 TRADUCTOR
+
+Traducción de Rubén Porras Campo <debian-l10n-spanish@lists.debian.org>

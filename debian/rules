@@ -2,8 +2,7 @@
 # Note that I have to refer to debhelper programs with ./, to make sure
 # I run the most current ones.
 #
-# This is _not_ a good example of a debhelper rules file, but I didn't need
-# to tell you that; just see the chunk of inlined perl below.. 
+# This is _not_ a good example of a debhelper rules file.
 # See examples/ for some good examples.
 
 # Ensure that builds are self-hosting, which means I have to use the .pm
@@ -14,44 +13,61 @@ export PERL5LIB=.
 # be sure to use the new templates from this package.
 export DH_AUTOSCRIPTDIR=autoscripts
 
-# Figure out the `current debhelper version.
-VERSION=$(shell expr "`dpkg-parsechangelog 2>/dev/null |grep Version:`" : '.*Version: \(.*\)')
-
-PERLLIBDIR=$(shell perl -MConfig -e 'print $$Config{vendorlib}')
-
-build: test build-stamp
-build-stamp:
-	# Generate the main man page. All the perl cruft is to get a list
-	# of debhelper commands with short descriptions into the man page.
-	pod2man --section=7 -c Debhelper -r "$(VERSION)" debhelper.pod | \
-	perl -e ' \
+# This generates a list of synopses of debhelper commands, and substitutes
+# it in to the #LIST# line on the man page fed to it on stdin. Must be passes
+# parameters of all the executables or pod files to get the synopses from.
+# (Like I said, this is not a good example of a debhelper rules file..)
+MAKEMANLIST=perl -e ' \
 		undef $$/; \
 		foreach (@ARGV) { \
 		        open (IN, $$_) or die "$$_: $$!"; \
 		        $$file=<IN>; \
 		        close IN; \
-		        if ($$file=~m/=head1 NAME\n\n(.*?) - (.*?)\n/m) { \
+		        if ($$file=~m/=head1 .*\n\n(.*?) - (.*?)\n/m) { \
 		                $$collect.=".IP $$1(1)\n$$2\n"; \
 		        } \
 		} \
 		END { \
 			while (<STDIN>) { \
-		        	s/#LIST#/$$collect/; \
+		        	s/\#LIST\#/$$collect/; \
 				print; \
 			}; \
-		}' `find . -type f -perm +100 -maxdepth 1 -name "dh_*" | sort` > debhelper.7
-	# Turn all executables into man pages.
+		}'
+
+# Figure out the `current debhelper version.
+VERSION=$(shell expr "`dpkg-parsechangelog 2>/dev/null |grep Version:`" : '.*Version: \(.*\)')
+
+PERLLIBDIR=$(shell perl -MConfig -e 'print $$Config{vendorlib}')
+
+POD2MAN=pod2man -c Debhelper -r "$(VERSION)"
+
+build: test build-stamp
+build-stamp:
+	# Build all the man pages.
 	find . -type f -perm +100 -maxdepth 1 -name "dh_*" \
-		-exec pod2man -c Debhelper -r "$(VERSION)" {} {}.1 \;
+		-exec $(POD2MAN) {} {}.1 \;
+	$(POD2MAN) --section=7 debhelper.pod | \
+		$(MAKEMANLIST) `find . -type f -perm +100 -maxdepth 1 -name "dh_*" | sort` > debhelper.7
+	# Translated pages.
+	set -e; \
+	for dir in man/*; do \
+		lang=`basename $$dir`; \
+		for file in $$dir/dh_*.pod; do \
+			prog=`basename $$file | sed 's/.pod//'`; \
+			$(POD2MAN) $$file $$prog.$$lang.1; \
+		done; \
+		$(POD2MAN) --section=7 $$dir/debhelper.pod | \
+			$(MAKEMANLIST) `find $$dir -type f -maxdepth 1 -name "dh_*.pod" | sort` > debhelper.$$lang.7; \
+	done
+	
 	printf "package Debian::Debhelper::Dh_Version;\n\$$version='$(VERSION)';" > \
 		Debian/Debhelper/Dh_Version.pm
-
 	touch build-stamp
 
 clean:
 	./dh_testdir
 	./dh_testroot
-	-./dh_clean *.1 *.7 *-stamp Debian/Debhelper/Dh_Version.pm
+	./dh_clean *.1 *.7 *-stamp Debian/Debhelper/Dh_Version.pm
 
 test: test-stamp
 test-stamp:
@@ -60,11 +76,6 @@ test-stamp:
 	./dh_clean
 	touch test-stamp
 
-# Build architecture-dependent files here.
-binary-arch: build
-# Nothing to do.
-
-# Build architecture-independent files here.
 binary-indep: build
 	./dh_testdir
 	./dh_testroot
@@ -93,6 +104,6 @@ installhook:
 	cp debian/changelog $(DIR)/CHANGES
 	echo -n $(VERSION) > $(DIR)/LATEST-VERSION-IS
 
+binary-arch:
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary dist
-
+.PHONY: build clean binary-indep binary-arch binary

@@ -1,0 +1,66 @@
+# (c) 2003 Software in the Public Interest
+# Esta traducción ha sido realizada por Rudy Godoy <rudy@kernel-panik.org>
+# y revisada por Rubén Porras <nahoo@inicia.es>
+# Está basada en la página de manual original:
+# versión 1.1 del CVS de
+# /cvs/debian-doc/manpages/english/debhelper/dh_usrlocal.pod
+
+=head1 NOMBRE
+
+dh_usrlocal - migra directorios usr/local a programas de desarrollador
+
+=head1 SINOPSIS
+
+B<dh_usrlocal> [S<I<opciones debhelper>>] [B<-n>]
+
+=head1 DESCRIPCIÓN
+
+dh_usrlocal es un programa de debhelper que puede ser usado para construir
+paquetes que proveerán un subdirectorio en /usr/local cuando se instalen.
+
+Éste busca subdirectorios de usr/local en el directorio de construcción
+del paquete, y los borra, reemplazándolos con las partes de programas de
+desarrollador (a menos que se use B<-n>) para crear los directorios al
+momento de la instalación, y los borra cuando el paquete es desinstalado,
+de una forma que cumpla con las Normas de Debian. Vea L<dh_installdeb(1)>
+para una explicación de las partes de programas Debhelper de desarrollador.
+
+Si los directorios encontrados en el árbol de construcción tienen propietarios,
+grupos o permisos inusuales, entonces estos valores serán preservados en los
+directorios hechos por el programa postinst. Sin embargo, como una excepción
+especial, si un directorio tiene como propietario root.root, éste será
+tratado como si tuviese como dueño root.staff y en modo 2775. Esto es útil,
+puesto que esa es la norma recomendada para el grupo y modo de los 
+directorios en /usr/local.
+
+=head1 OPCIONES
+
+=over 4
+
+=item B<-n>, B<--noscripts>
+
+No modifica programas F<postinst>/F<prerm>.
+
+=back
+
+=head1 NOTAS
+
+Nótese que esta orden no es idempotente. "dh_clean -k" debería ser
+ejecutado entre las invocaciones de esta orden. En caso contrario,
+puede originar que se añadan múltiples instancias del mismo texto a los
+programas del desarrollador.
+
+=head1 CONFORME A
+
+Normas de Debian, versión 2.2
+
+=head1 VÉASE TAMBIÉN
+
+L<debhelper(7)>
+
+Este programa es parte de debhelper.
+
+=head1 AUTOR
+
+Andrew Stribblehill <ads@debian.org>
+

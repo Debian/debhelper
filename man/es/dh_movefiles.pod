@@ -1,0 +1,83 @@
+# (c) 2003 Software in the Public Interest
+# Esta traducción ha sido realizada por Rudy Godoy <rudy@kernel-panik.org>
+# y revisada por Rubén Porras <nahoo@inicia.es>
+# Está basada en la página de manual original:
+# versión 1.1 del CVS de
+# /cvs/debian-doc/manpages/english/debhelper/dh_movefiles.pod
+
+=head1 NOMBRE
+
+dh_movefiles - mueve ficheros de debian/tmp en subpaquetes
+
+=head1 SINOPSIS
+
+B<dh_movefiles> [S<I<debhelper opciones>>] [B<--sourcedir=>I<dir>] [B<-X>I<elemento>] S<I<fichero ...>>]
+
+=head1 DESCRIPCIÓN
+
+dh_movefiles es un programa de debhelper que es responsable de mover
+ficheros de debian/tmp o algún otro directorio y ubicarlos dentro de otros 
+directorios de construcción de paquetes. Esto podría ser útil si su paquete 
+tiene un Makefile que instala todo en debian/tmp, y usted necesita dividirlos 
+en subpaquetes.
+
+Los ficheros nombrados debian/paquete.files listan los ficheros a ser movidos,
+separados por espacios en blanco. Los nombres de ficheros listados deben ser
+relativos a debian/tmp/. Usted puede listar también nombres de directorios, 
+así todo el directorio será movido. Si prefiere, puede listar los ficheros a
+mover en la línea de órdenes y esto se aplicará sobre el primer paquete que 
+actuar dh_movefiles.
+
+Nota: dh_install es un programa mejor que puede hacer todo lo que éste, y más.
+
+=head1 OPCIONES
+
+=over 4
+
+=item B<--sourcedir=>I<dir>
+
+En lugar de mover ficheros de debian/tmp (el predeterminado), esta opción
+los mueve de otro directorio. Puesto que el contenido del directorio origen
+es movido, especificar algo como --sourcedir=/ es muy inseguro, así que
+para prevenir errores, el sourcedir debe ser un fichero relativo; y no puede
+empezar con un `/'.
+
+=item B<-Xelemento>, B<--exclude=elemento>
+
+Excluye ficheros que contengan "elemento" en cualquier lugar de su nombre,
+de ser instalados.
+
+=item I<fichero ...>
+
+Lista ficheros a mover. Los nombres de fichero listados deben ser relativos
+a debian/tmp/. Usted también puede listar nombres de directorio, y el 
+directorio completo será movido. Es un error listar ficheros aquí al menos que
+usted use -p, -i, o -a para indicar a dh_movefiles en que subpaquete
+colocarlos.
+
+=back
+
+=head1 NOTAS
+
+Note que los ficheros son siempre movidos de debian/tmp por omisión (aún
+si usted indicó a debhelper usar nivel de compatibilidad superior a uno,
+con lo cual no usa debian/tmp para nada). La idea detrás de esto es
+que el paquete que esta siendo construido pueda ser instalado en
+debian/tmp, y entonces los ficheros pueden ser movidos por dh_movefiles 
+desde ese directorio. Los ficheros o directorios que permanezcan son
+ignorados, y luego son eliminados por dh_clean.
+
+=head1 VÉASE TAMBIÉN
+
+L<debhelper(7)>
+
+Este programa es parte de debhelper.
+
+=head1 AUTOR
+
+Joey Hess <joeyh@debian.org>
+
+
+=head1 TRADUCTOR
+
+Traducción de Rudy Godoy <debian-l10n-spanish@lists.debian.org>

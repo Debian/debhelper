@@ -1,0 +1,56 @@
+# (c) 2003 Software in the Public Interest
+# Esta traducción ha sido realizada por Rubén Porras Campo <nahoo@inicia.es>
+# Está basada en la página de manual original:
+# versión 1.2 del CVS de
+# /cvs/debian-doc/manpages/english/debhelper/dh_installdeb.pod
+
+=head1 NOMBRE
+
+dh_installdeb - instala ficheros en el directorio DEBIAN
+
+=head1 SINOPSIS
+
+B<dh_installdeb> [S<I<opciones debhelper>>]
+
+=head1 DESCRIPCIÓN
+
+dh_installdeb es un programa de debhelper responsable de instalar ficheros en el
+directorio DEBIAN en los directorios de construcción del paquete con los
+permisos correctos.
+
+dh_installdeb instala automáticamente los siguientes ficheros de debian/ en
+el directorio DEBIAN:
+  paquete.postinst
+  paquete.preinst
+  paquete.postrm
+  paquete.prerm
+  paquete.shlibs
+  paquete.conffiles
+
+postinst, preinst, postrm, y prerm se manejan de forma especial: Si existe un
+fichero correspondiente llamado debian/paquete.script.debhelper, los contenidos
+de ese fichero se unen con los del script del siguiente modo: Si el script
+existe, entonces en cualquier lugar de este donde aparezca "#DEBHELPER#", se
+inserta el texto del fichero .debhelper. Si el script no existe, se genera un
+script desde el fichero .debhelper. Los ficheros .debhelper son creados por
+otros programas de debhelper , como L<dh_installmenu(1)>, y son fragmentos de
+scripts de shell.
+
+En el modo de compatibilidad V3 o superior, todos los ficheros en el directorio
+etc/ del paquete se marcarán automáticamente como conffiles por este programa,
+así que no hay necesidad de listarlos manualmente en paquete.conffiles.
+
+=head1 VÉASE TAMBIÉN
+
+L<debhelper(7)>
+
+Este programa es parte de debhelper.
+
+=head1 AUTOR
+
+Joey Hess <joeyh@debian.org>
+
+
+=head1 TRADUCTOR
+
+Traducción de Rubén Porras Campo <debian-l10n-spanish@lists.debian.org>

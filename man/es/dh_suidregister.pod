@@ -1,0 +1,48 @@
+# (c) 2003 Software in the Public Interest
+# Esta traducción ha sido realizada por Rudy Godoy <rudy@kernel-panik.org>
+# Está basada en la página de manual original:
+# versión 1.1 del CVS de
+# /cvs/debian-doc/manpages/english/debhelper/dh_suidregister.pod
+
+=head1 NOMBRE
+
+dh_suidregister - programa obsoleto de registro suid
+
+=head1 SINOPSIS
+
+¡No lo ejecute!
+
+=head1 DESCRIPCIÓN
+
+Este programa se usaba para registrar ficheros suid y sgid con
+L<suidregister(1)>, pero con la introducción de L<dpkg-statoverrride(8)>,
+el registro de ficheros de esta forma es innecesaria, e inclusive peligrosa,
+por lo que este programa no debe ser usado.
+
+=head1 CONVERTIR A STATOVERRIDE
+
+El mecanismo para convertir un paquete que usa este programa para usar el
+nuevo statoverride es sencillo. Solamente elimine el llamado a dh_suidregister
+de debian/rules, y añada un conflicto de versión en su fichero control,
+como sigue:
+
+  Conflicts: suidmanager (<< 0.50)
+
+El conflicto solamente es necesario si su paquete registraba cosas con
+suidmanager; en caso contrario, usted simplemente puede eliminar el
+llamado a este programa de su fichero rules.
+
+=head1 VÉASE TAMBIÉN
+
+L<debhelper(7)>
+
+Este programa es parte de debhelper.
+
+=head1 AUTOR
+
+Joey Hess <joeyh@debian.org>
+
+
+=head1 TRADUCTOR
+
+Traducción de Rudy Godoy <debian-l10n-spanish@lists.debian.org>

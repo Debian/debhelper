@@ -1,0 +1,102 @@
+# (c) 2003 Software in the Public Interest
+# Esta traducción ha sido realizada por Rudy Godoy <rudy@kernel-panik.org>
+# y revisada por Rubén Porras <nahoo@inicia.es>
+# Está basada en la página de manual original:
+# versión 1.2 del CVS de
+# /cvs/debian-doc/manpages/english/debhelper/dh_makeshlibs.pod
+
+=head1 NOMBRE
+
+dh_makeshlibs - crea automáticamente fichero shlibs
+
+=head1 SINOPSIS
+
+B<dh_makeshlibs> [S<I<opciones debhelper>>] [B<-m>I<mayor>] [B<-V>I<[dependencias]>] [B<-n>] [B<-X>I<elemento>]
+
+=head1 DESCRIPCIÓN
+
+dh_makeshlibs es un programa de debhelper que busca automáticamente 
+bibliotecas compartidas, y genera un fichero shlibs para las bibliotecas
+que encuentra.
+
+También añade un llamado a ldconfig en los programas postinst y postrm (sólo
+en el modo V3 y superiores) a cualquier paquete en el que encuentra bibliotecas
+compartidas.
+
+=head1 OPCIONES
+
+=over 4
+
+=item B<-m>I<mayor>, B<--major=>I<mayor>
+
+En lugar de tratar de adivinar el número mayor de la biblioteca con 
+objdump, usa el número mayor especificado después del parámetro -m. Esto
+es mucho menos útil de lo que era antiguamente cuando este programa
+buscaba los nombres de fichero de las bibliotecas en lugar de usar
+objdump.
+
+=item B<-V>, B<-V>I<dependencias>
+
+=item B<--version-info>, B<--version-info=>I<dependencias>
+
+Por omisión, el fichero shlibs generado por este programa no hace que los
+paquetes dependan de alguna versión particular del paquete que contiene la
+biblioteca compartida. Podría ser necesario para usted añadir alguna
+información de dependencia de versión al fichero shlibs. Si -V es especificado
+sin información de dependencia, la versión actual del paquete es conectada
+en una dependencia de la forma "nombre_de_paquete (>= versión_de_paquete)".
+Si -V es especificado con parámetros, los parámetros pueden ser usados para
+especificar la información de dependencia exacta necesitada (asegúrese de
+incluir el nombre del paquete).
+
+Tenga cuidado al usar -V sin ningún parámetro; ésta es una configuración
+conservadora que siempre se asegura que las dependencias de bibliotecas
+compartidas de otros paquetes son al menos lo mas pequeñas que necesitan
+ser, de modo que si el desarrollador las malogra éstas no se romperán.
+Por otro lado los paquetes podrían terminar con dependencias muy rigurosas
+que harían difícil la actualización.
+
+=item B<-n>, B<--noscripts>
+
+No modifica programas postinst/postrm.
+
+=item B<-X>I<elemento>, B<--exclude=>I<elemento>
+
+Excluye ficheros que contienen "elemento" en cualquier lugar de su nombre o
+directorio de ser tratados como bibliotecas compartidas.
+
+=back
+
+=head1 EJEMPLOS
+
+ dh_makeshlibs
+
+Asumiendo que este es un paquete llamado libfoobar1, genera un fichero shlibs 
+que se ve como:
+ libfoobar 1 libfoobar1
+
+ dh_makeshlibs -V
+
+Asumiendo que la versión actual del paquete es 1.0-3, genera un fichero shlibs
+que se ve como:
+ libfoobar 1 libfoobar1 (>= 1.0-3)
+
+ dh_makeshlibs -V 'libfoobar1 (>= 1.0)'
+
+Genera un fichero shlibs que se ve como:
+  libfoobar 1 libfoobar1 (>= 1.0)
+
+=head1 VÉASE TAMBIÉN
+
+L<debhelper(7)>
+
+Este programa es parte de debhelper.
+
+=head1 AUTOR
+
+Joey Hess <joeyh@debian.org>
+
+
+=head1 TRADUCTOR
+
+Traducción de Rudy Godoy <debian-l10n-spanish@lists.debian.org>

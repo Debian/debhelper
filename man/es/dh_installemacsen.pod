@@ -1,0 +1,71 @@
+# (c) 2003 Software in the Public Interest
+# Esta traducción ha sido realizada por Rubén Porras Campo <nahoo@inicia.es>
+# Está basada en la página de manual original:
+# versión 1.1 del CVS de
+# /cvs/debian-doc/manpages/english/debhelper/dh_installemacsen.pod
+
+=head1 NOMBRE
+
+dh_installemacsen - registra un paquete añadido para emacs
+
+=head1 SINOPSIS
+
+B<dh_installemacsen> [S<I<opciones debhelper>>] [B<-n>] [B<--priority=>I<n>] [B<--flavor=>I<tal>]
+
+=head1 DESCRIPCIÓN
+
+dh_installemacsen es un programa de debhelper responsable de instalar ficheros
+usados por el paquete de Debian emacsen-common en los directorios de
+construcción del paquete.
+
+Además genera automáticamente las órdenes de postinst y prerm necesarios para
+registrar el paquete como un añadido para emacs. Lea L<dh_installdeb(1)>
+para una explicación acerca de como funciona esto.
+
+Si existe un fichero llamado debian/paquete.emacsen-install, entonces se instala
+en usr/lib/emacsen-common/packages/install/paquete en el directorio de
+construcción del paquete. De forma similar, debian/paquete.emacsen-remove se
+instala en usr/lib/emacsen-common/packages/remove/paquete. Y
+debian/paquete.emacsen-startup se instala en
+etc/emacs/site-start.d/50<paquete>.el (por omisión).
+
+=head1 OPCIONES
+
+=over 4
+
+=item B<-n>, B<--noscripts>
+
+No modifica los scripts postinst/prerm.
+
+=item B<--priority=>I<n>
+
+Establece el número de prioridad de un fichero site-start.d. 50 es el número
+predeterminado.
+
+=item B<--flavor=>I<tal>
+
+Establece el sabor para el cual se instalará el fichero site-start.d. Por
+omisión es "emacs", las alternativas son "xemacs" y "emacs20".
+
+=back
+
+=head1 NOTAS
+
+Esta orden no es idempotente. Debe llamarse a "dh_clean -k" entre invocaciones
+de esta orden. De otro modo, puede causar que los scripts de mantenimiento
+contengan partes duplicadas.
+
+=head1 VÉASE TAMBIÉN
+
+L<debhelper(7)>
+
+Este programa es parte de debhelper.
+
+=head1 AUTOR
+
+Joey Hess <joeyh@debian.org>
+
+
+=head1 TRADUCTOR
+
+Traducción de Rubén Porras Campo <debian-l10n-spanish@lists.debian.org>

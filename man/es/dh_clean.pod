@@ -1,0 +1,66 @@
+# (c) 2003 Software in the Public Interest
+# Esta traducción ha sido realizada por Rubén Porras Campo <nahoo@inicia.es>
+# Está basada en la página de manual original:
+# versión 1.1 del CVS de
+# /cvs/debian-doc/manpages/english/debhelper/dh_clean.pod
+
+=head1 NOMBRE
+
+dh_clean - limpia los directorios de construcción del paquete
+
+=head1 SINOPSIS
+
+B<dh_clean> [S<I<debhelper opciones>>] [B<-k>] [B<-d>] [B<-X>I<elemento>] [S<I<fichero ...>>]
+
+=head1 DESCRIPCIÓN
+
+dh_clean es un programa de debhelper responsable limpiar después de que el
+paquete sea construido. Elimina los directorios de construcción del paquete, y
+otros ficheros incluyendo debian/files, y toda la basura que han ido dejando
+otras órdenes de debhelper. También elimina ficheros comunes que no deben
+aparecer en un diff de Debian:
+  #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS core .deps/* *.P
+
+=head1 OPCIONES
+
+=over 4
+
+=item B<-k>, B<--keep>
+
+No elimina debian/files. Cuando quiere usar esto? Cunado un debian/rules tenga
+dos objetivos binarios que construyen paquetes .deb diferentes; por ejemplo, un
+objetivo es binary-arch, y el otro es binary-indep, o un objetivo construye una
+biblioteca compartida, y el otro un paquete -dev. Si en estos casos no usa -k,
+se eliminará debian/files en el medio, y los cambios sólo contendrán los del
+último paquete binario construido.
+
+=item B<-d>, B<--dirs-only>
+
+Sólo limpia los directorios de construcción del paquete, no limpia ningún otro
+tipo de ficheros en absoluto.
+
+=item B<-X>I<elemento> B<--exclude=>I<elemento>
+
+No borra los ficheros que contengan "elemento" en cualquier parte del nombre,
+incluso si normalmente hubiesen sido borrados. Puede usar esta opción si quiere
+excluir una lista de ficheros.
+
+=item I<fichero ...>
+
+Borra también estos ficheros.
+
+=back
+
+=head1 VÉASE TAMBIÉN
+
+L<debhelper(7)>
+
+Este programa es parte de debhelper.
+
+=head1 AUTOR
+
+Joey Hess <joeyh@debian.org>
+
+=head1 TRADUCTOR
+
+Traducción de Rubén Porras Campo <debian-l10n-spanish@lists.debian.org>

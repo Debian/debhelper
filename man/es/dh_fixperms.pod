@@ -1,0 +1,55 @@
+# (c) 2003 Software in the Public Interest
+# Esta traducción ha sido realizada por Rubén Porras Campo <nahoo@inicia.es>
+# Está basada en la página de manual original:
+# versión 1.1 del CVS de
+# /cvs/debian-doc/manpages/english/debhelper/dh_fixperms.pod
+
+=head1 NOMBRE
+
+dh_fixperms - arregla los permisos de los ficheros en los directorios de
+construcción.
+
+=head1 SINOPSIS
+
+B<dh_fixperms> [S<I<debhelper opciones>>] [B<-X>I<elemento>]
+
+=head1 DESCRIPCIÓN
+
+dh_fixperms en un  programa de debhelper responsable de dejar en buen estado (es
+decir, que se ajusten a las normas de Debian) los permisos de los ficheros y
+directorios de los directorios de construcción del paquete.
+
+dh_fixperms hace que el modo de todos los ficheros en usr/share/doc en el
+directorio de construcción del paquete (excluyendo los ficheros en el directorio
+examples/) se 644. También cambia el modo de las páginas del manual a 644. Hace
+que todos los ficheros pertenezcan al superusuario y elimina los permisos de
+escritura del grupo y de otros. Elimina los permisos de ejecución de cualquier
+biblioteca. Hace ejecutables todos los ficheros en bin/ y en etc/init.d (sólo
+v4). Finalmente, finalmente elimina los bit setuid y setgid de todos los
+ficheros en el paquete.
+
+=head1 OPCIONES
+
+=over 4
+
+=item B<-X>I<elemento>, B<--exclude> I<elemento>
+
+No se cambian los permisos de los ficheros que contengan "elemento" en su
+nombre. Puede usar la opción varias veces para construir una lista de ficheros a
+excluir.
+
+=back
+
+=head1 VÉASE TAMBIÉN
+
+L<debhelper(7)>
+
+Este programa es parte de debhelper.
+
+=head1 AUTOR
+
+Joey Hess <joeyh@debian.org>
+
+=head1 TRADUCTOR
+
+Traducción de Rubén Porras Campo <debian-l10n-spanish@lists.debian.org>

@@ -1,0 +1,68 @@
+# (c) 2003 Software in the Public Interest
+# Esta traducción ha sido realizada por Rubén Porras Campo <nahoo@inicia.es>
+# Está basada en la página de manual original:
+# versión 1.1 del CVS de
+# /cvs/debian-doc/manpages/english/debhelper/dh_installexamples.pod
+
+=head1 NOMBRE
+
+dh_installexamples - instala ficheros de ejemplo en los directorios de construcción
+
+=head1 SINOPSIS
+
+B<dh_installexamples> [S<I<opciones debhelper>>] [B<-A>] [B<-X>I<elemento>] [S<I<fichero ...>>]
+
+=head1 DESCRIPCIÓN
+
+dh_installexamples es un programa de debhelper responsable responsable de
+instalar ejemplos en usr/share/doc/paquete/examples en los directorios de
+construcción del paquete.
+
+Cualquier fichero especificado como parámetro se instalará en el primer paquete
+sobre el que actúe dh_installexamples. Por omisión, este es el primer paquete
+binario en debian/control, pero si usa alguna de las opciones B<-p>, B<-i>, o
+B<-a>, será el primer paquete especificado por estas.
+
+Los ficheros debian/paquete.examples pueden listar otros ficheros a instalar.
+
+=head1 OPCIONES
+
+=over 4
+
+=item B<-A>, B<--all>
+
+Instala todos los ficheros especificados en los parámetros de la línea de
+órdenes en TODOS los paquetes sobre los que actúe.
+
+=item I<fichero ...>
+
+Instala esos ficheros como documentación en el primer paquete sobre el que
+actúe. (O en todos si se especifica B<-A>).
+
+=item B<-Xelemento>, B<--exclude=elemento>
+
+Los ficheros que contengan "elemento" en alguna parte de su nombre no se
+instalarán.
+
+=back
+
+=head1 NOTAS
+
+Dese cuenta de que dh_installexamples copiará alegremente jerarquías de
+directorios enteras si usted lo pide (similar a -a). Si se le pide instalar un
+directorio instalará todos sus contenidos.
+
+=head1 VÉASE TAMBIÉN
+
+L<debhelper(7)>
+
+Este programa es parte de debhelper.
+
+=head1 AUTOR
+
+Joey Hess <joeyh@debian.org>
+
+
+=head1 TRADUCTOR
+
+Traducción de Rubén Porras Campo <debian-l10n-spanish@lists.debian.org>

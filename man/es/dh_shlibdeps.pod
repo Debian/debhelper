@@ -1,0 +1,91 @@
+# (c) 2003 Software in the Public Interest
+# Esta traducción ha sido realizada por Rudy Godoy <rudy@kernel-panik.org>
+# y revisada por Rubén Porras <nahoo@inicia.es>
+# Está basada en la página de manual original:
+# versión 1.1 del CVS de
+# /cvs/debian-doc/manpages/english/debhelper/dh_shlibdeps.pod
+
+=head1 NOMBRE
+
+dh_shlibdeps - calcula dependencias de bibliotecas compartidas
+
+=head1 SINOPSIS
+
+B<dh_shlibdeps> [S<I<opciones debhelper>>] [B<-L>I<paquete>] [B<-l>I<directorio>] [B<-X>I<elemento>] [S<B<--> I<params>>]
+
+=head1 DESCRIPCIÓN
+
+dh_shlibdeps es un programa de debhelper responsable de calcular las
+dependencias en bibliotecas compartidas de los paquetes.
+
+Este programa es encapsulado dentro de L<dpkg-shlibdeps(1)> el cual lo
+llama una vez por cada paquete listado en el fichero de control, pasándole
+una lista de ejecutables ELF y bibliotecas compartidas que ha encontrado.
+
+=head1 OPCIONES
+
+=over 4
+
+=item B<-u>I<params>, B<--dpkg-shlibdeps-params=>I<params>
+
+=item B<--> I<params>
+
+Pasa "params" a L<dpkg-shlibdeps(1)>.
+
+=item B<-X>I<elemento>, B<--exclude=>I<elemento>
+
+Excluye ficheros que contienen "elemento" en cualquier lugar de su
+nombre de ser pasados a dpkg-shlibdeps. Esto hará que sus dependencias
+sean ignoradas. Esto puede ser útil en algunas situaciones, pero úselo
+con cuidado. Esta opción puede ser usada más de una vez para excluir más
+de una cosa.
+
+=item B<-l>I<directorio>[:directorio:directorio:..]
+
+Antes de ejecutarse dpkg-shlibdeps, se deberá añadir a LD_LIBRARY_PATH 
+el directorio especificado (o directorios -- separados por dos puntos).
+Esto es útil para paquetes multi-binarios que contienen binarios enlazados
+con las bibliotecas indicadas. Las rutas relativas se convierten en
+absolutas para el beneficio de dpkg-shlibdeps.
+
+Nótese que el directorio especificado deberá ser la ruta completa o relativa
+a un directorio que contiene la biblioteca. Vea un ejemplo abajo.
+
+=item B<-L>I<paquete>, B<--libpackage=>I<paquete>
+
+Usa el fichero shlibs generado automáticamente por dh_makeshlibs para el
+paquete nombrado como un tipo de fichero shlibs.local generado automáticamente.
+Usted puede usar este modificador en conjunto con el modificador -l para
+hacer que dpkg-shlibdeps encuentre una biblioteca construida como parte 
+del paquete actual, y obtenga la información de shlibs. Vea un ejemplo abajo.
+
+=back
+
+=head1 EJEMPLOS
+
+Suponga que su paquete fuente crea los paquetes binarios libfoo1, libfoo-dev 
+y libfoo-bin. libfoo-bin se enlaza contra libfoo1 y debería depender de éste.
+En su fichero rules, primero debe ejecutar dh_makeshlibs, luego dh_shlibdeps:
+
+	dh_makeshlibs
+	dh_shlibdeps -L libfoo1 -l debian/libfoo1/usr/lib
+
+Esto generará automáticamente un fichero shlibs para
+libfoo1, y usará este fichero y la biblioteca libfoo1 en el directorio
+debian/libfoo1/usr/lib para calcular la información de dependencias en
+bibliotecas compartidas.
+
+=head1 VÉASE TAMBIÉN
+
+L<debhelper(7)>
+
+Este programa es parte de debhelper.
+
+=head1 AUTOR
+
+Joey Hess <joeyh@debian.org>
+
+
+=head1 TRADUCTOR
+
+Traducción de Rudy Godoy <debian-l10n-spanish@lists.debian.org>

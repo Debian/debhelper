@@ -1,0 +1,61 @@
+# (c) 2003 Software in the Public Interest
+# Esta traducción ha sido realizada por Rudy Godoy <rudy@kernel-panik.org>
+# y revisada por Rubén Porras <nahoo@inicia.es>
+# Está basada en la página de manual original:
+# versión 1.1 del CVS de
+# /cvs/debian-doc/manpages/english/debhelper/dh_testversion.pod
+
+=head1 NOMBRE
+
+dh_testversion - asegura que esté instalada la versión correcta de debhelper
+
+=head1 SINOPSIS
+
+B<dh_testversion> [S<I<opciones debhelper>>] [I<operador>] [I<versión>]
+
+=head1 DESCRIPCIÓN
+
+Nota: Este programa está desaconsejado. Usted deberá usar en su lugar
+las dependencias de construcción.
+
+dh_testversion compara la versión de debhelper contra la versión que
+usted especifique, y si no coinciden finaliza con un mensaje de error.
+
+Usted puede usar esto en sus ficheros debian/rules si se añade una nueva 
+característica a debhelper, y su paquete requiere esta característica
+para ser construido correctamente. Use el changelog de debhelper para
+saber que versión necesita.
+
+Asegúrese de no usar en exceso dh_testversion. Si la versión 9.5 de debhelper
+añade una nueva orden dh_autofixbugs, y su paquete la usa, entonces si
+alguien trata de construirlo con debhelper 1.0, la construcción fallará
+puesto que dh_autofixbugs no será encontrado, así que no hay necesidad de
+usar dh_testversion.
+
+=head1 OPCIONES
+
+=over 4
+
+=item I<operador>
+
+Operador opcional de comparación usado para comparar las versiones. Si no
+es especificado, se usará ">=". Para una descripción de los operadores de
+comparación vea dkpg --help.
+
+=item I<versión>
+
+Número de versión contra la cual comparar la versión actual de debhelper.
+Si no es especificado, dh_testversion no hace nada.
+
+=back
+
+=head1 VÉASE TAMBIÉN
+
+L<debhelper(7)>
+
+Este programa es parte de debhelper.
+
+=head1 AUTOR
+
+Joey Hess <joeyh@debian.org>
+

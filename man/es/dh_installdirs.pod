@@ -1,0 +1,62 @@
+# (c) 2003 Software in the Public Interest
+# Esta traducción ha sido realizada por Rubén Porras Campo <nahoo@inicia.es>
+# Está basada en la página de manual original:
+# versión 1.1 del CVS de
+# /cvs/debian-doc/manpages/english/debhelper/dh_installdirs.pod
+
+=head1 NOMBRE
+
+dh_installdirs - crea subdirectorios en los directorios de construcción
+
+=head1 SINOPSIS
+
+B<dh_installdirs> [S<I<opciones debhelper>>] [B<-A>] [S<I<dir ...>>]
+
+=head1 DESCRIPCIÓN
+
+dh_installdirs es un programa de debhelper responsable de crear subdirectorios
+en los directorios de construcción del paquete.
+
+Cualquier nombre de directorio especificado como parámetro se creará en el
+directorio de construcción del primer paquete sobre el que actúe
+dh_installdirs. Por omisión, es el primer paquete binario en debian/control,
+pero si usa las opciones -p, -i, o -a, será el primer paquete especificado por
+esas opciones.
+
+Un fichero llamado debian/paquete.dirs puede listar otros directorios a
+crear. Separe los nombres de los directorios con espacios.
+
+Asegúrese de sólo usar nombres de directorios relativos al directorio de
+construcción del paquete. Por ejemplo, no debe usarse "/usr/bin", pero si
+"usr/bin".
+
+=head1 OPCIONES
+
+=over 4
+
+=item B<-A>, B<--all>
+
+Crea cualquier directorio especificado mediante los parámetros de la línea de
+órdenes en TODOS los paquetes sobre los que actúe, no sólo en el primero.
+
+=item I<dir ...>
+
+Crea estos directorios en el directorio de construcción del primer paquete sobre
+el que se actúe. (O en todos los paquetes si se especifica -A).
+
+=back
+
+=head1 VÉASE TAMBIÉN
+
+L<debhelper(7)>
+
+Este programa es parte de debhelper.
+
+=head1 AUTOR
+
+Joey Hess <joeyh@debian.org>
+
+
+=head1 TRADUCTOR
+
+Traducción de Rubén Porras Campo <debian-l10n-spanish@lists.debian.org>

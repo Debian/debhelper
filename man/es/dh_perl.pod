@@ -1,0 +1,72 @@
+# (c) 2003 Software in the Public Interest
+# Esta traducción ha sido realizada por Rudy Godoy <rudy@kernel-panik.org>
+# y revisada por Rubén Porras <nahoo@inicia.es>
+# Está basada en la página de manual original:
+# versión 1.1 del CVS de
+# /cvs/debian-doc/manpages/english/debhelper/dh_perl.pod
+
+=head1 NOMBRE
+
+dh_perl - calcula dependencias de perl
+
+=head1 SINOPSIS
+
+B<dh_perl> [S<I<opciones debhelper>>] [B<-d>] [S<I<dirs biblioteca ...>>]
+
+=head1 DESCRIPCIÓN
+
+dh_perl es un programa de debhelper que se encarga de generar las
+substituciones ${perl:Depends} y añadirlas a los ficheros substvars.
+
+El programa buscará scripts y módulos perl en su paquete, y usará esta
+información para generar una dependencia en perl o perlapi. La dependencia
+será substituida en el fichero de control de su paquete dondequiera que
+usted ubique la señal "${perl:Depends}".
+
+=head1 OPCIONES
+
+=over 4
+
+=item B<-d>
+
+En algunos casos específicos usted podría querer depender de perl-base en
+lugar de todo el paquete de perl. De ser así, usted puede especificar la
+opción -d para que dh_perl genere una dependencia en el paquete base correcto.
+Esto es solamente necesario para algunos paquete que están incluidos en el
+sistema base.
+
+=item B<-V>
+
+Por omisión, los scripts y módulos independientes de la arquitectura dependen
+de cualquier versión de perl. La opción -V hace que la versión actual del
+paquete perl (o perl-base con -d) sea especificada.
+
+=item I<dirs biblioteca>
+
+Si su paquete instala módulos perl en directorios que no sean estándares, usted
+puede hacer que dh_perl verifique estos directorios especificando sus nombres en
+la línea de órdenes. Éste solamente verificará el directorio vendorlib y
+vendorarch por omisión.
+
+=back
+
+=head1 CONFORME A
+
+Normas de Debian, versión 3.0.1
+
+Normas de Perl, versión 1.18
+
+=head1 VÉASE TAMBIÉN
+
+L<debhelper(7)>
+
+Este programa es parte de debhelper.
+
+=head1 AUTOR
+
+Brendan O'Dea <bod@debian.org>
+
+
+=head1 TRADUCTOR
+
+Traducción de Rudy Godoy <debian-l10n-spanish@lists.debian.org>

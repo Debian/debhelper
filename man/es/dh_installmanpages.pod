@@ -1,0 +1,77 @@
+# (c) 2003 Software in the Public Interest
+# Esta traducción ha sido realizada por Rubén Porras Campo <nahoo@inicia.es>
+# Está basada en la página de manual original:
+# versión 1.1 del CVS de
+# /cvs/debian-doc/manpages/english/debhelper/dh_installmanpages.pod
+
+=head1 NOMBRE
+
+dh_installmanpages - instalador al viejo estilo de páginas del manual
+
+=head1 SINOPSIS
+
+B<dh_installmanpages> [S<I<opciones debhelper>>] [S<I<fichero ...>>]
+
+=head1 DESCRIPCIÓN
+
+dh_installmanpages es un programa de debhelper responsable de instalar
+automáticamente las páginas del manual en usr/share/man/ y usr/X11R6/man/ en
+los directorios de construcción del paquete.
+
+Este es un programa de estilo DWIM (N.T: Del inglés "Do what I mean", es decir,
+haz lo que quiero), con una interfaz diferente del resto de los programas de
+debhelper. Se recomienda el uso de L<dh_installman(1)> en su lugar.
+
+dh_installmanpages analiza el directorio actual y sus subdirectorios en busca de
+nombres de ficheros que parezcan aptos para páginas del manual. (Dese cuenta de
+que sólo se miran ficheros reales, los enlaces simbólicos son ignorados). Usa
+L<file(1)> para verificar que los ficheros están en el formato
+correcto. Entonces, basándose en la extensión de los ficheros, los instala en
+los directorios correctos.
+
+Todos los fichero especificados como parámetros serán saltados por
+dh_installmanpages. Esto es útil si por omisión instala alguna página del
+manual que no quiere instalar.
+
+Después del paso de instalación de las páginas del manual, dh_installmanpages
+comprobará si alguna de las páginas del manual en los directorios temporales de
+cualquiera de los paquetes sobre los que está actuando contienen enlaces
+".so". Si es así, los cambia por enlaces simbólicos.
+
+=head1 OPCIONES
+
+=over 4
+
+=item I<fichero ...>
+
+No instala estos ficheros como páginas del manual, incluso si parece que son
+páginas del manual válidas.
+
+=back
+
+=head1 FALLOS
+
+dh_installmanpages instalará las páginas del manual que encuentre en B<todos>
+los paquetes sobre los que actúa, ya que no puede determinar a que paquete
+pertenece cada página del manual. Esto casi nunca es lo que uno quiere (use -p
+para evitar esto, o use el programa L<dh_installman(1)> en su lugar).
+
+Se ignorarán ficheros que terminen con I<.man>.
+
+Ficheros especificados como parámetros que contengan espacios en sus nombres so
+se procesarán correctamente.
+
+=head1 VÉASE TAMBIÉN
+
+L<debhelper(7)>
+
+Este programa es parte de debhelper.
+
+=head1 AUTOR
+
+Joey Hess <joeyh@debian.org>
+
+
+=head1 TRADUCTOR
+
+Traducción de Rubén Porras Campo <debian-l10n-spanish@lists.debian.org>

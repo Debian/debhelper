@@ -1,0 +1,68 @@
+# (c) 2003 Software in the Public Interest
+# Esta traducción ha sido realizada por Rudy Godoy <rudy@kernel-panik.org>
+# y revisada por Rubén Porras <nahoo@inicia.es>
+# Está basada en la página de manual original:
+# versión 1.1 del CVS de
+# /cvs/debian-doc/manpages/english/debhelper/dh_strip.pod
+
+=head1 NOMBRE
+
+dh_strip - ejecuta strip sobre ejecutables, bibliotecas compartidas y algunas bibliotecas estáticas
+
+=head1 SINOPSIS
+
+B<dh_strip> [S<I<opciones debhelper>>] [B<-X>I<elemento>]
+
+=head1 DESCRIPCIÓN
+
+dh_strip es un programa de debhelper que es responsable de eliminar los símbolos
+de los ejecutables, bibliotecas compartidas y estáticas que no son usadas para
+depuración.
+
+Este programa examina sus directorios de construcción de paquetes y trabaja
+en lo que debe eliminar. Usa L<file(1)> y permisos y nombres de ficheros 
+para detectar que ficheros son bibliotecas compartidas (*.so), binarios
+ejecutables, bibliotecas estáticas (lib*.a) y ficheros de depuración
+(lib*_g.a, debug/*.so), y elimina cuanto más sea posible. (Que no es
+todo para depuración de bibliotecas). En general parece hacer muy buenas
+suposiciones, y hará lo correcto en la mayoría de casos.
+
+Puesto que es muy difícil adivinar automáticamente si un fichero es un módulo,
+y determinar como eliminar un módulo, dh_strip actualmente no trata de
+eliminar los símbolos de módulos binarios como los ficheros .o.
+
+=head1 OPCIONES
+
+=over 4
+
+=item B<-X>I<elemento>, B<--exclude=>I<elemento>
+
+Excluye ficheros que contienen "elemento" en cualquier lugar de su nombre de
+ser eliminados. Usted puede usar esta opción muchas veces para construir una
+lista de cosas a excluir.
+
+=back
+
+=head1 NOTAS
+
+Si la variable de entorno DEB_BUILD_OPTIONS contiene "nostrip", no se eliminará
+nada, conforme a las normas de Debian.
+
+=head1 CONFORME A
+
+Normas de Debian, versión 3.0.1
+
+=head1 VÉASE TAMBIÉN
+
+L<debhelper(7)>
+
+Este programa es parte de debhelper.
+
+=head1 AUTOR
+
+Joey Hess <joeyh@debian.org>
+
+
+=head1 TRADUCTOR
+
+Traducción de Rudy Godoy <debian-l10n-spanish@lists.debian.org>
