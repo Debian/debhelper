@@ -28,7 +28,7 @@ sub find_man {
 		return;
 	}
 	foreach $dir (@allpackages) {
-		if ($File::Find::dir=~m:debian/$dir:) {
+		if ($File::Find::dir=~m:debian/\Q$dir\E:) {
 			return;
 		}
 	}
