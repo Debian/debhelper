@@ -1,26 +1,107 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
-# Reads debian/docs, and looks at files listed on command line, installs all 
-# files listed there into /usr/doc/$PACKAGE
+# Reads debian/docs, installs all files listed there into /usr/doc/$PACKAGE
 # Also installs the debian/copyright and debian/README.debian and debian/TODO
+# and handles debian/doc-base.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-source dh_lib
+BEGIN { push @INC, "debian", "/usr/share/debhelper" }
+use Dh_Lib;
+init();
 
-if [ ! -d debian/tmp/usr/doc/$PACKAGE ]; then
-	doit "install -d debian/tmp/usr/doc/$PACKAGE"
-fi
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$file=pkgfile($PACKAGE,"docs");
 
-if [ -e debian/docs ]; then
-	docs=`cat debian/docs | tr "\n" " "`
-fi
+	if ( ! -d "$TMP/usr/doc/$PACKAGE") {
+		doit("install","-d","$TMP/usr/doc/$PACKAGE");
+	}
 
-for file in $docs $@; do
-	doit "cp -a $file debian/tmp/usr/doc/$PACKAGE/"
-done
+	undef @docs;
 
-for file in copyright README.debian TODO ; do
-	if [ -f debian/$file ]; then
-		doit "install -m 644 -p debian/$file debian/tmp/usr/doc/$PACKAGE/"
-	fi
-done
+	if ($file) {
+		@docs=filearray($file);
+	}
+
+	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+		push @docs, @ARGV;
+	}
+
+	if (@docs) {
+		doit("cp","-a",@docs,"$TMP/usr/doc/$PACKAGE/");
+		doit("chmod","-R","go=rX","$TMP/usr/doc");
+		doit("chmod","-R","u+rw","$TMP/usr/doc");
+	}
+
+	# .Debian is correct, according to policy, but I'm easy.
+	$readme_debian=pkgfile($PACKAGE,'README.Debian');
+	if (! $readme_debian) {
+		$readme_debian=pkgfile($PACKAGE,'README.debian');
+	}
+	if ($readme_debian) {
+		doit("install","-m","644","-p","$readme_debian","$TMP/usr/doc/$PACKAGE/README.Debian");
+	}
+
+	$todo=pkgfile($PACKAGE,'TODO');
+	if ($todo) {
+		if (isnative($PACKAGE)) {
+			doit("install","-m","644","-p",$todo,"$TMP/usr/doc/$PACKAGE/TODO");
+		}
+		else {
+			doit("install","-m","644","-p",$todo,"$TMP/usr/doc/$PACKAGE/TODO.Debian");
+		}
+	}
+
+	# Support debian/package.copyright, but if not present, fall back
+	# on debian/copyright for all packages, not just the main binary
+	# package.
+	$copyright=pkgfile($PACKAGE,'copyright');
+	if (! $copyright && -e "debian/copyright") {
+		$copyright="debian/copyright";
+	}
+	if ($copyright) {
+			doit("install","-m","644","-p",$copyright,"$TMP/usr/doc/$PACKAGE/copyright");
+	}
+	
+	# Handle doc-base files. There are two filename formats, the usual
+	# plus an extended format (debian/package.*).
+	my %doc_ids;
+	
+	opendir(DEB,"debian/") || error("can't read debian directory: $!");
+	# If this is the main package, we need to handle unprefixed filenames.
+	# For all packages, we must support both the usual filename format plus
+	# that format with a period an something appended.
+	my $regexp="\Q$PACKAGE\E\.";
+	if ($PACKAGE eq $dh{MAINPACKAGE}) {
+		$regexp="(|$regexp)";
+	}
+	foreach my $fn (grep {/^${regexp}doc-base(\..*)?$/} readdir(DEB)) {
+		# Parse the file to get the doc id.
+		open (IN, "debian/$fn") || die "Cannot read debian/$fn.";
+		while (<IN>) {
+			if (/^Document:\s+(.*)(\s+)?/) {
+				$doc_ids{$fn}=$1;
+				last;
+			}
+		}
+		close IN;
+	}
+	closedir(DEB);
+	
+	if (%doc_ids) {
+		if (! -d "$TMP/usr/share/doc-base/") {
+			doit("install","-d","$TMP/usr/share/doc-base/");
+		}
+	}
+	foreach my $fn (keys %doc_ids) {
+		doit("install","-m644","-p","debian/$fn",
+		     "$TMP/usr/share/doc-base/$doc_ids{$fn}");
+		if (! $dh{NOSCRIPTS}) {
+			autoscript($PACKAGE,"postinst","postinst-doc-base",
+				"s/#DOC-ID#/$doc_ids{$fn}/",
+			);
+			autoscript($PACKAGE,"prerm","prerm-doc-base",
+				"s/#DOC-ID#/$doc_ids{$fn}/",
+			);
+		}
+	}
+}
