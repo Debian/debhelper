@@ -114,7 +114,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			open (IN, $page) or die "$page: $!";
 		}
 		while (<IN>) {
-			if (/^\.TH\s+\S+\s+(\d+\S*)/) {
+			if (/^\.TH\s+\S+\s+"?(\d+\S*)"?/) {
 				$section=$1;
 				last;
 			}
