@@ -52,7 +52,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		$group=getgrgid($gid);
 		# Note that I have to print mode in ocal, stripping file type.
 		$sedstr=sprintf("s:#FILE#:$file:;s/#PACKAGE#/$PACKAGE/;s/#OWNER#/$user/;s/#GROUP#/$group/;s/#PERMS#/%#o/",
-			        $mode & 07777);
+			        $mode & 00777);
 
 		autoscript($PACKAGE,"postinst","postinst-suid",$sedstr);
 		autoscript($PACKAGE,"postrm","postrm-suid","$sedstr");

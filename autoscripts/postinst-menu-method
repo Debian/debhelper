@@ -1,5 +1,5 @@
 inst=/etc/menu-methods/#PACKAGE#
-if [ -x /usr/bin/update-menus -a -f $inst -a -x /usr/sbin/install-menu ] ; then
+if command -v update-menus >/dev/null 2>&1 && [ -f $inst ] ; then
 	chmod a+x $inst
 	update-menus
 fi

@@ -3,7 +3,7 @@
 dh_installdocs \- install documentation into package build directories
 .SH SYNOPSIS
 .B dh_installdocs
-.I "[debhelper options] [-A] [file ...]"
+.I "[debhelper options] [-A] [-n] [file ...]"
 .SH "DESCRIPTION"
 dh_installdocs is a debhelper program that is responsible for installing
 documentation into usr/doc/package in package build directories.
@@ -29,6 +29,15 @@ debian/package.TODO can be used to specify files for subpackages.
 .P
 A file named debian/package.docs (debian/docs may be used for the first
 binary package in debian/control) can list other files to be installed.
+.P
+A file named debian/package.doc-base (debian/doc-base may be used for the
+first binary package in debian/control), if it exists, will make
+dh_installdocs use that file as a doc-base control file, and will
+automatically generate the postinst and prerm commands needed to
+interface with the doc-base package. See
+.BR dh_installdeb (1)
+for an explanation of how this works. Note that the package name will be
+used as the doc-base document id.
 .SH OPTIONS
 .TP
 .B debhelper options
@@ -39,6 +48,9 @@ for a list of options common to all debhelper commands.
 .B \-A, \--all
 Install all files specified by command line parameters in ALL packages
 acted on.
+.TP
+.B \-n, \--noscripts
+DO not modify postinst/prerm scripts.
 .TP
 .B file ...
 Install these files as documentation into the first package acted on. (Or in
@@ -53,6 +65,8 @@ See
 for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
 .BR debhelper (1)
+.TP
+.BR install-docs (8)
 .SH BUGS
 It's impossible to specify filenames with spaces or other whitespace in them
 in debian/docs file. This is more a historical design flaw than a bug.

@@ -1,3 +1,17 @@
+debhelper (1.2.21) unstable; urgency=low
+
+  * dh_installdocs: Added doc-base support, if debian/<package>.doc-base
+    exists, it will be installed as a doc-base control file. If you use this,
+    you probably want to add "dh_testversion 1.2.21" to the rules file to make
+    sure your package is built with a new enough debhelper.
+  * dh_installdocs: now supports -n to make it not modify postinst/prerm.
+  * dh_suidregister: turned off leading 0/1 in permissions settings, until
+    suidregister actually supports it.
+  * autoscripts/*: instead of "text -x", use "command -v" to see if various
+    binaries exist. This gets rid of lots of hard-coded paths.
+
+ -- Joey Hess <joeyh@master.debian.org>  Wed, 30 Dec 1998 22:50:04 -0500
+
 debhelper (1.2.20) unstable; urgency=low
 
   * dh_compress: handle the hard link stuff properly, it was broken. Also

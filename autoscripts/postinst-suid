@@ -1,4 +1,4 @@
-if [ -e /etc/suid.conf -a -x /usr/sbin/suidregister ]; then
+if command -v suidregister >/dev/null 2>&1 && [ -e /etc/suid.conf ]; then
         suidregister -s #PACKAGE# /#FILE# #OWNER# #GROUP# #PERMS#
 else
         chown #OWNER#.#GROUP# /#FILE#

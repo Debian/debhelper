@@ -2,6 +2,7 @@
 #
 # Reads debian/docs, installs all files listed there into /usr/doc/$PACKAGE
 # Also installs the debian/copyright and debian/README.debian and debian/TODO
+# and handles debian/doc-base.
 
 BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
 use Dh_Lib;
@@ -59,5 +60,19 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	}
 	if ($copyright) {
 			doit("install","-m","644","-p",$copyright,"$TMP/usr/doc/$PACKAGE/copyright");
+	}
+	
+	# Handle doc-base files.
+	$file=pkgfile($PACKAGE,"doc-base");
+	if ($file) {
+		if (! -d "$TMP/usr/share/doc-base/") {
+			doit("install","-d","$TMP/usr/share/doc-base/");
+		}
+		doit("install","-p","-m644",$file,
+		     "$TMP/usr/share/doc-base/$PACKAGE");
+		if (! $dh{NOSCRIPTS}) {
+			autoscript($PACKAGE,"postinst","postinst-doc-base");
+			autoscript($PACKAGE,"postrm","postrm-doc-base")
+		}
 	}
 }
