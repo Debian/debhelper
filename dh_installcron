@@ -8,7 +8,7 @@ PATH=debian:$PATH:/usr/lib/debhelper
 for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
 
-	for type in daily weekly monthly; do
+	for type in daily weekly monthly d; do
 		cron=`pkgfile $PACKAGE cron.$type`
 		if [ "$cron" ]; then
 			if [ ! -d $TMP/etc/cron.$type ]; then

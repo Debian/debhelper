@@ -1,3 +1,15 @@
+debhelper (0.99) unstable; urgency=low
+
+  * !!!! WARNING: Debhelper (specifically dh_compress) is broken with
+    !!!! libtricks. Use fakeroot instead until this is fixed.
+  * dh_compress: applied patch from Herbert Xu <herbert@gondor.apana.org.au>
+    to make it not fail if there are no candidates for compression (#24654).
+  * Removed a whole debhelper-0.96 tree that had crept into the source
+    package by accident.
+  * Is version 1.0 next?
+
+ -- Joey Hess <joeyh@master.debian.org>  Thu, 16 Jul 1998 10:03:21 -0700
+
 debhelper (0.98) unstable; urgency=low
 
   * dh_lib: isnative: pass -l<changelog> to dpkg-parsechangelog, to support
