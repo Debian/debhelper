@@ -78,7 +78,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 		# Determine what directory the file belongs in,
 		# /usr/share/man, or /usr/X11R6/man, and how the link to
-		# the undocuemtned.7 man page will look.
+		# the undocumented.7 man page will look.
 		my ($dir, $reldir);
 		my ($section)=$file=~m/^.*\.(\d)/;
 		if (!$section) {
@@ -93,9 +93,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$reldir="";
 		}
 
+		# If an uncompressed version of the page exists, something
+		# is weird.
+		if (-e "$tmp/$dir/$file") {
+			error("A man page $tmp/$dir/$file exists.");
+		}
+		
 		if (! -d "$tmp/$dir") {
 			doit("install","-d","$tmp/$dir");
-		}
+		}		
 		doit("ln","-sf","${reldir}undocumented.7.gz","$tmp/$dir/$file.gz");
 	}
 }

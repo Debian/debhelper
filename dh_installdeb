@@ -75,7 +75,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			# Auto-generate script header and add .debhelper
 			# content to it.
 			if (-f "debian/$ext$file.debhelper") {
-				complex_doit("echo '#!/bin/sh -e' > $tmp/DEBIAN/$file");
+				complex_doit("printf '#!/bin/sh\nset -e\n' > $tmp/DEBIAN/$file");
 				complex_doit("cat debian/$ext$file.debhelper >> $tmp/DEBIAN/$file");
 				doit("chown","0.0","$tmp/DEBIAN/$file");
 				doit("chmod",755,"$tmp/DEBIAN/$file");
@@ -94,7 +94,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# Automatic conffiles registration: If it is in /etc, it is a
 	# conffile.
 	if (! compat(2) && -d "$tmp/etc") {
-		complex_doit("find $tmp/etc -type f |sed 's~^$tmp~~' >> $tmp/DEBIAN/conffiles");
+		complex_doit("find $tmp/etc -type f -printf '/etc/%P\n' >> $tmp/DEBIAN/conffiles");
 		# Anything found?
 		if (-z "$tmp/DEBIAN/conffiles") {
 			doit("rm", "-f", "$tmp/DEBIAN/conffiles");

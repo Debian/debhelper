@@ -412,6 +412,7 @@ sub GetPackages {
 	my $package="";
 	my $arch="";
 	my @list=();
+	my %seen;
 	open (CONTROL, 'debian/control') ||
 		error("cannot read debian/control: $!\n");
 	while (<CONTROL>) {
@@ -419,10 +420,18 @@ sub GetPackages {
 		s/\s+$//;
 		if (/^Package:\s*(.*)/) {
 			$package=$1;
+			# Detect duplicate package names in the same control file.
+			if (! $seen{$package}) {
+				$seen{$package}=1;
+			}
+			else {
+				error("debian/control has a duplicate entry for $package");
+			}
 		}
 		if (/^Architecture:\s*(.*)/) {
 			$arch=$1;
 		}
+		
 		if (!$_ or eof) { # end of stanza.
 			if ($package &&
 			    (($type eq 'indep' && $arch eq 'all') ||

@@ -1,3 +1,21 @@
+debhelper (3.0.50) unstable; urgency=low
+
+  * dh_undocumented: check for existing uncompressed man pages. Closes: #87972
+  * Optimized dh_installdeb conffile finding. Closes: #119035
+  * dh_installdeb: changed the #!/bin/sh -e to set -e on a new line. Whether
+    this additional bloat is worth it to make it easier for people to sh -x
+    a script by hand is debatable either way, I guess. Closes: #119046
+  * Added a check for duplicated package stanzas in debian/control, 
+    Closes: #118805
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 17 Nov 2001 14:00:54 -0500
+
+debhelper (3.0.49) unstable; urgency=low
+
+  * More informative error, Closes: #118767
+
+ -- Joey Hess <joeyh@debian.org>  Thu,  8 Nov 2001 18:12:11 -0500
+
 debhelper (3.0.48) unstable; urgency=low
 
   * Added .zip and .jar to list of things to compress (Closes: #115735),
