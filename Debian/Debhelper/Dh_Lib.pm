@@ -117,7 +117,7 @@ sub escape_shell {
 			# This does make -V"foo bar" turn into "-Vfoo bar",
 			# but that will be parsed identically by the shell
 			# anyway..
-			$word=~s/([\n`\$"\\])/\$1/g;
+			$word=~s/([\n`\$"\\])/\\$1/g;
 			push @ret, "\"$word\"";
 		}
 		else {
@@ -439,7 +439,7 @@ sub addsubstvar {
 	}
 
 	if (length $line) {
-		 complex_doit("(grep -s -v ${substvar} $substvarfile; echo '${substvar}=$line') > $substvarfile.new");
+		 complex_doit("(grep -s -v ${substvar} $substvarfile; echo ".escape_shell("${substvar}=$line").") > $substvarfile.new");
 		 doit("mv", "$substvarfile.new", $substvarfile);
 	}
 	else {
