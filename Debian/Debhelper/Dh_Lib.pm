@@ -14,7 +14,7 @@ use vars qw(@ISA @EXPORT %dh);
 	    &pkgfile &pkgext &pkgfilename &isnative &autoscript &filearray
 	    &filedoublearray &getpackages &basename &dirname &xargs %dh
 	    &compat &addsubstvar &delsubstvar &excludefile &package_arch
-	    &is_udeb &udeb_filename);
+	    &is_udeb &udeb_filename &debhelper_script_subst);
 
 my $max_compat=4;
 
@@ -612,18 +612,21 @@ sub getpackages {
 	return @list;
 }
 
+# Returns the arch a package will build for.
 sub package_arch {
 	my $package=shift;
 	
 	return $package_arches{$package} eq 'all' ? "all" : buildarch();
 }
 
+# Return true if a given package is really a udeb.
 sub is_udeb {
 	my $package=shift;
 	
 	return $package_types{$package} eq 'udeb';
 }
 
+# Generates the filename that is used for a udeb package.
 sub udeb_filename {
 	my $package=shift;
 	
@@ -632,6 +635,36 @@ sub udeb_filename {
 	my $version=$dh{VERSION};
 	$version=~s/^[0-9]+://; # strip any epoch
 	return "${package}_${version}_$filearch.udeb";
+}
+
+# Handles #DEBHELPER# substitution in a script; also can generate a new
+# script from scratch if none exists but there is a .debhelper file for it.
+sub debhelper_script_subst {
+	my $package=shift;
+	my $script=shift;
+	
+	my $tmp=tmpdir($package);
+	my $ext=pkgext($package);
+	my $file=pkgfile($package,$script);
+
+	if ($file ne '') {
+		if (-f "debian/$ext$script.debhelper") {
+			# Add this into the script, where it has #DEBHELPER#
+			complex_doit("perl -pe 's~#DEBHELPER#~qx{cat debian/$ext$script.debhelper}~eg' < $file > $tmp/DEBIAN/$script");
+		}
+		else {
+			# Just get rid of any #DEBHELPER# in the script.
+			complex_doit("sed s/#DEBHELPER#// < $file > $tmp/DEBIAN/$script");
+		}
+		doit("chown","0:0","$tmp/DEBIAN/$script");
+		doit("chmod",755,"$tmp/DEBIAN/$script");
+	}
+	elsif ( -f "debian/$ext$script.debhelper" ) {
+		complex_doit("printf '#!/bin/sh\nset -e\n' > $tmp/DEBIAN/$script");
+		complex_doit("cat debian/$ext$script.debhelper >> $tmp/DEBIAN/$script");
+		doit("chown","0:0","$tmp/DEBIAN/$script");
+		doit("chmod",755,"$tmp/DEBIAN/$script");
+	}
 }
 
 1

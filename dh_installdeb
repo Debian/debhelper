@@ -46,7 +46,6 @@ init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
-	my $ext=pkgext($package);
 
 	if (! -d "$tmp/DEBIAN") {
 		doit("install","-o",0,"-g",0,"-d","$tmp/DEBIAN");
@@ -62,34 +61,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		next;		
 	}
 	
-	# Install debian install scripts.
-	# If any .debhelper files exist, add them into the scripts.
-	foreach my $file (qw{postinst preinst prerm postrm}) {
-		my $f=pkgfile($package,$file);
-		if ($f) {
-			if (-f "debian/$ext$file.debhelper") {
-				# Add this into the script, where it has
-				# #DEBHELPER#
-				complex_doit("perl -pe 's~#DEBHELPER#~qx{cat debian/$ext$file.debhelper}~eg' < $f > $tmp/DEBIAN/$file");
-		        }
-			else {
-				# Just get rid of any #DEBHELPER# in the 
-				# script.
-				complex_doit("sed s/#DEBHELPER#// < $f > $tmp/DEBIAN/$file");
-			}
-			doit("chown","0:0","$tmp/DEBIAN/$file");
-			doit("chmod",755,"$tmp/DEBIAN/$file");
-		}
-		else {
-			# Auto-generate script header and add .debhelper
-			# content to it.
-			if (-f "debian/$ext$file.debhelper") {
-				complex_doit("printf '#!/bin/sh\nset -e\n' > $tmp/DEBIAN/$file");
-				complex_doit("cat debian/$ext$file.debhelper >> $tmp/DEBIAN/$file");
-				doit("chown","0:0","$tmp/DEBIAN/$file");
-				doit("chmod",755,"$tmp/DEBIAN/$file");
-			}
-		}
+	# Install debian scripts.
+	foreach my $script (qw{postinst preinst prerm postrm}) {
+		debhelper_script_subst($package, $script);
 	}
 
 	# Install non-executable files
