@@ -3,7 +3,7 @@
 dh_installinit \- install init scripts into package build directories
 .SH SYNOPSIS
 .B dh_installinit
-.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir] [-n] [-r] [-d] [-uparams]"
+.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir] [-n] [-r] [-d] [-uparams]"
 .SH "DESCRIPTION"
 dh_installinit is a debhelper program that is responsible for installing
 init scripts into package build directories. 
@@ -26,6 +26,10 @@ Install init scripts into all architecture dependent packages.
 .TP
 .B \-i, \--indep
 Install init scripts into all architecture independent packages.
+.TP
+.B \--no-act
+Do not really do anything. If used with -v, the result is that this command
+will output a list of what it would have done.
 .TP
 .B \-ppackage, \--package=package
 Install init scripts into the package named "package".
@@ -61,6 +65,9 @@ the control file will be effected.
 .TP
 .I DH_VERBOSE
 Enables verbose mode
+.TP
+.I DH_NO_ACT
+Enables no-act mode (see above).
 .SH "SEE ALSO"
 .BR /usr/doc/debhelper/README
 .SH AUTHOR
