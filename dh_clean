@@ -11,11 +11,11 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	$EXT=pkgext($PACKAGE);
 
 	if (! $dh{D_FLAG}) {
-		doit("rm","-f","debian/$EXT\substvars",
-			"debian/$EXT\postinst.debhelper",
-			"debian/$EXT\postrm.debhelper",
-			"debian/$EXT\preinst.debhelper",
-			"debian/$EXT\prerm.debhelper");
+		doit("rm","-f","debian/${EXT}substvars",
+			"debian/${EXT}postinst.debhelper",
+			"debian/${EXT}postrm.debhelper",
+			"debian/${EXT}preinst.debhelper",
+			"debian/${EXT}prerm.debhelper");
 	}
 	
 	doit ("rm","-rf",$TMP);
