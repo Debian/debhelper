@@ -49,8 +49,8 @@ binary-indep: link-stamp build
 	cp -a autoscripts debian/debhelper/usr/share/debhelper
 	rm -rf debian/debhelper/usr/share/debhelper/autoscripts/CVS
 
-	./dh_installdocs `ls -1 doc/* | grep -v CVS`
-	./dh_installexamples `ls -1 examples/* | grep -v CVS`
+	./dh_installdocs `echo doc/* | sed s/CVS//`
+	./dh_installexamples `echo examples/* | sed s/CVS//`
 	./dh_installmenu
 	./dh_installmanpages
 	./dh_installinfo
