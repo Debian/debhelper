@@ -1,66 +1,69 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Install debian/init[.d], and set up the postinst and postrm for init
 # scripts.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use Dh_Lib;
+init();
 
-for PACKAGE in $DH_DOPACKAGES; do
-	TMP=`tmpdir $PACKAGE`
-	init=`pkgfile $PACKAGE init`
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	# Debstd used either name, so do we for back-compatability.
+	$init=pkgfile($PACKAGE,"init") || pkgfile($PACKAGE,"init.d");
 
-	# This is for backwards compatability with debstd, which used either
-	# name.
-	if [ ! "$init" ]; then
-		init=`pkgfile $PACKAGE init.d`
-	fi
-
-	if [ "$init" ]; then
-		if [ ! -d $TMP/etc/init.d ]; then
-			doit "install -d $TMP/etc/init.d"
-		fi
+	if ($init ne '') {
+		if (! -d "$TMP/etc/init.d") {
+			doit("install","-d","$TMP/etc/init.d");
+		}
 
 		# Figure out what filename to install it as.
-		if [ "$DH_D_FLAG" ]; then
-			# -d on the command line sets DH_D_FLAG. We will 
+		my $script;
+		if ($dh{D_FLAG}) {
+			# -d on the command line sets D_FLAG. We will 
 			# remove a trailing 'd' from the package name and 
 			# use that as the name.
-			script=`expr $PACKAGE : '\(.*\)d$'` || true
-			if [ ! "$script" ]; then
-				echo `basename $0`" warning: \"$PACKAGE\" has no final -d, but -d was specified."
-				script=$PACKAGE
-			fi
-		elif [ "$DH_INIT_SCRIPT" != "" ]; then
-			script=$DH_INIT_SCRIPT
-		else
-			script=$PACKAGE
-		fi
-		doit "install -p -m755 $init $TMP/etc/init.d/$script"
+			$script=$PACKAGE;
+			if ($script=~m/(.*)d$/) {
+				$script=$1;
+			}
+			else {
+				warning("\"$PACKAGE\" has no final `d' in its name, but -d was specified.");
+			}
+		}	
+		elsif ($dh{INIT_SCRIPT}) {
+			$script=$dh{INIT_SCRIPT};
+		}
+		else {
+			$script=$PACKAGE;
+		}	
+		doit("install","-p","-m755",$init,"$TMP/etc/init.d/$script");
 
 		# This is set by the -u "foo" command line switch, it's
-		# the parameters to pass to update-rc.d. If not set, 
+		# the parameters to pass to update-rc.d. If not set,
 		# we have to say "defaults".
-		if [ "$DH_U_PARAMS" = "" ]; then
-			DH_U_PARAMS="defaults"
-		fi
+		my $params=join(' ',@{$dh{U_PARAMS}});
+		if ($params eq '') {
+			$params="defaults";
+		}
 
-		# -r on the command line sets DH_R_FLAG. If it's set, there
-		# is no restart on upgrade.
-		if [ ! "$DH_NOSCRIPTS" ]; then
-			if [ "$DH_R_FLAG" ]; then
-				autoscript "postinst" "postinst-init-norestart" \
-					"s/#SCRIPT#/$script/;s/#INITPARMS#/$DH_U_PARAMS/"
-				autoscript "postrm" "postrm-init" \
-					"s/#SCRIPT#/$script/;s/#INITPARMS#/$DH_U_PARAMS/"
-			else
-				autoscript "postinst" "postinst-init" \
-					"s/#SCRIPT#/$script/;s/#INITPARMS#/$DH_U_PARAMS/"
-				autoscript "postrm" "postrm-init" \
-					"s/#SCRIPT#/$script/;s/#INITPARMS#/$DH_U_PARAMS/"
-				autoscript "prerm" "prerm-init" \
-					"s/#SCRIPT#/$script/;s/#INITPARMS#/$DH_U_PARAMS/"
-			fi
-		fi
-	fi
-done
+		if (! $dh{NOSCRIPTS}) {
+			# -r on the command line sets R_FLAG. If it's set, there
+			# is no restart on upgrade.
+			if ($dh{R_FLAG}) {
+				autoscript($PACKAGE,"postinst","postinst-init-norestart",
+					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
+				autoscript($PACKAGE,"postrm","postrm-init",
+					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
+			}
+			else {
+				autoscript($PACKAGE,"postinst","postinst-init",
+					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
+				autoscript($PACKAGE,"postrm","postrm-init",
+					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
+				autoscript($PACKAGE,"prerm","prerm-init",
+					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
+			}
+		}
+	}
+}
