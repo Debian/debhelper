@@ -143,7 +143,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		complex_doit("(cd $sourcedir >/dev/null ; tar --create --files-from=$pwd/debian/movelist --file -) | (cd $tmp >/dev/null ;tar xpf -)");
 		# --remove-files is not used above because tar then doesn't
 		# preserve hard links
-		complex_doit("cd $sourcedir >/dev/null ; cat $pwd/debian/movelist | xargs rm -f)");
+		complex_doit("(cd $sourcedir >/dev/null ; cat $pwd/debian/movelist | xargs rm -f)");
 		doit("rm","-f","debian/movelist");
 	}
 }
