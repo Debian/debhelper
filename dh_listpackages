@@ -1,0 +1,8 @@
+#!/usr/bin/perl -w
+#
+# Output a list of all packages debhelper will act on.
+
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use Dh_Lib;
+init();
+print join("\n",@{$dh{DOPACKAGES}})."\n";

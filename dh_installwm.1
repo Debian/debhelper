@@ -1,0 +1,42 @@
+.TH DH_INSTALLWM 1 "" "Debhelper Commands" "Debhelper Commands"
+.SH NAME
+dh_installwm \- register a window manager
+.SH SYNOPSIS
+.B dh_installmenu
+.I "[debhelper options] [-n] wmfilename"
+.SH "DESCRIPTION"
+dh_installwm is a debhelper program that is responsible for
+generating the postinst and postrm commands needed to
+interface with the the
+.BR register-window-manager (1)
+command. This results in a window manager being registered when it is
+installed.
+.SH OPTIONS
+.TP
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
+.TP
+.B \-n, \--noscripts
+Do not modify postinst/postrm scripts. Turns this command into a no-op.
+.TP
+.B wmfilename
+The filename of the window manager you wish to register. May be either a
+simple filename if the window manager is in /usr/X11R6/bin/, or a complete
+path otherwise.
+.SH NOTES
+Note that this command will set up postinst and postrm scripts for every
+package it acts on. It's wise to limit its action to a single package with,
+for example, the -p switch.
+.SH ENVIRONMENT
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
+.SH "SEE ALSO"
+.TP
+.BR debhelper (1)
+.TP
+.BR register-window-manager (1)
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>
