@@ -7,51 +7,41 @@ dh_perl - calculates perl scripts & modules dependencies
 =cut
 
 use strict;
+use Config;
+use File::Find;
 use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-  dh_perl [debhelper options] [-k] [-d] [library dirs ...]
+  dh_perl [debhelper options] [-d] [library dirs ...]
 
 =head1 DESCRIPTION
 
 dh_perl is a debhelper program that is responsible for generating
 the perl:Depends substitutions and adding them to substvars files.
 
-The program will look for the location of installed modules and will
-use this information to generate a dependency (at the present time
-it can only be perl5, perl5-thread, perl-5.X or perl-5.X-thread).
+The program will look at perl scripts and modules in your package,
+and will use this information to generate a dependency.
 The dependancy will be substituted into your package's control file
 wherever you place the token "${perl:Depends}".
-
-It will also look at #! lines of perl scripts in order to be able
-to calculate a dependency for perl scripts and not only perl modules.
-
-In addition it will automatically remove .packlist file and will
-remove the directory in which it was if it's empty. You can
-switch off this option by passing -k.
 
 =head1 OPTIONS
 
 =over 4
 
-=item B<-k>
-
-Keep .packlist files.
-
 =item B<-d>
 
-In some specific cases you may want to depend on a -base package
-(ie perl-5.6-base or perl5-base). If so, you can pass
-the -d option to make dh_perl generate a dependency on the correct base
-package. This is only necessary for some packages that are included in the
-base system.
+In some specific cases you may want to depend on perl-base rather than the
+full perl package. If so, you can pass the -d option to make dh_perl generate
+a dependency on the correct base package. This is only necessary for some
+packages that are included in the base system.
 
 =item I<library dirs>
 
 If your package installs perl modules in non-standard
 directories, you can make dh_perl check those directories by passing their
-names on the command line. It will only check usr/lib/perl5 by default.
+names on the command line. It will only check the vendorlib and vendorarch
+directories by default.
 
 =back
 
@@ -59,27 +49,14 @@ names on the command line. It will only check usr/lib/perl5 by default.
 
 Debian policy, version 3.0.1
 
-Perl policy, version 1.0
+Perl policy, version 1.15
 
 =cut
 
 init();
 
-my $perlext = '';
-my $lib_dir = 'usr/lib/perl5';
-
-# Figure out the version of perl. If $ENV{PERL} is set, query the perl binary
-# it points to, otherwise query perl directly.
-#
-# This is pretty gawd-aweful ugly, because we need "5.00[45]"
-# and "5.[6789]" to be returned depending on perl version.
-my $version;
-if (defined $ENV{PERL}) {
-	$version=`$ENV{PERL} -e '\$] < 5.006 ? printf "%.3f", \$] : printf "%vd", substr \$^V, 0, -1'`;
-}
-else {
-	$version=$] < 5.006 ? sprintf "%.3f", $] : sprintf "%vd", substr $^V, 0, -1;
-}
+my $vendorlib = substr $Config{vendorlib}, 1;
+my $vendorarch = substr $Config{vendorarch}, 1;
 
 # Cleaning the paths given on the command line
 foreach (@ARGV) {
@@ -87,74 +64,62 @@ foreach (@ARGV) {
 	s#^/##;
 }
 
-# If -d is given, then we'll try to depend on one of the perl-5.00X-base 
-# package instead of perl-5.00X
-$perlext='-base' if ($dh{'D_FLAG'});
+my $perl = 'perl';
+# If -d is given, then the dependency is on perl-base rather than perl.
+$perl .= '-base' if $dh{D_FLAG};
+my $version;
+
+# dependency types
+use constant PROGRAM   => 1;
+use constant PM_MODULE => 2;
+use constant XS_MODULE => 4;
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
-	my $tmp=tmpdir($package);
-	my $ext=pkgext($package);
-
-	my ($file, $v, $arch);
-	my $dep_arch = '';
-	my $dep = '';
-	my $found = 0;
+	my $tmp = tmpdir($package);
+	my $ext = pkgext($package);
 
 	# Check also for alternate locations given on the command line
-	my $dirs = '';
-	foreach ($lib_dir, @ARGV) {
-		$dirs .= "$tmp/$_ " if (-d "$tmp/$_");
-	}
-	my $re = '(?:' . join('|', ($lib_dir, @ARGV)) . ')';
+	my @dirs = grep -d, map "$tmp/$_", $vendorlib, $vendorarch, @ARGV;
 
 	# Look for perl modules and check where they are installed
-	if ($dirs) {
-	    foreach $file (split(/\n/,`find $dirs -type f \\( -name "*.pm" -or -name "*.so" \\)`)) {
-	        $found++;
-		if ($file =~ m<^$tmp/$re/(\d\.\d+)/([^/]+)/>) {
-			$v = $1;
-			$arch = $2;
-			check_module_version ($v, $version);
-			$v .= '-thread' if ($arch =~ /-thread/); 
-			$dep_arch = add_deps ($dep_arch, "perl-$v");
-		} elsif ($file =~ m<^$tmp/$re/(\d.\d+)/>) {
-			$v = $1;
-			check_module_version ($v, $version);
-			$dep_arch = add_deps ($dep_arch, "perl-$v");
-		}
-	    }
-	}
+	my $deps = 0;
+	find sub {
+		return unless -f;
+		$deps |= PM_MODULE if /\.pm$/;
+		$deps |= XS_MODULE if /\.so$/;
+	    }, @dirs if @dirs;
 
-	if ($found and not $dep_arch) {
-		$dep = "perl5$perlext";
-	} elsif ($dep_arch) {
-		$dep = $dep_arch;
-	}
-
-	# Look for perl scripts
-	my ($ff, $newdep);
-	foreach $file (split(/\n/,`find $tmp -type f \\( -name "*.pl" -or -perm +111 \\)`)) {
-		$ff=`file -b $file`;
-		if ($ff =~ /perl/) {
-			$newdep = dep_from_script ($file);
-			$dep = add_deps ($dep, $newdep) if $newdep;
-		}
-	}
-
-	# Remove .packlist files and eventually some empty directories
-	if (not $dh{'K_FLAG'}) {
-		foreach $file (split(/\n/,`find $tmp -type f -name .packlist`))
+	# find scripts
+	find sub {
+		return unless -f and (-x or /\.pl$/);
+		local *F;
+		return unless open F, $_;
+		if (read F, local $_, 32 and m%^#!\s*/usr/bin/perl\s%)
 		{
-			unlink($file);
-			# Get the directory name
-			while ($file =~ s#/[^/]+$##){
-				last if (not -d $file);
-				last if (not rmdir $file);
-			}
+		    $deps |= PROGRAM;
 		}
+
+		close F;
+	    }, $tmp;
+
+	next unless $deps;
+
+	my $perl_depends = $perl;
+	if ($deps & XS_MODULE or $dh{V_FLAG_SET})
+	{
+	    ($version) = `dpkg -p $perl` =~ /^Version:\s*(\S+)/m
+		unless $version;
+
+	    $perl_depends .= " (>= $version)";
 	}
 
-	next unless $dep;
+	# add perlapi-<ver> for XS modules
+	$perl_depends .= ", perlapi-$Config{version}"
+	    if $deps & XS_MODULE;
+
+	# don't need to depend on an un-versioned perl-base, it's
+	# essential
+	next if $perl_depends eq 'perl-base';
 
 	if (-e "debian/${ext}substvars") {
 		open (IN, "<debian/${ext}substvars");
@@ -165,60 +130,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	} else {
 		open (OUT, ">debian/${ext}substvars");
 	}
-	print OUT "perl:Depends=$dep\n";
+	print OUT "perl:Depends=$perl_depends\n";
 	close OUT;
-}
-
-sub add_deps {
-	my ($dep, $new) = @_;
-	
-        # If the $new-base package can exist then add $perlext to $new
-	$new = "$new$perlext" if ($new =~ m/^(?:perl5|perl-\d\.\d+)$/);
-	
-	# If $new = perl5 or perl5-thread check if perl-X.XXX(-thread)?
-	# is not already in the dependencies
-	if ($new eq "perl5") {
-		return $dep if ($dep =~ m/(^|\s)perl-5\.\d+(\s|,|$)/);
-	} elsif ($new eq "perl5-thread") {
-		return $dep if ($dep =~ m/(^|\s)perl-5\.\d+-thread(\s|,|$)/);
-	}
-	
-	if (not $dep) {
-		$dep = $new;
-	} else {
-		$dep .= ", $new" unless ($dep =~ m/(^|\s)$new(\s|,|$)/);
-	}
-
-	return $dep;
-}
-
-sub check_module_version {
-	my ($v1, $v2) = @_;
-	unless ($v1 eq $v2) {
-		warning("A module has been found in perl-$v1 arch directory. But perl-$v2 is the perl currently used ...\n");
-	}
-}
-
-sub dep_from_script {
-	my $file = shift;
-	my ($line, $perl, $dep);
-	open (SCRIPT, "<$file") || die "Can't open $file: $!\n";
-	$line = <SCRIPT>;
-	close (SCRIPT);
-	if ($line =~ m<^#!\s*/usr/bin/(perl\S*)(?:\s+|$)>) {
-		$perl = $1;
-		if ($perl eq "perl") {
-			$dep = "perl5";
-		} elsif ($perl eq "perl-thread") {
-			$dep = "perl5-thread";
-		} elsif ($perl =~ m/^perl-\d\.\d+(?:-thread)?$/) {
-			$dep = $perl;
-		} elsif ($perl =~ m/^perl(\d\.\d+)(\d\d)$/) {
-			# Should never happen but ...
-			$dep = "perl-$1 (=$1.$2)";
-		}
-	}
-	return $dep;
 }
 
 =head1 SEE ALSO
@@ -229,6 +142,6 @@ This program is a part of debhelper.
 
 =head1 AUTHOR
 
-Joey Hess <joeyh@debian.org>
+Brendan O'Dea <bod@debian.org>
 
 =cut
