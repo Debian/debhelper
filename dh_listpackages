@@ -1,9 +1,38 @@
 #!/usr/bin/perl -w
-#
-# Output a list of all packages debhelper will act on.
+
+=head1 NAME
+
+dh_listpackages - list binary packages debhelper will act on
+
+=cut
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_listpackages [debhelper options]
+
+=head1 DESCRIPTION
+
+dh_listpackages is a debhelper program that outputs a list of all binary
+packages debhelper commands will act on. If you pass it some options, it
+will change the list to match the packages other debhelper commands would
+act on if passed the same options.
+
+=cut
+
 init();
 print join("\n",@{$dh{DOPACKAGES}})."\n";
 
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

@@ -1,9 +1,40 @@
 #!/usr/bin/perl -w
-#
-# Integration with the Debian X11 font policy.
+
+=head1 NAME
+
+dh_installxfonts - register X fonts
+
+=cut
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_installxfonts [debhelper options]
+
+=head1 DESCRIPTION
+
+dh_installxfonts is a debhelper program that is responsible for
+registering X fonts, so their corresponding fonts.dir, fonts.alias,
+and fonts.scale be rebuilt properly at install time.
+
+Before calling this program, you should have installed any X fonts
+provided by your package into the appropriate location in the package build
+directory. Also, your package should depend on xbase-clients (>=
+3.3.3.1-5).
+
+It automatically generates the postinst and postrm commands needed to
+register X fonts.  See L<dh_installdeb(1)> for an explanation of how this
+works.
+
+=head1 NOTES
+
+See L<update-fonts-alias(8)>, L<update-fonts-scale(8)>, and L<mkfontdir(1x)>
+for more information about X font installation.
+
+=cut
+
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -34,3 +65,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			":;s:#UPDATECMDS#:".join(' ', @updatecmds).":");
 	}
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

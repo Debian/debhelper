@@ -1,10 +1,77 @@
 #!/usr/bin/perl -w
-#
-# Generate symlinks in debian packages, reading debian/links. The
-# file contains pairs of files and symlinks.
+
+=head1 NAME
+
+dh_link - create symlinks in package build directories
+
+=cut
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_link [debhelper options] [-A] [source destination ...]
+
+=head1 DESCRIPTION
+
+dh_link is a debhelper program that creates symlinks in package build
+directories.
+
+dh_link accepts a list of pairs of source and destination files. The source
+files are the already existing files that will be symlinked from. The
+destination files are the symlinks that will be created. There B<must> be
+an equal number of source and destination files specified.
+
+The list can be specified in two ways. A file named debian/package.links
+can list pairs of files. If you use this file, you should put each pair
+of files on its own line, and separate the files within the pair with
+whitespace. Also, pairs of files can be specified as parameters - these
+pairs will only be created in the package build directory of the first
+package dh_link is told to act on. By default, this is the first binary
+package in debian/control, but if you use -p, -i, or -a flags, it will be
+the first package specified by those flags.
+
+Be sure you B<do> specify the full filename to both the source and
+destination files (unlike you would do if you were using something like
+L<ln(1)>).
+
+dh_link will generate symlinks that comply with debian policy - absolute
+when policy says they should be absolute, and relative links with as short
+a path as possible. It will also create any subdirectories it needs to to put
+the symlinks in.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-A>, B<--all>
+
+Create any links specified by command line parameters in ALL packages
+acted on, not just the first.
+
+=item I<source destination ...>
+
+Create a file named "destination" as a link to a file named "source". Do
+this in the package build directory of the first package acted on.
+(Or in all packages if -A is specified.)
+
+=back
+
+=head1 EXAMPLES
+
+ dh_link usr/share/man/man1/foo.1 usr/share/man/man1/bar.1
+
+Make bar.1 be a symlink to foo.1
+
+ dh_link var/lib/foo usr/lib/foo \
+   usr/X11R6/man/man1/foo.1x usr/share/man/man1/bar.1
+
+Make /usr/lib/foo/ be a link to /var/lib/foo/, and bar.1 be a symlink to
+the X man page foo.1x
+
+=cut
+
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -73,3 +140,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("ln","-sf",$src,"$tmp/$dest");
 	}
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut
