@@ -1,0 +1,40 @@
+.TH DH_INSTALLDEBCONF 1 "" "Debhelper Commands" "Debhelper Commands"
+.SH NAME
+dh_installdebconf \- install debconf files into package build directories
+.SH SYNOPSIS
+.B dh_installdebconf
+.I "[debhelper options] [-n]"
+.SH "DESCRIPTION"
+dh_installdebconf is a debhelper program that is responsible for installing
+files used by the debconf package into package build directories.
+.P
+It also automatically generates the postrm commands needed to 
+interface with debconf. See 
+.BR dh_installdeb (1)
+for an explanation of how this works.
+.P
+Files named debian/package.config and debian/package.templates are installed
+into the DEBIAN directory in the package build directory.
+.P
+For the first first binary package listed in the control file, you may use
+debian/config and debian/templates instead.
+.P
+Note that if you use debconf, your package probably needs to depend on it.
+.SH OPTIONS
+.TP
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
+.TP
+.B \-n, \--noscripts
+Do not modify postrm script.
+.SH ENVIRONMENT
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
+.SH "SEE ALSO"
+.TP
+.BR debhelper (1)
+.SH AUTHOR
+Joey Hess <joeyh@master.debian.org>

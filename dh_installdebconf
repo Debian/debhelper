@@ -1,0 +1,31 @@
+#!/usr/bin/perl -w
+#
+# Integration with debconf.
+
+BEGIN { push @INC, "debian", "/usr/share/debhelper" }
+use Dh_Lib;
+init();
+
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$config=pkgfile($PACKAGE,"config");
+	$templates=pkgfile($PACKAGE,"templates");
+
+	if (! -d "$TMP/DEBIAN") {
+		doit("install","-o","root","-g","root","-d","$TMP/DEBIAN");
+	}
+
+	if ($config ne '') {
+		doit("install", "-o", "root", "-g", "root", "-m", 755, "-p",
+		     $config, "$TMP/DEBIAN/config");
+	}
+	
+	if ($templates ne '') {
+		doit("install", "-o", "root", "-g", "root", "-m", 644, "-p",
+		     $templates, "$TMP/DEBIAN/templates");
+	}
+
+	if (($config ne ''|| $templates ne '') && ! $dh{NOSCRIPTS}) {
+		autoscript($PACKAGE,"postrm","postrm-debconf");
+	}
+}
