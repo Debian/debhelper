@@ -2,7 +2,7 @@
 #
 # Library functions for debhelper programs, perl version.
 #
-# Joey Hess, GPL copyright 1997, 1998.
+# Joey Hess, GPL copyright 1997-2000.
 
 package Debian::Debhelper::Dh_Lib;
 use strict;
@@ -12,8 +12,7 @@ use vars qw(@ISA @EXPORT %dh);
 @ISA=qw(Exporter);
 @EXPORT=qw(&init &doit &complex_doit &verbose_print &error &warning &tmpdir
 	    &pkgfile &pkgext &isnative &autoscript &filearray &GetPackages
-	    &xargs
-	    %dh);
+	    &xargs %dh);
 
 my $max_compat=3;
 
@@ -87,11 +86,12 @@ sub init {
 	}
 }
 
-# Escapes out shell metacharacters in a word of shell script.
-sub escape_shell { my $word=shift;
+# Escapes out shell metacharacters in a line of shell script.
+sub escape_shell {
+	my $line=shift;
 	# This list is from _Unix in a Nutshell_. (except '#')
-	$word=~s/([\s!"\$()*+#;<>?@\[\]\\`|~])/\\$1/g;
-	return $word;
+	$line~s/([\s!"\$()*+#;<>?@\[\]\\`|~])/\\$1/g;
+	return $line;
 }
 
 # Run a command, and display the command to stdout if verbose mode is on.
@@ -104,9 +104,7 @@ sub doit {
 	verbose_print(join(" ",map { escape_shell($_) } @_));
 	
 	if (! $dh{NO_ACT}) {
-		system(@_) == 0
-			|| error("command returned error code");
-		
+		system(@_) == 0 || error("command returned error code");
 	}
 }
 
@@ -132,7 +130,7 @@ sub xargs {
 	my $args=shift;
 
         # The kernel can accept command lines up to 20k worth of characters.
-	my $command_max=20000;
+	my $command_max=20000; # LINUX SPECIFIC!!
 
 	# Figure out length of static portion of command.
 	my $static_length=0;
@@ -160,31 +158,41 @@ sub xargs {
 }
 
 # Print something if the verbose flag is on.
-sub verbose_print { my $message=shift;
+sub verbose_print {
+	my $message=shift;
+	
 	if ($dh{VERBOSE}) {
 		print "\t$message\n";
 	}
 }
 
 # Output an error message and exit.
-sub error { my $message=shift;
+sub error {
+	my $message=shift;
+
 	warning($message);
 	exit 1;
 }
 
 # Output a warning.
-sub warning { my $message=shift;
+sub warning {
+	my $message=shift;
+	
 	print STDERR basename($0).": $message\n";
 }
 
 # Returns the basename of the argument passed to it.
-sub basename { my $fn=shift;
+sub basename {
+	my $fn=shift;
+	
 	$fn=~s:^.*/(.*?)$:$1:;
 	return $fn;
 }
 
 # Returns the directory name of the argument passed to it.
-sub dirname { my $fn=shift;
+sub dirname {
+	my $fn=shift;
+	
 	$fn=~s:^(.*)/.*?$:$1:;
 	return $fn;
 }
@@ -208,7 +216,9 @@ sub compat {
 
 # Pass it a name of a binary package, it returns the name of the tmp dir to
 # use, for that package.
-sub tmpdir { my $package=shift;
+sub tmpdir {
+	my $package=shift;
+
 	if ($dh{TMPDIR}) {
 		return $dh{TMPDIR};
 	}
@@ -248,7 +258,9 @@ sub pkgfile {
 
 # Pass it a name of a binary package, it returns the name to prefix to files
 # in debian for this package.
-sub pkgext { my $package=shift;
+sub pkgext {
+	my $package=shift;
+
 	if ($package ne $dh{MAINPACKAGE}) {
 		return "$package.";
 	}
@@ -261,33 +273,31 @@ sub pkgext { my $package=shift;
 	# Caches return code so it only needs to run dpkg-parsechangelog once.
 	my %isnative_cache;
 	
-	sub isnative { my $package=shift;
-		if (! defined $isnative_cache{$package}) {
-			# Make sure we look at the correct changelog.
-			my $isnative_changelog=pkgfile($package,"changelog");
-			if (! $isnative_changelog) {
-				$isnative_changelog="debian/changelog";
-			}
+	sub isnative {
+		my $package=shift;
 
-			# Get the package version.
-			my $version=`dpkg-parsechangelog -l$isnative_changelog`;
-			($dh{VERSION})=$version=~m/Version:\s*(.*)/m;
-
-			# Did the changelog parse fail?
-			if (! defined $dh{VERSION}) {
-				error("changelog parse failure");
-			}
-
-			# Is this a native Debian package?
-			if ($dh{VERSION}=~m/.*-/) {
-				$isnative_cache{$package}=0;
-			}
-			else {
-				$isnative_cache{$package}=1;
-			}
+		return $isnative_cache{$package} if defined $isnative_cache{$package};
+		
+		# Make sure we look at the correct changelog.
+		my $isnative_changelog=pkgfile($package,"changelog");
+		if (! $isnative_changelog) {
+			$isnative_changelog="debian/changelog";
 		}
-	
-		return $isnative_cache{$package};
+		# Get the package version.
+		my $version=`dpkg-parsechangelog -l$isnative_changelog`;
+		($dh{VERSION})=$version=~m/Version:\s*(.*)/m;
+		# Did the changelog parse fail?
+		if (! defined $dh{VERSION}) {
+			error("changelog parse failure");
+		}
+
+		# Is this a native Debian package?
+		if ($dh{VERSION}=~m/.*-/) {
+			return $isnative_cache{$package}=0;
+		}
+		else {
+			return $isnative_cache{$package}=1;
+		}
 	}
 }
 
@@ -299,7 +309,12 @@ sub pkgext { my $package=shift;
 # 2: script to add to
 # 3: filename of snippet
 # 4: sed to run on the snippet. Ie, s/#PACKAGE#/$PACKAGE/
-sub autoscript { my $package=shift; my $script=shift; my $filename=shift; my $sed=shift || "";
+sub autoscript {
+	my $package=shift;
+	my $script=shift;
+	my $filename=shift;
+	my $sed=shift || "";
+
 	# This is the file we will append to.
 	my $outfile="debian/".pkgext($package)."$script.debhelper";
 
@@ -318,19 +333,28 @@ sub autoscript { my $package=shift; my $script=shift; my $filename=shift; my $se
 		}
 	}
 
-	# TODO: do this in perl, perhaps?
 	complex_doit("echo \"# Automatically added by ".basename($0)."\">> $outfile");
 	complex_doit("sed \"$sed\" $infile >> $outfile");
 	complex_doit("echo '# End automatically added section' >> $outfile");
 }
 
 # Reads in the specified file, one word at a time, and returns an array of
-# the result.
-sub filearray { my $file=shift;
+# the result. Pass in a true value for the second parameter if the contents
+# of the file are filenames that can be glob expanded.
+sub filearray {
+	my $file=shift;
+	my $doglob=shift || '';
+
 	my @ret;
 	open (DH_FARRAY_IN,"<$file") || error("cannot read $file: $1");
 	while (<DH_FARRAY_IN>) {
-		push @ret,split(' ',$_);
+		# Only do glob expansion in v3 mode.
+		if ($doglob && compat(3)) {
+			push @ret, map glob, split;
+		}
+		else {
+			push @ret, split;
+		}
 	}
 	close DH_FARRAY_IN;
 	
@@ -354,7 +378,9 @@ sub filearray { my $file=shift;
 # Must pass "arch" or "indep" or "same" to specify arch-dependant or
 # -independant or same arch packages. If nothing is specified, returns all
 # packages.
-sub GetPackages { my $type=shift;
+sub GetPackages {
+	my $type=shift;
+	
 	$type="" if ! defined $type;
 	
 	# Look up the build arch if we need to.
