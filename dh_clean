@@ -86,7 +86,8 @@ if (! $dh{D_FLAG}) {
 
 	# Remove some files that were left around by older versions of
 	# debhelper.
-	doit("rm","-f","debian/substvars");
+	doit("rm","-f","debian/substvars")
+		unless excludefile("debian/substvars");
 	
 	# See if some files that would normally be deleted are excluded.
 	my $find_options='';
