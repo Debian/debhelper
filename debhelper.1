@@ -94,7 +94,8 @@ for an example of how to use this.
 By default, all debhelper programs assume that the temporary directory used
 for assembling the tree of files in a package is debian/tmp for the first
 package listed in debian/control, and debian/<packagename> for each
-additional package.
+additional package. If DH_COMPAT=2, debian/<packagename> is always used,
+even for the first package.
 .P
 Sometimes, you might want to use some other temporary directory. This is
 supported by the
@@ -109,9 +110,9 @@ binary package the debhelper program will act on.
 .B Other notes
 In general, if any debhelper program needs a directory to exist under
 debian/, it will create it. I haven't bothered to document this in all the
-man pages, but for example, dh_installdeb knows to make debian/tmp/DEBIAN/
+man pages, but for example, dh_installdeb knows to make debian/<foo>/DEBIAN/
 before trying to put files there, dh_installmenu knows you need a
-debian/tmp/usr/lib/menu/ before installing the menu files, etc.
+debian/<foo>/usr/lib/menu/ before installing the menu files, etc.
 .SH "DEBHELPER COMMANDS"
 Here is the complete list of available debhelper commands.
 #LIST#

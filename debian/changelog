@@ -1,3 +1,20 @@
+debhelper (2.0.00) unstable; urgency=low
+
+  * Don't let the version number fool you. Debhelper v2 is here, but just
+    barely. That's what all the zero's mean. :-)
+  * If DH_COMPAT=2, then debian/<package> will be used for the temporary
+    build directory for all packages. debian/tmp is no more! (Well, except
+    dh_movefiles still uses it.)
+  * debhelper.1: documented this. 
+  * Dh_lib.pm: added compat(), pass in a number, it returns true if the
+    current compatability level is equal to that number.
+  * doc/PROGRAMMING: documented that.
+  * debhelper itself now builds using DH_COMPAT=2.
+  * dh_debstd forces DH_COMPAT=1, because it needs to stay compatable with
+    debstd after all.
+
+ -- Joey Hess <joeyh@master.debian.org>  Thu,  1 Jul 1999 13:37:58 -0700
+
 debhelper (1.9.00) unstable; urgency=low
 
   * This is a release of debhelper in preparation for debhelper v2.

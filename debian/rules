@@ -7,6 +7,9 @@
 # be sure to use the new templates from this package.
 export DH_AUTOSCRIPTDIR=autoscripts
 
+# Living dangerously :-)
+export DH_COMPAT=2
+
 # Figure out the current debhelper version.
 VERSION=$(shell expr "`dpkg-parsechangelog 2>/dev/null |grep Version:`" : '.*Version: \(.*\)')
 
@@ -23,8 +26,8 @@ clean:
 
 test:
 	./dh_clean
-	perl -MTest::Harness -e 'runtests @ARGV' t/*
-	-rm -rf debian/tmp
+	DH_VERSION=10 perl -MTest::Harness -e 'runtests @ARGV' t/*
+	./dh_clean
 
 # Build architecture-dependent files here.
 binary-arch: build
@@ -37,11 +40,11 @@ binary-indep: build
 	./dh_clean -k
 	./dh_installdirs usr/bin usr/lib/debhelper
 
-	echo -e "package Dh_Version;\n\$$version='$(VERSION)';" > debian/tmp/usr/lib/debhelper/Dh_Version.pm
+	echo -e "package Dh_Version;\n\$$version='$(VERSION)';" > debian/debhelper/usr/lib/debhelper/Dh_Version.pm
 	find . -perm +111 -maxdepth 1 -type f -not -name "*.pl" \
-		-exec install -p {} debian/tmp/usr/bin \;
-	cp -a Dh_*.pm debian/tmp/usr/lib/debhelper
-	cp -a autoscripts debian/tmp/usr/lib/debhelper
+		-exec install -p {} debian/debhelper/usr/bin \;
+	cp -a Dh_*.pm debian/debhelper/usr/lib/debhelper
+	cp -a autoscripts debian/debhelper/usr/lib/debhelper
 
 	./dh_installdocs doc/TODO doc/README doc/PROGRAMMING doc/from-debstd
 	./dh_installexamples examples/*
@@ -61,7 +64,7 @@ binary-indep: build
 		open (OUT,">$$f"); \
 		print OUT @lines; \
 		close OUT; \
-	}' debian/tmp/usr/man/man1/*.1
+	}' debian/debhelper/usr/man/man1/*.1
 	# Fix up the debhelper.1 man page, substituting in a list of all
 	# debhelper commands. eek!
 	perl -ne ' \
@@ -69,10 +72,10 @@ binary-indep: build
 		$$collect.=".TP\n.BR $$_" if $$. eq 3 && /^dh_/; \
 		close(ARGV) if eof; \
 		END { \
-			open(I,"debian/tmp/usr/man/man1/debhelper.1"); \
+			open(I,"debian/debhelper/usr/man/man1/debhelper.1"); \
 			@lines=<I>; \
 			close I; \
-			open(O,">debian/tmp/usr/man/man1/debhelper.1"); \
+			open(O,">debian/debhelper/usr/man/man1/debhelper.1"); \
 			foreach (@lines) { \
 				s/#LIST#/$$collect/; \
 				print O; \
@@ -80,7 +83,7 @@ binary-indep: build
 			close O; \
 		}' *.1
 	./dh_installchangelogs
-	./dh_movefiles
+#	./dh_movefiles
 	./dh_link
 	./dh_compress
 	./dh_fixperms
