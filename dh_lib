@@ -207,11 +207,3 @@ for PACKAGE in $DH_DOPACKAGES ; do
 	DH_FIRSTPACKAGE="$PACKAGE"
 	break
 done
-
-# Check to see if: DH_FIRSTPACKAGE is not the MAINPACKAGE, and
-# some command line arguements are passed. Display a warning, becuase
-# debhelper's behaviour has changed in this case.
-if [ "$DH_FIRSTPACKAGE" != "$MAINPACKAGE" -a "$*" ]; then
-	echo `basename $0`": Warning: my behavior has changed, and command line" >&2
-	echo `basename $0`": arguments \"$*\" will apply to package \"$DH_FIRSTPACKAGE\"" >&2
-fi
