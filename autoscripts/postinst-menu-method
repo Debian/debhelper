@@ -1,5 +1,7 @@
 inst=/etc/menu-methods/#PACKAGE#
-if [ -x /usr/bin/update-menus ] && [ -f $inst ] ; then
+if [ -f $inst ]; then
 	chmod a+x $inst
-	update-menus
+	if [ -x /usr/bin/update-menus ]; then
+		update-menus
+	fi
 fi

@@ -30,13 +30,12 @@ NEWS.Debian files. If there is a debian/NEWS file, it is installed as
 usr/share/doc/package/NEWS.Debian. debian/package.NEWS files can also be
 used.
 
-If an upstream changelog file is specified as an option, and the package is
-not a native debian package, then this upstream changelog will be installed
-as usr/share/doc/package/changelog in the package build directory. If the
-changelog is a html file (determined by file extension), it will be
-installed as usr/share/doc/package/changelog.html instead, and will be
-converted to plain text with html2text to generate
-usr/share/doc/package/changelog.
+If an upstream changelog file is specified as an option, then this upstream
+changelog will be installed as usr/share/doc/package/changelog in the
+package build directory. If the changelog is a html file (determined by
+file extension), it will be installed as
+usr/share/doc/package/changelog.html instead, and will be converted to
+plain text with html2text to generate usr/share/doc/package/changelog.
 
 =head1 OPTIONS
 
@@ -56,23 +55,14 @@ Install this file as the upstream changelog.
 
 =back
 
-=head1 NOTES
-
-It is an error to specify an upstream changelog file for a debian native
-package.
-
 =cut
 
 init();
 
 my $upstream=shift;
 
-if (isnative($dh{MAINPACKAGE}) && defined $upstream) {
-	error("Cannot specify an upstream changelog for a native debian package.");
-}
-
 my $changelog_name="changelog.Debian";
-if (isnative($dh{MAINPACKAGE})) {
+if (isnative($dh{MAINPACKAGE}) && ! defined $upstream) {
 	$changelog_name='changelog';
 }
 my $news_name="NEWS.Debian";

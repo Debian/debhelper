@@ -67,7 +67,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (!-d "$tmp/etc/menu-methods") {
 			doit("install","-d","$tmp/etc/menu-methods");
 		}
-		doit("install","-p",$menu_method,"$tmp/etc/menu-methods/$package");
+		doit("install","-p","-m644",$menu_method,"$tmp/etc/menu-methods/$package");
 
 		if (! $dh{NOSCRIPTS}) {
 			autoscript($package,"postinst","postinst-menu-method","s/#PACKAGE#/$package/");
