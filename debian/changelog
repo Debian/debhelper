@@ -1,3 +1,13 @@
+debhelper (3.0.11) unstable; urgency=low
+
+  * dh_makeshlibs: don't follow links to .so files. Instead, we will look
+    for *.so* files. This should work for the variously broken db3,
+    liballeg, and it will fix the problem with console-tools-dev, which
+    contained (arguably broken) absolute symlinks to real files, which were
+    followed. Closes: #85483
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 14 Mar 2001 14:55:58 -0800
+
 debhelper (3.0.10) unstable; urgency=medium
 
   * Fixed broken -e #SCRIPT# tests in init script start/stop/restart code.

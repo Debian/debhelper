@@ -82,7 +82,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	doit("rm", "-f", "$tmp/DEBIAN/shlibs");
 
-	open (FIND, "find $tmp -xtype f -name '*.so*' |");
+	# So, we look for files or links to existing files with names that
+	# match "*.so*". Matching *.so.* is not good enough because of
+	# broken crap like db3. And we only look at real files not
+	# symlinks, so we don't accidentually add shlibs data to -dev
+	# packages. This may have a few false positives, which is ok,
+	# because only if we can get a library name and a major number from
+	# objdump is anything actually added.
+	open (FIND, "find $tmp -type f -name '*.so*' |");
 	while (<FIND>) {
 		my ($library, $major) = 
 			`objdump -p $_` =~ m/\s+SONAME\s+(.+)\.so\.(.+)/;
