@@ -9,6 +9,11 @@ debhelper (3.0.0) unstable; urgency=low
   * dh_installmanpages remains in the package for backwards compatability,
     but is mildly deprecated.
   * dh_testversion is deprecated; use build dependancies instead.
+  * dh_suidregister: re-enabled. Aj thinks that requiring people to stop
+    using it is unacceptable. Who am I to disagree with a rc bug report?
+    Closes: #84910 It is still deprecated, and it will still whine at you
+    if you use it. I appreciate the job everyone has been doing at
+    switching to statoverrides..
   * Since dh_debstd requires dh_installmanpages (where do you think the
     latter's evil interface came from?), I have removed it. It was a nice
     thought-toy, but nobody really used it, right?
@@ -24,22 +29,17 @@ debhelper (3.0.0) unstable; urgency=low
     Closes: #81853 (I hope the bug submitter doesn't care that
     dh_installmanpages still puts stuff in the X11R6/man directory.)
   * dh_undocumented now the same too now.
-  * dh_suidregister: re-enabled. Aj thinks that requiring people to stop
-    using it is unacceptable. Who am I to disagree with a rc bug report?
-    Closes: #84910
+  * dh_installinit: installs debian/package.default files as /etc/default/
+    files.
   * Updated to current perl coding standards (use strict, lower-case
     variable names, pod man pages).
   * Since with the fixing of the man page installer issue, my checklist for
     debhelper v3 is complete, I pronounce debhelper v3 done! Revved the
     version number appropriatly (a large jump; v3 changes less than I had
-    planned).
-  * Tonnes of changes here and there to mark v3 as done. I don't have a
-    v4 planned at this time. All the big changes are done.
-*** move man pages into programs as pod docs ***
-*** build all my packages using new version, and ditching dh_installmanpages
-    mainly as a regression test..
-*** fix aj's bug, sigh ***
-*** dh_installinit should install defaults files ***
+    planned). Note that I have no plans for a v4 at this time. :-)
+  * Testing: I have used this new version of debhelper to build a large
+    number of my own packages, and it seems to work. But this release
+    touches every file in this package, so be careful out there..
 
  -- Joey Hess <joeyh@debian.org>  Thu,  8 Feb 2001 14:29:58 -0800
 

@@ -14,6 +14,7 @@ export PERL5LIB=.
 # be sure to use the new templates from this package.
 export DH_AUTOSCRIPTDIR=autoscripts
 
+# Use most recent compatability level.
 export DH_COMPAT=3
 
 # Figure out the current debhelper version.
@@ -22,18 +23,46 @@ VERSION=$(shell expr "`dpkg-parsechangelog 2>/dev/null |grep Version:`" : '.*Ver
 # Debug
 #export DH_VERBOSE=1
 
-build: test
-# Nothing to do.	
+build: test build-stamp
+build-stamp:
+	# Turn all executables and .pod files into man pages.
+	find . \( \( -type f -perm +1 -maxdepth 1 \) -or \
+		  \( -type f -name '*.pod' \) \) \
+		-exec pod2man -c Debhelper -r "$(VERSION)" {} {}.1 \;
+	mv -f debhelper.pod.1 debhelper.1
+	# Fix up the debhelper.1 man page, substituting in a list of all
+	# debhelper commands. Eek!
+	perl -e ' \
+		undef $$/; \
+		foreach (@ARGV) { \
+		        open (IN, $$_) or die "$$_: $$!"; \
+		        $$file=<IN>; \
+		        close IN; \
+		        if ($$file=~m/=head1 NAME\n\n(.*?) - (.*?)\n/m) { \
+		                $$collect.=".IP $$1(1)\n$$2\n"; \
+		        } \
+		} \
+		END { \
+		        open(IN,"debhelper.1") or die "debhelper.1: $$!"; \
+			$$file=<IN>; \
+		        open(OUT,">debhelper.1") or die "debhelper.1: $$!";; \
+		        $$file=~s/#LIST#/$$collect/; \
+		        print OUT $$file; \
+		        close OUT; \
+		}' dh_*
+	touch build-stamp
 
 clean:
 	./dh_testdir
 	./dh_testroot
-	./dh_clean
+	-./dh_clean *.1 *-stamp
 
-test:
+test: test-stamp
+test-stamp:
 	./dh_clean
 	DH_VERSION=10 perl -MTest::Harness -e 'runtests grep { ! /CVS/ } @ARGV' t/*
 	./dh_clean
+	touch test-stamp
 
 # Build architecture-dependent files here.
 binary-arch: build
@@ -61,38 +90,6 @@ binary-indep: build
 	./dh_installmenu
 	./dh_installman *.1
 	./dh_installinfo
-	# Fix up all man pages, filling in the modification time for them.
-	# Note this runs before the command below so debhelper.1 gets the right
-	# date on it.
-	perl -mPOSIX -e ' \
-		foreach $$f (@ARGV) { \
-		@data=stat($$f); \
-		$$date=POSIX::strftime("%d %B %Y",localtime($$data[9])); \
-		open (IN,$$f); \
-		@lines=<IN>; \
-		close IN; \
-		$$lines[0]=~s/1 ""/1 "$$date"/; \
-		open (OUT,">$$f"); \
-		print OUT @lines; \
-		close OUT; \
-	}' debian/debhelper/usr/share/man/man1/*.1
-	# Fix up the debhelper.1 man page, substituting in a list of all
-	# debhelper commands. Eek!
-	perl -ne ' \
-		s/\\- /(1)\n/; \
-		$$collect.=".TP\n.BR $$_" if $$. eq 3 && /^dh_/; \
-		close(ARGV) if eof; \
-		END { \
-			open(I,"debian/debhelper/usr/share/man/man1/debhelper.1"); \
-			@lines=<I>; \
-			close I; \
-			open(O,">debian/debhelper/usr/share/man/man1/debhelper.1"); \
-			foreach (@lines) { \
-				s/#LIST#/$$collect/; \
-				print O; \
-			} \
-			close O; \
-		}' *.1
 	./dh_installchangelogs
 	./dh_link
 	./dh_compress

@@ -17,7 +17,7 @@ use Debian::Debhelper::Dh_Lib;
 =head1 DESCRIPTION
 
 dh_installinit is a debhelper program that is responsible for installing
-init scripts into package build directories.
+init scripts and associated defaults files into package build directories.
 
 It also automatically generates the postinst and postrm and prerm commands
 needed to set up the symlinks in /etc/rc*.d/ and to start and stop the init
@@ -25,6 +25,10 @@ scripts.
 
 If a file named debian/package.init exists, then it is installed into
 etc/init.d/package in the package build directory, with "package" replaced
+by the package name.
+
+If a file named debian/package.default exists, then it is installed into
+etc/default/package in the package build directory, with "package" replaced
 by the package name.
 
 =head1 OPTIONS
@@ -42,9 +46,10 @@ Do not restart daemon on upgrade.
 =item B<-d>, B<--remove-d>
 
 Remove trailing "d" from the name of the package, and use the result for the
-filename the init script is installed as in etc/init.d/ . This may be useful
-for daemons with names ending in "d". (Note: this takes precedence over
-the --init-script parameter described below.)
+filename the init script is installed as in etc/init.d/ , and the defualt file
+is installed as in etc/default/ . This may be useful for daemons with names
+ending in "d". (Note: this takes precedence over the --init-script parameter
+described below.)
 
 =item B<-u>I<params> B<--update-rcd-params=>I<params>
 
@@ -56,13 +61,13 @@ passed to L<update-rc.d(8)>.
 =item B<--init-script=>I<scriptname>
 
 Use "scriptname" as for the filename the init script is installed as in
-etc/init.d/ . This is useful if you need to have an init script with a name
+etc/init.d/ (and also use it as the filename for the defaults file, if it
+is installed). This is useful if you need to have an init script with a name
 different from the package's name. Note that if you use this parameter,
 dh_installinit will look to see if a file in the debian/ directory exists
-that looks like "scriptname" or "package.scriptname" and if so will install
-it as the init script in preference to the files it normally installs. This
-feature is really only useful if you need a single package to install more
-than one init script.
+that looks like "package.scriptname" and if so will install it as the init
+script in preference to the files it normally installs. This feature is really
+only useful if you need a single package to install more than one init script.
 
 =back
 
@@ -102,6 +107,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	my $init=pkgfile($package,$script) || pkgfile($package,"init") ||
 	      pkgfile($package,"init.d");
+	my $default=pkgfile($package,'default');
+
+	if ($default ne '') {
+		if (! -d "$tmp/etc/default") {
+			doit("install","-d","$tmp/etc/default");
+		}
+		doit("install","-p","-m644",$default,"$tmp/etc/default/$script");
+	}
 
 	if ($init ne '') {
 		if (! -d "$tmp/etc/init.d") {
