@@ -1,7 +1,7 @@
 # Library functions for debhelper programs.
 
 # Run a command, and display the command to stdout if verbose mode is on.
-# All commands that modifiy files in debian/$TMP should be ran via this 
+# All commands that modifiy files in $TMP should be ran via this 
 # function.
 # Unfortunatly, this function doesn't work if your command uses redirection,
 # you will have to call verbose_echo by hand then.
@@ -24,13 +24,15 @@ error() {
 }
 
 # Pass it a name of a binary package, it returns the name of the tmp dir to
-# use, for that package, relative to debian/
+# use, for that package.
 # This is for back-compatability with the debian/tmp tradition.
 tmpdir() {
-	if [ "$1" = "$MAINPACKAGE" ]; then
-		echo tmp
+	if [ "$DH_TMPDIR" ]; then
+		echo "$DH_TMPDIR"
+	elif [ "$1" = "$MAINPACKAGE" ]; then
+		echo debian/tmp
 	else
-		echo "$PACKAGE"
+		echo "debian/$PACKAGE"
 	fi
 }
 
@@ -77,7 +79,7 @@ autoscript() {
 # Argument processing and global variable initialization is below.
 
 # Parse command line.
-set -- `getopt xvianp: $*`
+set -- `getopt xvianp:P: $*`
 
 for i; do
 	case "$i"
@@ -105,6 +107,11 @@ for i; do
 			;;
 		-x)	
 			DH_EXCLUDE=1
+			shift
+			;;
+		-P)
+			DH_TMPDIR="$2"
+			shift
 			shift
 			;;
 		--)
@@ -171,4 +178,10 @@ if [ ! "$DH_DOPACKAGES" -o "$DH_DOPACKAGES" = " " ]; then
 		error "I have no package to build."
 	fi
 	DH_DOPACKAGES=`grep ^Package: debian/control | cut -d " " -f 2`
+fi
+
+# Check to see if -P was specified. If so, we can only act on a single
+# package.
+if [ "$DH_TMPDIR" ] && echo "$DH_DOPACKAGES" | grep -q " "; then
+	error "-P was specified, but multiple packages would be acted on."
 fi

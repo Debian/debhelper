@@ -3,7 +3,7 @@
 dh_compress \- compress files and fix symlinks in package build directories
 .SH SYNOPSIS
 .B dh_compress
-.I "[-v] [-a] [-i] [-ppackage]"
+.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir]"
 .SH "DESCRIPTION"
 dh_compress is a debhelper program that is responsible for compressing
 the files in package build directories, and makes sure that any symlinks
@@ -41,6 +41,9 @@ Compress files for all architecture independent packages.
 .TP
 .B \-ppackage
 Compress files for the package named "package".
+.TP
+.B \-Ptmpdir
+Use "tmpdir" for package build directory. 
 .SH NOTES
 The
 .B \-a

@@ -41,11 +41,11 @@ for PACKAGE in $DH_DOPACKAGES; do
 				reldir=..
 			fi
 
-			if [ ! -d debian/$TMP/$dir ]; then
-				doit "install -d debian/$TMP/$dir"
+			if [ ! -d $TMP/$dir ]; then
+				doit "install -d $TMP/$dir"
 			fi
 
-			doit ln -s $reldir/man7/undocumented.7.gz debian/$TMP/$dir/$file.gz
+			doit ln -s $reldir/man7/undocumented.7.gz $TMP/$dir/$file.gz
 		done
 	fi
 done

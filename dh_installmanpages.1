@@ -3,7 +3,7 @@
 dh_installmanpages \- install man pages into package build directories
 .SH SYNOPSIS
 .B dh_installmanpages
-.I "[-v] [-a] [-i] [-ppackage] [file ...]"
+.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir] [file ...]"
 .SH "DESCRIPTION"
 dh_installmanpages is a debhelper program that is responsible for
 automatically installing man pages into usr/man/ and usr/X11R6/man/ in
@@ -31,6 +31,9 @@ Install man pages into all architecture independent packages.
 .TP
 .B \-ppackage
 Install man pages into the package named "package".
+.TP
+.B \-Ptmpdir
+Use "tmpdir" for package build directory. 
 .TP
 .B file ...
 Do not install these files as man pages, even if they look like valid man

@@ -13,7 +13,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 	# Run the file name gatering commands from within the directory
 	# structure that will be effected.
 	olddir=`pwd`
-	cd debian/$TMP
+	cd $TMP
 
 	if [ -f debian/${EXT}compress ]; then
 		# The config file is a sh script that outputs the files to be compressed
@@ -40,7 +40,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 	cd $olddir
 
 	# Fix up symlinks that were pointing to the uncompressed files.
-	for file in `find debian/$TMP -type l`; do
+	for file in `find $TMP -type l`; do
 		DIRECTORY=`expr $file : "\(.*\)/[^/]*"`
 		NAME=`expr $file : ".*/\([^/]*\)"`
 		LINKVAL=`ls -l $DIRECTORY/$NAME | awk '{ print $11;}'`

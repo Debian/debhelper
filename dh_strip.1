@@ -3,7 +3,7 @@
 dh_strip \- strip executables, shared libraries, and some static libraries.
 .SH SYNOPSIS
 .B dh_strip
-.I "[-v] [-a] [-i] [-ppackage]"
+.I "[-v] [-a] [-i] [-Ptmpdir] [-ppackage]"
 .SH "DESCRIPTION"
 dh_strip is a debhelper program that is responsible for stripping
 executables, shared libraries, and static libraries that are not used for
@@ -25,6 +25,9 @@ pointless :-).
 .TP
 .B \-ppackage
 Strip files for the package named "package".
+.TP
+.B \-Ptmpdir
+Use "tmpdir" for package build directory. 
 .SH NOTES
 The
 .B \-a

@@ -10,8 +10,8 @@ for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
 	EXT=`pkgext $PACKAGE`
 
-	if [ ! -d debian/$TMP/DEBIAN ]; then
-		doit "install -o root -g root -d debian/$TMP/DEBIAN"
+	if [ ! -d $TMP/DEBIAN ]; then
+		doit "install -o root -g root -d $TMP/DEBIAN"
 	fi
 
 	# Install debian install scripts.
@@ -20,23 +20,23 @@ for PACKAGE in $DH_DOPACKAGES; do
 		if [ -f debian/$EXT$file ]; then
 			# Add this into the script, where it has #DEBHELPER#
 			if [ -f debian/$EXT$file.debhelper ]; then
-				verbose_echo "perl -pe \"s~#DEBHELPER#~qx{cat debian/$EXT$file.debhelper}~eg\" < debian/$EXT$file > debian/$TMP/DEBIAN/$file"
-				perl -pe "s~#DEBHELPER#~qx{cat debian/$EXT$file.debhelper}~eg" < debian/$EXT$file > debian/$TMP/DEBIAN/$file
-				doit "chown root.root debian/$TMP/DEBIAN/$file"
-				doit "chmod 755 debian/$TMP/DEBIAN/$file"
+				verbose_echo "perl -pe \"s~#DEBHELPER#~qx{cat debian/$EXT$file.debhelper}~eg\" < debian/$EXT$file > $TMP/DEBIAN/$file"
+				perl -pe "s~#DEBHELPER#~qx{cat debian/$EXT$file.debhelper}~eg" < debian/$EXT$file > $TMP/DEBIAN/$file
+				doit "chown root.root $TMP/DEBIAN/$file"
+				doit "chmod 755 $TMP/DEBIAN/$file"
 			else
-				doit "install -o root -g root -p debian/$EXT$file debian/$TMP/DEBIAN/$file"
+				doit "install -o root -g root -p debian/$EXT$file $TMP/DEBIAN/$file"
 			fi
 		else
 			# Auto-generate script header and add .debhelper
 			# content to it.
 			if [ -f debian/$EXT$file.debhelper ]; then
-				verbose_echo "echo '#!/bin/sh -e' > debian/$TMP/DEBIAN/$file"
-				echo '#!/bin/sh -e' > debian/$TMP/DEBIAN/$file
-				verbose_echo "cat debian/$EXT$file.debhelper >> debian/$TMP/DEBIAN/$file"
-				cat debian/$EXT$file.debhelper >> debian/$TMP/DEBIAN/$file
-				doit "chown root.root debian/$TMP/DEBIAN/$file"
-				doit "chmod 755 debian/$TMP/DEBIAN/$file"
+				verbose_echo "echo '#!/bin/sh -e' > $TMP/DEBIAN/$file"
+				echo '#!/bin/sh -e' > $TMP/DEBIAN/$file
+				verbose_echo "cat debian/$EXT$file.debhelper >> $TMP/DEBIAN/$file"
+				cat debian/$EXT$file.debhelper >> $TMP/DEBIAN/$file
+				doit "chown root.root $TMP/DEBIAN/$file"
+				doit "chmod 755 $TMP/DEBIAN/$file"
 			fi
 		fi
 	done
@@ -44,13 +44,13 @@ for PACKAGE in $DH_DOPACKAGES; do
 	# Install non-executable files
 	for file in shlibs conffiles; do
 		if [ -f debian/$EXT$file ]; then
-			doit "install -o root -g root -m 644 -p debian/$EXT$file debian/$TMP/DEBIAN/$file"
+			doit "install -o root -g root -m 644 -p debian/$EXT$file $TMP/DEBIAN/$file"
 		fi                                               
 	done
 
 	# Run dpkg-shlibdeps to generate dependancies.
 	filelist=""
-	for file in `find debian/$TMP -type f \( -perm +111 -or -name "*.so*" \) | tr "\n" " "` ; do
+	for file in `find $TMP -type f \( -perm +111 -or -name "*.so*" \) | tr "\n" " "` ; do
 		case "`file $file`" in
 			*ELF*)
 				filelist="$file $filelist"
@@ -62,6 +62,6 @@ for PACKAGE in $DH_DOPACKAGES; do
 	fi
 
 	# Generate and install control file.
-	doit "dpkg-gencontrol -p$PACKAGE -Tdebian/${EXT}substvars -Pdebian/$TMP"
-	doit "chown root.root debian/$TMP/DEBIAN/control"
+	doit "dpkg-gencontrol -p$PACKAGE -Tdebian/${EXT}substvars -P$TMP"
+	doit "chown root.root $TMP/DEBIAN/control"
 done

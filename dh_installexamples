@@ -21,10 +21,10 @@ for PACKAGE in $DH_DOPACKAGES; do
 	fi
 
 	if [ "$examples" ]; then
-		if [ ! -d debian/$TMP/usr/doc/$PACKAGE/examples ]; then
-			doit "install -d debian/$TMP/usr/doc/$PACKAGE/examples"
+		if [ ! -d $TMP/usr/doc/$PACKAGE/examples ]; then
+			doit "install -d $TMP/usr/doc/$PACKAGE/examples"
 		fi
 
-		doit "cp -a $examples debian/$TMP/usr/doc/$PACKAGE/examples/"
+		doit "cp -a $examples $TMP/usr/doc/$PACKAGE/examples/"
 	fi
 done

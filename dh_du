@@ -9,11 +9,11 @@ PATH=debian:$PATH:/usr/lib/debhelper
 for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
 
-	if [ ! -d "debian/$TMP/DEBIAN" ]; then
-		doit "install -d debian/$TMP/DEBIAN"
+	if [ ! -d "$TMP/DEBIAN" ]; then
+		doit "install -d $TMP/DEBIAN"
 	fi
 
-	verbose_echo "du -k debian/$TMP | sed \"s:	debian/$TMP/:	:\" | grep -v \"	DEBIAN$\" | grep -v \"	debian/$TMP$\" > debian/$TMP/DEBIAN/du"
-	du -k debian/$TMP | sed "s:	debian/$TMP/:	:" | grep -v "	DEBIAN$" | grep -v "	debian/$TMP$" >debian/$TMP/DEBIAN/du
+	verbose_echo "du -k $TMP | sed \"s:	$TMP/:	:\" | grep -v \"	DEBIAN$\" | grep -v \"	$TMP$\" > $TMP/DEBIAN/du"
+	du -k $TMP | sed "s:	$TMP/:	:" | grep -v "	DEBIAN$" | grep -v "	$TMP$" >$TMP/DEBIAN/du
 	doit "chown root.root debian/tmp/DEBIAN/du"
 done

@@ -102,4 +102,27 @@ effecting all packages.
 
 See examples/rules.multi for an example of how to use this.
 
+
+Package build directories -- debian/tmp, etc:
+--------------------------------------------
+
+By default, all debhelper programs assume that the temporary directory used
+for assembling the tree of files in a package is debian/tmp for the first
+package listed in debian/control, and debian/<packagename> for each
+additional package.
+
+Sometimes, you might want to use some other temporary directory. This is
+supported by the -P flag. The direcotry to use is specified after -P, for
+example, "dh_installdocs -Pdebian/tmp", will use debian/tmp as the temporary
+directory. Note that if you use -P, the debhelper programs can only be
+acting on a single package at a time. So if you have a package that builds
+many binary packages, you will need to use the -p flag to specify which
+binary package the debhelper program will act on. For example:
+
+	dh_installdocs -pfoolib1 -Pdebian/tmp-foolib1
+	dh_installdocs -pfoolib1-dev -Pdebian/tmp-foolib1-dev
+	dh_installdocs -pfoolib-bin -Pdebian/tmp-foolib-bin
+
+This uses debian/tmp-<package> as the package build directory.
+
 -- Joey Hess <joeyh@master.debian.org>

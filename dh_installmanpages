@@ -13,7 +13,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 	# Find all filenames that look like man pages.
 	# .ex files are examples installed by deb-make, we don't want those, or
 	# .in files, which are from configure.
-	for file in `find * -name "*.[1-9]*" ! -name "*.ex" ! -name "*.in" | grep -v ^debian/$TMP`; do
+	for file in `find * -name "*.[1-9]*" ! -name "*.ex" ! -name "*.in" | grep -v ^$TMP`; do
 		# Make sure file thinks they are man pages.
 		if file $file|grep -q roff; then
 			if echo $file|grep -q /; then
@@ -32,12 +32,12 @@ for PACKAGE in $DH_DOPACKAGES; do
 			done
 			if [ "$install" ]; then
 				SECTION=man`expr $NAME : '.*\.\([123456789]\)'`
-				if [ ! -e debian/$TMP/usr/man/$SECTION/$NAME -a \
-				     ! -e debian/$TMP/usr/X11*/man/$SECTION/$NAME ]; then
-					if [ ! -d debian/$TMP/usr/man/$SECTION ]; then
-						doit "install -d debian/$TMP/usr/man/$SECTION"
+				if [ ! -e $TMP/usr/man/$SECTION/$NAME -a \
+				     ! -e $TMP/usr/X11*/man/$SECTION/$NAME ]; then
+					if [ ! -d $TMP/usr/man/$SECTION ]; then
+						doit "install -d $TMP/usr/man/$SECTION"
 					fi
-					doit "install -p -m644 $file debian/$TMP/usr/man/$SECTION/$NAME"
+					doit "install -p -m644 $file $TMP/usr/man/$SECTION/$NAME"
 				fi
 			fi
 		fi

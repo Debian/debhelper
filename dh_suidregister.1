@@ -3,7 +3,7 @@
 dh_suidregister \- set up package to register files with suidregister
 .SH SYNOPSIS
 .B dh_suidregister
-.I "[-v] [-a] [-i] [-ppackage] [file ...]"
+.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir] [file ...]"
 .SH "DESCRIPTION"
 dh_suidregister is a debhelper program that is responsible for modifying the
 postinst and postrm scripts of a package so the package will register files
@@ -38,6 +38,9 @@ Register files for all architecture independent packages.
 .TP
 .B \-ppackage
 Register files for the package named "package".
+.TP
+.B \-Ptmpdir
+Use "tmpdir" for package build directory. 
 .TP
 .B file ...
 Register these files in the first binary package listed in debian/control, 

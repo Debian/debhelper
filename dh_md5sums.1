@@ -3,7 +3,7 @@
 dh_md5sums \- generate DEBIAN/md5sums file
 .SH SYNOPSIS
 .B dh_md5sums
-.I "[-x] [-v] [-a] [-i] [-ppackage]"
+.I "[-x] [-v] [-a] [-i] [-Ptmpdir] [-ppackage]"
 .SH "DESCRIPTION"
 dh_md5sums is a debhelper program that is responsible for generating
 a DEBIAN/md5sums file, which lists the md5sums of each file in the package.
@@ -29,6 +29,9 @@ Generate md5sums file for the package named "package".
 .B \-x
 Include conffiles in the md5sums list. Note that this is redundant, and
 included elsewhere in debian packages.
+.TP
+.B \-Ptmpdir
+Use "tmpdir" for package build directory. 
 .SH NOTES
 The
 .B \-a

@@ -26,11 +26,11 @@ for PACKAGE in $DH_DOPACKAGES; do
 	if [ ! "$files" -a ! -e debian/${EXT}suid ]; then
 		# No files specified (and no empty debian/suid file), so
 		# guess what files to process.
-		files=`find debian/$TMP -type f -perm +6000`
+		files=`find $TMP -type f -perm +6000`
 
 		# We will strip the debian working directory off of the
 		# filenames.
-		tostrip="debian/$TMP/"
+		tostrip="$TMP/"
 	else
 		# We will strip leading /'s, so the user can feed this
 		# program either absolute filenames, or relative filenames,
@@ -49,7 +49,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 			# Create the sed string that will be used to 
 			# fill in the blanks in the autoscript files.
 			# Fill with the owner, group, and perms of the file.
-			sedstr=`find debian/$TMP/$file -printf "s:#FILE#:$file:;s/#PACKAGE#/$PACKAGE/;s/#OWNER#/%u/;s/#GROUP#/%g/;s/#PERMS#/%m/"`
+			sedstr=`find $TMP/$file -printf "s:#FILE#:$file:;s/#PACKAGE#/$PACKAGE/;s/#OWNER#/%u/;s/#GROUP#/%g/;s/#PERMS#/%m/"`
 			
 			autoscript "postinst" "postinst-suid" "$sedstr"
 			autoscript "postrm" "postrm-suid" "$sedstr"

@@ -2,9 +2,9 @@
 #
 # Integration with debian menu system:
 #
-# If debian/menu file exists, save it to debian/$TMP/usr/lib/menu/$PACKAGE
+# If debian/menu file exists, save it to $TMP/usr/lib/menu/$PACKAGE
 # If debian/menu-method file exists, save it to 
-# debian/$TMP/etc/menu-methods/$PACKAGE
+# $TMP/etc/menu-methods/$PACKAGE
 #
 # Also, add to postinst and postrm.
 
@@ -16,10 +16,10 @@ for PACKAGE in $DH_DOPACKAGES; do
 	EXT=`pkgext $PACKAGE`
 
 	if [ -e debian/${EXT}menu ]; then
-		if [ ! -d debian/$TMP/usr/lib/menu ]; then
-			doit "install -d debian/$TMP/usr/lib/menu"
+		if [ ! -d $TMP/usr/lib/menu ]; then
+			doit "install -d $TMP/usr/lib/menu"
 		fi
-		doit "install -p -m644 debian/${EXT}menu debian/$TMP/usr/lib/menu/$PACKAGE"
+		doit "install -p -m644 debian/${EXT}menu $TMP/usr/lib/menu/$PACKAGE"
 
 		# Add the scripts if a menu-method file doesn't exist.
 		# The scripts for menu-method handle everything these do, too.
@@ -30,10 +30,10 @@ for PACKAGE in $DH_DOPACKAGES; do
 	fi
 
 	if [ -e debian/${EXT}menu-method ]; then
-		if [ ! -d debian/$TMP/etc/menu-methods ]; then
-			doit "install -d debian/$TMP/etc/menu-methods"
+		if [ ! -d $TMP/etc/menu-methods ]; then
+			doit "install -d $TMP/etc/menu-methods"
 		fi
-		doit "install -p debian/${EXT}menu-method debian/$TMP/etc/menu-methods/$PACKAGE"
+		doit "install -p debian/${EXT}menu-method $TMP/etc/menu-methods/$PACKAGE"
 
 		if [ ! "$DH_NOSCRIPTS" ]; then
 			autoscript "postinst" "postinst-menu-method" "s/#PACKAGE#/$PACKAGE/"

@@ -10,8 +10,8 @@ for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
 	EXT=`pkgext $PACKAGE`
 
-	if [ ! -d debian/$TMP/usr/doc/$PACKAGE ]; then
-		doit "install -d debian/$TMP/usr/doc/$PACKAGE"
+	if [ ! -d $TMP/usr/doc/$PACKAGE ]; then
+		doit "install -d $TMP/usr/doc/$PACKAGE"
 	fi
 
 	docs=""
@@ -25,27 +25,27 @@ for PACKAGE in $DH_DOPACKAGES; do
 	fi
 
 	if [ "$docs" ]; then
-		doit "cp -a $docs debian/$TMP/usr/doc/$PACKAGE/"
+		doit "cp -a $docs $TMP/usr/doc/$PACKAGE/"
 	fi
 
 	# Install these files only into the main package by default.
 	if [ "$PACKAGE" = "$MAINPACKAGE" ]; then
 		if [ -f debian/README.debian ]; then
-			doit "install -m 644 -p debian/README.debian debian/$TMP/usr/doc/$PACKAGE/"
+			doit "install -m 644 -p debian/README.debian $TMP/usr/doc/$PACKAGE/"
 		fi
 		if [ -f debian/README.Debian ]; then
-			doit "install -m 644 -p debian/README.Debian debian/$TMP/usr/doc/$PACKAGE/"
+			doit "install -m 644 -p debian/README.Debian $TMP/usr/doc/$PACKAGE/"
 		fi
 		if [ -f debian/TODO ]; then
 			if [ "$NATIVE" ]; then
-				doit "install -m 655 -p debian/TODO debian/$TMP/usr/doc/$PACKAGE/TODO"
+				doit "install -m 655 -p debian/TODO $TMP/usr/doc/$PACKAGE/TODO"
 			else
-				doit "install -m 644 -p debian/TODO debian/$TMP/usr/doc/$PACKAGE/TODO.Debian"
+				doit "install -m 644 -p debian/TODO $TMP/usr/doc/$PACKAGE/TODO.Debian"
 			fi
 		fi
 	fi
 
 	if [ -f debian/copyright ]; then
-			doit "install -m 644 -p debian/copyright debian/$TMP/usr/doc/$PACKAGE/"
+			doit "install -m 644 -p debian/copyright $TMP/usr/doc/$PACKAGE/"
 	fi
 done

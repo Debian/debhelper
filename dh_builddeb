@@ -7,5 +7,5 @@ PATH=debian:$PATH:/usr/lib/debhelper
 
 for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
-	doit "dpkg --build debian/$TMP .."
+	doit "dpkg --build $TMP .."
 done
