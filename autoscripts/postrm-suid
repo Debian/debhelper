@@ -1,4 +1,4 @@
-if [ "$1" = remove -a -e /etc/suid.conf ] && \
+if [ "$1" = remove ] && [ -e /etc/suid.conf ] && \
    which suidunregister >/dev/null 2>&1; then
         suidunregister -s #PACKAGE# /#FILE#
 fi
