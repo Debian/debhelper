@@ -179,7 +179,7 @@ if ($dh{LIST_MISSING}) {
 	find(sub {
 		-f || -l || return;
 		$_="$File::Find::dir/$_";
-		push @missing, $_ unless /$installed/;
+		push @missing, $_ unless /$installed/ || excludefile($_);
 	}, $srcdir);
 	if (@missing) {
 		warning "$_ not installed" foreach @missing;
