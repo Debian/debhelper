@@ -1,0 +1,44 @@
+.TH DH_PERLCHECK 1 "22 June 1999" "Debhelper Commands" "Debhelper Commands"
+.SH NAME
+dh_perl \- calculates perl scripts & modules dependencies
+.SH SYNOPSIS
+.B dh_perl
+.I "[debhelper options] [-k]"
+.SH "DESCRIPTION"
+dh_perl is a debhelper program that is responsible for generating
+the perl:Depends substitutions and adding them to substvars files. 
+.P
+The program will look for the location of installed modules and will
+use this information to generate a dependency (at the present time
+it can only be perl5, perl5-thread, perl-5.00X or perl-5.00X-thread).
+.P
+It will also look at #! lines of perl scripts in order to be able
+to calculate a dependency for perl scripts and not only perl modules.
+.P
+In addition it will automatically remove .packlist file and will
+remove the directory in which it was if it's empty. You can
+switch off this option by passing -k.
+.SH OPTIONS
+.TP
+.TP
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
+.TP
+.B -k
+Keep .packlist files.
+.SH ENVIRONMENT
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
+.SH "SEE ALSO"
+.TP
+.BR debhelper (1)
+.SH "CONFORMS TO"
+.P
+Debian policy, version 2.5.0.0
+.P
+Perl policy, version 1.0
+.SH AUTHOR
+Raphaël Hertzog <hertzog@debian.org>

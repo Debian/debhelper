@@ -1,0 +1,30 @@
+#!/usr/bin/perl -w
+#
+# Integration with xaw-wrappers
+#
+# If debian/xaw-wrappers file exists, save it to 
+# $TMP/usr/lib/xaw-wrappers/conf/$PACKAGE
+#
+# Also, add calls to postinst and postrm.
+
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use Dh_Lib;
+init();
+
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$xaw=pkgfile($PACKAGE,'xaw');
+
+	if ($xaw ne '') {
+		if (! -d "$TMP/usr/lib/xaw-wrappers/conf") {
+			doit("install","-d","$TMP/usr/lib/xaw-wrappers/conf");
+		}
+		doit("install","-p","-m644",$xaw,
+		     "$TMP/usr/lib/xaw-wrappers/conf/$PACKAGE");
+
+		if (! $dh{NOSCRIPTS}) {
+			autoscript($PACKAGE,"postinst","postinst-xaw");
+			autoscript($PACKAGE,"postrm","postrm-xaw");
+		}
+	}
+}

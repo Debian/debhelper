@@ -1,0 +1,21 @@
+#!/bin/sh -e
+#
+# Add to postinst and postrm to register a window manager.
+
+PATH=debian:$PATH:/usr/lib/debhelper
+. dh_lib
+
+wm=$1
+
+if [ -z "$wm" ]; then
+	error "No window manager was specified."
+fi
+
+for PACKAGE in $DH_DOPACKAGES; do
+	TMP=`tmpdir $PACKAGE`
+	
+	if [ ! "$DH_NOSCRIPTS" ]; then
+		autoscript "postinst" "postinst-wm" "s/#WM#/$wm/"
+		autoscript "postrm" "postrm-wm" "s/#WM#/$wm/"
+	fi
+done
