@@ -1,27 +1,85 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Move files out of debian/tmp, into subpackages.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
+BEGIN { push @INC, "debian", "/usr/share/debhelper" }
+use Dh_Lib;
+init();
 
-for PACKAGE in $DH_DOPACKAGES; do
-	TMP=`tmpdir $PACKAGE`
-	files=`pkgfile $PACKAGE files`
+$ret=0;
 
-	move=""
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$files=pkgfile($PACKAGE,"files");
 
-	# debian/files has a different purpose, so ignore it.
-	if [ "$files" -a "$files" != "debian/files" ]; then
-		if [ "$PACKAGE" = "$MAINPACKAGE" ]; then
-			error "I was asked to move some files from $PACKAGE into itself."
-		fi
+	if ($dh{SOURCEDIR}) {
+		if ($dh{SOURCEDIR}=~m:^/:) {
+			error("The sourcedir must be a relative filename, not starting with `/'.");
+		}
+		$sourcedir=$dh{SOURCEDIR};
+	}
+	else {
+		$sourcedir="debian/tmp";
+	}
 
-		if [ ! -d "$TMP" ]; then
-			doit "install -d $TMP"
-		fi
+	if (! -d $sourcedir) {
+		error("$sourcedir does not exist.");
+	}
 
-		files=`pwd`/$files
-		complex_doit "(cd debian/tmp;tar --create --remove-files --file - "`cat $files`") | (cd $TMP;tar xpf -)"
-	fi
-done
+	@tomove=();
+
+        # debian/files has a different purpose, so ignore it.
+	if ( $files && $files ne "debian/files" ) {
+		@tomove=filearray($files);
+	}
+	
+	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+		push @tomove, @ARGV;
+	}
+
+	if (@tomove && $TMP eq $sourcedir) {
+		error("I was asked to move files from $sourcedir to $sourcedir.");
+	}
+
+	if (@tomove) {
+		if (! -d $TMP) {
+			doit("install","-d",$TMP);
+		}
+		# Now we need to expand wildcards in @tomove.
+		@filelist=();
+		foreach (@tomove) {
+			push @filelist, glob("$sourcedir/$_");
+		}
+
+		# If the globs expended to nothing, we are done.
+		next unless @filelist;
+
+		# Order the files. First all real files, then symlinks. 
+		# Putting symlinks last is a nice thing to do for library 
+		# packages and doesn't affect much of anything else.
+		doit("rm","-f","movelist");
+		foreach (@filelist) {
+			$file=$_;
+			$ret=1 if (! -e $file && ! -l $file);
+			$file=~s:^$sourcedir/+::;
+			complex_doit("(cd $sourcedir >/dev/null ; find $file ! -type d -and ! -type l -print || true) >> movelist");
+		}
+		foreach (@filelist) {
+			$file=$_;
+			$ret=1 if (! -e $file && ! -l $file);
+			$file=~s:^$sourcedir/+::;
+			complex_doit("(cd $sourcedir >/dev/null ; find $file ! -type d -and -type l -print || true) >> movelist");
+		}
+		complex_doit("(cd $sourcedir >/dev/null ; tar --create --remove-files --files-from=../../movelist --file -) | (cd $TMP >/dev/null ;tar xpf -)");
+		doit("rm","-f","movelist");
+	}
+}
+
+# If $ret is set, we wern't actually able to find some 
+# files that were specified to be moved, and we should
+# exit with the code in $ret. This program puts off 
+# exiting with an error until all files have been tried
+# to be moved, because this makes it easier for some 
+# packages that arn't always sure exactly which files need
+# to be moved.
+exit $ret;
