@@ -17,8 +17,8 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	}
 
 	# General permissions fixing.
-	complex_doit("find $TMP ! -type l $find_options -print0",
-		"2>/dev/null | xargs -0r chown root.root");
+	complex_doit("find $TMP $find_options -print0",
+		"2>/dev/null | xargs -0r chown --no-dereference root.root");
 	complex_doit("find $TMP ! -type l $find_options -print0",
 		"2>/dev/null | xargs -0r chmod go=rX,u+rw,a-s");
 		
