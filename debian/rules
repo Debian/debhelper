@@ -16,6 +16,11 @@ export DH_VERBOSE=1
 test_files=dh_lib
 
 build:
+	# Important symlinks.
+	cd autoscripts && ln -sf postinst-menu postrm-menu
+	cd debian && ln -sf ../dh_lib dh_lib
+	cd debian && ln -sf ../dh_getopt.pl dh_getopt.pl
+
 	./dh_testdir $(test_files)
 	sed "s/#DEBHELPER_VERSION#/$(VERSION)/" < dh_testversion.in \
 		> dh_testversion
