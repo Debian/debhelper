@@ -115,6 +115,12 @@ if (defined($version_info)) {
 	$version_info_set=1;
 }
 
+# Check to see if DH_VERBOSE environment variable was set, if so, make sure
+# verbose is on.
+if ($ENV{DH_VERBOSE} ne undef) {
+	$verbose=1;
+}
+
 # Now output everything, in a format suitable for a shell to eval it. 
 # Note the last line sets $@ in the shell to whatever arguements remain.
 print qq{
