@@ -21,7 +21,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	
 	if ($templates ne '') {
 		# Are there translated templates too?
-		my @trans=glob("$templates.??");
+		my @trans=(glob("$templates.??"), glob("$templates.??_??"));
 		if (@trans) {
 			complex_doit("debconf-mergetemplate @trans $templates > $TMP/DEBIAN/templates");
 			chmod 0644, "$TMP/DEBIAN/templates";
