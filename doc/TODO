@@ -1,52 +1,62 @@
 This is the TODO for debhelper. As more and more people use debhelper, this
 list grows - I welcome patches to fix items on it!
 
+Bugs:
+
+* all commands should print a warning message if non-cumulative parameters
+  are given more than once (ie, two -u's to dh_gencontrol). (#22588)
+  (Bug currently under dispute, I think this is bogus).
+
 Wishlist items:
 
-* All debhelper programs should only accept the options they are documented
-  to accept (rather than accepting all debhelper options). They should
-  be able to print brief usage summaries.
-
-  I think this calls for a restucturing. Make a Debhelper.pm class. Each
-  program subclasses the class. The class provides command line parsing,
-  useful functions, and so on. Skeleton of a debhelper command would then
-  be:
-
-  use base qw{Debhelper};
-
-  sub startup {
-  	# Add initialization stuff here.
-  }
-
-  sub perpackage {
-  	my $package=shift;
-
-  	# Stuff to do for each package here.
-  }
-
-  sub fini {
-  	# And final stuff here, if any.
-  }
-
-  This needs more thought.
-  
-* install-info, as of dpkg 1.10, parses the info file for section if
-  --section is not given. So I should be able to stop parsing it myself for
-  section, after dpkg 1.10 has been around long enough.
+* Make dh_movefiles remove emptied directories after it's moved all the
+  files out of them (#17111).
+* info support for debhelper (currently implemented, but I hate how I did it,
+  so it's not in the package.) (#15717)
+* enhance dh_installmanpages so it associates binaries and man pages and
+  installs the man pages into the correct areas to suit the binaries they
+  document. I may need to make this only happen when a switch is given, to
+  preserve backward compatibility. (#16933, #17061)
+* maybe make dh_installmanpages look at the .TH line of man pages whose
+  filenames end in .man, to figure out what section they go it. This would
+  require a switch to turn on, for backwards compatibility.
+* All debhelper programs should be checked that they output files with the
+  correct permissions no matter what the umask is set to. Currently, only
+  those programs that run after dh_fixperms have been so checked. (Checking
+  the rest is low priority, since dh_fixperms fixes any incorrect permissions
+  they might have; still it would be nice to check them too, just to make
+  debhelper more flexible.) One easy fix is to add umask 022 to dh_lib,
+  however, there may be unforeseen ramifications of such a change.
+* something should add ldconfig calls properly to the postinst of packages
+  that contain shared libraries. maybe dh_makeshlibs? But it wasn't designed
+  to do that originally, and even worse, it is often run after
+  dh_installdeb, so the fragments wouldn't go into the postinst. So maybe a
+  new script is called for.
+* Need a way to make dh_strip not strip any static libs. Also, it'd be nice
+  if there were options to dh_strip, dh_compress, etc, to allow inclusion of
+  directories and exclusion of files based on filename globbing. (Request from
+  Matthias Klose <doko@cs.tu-berlin.de>)
+* docbase support (#25233). Waiting for docbase to stabilize and be used
+  widely.
+* dhelp support. Currently pending on dhelp use becoming widespead (#18342)
+* Support use of environment variables in data taken from user, ie, in
+  debian/dirs. The problem with doing this is that we really want to allow
+  any filenames in that input, even those that look like environment
+  variables. However, it may be worth adding a switch to make it parse
+  environment variables. (#20964)
+* It's possible to speed up debhelper by having it cache some values that
+  multiple commands call. One way to do this would be to write dh_cache,
+  that generates the cache. The catch is that if the user runs that program,
+  they are stating that they don't do anything later to invalidate the cache,
+  without calling ch_cache again. (#23792)
+* Add a switch to dh_installdeb to allow it to do user defined
+  substitutions. OTOH, maybe it's better if people just sed
+  postinst.in before debhelper gets it's hands on it... (#25235)
 
 Deprecated:
 
-* DH_COMPAT 1. Can be removed once all packages are seen to be using 2 or
-  higher. I won't hold my breath.
-* Also, grep the entire archive for all dh_* command lines (I do this now),
-  and check to see what other switches are not being used, and maybe remove
-  some of them. I'd also like to deprecate/remove debian/compress files, -X is
-  a better idea.
-* dh_suidregister. Once nothing in the archive uses it.
-* dh_installmanpages. Only mildly deprecated right now. Once dh_installman
-  catches on, make it emit a warning, and then wait for it to go away.
-* dh_testversion. Remove as soon as nothing uses it.
-* dh_movefiles. I won't hold my breath.
-* debconf-mergetemplates support and the debian/template.ll files and the
-  debconf-utils dependency.
-* dh_undocumented
+* remove dh_installdebfiles, dh_du.
+	- need to wait a reasonable length of time. I'm currently planning
+	  on doing this after slink is released or one year after they were
+	  deprecated, whichever comes first. Be sure to grep whole debian
+	  archive for all of them before removing them, though!
