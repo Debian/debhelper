@@ -1,0 +1,108 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dh_scrollkeeper - generate ScrollKeeper registration scripts
+
+=cut
+
+use strict;
+use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+B<dh_scrollkeeper> [S<I<debhelper options>>] [B<-n>] [S<I<directory>>]
+
+=head1 DESCRIPTION
+
+B<dh_scrollkeeper> is a debhelper program that handles correctly
+registering OMF files that it finds in package build trees with
+ScrollKeeper.
+
+This command automatically adds maintainer script snippets for registering
+and unregistering files with ScrollKeeper (unless B<-n> is used). A
+dependency on scrollkeeper will be added to C<${misc:Depends}>, so be sure
+your package uses that variable in F<debian/control>. See
+L<dh_installdeb(1)> for an explantion of Debhelper maintainer script
+snippets.
+
+It will also change any DTD declarations in the OMF and DocBook files
+to refer to local files instead of remote URLs. This change does not
+modify the source files, but the files in the package build tree.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-n>, B<--noscripts>
+
+Do not modify F<postinst>/F<postrm> scripts.
+
+=back
+
+=head1 NOTES
+
+Note that this command is not idempotent. "dh_clean -k" should be
+called between invocations of this command. Otherwise, it may cause
+multiple instances of the same text to be added to maintainer scripts.
+
+=cut
+
+init();
+
+# This is a list of paths where DocBook files might be stored.
+my @xml_paths = (
+	'usr/share/gnome/help' # GNOME Help
+);
+
+# Append the remaining command line arguments
+push @xml_paths, @ARGV if @ARGV;
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	
+	# Only run if there have been OMF files installed
+	if (-d "$tmp/usr/share/omf") {
+		# Get a list of the OMF files
+		my @omf_files = `find $tmp/usr/share/omf -type f -printf '%p\n'`;
+		if (@omf_files) {
+			# Change any remote DTDs into local DTDs. We only
+			# look at the first 10 lines to avoid changing any
+			# of the content. First, the OMF files
+			foreach my $file (@omf_files) {
+				chomp $file;
+				doit("perl", "-i", "-pe", "'s,http://scrollkeeper.sourceforge.net/dtds/scrollkeeper-omf-1.0/scrollkeeper-omf.dtd,/usr/share/xml/scrollkeeper/dtds/scrollkeeper-omf.dtd, if \$. < 10'", $file);
+			}
+			# I could be cunning and parse the OMF for the DocBook
+			# files. That is far too much effort. Find to the
+			# rescue! Look for .xml files in the list of
+			# directories we think they might be in.
+			foreach my $xmlpath (@xml_paths) {
+				foreach my $file (`find $tmp/$xmlpath -type f -name \*.xml -printf '%p\n'`) {
+					chomp $file;
+					doit("perl", "-i", "-pe", "'s,http://www.oasis-open.org/docbook/xml/([^/]+)/docbookx.dtd,/usr/share/sgml/docbook/dtd/xml/\\1/docbookx.dtd, if \$. < 10'", $file);
+				}
+			}
+		
+			if (! $dh{NOSCRIPTS}) {
+				autoscript($package,"postinst","postinst-scrollkeeper");
+				autoscript($package,"postrm","postrm-scrollkeeper");
+			}
+			# The scripts use scrollkeeper-update with the -q
+			# option, so we require 0.3.8+.
+			addsubstvar($package, "misc:Depends", "scrollkeeper", ">= 0.3.8");
+		}
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Ross Burton <ross@burtonini.com>
+
+=cut

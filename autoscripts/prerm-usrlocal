@@ -1,0 +1,7 @@
+(
+	while read dir; do
+		rmdir "$dir" 2>/dev/null || true
+	done
+) << DATA
+#JUSTDIRS#
+DATA
