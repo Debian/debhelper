@@ -30,14 +30,14 @@ Wishlist items:
 * something should add ldconfig calls properly to the postinst of packages
   that contain shared libraries. maybe dh_makeshlibs? But it wasn't designed
   to do that originally, and even worse, it is often run after
-  dh_installdeb, so the fragements wouldn't go into the postinst. So maybe a
+  dh_installdeb, so the fragments wouldn't go into the postinst. So maybe a
   new script is called for.
 * Need a way to make dh_strip not strip any static libs. Also, it'd be nice
-  if there were options to dh_strip, dh_compress, etc, to allow inclusiuon of
-  directories and exclusion of files based on filname globbing. (Request from
+  if there were options to dh_strip, dh_compress, etc, to allow inclusion of
+  directories and exclusion of files based on filename globbing. (Request from
   Matthias Klose <doko@cs.tu-berlin.de>)
-* docbase support (#25233). Waiting for docbase to stabalize and be used
-  widly.
+* docbase support (#25233). Waiting for docbase to stabilize and be used
+  widely.
 * dhelp support. Currently pending on dhelp use becoming widespead (#18342)
 * Support use of environment variables in data taken from user, ie, in
   debian/dirs. The problem with doing this is that we really want to allow
@@ -49,14 +49,14 @@ Wishlist items:
   that generates the cache. The catch is that if the user runs that program,
   they are stating that they don't do anything later to invalidate the cache,
   without calling ch_cache again. (#23792)
-* Add a switch to dh_installdeb to allow it to do user definied
-  substitutions. TOH, maybe it's better if peopld just sed
+* Add a switch to dh_installdeb to allow it to do user defined
+  substitutions. OTOH, maybe it's better if people just sed
   postinst.in before debhelper gets it's hands on it... (#25235)
 
-Depricated:
+Deprecated:
 
 * remove dh_installdebfiles, dh_du.
 	- need to wait a reasonable length of time. I'm currently planning
 	  on doing this after slink is released or one year after they were
-	  depricated, whichever comes first. Be sure to grep whole debian
-	  archive for alls to them before removing them, though!
+	  deprecated, whichever comes first. Be sure to grep whole debian
+	  archive for all of them before removing them, though!
