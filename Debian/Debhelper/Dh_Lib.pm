@@ -260,10 +260,10 @@ sub pkgfile {
 sub pkgext {
 	my $package=shift;
 
-	if ($package ne $dh{MAINPACKAGE}) {
-		return "$package.";
+	if (compat(1) and $package eq $dh{MAINPACKAGE}) {
+		return "";
 	}
-	return "";
+	return "$package.";
 }
 
 # Returns 1 if the package is a native debian package, null otherwise.
