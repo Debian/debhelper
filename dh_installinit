@@ -25,6 +25,8 @@ for PACKAGE in $DH_DOPACKAGES; do
 				echo `basename $0`" warning: \"$PACKAGE\" has no final -d, but -d was specified."
 				script=$PACKAGE
 			fi
+		elif [ "$DH_INIT_SCRIPT" != "" ]; then
+			script=$DH_INIT_SCRIPT
 		else
 			script=$PACKAGE
 		fi

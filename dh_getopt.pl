@@ -109,6 +109,8 @@ GetOptions(
 	"all" => \$all,
 
 	"no-act" => \$no_act,
+
+	"init-script=s" => \$init_script,
 );
 
 # Check to see if -V was specified. If so, but no parameters were passed,
@@ -147,6 +149,7 @@ DH_M_PARAMS='$major'
 DH_V_FLAG='$version_info'
 DH_V_FLAG_SET='$version_info_set'
 DH_PARAMS_ALL='$all'
+DH_INIT_SCRIPT='$init_script'
 DH_PARSE_ERROR='$parse_error'
 set -- @ARGV
 };
