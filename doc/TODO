@@ -4,8 +4,6 @@ list grows - I welcome patches to fix items on it!
 Wishlist items:
 
 * Make dh_* "use strict".
-* Make dh_movefiles remove emptied directories after it's moved all the
-  files out of them (#17111).
 * enhance dh_installmanpages so it associates binaries and man pages and
   installs the man pages into the correct areas to suit the binaries they
   document. I may need to make this only happen when a switch is given, to
@@ -23,12 +21,6 @@ Wishlist items:
 * All programs should also make sure the files they install are owned by
   root.root. Situation is currently the same as with permissions above, plus
   dh_installchangelogs is fixed.
-* something should add ldconfig calls properly to the postinst of packages
-  that contain shared libraries. maybe dh_makeshlibs? But it wasn't designed
-  to do that originally, and even worse, it is often run after
-  dh_installdeb, so the fragments wouldn't go into the postinst. So maybe a
-  new script is called for. But it's probably be best to just have a switch
-  to enable this.
 * Need a way to make dh_strip not strip any static libs. Also, it'd be nice
   if there were options to dh_strip, dh_compress, etc, to allow inclusion of
   directories and exclusion of files based on filename globbing. (Request from
@@ -51,14 +43,6 @@ Wishlist items:
 
 Deprecated:
 
-* remove dh_du. 
-  - need to wait a reasonable length of
-    time. I'm currently planning on doing this after slink is released or
-    one year after they were deprecated, whichever comes first. Be sure to
-    grep whole debian archive for all of them before removing them, though!
-  - currently, a few packages in potato use dh_du, but bugs have been filed.
-* Remove support for --number option
-  - only dh_installemacsen ever used it, it is not --priority.
 * DH_COMPAT 1. Can be removed once all packages are seen to be using 2 or
   higher. I won't hold my breath.
 * Also, grep the entire archive for all dh_* command lines, and check to

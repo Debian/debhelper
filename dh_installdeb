@@ -51,4 +51,14 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			doit("install","-o",0,"-g",0,"-m",644,"-p",$f,"$TMP/DEBIAN/$file");
 		}
 	}
+
+	# Automatic conffiles registration: If it is in /etc, it is a
+	# conffile.
+	if (! Debian::Debhelper::Dh_Lib::compat(2) && -d "$TMP/etc") {
+		complex_doit("find $TMP/etc -type f |sed 's~^$TMP~~' >> $TMP/DEBIAN/conffiles");
+		# Anything found?
+		if (-z "$TMP/DEBIAN/conffiles") {
+			doit("rm", "-f", "$TMP/DEBIAN/conffiles");
+		}
+	}
 }

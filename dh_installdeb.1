@@ -6,7 +6,7 @@ dh_installdeb \- install files into the DEBIAN directory
 .I "[debhelper options]"
 .SH "DESCRIPTION"
 dh_installdeb is a debhelper program that is responsible for installing
-files into the DEBIAN directory in package build directories with the
+files into the DEBIAN directories in package build directories with the
 correct permissions.
 .P
 dh_installdeb automatically installs the following files from debian/ into
@@ -27,6 +27,10 @@ the .debhelper file. The .debhelper files are created by other debhelper
 programs, such as
 .BR dh_installmenu (1)
 , and are shell script fragments.
+.P
+If DH_COMPAT is set to 3 or higher, all files in the etc/ directory in a
+package will automatically be flagged as conffiles by this program, so
+there is no need to list them manually in package.conffiles.
 .SH OPTIONS
 .TP
 .B debhelper options

@@ -3,10 +3,13 @@
 dh_makeshlibs \- automatically create shlibs file
 .SH SYNOPSIS
 .B dh_makeshlibs
-.I "[debhelper options] [-mmajor] [-V[dependancies]]"
+.I "[debhelper options] [-mmajor] [-V[dependancies]] [-n]"
 .SH "DESCRIPTION"
 dh_makeshlibs is a debhelper program that automatically scans for shared
 libraries, and generates a shlibs file for the libraries it finds.
+.P
+It also adds a call to ldconfig in the postinst and postrm scripts (in
+DH_COMPAT=3 mode and above only).
 .SH OPTIONS
 .TP
 .B debhelper options
@@ -27,6 +30,9 @@ information, the current version of the package is plugged into a dependancy
 that looks like "packagename (>= packageversion)". If -V is specified with
 parameters, the parameters can be used to specify the exact dependancy
 information needed (be sure to include the package name).
+.TP
+.B \-n, \--noscripts
+Do not modify postinst/postrm scripts.
 .SH EXAMPLES
 .TP
 .B dh_makeshlibs

@@ -126,7 +126,6 @@ sub parseopts {
 
 		"filename=s" => \$options{FILENAME},
 		
-		"number=i" => \$options{PRIORITY},	# deprecated
 		"priority=i" => \$options{PRIORITY},
 		
 		"flavor=s" => \$options{FLAVOR},

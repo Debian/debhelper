@@ -9,12 +9,14 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	$TMP=tmpdir($PACKAGE);
 
 	my %seen;
+	my $need_ldconfig = 0;
 
 	doit("rm", "-f", "$TMP/DEBIAN/shlibs");
 
 	open (FIND, "find $TMP -xtype f -name '*.so*' |");
 	while (<FIND>) {
 		chomp;
+		$need_ldconfig=1;
 		# The second evil regexp is for db3, whose author should
 		# be shot.
 		if (m#.*/(.*)\.so\.(\d*)\.?# || m#.*/(.*)-(\S+)\.so$#) {
@@ -50,6 +52,13 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		}
 	}
 	close FIND;
+
+	# New as of dh_v3.
+	if (! Debian::Debhelper::Dh_Lib::compat(2) && 
+	    ! $dh{NOSCRIPTS} && $need_ldconfig) {
+		autoscript($PACKAGE,"postinst","postinst-makeshlibs");
+		autoscript($PACKAGE,"postrm","postrm-makeshlibs");
+	}
 
 	if (-e "$TMP/DEBIAN/shlibs") {
 		doit("chmod",644,"$TMP/DEBIAN/shlibs");

@@ -25,17 +25,9 @@ them.
   the .man filenames properly. It'll probably just assume all man pages have
   an  extension, and delete that extentation, and add the correct one.
 
-* dh_movefiles will use a name other than debian/<package>.files for the
-  list of what to move, because it can't use debian/files for the first
-  package, since that file is already used elsewhere. It'll use
-  debian/<package>.move
-
-* dh_movefiles should delete empty directories after it's moved all files
-  out of them. (#17111)  
-
-* debian/README will be installed as /usr/share/doc/<package>/README in
++ debian/README is installed as /usr/share/doc/<package>/README in
   native packages, and as README.Debian in non-native packages. This is
-  consistent with the handing of debian/TODO and debian/changelog. (#34628)
+  consistent with the handing of debian/TODO and debian/changelog.
 
 * There will be no change to the names of debhelper config files used, I've
   decided against debian/<package>/* and the like, because although those
@@ -45,12 +37,12 @@ them.
   documenting that debian/<foo> works, and will deprecate that usage.
   debian/<package>.<foo> will be preferred even in single binary packages.
 
-* Every file in etc/ will be automatically be flagged as a conffile.
++ Every file in etc/ is automatically flagged as a conffile by dh_installdeb.
 
 * Debhelper config files will support globbing via * and ?, when
   appropriate. To turn this off and use those changarcters raw, just quote
   them.
 
-* dh_makeshlibs will generate autoscript fragments for ldconfig. This will
-  require you call it before dh_installdeb, which isn't always done now.
++ dh_makeshlibs will generate autoscript fragments for ldconfig. This will
+  require you call it before dh_installdeb.
 

@@ -1,3 +1,28 @@
+debhelper (2.2.0) unstable; urgency=low
+
+  * DH_COMPAT=3 now enables the following new features which I can't just
+    turn on by default for fear of breaking backwards compatability:
+    - dh_makeshlibs makes the postinst/postrm call ldconfig. Closes: #77154
+      Patch from Masato Taruishi <taru@debian.org> (modified). If you 
+      use this, be sure dh_makeshlibs runs before dh_installdeb; many
+      old rules files have the ordering backwards.
+    - dh_installdeb now causes all files in /etc to be registered as
+      conffiles.
+    - debian/README is now supported: it is treated exactly like
+      debian/README.Debian. Either file is installed as README.Debian in
+      non-native packages, and now as just README in native packages.
+      Closes: #34628
+  * This is really only the start of the changes for v3, so use with
+    caution..
+  * dh_du has finally been removed. It has been deprecated for ages, and
+    a grep of the archive shows that nothing is using it except biss-awt
+    and scsh. I filed bugs on both almost exactly a year ago. Those bugs
+    should now be raised to severity important..
+  * --number option (to dh_installemacsen) is removed. It has been
+    deprecated for a while and nothing uses it. Use --priority instead.
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 26 Nov 2000 17:51:58 -0800
+
 debhelper (2.1.28) unstable; urgency=low
 
   * Ok, fine, I'll make debhelper depend on lynx for the one or two

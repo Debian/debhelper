@@ -19,13 +19,13 @@ package dh_installdocs is told to act on. By default, this is the first
 binary package in debian/control, but if you use -p, -i, or -a flags, it
 will be the first package specified by those flags.
 .P
-Also, debian/README.Debian (or debian/README.debian) and debian/TODO, if
+Also, debian/README (or debian/README.Debian) and debian/TODO, if
 they exist, will be installed into the first binary package listed in
 debian/control, if dh_installdocs is acting on that package. Note that
-debian/TODO will be installed named TODO.Debian, if the package is not a
-debian native package. Also note that README.debian is installed as
-README.Debian, for consitency. Note that debian/package.README.Debian and
-debian/package.TODO can be used to specify files for subpackages.
+they will be named README.Debian and TODO.Debian, if the package is not a
+debian native package, and README and TODO if it is. Also note that
+Additionally, debian/package.README and debian/package.TODO can be used
+to specify files for subpackages.
 .P
 Files named debian/package.docs can list other files to be installed.
 .P

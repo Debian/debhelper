@@ -190,7 +190,7 @@ sub dirname { my $fn=shift;
 }
 
 # Pass in a number, will return true iff the current compatability level
-# is equal to that number.
+# is less than or equal to that number.
 sub compat {
 	my $num=shift;
 	
@@ -203,7 +203,7 @@ sub compat {
 		error("Sorry, but $max_compat is the highest compatability level of debhelper currently supported.");
 	}
 
-	return ($c == $num);
+	return ($c <= $num);
 }
 
 # Pass it a name of a binary package, it returns the name of the tmp dir to
