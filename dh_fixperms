@@ -68,6 +68,17 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	complex_doit("find $tmp/usr/share/man $tmp/usr/man/ $tmp/usr/X11*/man/ -type f",
 		"$find_options -print0 2>/dev/null | xargs -0r chmod 644");
 
+	# ..and so are executable shared and static libraries 
+	# (and .la files from libtool) ..
+	complex_doit("find $tmp -perm -5 -type f",
+		"\\( -name '*.so*' -or -name '*.la' -or -name '*.a' \\) $find_options -print0",
+		"2>/dev/null | xargs -0r chmod 644");
+	
+	# .. and perl modules.
+	complex_doit("find $tmp/usr/lib/perl5 $tmp/usr/share/perl5 -type f",
+		"-perm -5 -name '*.pm' $find_options -print0",
+		"2>/dev/null | xargs -0r chmod a-X");
+	
 	# v4 only
 	if (! compat(3)) {
 		# Programs in the bin and init.d dirs should be executable..
@@ -79,11 +90,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 	}
 	
-	# ..and so are executable shared and static libraries 
-	# (and .la files from libtool)
-	complex_doit("find $tmp -perm -5 -type f",
-		"\\( -name '*.so*' -or -name '*.la' -or -name '*.a' \\) $find_options -print0",
-		"2>/dev/null | xargs -0r chmod a-X");
 }
 
 =head1 SEE ALSO
