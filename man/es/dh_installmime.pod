@@ -1,7 +1,7 @@
 # (c) 2003 Software in the Public Interest
 # Esta traducción ha sido realizada por Rubén Porras Campo <nahoo@inicia.es>
 # Está basada en la página de manual original:
-# versión 1.1 del CVS de
+# versión 1.2 del CVS de
 # /cvs/debian-doc/manpages/english/debhelper/dh_installmime.pod
 
 =head1 NOMBRE
@@ -18,11 +18,13 @@ dh_installmime es un programa de debhelper responsable de instalar ficheros
 mime en los directorios de construcción del paquete.
 
 Además genera automáticamente las órdenes de postinst y postrm necesarias para
-interactuar con el paquete mime-support. Lea L<dh_installdeb(1)> para una
-explicación acerca de como funciona esto.
+interactuar con los paquetes mime-support y shared-mime-info. Lea
+L<dh_installdeb(1)> para una explicación acerca de como funciona esto.
 
-Si existe un fichero debian/paquete.mime, este se instala en
-usr/lib/mime/packages/paquete en el directorio de construcción del paquete.
+Si existen ficheros llamados debian/paquete.mime o
+debian/paquete.sharedmimeinfo, se instalan en usr/lib/mime/packages/paquete y
+/usr/share/mime/packages/package.xml (respectivamente) en el directorio de
+construcción del paquete.
 
 =head1 OPCIONES
 
