@@ -181,7 +181,12 @@ sub find_so_man {
 	}
 
 	# Test first line of file for the .so thing.
-	open (SOTEST,$_) || die "$_: $!";
+	if (/\.gz$/) {
+		open (SOTEST, "zcat $_|") or die "$_: $!";
+	}
+	else {
+		open (SOTEST,$_) || die "$_: $!";
+	}
 	my $l=<SOTEST>;
 	close SOTEST;
 	if ($l=~m/\.so\s+(.*)\s*/) {
