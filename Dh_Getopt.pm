@@ -100,6 +100,8 @@ sub parseopts {
 	        "dpkg-shlibdeps-params=s", => \$options{U_PARAMS},
 		"dpkg-gencontrol-params=s", => \$options{U_PARAMS},
 
+		"l=s", => \$options{L_PARAMS},
+
 		"m=s", => \$options{M_PARAMS},
 		"major=s" => \$options{M_PARAMS},
 

@@ -17,7 +17,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	# better know what they're doing.
 	if ( ! -d "$TMP/usr/share/doc/$PACKAGE" && 
 	     ! -l "$TMP/usr/share/doc/$PACKAGE") {
-		doit("install","-d","$TMP/usr/share/doc/$PACKAGE");
+		doit("install","-g","root","-o","root","-d","$TMP/usr/share/doc/$PACKAGE");
 	}
 
 	undef @docs;
@@ -31,7 +31,8 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	}
 
 	if (@docs) {
-		doit("cp","-a",@docs,"$TMP/usr/share/doc/$PACKAGE/");
+		doit("cp", "-a",@docs,"$TMP/usr/share/doc/$PACKAGE/");
+		doit("chown","-R","root.root","$TMP/usr/share/doc");
 		doit("chmod","-R","go=rX","$TMP/usr/share/doc");
 		doit("chmod","-R","u+rw","$TMP/usr/share/doc");
 	}
@@ -42,18 +43,18 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		$readme_debian=pkgfile($PACKAGE,'README.debian');
 	}
 	if ($readme_debian) {
-		doit("install","-m","644","-p","$readme_debian",
+		doit("install","-g","root","-o","root","-m","644","-p","$readme_debian",
 			"$TMP/usr/share/doc/$PACKAGE/README.Debian");
 	}
 
 	$todo=pkgfile($PACKAGE,'TODO');
 	if ($todo) {
 		if (isnative($PACKAGE)) {
-			doit("install","-m","644","-p",$todo,
+			doit("install","-g","root","-o","root","-m","644","-p",$todo,
 				"$TMP/usr/share/doc/$PACKAGE/TODO");
 		}
 		else {
-			doit("install","-m","644","-p",$todo,
+			doit("install","-g","root","-o","root","-m","644","-p",$todo,
 				"$TMP/usr/share/doc/$PACKAGE/TODO.Debian");
 		}
 	}
@@ -66,7 +67,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		$copyright="debian/copyright";
 	}
 	if ($copyright) {
-			doit("install","-m","644","-p",$copyright,
+			doit("install","-g","root","-o","root","-m","644","-p",$copyright,
 				"$TMP/usr/share/doc/$PACKAGE/copyright");
 	}
 
@@ -107,11 +108,11 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	
 	if (%doc_ids) {
 		if (! -d "$TMP/usr/share/doc-base/") {
-			doit("install","-d","$TMP/usr/share/doc-base/");
+			doit("install","-g","root","-o","root","-d","$TMP/usr/share/doc-base/");
 		}
 	}
 	foreach my $fn (keys %doc_ids) {
-		doit("install","-m644","-p","debian/$fn",
+		doit("install","-g","root","-o","root","-m644","-p","debian/$fn",
 		     "$TMP/usr/share/doc-base/$doc_ids{$fn}");
 		if (! $dh{NOSCRIPTS}) {
 			autoscript($PACKAGE,"postinst","postinst-doc-base",

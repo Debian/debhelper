@@ -3,7 +3,7 @@
 dh_shlibdeps \- calculate shared library dependancies
 .SH SYNOPSIS
 .B dh_shlibdeps
-.I "[debhelper options] [-uparams]"
+.I "[debhelper options] [-uparams] [-ldirectory]"
 .SH "DESCRIPTION"
 dh_shlibdeps is a debhelper program that is responsible for calculating
 shared library dependancies for all executables found in the package build
@@ -22,6 +22,14 @@ for a list of options common to all debhelper commands.
 .B \-uparams, \--dpkg-shlibdeps-params=params
 Pass "params" to 
 .BR dpkg-shlibdeps (1)
+.TP
+.B \-ldirectory
+Before
+.BR dpkg-shlibdeps (1)
+is run, LD_LIBRARY_PATH will be set to the specified directory.
+This is useful for multi-binary packages where a library
+is built in one package and another package contains binaries linked
+against said library.
 .SH ENVIRONMENT
 See
 .BR debhelper (1)

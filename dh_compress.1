@@ -32,8 +32,8 @@ customization of what files are compressed:
  find usr/info usr/share/info usr/man usr/share/man usr/X11*/man -type f ! -name "*.gz"
  find usr/doc usr/share/doc -type f \\ 
  	\\( -size +4k -or -name "changelog*" \\) \\
- 	\\( -name changelog.html -or ! -name "*.htm*" \\) \\
- 	! -name "*.gif" ! -iname "*.gz" \\
+ 	\\( -name changelog.html -or ! -iname "*.htm*" \\) \\
+ 	! -iname "*.gif" ! -iname "*.png" ! -iname "*.jpg" ! -iname "*.jpeg" ! -iname "*.gz" \\
  	! -iname "*.taz" ! -iname "*.tgz" ! -iname "*.z" \\
  	! -name "copyright"
 .SH OPTIONS

@@ -1,3 +1,20 @@
+debhelper (2.0.69) unstable; urgency=low
+
+  * dh_shlibdeps: added -l option, which lets you specify a path that
+    LD_LIBRARY_PATH is then set to when dpkg-shlibdeps is run. This
+    should make it easier for library packages that also build binary
+    packages to be built with correct dependancies. Closes: #36751
+  * In honor of Burn all GIFs Day (hi Don!), I added alternative
+    image formats .png, .jpg (and .jpeg) to the list of extentions dh_compress
+    does not compress. Closes: #41733
+  * Also, made all extentions dh_compress skips be looked at case
+    insensitively.
+  * dh_movefiles: force owner and group of installed files to be root.
+    Closes: #46039
+  * Closes: #42650, #47175 -- they've been fixed forever.
+
+ -- Joey Hess <joeyh@master.debian.org>  Thu,  4 Nov 1999 15:05:59 -0800
+
 debhelper (2.0.68) unstable; urgency=low
 
   * dh_installxfonts: Patch from Anthony Wong to fix directory searching.
