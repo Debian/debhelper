@@ -196,7 +196,10 @@ for PACKAGE in $DH_DOPACKAGES; do
 	for file in postinst postrm preinst prerm; do
 		f="`pkgfile $PACKAGE $file`"
 		if [ "$f" ]; then
-			filelist="$filelist$f "
+			if ! grep -q "#DEBHELPER#" "$f"; then
+				filelist="$filelist$f "
+
+			fi
 		fi
 	done
 done

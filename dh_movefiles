@@ -25,7 +25,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 		tomove="$* $tomove"
 	fi
 
-	if [ "$tomove" -a "$PACKAGE" = "$MAINPACKAGE" ]; then
+	if [ "$tomove" -a "$TMP" = "debian/tmp" ]; then
 		error "I was asked to move files from debian/tmp to debian/tmp."
 	fi
 
