@@ -9,6 +9,7 @@ Bugs:
 
 Wishlist items:
 
+* Make dh_* "use strict".
 * Make dh_movefiles remove emptied directories after it's moved all the
   files out of them (#17111).
 * info support for debhelper (currently implemented, but I hate how I did it,
@@ -31,14 +32,12 @@ Wishlist items:
   that contain shared libraries. maybe dh_makeshlibs? But it wasn't designed
   to do that originally, and even worse, it is often run after
   dh_installdeb, so the fragments wouldn't go into the postinst. So maybe a
-  new script is called for.
+  new script is called for. But it's probably be best to just have a switch
+  to enable this.
 * Need a way to make dh_strip not strip any static libs. Also, it'd be nice
   if there were options to dh_strip, dh_compress, etc, to allow inclusion of
   directories and exclusion of files based on filename globbing. (Request from
   Matthias Klose <doko@cs.tu-berlin.de>)
-* docbase support (#25233). Waiting for docbase to stabilize and be used
-  widely.
-* dhelp support. Currently pending on dhelp use becoming widespead (#18342)
 * Support use of environment variables in data taken from user, ie, in
   debian/dirs. The problem with doing this is that we really want to allow
   any filenames in that input, even those that look like environment

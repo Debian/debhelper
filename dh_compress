@@ -15,6 +15,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	# Run the file name gathering commands from within the directory
 	# structure that will be effected.
 	$olddir=getcwd();
+	verbose_print("cd $TMP");
 	chdir($TMP) || error("Can't cd to $TMP: $!");
 
 	# Figure out what files to compress.
@@ -58,6 +59,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	# we can preserve the hard link across the compression and save
 	# space in the end.
 	my @f=();
+	my %hardlinks={};
 	foreach (@files) {
 		($dev, $inode, undef, $nlink)=stat($_);
 		if ($nlink > 1) {
@@ -88,6 +90,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		doit("ln","$hardlinks{$_}.gz","$_.gz");
 	}
 
+	verbose_print("cd $olddir");
 	chdir($olddir);
 
 	# Fix up symlinks that were pointing to the uncompressed files.

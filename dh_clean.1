@@ -3,7 +3,7 @@
 dh_clean \- clean up package build directories
 .SH SYNOPSIS
 .B dh_clean
-.I "[debhelper options] [-k] [file ...]"
+.I "[debhelper options] [-k] [-d] [file ...]"
 .SH "DESCRIPTION"
 dh_clean is a debhelper program that is responsible for cleaning up after a
 package is built. It removes the package build directories, and removes some
@@ -24,6 +24,10 @@ one target builds the shared library, and the other the -dev package. If you
 didn't use -k in these cases, then debian/files would be deleted in the
 middle, and your changes file will only contain the last binary package that
 was built.
+.TP
+.B \-d, \--dirs-only
+Only clean the package build directories, do not clean up any other files at
+all.
 .TP
 .B file ...
 Delete these files too.

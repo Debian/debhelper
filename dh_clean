@@ -11,28 +11,33 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	$TMP=tmpdir($PACKAGE);
 	$EXT=pkgext($PACKAGE);
 
-	doit("rm","-f","debian/$EXT\substvars",
-		"debian/$EXT\postinst.debhelper",
-		"debian/$EXT\postrm.debhelper",
-		"debian/$EXT\preinst.debhelper",
-		"debian/$EXT\prerm.debhelper");
+	if (! $dh{D_FLAG}) {
+		doit("rm","-f","debian/$EXT\substvars",
+			"debian/$EXT\postinst.debhelper",
+			"debian/$EXT\postrm.debhelper",
+			"debian/$EXT\preinst.debhelper",
+			"debian/$EXT\prerm.debhelper");
+	}
 	
 	doit ("rm","-rf",$TMP);
 }
 
-if (@ARGV) {
-	doit("rm","-f","--",@ARGV);
-}
+if (! $dh{D_FLAG}) {
+	if (@ARGV) {
+		doit("rm","-f","--",@ARGV);
+	}
 
-if (! $dh{K_FLAG}) {
-	doit("rm","-f","debian/files");
-}
+	if (! $dh{K_FLAG}) {
+		doit("rm","-f","debian/files");
+	}
 
-# Remove other temp files.
-# (The \s+ is important, \s won't work because find would get null parameters).
-# Note that you _don't_ quote wildcards used by find in here.
-doit(split(/\s+/,"find . ( -name #*# -o -name *~ -o -name DEADJOE
-	-o -name *.orig -o -name *.rej -o -name *.bak
-	-o -name .*.orig -o -name .*.rej -o -name .SUMS
-	-o -name TAGS -o -name core -o ( -path */.deps/* -a -name *.P )
-	) -exec rm -f {} ;"));
+	# Remove other temp files.
+	# (The \s+ is important, \s won't work because find would get null
+	# parameters). Note that you _don't_ quote wildcards used by find
+	# in here.
+	doit(split(/\s+/,"find . ( -name #*# -o -name *~ -o -name DEADJOE
+		-o -name *.orig -o -name *.rej -o -name *.bak
+		-o -name .*.orig -o -name .*.rej -o -name .SUMS
+		-o -name TAGS -o -name core -o ( -path */.deps/* -a -name *.P )
+		) -exec rm -f {} ;"));
+}
