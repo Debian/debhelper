@@ -8,10 +8,11 @@ init();
 
 foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	$TMP=tmpdir($PACKAGE);
+	my $XFONTDIR="$TMP/usr/X11R6/lib/X11/fonts/";
 
 	# Find all fint directories in the package build directory.
-	opendir DIR, "$TMP/usr/X11R6/lib/X11/fonts/" || next;
-	my @fontdirs = grep { -d $_ && !/^\./ } (readdir DIR);
+	opendir DIR, $XFONTDIR || next;
+	my @fontdirs = grep { -d "$XFONTDIR/$_" && !/^\./ } (readdir DIR);
 	closedir DIR;
 
 	if (@fontdirs) {
