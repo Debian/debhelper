@@ -31,7 +31,8 @@ install: install-stamp
 install-stamp: build
 	dh_testdir
 	dh_testroot
-	dh_clean
+	dh_clean -k
+	dh_installdirs
 
 	# Add here commands to install the package into debian/tmp.
 	#$(MAKE) prefix=`pwd`/debian/tmp/usr install
@@ -43,8 +44,6 @@ binary-indep: build install
 #	dh_testversion
 	dh_testdir -i
 	dh_testroot -i
-	dh_clean -i -k
-	dh_installdirs -i
 	dh_movefiles -i
 	dh_installdocs -i
 	dh_installexamples -i
@@ -67,8 +66,6 @@ binary-arch: build install
 #	dh_testversion
 	dh_testdir -a
 	dh_testroot -a
-	dh_clean -a -k
-	dh_installdirs -a
 	dh_movefiles -a
 	dh_installdocs -a
 	dh_installexamples -a
