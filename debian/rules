@@ -45,7 +45,7 @@ build-stamp:
 		        	s/#LIST#/$$collect/; \
 				print; \
 			}; \
-		}' `find . -type f -perm +1 -maxdepth 1 -name "dh_*"` > debhelper.1
+		}' `find . -type f -perm +1 -maxdepth 1 -name "dh_*" | sort` > debhelper.1
 	# Turn all executables into man pages.
 	find . -type f -perm +1 -maxdepth 1 -name "dh_*" \
 		-exec pod2man -c Debhelper -r "$(VERSION)" {} {}.1 \;
