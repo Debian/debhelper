@@ -15,7 +15,7 @@ B<dh_builddeb> [S<I<debhelper options>>] [B<--destdir=>I<directory>] [B<--filena
 
 =head1 DESCRIPTION
 
-dh_builddeb simply calls L<dpkg(8)> to build a debian package or
+dh_builddeb simply calls L<dpkg-deb(8)> to build a debian package or
 packages.
 
 =head1 OPTIONS
@@ -36,7 +36,7 @@ file name. Does not work well if more than one .deb is generated!
 
 =item B<--> I<params>
 
-Pass I<params> to L<dpkg(1)|dpkg> when it is used to build the
+Pass I<params> to L<dpkg-deb(1)> when it is used to build the
 package.
 
 =back
@@ -62,7 +62,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (exists $ENV{DH_ALWAYS_EXCLUDE} && length $ENV{DH_ALWAYS_EXCLUDE}) {
 		complex_doit("find $tmp -name $ENV{DH_ALWAYS_EXCLUDE} | xargs rm -rf");
 	}
-	doit("dpkg","--build",$tmp,"$dh{DESTDIR}$dh{FILENAME}",@{$dh{U_PARAMS}});
+	doit("dpkg-deb", @{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$dh{FILENAME});
 }
 
 =head1 SEE ALSO
