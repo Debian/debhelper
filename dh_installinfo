@@ -1,10 +1,62 @@
 #!/usr/bin/perl -w
-#
-# Reads debian/info, installs all files listed there into /usr/share/info
-# and puts appropriate commands into the postinst.
+
+=head1 NAME
+
+dh_installinfo - install and register info files
+
+=cut
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_installinfo [debhelper options] [-A] [-n] [file ...]
+
+=head1 DESCRIPTION
+
+dh_installinfo is a debhelper program that is responsible for installing
+info files and registering them with install-info.
+
+Any filenames specified as parameters will be installed into the first
+package dh_installinfo is told to act on. By default, this is the first
+binary package in debian/control, but if you use -p, -i, or -a flags, it
+will be the first package specified by those flags.
+
+Files named debian/package.info can list other files to be installed.
+
+dh_installinfo will automatically generate the postinst and prerm commands
+needed to interface with install-info. See L<dh_installdeb(1)> for an
+explanation of how this works.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-A>, B<--all>
+
+Install all files specified by command line parameters in ALL packages
+acted on.
+
+=item B<-n>, B<--noscripts>
+
+Do not modify postinst/prerm scripts.
+
+=item I<file ...>
+
+Install these info files into the first package acted on. (Or in
+all packages if -A is specified).
+
+=back
+
+=head1 NOTES
+
+Note that this command is not idempotent. "dh_clean -k" should be called
+between invocations of this command. Otherwise, it may cause multiple
+instances of the same text to be added to maintainer scripts.
+
+=cut
+
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -60,3 +112,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 	}
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

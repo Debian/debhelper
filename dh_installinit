@@ -1,10 +1,79 @@
 #!/usr/bin/perl -w
-#
-# Install debian/init[.d], and set up the postinst and postrm for init
-# scripts.
+
+=head1 NAME
+
+dh_installinit - install init scripts into package build directories
+
+=cut
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_installinit [debhelper options] [--init-script=scriptname] 
+                 [-n] [-r] [-d] [-uparams] -- [params]
+
+=head1 DESCRIPTION
+
+dh_installinit is a debhelper program that is responsible for installing
+init scripts into package build directories.
+
+It also automatically generates the postinst and postrm and prerm commands
+needed to set up the symlinks in /etc/rc*.d/ and to start and stop the init
+scripts.
+
+If a file named debian/package.init exists, then it is installed into
+etc/init.d/package in the package build directory, with "package" replaced
+by the package name.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-n>, B<--noscripts>
+
+Do not modify postinst/postrm/prerm scripts.
+
+=item B<-r>, B<--no-restart-on-upgrade>
+
+Do not restart daemon on upgrade.
+
+=item B<-d>, B<--remove-d>
+
+Remove trailing "d" from the name of the package, and use the result for the
+filename the init script is installed as in etc/init.d/ . This may be useful
+for daemons with names ending in "d". (Note: this takes precedence over
+the --init-script parameter described below.)
+
+=item B<-u>I<params> B<--update-rcd-params=>I<params>
+
+=item B<--> I<params>
+
+Pass "params" to L<update-rc.d(8)>. If not specified, "defaults" will be
+passed to L<update-rc.d(8)>.
+
+=item B<--init-script=>I<scriptname>
+
+Use "scriptname" as for the filename the init script is installed as in
+etc/init.d/ . This is useful if you need to have an init script with a name
+different from the package's name. Note that if you use this parameter,
+dh_installinit will look to see if a file in the debian/ directory exists
+that looks like "scriptname" or "package.scriptname" and if so will install
+it as the init script in preference to the files it normally installs. This
+feature is really only useful if you need a single package to install more
+than one init script.
+
+=back
+
+=head1 NOTES
+
+Note that this command is not idempotent. "dh_clean -k" should be called
+between invocations of this command. Otherwise, it may cause multiple
+instances of the same text to be added to maintainer scripts.
+
+=cut
+
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -74,3 +143,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 	}
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut
