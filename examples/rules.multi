@@ -54,6 +54,7 @@ binary-indep: build install
 #	dh_installmanpages -i
 #	dh_undocumented
 	dh_installchangelogs -i
+	dh_link -i
 	dh_compress -i
 	dh_fixperms -i
 	dh_suidregister -i
@@ -77,6 +78,7 @@ binary-arch: build install
 #	dh_undocumented
 	dh_installchangelogs -a
 	dh_strip -a
+	dh_link -a
 	dh_compress -a
 	dh_fixperms -a
 	dh_suidregister -a
