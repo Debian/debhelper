@@ -1,0 +1,54 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dh_gconf - generate GConf schema registration scripts
+
+=cut
+
+use strict;
+use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+B<dh_gconf> [S<I<debhelper options>>] [B<-p<package>>]
+
+=head1 DESCRIPTION
+
+dh_gconf is a debhelper program that is responsible for registering
+GConf schemas.
+
+It automatically generates the postinst and prerm sragments needed
+to register and unregister the schemas in etc/gconf/schemas.
+These fragements will use gconftool-2, so the package should depend on
+gconf2. This rogram will add an apprioriate dependency to ${misc:Depends}.
+
+=cut
+
+init();
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+
+	if (-d "$tmp/etc/gconf/schemas") {
+		# Get a list of the schemas
+		my $schemas = `find debian/$package/etc/gconf/schemas -type f -name \*.schemas -printf '%P '`;
+		if ($schemas ne '') {
+			autoscript($package,"postinst","postinst-gconf","s%#SCHEMAS#%$schemas%");
+			autoscript($package,"prerm","prerm-gconf","s%#SCHEMAS#%$schemas%");
+			addsubstvar($package, "misc:Depends", "gconf2 >= 2.4.0");
+		}
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Ross Burton <ross@burtonini.com>
+
+=cut
