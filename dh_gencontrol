@@ -19,9 +19,8 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	}
 
 	# Generate and install control file.
-	doit("dpkg-gencontrol","-c".Debian::Debhelper::Dh_Lib::getcontrol(),
-		"-l$changelog","-isp","-p$PACKAGE","-Tdebian/${EXT}substvars",
-		"-P$TMP",@{$dh{U_PARAMS}});
+	doit("dpkg-gencontrol","-l$changelog","-isp","-p$PACKAGE",
+		"-Tdebian/${EXT}substvars","-P$TMP",@{$dh{U_PARAMS}});
 
 	# This chmod is only necessary if the user sets the umask to something odd.
 	doit("chmod","644","$TMP/DEBIAN/control");
