@@ -1,3 +1,6 @@
 if test -x /usr/sbin/update-xaw-wrappers; then
 	/usr/sbin/update-xaw-wrappers
 fi
+for opts in #OPTS#; do
+	update-alternatives --quiet --install $opts 25
+done	
