@@ -623,7 +623,9 @@ sub udeb_filename {
 	
 	my $filearch=$package_arches{$package} eq 'all' ? "all" : buildarch();
 	isnative($package); # side effect
-	return "${package}_$dh{VERSION}_$filearch.udeb";
+	my $version=$dh{VERSION};
+	$version=~s/^[0-9]+://; # strip any epoch
+	return "${package}_${version}_$filearch.udeb";
 }
 
 1
