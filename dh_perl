@@ -89,7 +89,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $ext = pkgext($package);
 
 	my @subs;
-	if (open IN, "debian/${ext}substvars")
+	if (open IN, "debian/${ext}substvars.debhelper")
 	{
 	    @subs = grep !/^perl:Depends=/, <IN>;
 	    close IN;
@@ -144,7 +144,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		unless $perl_depends eq 'perl-base';
 	}
 
-	open OUT, ">debian/${ext}substvars";
+	open OUT, ">debian/${ext}substvars.debhelper";
 	print OUT @subs;
 	close OUT;
 }

@@ -1,3 +1,21 @@
+debhelper (3.0.30) unstable; urgency=low
+
+  * dh_gencontrol: Added a documented interface for specifying substvars
+    data in a file. Substvars data may be put in debian/package.substvars.
+    (Those files used to be used by debhelper for automatically generated
+    data, but it uses a different internal filename now). It will be merged
+    with any automatically determined substvars data. See bug #98819
+  * I want to stress that no one should ever rely in internal, undocumented
+    debhelper workings. Just because debhelper uses a certian name for some
+    internally used file does not mean that you should feel free to modify
+    that file to your own ends in a debian package. If you do use it, don't
+    be at all suprised when it breaks. If you find that debhelper is lacking
+    a documented interface for something that you need, ask for it!
+    (debhelper's undocumented, internal use only files should now all be
+    prefixed with ".debhelper")
+
+ -- Joey Hess <joeyh@debian.org>  Sun,  3 Jun 2001 16:37:33 -0400
+
 debhelper (3.0.29) unstable; urgency=low
 
   * Added -X flag to dh_makeshlibs, for packages with wacky plugins that
