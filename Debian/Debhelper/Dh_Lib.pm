@@ -60,9 +60,7 @@ sub init {
 	# the default, doing them all.
 	if (! defined $dh{DOPACKAGES} || ! @{$dh{DOPACKAGES}}) {
 		if ($dh{DOINDEP} || $dh{DOARCH} || $dh{DOSAME}) {
-			# User specified that all arch (in)dep package be 
-			# built, and there are none of that type.
-			error("I have no package to act on");
+			error("You asked that all arch in(dep) packages be built, but there are none of that type.");
 		}
 		push @{$dh{DOPACKAGES}},@allpackages;
 	}

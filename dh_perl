@@ -36,6 +36,12 @@ full perl package. If so, you can pass the -d option to make dh_perl generate
 a dependency on the correct base package. This is only necessary for some
 packages that are included in the base system.
 
+=item B<-V>
+
+By default, scripts and architecture independent modules don't depend
+on any specific version of perl.  The -V option causes the current
+version of the perl (or perl-base with -d) package to be specified.
+
 =item I<library dirs>
 
 If your package installs perl modules in non-standard
@@ -107,7 +113,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $perl_depends = $perl;
 	if ($deps & XS_MODULE or $dh{V_FLAG_SET})
 	{
-	    ($version) = `dpkg -p $perl` =~ /^Version:\s*(\S+)/m
+	    ($version) = `dpkg -s $perl` =~ /^Version:\s*(\S+)/m
 		unless $version;
 
 	    $perl_depends .= " (>= $version)";
