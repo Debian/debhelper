@@ -36,7 +36,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if ($schemas ne '') {
 			autoscript($package,"postinst","postinst-gconf","s%#SCHEMAS#%$schemas%");
 			autoscript($package,"prerm","prerm-gconf","s%#SCHEMAS#%$schemas%");
-			addsubstvar($package, "misc:Depends", "gconf2 >= 2.4.0");
+			addsubstvar($package, "misc:Depends", "gconf2 (>= 2.4.0)");
 		}
 	}
 }
