@@ -34,7 +34,7 @@ sub find_man {
 	}
 	
 	# And file does think it's a real man page?
-	my $type=`file $_`;
+	my $type=`file -z $_`;
 	if ($type !~ m/:.*roff/) {
 		return;
 	}

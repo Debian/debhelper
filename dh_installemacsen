@@ -24,21 +24,21 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		if (! -d "$TMP/usr/lib/emacsen-common/packages/install") {
 			doit("install","-d","$TMP/usr/lib/emacsen-common/packages/install");
 		}
-		doit("install",$emacsen_install,"$TMP/usr/lib/emacsen-common/packages/install/$PACKAGE");
+		doit("install","-m0644",$emacsen_install,"$TMP/usr/lib/emacsen-common/packages/install/$PACKAGE");
 	}
 
 	if ($emacsen_remove ne '') {
 		if (! -d "$TMP/usr/lib/emacsen-common/packages/remove") {
 			doit("install","-d","$TMP/usr/lib/emacsen-common/packages/remove");
 		}
-		doit("install","$emacsen_remove","$TMP/usr/lib/emacsen-common/packages/remove/$PACKAGE");
+		doit("install","-m0644","$emacsen_remove","$TMP/usr/lib/emacsen-common/packages/remove/$PACKAGE");
 	}
 	
 	if ($emacsen_startup ne '') {
 		if (! -d "$TMP/etc/$dh{flavor}/site-start.d/") {
 			doit("install","-d","$TMP/etc/$dh{flavor}/site-start.d/");
 		}
-		doit("install",$emacsen_startup,"$TMP/etc/$dh{flavor}/site-start.d/$dh{number}$PACKAGE.el");
+		doit("install","-m0644",$emacsen_startup,"$TMP/etc/$dh{flavor}/site-start.d/$dh{number}$PACKAGE.el");
 	}
 
 	if ($emacsen_install ne '' || $emacsen_remove ne '') {
