@@ -83,7 +83,7 @@ sub init {
 
 # Pass it an array containing the arguments of a shell command like would
 # be run by exec(). It turns that into a line like you might enter at the
-# shell, escaping metacharacters and quoting qrguments that contain spaces.
+# shell, escaping metacharacters and quoting arguments that contain spaces.
 sub escape_shell {
 	my @args=@_;
 	my $line="";
