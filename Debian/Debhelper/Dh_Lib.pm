@@ -4,7 +4,7 @@
 #
 # Joey Hess, GPL copyright 1997, 1998.
 
-package Dh_Lib;
+package Debian::Debhelper::Dh_Lib;
 use strict;
 
 use Exporter;
@@ -35,9 +35,9 @@ sub init {
 		}       
 	}
 	if ($parseopt) {
-		eval "use Dh_Getopt";
+		eval "use Debian::Debhelper::Dh_Getopt";
 		error($!) if $@;
-		%dh=Dh_Getopt::parseopts();
+		%dh=Debian::Debhelper::Dh_Getopt::parseopts();
 	}
 
 	# Check to see if DH_VERBOSE environment variable was set, if so,

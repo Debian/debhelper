@@ -4,10 +4,10 @@
 #
 # Joey Hess GPL copyright 1998.
 
-package Dh_Getopt;
+package Debian::Debhelper::Dh_Getopt;
 use strict;
 
-use Dh_Lib;
+use Debian::Debhelper::Dh_Lib;
 use Getopt::Long;
 use Exporter;
 #use vars qw{@ISA @EXPORT};
@@ -124,9 +124,10 @@ sub parseopts {
 		
 		"destdir=s" => \$options{DESTDIR},
 		
-		"number=s" => \$options{number},
+		"number=i" => \$options{PRIORITY},	# deprecated
+		"priority=i" => \$options{PRIORITY},
 		
-		"flavor=s" => \$options{flavor},
+		"flavor=s" => \$options{FLAVOR},
 		
 		"<>" => \&NonOption,
 	);
