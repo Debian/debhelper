@@ -51,5 +51,25 @@ binary-indep: build
 	./dh_md5sums
 	./dh_builddeb
 
+# Install in the proper location on my ftp server and web server. Not intended
+# for use by anyone except the author.
+OLD_VER=$(shell perl -e '<>;<>;while(<>){last if /^ --/};<>;$$_=<>;print m/\((.*?)\)/'<debian/changelog)
+localdist:
+	dpkg-buildpackage -rfakeroot -tc
+	if [ `hostname` = 'kite' ] ; then \
+		cp ../debhelper_$(VERSION).tar.gz ../../public; \
+		rm /home/ftp/pub/code/debhelper/* || true; \
+		cp debian/changelog /home/pub/programs/debhelper/CHANGES; \
+		echo $(VERSION) > /home/pub/programs/debhelper/LATEST-VERSION-IS; \
+		cd ..; rm -rf debhelper-$(OLD_VER); \
+		[ -f ../public/debhelper_$(OLD_VER).tar.gz ] && \
+		tar zxf ../public/debhelper_$(OLD_VER).tar.gz || \
+		tar zxf ../outdated/debhelper_$(OLD_VER).tar.gz; \
+		diff -r -u --new-file debhelper-$(OLD_VER) debhelper-$(VERSION) > \
+			/home/ftp/pub/code/debhelper/diffs/debhelper-$(VERSION).diff; \
+		gzip -9f /home/ftp/pub/code/debhelper/diffs/debhelper-$(VERSION).diff; \
+		cd /tmp; rm -f debhelper-$(OLD-VER); \
+        fi
+
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary
+.PHONY: build clean binary-indep binary-arch binary localdist

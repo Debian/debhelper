@@ -1,3 +1,17 @@
+debhelper (1.1.14) unstable; urgency=low
+
+  * Debhelper now has a web page at http://kitenet.net/programs/debhelper/
+
+  * Added code to debian/rules to update the web page when I release new
+    debhelpers.
+  * dh_compress: since version 0.88 or so, dh_compress has bombed out if
+    a debian/compress file returned an error code. This was actually
+    unintentional - in fact, the debian/compress example in the man page
+    will fail this way if usr/info or usr/X11R6 is not present. Corrected
+    the program to not fail. (#26214)
+
+ -- Joey Hess <joeyh@master.debian.org>  Sun, 30 Aug 1998 22:15:44 -0700
+
 debhelper (1.1.13) unstable; urgency=low
 
   * dh_installmanpages: rewritten in perl. Allows me to fix bug #26221 (long
