@@ -72,6 +72,12 @@ sub init {
 	$dh{FIRSTPACKAGE}=${$dh{DOPACKAGES}}[0];
 }
 
+# Escapes out shell metacharacters in a word of shell script.
+sub escape_shell { my $word=shift;
+	$word=~s/([\s><&!\[\]\{\}\(\)\$])/\\$1/g;
+	return $word;
+}
+
 # Run a command, and display the command to stdout if verbose mode is on.
 # All commands that modifiy files in $TMP should be ran via this 
 # function.
@@ -79,7 +85,7 @@ sub init {
 # Note that this cannot handle complex commands, especially anything
 # involving redirection. Use complex_doit instead.
 sub doit {
-	verbose_print(join(" ",@_));
+	verbose_print(join(" ",map { escape_shell($_) } @_));
 	
 	if (! $dh{NO_ACT}) {
 		system(@_) == 0
@@ -171,30 +177,30 @@ sub pkgext { my $package=shift;
 # As a side effect, sets $dh{VERSION} to the version of this package.
 {
 	# Caches return code so it only needs to run dpkg-parsechangelog once.
-	my $isnative_cache;
+	my %isnative_cache;
 	
 	sub isnative { my $package=shift;
-		if ($isnative_cache eq undef) {
+		if (! defined $isnative_cache{$package}) {
 			# Make sure we look at the correct changelog.
 			my $isnative_changelog=pkgfile($package,"changelog");
 			if (! $isnative_changelog) {
 				$isnative_changelog="debian/changelog";
 			}
-			
+
 			# Get the package version.
 			my $version=`dpkg-parsechangelog -l$isnative_changelog`;
-			($dh{VERSION})=$version=~s/[^|\n]Version: \(.*\)\n//m;
-	
+			($dh{VERSION})=$version=~m/Version: (.*)/m;
+
 			# Is this a native Debian package?
 			if ($dh{VERSION}=~m/.*-/) {
-				$isnative_cache=1;
+				$isnative_cache{$package}=0;
 			}
 			else {
-				$isnative_cache=0;
+				$isnative_cache{$package}=1;
 			}
 		}
 	
-		return $isnative_cache;
+		return $isnative_cache{$package};
 	}
 }
 

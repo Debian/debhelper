@@ -1,11 +1,12 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Build the .deb package, assuming all the files are set up.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use Dh_Lib;
+init();
 
-for PACKAGE in $DH_DOPACKAGES; do
-	TMP=`tmpdir $PACKAGE`
-	doit "dpkg --build $TMP .."
-done
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	doit("dpkg","--build",$TMP,"..");
+}

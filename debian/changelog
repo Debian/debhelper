@@ -1,3 +1,23 @@
+debhelper (1.1.4) unstable; urgency=low
+
+  * dh_movefiles: fixed bug introduced in 1.1.1 where it would fail in some
+    cases if you tried to move a broken symlink.
+  * dh_installdocs: was only operating on the first package.
+  * dh_installexamples: rewritten in perl.
+  * Dh_Lib.pm: all multiple package operations were broken.
+  * Dh_Lib.pm: implemented complex_doit() and autoscript().
+  * Made all perl code work with use strict and -w (well, except
+    dh_getopt.pl, but that's a hack that'll go away one day).
+  * I didn't realize, but rewriting dh_installdocs in perl fixed bug #24686,
+    although this same problem applies to other debhelper programs... like
+    dh_installexamples, which had the same bug fixed when I rewrote it in
+    perl just now.
+  * Dh_Lib.pm: accidentially didn't check DH_VERBOSE if commands were not
+    passed any switches.
+  * Dh_Getopt.pm: --noscripts was broken.
+
+ -- Joey Hess <joeyh@master.debian.org>  Tue, 11 Aug 1998 12:44:04 -0700
+
 debhelper (1.1.3) unstable; urgency=low
 
   * dh_md5sums: -x was broken since version 1.1.1 - fixed.

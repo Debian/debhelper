@@ -5,19 +5,4 @@
 #
 # No longer - it was decided these files are a bad idea.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
-
-echo "* Note: dh_du does nothing and is deprecated. Remove it from debian/rules." >&2
-
-#for PACKAGE in $DH_DOPACKAGES; do
-#	TMP=`tmpdir $PACKAGE`
-#
-#	if [ ! -d "$TMP/DEBIAN" ]; then
-#		doit "install -d $TMP/DEBIAN"
-#	fi
-#
-#	# Note that the tabs in this next line are important.
-#	complex_doit "du -k $TMP | sed 's:	$TMP/:	:' | grep -v '	DEBIAN$' | grep -v '	$TMP$' >$TMP/DEBIAN/du"
-#	doit "chown root.root $TMP/DEBIAN/du"
-#done
+echo "dh_du: this program does nothing and is deprecated. Remove it from debian/rules." >&2

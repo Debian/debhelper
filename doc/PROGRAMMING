@@ -36,15 +36,18 @@ merge these modifications into the actual postinst scripts.
 
 There are always exceptions. Just ask me.
 
-Introducing dh_lib:
-------------------
+Introducing dh_lib and Dh_Lib.pm:
+--------------------------------
 
-All debhelper programs use the dh_lib library (actually it's a shell script)
-to parse their arguments and set some useful variables. It's not mandatory
-that your program use dh_lib, but it will make it a lot easier to keep it in
+dh_lib/Dh_lib.pm is the library used by all debhelper programs to parse
+their arguments and set some useful variables. It's not mandatory that your
+program use dh_lib/Dh_lib.pm, but it will make it a lot easier to keep it in
 sync with the rest of debhelper if it does, so this is highly encouraged.
+There are two versions of this library - dh_lib is a shell library, while
+Dh_Lib.pm is a perl module.
 
-Typically, you invoke dh_lib like this:
+Typically, you invoke dh_lib like this if your debhelper program is a shell
+script:
 
 PATH=debian:$PATH:/usr/lib/debhelper
 . dh_lib
@@ -53,74 +56,93 @@ The path statement is there to make your program look first in debian/ for
 dh_lib (so users can install a modified version there if necessary), then the
 rest of the path, then the canonical location of dh_lib, /usr/lib/debhelper.
 
+If you are writing a perl program instead, use Dh_lib.pm like this:
+
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use Dh_Lib;
+init();
+
+The BEGIN block is there to make perl look for the module in all the right
+places.
+
+Notice the init() function in the perl version. dh_lib automatically parses
+the command line and does some other initialization tasks. Dh_Lib.pm
+requires you to run init() to accomplish the same task.
+
 Argument processing:
 -------------------
 
 All debhelper programs should respond to certain arguments, such as -v, -i,
--a, and -p. To help you make this work right, dh_lib handles argument
-processing.
+-a, and -p. To help you make this work right, dh_lib/Dh_Lib.pm handles 
+argument processing.
 
 As soon as dh_lib loads, it processes any arguments that have been passed to
-your program. The following variables may be set during this stage; your
-program can use them later:
+your program. On the other hand, you need to call init() in Dh_Lib.pm before
+it will parse arguments.
+
+After argument processing, some global variables are used to hold the
+results; program can use them later. If using dh_lib, prefix DH_ to the name
+of each of these variables to get the name of the environment variable that
+is set. If using Dh_lib.pm, these variables are in the %dh hash.
 
 switch		variable	description
--v		DH_VERBOSE	should the program verbosely output what it is
+-v		VERBOSE		should the program verbosely output what it is
 				doing?
---no-act	DH_NO_ACT	should the program not actually do anything?
--i,-a,-p,-N	DH_DOPACKAGES	a space delimited list of the binary packages
-				to act on
--i,-p,-N	DH_DOINDEP	a space delimited list of the binary independent
+--no-act	NO_ACT		should the program not actually do anything?
+-i,-a,-p,-N	DOPACKAGES	a space delimited list of the binary packages
+				to act on (in Dh_Lib.pm, this is an array)
+-i,-p,-N	DOINDEP		a space delimited list of the binary independent
 				packages to act on
--a,-p,-N	DH_DOARCH	a space delimited list of the binary dependent
+-a,-p,-N	DOARCH		a space delimited list of the binary dependent
 				packages to act on
--n		DH_NOSCRIPTS	if set, do not make any modifications to the 
+-n		NOSCRIPTS	if set, do not make any modifications to the 
 				package's postinst, postrm, etc scripts.
--X		DH_EXCLUDE	exclude a something from processing (you
+-X		EXCLUDE		exclude a something from processing (you
 				decide what this means for your program)
-		DH_EXCLUDE_GREP	same as DH_EXCLUDE, except all items are
+				(In Dh_Lib.pm, this is an array)
+		EXCLUDE_GREP	same as DH_EXCLUDE, except all items are
 				separated by '|' characters, instead of spaces,
-				handy for egrep -v
-                DH_EXCLUDE_FIND same as DH_EXCLUDE, except all items are put
+				handy for egrep -v (only available to dh_lib)
+                EXCLUDE_FIND	same as DH_EXCLUDE, except all items are put
 				into a string in a way that they will make
 				find find them. (Use ! in front to negate
-				that, of course)
--x		DH_INCLUDE_CONFFILES
+				that, of course) (only available to dh_lib)
+-x		INCLUDE_CONFFILES
 				include conffiles. It's -x for obscure
 				historical reasons.
--d		DH_D_FLAG	you decide what this means to your program
--r		DH_R_FLAG	you decide what this means to your program
--k		DH_K_FLAG	you decide what this means to your program
--P		DH_TMPDIR	package build directory (implies only one
+-d		D_FLAG		you decide what this means to your program
+-r		R_FLAG		you decide what this means to your program
+-k		K_FLAG		you decide what this means to your program
+-P		TMPDIR		package build directory (implies only one
 				package is being acted on)
--u		DH_U_PARAMS	will be set to a string, that is typically
+-u		U_PARAMS	will be set to a string, that is typically
 				parameters your program passes on to some
 				other program.
--m		DH_M_PARAMS	will be set to a string, you decide what it
+-m		M_PARAMS	will be set to a string, you decide what it
 				means to your program
--V		DH_V_FLAG	will be set to a string, you decide what it
+-V		V_FLAG		will be set to a string, you decide what it
 				means to your program
--V		DH_V_FLAG_SET	will be 1 if -V was specified, even if no
+-V		V_FLAG_SET	will be 1 if -V was specified, even if no
 				parameters were passed along with the -V
--A		DH_PARAMS_ALL	generally means that additional command line
+-A		PARAMS_ALL	generally means that additional command line
 				parameters passed to the program (other than
 				those processed here), will apply to all 
 				binary packages the program acts on, not just
 				the first
---init-script	DH_INIT_SCRIPT	will be set to a string, which specifies an
+--init-script	INIT_SCRIPT	will be set to a string, which specifies an
 				init script name (probably only
 				dh_installinit will ever use this)
 
 Any additional command line parameters that do not start with "-" will be 
-ignored, and you can access them later just as you normally would ($1, $2,
-etc).
+ignored, and you can access them later just as you normally would.
 
 If you need a new command line option, just ask me, and I will add it.
 
 Global variables:
 ----------------
 
-The following variables are also set, you can use any of them:
+If using dh_lib, the following variables are also set as soon as you load
+the library:
 
 MAINPACKAGE	the name of the first binary package listed in
 		debian/control
@@ -128,21 +150,28 @@ DH_FIRSTPACKAGE	the first package we were instructed to act on. This package
 		typically gets special treatment, additional arguments
 		specified on the command line may effect it.
 
+If using Dh_Lib.pm, these are only set after init(), and they are named
+$dh{MAINPACKAGE} and $dh{FIRSTPACKAGE}, instead.
+
 Functions:
 ---------
 
-Dh_lib also contains a number of functions you may find useful.
+dh_lib/Dh_Lib.pm also contains a number of functions you may find useful.
+Note that the functions calling conventions are slightly different between
+the two versions of the library.
 
 doit()
-	Pass this function a string that is a shell command. It will run the
-	command (unless DH_NO_ACT is set), and if DH_VERBOSE is set, it will
-	also output the command to stdout. You should use this function for
-	almost all commands your program performs that manipulate files in
-	the package build directories.
+	Pass this function a string (dh_lib) or array (Dh_Lib.pm) that is a 
+	shell command. It will run the command (unless DH_NO_ACT is set), and
+	if DH_VERBOSE is set, it will also output the command to stdout. You
+	should use this function for almost all commands your program performs
+	that manipulate files in the package build directories.
 complex_doit()
-	This is the same as doit(), except you can pass more complicated
-	commands to it (ie, commands involving piping redirection)
-verbose_echo()
+	Pass this function a string that is a shell command, it will run it
+	similarly to how doit() does. You can pass more complicated commands 
+	to this (ie, commands involving piping redirection)
+verbose_echo()   (dh_lib)
+verbose_print()  (Dh_Lib.pm)
 	Pass this command a string, and it will echo it if DH_VERBOSE is set.
 error()
 	Pass this command a string, it will output it to standard error and
@@ -174,18 +203,13 @@ isnative()
 	As a side effect, VERSION is set to the version number of the
 	package.
 autoscript()
-	Pass 3 parameters:
-	 1: script to add to
-	 2: filename of snippet
-	 3: sed commands to run on the snippet. Ie, s/#PACKAGE#/$PACKAGE/
-	    (optional)
+	Pass parameters:
+	 - package to be affected (Dh_Lib.pm only)
+	 - script to add to
+	 - filename of snippet
+	 - sed commands to run on the snippet. Ie, s/#PACKAGE#/$PACKAGE/
+	   (optional)
 	This command automatically adds shell script snippets to a debian
 	maintainer script (like the postinst or prerm).
-
-Notes:
------
-
-Dh_lib is still evolving.
-There will probably be a perl version too, in the future.
 
 -- Joey Hess <joeyh@master.debian.org>

@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Installs debian/changelog. If another filename is passed to it, installs
 # that file as the upstream changelog.
@@ -7,35 +7,41 @@
 # if so, the debian changelog is just installed as "changelog", and it is an 
 # error to specify an upstream changelog on the command line.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use Dh_Lib;
+init();
 
-UPSTREAM=$1
+$upstream=shift;
 
-if isnative && [ "$UPSTREAM" ]; then
-	error "Cannot specify an upstream changelog for a native debian package."
-fi
+if (isnative($dh{MAINPACKAGE}) && defined $upstream) {
+	error("Cannot specify an upstream changelog for a native debian package.");
+}
 
-if isnative; then
-	CHANGELOG_NAME=changelog
-else
-	CHANGELOG_NAME=changelog.Debian
-fi
+if (isnative($dh{MAINPACKAGE})) {
+	$changelog_name='changelog';
+}
+else {
+	$changelog_name='changelog.Debian';
+}
 
-for PACKAGE in $DH_DOPACKAGES; do
-	TMP=`tmpdir $PACKAGE`
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$changelog=pkgfile($PACKAGE,"changelog");
 
-	changelog=`pkgfile $PACKAGE changelog`
-	if [ ! "$changelog" ]; then
-		changelog=debian/changelog
-	fi
+	if (!$changelog) {
+		$changelog="debian/changelog";
+	}
 
-	if [ ! -d $TMP/usr/doc/$PACKAGE ]; then
-		doit "install -d $TMP/usr/doc/$PACKAGE"
-	fi
-	doit "install -p -m644 $changelog $TMP/usr/doc/$PACKAGE/$CHANGELOG_NAME"
+	if (! -e $changelog) {
+		error("could not find changelog $changelog");
+	}
 
-	if [ "$UPSTREAM" ]; then
-		doit "install -p -m644 $UPSTREAM $TMP/usr/doc/$PACKAGE/changelog"
-	fi
-done
+	if (! -d "$TMP/usr/doc/$PACKAGE") {
+		doit("install","-d","$TMP/usr/doc/$PACKAGE");
+	}
+	doit("install","-p","-m644",$changelog,"$TMP/usr/doc/$PACKAGE/$changelog_name");
+
+	if ($upstream) {
+		doit("install","-p","-m644",$upstream,"$TMP/usr/doc/$PACKAGE/changelog");
+	}
+}
