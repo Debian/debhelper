@@ -187,12 +187,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			}
 			$verdeps{$pyver} |= PY_MODULE if($deps & PY_MODULE);
 		}
-		if ($verdeps{$pyver} & PY_MODULE) {
+		if ($verdeps{$pyver} & PY_MODULE && ! $dh{NOSCRIPTS}) {
 			autoscript($package,"postinst","postinst-python","s%#PYVER#%$pyver%;s%#DIRLIST#%$pydir%");
 			$need_prerm = 1;
 		}
 	}
-	if ($need_prerm) {
+	if ($need_prerm && ! $dh{NOSCRIPTS}) {
 		autoscript($package,"prerm","prerm-python","s%#PACKAGE#%$package%");
 	}
 }
