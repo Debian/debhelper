@@ -21,12 +21,12 @@ Debhelper programs should accept the options, -v, -i, -a, -p, --no-act, and
 options may be ignored.
 
 If debhelper commands need config files, they should use
-debian/package.filename as the name of the confile file (replace filename
+debian/package.filename as the name of the config file (replace filename
 with whatever your command wants), and debian/filename should also be
-checked for config information for the first binart package in
+checked for config information for the first binary package in
 debian/control. Also, debhelper commands should accept the same sort of
 information that appears in the config files, on their command lines, if
-possible, and apply that information to the first package thay act on.
+possible, and apply that information to the first package they act on.
 
 Debhelper programs should never modify the debian/postinst, debian/prerm,
 etc scripts, instead, they can add lines to debian/postinst.debhelper, etc. 
@@ -36,7 +36,7 @@ merge these modifications into the actual postinst scripts.
 
 There are always exceptions. Just ask me.
 
-Intoroducing dh_lib:
+Introducing dh_lib:
 -------------------
 
 All debhelper programs use the dh_lib library (actually it's a shell script)
@@ -51,13 +51,13 @@ PATH=debian:$PATH:/usr/lib/debhelper
 
 The path statement is there to make your program look first in debian/ for
 dh_lib (so users can install a modified version there if necessary), then the
-rest of the path, then the canoical location of dh_lib, /usr/lib/debhelper.
+rest of the path, then the canonical location of dh_lib, /usr/lib/debhelper.
 
 Argument processing:
 -------------------
 
-All debhelper programs should respond to certian arguemnts, such as -v, -i,
--a, and -p. To help you make this work right, dh_lib handles argumeny
+All debhelper programs should respond to certain arguments, such as -v, -i,
+-a, and -p. To help you make this work right, dh_lib handles argument
 processing.
 
 As soon as dh_lib loads, it processes any arguments that have been passed to
@@ -70,12 +70,12 @@ switch		variable	description
 --no-act	DH_NO_ACT	should the program not actually do anything?
 -i,-a,-p	DH_DOPACKAGES	a space delimited list of the binary packages
 				to act on
--i,-p		DH_DOINDEP	a space delimited list of the binary independant
+-i,-p		DH_DOINDEP	a space delimited list of the binary independent
 				packages to act on
--a,-p		DH_DOARCH	a space delimited list of the binary dependant
+-a,-p		DH_DOARCH	a space delimited list of the binary dependent
 				packages to act on
 -n		DH_NOSCRIPTS	if set, do not make any modifications to the 
-				package's postinst, posrtm, etc scripts.
+				package's postinst, postrm, etc scripts.
 -x		DH_EXCLUDE	exclude a something from processing (you
 				decide what this means for your program)
 -d		DH_D_FLAG	you decide what this means to your program
@@ -115,7 +115,7 @@ The following variables are also set, you can use any of them:
 MAINPACKAGE	the name of the first binary package listed in
 		debian/control
 DH_FIRSTPACKAGE	the first package we were instructed to act on. This package
-		typically gets special tratment, addiiional arguments
+		typically gets special treatment, additional arguments
 		specified on the command line may effect it.
 
 Functions:
@@ -147,7 +147,7 @@ pkgfile()
 	file, and it will return the actual filename to use. This is used
 	for allowing debhelper programs to have configuration files in the
 	debian/ directory, so there can be one config file per binary
-	package. The conversion is that the files are named
+	package. The convention is that the files are named
 	debian/package.filename, and debian/filename is also allowable for
 	the MAINPACKAGE. If the file does not exist, nothing is returned.
 pkgext()
