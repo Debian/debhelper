@@ -13,12 +13,12 @@ for PACKAGE in $DH_DOPACKAGES; do
 	# Run the file name gatering commands from within the directory
 	# structure that will be effected.
 	olddir=`pwd`
-	cd $TMP
+	doit "cd $TMP"
 
-	if [ -f ../${EXT}compress ]; then
+	if [ -f $olddir/${EXT}compress ]; then
 		# The config file is a sh script that outputs the files to be compressed
 		# (typically using find).
-		files=`sh ../${EXT}compress 2>/dev/null`
+		files=`sh $olddir/${EXT}compress 2>/dev/null`
 	else
 		# By default fall back on what the policy manual says to compress.
 		files=`
@@ -26,7 +26,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 			find usr/doc -type f \( -size +4k -or -name "changelog*" \) \
 				! -name "*.htm*" ! -name "*.gif" \
 				! -name "copyright" 2>/dev/null
-		`
+			`
 	fi
 
 	if [ "$files" ]; then
@@ -37,7 +37,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 	fi
 
 	# Change back to old pwd.
-	cd $olddir
+	doit "cd $olddir"
 
 	# Fix up symlinks that were pointing to the uncompressed files.
 	for file in `find $TMP -type l`; do

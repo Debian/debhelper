@@ -19,7 +19,8 @@ for PACKAGE in $DH_DOPACKAGES; do
 		complex_doit "sort $TMP/DEBIAN/conffiles | comm -13 - $TMP/DEBIAN/allfiles > $TMP/DEBIAN/allfiles.new"
 		doit "mv $TMP/DEBIAN/allfiles.new $TMP/DEBIAN/allfiles"
 	fi
-	complex_doit "cd $TMP ; sed 's:^/::' < DEBIAN/allfiles | xargs md5sum > DEBIAN/md5sums ; cd ../.."
+	olddir=`pwd`
+	complex_doit "cd $TMP ; sed 's:^/::' < DEBIAN/allfiles | xargs md5sum > DEBIAN/md5sums ; cd $olddir"
 	doit "chown root.root $TMP/DEBIAN/md5sums"
 	doit "rm -f $TMP/DEBIAN/allfiles"
 done

@@ -31,8 +31,9 @@ for PACKAGE in $DH_DOPACKAGES; do
 			fi
 		done
 		# Create dirs.
+		olddir=`pwd`
 		doit "cd $TMP"
 		doit "install -d $dirs"
-		doit "cd ../.."
+		doit "cd $olddir"
 	fi
 done
