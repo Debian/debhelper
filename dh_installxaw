@@ -3,11 +3,11 @@
 # Integration with xaw-wrappers
 #
 # If debian/xaw-wrappers file exists, save it to 
-# $TMP/usr/lib/xaw-wrappers/conf/$PACKAGE
+# $TMP/usr/share/xaw-wrappers/config/$PACKAGE
 #
 # Also, add calls to postinst and postrm.
 
-BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+BEGIN { push @INC, "debian", "/usr/share/debhelper" }
 use Dh_Lib;
 init();
 
@@ -16,14 +16,49 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	$xaw=pkgfile($PACKAGE,'xaw');
 
 	if ($xaw ne '') {
-		if (! -d "$TMP/usr/lib/xaw-wrappers/conf") {
-			doit("install","-d","$TMP/usr/lib/xaw-wrappers/conf");
+		if (! -d "$TMP/usr/share/xaw-wrappers/config") {
+			doit("install","-d","$TMP/usr/share/xaw-wrappers/config");
 		}
 		doit("install","-p","-m644",$xaw,
-		     "$TMP/usr/lib/xaw-wrappers/conf/$PACKAGE");
+			"$TMP/usr/share/xaw-wrappers/config/$PACKAGE");
 
 		if (! $dh{NOSCRIPTS}) {
-			autoscript($PACKAGE,"postinst","postinst-xaw");
+			# Parse the xaw conf file to figure out what programs
+			# and link names are present in it. Have to pass
+			# those into the scripts.
+			my %data;
+			my $install_opts='';
+			my $remove_opts='';
+			my $stanza='';
+			
+			open (IN,$xaw);
+			while (<IN>) {
+				chomp;
+				s/\s+/ /g;
+				if (/^#/ eq '') {
+					if (/(.*?):\s?(.*)/) {
+						$data{lc($1)}=$2;
+						$stanza=1;
+					}
+					elsif ($stanza) {
+						$install_opts.="'$data{program} $data{'link-name'} $data{wrapped}' ";
+						$remove_opts.="'$data{'link-name'} $data{wrapped}' ";
+						undef %data;
+						$stanza='';
+					}
+				}
+			}
+			close IN;
+
+			if ($stanza) {
+				$install_opts.="'$data{program} $data{'link-name'} $data{wrapped}'";
+				$remove_opts.="'$data{'link-name'} $data{wrapped}'";
+			}
+			
+			autoscript($PACKAGE,"postinst","postinst-xaw",
+				"s:#OPTS#:$install_opts:");
+			autoscript($PACKAGE,"prerm","prerm-xaw",
+				"s:#OPTS#:$remove_opts:");
 			autoscript($PACKAGE,"postrm","postrm-xaw");
 		}
 	}
