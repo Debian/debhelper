@@ -16,11 +16,12 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 DESCRIPTION
 
-dh_installman is a debhelper program that handles for installing
+dh_installman is a debhelper program that handles installing
 man pages into the correct locations in package build directories. You tell
 it what man pages go in your packages, and it figures out where to
 install them based on the section field in their .TH line and their filename
-extention.
+extention. It also supports translated man pages, by looking for extentions
+like .ll.8 and .ll_LL.8
 
 Any man page filenames specified as parameters will be installed into the
 first package dh_installman is told to act on. By default, this is the
@@ -115,19 +116,21 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			error("Could not determine section for $page");
 		}
 		
-		my $destdir="$tmp/usr/share/man/man$realsection/";
-		# Translated man pages are typically specified by adding the
-		# language code to the filename, so detect that and
-		# redirect to appropriate directory.
-		my ($langcode)=$basename=~m/.*\.([a-z][a-z](?:_[A-Z][A-Z])?)\.(?:[1-9]|man)/;
-		if (defined $langcode && $langcode ne '') {
-			$destdir="$tmp/usr/share/man/$langcode/man$section/";
-		}
-		$destdir=~tr:/:/:s; # just for looks
-
 		# Get the man page's name -- everything up to the last dot.
 		my ($instname)=$basename=~m/^(.*)\./;
 	
+		my $destdir="$tmp/usr/share/man/man$realsection/";
+		# Translated man pages are typically specified by adding the
+		# language code to the filename, so detect that and
+		# redirect to appropriate directory, stripping the code.
+		my ($langcode)=$basename=~m/.*\.([a-z][a-z](?:_[A-Z][A-Z])?)\.(?:[1-9]|man)/;
+		if (defined $langcode && $langcode ne '') {
+			$destdir="$tmp/usr/share/man/$langcode/man$section/";
+			# Strip the language code from the instname.
+			$instname=~s/\.$langcode$//;
+		}
+		$destdir=~tr:/:/:s; # just for looks
+
 		if (! -e "$destdir/$instname.$section" && 
 		    ! -l "$destdir/$instname.$section") {
 			if (! -d $destdir) {
