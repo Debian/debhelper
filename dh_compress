@@ -31,10 +31,17 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	}
 	else {
 		# By default, fall back to what the policy manual says to compress.
+		# Note that all the excludes of odd things like _z are because
+		# gzip refuses to compress such files, assumming they are zip files.
+		# I looked at the gzip source to get the complete list of such
+		# extentions. ".gz", ".z", ".taz", ".tgz", "-gz", "-z", "_z"
+		
 		push @files, split(/\n/,`
 			find usr/info usr/man usr/X11*/man -type f ! -name "*.gz" 2>/dev/null || true;
 			find usr/doc -type f \\( -size +4k -or -name "changelog*" \\) \\
-				! -name "*.htm*" ! -name "*.gif" ! -name "*.gz" \\
+				! -name "*.htm*" ! -name "*.gif" ! -iname "*.gz" \\
+				! -iname "*.taz" ! -iname "*.tgz" ! -iname "*.z" \\
+				! -iname "*-gz" ! -iname "*-z" ! -iname "*_z" \\
 				! -name "copyright" 2>/dev/null || true
 		`);
 	}

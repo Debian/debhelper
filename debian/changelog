@@ -1,3 +1,16 @@
+debhelper (1.2.53) unstable; urgency=low
+
+  * dh_compress: leave .taz and .tgz files alone. Previously trying to
+    compress such files caused gzip to fail and the whole command to fail.
+    Probably fixes #35677. Actually, it now skips files with a whole
+    range of odd suffixes that gzip refuses to compress, including "_z" and
+    "-gz".
+  * dh_compress.1: updated docs to reflect this, and to give the new
+    suggested starting point if you want to write your own debian/compress
+    file.
+
+ -- Joey Hess <joeyh@master.debian.org>  Wed,  7 Apr 1999 02:20:14 -0700
+
 debhelper (1.2.52) unstable; urgency=low
 
   * dh_installmodules: new program, closes #32546.
