@@ -1,0 +1,30 @@
+#!/bin/sh -e
+#
+# Strip files.
+
+PATH=debian:$PATH:/usr/lib/debhelper
+source dh_lib
+
+for PACKAGE in $DH_DOPACKAGES; do
+	TMP=`tmpdir $PACKAGE`
+	
+	# Handle executables and shared libraries.
+	for file in `find debian/$TMP -type f \( -perm +111 -or -name "*.so*" \) 2>/dev/null` ; do
+		case "`file $file`" in
+			*ELF*shared*)
+				doit "strip --strip-unneeded $file"
+			;;
+			*ELF*executable*)
+				doit "strip --remove-section=comment --remove-section=note $file"
+			;;
+		esac
+	done
+
+	# Handle static libraries.
+	for file in `find debian/$TMP -type f -name "lib*.a" 2>/dev/null` ; do
+		# Don't strip debug libraries.
+		if ! expr "$file" : ".*_g\.a" >/dev/null ; then
+			doit "strip --strip-debug $file"
+		fi
+	done
+done

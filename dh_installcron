@@ -1,0 +1,20 @@
+#!/bin/sh -e
+#
+# Install cron scripts into the appropriate places.
+
+PATH=debian:$PATH:/usr/lib/debhelper
+source dh_lib
+
+for PACKAGE in $DH_DOPACKAGES; do
+	TMP=`tmpdir $PACKAGE`
+	EXT=`pkgext $PACKAGE`
+
+	for type in daily weekly monthly; do
+		if [ -e debian/${EXT}cron.$type ]; then
+			if [ ! -d debian/$TMP/etc/cron.$type ]; then
+				doit "install -o root -g root -d debian/$TMP/etc/cron.$type"
+			fi
+			doit "install debian/${EXT}cron.$type debian/$TMP/etc/cron.$type/$PACKAGE"
+		fi
+	done
+done
