@@ -67,7 +67,7 @@ my $python_version = `$python -V 2>&1`;
 if ("$python_version" eq "") {
 	error("Python is not installed, aborting. (Probably forgot to Build-Depend on python.)");
 }
-elsif ($python_version =~ m/^Python\s+(\d+)\.(\d+)\.\d+\n$/) {
+elsif ($python_version =~ m/^Python\s+(\d+)\.(\d+)\.\d+\+?\n$/) {
 	$python_version = "$1.$2" ;
 	$python_major = $1 ;
 } else { 
