@@ -1,14 +1,63 @@
 #!/usr/bin/perl -w
-#
-# Installs debian/changelog. If another filename is passed to it, installs
-# that file as the upstream changelog.
-#
-# Looks at debian/control to determine if this is a native debian package,
-# if so, the debian changelog is just installed as "changelog", and it is an 
-# error to specify an upstream changelog on the command line.
+
+=head1 NAME
+
+dh_installchangelogs - install changelogs into package build directories
+
+=cut
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_installchangelogs [debhelper options] [-k] [upstream]
+
+=head1 DESCRIPTION
+
+dh_installchangelogs is a debhelper program that is responsible for
+installing changelogs into package build directories.
+
+dh_installchangelogs determines if the package is a debian native package,
+and if so, it installs debian/changelog into usr/share/doc/package/changelog
+in the package build directory. Otherwise, it installs debian/changelog
+into usr/share/doc/package/changelog.Debian in the package build directory. (If
+files named debian/package.changelog exist, they will be used in preference
+to debian/changelog.)
+
+If an upstream changelog file is specified as an option, and the package is
+not a native debian package, then this upstream changelog will be installed
+as usr/share/doc/package/changelog in the package build directory. If the
+changelog is a html file (determined by file extension), it will be
+installed as usr/share/doc/package/changelog.html instead, and will be
+converted to plain text with lynx to generate
+usr/share/doc/package/changelog.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-k>, B<--keep>
+
+Keep the original name of the upstream changelog. This will be accomplished
+by installing the upstream changelog as "changelog", and making a symlink from
+that to the original name of the changelog file. This can be useful if the
+upstream changelog has an unusual name, or if other documentation in the
+package refers to the changelog file.
+
+=item I<upstream>
+
+Install this file as the upstream changelog.
+
+=back
+
+=head1 NOTES
+
+It is an error to specify an upstream changelog file for a debian native
+package.
+
+=cut
+
 init();
 
 my $upstream=shift;
@@ -66,3 +115,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 	}
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

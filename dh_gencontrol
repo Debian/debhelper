@@ -1,9 +1,39 @@
 #!/usr/bin/perl -w
-#
-# Generate and install the control file. Simple dpkg-gencontrol wrapper.
+
+=head1 NAME
+
+dh_gencontrol - generate and install control file
+
+=cut
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_gencontrol [debhelper options] [-uparams] [-- params]
+
+=head1 DESCRIPTION
+
+dh_gencontrol is a debhelper program that is responsible for generating
+control files, and installing them into the DEBIAN directory with the
+proper permissions.
+
+This program is merely a wrapper around L<dpkg-gencontrol(1)>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-u>I<params>, B<--dpkg-gencontrol-params>I<params>
+=item B<--> I<params>
+
+Pass "params" to L<dpkg-gencontrol(1)>.
+
+=back
+
+=cut
+
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -29,3 +59,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	doit("chown","0.0","$tmp/DEBIAN/control");
 }
 
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut
