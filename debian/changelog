@@ -1,3 +1,12 @@
+debhelper (1.2.76) unstable; urgency=low
+
+  * dh_fixperms: Do not use chmod/chown -R at all anymore, instead it uses
+    the (slower) find then chown method. Necessary because the -R methods will
+    happyily attempt to chown a dangling symlink, which makes them fail.
+    (Closes: #38911)
+
+ -- Joey Hess <joeyh@master.debian.org>  Mon,  7 Jun 1999 20:20:01 -0700
+
 debhelper (1.2.75) unstable; urgency=low
 
   * dh_installemacsen: fixed perms of install, remove scripts.

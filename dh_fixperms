@@ -9,26 +9,19 @@ init();
 foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	$TMP=tmpdir($PACKAGE);
 
-	# General permissions fixing.
 	if (! defined($dh{EXCLUDE_FIND}) || $dh{EXCLUDE_FIND} eq '') {
-		# It's much faster to do it this way, but we can only do
-		# this if there is nothing to exclude.
-		if (-d $TMP) {
-			doit("chown","-R","root.root",$TMP);
-			doit("chmod","-R","go=rX,u+rw,a-s",$TMP);
-		}
-
 		$find_options="";
 	}
 	else {
-		# Do it the hard way.
-		complex_doit("find $TMP ! -type l ! \\( $dh{EXCLUDE_FIND} \\) -print0",
-			"2>/dev/null | xargs -0r chown root.root");
-		complex_doit("find $TMP ! -type l ! \\( $dh{EXCLUDE_FIND} \\) -print0",
-			"2>/dev/null | xargs -0r chmod go=rX,u+rw,a-s");
-
 		$find_options="! \\( $dh{EXCLUDE_FIND} \\)";
 	}
+
+	# General permissions fixing.
+	complex_doit("find $TMP ! -type l $find_options -print0",
+		"2>/dev/null | xargs -0r chown root.root");
+	complex_doit("find $TMP ! -type l $find_options -print0",
+		"2>/dev/null | xargs -0r chmod go=rX,u+rw,a-s");
+		
 
 	# Fix up premissions in usr/doc, setting everything to not exectable
 	# by default, but leave examples directories alone.
