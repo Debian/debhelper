@@ -1,3 +1,12 @@
+debhelper (2.0.16) unstable; urgency=low
+
+  * Dh_lib.pm: when looking for debhelper files in debian/, test with -f,
+    not with -e, because it might fail if you're building a package named,
+    say, 'docs', with a temp dir of debian/docs. I don't anticipate this
+    ever happenning, but it pays to be safe.
+
+ -- Joey Hess <joeyh@master.debian.org>  Tue, 20 Jul 1999 21:00:04 -0700
+
 debhelper (2.0.15) unstable; urgency=low
 
   * dh_clean: only force-remove debian/tmp if in v2 mode. In v1 mode, we
