@@ -75,6 +75,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		"\\( -name '*.so*' -or -name '*.la' -or -name '*.a' \\) $find_options -print0",
 		"2>/dev/null | xargs -0r chmod 644");
 	
+	# ..and header files ..
+	complex_doit("find $tmp/usr/include  -type f",
+		"-name '*.h' $find_options -print0",
+		"2>/dev/null | xargs -0r chmod 644");
+	
 	# .. and perl modules.
 	complex_doit("find $tmp/usr/lib/perl5 $tmp/usr/share/perl5 -type f",
 		"-perm -5 -name '*.pm' $find_options -print0",
