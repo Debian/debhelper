@@ -25,7 +25,7 @@ fragements to call F<update-desktop-database>.
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
-	y $tmp=tmpdir($package);
+	my $tmp=tmpdir($package);
 
 	if (-d "$tmp/usr/share/applications") {
 		# Get a list of the desktop files that are in
