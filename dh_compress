@@ -88,8 +88,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		push @files, split(/\n/,`sh $olddir/$compress 2>/dev/null`);
 	}
 	else {
-		# By default, fall back to what the policy manual says to
-		# compress. Note that all the excludes of odd things like _z 
+		# Note that all the excludes of odd things like _z 
 		# are because gzip refuses to compress such files, assumming
 		# they are zip files. I looked at the gzip source to get the
 		# complete list of such extensions: ".gz", ".z", ".taz", 
@@ -99,7 +98,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			find usr/doc usr/share/doc -type f \\( -size +4k -or -name "changelog*" \\) \\
 				\\( -name changelog.html -or ! -iname "*.htm*" \\) \\
 				! -iname "*.gif" ! -iname "*.png" ! -iname "*.jpg" ! -iname "*.jpeg" ! -iname "*.gz" \\
-				! -iname "*.taz" ! -iname "*.tgz" ! -iname "*.z" \\
+				! -iname "*.taz" ! -iname "*.tgz" ! -iname "*.z" ! -iname "*.bz2" \\
 				! -iname "*-gz" ! -iname "*-z" ! -iname "*_z" \\
 				! -name "copyright" 2>/dev/null || true
 		`);
