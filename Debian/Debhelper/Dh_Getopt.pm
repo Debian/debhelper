@@ -101,6 +101,7 @@ sub parseopts {
 	
 		"r" => \$options{R_FLAG},
 		"no-restart-on-upgrade" => \$options{R_FLAG},
+		"no-start" => \$options{NO_START},
 	
 		"k" => \$options{K_FLAG},
 		"keep" => \$options{K_FLAG},

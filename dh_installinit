@@ -40,7 +40,12 @@ Do not modify postinst/postrm/prerm scripts.
 
 =item B<-r>, B<--no-restart-on-upgrade>
 
-Do not restart daemon on upgrade.
+Do not restart init script on upgrade.
+
+=item B<--no-start>
+
+Do not start the init script at on install or upgrade, or stop it on removal.
+Only call update-rc.d. Useful for rcS scripts.
 
 =item B<-d>, B<--remove-d>
 
@@ -135,19 +140,29 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 		my $substvaradded=0;
 		if (! $dh{NOSCRIPTS}) {
-			autoscript($package,"postinst", "postinst-init",
-				"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
-			# -r on the command line sets R_FLAG. If it's set,
-			# there  is no restart on upgrade, so don't stop
-			# daemon. (It's ok that it's always started.)
-			if ($dh{R_FLAG}) {
-				autoscript($package,"prerm","prerm-init-norestart",
+			if (! $dh{NO_START}) {
+				# update-rc.d, and start script
+				autoscript($package,"postinst", "postinst-init",
 					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
+			
+				if ($dh{R_FLAG}) {
+					# stops script only on remove
+					autoscript($package,"prerm","prerm-init-norestart",
+						"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
+				}
+				else {
+					# always stops script
+					autoscript($package,"prerm","prerm-init",
+						"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
+				}
 			}
 			else {
-				autoscript($package,"prerm","prerm-init",
+				# just update-rc.d
+				autoscript($package,"postinst", "postinst-init-nostart",
 					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
 			}
+
+			# removes rc.d links
 			autoscript($package,"postrm","postrm-init",
 				"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
 		}
