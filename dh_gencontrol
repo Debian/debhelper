@@ -1,26 +1,30 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Generate and install the control file. Simple dpkg-gencontrol wrapper.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use Dh_Lib;
+init();
 
-for PACKAGE in $DH_DOPACKAGES; do
-	TMP=`tmpdir $PACKAGE`
-	EXT=`pkgext $PACKAGE`
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$EXT=pkgext($PACKAGE);
+	
+	$changelog=pkgfile($PACKAGE,'changelog');
+	if (! $changelog) {
+		$changelog='debian/changelog';
+	}
 
-	changelog=`pkgfile $PACKAGE changelog`
-	if [ ! "$changelog" ]; then
-		changelog=debian/changelog
-	fi
-
-	if [ ! -d $TMP/DEBIAN ]; then
-		doit "install -o root -g root -d $TMP/DEBIAN"
-	fi
+	if ( ! -d '$TMP/DEBIAN' ) {
+		doit("install","-o","root","-g","root","-d","$TMP/DEBIAN");
+	}
 
 	# Generate and install control file.
-	doit "dpkg-gencontrol -l$changelog -isp -p$PACKAGE -Tdebian/${EXT}substvars -P$TMP $DH_U_PARAMS"
+	doit("dpkg-gencontrol","-l$changelog","-isp","-p$PACKAGE",
+		"-Tdebian/$EXT\substvars","-P$TMP",@{$dh{U_PARAMS}});
+
 	# This chmod is only necessary if the user sets the umask to something odd.
-	doit "chmod 644 $TMP/DEBIAN/control"
-	doit "chown root.root $TMP/DEBIAN/control"
-done
+	doit("chmod","644","$TMP/DEBIAN/control");
+	
+	doit("chown","root.root","$TMP/DEBIAN/control");
+}

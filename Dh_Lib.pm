@@ -70,12 +70,19 @@ sub init {
 	# This package gets special treatement: files and directories specified on
 	# the command line may affect it.
 	$dh{FIRSTPACKAGE}=${$dh{DOPACKAGES}}[0];
+
+	# Split the U_PARAMS up into an array.
+	my $u=$dh{U_PARAMS};
+	undef $dh{U_PARAMS};
+	if (defined $u) {
+		push @{$dh{U_PARAMS}}, split(/\s+/,$u);
+	}
 }
 
 # Escapes out shell metacharacters in a word of shell script.
 sub escape_shell { my $word=shift;
-	# This list is from )Unix in a Nutshell_. (except '#')
-	$word=~s/([-\s!"$()*+#;<>?@\[\]\\`|~])/\\$1/g;
+	# This list is from _Unix in a Nutshell_. (except '#')
+	$word=~s/([\s!"\$()*+#;<>?@\[\]\\`|~])/\\$1/g;
 	return $word;
 }
 

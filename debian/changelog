@@ -1,3 +1,15 @@
+debhelper (1.1.8) unstable; urgency=low
+
+  * Dh_Lib.pm: made U_PARAMS an array of parameters.
+  * Dh_Lib.pm: fixed bug in the escaping code, numbers don't need to be
+    escaped. Also, no longer escape "-".
+  * dh_clean, dh_gencontrol, dh_installcron: converted to perl.
+  * dh_gencontrol.1, dh_gencontrol: the man page had said that
+    --update-rcd-params was equivilant to -u for this program. You should
+    really use --dpkg-gencontrol-params.
+
+ -- Joey Hess <joeyh@master.debian.org>  Fri, 14 Aug 1998 14:07:35 -0700
+
 debhelper (1.1.7) unstable; urgency=low
 
   * examples/rules.multi: moved dh_movefiles into the install section.

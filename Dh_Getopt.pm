@@ -90,6 +90,7 @@ sub parseopts {
 		"u=s", => \$options{U_PARAMS},
 		"update-rcd-params=s", => \$options{U_PARAMS},
 	        "dpkg-shlibdeps-params=s", => \$options{U_PARAMS},
+		"dpkg-gencontrol-params=s", => \$options{U_PARAMS},
 
 		"m=s", => \$options{M_PARAMS},
 		"major=s" => \$options{M_PARAMS},
