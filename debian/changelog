@@ -1,6 +1,5 @@
 debhelper (3.0.0) unstable; urgency=low
 
-  * The "Does the version number frighten you?" release.
   * Added dh_installman, a new program that replaces dh_installmanpages.
     It is not DWIM. You tell it what to install and it figures out where 
     based on .TH section field and filename extention. I reccommend everyone
@@ -24,15 +23,17 @@ debhelper (3.0.0) unstable; urgency=low
     a man page being in /usr/share/man is going to break many programs.
     Closes: #81853 (I hope the bug submitter doesn't care that
     dh_installmanpages still puts stuff in the X11R6/man directory.)
+  * Updated to current perl coding standards (use strict, lower-case
+    variable names, pod man pages).
   * Since with the fixing of the man page installer issue, my checklist for
     debhelper v3 is complete, I pronounce debhelper v3 done! Revved the
     version number appropriatly (a large jump; v3 changes less than I had
     planned).
   * Tonnes of changes here and there to mark v3 as done. I don't have a
     v4 planned at this time. All the big changes are done.
-  * Updated to current perl coding standards (use strict, lower-case
-    variable names). No perl-5.6isms though.
 *** move man pages into programs as pod docs ***
+*** build all my packages using new version, and ditching dh_installmanpages
+    mainly as a regression test..
 *** fix aj's bug, sigh ***
 
  -- Joey Hess <joeyh@debian.org>  Thu,  8 Feb 2001 14:29:58 -0800
