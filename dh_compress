@@ -22,9 +22,9 @@ for PACKAGE in $DH_DOPACKAGES; do
 	else
 		# By default fall back on what the policy manual says to compress.
 		files=`
-			find usr/info usr/man usr/X11*/man -type f 2>/dev/null ;
+			find usr/info usr/man usr/X11*/man -type f ! -name "*.gz" 2>/dev/null ;
 			find usr/doc -type f \( -size +4k -or -name "changelog*" \) \
-				! -name "*.htm*" ! -name "*.gif" \
+				! -name "*.htm*" ! -name "*.gif" ! -name "*.gz" \
 				! -name "copyright" 2>/dev/null ;
 			true
 			`

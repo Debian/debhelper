@@ -1,3 +1,16 @@
+debhelper (0.85) unstable; urgency=low
+
+  * Moved a few things around that were broken by Che's patch:
+    - dh_installdirs should go in install target.
+    - dh_clean should not run in binary targets.
+  * This is just a quick fix to make it work, I'm not happy with it. I'm
+    going to discuss my problems with it with Che, and either make a new
+    version fixing them, or revert to 0.83.
+  * So be warned that the example rules files are not currently in good
+    shape if you're starting a new package.
+
+ -- Joey Hess <joeyh@master.debian.org>  Sat, 18 Apr 1998 23:30:38 -0700
+
 debhelper (0.84) unstable; urgency=low
 
   * Applied Che_Fox'x patches to example rules files, which makes them use
