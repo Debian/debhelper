@@ -69,9 +69,9 @@ will automatically guess the destination even if this flag is not set.
 =item B<--list-missing>
 
 This option makes dh_install keep track of the files it installs, and then at
-the end, compare that list with the files in debian/tmp. If any of the files
-(and symlinks) in debian/tmp were not installed to somewhere, it will
-warn on stderr about that.
+the end, compare that list with the files in the source directory. If any of
+the files (and symlinks) in the source directory were not installed to
+somewhere, it will warn on stderr about that.
 
 This may be useful if you have a large package and want to make sure that
 you don't miss installing newly added files in new upstream releases.
@@ -79,10 +79,12 @@ you don't miss installing newly added files in new upstream releases.
 Note that files that are excluded from being moved via the -X option are not
 warned about.
 
+You need to use the --sourcedir parameter for this one to be of much use.
+
 =item B<--sourcedir=dir>
 
-Makes all source files be found under dir. If this is specified, it is akin 
-to all the source filenames having "dir/" prepended to them.
+Makes all source files be found under dir. If this is specified, it is
+akin to all the source filenames having "dir/" prepended to them.
 
 To make dh_install behave like the old dh_movefiles, move your
 package.files file to package.install and call dh_install with
@@ -103,17 +105,17 @@ init();
 
 my @installed;
 
+my $srcdir = '.';
+$srcdir = $dh{SOURCEDIR}."/" if defined $dh{SOURCEDIR};
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $file=pkgfile($package,"install");
-	my $srcdir = '.';
 
 	my @install;
 	if ($file) {
 		@install=filedoublearray($file); # no globbing yet
 	}
-	
-	$srcdir = $dh{SOURCEDIR}."/" if defined $dh{SOURCEDIR};
 	
 	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
 		push @install, [@ARGV];
@@ -178,7 +180,7 @@ if ($dh{LIST_MISSING}) {
 		-f || -l || return;
 		$_="$File::Find::dir/$_";
 		push @missing, $_ unless /$installed/;
-	}, './debian/tmp');
+	}, $srcdir);
 	if (@missing) {
 		warning "$_ not installed" foreach @missing;
 	}
