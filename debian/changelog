@@ -1,3 +1,14 @@
+debhelper (4.1.76) unstable; urgency=low
+
+  * Patch from Andrew Suffield <asuffield@debian.org> to make dh_strip
+    support saving the debugging symbols with a --keep-debug flag and
+    dh_shlibdeps skip /usr/lib/debug. Thanks! Closes: #215670
+  * Add --dbg-package flag to dh_strip, to list packages that have associated
+    -dbg packages. dh_strip will then move the debug symbols over to the
+    associated -dbg packages.
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 14 Oct 2003 14:18:06 -0400
+
 debhelper (4.1.75) unstable; urgency=low
 
   * dh_install: add --fail-missing option. Closes: #120026
