@@ -25,13 +25,9 @@ VERSION=$(shell expr "`dpkg-parsechangelog 2>/dev/null |grep Version:`" : '.*Ver
 
 build: test build-stamp
 build-stamp:
-	# Turn all executables and .pod files into man pages.
-	find . \( \( -type f -perm +1 -maxdepth 1 \) -or \
-		  \( -type f -name '*.pod' \) \) \
-		-exec pod2man -c Debhelper -r "$(VERSION)" {} {}.1 \;
-	mv -f debhelper.pod.1 debhelper.1
-	# Fix up the debhelper.1 man page, substituting in a list of all
-	# debhelper commands. Eek!
+	# Generate the main man page. All the perl cruft is to get a list
+	# of debhelper commands with short descriptions into the man page.
+	pod2man -c Debhelper -r "$(VERSION)" debhelper.pod | \
 	perl -e ' \
 		undef $$/; \
 		foreach (@ARGV) { \
@@ -43,13 +39,14 @@ build-stamp:
 		        } \
 		} \
 		END { \
-		        open(IN,"debhelper.1") or die "debhelper.1: $$!"; \
-			$$file=<IN>; \
-		        open(OUT,">debhelper.1") or die "debhelper.1: $$!";; \
-		        $$file=~s/#LIST#/$$collect/; \
-		        print OUT $$file; \
-		        close OUT; \
-		}' dh_*
+			while (<STDIN>) { \
+		        	s/#LIST#/$$collect/; \
+				print; \
+			}; \
+		}' `find . -type f -perm +1 -maxdepth 1 -name "dh_*"` > debhelper.1
+	# Turn all executables into man pages.
+	find . -type f -perm +1 -maxdepth 1 -name "dh_*" \
+		-exec pod2man -c Debhelper -r "$(VERSION)" {} {}.1 \;
 	touch build-stamp
 
 clean:
