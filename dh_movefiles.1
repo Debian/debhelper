@@ -39,6 +39,14 @@ Lists files to move. The filenames listed should be relative to debian/tmp/.
 You can also list directory names, and the whole directory will be moved. You
 can even use wildcards if you like. It is an error to list files here unless
 you use -p, -i, or -a to tell dh_movefiles which subpackage to put them in.
+.SH NOTES
+Note that files are always moved out of debian/tmp by default (even if you
+have instructed debhelper to use a compatability level higher than one,
+which does not otherwise use debian/tmp for anything at all). The idea
+behind this is that the package that is being built can be told to install
+into debian/tmp, and then files can be moved by dh_movefiles from that
+directory. Any files or directories that remain are ignored, and get
+deleted by dh_clean later.
 .SH ENVIRONMENT
 See
 .BR debhelper (1)
