@@ -93,7 +93,7 @@ sub testfile {
 	if ($mode & 0111) {
 		# Ok, expensive test.
 		my $type=get_file_type($_);
-		if ($type=~m/.*ELF.*executable.*/) {
+		if ($type=~m/.*ELF.*(executable|shared).*/) {
 			push @executables, $fn;
 			return;
 		}
