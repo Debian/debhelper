@@ -3,7 +3,7 @@
 dh_makeshlibs \- automatically create shlibs file
 .SH SYNOPSIS
 .B dh_makeshlibs
-.I "[-v] [-a] [-i] [-Ptmpdir] [-ppackage]"
+.I "[-v] [-a] [-i] [-mmajor] [-Ptmpdir] [-ppackage]"
 .SH "DESCRIPTION"
 dh_makeshlibs is a debhelper program that automatically scans for shared
 libraries, and generates a shlibs file for the libraries it finds.
@@ -26,6 +26,10 @@ Generate shlibs file for the package named "package".
 .TP
 .B \-Ptmpdir
 Use "tmpdir" for package build directory. 
+.TP
+.B \-mmajor
+Instead of trying to guess the major number of the library from the filename
+of the library, use the major number specified after the -m parameter.
 .SH NOTES
 The
 .B \-a
@@ -44,7 +48,9 @@ Enables verbose mode
 There is no guarantee that the program will get the shlibs file right. For
 example, it may not correctly guess the major number of your package. In
 cases like these (and perhaps in general, just to be safe), it is better to
-create a debian/shlibs file by hand.
+create a debian/shlibs file by hand, or force it to use the correct major
+number by specifying the -m parameter.
+.P
 This is a "do what I Mean" type program - you have been warned!
 .SH AUTHOR
 Joey Hess <joeyh@master.debian.org>

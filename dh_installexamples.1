@@ -8,9 +8,10 @@ dh_installexamples \- install example files into package build directories
 dh_installexamples is a debhelper program that is responsible for installing
 examples into usr/doc/package/examples in package build directories.
 .P
-Any filenames specified as parameters will be installed into the first
-binary package listed in debian/control, if dh_installexamples is acting on
-that package.
+Any file names specified as parameters will be installed into the first 
+package dh_installdirs is told to act on. By default, this is the first 
+binary package in debian/control, but if you use -p, -i, or -a flags, it
+will be the first package specified by those flags.
 .P
 A file named debian/examples (for the first binary package in debian/control),
 or debian/package.examples (for each additional package in debian/control) can
@@ -33,8 +34,7 @@ Install files for the package named "package".
 Use "tmpdir" for package build directory. 
 .TP
 .B file ...
-Install these files as documentation into the first binary package listed in
-debian/control, if we are acting on that package.
+Install these files as examples into the first package acted on.
 .SH NOTES
 The
 .B \-a

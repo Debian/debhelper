@@ -1,8 +1,35 @@
+debhelper (0.50) unstable; urgency=low
+
+  * dh_makeshlibs: added -m parameter, which can force the major number
+    of the shared library if it is guessed incorrectly.
+  * Added dh_testversion to let your package depend on a certian version of
+    debhelper to build.
+  * dh_{installdirs,installdocs,installexamples,suidregieter,undocumented}:
+    behavior modification - any files/directories specified on the command
+    line now apply to the first package acted on. This may not be the
+    first package listed in debian/control, if you use -p to make it act on
+    a given package, or -i or -a.
+  * If you take advantage of the above new behavior, I suggest you add
+    "dh_testversion 0.50" to your debian/rules.
+  * Display a warning message in cases where the above behavior is triggered,
+    and debhelper's behavior has altered.
+  * I have grepped debian's source packages, and I'm quite sure this
+    is not going to affect any packages currently in debian.
+  * dh_lib: isnative() now caches its return value, which should optimize
+    away several more calls to dpkg-parsechangelog.
+  * README: explain a way to embed debhelper generated shell script into a
+    perl script.
+  * dh_installinit: A hack to work around the problem in getopt(1) that
+    led to bug report #16229: Any text specified on the command line that is
+    not a flag will be presumed to be part of the -u flag. Yuck.
+
+ -- Joey Hess <joeyh@master.debian.org>  Sat,  3 Jan 1998 14:36:15 -0500
+
 debhelper (0.37) unstable; urgency=low
 
   * dh_du: Fixed hardcoded debian/tmp.
   * This change got lost by accident, redid it: Optimized out most of the
-    slowdown caused byusing dpkg-parsechangelog - now it's only called by
+    slowdown caused by using dpkg-parsechangelog - now it's only called by
     2 dh_* programs.
 
  -- Joey Hess <joeyh@master.debian.org>  Sun, 28 Dec 1997 20:45:22 -0500

@@ -60,6 +60,13 @@ and
 .B \-p
 arguments are cumulative. If none are specified, then all packages listed in
 the control file will be effected.
+.P
+Due to a bug in
+.BR getopt (1)
+, you cannot really text with spaces in it to the -u flag. However, this bug
+has been worked around, and it should appear to work. What it's really doing
+is looking at any parameters passed that are not known flags, and appending
+that text onto the end of the text specified by the -u flag.
 .SH ENVIRONMENT
 .TP
 .I DH_VERBOSE

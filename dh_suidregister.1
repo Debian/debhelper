@@ -11,8 +11,10 @@ with
 .BR suidregister (1)
 when it is installed.
 .P
-Any files specified as parameters will be registered, if dh_suidregister is
-acting on the first binary package listed in debian/control.
+Any filenames specified as parameters will be registered in the first 
+package dh_installdocs is told to act on. By default, this is the first 
+binary package in debian/control, but if you use -p, -i, or -a flags, 
+it will be the first package specified by those flags.
 .P
 The files debian/suid (for the first binary package in debian/control) or 
 debian/package.suid (for  each  additional package in debian/control) can 
@@ -43,8 +45,7 @@ Register files for the package named "package".
 Use "tmpdir" for package build directory. 
 .TP
 .B file ...
-Register these files in the first binary package listed in debian/control, 
-if we are acting on that package.
+Register these files in the first package acted on.
 .SH NOTES
 The
 .B \-a

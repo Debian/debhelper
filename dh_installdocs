@@ -20,7 +20,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 		docs=`tr "\n" " " < debian/${EXT}docs`
 	fi
 
-	if [ "$PACKAGE" = "$MAINPACKAGE" -a "$*" ]; then
+	if [ "$PACKAGE" = "$DH_FIRSTPACKAGE" -a "$*" ]; then
 		docs="$* $docs"
 	fi
 

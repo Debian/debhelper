@@ -15,8 +15,12 @@ for PACKAGE in $DH_DOPACKAGES; do
 	for file in `find $TMP -type f -name "*.so*" | tr "\n" " "` ; do
 		LIBRARY=`expr $file : ".*/\(.*\)\.so\..*"` || true
 		VERSION=`expr $file : ".*/.*\.so\.\(.*\)"` || true
-		MAJOR=`expr $VERSION : "\([0-9]*\)\."` || true
-		LIBSTUB=`expr $file : "\(.*\/.*\.so\)\..*"` || true
+		if [ -z "$DH_M_PARAMS" ]; then
+			MAJOR=`expr $VERSION : "\([0-9]*\)\."` || true
+		else
+			MAJOR="$DH_M_PARAMS"
+		fi
+#		LIBSTUB=`expr $file : "\(.*\/.*\.so\)\..*"` || true
 		if [ ! -d "$TMP/DEBIAN" ] ; then
 			doit "install -d $TMP/DEBIAN"
 		fi
