@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Script to be called from debian/rules to setup all the debian specifc
 # required files
@@ -8,214 +8,212 @@
 # (but doc files can also be listed in debian/docs)
 #
 # This has been gutted and extensively rewritten to function as a debhelper
-# command by Joey Hess.
+# command by Joey Hess. And then completly rewritten in perl.
 
 # Pre-parse command line before we load dh_lib, becuase we use a
 # different style of arguments.
-for i;do
-  case "$i" in
-  -p) PERMS=1
-    ;;
-  -u) UNDOC=1
-    ;;
-  -s) SUMS=1
-    ;;
-  -m) NOAUTOMAN=1
-    ;;
-  -c) NOCOMPRESS=1
-    ;;
-  *) collect="$collect$i "
-    ;;
-  esac
-done
-set -- $collect
+@argv=();
+foreach (@ARGV) {
+	if ($_ eq '-p') {
+		$ds{PERMS}=1;
+	}
+	elsif ($_ eq '-u') {
+		$ds{UNDOC}=1;
+	}
+	elsif ($_ eq '-s') {
+		$ds{SUMS}=1;
+	}
+	elsif ($_ eq '-m') {
+		$ds{NOAUTOMAN}=1;
+	}
+	elsif ($_ eq '-c') {
+		$ds{NOCOMPRESS}=1;
+	}
+	else {
+		push @argv,$_;
+	}
+}
+@ARGV=@argv;
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use Dh_Lib;
+init();
 
 # Tolerate old style debstd invocations
-if [ "$DH_FIRSTPACKAGE" = "$1" ]; then
-	shift
-fi
-
-# Subroutines
+if ($ARGV[0] && $dh{FIRSTPACKAGE} eq $ARGV[0]) {
+	shift;
+}
 
 # debinit handles the installation of an init.d script
-# Parameters:
-# $1= name in /etc/init.d
-# $2 = scriptname
-# $3 = package name
-# $4 = extra params for debhelper
-debinit() {
-	PPACKAGE=$3
-	SCRIPT=$1
+sub debinit { my ($script, $filename, $package, @params)=@_;
+	@initparams=();
+	$norestart='';
+	open (IN,$filename) || warn("$filename: $!");
+	while (<IN>) {
+		if (/^FLAGS=(.*)/) {
+			push @initparams, $1;
+		}
+		if (/NO_RESTART_ON_UPGRADE/) {
+			$norestart='--no-restart-on-upgrade';
+		}
+	}
+	close IN;
+	$initparams='';
+	if (@initparams) {
+		$initparams="--update-rcd-params='".join(" ",@initparams)."'";
+	}
 
-	INITPARAMS=`grep "^FLAGS=" $2` || true
-	if [ "$INITPARAMS" != "" ]; then
-		INITPARAMS=`expr "$INITPARAMS" : 'FLAGS="\(.*\)"'` || true
-		if [ "$INITPARAMS" ]; then
-			INITPARAMS="--update-rcd-params='$INITPARAMS'"
-		fi
-	fi
-
-	if grep -q NO_RESTART_ON_UPGRADE $2; then
-		doit "dh_installinit --no-restart-on-upgrade -p$PPACKAGE $INITPARAMS --init-script=$SCRIPT $4"
-	  else
-		doit "dh_installinit -p$PPACKAGE $INITPARAMS --init-script=$SCRIPT $4"
-	fi
+	doit("dh_installinit",$norestart,"-p$package",$initparams,"--init-script=$script",@params);
 }
 
-# Package specific things
-#
-# The first parameter is the package name
-# The second parameter is the directory name of the temp directory
-# The third parameter is the prefix for all configuration files to be processed
-package()
-{
-	local i
-	local X Y
-	CPACKAGE=$1
-	CTEMP=$2
-
+# Do package specific things for a package.
+sub do_package { my ($package, $tmp, $prefix)=@_;
 	# Deal with scripts in etc directories
-	if [ -f $3/rc.boot ]; then
-		warning "file $3/rc.boot was ignored."
-	fi
+	if (-d "$prefix/rc.boot") {
+		warning("file $prefix/rc.boot was ignored.");
+	}
 
 	# etc files that could need some tweaking
-	for i in services inittab crontab protocols profile shells rpc shells \
-		syslog.conf conf.modules modules aliases diversions inetd.conf \
-		X11/Xresources X11/config X11/window-managers X11/xinit purge ; do
-		if [ -f $3$i ]; then
-			warning "file $3$i was ignored."
-		fi
-	done
+	foreach $f ('services','inittab','crontab','protocols','profile',
+		'shells','rpc','syslog.conf','conf.modules','modules',
+		'aliases','diversions','inetd.conf','X11/Xresources',
+		'X11/config','X11/window-managers','X11/xinit','purge') {
+		if ( -f "$prefix$f") {
+			warning("file $prefix$f was ignored.");
+		}
+	}
 
-	if [ -f $3init.d ]; then
-		debinit $1 $3init.d $1 ""
-	fi
+	if (-f "${prefix}init.d") {
+		debinit($package,"${prefix}init.d",$package,"");
+	}
 
 	# The case of a daemon without the final d
-	if [ -f $3init ]; then
-		X=`expr $1 : '\(.*\)d$'` || true  
-		if [ "$X" ]; then
-			debinit $X $3init $1 "--remove-d"
-		fi
-	fi
+	if (-f "${prefix}init") {
+		$p=$package;
+		if ($p=~s/d$//) {
+			debinit($p,"${prefix}init",$package,"--remove-d");
+		}
+	}
 
-	if [ -f $3info ]; then
-		warning "debhelper does not yet support info files, so $3info was ignored."
-	fi
+	if (-f "${prefix}info") {
+		warning("debhelper does not yet support info files, so ${prefix}info was ignored.");
+	}
 
-	X=`find $2 -type f -perm +111 2>/dev/null | tr "\n" " "`
-	for i in $X; do
-		BINPATH="`expr "$i" : "$2/\(.*\)/.*"`"
-		BINNAME="`expr "$i" : "$2/.*/\(.*\)"`"
-
-		# Check if manpages exist
-		case "$BINPATH" in
-			DEBIAN|etc/rc.boot|usr/lib/cgi-bin|etc/init.d|etc/cron.*|usr/lib/lib*|usr/lib/*) SECTION=""
-				;;
-			sbin|usr/sbin) SECTION="8"
-				;;
-			usr/X11R6/bin) SECTION="1x"
-				;;
-			bin|usr/bin) SECTION="1"
-				;;
-			usr/games) SECTION="6"
-				;;
-			*)  SECTION=""
-				;;
-		esac
-		if [ "$SECTION" ]; then
-			Y=`find $2/usr/man $2/usr/X11R6/man -name "$BINNAME.*" 2>/dev/null` || true
-			if [ "$Y" = "" ]; then
-				if [ "$UNDOC" ]; then
-					doit "dh_undocumented -p$CPACKAGE $BINNAME.$SECTION"
-				fi
-			fi
-		fi
-	done
-}
-
-packages() {
-	local i
-	BASE=$1
-	shift
-	for i in $*; do
-		package $i debian/$i "debian/$i."
-		if [ -x debian/$i.prebuild ]; then
-			warning "file debian/$i.prebuild ignored"
-		fi
-	done
-
-	if [ -f debian/clean ]; then
-		warning "file debian/clean ignored"
-	fi
-	package $BASE debian/tmp "debian/"
+	# Set up undocumented man page symlinks.
+	if (defined($ds{UNDOC}) && $ds{UNDOC}) {
+		open (FIND,"find $tmp -type f -perm +111 2>/dev/null |") || warning("find: $!");
+		while (<FIND>) {
+			chomp;
+			($binpath, $binname)=m:$tmp/(.*)/(.*):;
+	
+			# Check if manpages exist
+			$section='';
+			if ($binpath eq 'sbin' || $binpath eq 'usr/sbin') {
+				$section=8;
+			}
+			elsif ($binpath eq 'usr/X11R6/bin') {
+				$section='1x';
+			}
+			elsif ($binpath eq 'bin' || $binpath eq 'usr/bin') {
+				$section=1;
+			}
+			elsif ($binpath eq 'usr/games') {
+				$section=6;
+			}	
+			if ($section && `find $tmp/usr/man $tmp/usr/X11R6/man -name "$binname.*" 2>/dev/null` eq '') {
+				doit("dh_undocumented","-p$package","$binname.$section");
+			}
+		}
+		close FIND;
+	}
 }
 
 # Special case of changelog
-if [ "$1" ]; then
-	if echo "$1" | egrep -qi "change|news|history" ; then
-		changelogfile=$1
-		shift
-	fi
-fi
+$changelogfile='';
+if ($ARGV[0] && $ARGV[0]=~m/change|news|history/) {
+	$changelogfile=shift;
+}
 
-doit "dh_installdirs" # here just to make the debian/tmp, etc directories.
-doit "dh_installdocs $*"
-doit "dh_installexamples"
-doit "dh_installchangelogs $changelogfile"
-doit "dh_installmenu"
-doit "dh_installcron"
+doit("dh_installdirs"); # here just to make the debian/tmp, etc directories.
+doit("dh_installdocs",@ARGV);
+doit("dh_installexamples");
+if ($changelogfile) {
+	doit("dh_installchangelogs",$changelogfile);
+}
+else {
+	doit("dh_installchangelogs");
+}
+doit("dh_installmenu");
+doit("dh_installcron");
 
 # Manpage scan
-if [ "$NOAUTOMAN" = "" ]; then
-	doit "dh_installmanpages -p$DH_FIRSTPACKAGE"
-fi
+if (! $ds{NOAUTOMAN}) {
+	doit("dh_installmanpages","-p$dh{FIRSTPACKAGE}");
+}
 
-packages $DH_DOPACKAGES
+# Per-package stuff:
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	if ($PACKAGE eq $dh{FIRSTPACKAGE}) {
+		if (-f "debian/clean") {
+			warning("file debian/clean ignored.");
+		}
+		do_package($PACKAGE,"debian/tmp","debian/");
+	}
+	else {
+		do_package($PACKAGE,"debian/$PACKAGE","debian/$PACKAGE.");
+		if ( -x "debian/$PACKAGE.prebuild") {
+			warning("file debian/$PACKAGE.prebuild ignored.");
+		}
+	}
+}
 
-doit "dh_movefiles"
-doit "dh_strip"
+doit("dh_movefiles");
+doit("dh_strip");
 
-if [ ! "$nocompress" ]; then
-	doit "dh_compress"
-fi
+if (! $ds{NOCOMPRESS}) {
+	doit("dh_compress");
+}
 
-doit "dh_fixperms"
-doit "dh_suidregister"
-doit "dh_shlibdeps"
-doit "dh_gencontrol"
-doit "dh_makeshlibs"
+doit("dh_fixperms");
+doit("dh_suidregister");
+doit("dh_shlibdeps");
+doit("dh_gencontrol");
+doit("dh_makeshlibs");
 
 # Check to see if the install scripts have #DEBHELPER# in them, if not,
 # warn.
-for PACKAGE in $DH_DOPACKAGES; do
-	for file in postinst postrm preinst prerm; do
-		f="`pkgfile $PACKAGE $file`"
-		if [ "$f" ]; then
-			if ! grep -q "#DEBHELPER#" "$f"; then
-				filelist="$filelist$f "
+@filelist=();
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	foreach $file (qw{postinst postrm preinst prerm}) {
+		$f=pkgfile($PACKAGE,$file);
+		if ($f) {
+			open (IN,$f);
+			$found=undef;
+			while (<IN>) {
+				if (/#DEBHELPER#/) {
+					$found=1;
+					last;
+				}
+			}
+			if (! $found) {
+				push @filelist, $f;
+			}
+		}
+	}
+}
+if (@filelist) {
+	warning("The following scripts do not contain \"#DEBHELPER#\" in them,");
+	warning("and so debhelper will not automatically add commands to them:");
+	warning(join(" ",@filelist));
+}
 
-			fi
-		fi
-	done
-done
-if [ "$filelist" ]; then
-	warning "The following scripts do not contain \"#DEBHELPER#\" in them,"
-	warning "and so debhelper will not automatically add commands to them:"
-	warning "$filelist"
-fi
+doit("dh_installdeb");
 
-doit "dh_installdeb"
-
-if [ "$SUMS" = "" ]; then
-	doit "dh_md5sums"
-fi
+if (! $ds{SUMS}) {
+	doit("dh_md5sums");
+}
 
 # This causes the main binary package to be built, which
 # real debstd does not do. Shouldn't be a problem though,
 # if that package gets built twice.
-doit "dh_builddeb"
+doit("dh_builddeb");

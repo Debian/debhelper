@@ -1,50 +1,52 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Do some general file permission fixups.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use Dh_Lib;
+init();
 
-for PACKAGE in $DH_DOPACKAGES; do
-	TMP=`tmpdir $PACKAGE`
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
 
 	# General permissions fixing.
-	if [ ! "$DH_EXCLUDE_FIND" ]; then
+	if (! defined($dh{EXCLUDE_FIND}) || $dh{EXCLUDE_FIND} eq '') {
 		# It's much faster to do it this way, but we can only do
 		# this if there is nothing to exclude.
-		if [ -d $TMP ]; then
-			doit "chown -R root.root $TMP"
-			doit "chmod -R go=rX $TMP"
-			doit "chmod -R u+rw $TMP"
-		fi
+		if (-d $TMP) {
+			doit("chown","-R","root.root",$TMP);
+			doit("chmod","-R","go=rX",$TMP);
+			doit("chmod","-R","u+rw",$TMP);
+		}
 
-		FIND_OPTIONS=""
-	else
+		$find_options="";
+	}
+	else {
 		# Do it the hard way.
-		complex_doit "find $TMP ! \( $DH_EXCLUDE_FIND \) -print0 \
-			2>/dev/null | xargs -0r chown root.root"
-		complex_doit "find $TMP ! \($DH_EXCLUDE_FIND \) -print0 \
-			2>/dev/null | xargs -0r chmod go=rX"
-		complex_doit "find $TMP ! \( $DH_EXCLUDE_FIND \) -print0 \
-			2>/dev/null | xargs -0r chmod u+rw"
+		complex_doit("find $TMP ! \\( $dh{EXCLUDE_FIND} \\) -print0 \
+			2>/dev/null | xargs -0r chown root.root");
+		complex_doit("find $TMP ! \\( $dh{EXCLUDE_FIND} \\) -print0 \
+			2>/dev/null | xargs -0r chmod go=rX");
+		complex_doit("find $TMP ! \\( $dh{EXCLUDE_FIND} \\) -print0 \
+			2>/dev/null | xargs -0r chmod u+rw");
 
-		FIND_OPTIONS="! \( $DH_EXCLUDE_FIND \)"
-	fi
+		$find_options="! \\( $dh{EXCLUDE_FIND} \\)";
+	}
 
 	# Fix up premissions in usr/doc, setting everything to not exectable
 	# by default, but leave examples directories alone.
-	complex_doit "find $TMP/usr/doc -type f $FIND_OPTIONS ! -regex .\*/examples/.\* -print0 \
-	        2>/dev/null | xargs -0r chmod 644"
-	complex_doit "find $TMP/usr/doc -type d $FIND_OPTIONS -print0 \
-		2>/dev/null | xargs -0r chmod 755"
+	complex_doit("find $TMP/usr/doc -type f $find_options ! -regex .\*/examples/.\* -print0",
+		"2>/dev/null | xargs -0r chmod 644");
+	complex_doit("find $TMP/usr/doc -type d $find_options -print0",
+		"2>/dev/null | xargs -0r chmod 755");
 
 	# Executable man pages are a bad thing..
-	complex_doit "find $TMP/usr/man/ $TMP/usr/X11*/man/ -type f \
-		$FIND_OPTIONS -print0 2>/dev/null | xargs -0r chmod 644"
+	complex_doit("find $TMP/usr/man/ $TMP/usr/X11*/man/ -type f",
+		"$find_options -print0 2>/dev/null | xargs -0r chmod 644");
 
 	# ..and so are executable shared and static libraries 
 	# (and .la files from libtool)
-	complex_doit "find $TMP -perm -5 -type f \
-		\( -name '*.so*' -or -name '*.la' -or -name '*.a' \) $FIND_OPTIONS -print0 \
-		2>/dev/null | xargs -0r chmod a-X"
-done
+	complex_doit("find $TMP -perm -5 -type f",
+		"\\( -name '*.so*' -or -name '*.la' -or -name '*.a' \\) $find_options -print0",
+		"2>/dev/null | xargs -0r chmod a-X");
+}

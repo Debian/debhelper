@@ -1,70 +1,70 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Move files out of debian/tmp, into subpackages.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use Dh_Lib;
+init();
 
-for PACKAGE in $DH_DOPACKAGES; do
-	TMP=`tmpdir $PACKAGE`
-	files=`pkgfile $PACKAGE files`
+$ret=0;
 
-	if [ ! -d "debian/tmp" ]; then
-		error "debian/tmp does not exist"
-	fi
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$files=pkgfile($PACKAGE,"files");
 
-	tomove=""
+	if (! -d "debian/tmp") {
+		error("debian/tmp does not exist.");
+	}
+
+	@tomove=();
 
         # debian/files has a different purpose, so ignore it.
-	if [ "$files" -a "$files" != "debian/files" ]; then
-		tomove=`cat $files`
-	fi
+	if ( $files && $files != "debian/files" ) {
+		@tomove=filearray($files);
+	}
 	
-	if [ \( "$PACKAGE" = "$DH_FIRSTPACKAGE" -o "$DH_PARAMS_ALL" \) \
-	     -a "$*" ]; then
-		tomove="$* $tomove"
-	fi
+	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+		push @tomove, @ARGV;
+	}
 
-	if [ "$tomove" -a "$TMP" = "debian/tmp" ]; then
-		error "I was asked to move files from debian/tmp to debian/tmp."
-	fi
+	if (@tomove && $TMP eq "debian/tmp") {
+		error("I was asked to move files from debian/tmp to debian/tmp.");
+	}
 
-	if [ "$tomove" ]; then
-		if [ ! -d "$TMP" ]; then
-			doit "install -d $TMP"
-		fi
-
+	if (@tomove) {
+		if (! -d $TMP) {
+			doit("install","-d",$TMP);
+		}
+		# Now we need to expand wildcards in @tomove.
+		@filelist=();
+		foreach (@tomove) {
+			push @filelist, glob("debian/tmp/$_");
+		}
+		
 		# Order the files. First all real files, then symlinks. 
 		# Putting symlinks last is a nice thing to do for library 
 		# packages and doesn't affect much of anything else.
-		#
-		# (The echo is in here to expand wildcards. Note that 'ls'
-		# won't work properly.)
-		# The file list is used, so even very weird filenames can be
-		# moved.
-		doit "rm -f movelist"
-		for i in `(cd debian/tmp; echo $tomove)`; do
-			if [ ! -e "debian/tmp/$i" -a ! -L "debian/tmp/$i" ]; then
-				fail=1
-			fi
-			complex_doit "(cd debian/tmp ; find $i ! -type d -and ! -type l -print || true) >> movelist"
-		done
-		for i in `(cd debian/tmp; echo $tomove)`; do
-			if [ ! -e "debian/tmp/$i" -a ! -L "debian/tmp/$i" ]; then
-				fail=1
-			fi
-			complex_doit "(cd debian/tmp ; find $i ! -type d -and -type l -print || true) >> movelist"
-		done
-		complex_doit "(cd debian/tmp;tar --create --remove-files --files-from=../../movelist --file -) | (cd $TMP;tar xpf -)"
-		doit "rm -f movelist"
-	fi
-done
+		doit("rm","-f","movelist");
+		foreach (@filelist) {
+			$ret=1 if (! -e $_ && ! -l $_);
+			s:^debian/tmp/*::;
+			complex_doit("(cd debian/tmp ; find $_ ! -type d -and ! -type l -print || true) >> movelist");
+		}
+		foreach (@filelist) {
+			$ret=1 if (! -e $_ && ! -l $_);
+			s:^debian/tmp/*::;
+			complex_doit("(cd debian/tmp ; find $_ ! -type d -and -type l -print || true) >> movelist");
+		}
+		complex_doit("(cd debian/tmp;tar --create --remove-files --files-from=../../movelist --file -) | (cd $TMP;tar xpf -)");
+		doit("rm","-f","movelist");
+	}
+}
 
-# If fail is set, we wern't actually able to find some 
+# If $ret is set, we wern't actually able to find some 
 # files that were specified to be moved, and we should
-# exit with the code in fail. This program puts off 
+# exit with the code in $ret. This program puts off 
 # exiting with an error until all files have been tried
 # to be moved, because this makes it easier for some 
 # packages that arn't always sure exactly which files need
 # to be moved.
-exit $fail
+exit $ret;

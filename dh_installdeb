@@ -1,51 +1,55 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Install files from debian/ into the package's DEBIAN directory.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use Dh_Lib;
+init();
 
-for PACKAGE in $DH_DOPACKAGES; do
-	TMP=`tmpdir $PACKAGE`
-	EXT=`pkgext $PACKAGE`
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$EXT=pkgext($PACKAGE);
 
-	if [ ! -d $TMP/DEBIAN ]; then
-		doit "install -o root -g root -d $TMP/DEBIAN"
-	fi
+	if (! -d "$TMP/DEBIAN") {
+		doit("install","-o","root","-g","root","-d","$TMP/DEBIAN");
+	}
 
 	# Install debian install scripts.
 	# If any .debhelper files exist, add them into the scripts.
-	for file in postinst preinst prerm postrm; do
-		f=`pkgfile $PACKAGE $file`
-		if [ "$f" ]; then
-			if [ -f debian/$EXT$file.debhelper ]; then
+	foreach $file (qw{postinst preinst prerm postrm}) {
+		$f=pkgfile($PACKAGE,$file);
+		if ($f) {
+			if (-f "debian/$EXT$file.debhelper") {
 				# Add this into the script, where it has
 				# #DEBHELPER#
-				complex_doit "perl -pe 's~#DEBHELPER#~qx{cat debian/$EXT$file.debhelper}~eg' < $f > $TMP/DEBIAN/$file"
-			else
+				# TODO: do internally, no perl fork?
+				complex_doit("perl -pe 's~#DEBHELPER#~qx{cat debian/$EXT$file.debhelper}~eg' < $f > $TMP/DEBIAN/$file");
+		        }
+			else {
 				# Just get rid of any #DEBHELPER# in the 
 				# script.
-				complex_doit "sed s/#DEBHELPER#// < $f > $TMP/DEBIAN/$file"
-			fi
-			doit "chown root.root $TMP/DEBIAN/$file"
-			doit "chmod 755 $TMP/DEBIAN/$file"
-		else
+				complex_doit("sed s/#DEBHELPER#// < $f > $TMP/DEBIAN/$file");
+			}
+			doit("chown","root.root","$TMP/DEBIAN/$file");
+			doit("chmod",755,"$TMP/DEBIAN/$file");
+		}
+		else {
 			# Auto-generate script header and add .debhelper
 			# content to it.
-			if [ -f debian/$EXT$file.debhelper ]; then
-				complex_doit "echo '#!/bin/sh -e' > $TMP/DEBIAN/$file"
-				complex_doit "cat debian/$EXT$file.debhelper >> $TMP/DEBIAN/$file"
-				doit "chown root.root $TMP/DEBIAN/$file"
-				doit "chmod 755 $TMP/DEBIAN/$file"
-			fi
-		fi
-	done
+			if (-f "debian/$EXT$file.debhelper") {
+				complex_doit("echo '#!/bin/sh -e' > $TMP/DEBIAN/$file");
+				complex_doit("cat debian/$EXT$file.debhelper >> $TMP/DEBIAN/$file");
+				doit("chown","root.root","$TMP/DEBIAN/$file");
+				doit("chmod",755,"$TMP/DEBIAN/$file");
+			}
+		}
+	}
 
 	# Install non-executable files
-	for file in shlibs conffiles; do
-		f=`pkgfile $PACKAGE $file`
-		if [ "$f" ]; then
-			doit "install -o root -g root -m 644 -p $f $TMP/DEBIAN/$file"
-		fi                                               
-	done
-done
+	foreach $file (qw{shlibs conffiles}) {
+		$f=pkgfile($PACKAGE,$file);
+		if ($f) {
+			doit("install","-o","root","-g","root","-m",644,"-p",$f,"$TMP/DEBIAN/$file");
+		}
+	}
+}

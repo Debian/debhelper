@@ -42,7 +42,10 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		# This is set by the -u "foo" command line switch, it's
 		# the parameters to pass to update-rc.d. If not set,
 		# we have to say "defaults".
-		my $params=join(' ',@{$dh{U_PARAMS}});
+		my $params='';
+		if (defined($dh{U_PARAMS})) {
+			$params=join(' ',@{$dh{U_PARAMS}});
+		}	
 		if ($params eq '') {
 			$params="defaults";
 		}

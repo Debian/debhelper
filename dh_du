@@ -5,4 +5,7 @@
 #
 # No longer - it was decided these files are a bad idea.
 
-print STDERR "dh_du: this program does nothing and is deprecated. Remove it from debian/rules.\n";
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use Dh_Lib;
+
+warning("this program does nothing and is deprecated. Remove it from debian/rules.");
