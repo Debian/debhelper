@@ -22,9 +22,9 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	}
 	else {
 		# Do it the hard way.
-		complex_doit("find $TMP ! \\( $dh{EXCLUDE_FIND} \\) -print0",
+		complex_doit("find $TMP ! -type l ! \\( $dh{EXCLUDE_FIND} \\) -print0",
 			"2>/dev/null | xargs -0r chown root.root");
-		complex_doit("find $TMP ! \\( $dh{EXCLUDE_FIND} \\) -print0",
+		complex_doit("find $TMP ! -type l ! \\( $dh{EXCLUDE_FIND} \\) -print0",
 			"2>/dev/null | xargs -0r chmod go=rX,u+rw,a-s");
 
 		$find_options="! \\( $dh{EXCLUDE_FIND} \\)";
