@@ -81,7 +81,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			my @paths=();
 			# Add to existing paths, if set.
 			push @paths, $ENV{'LD_LIBRARY_PATH'}
-				if exists $ENV{'LD_LIBRARY_PATH'}
+				if exists $ENV{'LD_LIBRARY_PATH'};
 			foreach (split(/:/, $dh{L_PARAMS})) {
 				# Force the path absolute.
 				if (m:^/:) {
