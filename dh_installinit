@@ -150,17 +150,16 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				addsubstvar($package, "misc:Depends", "sysvinit", ">= 2.80-1");
 				$substvaradded=1;
 			}
+			autoscript($package,"postinst", "postinst-init$tailstr",
+				"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
 			# -r on the command line sets R_FLAG. If it's set,
-			# there  is no restart on upgrade.
+			# there  is no restart on upgrade, so don't stop
+			# daemon. (It's ok that it's always started.)
 			if ($dh{R_FLAG}) {
-				autoscript($package,"postinst", "postinst-init-norestart$tailstr",
-					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
 				autoscript($package,"prerm","prerm-init-norestart$tailstr",
 					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
 			}
 			else {
-				autoscript($package,"postinst","postinst-init$tailstr",
-					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
 				autoscript($package,"prerm","prerm-init$tailstr",
 					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
 			}
