@@ -7,7 +7,7 @@ for currentdir in $fontdirs; do
 		for file in fonts.dir fonts.alias; do
 			rm -f $file
 		done
-		if [ $(find $currentdir| wc -l) -eq 1 ]; then
+		if [ $(find $longdir| wc -l) -eq 1 ]; then
 			rmdir -p $longdir
 		else
 			for currentcmd in $updatecmds; do
