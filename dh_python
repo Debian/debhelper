@@ -12,7 +12,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_python> [S<I<debhelper options>>] [B<-n>] [S<I<module dirs ...>>]
+B<dh_python> [S<I<debhelper options>>] [B<-n>] [B<-V> I<version>] [S<I<module dirs ...>>]
 
 =head1 DESCRIPTION
 
@@ -42,6 +42,13 @@ can make dh_python check those directories by passing their names on the
 command line. By default, it will check /usr/lib/site-python,
 /usr/lib/$PACKAGE, /usr/share/$PACKAGE, /usr/lib/games/$PACKAGE,
 /usr/share/games/$PACKAGE and /usr/lib/python?.?/site-packages.
+
+=item B<-V> I<version>
+
+If the .py files your package ships are meant to be used by a specific
+pythonX.Y version, you can set this option with the desired X.Y python
+version.
+Do not use if you ship modules in /usr/lib/site-python.
 
 =item B<-n>, B<--noscripts>
 
@@ -83,6 +90,13 @@ foreach (@python_allversions) {
 	s/^/python/;
 }
 
+# Check for -V
+my $usepython = "python$python_version";
+if($dh{V_FLAG_SET}) {
+	$usepython = $dh{V_FLAG};
+	$usepython =~ s/^/python/;
+}
+
 # Cleaning the paths given on the command line
 foreach (@ARGV) {
 	s#/$##;
@@ -92,6 +106,7 @@ foreach (@ARGV) {
 # dependency types
 use constant PROGRAM   => 1;
 use constant PY_MODULE => 2;
+use constant PY_MODULE_NONSTANDARD => 4;
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp = tmpdir($package);
@@ -153,7 +168,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				$has_module = 1 if /\.py$/;
 			}, "$tmp/$curdir" ;
 			if ($has_module) {
-				$deps |= PY_MODULE;
+				if ($dh{V_FLAG_SET}) {
+					$verdeps{$usepython} |= PY_MODULE_NONSTANDARD;
+				} else {
+					$deps |= PY_MODULE;
+				}
 				$dirlist="$dirlist /$curdir";
 			}
 		}
@@ -190,7 +209,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		addsubstvar($package, "python:Depends", $pyver) if $verdeps{$pyver};
 
 		# And now, the postinst and prerm stuff
-		if ($pyver eq "python$python_version") {
+		if ($pyver eq "$usepython") {
 			if ($verdeps{$pyver} & PY_MODULE) {
 				$pydir = $pydir.$dirlist;
 			} else {
@@ -198,7 +217,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			}
 			$verdeps{$pyver} |= PY_MODULE if($deps & PY_MODULE);
 		}
-		if ($verdeps{$pyver} & PY_MODULE && ! $dh{NOSCRIPTS}) {
+		if ($verdeps{$pyver} & (PY_MODULE|PY_MODULE_NONSTANDARD) && ! $dh{NOSCRIPTS}) {
 			autoscript($package,"postinst","postinst-python","s%#PYVER#%$pyver%;s%#DIRLIST#%$pydir%");
 			$need_prerm = 1;
 		}
