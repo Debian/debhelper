@@ -19,7 +19,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		$need_ldconfig=1;
 		# The second evil regexp is for db3, whose author should
 		# be shot.
-		if (m#.*/(.*)\.so\.(\d*)\.?# || m#.*/(.*)-(\S+)\.so$#) {
+		if (m#.*/([^/]*)\.so\.(\d*)\.?# || m#.*/([^/]*)-([^\s/]+)\.so$#) {
 			$library = $1;
 			$major = $2;
 		}
