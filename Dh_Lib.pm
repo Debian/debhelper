@@ -228,10 +228,10 @@ sub tmpdir { my $package=shift;
 # the main package, it will look for debian/foo, and if found, return that.
 # Failing that, it will return nothing.
 sub pkgfile { my $package=shift; my $filename=shift;
-	if (-e "debian/$package.$filename") {
+	if (-f "debian/$package.$filename") {
 		return "debian/$package.$filename";
 	}
-	elsif ($package eq $dh{MAINPACKAGE} && -e "debian/$filename") {
+	elsif ($package eq $dh{MAINPACKAGE} && -f "debian/$filename") {
 		return "debian/$filename";
 	}
 	return "";
