@@ -31,9 +31,6 @@ for PACKAGE in $DH_DOPACKAGES; do
 			fi
 		done
 		# Create dirs.
-		verbose_echo "cd $TMP && install -d $dirs && cd ../.."
-		cd $TMP
-		install -d $dirs
-		cd ../..
+		doit "cd $TMP && install -d $dirs && cd ../.."
 	fi
 done

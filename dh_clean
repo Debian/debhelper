@@ -16,5 +16,7 @@ doit "rm -f debian/files* debian/*.debhelper $*"
 
 # Remove other temp files. doit isn't smart enough to handle this, so I echo
 # by hand (sigh).
-verbose_echo "find . \( -name "\#*\#" -o -name "*~" -o -name "DEADJOE" \) -exec rm -f {} \;"
-find . \( -name "\#*\#" -o -name "*~" -o -name "DEADJOE" \) -exec rm -f {} \;
+doit "find . \( -name '#*#' -o -name '*~' -o -name DEADJOE -o -name '*.orig' \
+	-o -name '*.rej' -o -name '*.bak' -o -name '.*.orig' \
+	-o -name '.*.rej' -o -name .SUMS -o -name TAGS -o -name core \
+	-o -size 0 \) -exec rm -f {} \;"

@@ -3,17 +3,15 @@
 # Run a command, and display the command to stdout if verbose mode is on.
 # All commands that modifiy files in $TMP should be ran via this 
 # function.
-# Unfortunatly, this function doesn't work if your command uses redirection,
-# you will have to call verbose_echo by hand then.
 doit() {
-	verbose_echo "$*"
-	$*
+	verbose_echo "$@"
+	eval "$@"
 }
 
 # Echo something if the verbose flag is on.
 verbose_echo() {
 	if [ "$DH_VERBOSE" ]; then
-		echo "	$*"
+		echo "	$@"
 	fi
 }
 
@@ -68,12 +66,9 @@ autoscript() {
 	fi
 
 	# Running doit doesn't cut it here.
-	verbose_echo echo "# Automatically added by `basename $0` on `822-date`" ">>" $autoscript_debscript
-	echo "# Automatically added by `basename $0` on `822-date`" >> $autoscript_debscript
-	verbose_echo sed "$autoscript_sed" $autoscript_filename ">>" $autoscript_debscript
-	sed "$autoscript_sed" $autoscript_filename >> $autoscript_debscript
-	verbose_echo  echo "# End automatically added section" ">>" $autoscript_debscript
-	echo "# End automatically added section" >> $autoscript_debscript
+	doit "echo \"# Automatically added by `basename $0` on `822-date`\" >> $autoscript_debscript"
+	doit "sed \"$autoscript_sed\" $autoscript_filename >> $autoscript_debscript"
+	doit "echo '# End automatically added section' >> $autoscript_debscript"
 }
 
 # Argument processing and global variable initialization is below.

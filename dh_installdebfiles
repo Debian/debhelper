@@ -20,8 +20,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 		if [ -f debian/$EXT$file ]; then
 			# Add this into the script, where it has #DEBHELPER#
 			if [ -f debian/$EXT$file.debhelper ]; then
-				verbose_echo "perl -pe \"s~#DEBHELPER#~qx{cat debian/$EXT$file.debhelper}~eg\" < debian/$EXT$file > $TMP/DEBIAN/$file"
-				perl -pe "s~#DEBHELPER#~qx{cat debian/$EXT$file.debhelper}~eg" < debian/$EXT$file > $TMP/DEBIAN/$file
+				doit "perl -pe 's~#DEBHELPER#~qx{cat debian/$EXT$file.debhelper}~eg' < debian/$EXT$file > $TMP/DEBIAN/$file"
 				doit "chown root.root $TMP/DEBIAN/$file"
 				doit "chmod 755 $TMP/DEBIAN/$file"
 			else
@@ -31,10 +30,8 @@ for PACKAGE in $DH_DOPACKAGES; do
 			# Auto-generate script header and add .debhelper
 			# content to it.
 			if [ -f debian/$EXT$file.debhelper ]; then
-				verbose_echo "echo '#!/bin/sh -e' > $TMP/DEBIAN/$file"
-				echo '#!/bin/sh -e' > $TMP/DEBIAN/$file
-				verbose_echo "cat debian/$EXT$file.debhelper >> $TMP/DEBIAN/$file"
-				cat debian/$EXT$file.debhelper >> $TMP/DEBIAN/$file
+				doit "echo '#!/bin/sh -e' > $TMP/DEBIAN/$file"
+				doit "cat debian/$EXT$file.debhelper >> $TMP/DEBIAN/$file"
 				doit "chown root.root $TMP/DEBIAN/$file"
 				doit "chmod 755 $TMP/DEBIAN/$file"
 			fi

@@ -13,7 +13,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 		doit "install -d $TMP/DEBIAN"
 	fi
 
-	verbose_echo "du -k $TMP | sed \"s:	$TMP/:	:\" | grep -v \"	DEBIAN$\" | grep -v \"	$TMP$\" > $TMP/DEBIAN/du"
-	du -k $TMP | sed "s:	$TMP/:	:" | grep -v "	DEBIAN$" | grep -v "	$TMP$" >$TMP/DEBIAN/du
+	# Note that the tabs in this next line are important.
+	doit "du -k $TMP | sed 's:	$TMP/:	:' | grep -v '	DEBIAN$' | grep -v '	$TMP$' >$TMP/DEBIAN/du"
 	doit "chown root.root debian/tmp/DEBIAN/du"
 done

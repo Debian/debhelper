@@ -13,17 +13,13 @@ for PACKAGE in $DH_DOPACKAGES; do
 		doit "install -d $TMP/DEBIAN"
 	fi
 
-	# Doit isn't smart enough to hande this next command so echo by hand. (sigh)
-	verbose_echo 'find $TMP/* -type f ! -regex "^$TMP/DEBIAN/.*" | sed s:$TMP/:: | sort > $TMP/DEBIAN/allfiles'
-	find $TMP/* -type f ! -regex "^$TMP/DEBIAN/.*" | sed s:$TMP:: | sort > $TMP/DEBIAN/allfiles
+	doit "find $TMP/* -type f ! -regex '^$TMP/DEBIAN/.*' | sed s:$TMP:: | sort > $TMP/DEBIAN/allfiles"
 	# Check if we should exclude conffiles.
 	if [ ! "$DH_EXCLUDE" -a -r $TMP/DEBIAN/conffiles ]; then
-		verbose_echo "sort $TMP/DEBIAN/conffiles | comm -13 - $TMP/DEBIAN/allfiles > $TMP/DEBIAN/allfiles.new"
-		sort $TMP/DEBIAN/conffiles | comm -13 - $TMP/DEBIAN/allfiles > $TMP/DEBIAN/allfiles.new
+		doit "sort $TMP/DEBIAN/conffiles | comm -13 - $TMP/DEBIAN/allfiles > $TMP/DEBIAN/allfiles.new"
 		doit "mv $TMP/DEBIAN/allfiles.new $TMP/DEBIAN/allfiles"
 	fi
-	verbose_echo "cd $TMP ; sed 's:^/::' < DEBIAN/allfiles | xargs md5sum > DEBIAN/md5sums ; cd ../.."
-	cd $TMP ; sed 's:^/::' < DEBIAN/allfiles | xargs md5sum > DEBIAN/md5sums ; cd ../..
+	doit "cd $TMP ; sed 's:^/::' < DEBIAN/allfiles | xargs md5sum > DEBIAN/md5sums ; cd ../.."
 	doit "chown root.root $TMP/DEBIAN/md5sums"
 	doit "rm -f $TMP/DEBIAN/allfiles"
 done
