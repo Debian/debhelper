@@ -1,3 +1,4 @@
-if [ -e /etc/suid.conf -a -x /usr/sbin/suidunregister ]; then
+if [ "$1" = remove -a -e /etc/suid.conf ] && \
+   command -v suidunregister >/dev/null 2>&1; then
         suidunregister -s #PACKAGE# /#FILE#
 fi
