@@ -1,0 +1,175 @@
+This file documents things you should know to write a new debhelper program.
+
+Standardization:
+---------------
+
+There are lots of debhelper commands. To make the learning curve shallower,
+I want them all to behave in a standard manner:
+
+All debhelper programs have names beginning with "dh_". This is so we don't
+pollute the name space too much.
+
+Debhelper programs should never output anything to standard output except
+error messages, important warnings, and the actual commands they run that
+modify files under debian/ and debian/tmp, etc (this last only if they are
+passed -v, and if you output the commands, you should indent them with 1 tab). 
+This is so we don't have a lot of noise output when all the debhelper commands
+in a debian/rules are run, so the important stuff is clearly visible.
+
+Debhelper programs should accept the options, -v, -i, -a, -p, --no-act, and
+-P, and any long forms of these options, like --verbose . If necessary, the
+options may be ignored.
+
+If debhelper commands need config files, they should use
+debian/package.filename as the name of the confile file (replace filename
+with whatever your command wants), and debian/filename should also be
+checked for config information for the first binart package in
+debian/control. Also, debhelper commands should accept the same sort of
+information that appears in the config files, on their command lines, if
+possible, and apply that information to the first package thay act on.
+
+Debhelper programs should never modify the debian/postinst, debian/prerm,
+etc scripts, instead, they can add lines to debian/postinst.debhelper, etc. 
+The autoscript() function (see below) is one easy way to do this.
+dh_installdeb is an exception, it will run after the other commands and
+merge these modifications into the actual postinst scripts.
+
+There are always exceptions. Just ask me.
+
+Intoroducing dh_lib:
+-------------------
+
+All debhelper programs use the dh_lib library (actually it's a shell script)
+to parse their arguments and set some useful variables. It's not mandatory
+that your program use dh_lib, but it will make it a lot easier to keep it in
+sync with the rest of debhelper if it does, so this is highly encouraged.
+
+Typically, you invoke dh_lib like this:
+
+PATH=debian:$PATH:/usr/lib/debhelper
+. dh_lib
+
+The path statement is there to make your program look first in debian/ for
+dh_lib (so users can install a modified version there if necessary), then the
+rest of the path, then the canoical location of dh_lib, /usr/lib/debhelper.
+
+Argument processing:
+-------------------
+
+All debhelper programs should respond to certian arguemnts, such as -v, -i,
+-a, and -p. To help you make this work right, dh_lib handles argumeny
+processing.
+
+As soon as dh_lib loads, it processes any arguments that have been passed to
+your program. The following variables may be set during this stage; your
+program can use them later:
+
+switch		variable	description
+-v		DH_VERBOSE	should the program verbosely output what it is
+				doing?
+--no-act	DH_NO_ACT	should the program not actually do anything?
+-i,-a,-p	DH_DOPACKAGES	a space delimited list of the binary packages
+				to act on
+-i,-p		DH_DOINDEP	a space delimited list of the binary independant
+				packages to act on
+-a,-p		DH_DOARCH	a space delimited list of the binary dependant
+				packages to act on
+-n		DH_NOSCRIPTS	if set, do not make any modifications to the 
+				package's postinst, posrtm, etc scripts.
+-x		DH_EXCLUDE	exclude a something from processing (you
+				decide what this means for your program)
+-d		DH_D_FLAG	you decide what this means to your program
+-r		DH_R_FLAG	you decide what this means to your program
+-k		DH_K_FLAG	you decide what this means to your program
+-P		DH_TMPDIR	package build directory (implies only one
+				package is being acted on)
+-u		DH_U_PARAMS	will be set to a string, that is typically
+				parameters your program passes on to some
+				other program.
+-m		DH_M_PARAMS	will be set to a string, you decide what it
+				means to your program
+-V		DH_V_FLAG	will be set to a string, you decide what it
+				means to your program
+-V		DH_V_FLAG_SET	will be 1 if -V was specified, even if no
+				parameters were passed along with the -V
+-A		DH_PARAMS_ALL	generally means that additional command line
+				parameters passed to the program (other than
+				those processed here), will apply to all 
+				binary packages the program acts on, not just
+				the first
+
+Any additional command line parameters that do not start with "-" will be 
+ignored, and you can access them later just as you normally would ($1, $2,
+etc).
+
+If you need a new command line option, just ask me, and I will add it.
+
+Global variables:
+----------------
+
+The following variables are also set, you can use any of them:
+
+MAINPACKAGE	the name of the first binary package listed in
+		debian/control
+DH_FIRSTPACKAGE	the first package we were instructed to act on. This package
+		typically gets special tratment, addiiional arguments
+		specified on the command line may effect it.
+
+Functions:
+---------
+
+Dh_lib also contains a number of functions you may find useful.
+
+doit()
+	Pass this function a string that is a shell command. It will run the
+	command (unless DH_NO_ACT is set), and if DH_VERBOSE is set, it will
+	also output the command to stdout. You should use this function for
+	almost all commands your program performs that manipulate files in
+	the package build directories.
+complex_doit()
+	This is the same as doit(), except you can pass more complicated
+	commands to it (ie, commands involving piping redirection)
+verbose_echo()
+	Pass this command a string, and it will echo it if DH_VERBOSE is set.
+error()
+	Pass this command a string, it will output it to standard error and
+	exit.
+tmpdir()
+	Pass this command the name of a binary package, it will return the
+	name of the tmp directory that will be used as this package's
+	package build directory. Typically, this will be "debian/tmp" or
+	"debian/package".
+pkgfile()
+	Pass this command the name of a binary package, and the base name of a
+	file, and it will return the actual filename to use. This is used
+	for allowing debhelper programs to have configuration files in the
+	debian/ directory, so there can be one config file per binary
+	package. The conversion is that the files are named
+	debian/package.filename, and debian/filename is also allowable for
+	the MAINPACKAGE. If the file does not exist, nothing is returned.
+pkgext()
+	Pass this command the name of a binary package, and it will return
+	the name to prefix to files in debian/ for this package. For the
+	MAINPACKAGE, it returns nothing (there is no prefix), for the other
+	packages, it returns "package.".
+isnative()
+	Pass this command the name of a package, it returns 1 if the package
+	is a native debian package.
+	As a side effect, VERSION is set to the version number of the
+	package.
+autoscript()
+	Pass 3 parameters:
+	 1: script to add to
+	 2: filename of snippet
+	 3: sed commands to run on the snippet. Ie, s/#PACKAGE#/$PACKAGE/
+	    (optional)
+	This command automatically adds shell script snippets to a debian
+	maintainer script (like the postinst or prerm).
+
+Notes:
+-----
+
+Dh_lib is still evolving.
+There will probably be a perl version too, in the future.
+
+-- Joey Hess <joeyh@master.debian.org>
