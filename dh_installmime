@@ -19,11 +19,13 @@ dh_installmime is a debhelper program that is responsible for installing
 mime files into package build directories.
 
 It also automatically generates the postinst and postrm commands needed to
-interface with the debian mime-support package. See L<dh_installdeb(1)> for
-an explanation of how this works.
+interface with the debian mime-support and shared-mime-info packages.  See
+L<dh_installdeb(1)> for an explanation of how this works.
 
-If a file named debian/package.mime exists, then it is installed into
-usr/lib/mime/packages/package in the package build directory.
+If files named debian/package.mime or debian/package.sharedmimeinfo exist, then
+they are installed into usr/lib/mime/packages/package and
+/usr/share/mime/packages/package.xml (respectively) in the package build
+directory.
 
 =head1 OPTIONS
 
@@ -54,11 +56,28 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			doit("install","-d","$tmp/usr/lib/mime/packages");
 		}
 		doit("install","-p","-m644",$mime,"$tmp/usr/lib/mime/packages/$package");
-
-		if (! $dh{NOSCRIPTS}) {
-			autoscript($package,"postinst","postinst-mime");
-			autoscript($package,"postrm","postrm-mime")
+	}
+	# Check wether we have to call update-mime (either upstream already
+	# installs a MIME information file or Debian provides one)
+	if ((! $dh{NOSCRIPTS}) && (-d "$tmp/usr/lib/mime/packages")) {
+		autoscript($package,"postinst","postinst-mime");
+		autoscript($package,"postrm","postrm-mime")
+	}
+	
+	my $sharedmimeinfo=pkgfile($package,"sharedmimeinfo");
+	
+	if ($sharedmimeinfo ne '') {
+		if (! -d "$tmp/usr/share/mime/packages") {
+			doit("install", "-d", "$tmp/usr/share/mime/packages");
 		}
+		doit("install", "-p", "-m644", $sharedmimeinfo, "$tmp/usr/share/mime/packages/$package.xml");
+	}
+	# check wether we have to call update-mime-database (either upstream
+	# already installs a shared MIME information file or Debian provides
+	# one)
+	if ((! $dh{NOSCRIPTS}) && (-d "$tmp/usr/share/mime/packages")) {
+		autoscript($package, "postinst", "postinst-sharedmimeinfo");
+		autoscript($package, "postrm", "postrm-sharedmimeinfo")
 	}
 }
 

@@ -1,5 +1,5 @@
 if [ -x "/etc/init.d/#SCRIPT#" ] && [ "$1" = remove ]; then
-	if [ -x /usr/sbin/invoke-rc.d ] ; then
+	if [ -x "`which invoke-rc.d 2>/dev/null`" ]; then
 		invoke-rc.d #SCRIPT# stop || #ERROR_HANDLER#
 	else
 		/etc/init.d/#SCRIPT# stop || #ERROR_HANDLER#

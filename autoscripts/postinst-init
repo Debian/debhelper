@@ -1,6 +1,6 @@
 if [ -x "/etc/init.d/#SCRIPT#" ]; then
 	update-rc.d #SCRIPT# #INITPARMS# >/dev/null
-	if [ -x /usr/sbin/invoke-rc.d ]; then
+	if [ -x "`which invoke-rc.d 2>/dev/null`" ]; then
 		invoke-rc.d #SCRIPT# start || #ERROR_HANDLER#
 	else
 		/etc/init.d/#SCRIPT# start || #ERROR_HANDLER#
