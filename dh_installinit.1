@@ -3,7 +3,7 @@
 dh_installinit \- install init scripts into package build directories
 .SH SYNOPSIS
 .B dh_installinit
-.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir] [-n] [-r] [-d] [-uparams]"
+.I "[-v] [-a] [-i] [--no-act] [--init-script=scriptname] [-ppackage] [-Ptmpdir] [-n] [-r] [-d] [-uparams]"
 .SH "DESCRIPTION"
 dh_installinit is a debhelper program that is responsible for installing
 init scripts into package build directories. 
@@ -46,13 +46,19 @@ Do not restart daemon on upgrade.
 .B \-d, \--remove-d
 Remove trailing "d" from the name of the package, and use the result for the
 filename the init script is installed as in etc/init.d/ . This may be useful
-for daemons with named ending in "d".
+for daemons with named ending in "d". (Note: this takes precidence over
+the --init-script parameter described below.)
 .TP
 .B \-uparams, \--update-rcd-params=params
 Pass "params" to 
 .BR update-rc.d (8)
 If not specified, "default" will be passed to
 .BR update-rc.d (8)
+.TP
+.B \--init-script=scriptname
+Use "scriptname" as for the filename the init script is installed as in
+etc/init.d/ . This is useful if you need to have an init script with a name
+different from the package's name.
 .SH NOTES
 The
 .B \-a
