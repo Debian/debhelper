@@ -1,3 +1,26 @@
+debhelper (2.1.0) unstable; urgency=low
+
+  * I started work on debhelper v2 over a year ago, with a long list of
+    changes I hoped to get in that broke backwards compatability. That
+    development stalled after only the most important change was made,
+    although I did get out over 100 releases in the debhelper 2.0.x tree.
+    In the meantime, lots of packages have switched to using v2, despite my
+    warnings that doing so leaves packages open to being broken without
+    notice until v2 is complete.
+  * Therefore, I am calling v2 complete, as it is. Future non-compatabile
+    changes will happen in v3, which will be started soon. This means that
+    by using debhelper v2, one major thing changes: debhelper uses
+    debian/<package> as the temporary directory for *all* packages;
+    debian/tmp is no longer used to build binary packages out of. This is
+    very useful for multi-binary packages, and I reccommend everyone
+    switch to v2.
+  * Updated example rules files to use v2 by default.
+  * Updated all documentation to assume that v2 is being used.
+  * Added a few notes for people still using v1.
+  * Moved all of the README into debhelper(1).
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 18 Jul 2000 15:48:41 -0700
+
 debhelper (2.0.104) unstable; urgency=low
 
   * Put dh_installogrotate in the examples, Closes: #66986

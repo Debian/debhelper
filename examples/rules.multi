@@ -10,7 +10,7 @@
 #export DH_VERBOSE=1
 
 # This is the debhelper compatibility version to use.
-export DH_COMPAT=1
+export DH_COMPAT=2
 
 # This has to be exported to make some magic below work.
 export DH_OPTIONS
@@ -51,8 +51,7 @@ install: build
 # Pass -i to all debhelper commands in this target to reduce clutter.
 binary-indep: DH_OPTIONS=-i
 binary-indep: build install
-	# Need this version of debhelper for DH_OPTIONS to work.
-	dh_testversion 1.1.17
+	dh_testversion 2
 	dh_testdir
 	dh_testroot
 #	dh_installdebconf
@@ -84,8 +83,7 @@ binary-indep: build install
 # Pass -a to all debhelper commands in this target to reduce clutter.
 binary-arch: DH_OPTIONS=-a
 binary-arch: build install
-	# Need this version of debhelper for DH_OPTIONS to work.
-	dh_testversion 1.1.17
+	dh_testversion 2
 	dh_testdir
 	dh_testroot
 #	dh_installdebconf

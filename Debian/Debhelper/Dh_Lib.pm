@@ -15,7 +15,7 @@ use vars qw(@ISA @EXPORT %dh);
 	    &xargs
 	    %dh);
 
-my $max_compat=2;
+my $max_compat=3;
 
 sub init {
 	# If DH_OPTIONS is set, prepend it @ARGV.

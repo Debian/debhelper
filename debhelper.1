@@ -5,12 +5,30 @@ debhelper \- overview of the debhelper commands
 .B dh_*
 .I "[-v] [-a] [-i] [-s] [--no-act] [-ppackage] [-Npackage] [-Ptmpdir]"
 .SH "DESCRIPTION"
-Debhelper is a collection of programs that can be used in debian/rules files
-to automate common tasks related to building debian binary packages. All the
-debhelper commands accept a set of options, and this man page is here to
-document those options and to document debhelper as a whole. For additional 
-options, and documentation for each individual command, see the commands' own
-man pages.
+Debhelper is used to help you build a debian package. The philospohy behind
+debhelper is to provide a collection of small, simple, and easily
+understood tools that are used in debian/rules to automate various common 
+aspects of building a package. This means less work for you, the packager.
+It also, to some degree means that these tools can be changed if debian
+policy changes, and packages that use them will require only a rebuild to
+comply with the new policy.
+.P
+A typical debian/rules file that uses debhelper will call several debhelper
+commands in sequence. Debhelper commands are all named with a "dh_" prefix.
+Examples of rules files that use debhelper are in
+/usr/share/doc/debhelper/examples/ .
+.P
+To create a new debian package using debhelper, you can just copy one of
+the sample rules files and edit it by hand. Or you can try the dh-make
+package, which contains a 
+.BR dh_make (1)
+command that partially automates the process. For a more gentle
+introduction, the maint-guide debian package contains a
+tutorial about making your first package using debhelper.
+.SH "DEBHELPER COMMANDS"
+Here is the complete list of available debhelper commands. See their man
+pages for additional documentation.
+#LIST#
 .SH "SHARED DEBHLPER OPTIONS"
 The following command line options are supported by all debhelper programs.
 .TP
@@ -44,10 +62,10 @@ Do not act on the specified package even if an -a, -i, or -p option lists
 the package as one that should be acted on.
 .TP
 .B \-Ptmpdir, \--tmpdir=tmpdir
-Use "tmpdir" for package build directory. 
+Use "tmpdir" for package build directory. The default is debian/<package>
 .SH "COMMON DEBHELPER OPTIONS"
 The following command line options are supported by some debhelper programs.
-See the man page of each program for a complete explination of what the
+See the man page of each program for a complete explanation of what the
 option does.
 .TP
 .B \-n
@@ -89,13 +107,32 @@ See
 for an example of how to use this.
 .RE
 .TP
+.B Automatic generation of debian install scripts
+.RS
+Some debhelper commands will automatically generate parts of debian install
+scripts. If you want these automatically generated things included in your
+debian install scripts, then you need to add "#DEBHELPER#" to your scripts,
+in the place the code should be added. "#DEBHELPER#" will be replaced by
+any auto-generated code when you run dh_installdeb.
+.P
+All scripts that automatically generate code in this way let it be disabled
+by the -n parameter (see above).
+.P
+Note that the inserted code will be shell code, so you cannot directly use
+it in a perl script. If you would like to embed it into a perl script, here
+is one way to do that (note that I made sure that $1, $2, etc are set with
+the set command):
+  my $temp="set -e\\nset -- @ARGV\\n" . << 'EOF';
+  #DEBHELPER#
+  EOF
+  system ($temp) / 256 == 0
+  	or die "Problem with debhelper scripts: $!";
+.RE
+.TP
 .B Package build directories
 .RS
 By default, all debhelper programs assume that the temporary directory used
-for assembling the tree of files in a package is debian/tmp for the first
-package listed in debian/control, and debian/<packagename> for each
-additional package. If DH_COMPAT=2, debian/<packagename> is always used,
-even for the first package.
+for assembling the tree of files in a package is debian/<packagename>.
 .P
 Sometimes, you might want to use some other temporary directory. This is
 supported by the
@@ -107,27 +144,61 @@ many binary packages, you will need to use the -p flag to specify which
 binary package the debhelper program will act on.
 .RE
 .TP
+.B Debhelper compatability levels
+.RS
+From time to time, major non-backwards-compatabile changes need to be made
+to debhelper, to keep it clean and well-designed as needs change and its
+author gains more experience. To prevent such major changes from breaking
+existing packages, the DH_COMPAT environment variable was introduced.
+DH_COMPAT may be set to a number, to determine which major revision of
+debhelper should be used. There are currently 3:
+.TP
+.B V1
+Setting DH_COMPAT=1 (or leaving it unset) causes debhelper to act in
+compatability mode. It will use debian/tmp as the package tree
+directory for the first binary package listed in the control file, while using
+debian/<package> for all other packages listed in the control file.
+This mode is deprecated.
+.TP
+.B V2
+Setting DH_COMPAT=2 causes debhelper to consitently use debian/<package>
+as the package tree directory for every package that is built. This
+mode is currently set by default in all the example rules files, and you
+are encouraged to use it.
+.TP
+.B V3
+Setting DH_COMPAT=3 will make debhelper start using new v3 features as
+they are implemented. This will cause its behavior to change without
+notice, and so may break packages that use it. See the file
+"/usr/share/doc/debhelper/v3" for more information about planned
+changes.
+.RE
+.TP
 .B Other notes
+.RS
 In general, if any debhelper program needs a directory to exist under
 debian/, it will create it. I haven't bothered to document this in all the
 man pages, but for example, dh_installdeb knows to make debian/<foo>/DEBIAN/
 before trying to put files there, dh_installmenu knows you need a
 debian/<foo>/usr/lib/menu/ before installing the menu files, etc.
-.SH "DEBHELPER COMMANDS"
-Here is the complete list of available debhelper commands.
-#LIST#
+.P
+Note that if you are generating a debian package that has arch-indep and
+arch-dependent portions, and you are using dh_movefiles to move the
+arch-indep files out of debian/tmp, you need to make sure that dh_movefiles
+does this even if only the arch-dependent package is being built (for
+ports to other architectures). I handle this in the example rules file 
+"rules.multi" by calling dh_movefiles in the install target.
+.P
+Once your package uses debhelper to build, be sure to add
+debhelper to your Build-Depends line in debian/control.
+.RE
 .SH ENVIRONMENT
 .TP
 .I DH_VERBOSE
 Enables verbose mode.
 .TP
 .I DH_COMPAT
-Specifies what compatability level debhelper should run at. The default is 1,
-which makes debhelper behave in a manner compatable with the 1.x series of
-debhelper. If set to 2, debhelper's behavior will change to use the new
-features of the 2.x series. Use this with caution, as the 2.x series makes
-major changes that will break most packages. For documentation on these
-changes, read /usr/share/doc/debhelper/v2
+Specifies what compatability level debhelper should run at. See above.
 .TP
 .I DH_NO_ACT
 Enables no-act mode.
@@ -141,9 +212,6 @@ debhelpers will ignore it and do things you don't want them to. One very
 good way to set DH_OPTIONS is by using "Target-specific Variable Values" in
 your debian/rules file. See the make documentation for details on doing this.
 .SH "SEE ALSO"
-.TP
-.BR /usr/share/doc/debhelper/README
-An introduction to debhelper.
 .TP
 .BR /usr/share/doc/debhelper/examples/
 A set of example debian/rules files that use debhelper.

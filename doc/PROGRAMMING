@@ -11,10 +11,10 @@ pollute the name space too much.
 
 Debhelper programs should never output anything to standard output except
 error messages, important warnings, and the actual commands they run that
-modify files under debian/ and debian/tmp, etc (this last only if they are
-passed -v, and if you output the commands, you should indent them with 1 tab). 
-This is so we don't have a lot of noise output when all the debhelper commands
-in a debian/rules are run, so the important stuff is clearly visible.
+modify files under debian/ (this last only if they are passed -v, and if you
+output the commands, you should indent them with 1 tab). This is so we don't
+have a lot of noise output when all the debhelper commands in a debian/rules
+are run, so the important stuff is clearly visible.
 
 Debhelper programs should accept all options listed in the "SHARED
 DEBHELPER OPTIONS" section of debhelper(1), including and any long forms of
@@ -171,8 +171,7 @@ warning()
 tmpdir()
 	Pass this command the name of a binary package, it will return the
 	name of the tmp directory that will be used as this package's
-	package build directory. Typically, this will be "debian/tmp" or
-	"debian/package".
+	package build directory. Typically, this will be "debian/package".
 compat()
 	Pass this command a number, and if the current compatability level
 	equals that number, it will return true. Looks at DH_COMPAT to get
