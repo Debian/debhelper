@@ -20,10 +20,10 @@ your package you are converting, run:
 
 	dh_debstd CHANGES TODO README --verbose --no-act
 
-Notice the parallel to the debstd command above, I just added "--verbose --act"
-to the end. This will make dh_debstd output a list of commands that it thinks
-will emulate what debstd would have done, without actually doing anything to
-your package. The list will look similar to this:
+Notice the parallel to the debstd command above, I just added
+"--verbose --noact" to the end. This will make dh_debstd output a list of
+commands that it thinks will emulate what debstd would have done, without 
+actually doing anything to your package. The list will look similar to this:
 
         dh_installdirs
 	dh_installdocs TODO README
@@ -45,7 +45,7 @@ your package. The list will look similar to this:
 	dh_builddeb
 
 Now copy that output into debian/rules, replacing the debstd command, as
-well as any dpkg-gencontol and dpkg --build commands.
+well as any dpkg-gencontrol and dpkg --build commands.
 
 Finally, debstd automatically modified postinst, postrm, etc scripts. Some
 of the debhelper apps do that too, but they do it differently. Debstd just
@@ -60,4 +60,4 @@ debstd-generated package very closely. Pay special attention to the
 postinst, postrm, etc scripts, and make sure that the new package contains
 all the same files as the old, with the same permissions.
 
--- Joey Hess <joeyh@master.debian.org>
+-- Joey Hess <joeyh@debian.org>

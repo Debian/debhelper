@@ -1,59 +1,46 @@
-.TH DH_INSTALLDIRS 1
+.TH DH_INSTALLDIRS 1 "" "Debhelper Commands" "Debhelper Commands"
 .SH NAME
 dh_installdirs \- create subdirectories in package build directories
 .SH SYNOPSIS
 .B dh_installdirs
-.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir] [dir ...]"
+.I "[debhelper options] [-A] [dir ...]"
 .SH "DESCRIPTION"
 dh_installdirs is a debhelper program that is responsible for creating
 subdirectories in package build directories.
 .P
 Any directory names specified as parameters will be created in the package
-build directory of the first binary package listed in debian/control, if 
-dh_installdirs is acting on that package.
+build directory of the first package dh_installdirs is told to act on. By
+default, this is the first binary package in debian/control, but if you use 
+-p, -i, or -a flags, it will be the first package specified by those flags.
 .P
-A file named debian/dirs (for the first binary package in debian/control),
-or debian/package.dirs (for each additional package in debian/control) can
-list other directories to be created. Seperate the directory names with
-whitespace.
+A file named debian/package.dirs (debian/dirs may be used for the first
+binary package in debian/control) can list other directories to be created.
+Separate the directory names with whitespace.
 .P
 Be sure to only use directory names relative to the package build
 directory. Ie, "/usr/bin" should not be used, use "usr/bin" instead.
 .SH OPTIONS
 .TP
-.B \-v
-Verbose mode; show all commands that modify the package build directory.
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
 .TP
-.B \-a
-Create directories for all architecture dependent packages.
-.TP
-.B \-i
-Create directories for all architecture independent packages.
-.TP
-.B \-ppackage
-Create directories for the package named "package".
-.TP
-.B \-Ptmpdir
-Use "tmpdir" for package build directory. 
+.B \-A, \--all
+Create any directories specified by command line parameters in ALL packages
+acted on, not just the first.
 .TP
 .B dir ...
-Create these directories in the package build directory of the first binary 
-package listed in debian/control, if we are acting on that package.
-.SH NOTES
-The
-.B \-a
-.B \-i
-and
-.B \-p
-arguments are cumulative. If none are specified, then all packages listed in
-the control file will be effected.
+Create these directories in the package build directory of the first package
+acted on. (Or in all packages if -A is specified.)
 .SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
-.BR /usr/doc/debhelper/README
+.BR debhelper (1)
 .SH BUGS
-Directories with spaces in them will not currently be installed.
+It's impossible to specify filenames with spaces or other whitespace in them
+in debian/dirs file. This is more a historical design flaw than a bug.
 .SH AUTHOR
-Joey Hess <joeyh@master.debian.org>
+Joey Hess <joeyh@debian.org>

@@ -1,9 +1,9 @@
-.TH DH_SUIDREGISTER 1
+.TH DH_SUIDREGISTER 1 "" "Debhelper Commands" "Debhelper Commands"
 .SH NAME
 dh_suidregister \- set up package to register files with suidregister
 .SH SYNOPSIS
 .B dh_suidregister
-.I "[-v] [-a] [-i] [-ppackage] [file ...]"
+.I "[debhelper options] [-A] [file ...]"
 .SH "DESCRIPTION"
 dh_suidregister is a debhelper program that is responsible for modifying the
 postinst and postrm scripts of a package so the package will register files
@@ -11,52 +11,52 @@ with
 .BR suidregister (1)
 when it is installed.
 .P
-Any files specified as parameters will be registered, if dh_suidregister is
-acting on the first binary package listed in debian/control.
+Any filenames specified as parameters will be registered in the first 
+package dh_suidregister is told to act on. By default, this is the first 
+binary package in debian/control, but if you use -p, -i, or -a flags, 
+it will be the first package specified by those flags.
 .P
-The files debian/suid (for the first binary package in debian/control) or 
-debian/package.suid (for  each  additional package in debian/control) can 
-list other files to be registered.
+Files named debian/package.suid (or debian/suid for the first binary package
+in debian/control) can list other files to be registered.
 .P
 If neither of these methods is used to specify files, dh_suidregister will
 scan the package build directory for files that have suid permissions, and
 will automatically register all files it finds.
 .P
-Note that this package modifies your postinst and postrm files. See
-.BR dh_installdebfiles (1)
-for an explination of how this works.
+Note that this program modifies your postinst and postrm files. See
+.BR dh_installdeb (1)
+for an explanation of how this works.
+.P
+Also note that all files registered by this program will *not* be suid in the
+resulting .deb file. The postinst of the package will set their permissions
+(even if the user doesn't have suidmanager installed).
 .SH OPTIONS
 .TP
-.B \-v
-Verbose mode; show all commands that modify the package build directory.
+.B debhelper options
+See
+.BR debhelper (1)
+for a list of options common to all debhelper commands.
 .TP
-.B \-a
-Register files for all architecture dependent packages.
-.TP
-.B \-i
-Register files for all architecture independent packages.
-.TP
-.B \-ppackage
-Register files for the package named "package".
+.B \-A, \--all
+Register any files specified by command line parameters in ALL packages
+acted on. I doubt anyone will find this useful, it's here for consitency
+with other debhelper programs.
 .TP
 .B file ...
-Register these files in the first binary package listed in debian/control, 
-if we are acting on that package.
+Register these files in the first package acted on. (Or in all packages if
+-A is specified.)
 .SH NOTES
-The
-.B \-a
-.B \-i
-and
-.B \-p
-arguments are cumulative. If none are specified, then all packages listed in
-the control file will be effected.
+dh_suidregister does not make anything suid. It merely records the
+permissions binaries already have. If you need to make something suid, you
+must do so manually before calling dh_suidregister.
 .SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode
+See
+.BR debhelper (1)
+for a list of environment variables that affect all debhelper commands.
 .SH "SEE ALSO"
-.BR /usr/doc/debhelper/README
-,
-.BR suidregister (1)
+.TP
+.BR debhelper (1)
+.TP
+.BR suidregister (8)
 .SH AUTHOR
-Joey Hess <joeyh@master.debian.org>
+Joey Hess <joeyh@debian.org>

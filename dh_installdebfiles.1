@@ -1,59 +1,33 @@
-.TH DH_INSTALLDOCS 1
+.TH DH_INSTALLDEBFILES 1 "" "Debhelper Commands" "Debhelper Commands"
 .SH NAME
-dh_installdebfiles \- install files into the DEBIAN directory
+dh_installdebfiles \- install files into the DEBIAN directory (deprecated)
 .SH SYNOPSIS
-.B dh_installdebfils
-.I "[-v] [-a] [-i] [-ppackage]"
+.B dh_installdebfiles
 .SH "DESCRIPTION"
 dh_installdebfiles is a debhelper program that is responsible for installing
 files into the DEBIAN directory in package build directories with the
-correct prmissions.
+correct permissions, canculating shared library dependancies, and creating a
+control file.
 .P
-dh_installdocs automatically installs the following files from debian/ into
-the DEBIAN directory:
-.IP postinst
-.IP preinst
-.IP postrm
-.IP prerm
-.IP shlibs
-.IP conffiles
+This program is deprecated. It is now merely a wrapper around three other
+programs, and you may replace any calls to this program by:
 .P
-(For packages other than the first binary package listed in debian/control,
-prefix these filenames with then name of the "package.", for example, 
-"foo.postinst".)
-.P
-In addition, it will generate a DEBIAN/control file, by running
-.BR dpkg-shlibdeps (1)
-and
-.BR dpkg-gencontrol (1)
+  dh_installdeb
+  dh_shlibdeps
+  dh_gencontrol
+.SH WARNING
+This program will be removed at some time in the future.
 .SH OPTIONS
-.TP
-.B \-v
-Verbose mode; show all commands that modify the package build directory.
-.TP
-.B \-a
-Install files for all architecture dependent packages.
-.TP
-.B \-i
-Install files for all architecture independent packages.
-.TP
-.B \-ppackage
-Install files for the package named "package".
-.SH NOTES
-The
-.B \-a
-.B \-i
-and
-.B \-p
-arguments are cumulative. If none are specified, then all packages listed in
-the control file will be effected.
-.SH ENVIRONMENT
-.TP
-.I DH_VERBOSE
-Enables verbose mode
+Any options passed to this program will be sent to each of the 3 programs
+listed above.
 .SH "SEE ALSO"
-.BR /usr/doc/debhelper/README
-.SH "CONFORMS TO"
-Debian policy, version 2.3.0.0
+.TP
+.BR debhelper (1)
+.TP
+.BR dh_installdeb (1)
+.TP
+.BR dh_shlibdeps (1)
+.TP
+.BR dh_gencontrol (1)
 .SH AUTHOR
-Joey Hess <joeyh@master.debian.org>
+Joey Hess <joeyh@debian.org>
