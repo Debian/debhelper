@@ -97,9 +97,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			if (@trans) {
 				warning "ignoring debian/templates.ll files in favour of debian/po directory";
 			}
-			else {
-				complex_doit("po2debconf @extraparams $templates > $tmp/DEBIAN/templates");
-			}
+			complex_doit("po2debconf @extraparams $templates > $tmp/DEBIAN/templates");
 		}
 		elsif (@trans) {
 			complex_doit("debconf-mergetemplate --drop-old-templates @extraparams @trans $templates > $tmp/DEBIAN/templates");

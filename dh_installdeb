@@ -60,7 +60,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			if (-f "debian/$ext$file.debhelper") {
 				# Add this into the script, where it has
 				# #DEBHELPER#
-				# TODO: do internally, no perl fork?
 				complex_doit("perl -pe 's~#DEBHELPER#~qx{cat debian/$ext$file.debhelper}~eg' < $f > $tmp/DEBIAN/$file");
 		        }
 			else {
