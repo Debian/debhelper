@@ -68,9 +68,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 
 		autoscript($package, "postinst", "postinst-xfonts",
-			"s:#CMDS#:".join("\n", map { "\t$_" } @cmds).":;");
+			"s:#CMDS#:".join(";", @cmds).":;");
 		autoscript($package, "postrm", "postrm-xfonts",
-			"s:#CMDS#:".join("\n", @cmds).":;");
+			"s:#CMDS#:".join(";", @cmds).":;");
 
 		addsubstvar($package, "misc:Depends", "xutils", ">= 4.0.3");
 	}
