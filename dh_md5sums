@@ -13,10 +13,10 @@ for PACKAGE in $DH_DOPACKAGES; do
 		doit "install -d debian/$TMP/DEBIAN"
 	fi
 
-	doit "pushd debian/$TMP" >/dev/null
+	doit "cd debian/$TMP"
 	# Doit isn't smart enough to hande this next command so echo by hand. (sigh)
 	verbose_echo 'md5sum `find * -type f ! -regex "^DEBIAN/.*"` > DEBIAN/md5sums </dev/null'
 	md5sum `find * -type f ! -regex "^DEBIAN/.*"` >DEBIAN/md5sums </dev/null
 	doit "chown root.root DEBIAN/md5sums"
-	doit "popd 2>/dev/null" >/dev/null 
+	doit "cd ../.."
 done

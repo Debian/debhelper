@@ -20,23 +20,23 @@ for PACKAGE in $DH_DOPACKAGES; do
 		if [ -f debian/$EXT$file ]; then
 			# Add this into the script, where it has #DEBHELPER#
 			if [ -f debian/$EXT$file.debhelper ]; then
-				verbose_echo "perl -pe \"s~#DEBHELPER#~qx{cat debian/$EXT$file.debhelper}~eg\" < debian/$EXT$file > debian/$TMP/DEBIAN/$EXT$file"
-				perl -pe "s~#DEBHELPER#~qx{cat debian/$EXT$file.debhelper}~eg" < debian/$EXT$file > debian/$TMP/DEBIAN/$EXT$file
-				doit "chown root.root debian/$TMP/DEBIAN/$EXT$file"
-				doit "chmod 755 debian/$TMP/DEBIAN/$EXT$file"
+				verbose_echo "perl -pe \"s~#DEBHELPER#~qx{cat debian/$EXT$file.debhelper}~eg\" < debian/$EXT$file > debian/$TMP/DEBIAN/$file"
+				perl -pe "s~#DEBHELPER#~qx{cat debian/$EXT$file.debhelper}~eg" < debian/$EXT$file > debian/$TMP/DEBIAN/$file
+				doit "chown root.root debian/$TMP/DEBIAN/$file"
+				doit "chmod 755 debian/$TMP/DEBIAN/$file"
 			else
-				doit "install -o root -g root -p debian/$EXT$file debian/$TMP/DEBIAN/"
+				doit "install -o root -g root -p debian/$EXT$file debian/$TMP/DEBIAN/$file"
 			fi
 		else
 			# Auto-generate script header and add .debhelper
 			# content to it.
 			if [ -f debian/$EXT$file.debhelper ]; then
-				verbose_echo "echo '#!/bin/sh -e' > debian/$TMP/DEBIAN/$EXT$file"
-				echo '#!/bin/sh -e' > debian/$TMP/DEBIAN/$EXT$file
-				verbose_echo "cat debian/$EXT$file.debhelper >> debian/$TMP/DEBIAN/$EXT$file"
-				cat debian/$EXT$file.debhelper >> debian/$TMP/DEBIAN/$EXT$file
-				doit "chown root.root debian/$TMP/DEBIAN/$EXT$file"
-				doit "chmod 755 debian/$TMP/DEBIAN/$EXT$file"
+				verbose_echo "echo '#!/bin/sh -e' > debian/$TMP/DEBIAN/$file"
+				echo '#!/bin/sh -e' > debian/$TMP/DEBIAN/$file
+				verbose_echo "cat debian/$EXT$file.debhelper >> debian/$TMP/DEBIAN/$file"
+				cat debian/$EXT$file.debhelper >> debian/$TMP/DEBIAN/$file
+				doit "chown root.root debian/$TMP/DEBIAN/$file"
+				doit "chmod 755 debian/$TMP/DEBIAN/$file"
 			fi
 		fi
 	done
@@ -44,7 +44,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 	# Install non-executable files
 	for file in shlibs conffiles; do
 		if [ -f debian/$EXT$file ]; then
-			doit "install -o root -g root -m 644 -p debian/$EXT$file debian/$TMP/DEBIAN"
+			doit "install -o root -g root -m 644 -p debian/$EXT$file debian/$TMP/DEBIAN/$file"
 		fi                                               
 	done
 
