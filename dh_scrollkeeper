@@ -66,31 +66,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# Get a list of the OMF files
 		my @omf_files = `find $tmp/usr/share/omf -type f -printf '%p\n'`;
 		if (@omf_files) {
-			# Change any remote DTDs into local DTDs. We only
-			# look at the first 10 lines to avoid changing any
-			# of the content. First, the OMF files
-			foreach my $file (@omf_files) {
-				chomp $file;
-				doit("perl", "-i", "-pe", 's,http://scrollkeeper.sourceforge.net/dtds/scrollkeeper-omf-1.0/scrollkeeper-omf.dtd,/usr/share/xml/scrollkeeper/dtds/scrollkeeper-omf.dtd, if $. < 10', $file);
-			}
-			# I could be cunning and parse the OMF for the DocBook
-			# files. That is far too much effort. Find to the
-			# rescue! Look for .xml files in the list of
-			# directories we think they might be in.
-			foreach my $xmlpath (@xml_paths) {
-				foreach my $file (`find $tmp/$xmlpath -type f -name \*.xml -printf '%p\n'`) {
-					chomp $file;
-					doit("perl", "-i", "-pe", 's,http://www.oasis-open.org/docbook/xml/([^/]+)/docbookx.dtd,/usr/share/sgml/docbook/dtd/xml/\\1/docbookx.dtd, if $. < 10', $file);
-				}
-			}
-		
 			if (! $dh{NOSCRIPTS}) {
 				autoscript($package,"postinst","postinst-scrollkeeper");
 				autoscript($package,"postrm","postrm-scrollkeeper");
 			}
-			# The scripts use scrollkeeper-update with the -q
-			# option, so we require 0.3.8+.
-			addsubstvar($package, "misc:Depends", "scrollkeeper", ">= 0.3.8");
+			# scrollkeeper use xml catalogs so we require 0.3.14-5+.
+			addsubstvar($package, "misc:Depends", "scrollkeeper", ">= 0.3.14-5");
 		}
 	}
 }
