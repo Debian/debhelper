@@ -1,3 +1,13 @@
+debhelper (1.2.74) unstable; urgency=low
+
+  * dh_installmanpages: recognizes gzipped man pages and installs them.
+    This is an experimental change, one problem is if your man page isn't
+    already gzip-9'd, it will be in violation of policy. (closes: #38673)
+  * The previous fix to dh_installemacsen was actually quite necessary - the
+    x bit was being set!
+
+ -- Joey Hess <joeyh@master.debian.org>  Thu,  3 Jun 1999 15:14:27 -0700
+
 debhelper (1.2.73) unstable; urgency=low
 
   * dh_installemacsen: make sure files are installed mode 0644. Not strictly
