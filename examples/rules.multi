@@ -41,8 +41,9 @@ binary-indep: build
 	dh_compress -i
 	dh_fixperms -i
 	dh_suidregister -i
-	dh_installdebfiles -i
-	dh_du -a
+	dh_installdeb -i
+	dh_gencontrol -i
+	dh_du -i
 	dh_md5sums -i
 	dh_builddeb -i
 
@@ -66,7 +67,9 @@ binary-arch: build
 	dh_compress -a
 	dh_fixperms -a
 	dh_suidregister -a
-	dh_installdebfiles -a
+	dh_installdeb -a
+	dh_shlibdeps -a
+	dh_gencontrol -a
 #	dh_makeshlibs -a
 	dh_du -a
 	dh_md5sums -a
