@@ -56,11 +56,11 @@ specified, you should not list destination directories in
 debian/package.install files or on the command line. Instead, dh_install
 will guess as follows:
 
-Strip off debian/tmp from the front of the filename, if it is present, and
-install into the dirname of the filename. So if the filename is
-debian/tmp/usr/bin, then that directory will be copied to 
-debian/package/usr/. If the filename is debian/tmp/etc/passwd, it will be 
-copied to debian/package/etc/.
+Strip off debian/tmp (or the sourcedir if one is given) from the front of
+the filename, if it is present, and install into the dirname of the
+filename. So if the filename is debian/tmp/usr/bin, then that directory
+will be copied to debian/package/usr/. If the filename is
+debian/tmp/etc/passwd, it will be copied to debian/package/etc/.
 
 Note that if you list only a filename on a line by itself in a
 debian/package.install file, with no explicit destination, then dh_install
@@ -138,7 +138,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			if (! defined $dest) {
 				# Guess at destination directory.
 				$dest=$src;
-				$dest=~s/^(.*\/)?debian\/tmp//;
+				my $strip=$srcdir;
+				if ($strip eq '.') {
+					$strip = "debian/tmp";
+				}
+				$dest=~s/^(.*\/)?\Q$strip\E//;
 				$dest=dirname($dest);
 			}
 			
@@ -153,6 +157,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				# @installed stuff more robust.
 				$src=~y:/:/:s;
 				$src=~s:/+$::;
+				$src=~s:^(\./)*::;
 				push @installed, "\Q$src\E\/.*|\Q$src\E";
 			}
 			
