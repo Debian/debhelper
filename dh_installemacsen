@@ -27,8 +27,10 @@ for PACKAGE in $DH_DOPACKAGES; do
 
 	if [ "$emacsen_install" -o "$emacsen_remove" ]; then
 		if [ ! "$DH_NOSCRIPTS" ]; then
-			autoscript "postinst" "postinst-emacsen"
-			autoscript "prerm" "prerm-emacsen"
+			autoscript "postinst" "postinst-emacsen" \
+				"s/#PACKAGE#/$PACKAGE/"
+			autoscript "prerm" "prerm-emacsen" \
+				"s/#PACKAGE#/$PACKAGE/"
 		fi
 	fi	
 done
