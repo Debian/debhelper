@@ -14,8 +14,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 done
 doit "rm -f debian/files* debian/*.debhelper $*"
 
-# Remove other temp files. I don't run this through doit becuase
-# I haven't figured out what I have to esacape to put it in quotes.
-# However, it doesn't modify debian/$TMP, so I guess it's ok to not run it 
-# through doit.
+# Remove other temp files. doit isn't smart enough to handle this, so I echo
+# by hand (sigh).
+verbose_echo "find . \( -name "\#*\#" -o -name "*~" -o -name "DEADJOE" \) -exec rm -f {} \;"
 find . \( -name "\#*\#" -o -name "*~" -o -name "DEADJOE" \) -exec rm -f {} \;
