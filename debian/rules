@@ -41,6 +41,22 @@ binary-indep: build
 	./dh_installexamples examples/*
 	./dh_installmenu
 	./dh_installmanpages
+	# Fix up the debhelper.1 man page, substituting in a list of all
+	# debhelper commands. eek!
+	perl -ne ' \
+		s/\\- /(1)\n/; \
+		$$collect.=".TP\n.BR $$_" if $$. eq 3 && /^dh_/; \
+		close(ARGV) if eof; \
+		END { \
+			open(I,"debhelper.1"); \
+			open(O,">debian/tmp/usr/man/man1/debhelper.1"); \
+			while (<I>) { \
+				s/#LIST#/$$collect/; \
+				print O; \
+			} \
+			close I; \
+			close O; \
+		}' *.1
 	./dh_installchangelogs
 	./dh_movefiles
 	./dh_link
