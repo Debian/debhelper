@@ -15,7 +15,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 	# .in files, which are from configure.
 	# We also need to exclude all debian/tmp type dirs.
 	EXCLUDE=`grep ^Package: debian/control | cut -d " " -f 2 | tac | tr "\n" "|"`
-	for file in `find * -name "*.[1-9]*" ! -name "*.ex" ! -name "*.in" | egrep -v "^debian/(${EXCLUDE}tmp)"`; do
+	for file in `find * -name "*.[1-9]*" ! -name "*.ex" ! -name "*.in" | egrep -v "^debian/(${EXCLUDE}tmp)/"`; do
 		# Make sure file thinks they are man pages.
 		if file $file|grep -q roff; then
 			if echo $file|grep -q /; then
