@@ -25,10 +25,15 @@ fi
 for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
 
+	changelog=`pkgfile $PACKAGE changelog`
+	if [ ! "$changelog" ]; then
+		changelog=debian/changelog
+	fi
+
 	if [ ! -d $TMP/usr/doc/$PACKAGE ]; then
 		doit "install -d $TMP/usr/doc/$PACKAGE"
 	fi
-	doit "install -p -m644 debian/changelog $TMP/usr/doc/$PACKAGE/$CHANGELOG_NAME"
+	doit "install -p -m644 $changelog $TMP/usr/doc/$PACKAGE/$CHANGELOG_NAME"
 
 	if [ "$UPSTREAM" ]; then
 		doit "install -p -m644 $UPSTREAM $TMP/usr/doc/$PACKAGE/changelog"

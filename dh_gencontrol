@@ -9,12 +9,17 @@ for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
 	EXT=`pkgext $PACKAGE`
 
+	changelog=`pkgfile $PACKAGE changelog`
+	if [ ! "$changelog" ]; then
+		changelog=debian/changelog
+	fi
+
 	if [ ! -d $TMP/DEBIAN ]; then
 		doit "install -o root -g root -d $TMP/DEBIAN"
 	fi
 
 	# Generate and install control file.
-	doit "dpkg-gencontrol -p$PACKAGE -Tdebian/${EXT}substvars -P$TMP $DH_U_PARAMS"
+	doit "dpkg-gencontrol -l$changelog -p$PACKAGE -Tdebian/${EXT}substvars -P$TMP $DH_U_PARAMS"
 	# This chmod is only necessary if the user sets the umask to something odd.
 	doit "chmod 644 $TMP/DEBIAN/control"
 	doit "chown root.root $TMP/DEBIAN/control"

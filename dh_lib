@@ -53,9 +53,9 @@ tmpdir() {
 # Pass this the name of a binary package, and the name of the file wanted
 # for the package, and it will return the actual filename to use. For
 # example if the package is foo, and the file is somefile, it will look for 
-# debian/somefile, and if found return that, otherwise, it will look for
-# debian/foo, and if found, return that. Failing that, it will return
-# nothing.
+# debian/somefile, and if found return that, otherwise, if the package is
+# the main package, it will look for debian/foo, and if found, return that. 
+# Failing that, it will return nothing.
 pkgfile() {
 	if [ -e "debian/$1.$2" ]; then
 		echo "debian/$1.$2"

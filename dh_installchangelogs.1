@@ -11,7 +11,9 @@ changelogs into package build directories.
 dh_installchangelogs determines if the package is a debian native package,
 and if so, it installs debian/changelog into usr/doc/package/changelog in
 the package build directory. Otherwise, it installs debian/changelog into
-usr/doc/package/changelog.Debian in the package build directory.
+usr/doc/package/changelog.Debian in the package build directory. (If files
+named debian/package.changelog exist, they will be used in preference to
+debian/changelog.)
 .P
 If an upstream changelog file is specified as an option, and the package is
 not a native debian package, then this upstream changelog will be installed

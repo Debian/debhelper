@@ -9,7 +9,9 @@ for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
 	files=`pkgfile $PACKAGE files`
 
-	move=""
+	if [ ! -d "debian/tmp" ]; then
+		error "debian/tmp does not exist"
+	fi
 
 	# debian/files has a different purpose, so ignore it.
 	if [ "$files" -a "$files" != "debian/files" ]; then
@@ -22,6 +24,21 @@ for PACKAGE in $DH_DOPACKAGES; do
 		fi
 
 		files=`pwd`/$files
-		complex_doit "(cd debian/tmp;tar --create --remove-files --file - "`cat $files`") | (cd $TMP;tar xpf -)"
+
+		# Order the files. First all real files, then symlinks. 
+		# Putting symlinks last is a nice thing to do for library 
+		# packages and doesn't affect much of anything else.
+		#
+		# (The echo is in here to expand wildcards. Note that ls
+		# won't work properly.)
+		for i in `(cd debian/tmp ; echo \`cat $files\`)`; do
+			tomove="`(cd debian/tmp ; \
+				find $i ! -type d -and ! -type l -print)` \
+				$tomove \
+				`(cd debian/tmp ; \
+				find $i ! -type d -and -type l -print)`"
+		done
+
+		complex_doit "(cd debian/tmp;tar --create --remove-files --file - "$tomove") | (cd $TMP;tar xpf -)"
 	fi
 done
