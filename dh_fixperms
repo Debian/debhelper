@@ -21,11 +21,12 @@ sane state -- a state that complies with Debian policy.
 
 dh_fixperms makes all files in usr/share/doc in the package build directory
 (excluding files in the examples/ directory) be mode 644. It also changes
-the permissions of all man pages to mode 644. It makes all files be owned by
-root, and it removes group and other write permission from all files.
-It removes execute permissions from any libraries that have it set. It makes
-all files in bin/ directories and etc/init.d executable (v4 only). Finally,
-it removes the setuid and setgid bits from all files in the package.
+the permissions of all man pages to mode 644. It makes all files be owned
+by root, and it removes group and other write permission from all files. It
+removes execute permissions from any libraries that have it set. It makes
+all files in bin/ directories, /usr/games/ and etc/init.d executable (v4
+only). Finally, it removes the setuid and setgid bits from all files in the
+package.
 
 =head1 OPTIONS
 
@@ -82,7 +83,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# v4 only
 	if (! compat(3)) {
 		# Programs in the bin and init.d dirs should be executable..
-		for my $dir (qw{usr/bin bin usr/sbin sbin etc/init.d}) {
+		for my $dir (qw{usr/bin bin usr/sbin sbin usr/games etc/init.d}) {
 			if (-d "$tmp/$dir") {
 				complex_doit("find $tmp/$dir -type f $find_options -print0 2>/dev/null",
 					"| xargs -0r chmod +x");

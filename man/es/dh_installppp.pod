@@ -1,0 +1,52 @@
+# (c) 2003 Software in the Public Interest
+# Esta traducción ha sido realizada por Rubén Porras <nahoo@inicia.es>
+# Está basada en la página de manual original:
+# versión 1.1 del CVS de
+# /cvs/debian-doc/manpages/english/debhelper/dh_installppp.pod
+
+=head1 NOMBRE
+
+dh_installppp - instala los ficheros ip-up e ip-down de ppp
+
+=head1 SINOPSIS
+
+B<dh_installppp> [S<I<debhelper opciones>>] [B<--name=>I<nombre>]
+
+=head1 DESCRIPCIÓN
+
+dh_installppp es un programa de debhelper responsable de instalar
+los scripts ip-up e ip-down de ppp en los directorios de construcción del
+paquete.
+
+Si existe un fichero llamado debian/package.ppp.ip-up, se instala en
+etc/ppp/ip-up.d/paquete en el directorio de construcción del paquete. 
+Los ficheros debian/package.ppp.ip-down se instalan en etc/ppp/ip-down.d/paquete.
+
+=head1 OPCIONES
+
+=over 4
+
+=item B<--name=>I<nombre>
+
+Busca ficheros llamados debian/paquete.nombre.ppp.ip-* y los instala como
+etc/ppp/ip-*/nombre, en vez de usar los ficheros usuales e instalarlos con
+el nombre del paquete.
+
+=back
+
+=head1 VÉASE TAMBIÉN
+
+L<debhelper(7)>
+
+Este programa es parte de debhelper.
+
+=head1 AUTOR
+
+Joey Hess <joeyh@debian.org>
+
+=head1 TRADUCTOR
+
+Traducción de Rubén Porras Campo <debian-l10n-spanish@lists.debian.org>
+
+
+=cut
