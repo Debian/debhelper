@@ -33,13 +33,16 @@ for PACKAGE in $DH_DOPACKAGES; do
 		# won't work properly.)
 		tomove=""
 		for i in `(cd debian/tmp ; echo \`cat $files\`)`; do
-			tomove="`(cd debian/tmp ; \
-				find $i ! -type d -and ! -type l -print)` \
-				$tomove \
-				`(cd debian/tmp ; \
-				find $i ! -type d -and -type l -print)`"
+tomove="`(cd debian/tmp ;\
+find $i ! -type d -and ! -type l -print)`\
+$tomove\
+`(cd debian/tmp ;\
+find $i ! -type d -and -type l -print)`"
 		done
-
-		complex_doit "(cd debian/tmp;tar --create --remove-files --file - "$tomove") | (cd $TMP;tar xpf -)"
+		
+		# Use a filelist, so very weird filenames can be moved.
+		complex_doit "echo '$tomove' > movelist"
+		complex_doit "(cd debian/tmp;tar --create --remove-files --files-from=../../movelist --file -) | (cd $TMP;tar xpf -)"
+		doit "rm -f movelist"
 	fi
 done
