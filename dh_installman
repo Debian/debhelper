@@ -20,8 +20,14 @@ dh_installman is a debhelper program that handles installing
 man pages into the correct locations in package build directories. You tell
 it what man pages go in your packages, and it figures out where to
 install them based on the section field in their .TH line and their filename
-extention. It also supports translated man pages, by looking for extensions
+extension. It also supports translated man pages, by looking for extensions
 like .ll.8 and .ll_LL.8
+
+If dh_installman seems to install a man page into the wrong section or with
+the wrong extension, this is because the man page has thw wrong section
+listed in its .TH line. Edit the man page and correct the section, and
+dh_installman will follow suit.  See to L<man(7)> for details about the .TH
+section.
 
 Any man page filenames specified as parameters will be installed into the
 first package dh_installman is told to act on. By default, this is the

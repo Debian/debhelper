@@ -1,3 +1,17 @@
+debhelper (3.4.2) unstable; urgency=low
+
+  * dh_installman: more documentation about the .TH line. Closes: #129205
+  * dh_installxfonts:
+    - Packages that use this should depend on xutils. See man page.
+    - However, if you really want to, you can skip the dep, and the
+      postinst will avoid running program that arn't available. Closes: #131053
+    - Use update-fonts-dir instead of handling encodings ourselves. Yay!
+    - Pass only the last component of the directory name to
+      update-fonts-*, since that's what they perfer now.
+    - Other changes, chould fully comply with Debian X font policy now.
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 15 Jan 2002 12:17:43 -0500
+
 debhelper (3.4.1) unstable; urgency=low
 
   * Fixed programmer's documentation of DOINDEP and DOARCH, Closes: #128546
