@@ -86,6 +86,9 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	}
 
 	if (@f) {
+		# Make executables not be anymore.
+		xargs(\@f,"chmod","a-x");
+		
 		xargs(\@f,"gzip","-9f");
 	}
 	
