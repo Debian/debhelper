@@ -68,7 +68,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	my %doc_ids;
 	
 	opendir(DEB,"debian/") || error("can't read debian directory: $!");
-	foreach (grep {/^$PACKAGE\.doc-base\..*$/} readdir(DEB)) {
+	foreach (grep {/^\Q$PACKAGE\E\.doc-base\..*$/} readdir(DEB)) {
 		$id=$_;
 		$id=~s/\.doc-base\./-/;
 		$doc_ids{$id}="debian/$_";
