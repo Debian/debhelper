@@ -1,3 +1,26 @@
+debhelper (2.0.76) unstable; urgency=low
+
+  * dh_installmanpages:
+    - Added support for translated man pages, with a patch from Kis Gergely
+      <kisg@lme.linux.hu>. Closes: #51268 
+    - Fixed the undefined value problem in Kis's patch. 
+    - This also Closes: #37092 come to think of it. 
+  * dh_shlibdeps, dh_shlibdeps.1:
+    - Added -X option, which makes it not examine some files. This is
+      useful in rare cases. Closes: #51100 
+    - Always pass "-dDepends" before the list of files, which makes it
+      easier to specify other -d parameters in the uparams, and doesn't
+      otherwise change the result at all. 
+  * doc/TODO:
+     - dh_installdebfiles is no longer a part of debhelper. This affects
+      exactly one package in unstable, biss-awt, which has had a bug filed
+      against it for 200+ days now asking that it stop using the program.
+      dh_installdebfiles has been depreacted for nearly 2 years now.. 
+  * This changelog was automatically generated from CVS commit information.
+    Fear makechangelog.
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 28 Nov 1999 21:59:00 -0800
+
 debhelper (2.0.75) unstable; urgency=low
 
   * Fixed typo in dh_installmenu.1, Closes: #51332
