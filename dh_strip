@@ -53,6 +53,17 @@ if (defined $ENV{DEB_BUILD_OPTIONS} && $ENV{DEB_BUILD_OPTIONS} =~ /nostrip/) {
 	exit;
 }
 
+# I could just use `file $_[0]`, but this is safer
+sub get_file_type {
+	my $file=shift;
+	open (FILE, '-|') # handle all filenames safely
+		|| exec('file', $file)
+		|| die "can't exec file: $!";
+	my $type=<FILE>;
+	close FILE;
+	return $type;
+}
+
 # Check if a file is an elf binary, shared library, or static library,
 # for use by File::Find. It'll fill the following 3 arrays with anything
 # it finds:
@@ -70,7 +81,7 @@ sub testfile {
 	# Does its filename look like a shared library?
 	if (m/.*\.so.*?/) {
 		# Ok, do the expensive test.
-		my $type=`file $_`;
+		my $type=get_file_type($_);
 		if ($type=~m/.*ELF.*shared.*/) {
 			push @shared_libs, $fn;
 			return;
@@ -81,7 +92,7 @@ sub testfile {
 	my (undef,undef,$mode,undef)=stat(_);
 	if ($mode & 0111) {
 		# Ok, expensive test.
-		my $type=`file $_`;
+		my $type=get_file_type($_);
 		if ($type=~m/.*ELF.*executable.*/) {
 			push @executables, $fn;
 			return;
