@@ -8,7 +8,7 @@ init();
 
 foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	$TMP=tmpdir($PACKAGE);
-	foreach $type (qw{daily weekly monthly d}) {
+	foreach $type (qw{daily weekly monthly}) {
 		$cron=pkgfile($PACKAGE,"cron.$type");
 		if ($cron) {
 			if (! -d "$TMP/etc/cron.$type") {
@@ -16,5 +16,13 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			}
 			doit("install",$cron,"$TMP/etc/cron.$type/$PACKAGE");
 		}
+	}
+	# Seperate because this needs to be mode 644.
+	$cron=pkgfile($PACKAGE,"cron.d");
+	if ($cron) {
+		if (! -d "$TMP/etc/cron.d") {
+			doit("install","-o","root","-g","root","-d","$TMP/etc/cron.d");
+		}	
+		doit("install","-m",644,"-o","root","-g","root","-d","$TMP/etc/cron.d");
 	}
 }
