@@ -50,10 +50,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# Figure out what commands the postinst will need to call.
 		my @updatecmds=('makefontdir');
 		foreach my $f (@fontdirs) {
-			push @updatecmds, '/usr/sbin/update-fonts-alias'
+			push @updatecmds, 'update-fonts-alias'
 				if -f "$tmp/etc/X11/fonts/$f/$package.alias";
 			# This must come _before_ mkfontdir, thus the unshift.
-			unshift @updatecmds, '/usr/sbin/update-fonts-scale'
+			unshift @updatecmds, 'update-fonts-scale'
 				if -f "$tmp/etc/X11/fonts/$f/$package.scale";
 		}
 
