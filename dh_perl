@@ -7,8 +7,14 @@ BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
 use Dh_Lib;
 init();
 
-my $perl = $ENV{'PERL'} || '/usr/bin/perl';
-$version=sprintf("%.3f", $]);
+my $perl = $ENV{PERL} || '/usr/bin/perl';
+
+# Figure out the version of perl. If $ENV{PERL} is set, query the perl binary
+# it points to, otherwise query perl directly.
+my $version=sprintf("%.3f", $]);
+if (defined $ENV{PERL}) {
+	$version=`$ENV{PERL} -e 'printf "%.3f", \$]'`;
+}
 
 foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	$TMP=tmpdir($PACKAGE);
@@ -21,7 +27,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 
 	# Look for perl modules and check where they are installed
 	if (-d "$TMP/usr/lib/perl5") {
-	    foreach $file (split(/\n/,`find $TMP/usr/lib/perl5 -type f -name "*.pm"`)) {
+	    foreach $file (split(/\n/,`find $TMP/usr/lib/perl5 -type f \\( -name "*.pm" -or -name "*.so" \\)`)) {
 	        $found++;
 		if ($file =~ m<^$TMP/usr/lib/perl5/(\d\.\d{3})/([^/]+)/>) {
 			$v = $1;
