@@ -1,3 +1,14 @@
+debhelper (4.1.33) unstable; urgency=low
+
+  * wiggy didn't take my hint about making update-modules send warnings to
+    stderr, so its overly verbose stdout is now directed to /dev/null to
+    prevent conflicts with debconf. Closes: #150804
+  * dh_fixperms: only skip examples directories which in a parent of
+    usr/share/doc, not in a deeper tree. Closes: #152602
+  * dh_compress: stop even looking at usr/doc
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 22 Feb 2003 14:45:32 -0500
+
 debhelper (4.1.32) unstable; urgency=low
 
   * dh_md5sums: note that it's used by debsums. Closes: #181521

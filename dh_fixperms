@@ -59,9 +59,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		
 	# Fix up premissions in usr/share/doc, setting everything to not
 	# executable by default, but leave examples directories alone.
-	complex_doit("find $tmp/usr/share/doc $tmp/usr/doc -type f $find_options ! -regex '.*/examples/.*' -print0 2>/dev/null",
+	complex_doit("find $tmp/usr/share/doc -type f $find_options ! -regex '$tmp/usr/share/doc/[^/]*/examples/.*' -print0 2>/dev/null",
 		"| xargs -0r chmod 644");
-	complex_doit("find $tmp/usr/share/doc $tmp/usr/doc -type d $find_options -print0 2>/dev/null",
+	complex_doit("find $tmp/usr/share/doc -type d $find_options -print0 2>/dev/null",
 		"| xargs -0r chmod 755");
 
 	# Executable man pages are a bad thing..
