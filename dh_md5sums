@@ -29,7 +29,13 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	}
 
 	$olddir=getcwd();
-	complex_doit("cd $TMP ; find * -type f $exclude ! -regex '^DEBIAN/.*' -print0 | xargs -0 md5sum > DEBIAN/md5sums ; cd $olddir");
-	doit("chmod",644,"$TMP/DEBIAN/md5sums");
-	doit("chown","root.root","$TMP/DEBIAN/md5sums");
+	complex_doit("cd $TMP ; find * -type f $exclude ! -regex '^DEBIAN/.*' -print0 | xargs -r0 md5sum > DEBIAN/md5sums ; cd $olddir");
+	# If the file's empty, no reason to waste inodes on it.
+	if (-z "$TMP/DEBIAN/md5sums") {
+		doit("rm","-f","$TMP/DEBIAN/md5sums");
+	}
+	else {
+		doit("chmod",644,"$TMP/DEBIAN/md5sums");
+		doit("chown","root.root","$TMP/DEBIAN/md5sums");
+	}
 }
