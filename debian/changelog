@@ -1,3 +1,11 @@
+debhelper (4.1.66) unstable; urgency=low
+
+  * dh_link: rm -f every time, ln -f is not good enough if the link target
+    is an existing directory (aka, ln sucks). Closes: #206245
+  * dh_clean: honor -X for debian/tmp removal. Closes: #199952 more or less.
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 19 Aug 2003 19:52:53 -0400
+
 debhelper (4.1.65) unstable; urgency=low
 
   * Converted several chown 0.0 to chown 0:0 for POSIX 200112.

@@ -119,7 +119,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 					push @links, "$dir/$target";
 				}
 				push @links, "$dir/$_";
-				doit("rm","-f",$_);
 				
 			},
 			$tmp);
@@ -164,7 +163,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$src="/$src";
 		}
 		
-		doit("ln","-sf",$src,"$tmp/$dest");
+		doit("rm", "-f", "$tmp/$dest");
+		doit("ln","-sf", $src, "$tmp/$dest");
 	}
 }
 

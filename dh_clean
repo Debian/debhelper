@@ -106,7 +106,8 @@ if (! $dh{D_FLAG}) {
 		unless excludefile("autom4te.cache");
 }
 
-doit('rm', '-rf', 'debian/tmp') if -x 'debian/tmp' && ! compat(1);
+doit('rm', '-rf', 'debian/tmp') if -x 'debian/tmp' && ! compat(1) &&
+                                   ! excludefile("debian/tmp");
 
 =head1 SEE ALSO
 
