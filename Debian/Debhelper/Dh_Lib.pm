@@ -264,6 +264,11 @@ sub pkgext { my $package=shift;
 			my $version=`dpkg-parsechangelog -l$isnative_changelog`;
 			($dh{VERSION})=$version=~m/Version: (.*)/m;
 
+			# Did the changelog parse fail?
+			if (! defined $dh{VERSION}) {
+				error("changelog parse failure");
+			}
+
 			# Is this a native Debian package?
 			if ($dh{VERSION}=~m/.*-/) {
 				$isnative_cache{$package}=0;
