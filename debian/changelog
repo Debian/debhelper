@@ -1,3 +1,20 @@
+debhelper (0.7) unstable; urgency=low
+
+  * Sped up some things by removing unnecesary for loops.
+  * dh_installdocs: behavior modifcation: if there is a debian/TODO, it is
+    named like a debian/changelog file: if the package is a debian native
+    package, it is installed as TODO. If the package is not a native package,
+    it is installed as TODO.Debian.
+  * dh_installdocs: handle debian/README.Debian as well as
+    debian/README.debian.
+  * Added dh_undocumented program, which can set up undocumented.7 symlinks.
+  * Moved dh_installdebfiles to come after dh_fixperms in the example rules
+    files. (dh_installdebfiles makes sure it installs things with the proper
+    permissions, and this reorganization makes the file a bit more flexable
+    in a few situations.)
+
+ -- Joey Hess <joeyh@master.debian.org>  Mon, 13 Oct 1997 20:08:05 -0400
+
 debhelper (0.6) unstable; urgency=low
 
   * Got rid of bashisms - this package should work now if /bin/sh is ash.

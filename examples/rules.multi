@@ -34,10 +34,11 @@ binary-indep: build
 	dh_installmenu -i
 	dh_installcron -i
 #	dh_installmanpages -i
+#	dh_undocumented
 	dh_installchangelogs -i
 	dh_compress -i
-	dh_installdebfiles -i
 	dh_fixperms -i
+	dh_installdebfiles -i
 	dh_builddeb -i
 
 # Build architecture-dependent files here.
@@ -52,11 +53,12 @@ binary-arch: build
 	dh_installmenu -a
 	dh_installcron -a
 	dh_installmanpages -a
+#	dh_undocumented
 	dh_installchangelogs -a
 	dh_strip -a
 	dh_compress -a
-	dh_installdebfiles -a
 	dh_fixperms -a
+	dh_installdebfiles -a
 	dh_builddeb -a
 
 binary: binary-indep binary-arch

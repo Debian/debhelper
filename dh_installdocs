@@ -25,18 +25,24 @@ for PACKAGE in $DH_DOPACKAGES; do
 	fi
 
 	if [ "$docs" ]; then
-		for file in $docs; do
-			doit "cp -a $file debian/$TMP/usr/doc/$PACKAGE/"
-		done
+		doit "cp -a $docs debian/$TMP/usr/doc/$PACKAGE/"
 	fi
 
 	# Install these files only into the main package by default.
 	if [ "$PACKAGE" = "$MAINPACKAGE" ]; then
-		for file in README.debian TODO ; do
-			if [ -f debian/$file ]; then
-				doit "install -m 644 -p debian/$file debian/$TMP/usr/doc/$PACKAGE/"
+		if [ -f debian/README.debian ]; then
+			doit "install -m 644 -p debian/README.debian debian/$TMP/usr/doc/$PACKAGE/"
+		fi
+		if [ -f debian/README.Debian ]; then
+			doit "install -m 644 -p debian/README.Debian debian/$TMP/usr/doc/$PACKAGE/"
+		fi
+		if [ -f debian/TODO ]; then
+			if [ "$NATIVE" ]; then
+				doit "install -m 655 -p debian/TODO debian/$TMP/usr/doc/$PACKAGE/TODO"
+			else
+				doit "install -m 644 -p debian/TODO debian/$TMP/usr/doc/$PACKAGE/TODO.Debian"
 			fi
-		done
+		fi
 	fi
 
 	if [ -f debian/copyright ]; then
