@@ -247,7 +247,7 @@ sub compat {
 	}
 	elsif (-e 'debian/compat') {
 		# Try the file..
-		open (COMPAT_IN, "debian/compat") || die "debian/compat: $!";
+		open (COMPAT_IN, "debian/compat") || error "debian/compat: $!";
 		$c=<COMPAT_IN>;
 		chomp $c;
 	}
@@ -392,7 +392,7 @@ sub delsubstvar {
 	my $substvarfile="debian/${ext}substvars";
 
 	if (-e $substvarfile) {
-		complex_doit("grep -v '^${substvar}=' $substvarfile > $substvarfile.new || true");
+		complex_doit("grep -s -v '^${substvar}=' $substvarfile > $substvarfile.new || true");
 		doit("mv", "$substvarfile.new","$substvarfile");
 	}
 }
@@ -416,7 +416,7 @@ sub addsubstvar {
 	my $line="";
 	if (-e $substvarfile) {
 		my %items;
-		open(SUBSTVARS_IN, "$substvarfile") || die "read $substvarfile: $!";
+		open(SUBSTVARS_IN, "$substvarfile") || error "read $substvarfile: $!";
 		while (<SUBSTVARS_IN>) {
 			chomp;
 			if (/^\Q$substvar\E=(.*)/) {
@@ -439,8 +439,11 @@ sub addsubstvar {
 	}
 
 	if (length $line) {
-		 complex_doit("(grep -v ${substvar} $substvarfile 2>/dev/null; echo '${substvar}=$line') > $substvarfile.new");
+		 complex_doit("(grep -s -v ${substvar} $substvarfile; echo '${substvar}=$line') > $substvarfile.new");
 		 doit("mv", "$substvarfile.new", $substvarfile);
+	}
+	else {
+		delsubstvar($package,$substvar);
 	}
 }
 

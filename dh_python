@@ -1,0 +1,208 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dh_python - calculates python dependencies and adds postinst and prerm python scripts
+
+=cut
+
+use strict;
+use File::Find;
+use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+B<dh_python> [S<I<debhelper options>>] [B<-n>] [S<I<module dirs ...>>]
+
+=head1 DESCRIPTION
+
+dh_python is a debhelper program that is responsible for generating the
+${python:Depends} substitutions and adding them to substvars files. It
+will also add a postinst and a prerm script if required.
+
+The program will look at python scripts and modules in your package, and
+will use this information to generate a dependency on python, with the
+current major version, or on pythonX.Y if your scripts or modules need a
+specific python version. The dependency will be substituted into your
+package's control file wherever you place the token "${python:Depends}".
+
+If some modules need to be byte-compiled at build time, appropriate
+postinst and prerm scripts will be generated.
+
+=head1 OPTIONS
+
+=over 4
+
+=item I<module dirs>
+
+If your package installs python modules in non-standard directories, you
+can make dh_python check those directories by passing their names on the
+command line. By default, it will check /usr/lib/site-python,
+/usr/lib/$PACKAGE, /usr/share/$PACKAGE, /usr/lib/games/$PACKAGE,
+/usr/share/games/$PACKAGE and /usr/lib/python?.?/site-packages.
+
+=item B<-n>, B<--noscripts>
+
+Do not modify postinst/postrm scripts.
+
+=back
+
+=head1 CONFORMS TO
+
+Debian policy, version 3.5.7
+
+Python policy, version 0.3.7
+
+=cut
+
+init();
+
+my $python = 'python';
+
+# The current python major version
+my $python_version;
+my $python_major;
+if(`$python -V 2>&1` =~ m/^Python\s+(\d+)\.(\d+)\.\d+\n$/) {
+	$python_version = "$1.$2" ;
+	$python_major = $1 ;
+} else { 
+	error("Cannot obtain python version.");
+}
+
+# The next python version
+my $python_nextversion = $python_version + 0.1;
+my $python_nextmajor = $python_major + 1;
+
+my @python_allversions = ('1.5','2.1','2.2','2.3');
+foreach (@python_allversions) {
+	s/^/python/;
+}
+
+# Cleaning the paths given on the command line
+foreach (@ARGV) {
+	s#/$##;
+	s#^/##;
+}
+
+# dependency types
+use constant PROGRAM   => 1;
+use constant PY_MODULE => 2;
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp = tmpdir($package);
+
+	delsubstvar($package, "python:Depends");
+
+	# Check for current python dependencies
+	my @dirs = ("usr/lib/site-python", "usr/lib/$package", "usr/share/$package", "usr/lib/games/$package", "usr/share/games/$package", @ARGV );
+	@dirs = grep -d, map "$tmp/$_", @dirs;
+
+	my $deps = 0;
+	my %verdeps = ();
+	foreach (@python_allversions) {
+		$verdeps{$_} = 0;
+	}
+
+	# Find scripts
+	find sub {
+		return unless -f and (-x or /\.py$/);
+		local *F;
+		return unless open F, $_;
+		if (read F, local $_, 32 and m%^#!\s*/usr/bin/(env\s+)?(python(\d+\.\d+)?)\s%) {
+			if ( "python" eq $2 ) {
+				$deps |= PROGRAM;
+			} elsif(defined $verdeps{$2}) {
+				$verdeps{$2} |= PROGRAM;
+			}
+		}
+		close F;
+	}, $tmp;
+
+	# Look for python modules
+	my $dirlist="";
+	if (@dirs) {
+		foreach my $curdir (@dirs) {
+			my $has_module = 0;
+			$curdir =~ s%^$tmp/%%;
+			find sub {
+				return unless -f;
+				$has_module = 1 if /\.py$/;
+			}, "$tmp/$curdir" ;
+			if($has_module) {
+				$deps |= PY_MODULE;
+				$dirlist="$dirlist /$curdir";
+			}
+		}
+	}
+
+	# Dependencies on current python
+	my $dep_on_python = 0;
+	my $strong_dep = 0;
+	$dep_on_python = 1 if $deps;
+	$strong_dep = 1 if($deps & PY_MODULE);
+	if($package =~ /^python-/) {
+		my $pack = $package;
+		$pack =~ s/^python/python$python_version/;
+		if(grep { "$_" eq "$pack" } @{$dh{DOPACKAGES}}) {
+			addsubstvar($package, "python:Depends", $pack);
+			$dep_on_python = 1;
+			$strong_dep = 1;
+		}
+	}
+	if($dep_on_python) {
+		addsubstvar($package, "python:Depends", $python, ">= $python_version");
+		if($strong_dep) {
+			addsubstvar($package, "python:Depends", $python, "<< $python_nextversion");
+		} else {
+			addsubstvar($package, "python:Depends", $python, "<< $python_nextmajor");
+		}
+	}
+
+	my $need_prerm = 0;
+
+	# Look for specific pythonX.Y modules
+	foreach my $pyver (@python_allversions) {
+		my $pydir="/usr/lib/$pyver/site-packages";
+		if (grep -d,"$tmp$pydir") {
+			find sub {
+				return unless -f;
+				$verdeps{$pyver} |= PY_MODULE if /\.py$/;
+			}, "$tmp$pydir";
+		}
+		
+		# Go for the dependencies
+		addsubstvar($package, "python:Depends", $pyver) if $verdeps{$pyver};
+
+		# And now, the postinst and prerm stuff
+		if($pyver eq "python$python_version") {
+			if($verdeps{$pyver} & PY_MODULE) {
+				$pydir = $pydir.$dirlist;
+			} else {
+				$pydir = $dirlist;
+			}
+			$verdeps{$pyver} |= PY_MODULE if($deps & PY_MODULE);
+		}
+		if($verdeps{$pyver} & PY_MODULE) {
+			autoscript($package,"postinst","postinst-python","s%#PYVER#%$pyver%;s%#DIRLIST#%$pydir%");
+			$need_prerm = 1;
+		}
+	}
+	if($need_prerm) {
+		autoscript($package,"prerm","prerm-python","s%#PACKAGE#%$package%");
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Josselin Mouette <joss@debian.org>
+
+most ideas stolen from Brendan O'Dea <bod@debian.org>
+
+=cut
+
