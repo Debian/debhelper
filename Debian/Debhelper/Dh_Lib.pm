@@ -233,7 +233,7 @@ sub pkgfile {
 	my $filename=shift;
 
 	if (-f "debian/$package.$filename.".buildarch()) {
-		return "debian/$package.$filename".buildarch();
+		return "debian/$package.$filename.".buildarch();
 	}
 	elsif (-f "debian/$package.$filename") {
 		return "debian/$package.$filename";
