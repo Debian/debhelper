@@ -10,10 +10,12 @@
 # This has been gutted and extensively rewritten to function as a debhelper
 # command by Joey Hess. And then completly rewritten in perl.
 
+use Debian::Debhelper::Dh_Lib;
+
 # Need to stay compatable with debstd, so force use of level 1.
 $ENV{DH_COMAPT}=1;
 
-# Pre-parse command line before we load Dh_lib, becuase we use a
+# Pre-parse command line before we parse the command line, becuase we use a
 # different style of arguments.
 @argv=();
 foreach (@ARGV) {
@@ -37,9 +39,6 @@ foreach (@ARGV) {
 	}
 }
 @ARGV=@argv;
-
-BEGIN { push @INC, "debian", "/usr/share/debhelper" }
-use Dh_Lib;
 init();
 
 # Tolerate old style debstd invocations

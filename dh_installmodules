@@ -2,8 +2,7 @@
 #
 # Register modules with modutils.
 
-BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
-use Dh_Lib;
+use Debian::Debhelper::Dh_Lib;
 init();
 
 foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
@@ -17,7 +16,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	if ($file) {
 		if (! -e "$TMP/etc/modutils") {
 			doit("install","-d","$TMP/etc/modutils");
-			doit("cp","-m0644",$file,"$TMP/etc/modutils/$PACKAGE");
+			doit("install","-m","0644",$file,"$TMP/etc/modutils/$PACKAGE");
 		}
 		
 		if (! $dh{NOSCRIPTS}) {

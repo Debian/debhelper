@@ -1,30 +1,70 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Strip files.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-source dh_lib
+use File::Find;
+use Debian::Debhelper::Dh_Lib;
+init();
 
-for PACKAGE in $DH_DOPACKAGES; do
-	TMP=`tmpdir $PACKAGE`
+# Check if a file is an elf binary, shared library, or static library,
+# for use by File::Find. It'll fill the following 3 arrays with anything
+# it finds:
+my (@shared_libs, @executables, @static_libs);
+sub testfile {
+	return if -l $_ or -d $_; # Skip directories and symlinks always.
+
+	# See if we were asked to exclude this file.
+	# Note that we have to test on the full filename, including directory.
+	$fn="$File::Find::dir/$_";
+	foreach $f (@{$dh{EXCLUDE}}) {
+		return if ($fn=~m/\Q$f\E/);
+	}
+
+	# Does its filename look like a shared library?
+	if (m/.*\.so.*?/) {
+		# Ok, do the expensive test.
+		my $type=`file $_`;
+		if ($type=~m/.*ELF.*shared.*/) {
+			push @shared_libs, $fn;
+			return;
+		}
+	}
 	
-	# Handle executables and shared libraries.
-	for file in `find debian/$TMP -type f \( -perm +111 -or -name "*.so*" \) 2>/dev/null` ; do
-		case "`file $file`" in
-			*ELF*shared*)
-				doit "strip --strip-unneeded $file"
-			;;
-			*ELF*executable*)
-				doit "strip --remove-section=comment --remove-section=note $file"
-			;;
-		esac
-	done
+	# Is it executable? -x isn't good enough, so we need to use stat.
+	(undef,undef,$mode,undef)=stat(_);
+	if ($mode & 0111) {
+		# Ok, expensive test.
+		my $type=`file $_`;
+		if ($type=~m/.*ELF.*executable.*/) {
+			push @executables, $fn;
+			return;
+		}
+	}
+	
+	# Is it a static library, and not a debug library?
+	if (m/lib.*\.a/ && ! m/.*_g\.a/) {
+		push @static_libs, $fn;
+		return;
+	}
+}
 
-	# Handle static libraries.
-	for file in `find debian/$TMP -type f -name "lib*.a" 2>/dev/null` ; do
-		# Don't strip debug libraries.
-		if ! expr "$file" : ".*_g\.a" >/dev/null ; then
-			doit "strip --strip-debug $file"
-		fi
-	done
-done
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+
+	@shared_libs=@executables=@static_libs=();
+	find(\&testfile,$TMP);
+
+	foreach (@shared_libs) {
+		# Note that all calls to strip on shared libs
+		# *must* inclde the --strip-unneeded.
+		doit("strip","--remove-section=.comment","--remove-section=.note","--strip-unneeded",$_);
+	}
+	
+	foreach (@executables) {
+		doit("strip","--remove-section=.comment","--remove-section=.note",$_);
+	}
+
+	foreach (@static_libs) {
+		doit("strip","--strip-debug",$_);
+	}
+}

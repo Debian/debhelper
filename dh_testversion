@@ -2,9 +2,8 @@
 #
 # Debhelper version check.
 
-BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
-use Dh_Lib;
-use Dh_Version; # contains the version number of debhelper.
+use Debian::Debhelper::Dh_Lib;
+use Debian::Debhelper::Dh_Version; # contains the version number of debhelper.
 init();
 
 my($compare, $ver);
@@ -19,6 +18,6 @@ elsif ($#ARGV eq 0) {
 }
 
 if (defined $compare and defined $ver) {
-	system('dpkg','--compare-versions',$Dh_Version::version,$compare,$ver) == 0 ||
-		error("debhelper version $Dh_Version::version is installed, but a version $compare $ver is needed to build this package.");
+	system('dpkg','--compare-versions',$Debian::Debhelper::Dh_Version::version,$compare,$ver) == 0 ||
+		error("debhelper version $Debian::Debhelper::Dh_Version::version is installed, but a version $compare $ver is needed to build this package.");
 }

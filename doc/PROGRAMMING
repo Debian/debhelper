@@ -16,9 +16,9 @@ passed -v, and if you output the commands, you should indent them with 1 tab).
 This is so we don't have a lot of noise output when all the debhelper commands
 in a debian/rules are run, so the important stuff is clearly visible.
 
-Debhelper programs should accept the options, -v, -i, -a, -p, --no-act, and
--P, and any long forms of these options, like --verbose . If necessary, the
-options may be ignored.
+Debhelper programs should accept all options listed in the "SHARED
+DEBHELPER OPTIONS" section of debhelper(1), including and any long forms of
+these options, like --verbose . If necessary, the options may be ignored.
 
 If debhelper commands need config files, they should use
 debian/package.filename as the name of the config file (replace filename
@@ -41,9 +41,9 @@ There are always exceptions. Just ask me.
 Introducing Dh_Lib.pm:
 ---------------------
 
-Dh_lib.pm is the library used by all debhelper programs to parse their
+Dh_Lib.pm is the library used by all debhelper programs to parse their
 arguments and set some useful variables. It's not mandatory that your
-program use Dh_lib.pm, but it will make it a lot easier to keep it in sync
+program use Dh_Lib.pm, but it will make it a lot easier to keep it in sync
 with the rest of debhelper if it does, so this is highly encouraged.
 
 (There used to be a version of Dh_lib.pm that was a library of functions for
@@ -51,17 +51,16 @@ shell scripts. If you want to write a debhelper command that is a shell
 script, I can dig up that old library for you. Only the perl one is
 supported now, though.)
 
-Use Dh_lib.pm like this:
+Use Dh_Lib.pm like this:
 
-BEGIN { push @INC, "debian", "/usr/share/debhelper" }
-use Dh_Lib;
+use Debian::Debhelper::Dh_Lib
 init();
 
 The BEGIN block is there to make perl look for the module in all the right
 places.
 
-The init() function in the perl version. This causes Dh_lib to
-parse the command line and do some other initialization tasks.
+The init() function causes Dh_lib to parse the command line and do some other
+initialization tasks.
 
 Argument processing:
 -------------------
@@ -126,7 +125,8 @@ switch		variable	description
 				dh_builddeb will ever use this)
 --flavor	FLAVOR		will be set to a string (probably only
 				dh_installemacsen will ever use this)
---number	NUMBER		will be set to a number
+--number	PRIORITY	will be set to a number (deprecated)
+--priority	PRIORITY	will be set to a number
 
 Any additional command line parameters that do not start with "-" will be 
 ignored, and you can access them later just as you normally would.
@@ -206,3 +206,4 @@ autoscript()
 	maintainer script (like the postinst or prerm).
 
 -- Joey Hess <joeyh@debian.org>
+

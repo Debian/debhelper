@@ -6,8 +6,7 @@
 # If there are parameters, or there is a debian/suid, register the files
 # listed there.
 
-BEGIN { push @INC, "debian", "/usr/share/debhelper" }
-use Dh_Lib;
+use Debian::Debhelper::Dh_Lib;
 init();
 
 foreach $PACKAGE (@{$dh{DOPACKAGES}}) {

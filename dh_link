@@ -3,8 +3,7 @@
 # Generate symlinks in debian packages, reading debian/links. The
 # file contains pairs of files and symlinks.
 
-BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
-use Dh_Lib;
+use Debian::Debhelper::Dh_Lib;
 init();
 
 foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
@@ -31,14 +30,16 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		error("parameters list a link without a destination.");
 	}
 
-	# Now I'd prefer to work with a hash.
-	%links=@links;
+	while (@links) {
+		$dest=pop @links;
+		$src=pop @links;
 
-	foreach $src (keys %links) {
-		$dest=$links{$src};
-				
+		# Relivatize src and dest.
+		$src=~s:^/::;
+		$dest=~s:^/::;
+
 		# Make sure the directory the link will be in exists.
-		$basedir=Dh_Lib::dirname("$TMP/$dest");
+		$basedir=Debian::Debhelper::Dh_Lib::dirname("$TMP/$dest");
 		if (! -e $basedir) {
 			doit("install","-d",$basedir);
 		}
@@ -52,18 +53,20 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		    	# Figure out how much of a path $src and $dest
 			# share in common.
 			for ($x=0; $x<$#src_dirs && $src_dirs[$x] eq $dest_dirs[$x]; $x++) {}
-
 			# Build up the new src.
 			$src="";
 			for (1..$#dest_dirs - $x) {
 				$src.="../";
 			}
-			# The + 1 is here to include the actual filename.
-			for (1..$#src_dirs - $x + 1) {
+			for ($x .. $#src_dirs) {
 				$src.=$src_dirs[$_]."/";
 			}
 			$src=~s:/$::;
-		}	
+		}
+		else {
+			# Make sure it's properly absolute.
+			$src="/$src";
+		}
 		
 		doit("ln","-sf",$src,"$TMP/$dest");
 	}

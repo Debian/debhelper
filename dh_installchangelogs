@@ -7,8 +7,7 @@
 # if so, the debian changelog is just installed as "changelog", and it is an 
 # error to specify an upstream changelog on the command line.
 
-BEGIN { push @INC, "debian", "/usr/share/debhelper" }
-use Dh_Lib;
+use Debian::Debhelper::Dh_Lib;
 init();
 
 $upstream=shift;
@@ -59,7 +58,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		if ($dh{K_FLAG}) {
 			# Install symlink to original name of the upstream changelog file.
 			# Use basename in case original file was in a subdirectory or something.
-			doit("ln","-sf",$link_to,"$TMP/usr/share/doc/$PACKAGE/".Dh_Lib::basename($upstream));
+			doit("ln","-sf",$link_to,"$TMP/usr/share/doc/$PACKAGE/".Debian::Debhelper::Dh_Lib::basename($upstream));
 		}
 	}
 }

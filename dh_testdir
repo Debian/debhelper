@@ -1,14 +1,14 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Checks to make sure we are building the package in the right directory.
 # Tests for the existance of debian/control, and for the existance
 # of any other files you specify on the command line.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-source dh_lib
+use Debian::Debhelper::Dh_Lib;
+init();
 
-for file in debian/control $@; do
-	if [ ! -e "$file" ] ; then
-		error "\"$file\" not found. Are you sure you are in the correct directory?"
-	fi
-done
+foreach $file ('debian/control',@ARGV) {
+	if (! -e $file) {
+		error("\"$file\" not found. Are you sure you are in the correct directory?");
+	}
+}

@@ -6,8 +6,7 @@
 # Also, it looks for debian/undocumented files for more lists of
 # undocumented man pages.
 
-BEGIN { push @INC, "debian", "/usr/share/debhelper" }
-use Dh_Lib;
+use Debian::Debhelper::Dh_Lib;
 init();
 
 foreach $PACKAGE (@{$dh{DOPACKAGES}}) {

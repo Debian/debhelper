@@ -1,24 +1,44 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Integration with debian menu system:
 #
-# If debian/menu file exists, save it to debian/tmp/usr/lib/menu/$PACKAGE
+# If debian/menu file exists, save it to $TMP/usr/lib/menu/$PACKAGE
 # If debian/menu-method file exists, save it to 
-# debian/tmp/etc/menu-methods/$PACKAGE
+# $TMP/etc/menu-methods/$PACKAGE
+#
+# Also, add to postinst and postrm.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-source dh_lib
+use Debian::Debhelper::Dh_Lib;
+init();
 
-if [ -e debian/menu ]; then
-	if [ ! -d debian/tmp/usr/lib/menu ]; then
-		doit "install -d debian/tmp/usr/lib/menu"
-	fi
-	doit "install -p -m644 debian/menu debian/tmp/usr/lib/menu/$PACKAGE"
-fi
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$menu=pkgfile($PACKAGE,"menu");
+	$menu_method=pkgfile($PACKAGE,"menu-method");
+	
+	if ($menu ne '') {
+		if (! -d "$TMP/usr/lib/menu") {
+			doit("install","-d","$TMP/usr/lib/menu");
+		}
+		doit("install","-p","-m644",$menu,"$TMP/usr/lib/menu/$PACKAGE");
+		
+		# Add the scripts if a menu-method file doesn't exist.
+		# The scripts for menu-method handle everything these do, too.
+		if ($menu_method eq "" && ! $dh{NOSCRIPTS}) {
+			autoscript($PACKAGE,"postinst","postinst-menu");
+			autoscript($PACKAGE,"postrm","postrm-menu")
+		}
+	}
 
-if [ -e debian/menu-method ]; then
-	if [ ! -d debian/tmp/etc/menu-methods ]; then
-		doit "install -d debian/tmp/etc/menu-methods"
-	fi
-	doit "install -p debian/menu-method debian/tmp/etc/menu-methods/$PACKAGE"
-fi
+	if ($menu_method ne '') {
+		if (!-d "$TMP/etc/menu-methods") {
+			doit("install","-d","$TMP/etc/menu-methods");
+		}
+		doit("install","-p",$menu_method,"$TMP/etc/menu-methods/$PACKAGE");
+
+		if (! $dh{NOSCRIPTS}) {
+			autoscript($PACKAGE,"postinst","postinst-menu-method","s/#PACKAGE#/$PACKAGE/");
+			autoscript($PACKAGE,"postrm","postrm-menu-method","s/#PACKAGE#/$PACKAGE/");
+		}
+	}
+}

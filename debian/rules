@@ -1,11 +1,10 @@
 #!/usr/bin/make -f
 # Note that I have to refer to debhelper programs with ./, to make sure
-# I run the most current ones. That's also why there is a symlink to the 
-# current Dh_lib.pm and the current Dh_getopt.pm in this debian/ directory.
+# I run the most current ones.
 #
 # This is _not_ a good example of a debhelper rules file, but I didn't need
-# to tell you that; just see the 25 lines of inlined perl below.. See
-# examples/ for some good examples.
+# to tell you that; just see the 25 lines of inlined perl below.. 
+# See examples/ for some good examples.
 
 # If any automatic script generation is done in building this package, 
 # be sure to use the new templates from this package.
@@ -41,12 +40,15 @@ binary-indep: link-stamp build
 	./dh_testdir
 	./dh_testroot
 	./dh_clean -k
-	./dh_installdirs usr/bin usr/share/debhelper
+	./dh_installdirs usr/bin usr/share/debhelper \
+		usr/lib/perl5/Debian/Debhelper
 
-	echo -e "package Dh_Version;\n\$$version='$(VERSION)';" > debian/debhelper/usr/share/debhelper/Dh_Version.pm
+	echo -e "package Dh_Version;\n\$$version='$(VERSION)';" > \
+		debian/debhelper/usr/lib/perl5/Debian/Debhelper/Dh_Version.pm
 	find . -perm +111 -maxdepth 1 -type f -not -name "*.pl" \
 		-exec install -p {} debian/debhelper/usr/bin \;
-	cp -a Dh_*.pm debian/debhelper/usr/share/debhelper
+	cp -a Debian/Debhelper/*.pm \
+		debian/debhelper/usr/lib/perl5/Debian/Debhelper/
 	cp -a autoscripts debian/debhelper/usr/share/debhelper
 	rm -rf debian/debhelper/usr/share/debhelper/autoscripts/CVS
 
@@ -111,3 +113,4 @@ installhook:
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary dist
+

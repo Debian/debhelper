@@ -1,39 +1,41 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
-# Reads debian/dirs, creates the directories listed there there
+# Reads debian/dirs, creates the directories listed there
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
+use Debian::Debhelper::Dh_Lib;
+init();
 
-for PACKAGE in $DH_DOPACKAGES; do
-	TMP=`tmpdir $PACKAGE`
-	EXT=`pkgext $PACKAGE`
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$file=pkgfile($PACKAGE,"dirs");
 
-	if [ ! -d $TMP/usr/doc/$PACKAGE ]; then
-		doit "install -d $TMP/usr/doc/$PACKAGE"
-	fi
+	if (! -e $TMP) {
+		doit("install","-d",$TMP);
+	}
 
-	dirs=""
+	undef @dirs;
 
-	if [ -e debian/${EXT}dirs ]; then
-		dirs=`tr "\n" " " < debian/${EXT}dirs`
-	fi
+	if ($file) {
+		@dirs=filearray($file)
+	}
 
-	if [ "$PACKAGE" = "$MAINPACKAGE" -a "$*" ]; then
-		dirs="$* $dirs"
-	fi
+	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+		push @dirs, @ARGV;
+	}	
 
-	if [ "$dirs" ]; then
-		# Check to see if any of the dirs are absolute.
-		for dir in "$dirs" ; do
-			if expr "$dir" : "/" >/dev/null ; then
-				error "Absolute directory name \"$dir\" specified."
-			fi
-		done
+	if (@dirs) {
+		# Stick the $TMP onto the front of all the dirs.
+		# This is necessary, for 2 reasons, one to make them 
+		# be in the right directory, but more importantly, it 
+		# protects against the danger of absolute dirs being
+		# specified.
+		@dirs=map {
+				$_="$TMP/$_";
+				tr:/:/:s; # just beautification.
+				$_
+			  } @dirs;
+
 		# Create dirs.
-		verbose_echo "cd $TMP && install -d $dirs && cd ../.."
-		cd $TMP
-		install -d $dirs
-		cd ../..
-	fi
-done
+		doit("install","-d",@dirs);
+	}
+}

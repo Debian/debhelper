@@ -2,21 +2,38 @@
 #
 # Add to postinst and postrm to register a window manager.
 
-BEGIN { push @INC, "debian", "/usr/share/debhelper" }
-use Dh_Lib;
+use Debian::Debhelper::Dh_Lib;
 init();
 
-$wm=shift;
+if (! defined $dh{PRIORITY}) {
+        $dh{PRIORITY}=20;
+}
 
-if ($wm eq '') {
-	error("No window manager filename was specified.");
+if (@ARGV) {
+	# This is here for backwards comatability. If the filename doesn't
+	# include a path, assume it's in /usr/X11R6/bin.
+	if ($ARGV[0] !~ m:/:) {
+		$ARGV[0]="/usr/X11R6/$ARGV[0]";
+	}
 }
 
 foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 #	$TMP=tmpdir($PACKAGE);
+	$file=pkgfile($PACKAGE,"wm");
 
-	if (! $dh{NOSCRIPTS}) {
-		autoscript($PACKAGE,"postinst","postinst-wm","s:#WM#:$wm:");
-		autoscript($PACKAGE,"postrm","postrm-wm","s:#WM#:$wm:");
+	if ($file) {
+		@wm=filearray($file);
+	}
+
+	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+		push @wm, @ARGV;
+	}
+
+	if (@wm && ! $dh{NOSCRIPTS}) {
+		foreach (@wm) {
+			autoscript($PACKAGE,"postinst","postinst-wm","s:#WM#:$_:;s/#PRIORITY#/$dh{PRIORITY}/",);
+			autoscript($PACKAGE,"postrm","postrm-wm","s:#WM#:$_:");
+		}
 	}
 }
+

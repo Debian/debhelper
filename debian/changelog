@@ -1,3 +1,23 @@
+debhelper (2.0.89) unstable; urgency=low
+
+  * Patch from Jorgen `forcer' Schaefer <forcer at mindless.com> (much
+    modified)to make dh_installwm use new window manager registration method,
+    update-alternatives. Closes: #52156, #34684 (latter bug is obsolete)
+  * Fixed $dh{flavor} to be upper-case.
+  * Deprecated dh_installemavcsen --number; use --priority instead. Also,
+    the option parser requires the parameter be a number now. And,
+    dh_installwm now accepts --priority, and window manager packages should
+    start using it.
+  * dh_installwm now behaves like a proper debhelper command, and reads
+    debian/<package>.wm too. This is a small behavior change; filenames
+    specified on the command line no longer apply to all packages it acts
+    on. I can't belive this program existed for 2 years with such a glaring
+    problem; I guess most people don't need ot register 5 wm's in 3
+    sub-packages. Anyway, it can handle such things now. :-)
+  * Moved Dh_*.pm to /usr/lib/perl5/Debian/Debhelper. *big* change.
+
+ -- Joey Hess <joeyh@debian.org>  Thu,  2 Mar 2000 11:39:56 -0800
+
 debhelper (2.0.88) unstable; urgency=low
 
   * Copyright update: files in the examples directory are public domain.
@@ -1328,7 +1348,7 @@ debhelper (1.2.0) unstable; urgency=low
     perl.. Since 1.1 has actually stabalized, I've upped this to 1.2.
   * dh_md5sums: rewritten in perl, for large speed gain under some
     circumstances (old version called perl sometimes, once per package.)
-  * dh_installmenu, dh_installwmacsen, dh_installwm: perlized.
+  * dh_installmenu, dh_installemacsen, dh_installwm: perlized.
   * Dh_Lib.pm: made autoscript() really work.
 
  -- Joey Hess <joeyh@debian.org>  Mon,  9 Nov 1998 13:04:16 -0800

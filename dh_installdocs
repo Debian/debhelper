@@ -5,8 +5,7 @@
 # Also installs the debian/copyright and debian/README.debian and debian/TODO
 # and handles debian/doc-base.
 
-BEGIN { push @INC, "debian", "/usr/share/debhelper" }
-use Dh_Lib;
+use Debian::Debhelper::Dh_Lib;
 init();
 
 foreach $PACKAGE (@{$dh{DOPACKAGES}}) {

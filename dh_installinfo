@@ -3,8 +3,7 @@
 # Reads debian/info, installs all files listed there into /usr/share/info
 # and puts appropriate commands into the postinst.
 
-BEGIN { push @INC, "debian", "/usr/share/debhelper" }
-use Dh_Lib;
+use Debian::Debhelper::Dh_Lib;
 init();
 
 foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
@@ -45,7 +44,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			}
 			close IN;
 			
-			my $fn="/usr/share/info/".Dh_Lib::basename($file);
+			my $fn="/usr/share/info/".Debian::Debhelper::Dh_Lib::basename($file);
 			
 			if ($section ne '') {
 				$section=~s:/:\\/:g; # allow / in section.

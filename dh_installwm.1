@@ -3,14 +3,21 @@
 dh_installwm \- register a window manager
 .SH SYNOPSIS
 .B dh_installwm
-.I "[debhelper options] [-n] wmfilename"
+.I "[debhelper options] [-n] [--priority=n] [wm ...]"
 .SH "DESCRIPTION"
 dh_installwm is a debhelper program that is responsible for
-generating the postinst and postrm commands needed to
-interface with the the
-.BR register-window-manager (8)
-command. This results in a window manager being registered when it is
-installed.
+generating the postinst and postrm commands that register a window manager
+with
+.BR update-alternatives (8)
+.P
+Any windowmanager filenames specified as parameters will be registered in
+the first package dh_installwm is told to ast on. By default, this is the
+first binary package in debian/control, but if you use -p, -i, or -a flags, it
+will be the first package specified by those flags.
+.P
+A file named debian/package.wm (debian/wm may be used for the
+first binary package in debian/control) can list other window manager to
+register.
 .SH OPTIONS
 .TP
 .B debhelper options
@@ -18,13 +25,16 @@ See
 .BR debhelper (1)
 for a list of options common to all debhelper commands.
 .TP
+.B \--priority=n
+Set the priority of the window manager. Default is 20, which is too low for
+most window managers; see the Debian Policy document for instructions on
+calculating the correct value.
+.TP
 .B \-n, \--noscripts
 Do not modify postinst/postrm scripts. Turns this command into a no-op.
 .TP
 .B wmfilename
-The filename of the window manager you wish to register. May be either a
-simple filename if the window manager is in /usr/X11R6/bin/, or a complete
-path otherwise.
+The filename of the window manager you wish to register.
 .SH NOTES
 Note that this command will set up postinst and postrm scripts for every
 package it acts on. It's wise to limit its action to a single package with,
@@ -41,6 +51,6 @@ instances of the same text to be added to maintainer scripts.
 .TP
 .BR debhelper (1)
 .TP
-.BR register-window-manager (8)
+.BR update-alternatives (8)
 .SH AUTHOR
 Joey Hess <joeyh@debian.org>

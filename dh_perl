@@ -3,12 +3,28 @@
 # Find dependencies on perl stuff
 # Remove .packlist files
 
-BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
-use Dh_Lib;
+use Debian::Debhelper::Dh_Lib;
 init();
 
-my $perl = $ENV{'PERL'} || '/usr/bin/perl';
-$version=sprintf("%.3f", $]);
+my $ext = '';
+my $lib_dir = 'usr/lib/perl5';
+
+# Figure out the version of perl. If $ENV{PERL} is set, query the perl binary
+# it points to, otherwise query perl directly.
+my $version=sprintf("%.3f", $]);
+if (defined $ENV{PERL}) {
+	$version=`$ENV{PERL} -e 'printf "%.3f", \$]'`;
+}
+
+# Cleaning the paths given on the command line
+foreach (@ARGV) {
+	s#/$##;
+	s#^/##;
+}
+
+# If -d is given, then we'll try to depend on one of the perl-5.00X-base 
+# package instead of perl-5.00X
+$ext='-base' if ($dh{'D_FLAG'});
 
 foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	$TMP=tmpdir($PACKAGE);
@@ -19,17 +35,24 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	my $dep = '';
 	my $found = 0;
 
+	# Check also for alternate locations given on the command line
+	my $dirs = '';
+	foreach ($lib_dir, @ARGV) {
+		$dirs .= "$TMP/$_ " if (-d "$TMP/$_");
+	}
+	my $re = '(?:' . join('|', ($lib_dir, @ARGV)) . ')';
+
 	# Look for perl modules and check where they are installed
-	if (-d "$TMP/usr/lib/perl5") {
-	    foreach $file (split(/\n/,`find $TMP/usr/lib/perl5 -type f -name "*.pm"`)) {
+	if ($dirs) {
+	    foreach $file (split(/\n/,`find $dirs -type f \\( -name "*.pm" -or -name "*.so" \\)`)) {
 	        $found++;
-		if ($file =~ m<^$TMP/usr/lib/perl5/(\d\.\d{3})/([^/]+)/>) {
+		if ($file =~ m<^$TMP/$re/(\d\.\d{3})/([^/]+)/>) {
 			$v = $1;
 			$arch = $2;
 			check_module_version ($v, $version);
-			$v .= '-thread' if ($arch =~ /-thread/);
+			$v .= '-thread' if ($arch =~ /-thread/); 
 			$dep_arch = add_deps ($dep_arch, "perl-$v");
-		} elsif ($file =~ m<^$TMP/usr/lib/perl5/(\d.\d{3})/>) {
+		} elsif ($file =~ m<^$TMP/$re/(\d.\d{3})/>) {
 			$v = $1;
 			check_module_version ($v, $version);
 			$dep_arch = add_deps ($dep_arch, "perl-$v");
@@ -38,7 +61,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	}
 
 	if ($found and not $dep_arch) {
-		$dep = "perl5";
+		$dep = "perl5$ext";
 	} elsif ($dep_arch) {
 		$dep = $dep_arch;
 	}
@@ -68,14 +91,14 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 
 	next unless $dep;
 
-	if (-e "debian/$EXT\subtsvars") {
-		open (IN, "<debian/$EXT\subtsvars");
+	if (-e "debian/$EXT\substvars") {
+		open (IN, "<debian/$EXT\substvars");
 		my @lines=grep { ! /^perl:Depends=/ } <IN>;
 		close IN;
-		open (OUT, ">debian/$EXT\subtsvars");
+		open (OUT, ">debian/$EXT\substvars");
 		print OUT @lines;
 	} else {
-		open (OUT, ">debian/$EXT\subtsvars");
+		open (OUT, ">debian/$EXT\substvars");
 	}
 	print OUT "perl:Depends=$dep\n";
 	close OUT;
@@ -83,6 +106,9 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 
 sub add_deps {
 	my ($dep, $new) = @_;
+	
+        # If the $new-base package can exist then add $ext to $new
+	$new = "$new$ext" if ($new =~ m/^(?:perl5|perl-\d\.\d{3})$/);
 	
 	# If $new = perl5 or perl5-thread check if perl-X.XXX(-thread)?
 	# is not already in the dependencies
