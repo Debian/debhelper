@@ -18,7 +18,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 
 	$emacsen_install=pkgfile($PACKAGE,"emacsen-install");
 	$emacsen_remove=pkgfile($PACKAGE,"emacsen-remove");
-	$emacsen_init=pkgfile($PACKAGE,"emacsen-init");
+	$emacsen_startup=pkgfile($PACKAGE,"emacsen-startup");
 
 	if ($emacsen_install ne '') {
 		if (! -d "$TMP/usr/lib/emacsen-common/packages/install") {
@@ -34,11 +34,11 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		doit("install","$emacsen_remove","$TMP/usr/lib/emacsen-common/packages/remove/$PACKAGE");
 	}
 	
-	if ($emacsen_init ne '') {
+	if ($emacsen_startup ne '') {
 		if (! -d "$TMP/etc/$dh{flavor}/site-start.d/") {
 			doit("install","-d","$TMP/etc/$dh{flavor}/site-start.d/");
 		}
-		doit("install",$emacsen_init,"$TMP/etc/$dh{flavor}/site-start.d/$dh{number}$PACKAGE.el");
+		doit("install",$emacsen_startup,"$TMP/etc/$dh{flavor}/site-start.d/$dh{number}$PACKAGE.el");
 	}
 
 	if ($emacsen_install ne '' || $emacsen_remove ne '') {
