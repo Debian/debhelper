@@ -136,7 +136,13 @@ sub warning { my $message=shift;
 
 # Returns the basename of the argument passed to it.
 sub basename { my $fn=shift;
-	$fn=~s:.*/(.*?):$1:;
+	$fn=~s:^.*/(.*?)$:$1:;
+	return $fn;
+}
+
+# Returns the directory name of the argument passed to it.
+sub dirname { my $fn=shift;
+	$fn=~s:^(.*)/.*?$:$1:;
 	return $fn;
 }
 

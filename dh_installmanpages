@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Automatically find and install man pages. However, do not install any man 
 # pages listed on the command line.
@@ -6,66 +6,114 @@
 #
 # This is a little bit (hah!) DWIMish, but still very handy.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use File::Find;
+use Dh_Lib;
+init();
 
-for PACKAGE in $DH_DOPACKAGES; do
-        TMP=`tmpdir $PACKAGE`
+# Check if a file is a man page, for use by File::Find.
+my @manpages;
+sub find_man {
+	# Does its filename look like a man page?
+	# .ex files are examples installed by deb-make,
+	# we don't want those, or .in files, which are
+	# from configure.
+	if (! (-f $_ && /^.*\.[1-9].*$/ && ! /\.(ex|in)$/)) {
+		return;
+	}
+	# It's not in a tmp directory is it?
+	if ($File::Find::dir=~m:debian/.*tmp.*:) {
+		return;
+	}
+	# And file does think it's a real man page?
+	if (! `file $_`=~/roff/) {
+		return;
+	}
+
+	# Good enough.
+	push @manpages,"$File::Find::dir/$_";
+}
+
+# Check if a file is a .so man page, for use by File::Find.
+my @sofiles;
+my @sodests;
+sub find_so_man {
+	# The -s test is becuase a .so file tends to be small. We don't want
+	# to open every man page. 1024 is arbitrary.
+	if (! -f $_ || -s $_ > 1024) {
+		return;
+	}
+
+	# Test first line of file for the .so thing.
+	open (SOTEST,$_);
+	my $l=<SOTEST>;
+	close SOTEST;
+	if ($l=~m/\.so\s+(.*)/) {
+		my $solink=$1;
+		# This test is here to prevent links like ... man8/../man8/foo.8
+		if (Dh_Lib::basename($File::Find::dir) eq Dh_Lib::dirname($solink)) {
+			$solink=Dh_Lib::basename($solink);
+		}
+		else {
+			$solink="../$solink";
+		}
+	
+		push @sofiles,"$File::Find::dir/$_";
+		push @sodests,$solink;
+	}
+}
+
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
 
 	# Find all filenames that look like man pages.
-	# .ex files are examples installed by deb-make, we don't want those, or
-	# .in files, which are from configure.
-	# We also need to exclude all debian/tmp type dirs.
-	EXCLUDE=`grep ^Package: debian/control | \
-		cut -d " " -f 2 | tr "\n" "|"`
-	for file in `find * -type f -name "*.[1-9]*" ! -name "*.ex" \
-		! -name "*.in" | egrep -v "^debian/(${EXCLUDE}tmp)/"`
-	do
-		# Make sure file thinks they are man pages.
-		if file -L $file|grep -q roff; then
-			if echo $file|grep -q /; then
-				NAME=`expr $file : '.*/\(.*\)'`
-			else
-				NAME=$file
-			fi
-			# Look at the command line and check if we should
-			# install the file.
-			install=1
-			for notinstall in $@; do
-				if [ "$NAME" = "$notinstall" -o \
-				     "$file" = "$notinstall" ]; then
-					install=""
-				fi
-			done
-			if [ "$install" ]; then
-				SECTION=man`expr $NAME : '.*\.\([123456789]\)'`
-				# Test to see if the filename ends with 'x',
-				# if so, this is an X man page.
-				if expr $NAME : '.*\.[123456789]x' >/dev/null; then
-					EXTDIR="X11R6"
-				else
-					EXTDIR=""
-				fi
-				if [ ! -e $TMP/usr/man/$SECTION/$NAME -a \
-				     ! -e $TMP/usr/X11*/man/$SECTION/$NAME ]; then
-					if [ ! -d $TMP/usr/$EXTDIR/man/$SECTION ]; then
-						doit "install -d $TMP/usr/$EXTDIR/man/$SECTION"
-					fi
-					doit "install -p -m644 $file $TMP/usr/$EXTDIR/man/$SECTION/$NAME"
-				fi
-			fi
-		fi
-	done
-
+	@manpages=();
+	find(\&find_man,'.'); # populates @manpages
+	
+	foreach $page (@manpages) {
+		$page=~s:^\./::; # just for looks
+		
+		$basename=Dh_Lib::basename($page);
+		
+		# Skip all files listed on command line.
+		my $install=1;
+		foreach $skip (@ARGV) {
+			if ($basename eq $skip) {
+				$install=undef;
+				last;
+			}
+		}
+		
+		if ($install) {
+			my $extdir="";
+			# Handle X man pages specially.
+			if ($basename=~/x$/) {
+				$extdir="X11R6";
+			}
+			
+			my ($section)=$basename=~m/.*\.([1-9])/;
+			
+			my $destdir="$TMP/usr/$extdir/man/man$section/";
+			$destdir=~tr:/:/:s; # just for looks
+			if (! -e "$destdir/$basename" && !-l "$destdir/$basename") {
+				if (! -d $destdir) {
+					doit "install","-d",$destdir;
+				}
+				doit "install","-p","-m644",$page,$destdir;
+			}
+		}
+	}
+	
 	# Now the .so conversion.
-	for file in `find $TMP/usr/man $TMP/usr/X11*/man -type f -size -256c 2>/dev/null`
-	do
-		solink=`expr "\`head -1 $file\`" : '\.so \(.*\)'`
-		if [ "$solink" ]; then
-			doit "rm -f $file"
-			# The .so links include the subdir the page is in, 
-			# thus the ../
-			doit "ln -s ../$solink $file"
-		fi
-	done
-done
+	@sofiles=@sodests=();
+	foreach $dir (qw{usr/man usr/X11R6/man}) {
+		if (-e "$TMP/$dir") {
+			find(\&find_so_man, "$TMP/$dir");
+		}
+	}
+	foreach $sofile (@sofiles) {
+		my $sodest=shift(@sodests);
+		doit "rm","-f",$sofile;
+		doit "ln","-sf",$sodest,$sofile;
+	}
+}
