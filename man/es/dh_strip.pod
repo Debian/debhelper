@@ -2,16 +2,19 @@
 # Esta traducción ha sido realizada por Rudy Godoy <rudy@kernel-panik.org>
 # y revisada por Rubén Porras <nahoo@inicia.es>
 # Está basada en la página de manual original:
-# versión 1.1 del CVS de
+# versión 1.2 del CVS de
 # /cvs/debian-doc/manpages/english/debhelper/dh_strip.pod
 
 =head1 NOMBRE
 
 dh_strip - ejecuta strip sobre ejecutables, bibliotecas compartidas y algunas bibliotecas estáticas
 
+
+=cut
+
 =head1 SINOPSIS
 
-B<dh_strip> [S<I<opciones debhelper>>] [B<-X>I<elemento>]
+B<dh_strip> [S<I<opciones debhelper>>] [B<-X>I<elemento>] [--dbg-package=paquete] [--keep-debug]
 
 =head1 DESCRIPCIÓN
 
@@ -41,6 +44,29 @@ Excluye ficheros que contienen "elemento" en cualquier lugar de su nombre de
 ser eliminados. Usted puede usar esta opción muchas veces para construir una
 lista de cosas a excluir.
 
+=item B<--dbg-package=>I<paquete>
+
+Esta opción indica a dh_strip que el paquete dado tiene asociado un paquete
+"-dbg". Entonces, dh_strip, cuando ejecute strip para eliminar los símbolos de
+depuración de los ficheros del paquete, los guardará en ficheros independientes
+en el directorio de construcción para el paquete "-dbg".
+
+Por ejemplo, puede que tenga un paquete libtal, y quiera incluir un paquete
+libtal-dbg que contenga los símbolos de depuración. La orden "dh_strip
+--dbg-package=libtal" hará que dh_strip guarde los símbolos de depuración de
+usr/lib/libtal.so.0 en usr/lib/debug/usr/lib/libtal.so.0 en el directorio de
+construcción para libtal-dbg. Si está instalado libtal-dbg, gdb cargará
+automáticamente los símbolos de depuración al depurar libtal.
+
+Esta opción puede estar repetida para listar más de un paquete.
+
+=item B<-k>, B<--keep-debug>
+
+Se mantendrán los símbolos de depuración, pero separados en un fichero
+independiente en usr/lib/debug/ en el directorio de construcción del
+paquete. --dbg-package es más fácil de usar que esta opción, pero esta opción es
+más flexible.
+
 =back
 
 =head1 NOTAS
@@ -51,6 +77,9 @@ nada, conforme a las normas de Debian.
 =head1 CONFORME A
 
 Normas de Debian, versión 3.0.1
+
+
+=cut
 
 =head1 VÉASE TAMBIÉN
 
@@ -66,3 +95,6 @@ Joey Hess <joeyh@debian.org>
 =head1 TRADUCTOR
 
 Traducción de Rudy Godoy <debian-l10n-spanish@lists.debian.org>
+
+
+=cut

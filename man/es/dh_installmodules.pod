@@ -1,7 +1,7 @@
 # (c) 2003 Software in the Public Interest
 # Esta traducción ha sido realizada por Rubén Porras Campo <nahoo@inicia.es>
 # Está basada en la página de manual original:
-# versión 1.1 del CVS de
+# versión 1.2 del CVS de
 # /cvs/debian-doc/manpages/english/debhelper/dh_installmodules.pod
 
 =head1 NOMBRE
@@ -11,7 +11,7 @@ dh_installmodules - registra módulos con modutils
 
 =head1 SINOPSIS
 
-B<dh_installmodules> [S<I<opciones debhelper>>] [B<-n>]
+B<dh_installmodules> [S<I<opciones debhelper>>] [B<-n>] [B<--name=>I<nombre>]
 
 =head1 DESCRIPCIÓN
 
@@ -34,6 +34,16 @@ fichero arriba mencionado, o tenga fichero .o en /lib/modules.
 =item B<-n>, B<--noscripts>
 
 No modifica los scripts de postinst/postrm.
+
+=head1 OPCIONES
+
+=over 4
+
+=item B<--name=>I<nombre>
+
+Usa "nombre" para el fichero de módulos instalado en etc/modutils/. Cuando se
+usa este parámetro, dh_installmodules busca e instala ficheros llamados
+debian/paquete.nombre.modules en vez del usual debian/paquete.modules.
 
 =back
 

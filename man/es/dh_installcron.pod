@@ -1,7 +1,7 @@
 # (c) 2003 Software in the Public Interest
 # Esta traducción ha sido realizada por Rubén Porras Campo <nahoo@inicia.es>
 # Está basada en la página de manual original:
-# versión 1.1 del CVS de
+# versión 1.2 del CVS de
 # /cvs/debian-doc/manpages/english/debhelper/dh_installcron.pod
 
 =head1 NOMBRE
@@ -10,7 +10,7 @@ dh_installcron - instala scripts para cron en etc/cron.*
 
 =head1 SINOPSIS
 
-B<dh_installcron> [S<B<opciones debhelper>>]
+B<dh_installcron> [S<B<opciones debhelper>>] [B<--name=>I<nombre>]
 
 =head1 DESCRIPCIÓN
 
@@ -18,6 +18,18 @@ dh_installcron es un programa de debhelper responsable de instalar scripts para
 cron en etc/cron.*/ en los directorios de construcción del paquete. Se instalan
 los ficheros debian/paquete.cron.daily, debian/paquete.cron.weekly,
 debian/paquete.cron.monthly, y debian/paquete.cron.d.
+
+=head1 OPCIONES
+
+=over 4
+
+=item B<--name=>I<nombre>
+
+Busca ficheros con el nombre debian/paquete.nombre.cron.* y los instala como
+etc/cron.*/nombre, en vez de usar los ficheros usuales e instalarlos con el
+nombre del paquete.
+
+=back
 
 =head1 VÉASE TAMBIÉN
 

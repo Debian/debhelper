@@ -1,16 +1,19 @@
 # (c) 2003 Software in the Public Interest
 # Esta traducción ha sido realizada por Rubén Porras Campo <nahoo@inicia.es>
 # Está basada en la página de manual original:
-# versión 1.3 del CVS de
+# versión 1.4 del CVS de
 # /cvs/debian-doc/manpages/english/debhelper/dh_install.pod
 
 =head1 NOMBRE
 
 dh_install - instala ficheros en los directorios de construcción del paquete
 
+
+=cut
+
 =head1 SINOPSIS
 
-B<dh_install> [B<-X>I<elemento>] [B<--autodest>] [B<--list-missing>] [B<--sourcedir=>I<dir>] [S<I<opciones debhelper>>] [S<I<fichero [...] dest>>]
+B<dh_install> [B<-X>I<elemento>] [B<--autodest>] [B<--sourcedir=>I<dir>] [S<I<opciones debhelper>>] [S<I<fichero [...] dest>>]
 
 =head1 DESCRIPCIÓN
 
@@ -77,6 +80,12 @@ programa.
 
 Dese cuenta de que no se avisa de los fichero excluidos mediante la opción -X.
 
+=item B<--fail-missing>
+  	 
+Esta opción es como --list-missing, excepto que si se olvida un fichero, no sólo
+se listarán los ficheros olvidados, sino que además se devolverá un código de
+salida distinto de cero.
+
 =item B<--sourcedir=dir>
 
 Hace que todos los ficheros fuente se encuentren bajo dir. Si se especifica, es
@@ -93,6 +102,9 @@ Lista los ficheros (o directorios) a instalar y el lugar donde se instalarán.
 Los ficheros se instalarán en el primer paquete sobre el que actúe dh_install.
 
 =back
+
+
+=cut
 
 =head1 EJEMPLO
 
@@ -136,3 +148,6 @@ Joey Hess <joeyh@debian.org>
 =head1 TRADUCTOR
 
 Traducción de Rubén Porras Campo <debian-l10n-spanish@lists.debian.org>
+
+
+=cut

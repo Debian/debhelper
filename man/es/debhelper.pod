@@ -3,7 +3,7 @@
 # y revisada por Javier Fernández-Sanguino <jfs@computer.org>,
 # Santiago Vila <sanvila@unex.es> y Esteban Manchado <zoso@demiurgo.org>
 # Está basada en la página de manual original:
-# versión 1.5 del CVS de
+# versión 1.6 del CVS de
 # /cvs/debian-doc/manpages/english/debhelper/debhelper.pod
 
 =head1 NOMBRE
@@ -246,7 +246,7 @@ debhelper actuará.
 Cada cierto tiempo, debhelper necesita cambios que lo pueden hacer incompatible
 con versiones anteriores, para de este modo mantenerse con un buen diseño a
 medida que necesita cambios y que su autor gana más experiencia. Los niveles de
-compatibilidad de debhelper se crearon para prevenir que estos cambios estropeen
+compatibilidad de debhelper se crearon para impedir que estos cambios estropeen
 algún paquete. Según el nivel de compatibilidad que se especifique debhelper se
 comporta de diferentes maneras.
 
@@ -370,14 +370,12 @@ Poner a 1 para habilitar el modo no-act.
 
 =item DH_OPTIONS
 
-Todo lo que halla en esta variable se antepondrá a los argumentos en
-la línea de órdenes de todas las órdenes de debhelper. Esto es útil en algunas
-situaciones, por ejemplo, si necesita pasar la opción -p a todas las órdenes de
-debhelper que va a utilizar. Si usa DH_OPTIONS, asegúrese de usar "debhelper >=
-1.1.17" -- debhelpers más antiguos la ignorarán y por lo tanto no harán lo
-esperado. Una buena manera de dar valor a DH_OPTIONS es usando "Target-specific
-Variable Values" en su fichero debian/rules. Lea la documentación de make para
-los detalles sobre como hacer esto.
+Todo lo que halla en esta variable se antepondrá a los argumentos en la línea de
+órdenes de todas las órdenes de debhelper. Esto es útil en algunas situaciones,
+por ejemplo, si necesita pasar la opción -p a todas las órdenes de debhelper que
+va a utilizar. Una buena manera de dar valor a DH_OPTIONS es usando
+"Target-specific Variable Values" en su fichero debian/rules. Lea la
+documentación de make para los detalles sobre como hacer esto.
 
 =item DH_ALWAYS_EXCLUDE
 

@@ -1,7 +1,7 @@
 # (c) 2003 Software in the Public Interest
 # Esta traducción ha sido realizada por Rubén Porras Campo <nahoo@inicia.es>
 # Está basada en la página de manual original:
-# versión 1.1 del CVS de
+# versión 1.2 del CVS de
 # /cvs/debian-doc/manpages/english/debhelper/dh_installinit.pod
 
 =head1 NOMBRE
@@ -10,7 +10,7 @@ dh_installinit - instala scripts de init en los directorios de construcción
 
 =head1 SINOPSIS
 
-B<dh_installinit> [S<I<opciones debhelper>>] [B<--init-script=>I<nombrescript>] [B<-n>] [B<-r>] [B<-d>] [S<B<--> I<parámetros>>]
+B<dh_installinit> [S<I<opciones debhelper>>] [B<--name=>I<nombre>] [B<-n>] [B<-r>] [B<-d>] [S<B<--> I<parámetros>>]
 
 =head1 DESCRIPCIÓN
 
@@ -61,16 +61,24 @@ finalizados en "d". (Nota: Este parámetro tiene preferencia sobre --init-script)
 Pasa "parámetros" a L<update-rc.d(8)>. Si no se especifica se pasa "defaults" a
 L<update-rc.d(8)>.
 
+=item B<--name=>I<nombre>
+
+Instala el script de init (y el fichero default) usando el nombre I<nombre> en
+vez del nombre predeterminado, que es el nombre del paquete. Cuando se usa este
+parámetro, dh_installinit busca ficheros que se llamen
+debian/paquete.nombre.init y debian/paquete.nombre.default, en vez de los
+usuales debian/paquete.init y debian/paquete.default, y los instala.
+
 =item B<--init-script=>I<nombrescript>
 
 Usa "nombrescript" como nombre del script de init a instalar en etc/init.d/ (y
-también usa este nombre para el fichero defaults, si se instala). Esto es útil
-si necesita tener un script de nombre diferente al del paquete. Dese cuenta que
-si usa este parámetro, dh_installinit mirará si existe un fichero cuyo nombre se
-parezca a "paquete.nombrescript" en el directorio debian/ y si es así lo
-instalará preferentemente como el script de init en lugar de los ficheros que
-instala normalmente. Esta característica sólo es útil si necesita que el mismo
-paquete instale más de un script.
+también usa este nombre para el fichero defaults, si se instala). Si usa este
+parámetro, dh_installinit mirará si existe un fichero cuyo nombre se parezca a
+"paquete.nombrescript" en el directorio debian/ y si es así lo instalará
+preferentemente como el script de init en lugar de los ficheros que instala
+normalmente.
+
+Se desaconseja el uso de esta opción, use --name en su lugar.
 
 =back
 
