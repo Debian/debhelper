@@ -108,7 +108,7 @@ binary-indep: build
 # author.
 installhook:
 	cp debian/changelog /home/pub/programs/debhelper/CHANGES
-	echo $(VERSION) > /home/pub/programs/debhelper/LATEST-VERSION-IS
+	echo -n $(VERSION) > /home/pub/programs/debhelper/LATEST-VERSION-IS
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary dist
