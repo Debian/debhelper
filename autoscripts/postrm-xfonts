@@ -1,0 +1,18 @@
+fontdirs="#FONTDIRS#"
+updatecmds="#UPDATECMDS#"
+
+for currentdir in $fontdirs; do
+	longdir=/usr/X11R6/lib/X11/fonts/$currentdir
+	if [ -d $longdir ]; then
+		for file in fonts.dir fonts.alias; do
+			rm -f $file
+		done
+		if [ $(find $currentdir| wc -l) -eq 1 ]; then
+			rmdir -p $longdir
+		else
+			for currentcmd in $updatecmds; do
+				$currentcmd $longdir
+			done
+		fi
+	fi
+done

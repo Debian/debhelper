@@ -7,12 +7,12 @@
 package Dh_Getopt;
 use strict;
 
-use Exporter;
-my @ISA=qw(Exporter);
-my @EXPORT=qw(&parseopts);
-
 use Dh_Lib;
 use Getopt::Long;
+use Exporter;
+#use vars qw{@ISA @EXPORT};
+#@ISA=qw(Exporter);
+#@EXPORT=qw(&aparseopts); # FIXME: for some reason, this doesn't work.
 
 my (%options, %exclude_package);
 
@@ -31,6 +31,10 @@ sub AddPackage { my($option,$value)=@_;
 	elsif ($option eq 'p' or $option eq 'package') {
 		push @{$options{DOPACKAGES}}, $value;
 	}
+	elsif ($option eq 's' or $option eq 'same-arch') {
+		push @{$options{DOPACKAGES}}, GetPackages('same');
+		$options{DOSAME}=1;
+	}
 	else {
 		error("bad option $option - should never happen!\n");
 	}
@@ -46,15 +50,10 @@ sub AddExclude { my($option,$value)=@_;
 	push @{$options{EXCLUDE}},$value;
 }
 
-sub import {
-	# Enable bundling of short command line options.
-	Getopt::Long::config("bundling");
-}
-
 # Parse options and return a hash of the values.
 sub parseopts {
 	undef %options;
-
+	
 	my $ret=GetOptions(
 		"v" => \$options{VERBOSE},
 		"verbose" => \$options{VERBOSE},
@@ -68,12 +67,15 @@ sub parseopts {
 		"p=s" => \&AddPackage,
 	        "package=s" => \&AddPackage,
 	
+		"s" => \&AddPackage,
+		"same-arch" => \&AddPackage,
+	
 		"N=s" => \&ExcludePackage,
 		"no-package=s" => \&ExcludePackage,
 	
 		"n" => \$options{NOSCRIPTS},
-#		"noscripts" => \$options(NOSCRIPTS},
-	
+		"noscripts" => \$options{NOSCRIPTS},
+
 		"x" => \$options{INCLUDE_CONFFILES}, # is -x for some unknown historical reason..
 		"include-conffiles" => \$options{INCLUDE_CONFFILES},
 	
@@ -82,6 +84,7 @@ sub parseopts {
 	
 		"d" => \$options{D_FLAG},
 		"remove-d" => \$options{D_FLAG},
+		"dirs-only" => \$options{D_FLAG},
 	
 		"r" => \$options{R_FLAG},
 		"no-restart-on-upgrade" => \$options{R_FLAG},
@@ -95,6 +98,7 @@ sub parseopts {
 		"u=s", => \$options{U_PARAMS},
 		"update-rcd-params=s", => \$options{U_PARAMS},
 	        "dpkg-shlibdeps-params=s", => \$options{U_PARAMS},
+		"dpkg-gencontrol-params=s", => \$options{U_PARAMS},
 
 		"m=s", => \$options{M_PARAMS},
 		"major=s" => \$options{M_PARAMS},
@@ -108,30 +112,38 @@ sub parseopts {
 		"no-act" => \$options{NO_ACT},
 	
 		"init-script=s" => \$options{INIT_SCRIPT},
+		
+		"sourcedir=s" => \$options{SOURCEDIR},
+		
+		"destdir=s" => \$options{DESTDIR},
+		
+		"number=s" => \$options{number},
+		
+		"flavor=s" => \$options{flavor},
 	);
 
 	if (!$ret) {
 		error("unknown option; aborting");
 	}
-
+	
 	# Check to see if -V was specified. If so, but no parameters were
 	# passed, the variable will be defined but empty.
 	if (defined($options{V_FLAG})) {
 		$options{V_FLAG_SET}=1;
 	}
 	
-	# Check to see if DH_VERBOSE environment variable was set, if so,
-	# make sure verbose is on.
-	if ($ENV{DH_VERBOSE} ne undef) {
-		$options{VERBOSE}=1;
+	# If we have not been given any packages to act on, assume they
+	# want us to act on them all. Note we have to do this before excluding
+	# packages out, below.
+	if (! defined $options{DOPACKAGES} || ! @{$options{DOPACKAGES}}) {
+		if ($options{DOINDEP} || $options{DOARCH} || $options{DOSAME}) {
+				# User specified that all arch (in)dep package be
+				# built, and there are none of that type.
+				error("I have no package to build");
+		}
+		push @{$options{DOPACKAGES}},GetPackages();
 	}
 	
-	# Check to see if DH_NO_ACT environment variable was set, if so, 
-	# make sure no act mode is on.
-	if ($ENV{DH_NO_ACT} ne undef) {
-		$options{NO_ACT}=1;
-	}
-
 	# Remove excluded packages from the list of packages to act on.
 	my @package_list;
 	my $package;
@@ -141,8 +153,25 @@ sub parseopts {
 		}
 	}
 	@{$options{DOPACKAGES}}=@package_list;
-	
+
+	# Generate EXCLUDE_FIND.
+	$options{EXCLUDE_FIND}='';
+	foreach (@{$options{EXCLUDE}}) {
+		$options{EXCLUDE_FIND}.="-regex .*".quotemeta($_).".* -or ";
+	}
+	$options{EXCLUDE_FIND}=~s/ -or $//;
+
+	# If there are no packages to act on now, it's an error.
+	if (! defined $options{DOPACKAGES} || ! @{$options{DOPACKAGES}}) {
+		error("I have no package to build");
+	}
+
 	return %options;
 }	
+
+sub import {
+	# Enable bundling of short command line options.
+	Getopt::Long::config("bundling");
+}		
 
 1

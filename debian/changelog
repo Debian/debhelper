@@ -1,3 +1,27 @@
+debhelper (2.0.62) unstable; urgency=low
+
+  * Fixed problem with dh_installemacsen options not working, patch from
+    Rafael Laboissiere <rafael@icp.inpg.fr>, Closes: #47738
+  * Added new dh_installxfonts script by Changwoo Ryu
+    <cwryu@dor17988.kaist.ac.kr>. Closes: #46684
+    I made some changes, though:
+    - I rewrote lots of this script to be more my style of perl.
+    - I removed all the verbisity from the postinst script fragment, since
+      that is a clear violation of policy.
+    - I made the postinst fail if the mkfontdir, etc commands fail, because
+      this really makes more sense. Consider idempotency.
+    - I moved the test to see if the font dir is really a directory into the
+      dh_ script and out of the snippet. If the maintainer plays tricks on
+      us, mkfontdir will blow up satisfactorally anyway.
+    - So, the snippet is 9 lines long now, down from 20-some.
+    - I realize this isn't following the reccommendations made in Brandon's
+      font policy. I'll fight it out with him. :-)
+    - In postrm fragment, used rmdir -p to remove as many parent directories
+      as I can.
+    - s:/usr/lib/X11/:/usr/X11R6/lib/X11/:g
+
+ -- Joey Hess <joeyh@master.debian.org>  Sun, 24 Oct 1999 15:30:53 -0700
+
 debhelper (2.0.61) unstable; urgency=low
 
   * Clarified rules.multi2 comment. Closes: #46828

@@ -1,0 +1,35 @@
+#!/usr/bin/perl -w
+#
+# Integration with the Debian X11 font policy.
+
+BEGIN { push @INC, "debian", "/usr/share/debhelper" }
+use Dh_Lib;
+init();
+
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+
+	# Find all fint directories in the package build directory.
+	opendir DIR, "$TMP/usr/X11R6/lib/X11/fonts/" || next;
+	my @fontdirs = grep { -d $_ && !/^\./ } (readdir DIR);
+	closedir DIR;
+
+	if (@fontdirs) {
+		# Figure out what commands the postinst will need to call.
+		my @updatecmds=('/usr/bin/X11/mkfontdir');
+		foreach my $f (@fontdirs) {
+			push @updatecmds, '/usr/sbin/update-fonts-alias'
+				if -f "$TMP/etc/X11/fonts/$f/$PACKAGE.alias";
+			# This must come _before_ mkfontdir, thus the unshift.
+			unshift @updatecmds, '/usr/sbin/update-fonts-scale'
+				if -f "$TMP/etc/X11/fonts/$f/$PACKAGE.scale";
+		}
+
+		autoscript($PACKAGE, "postinst", "postinst-xfonts",
+			"s:#FONTDIRS#:".join(' ', @fontdirs).
+			":;s:#UPDATECMDS#:".join(' ', @updatecmds).":");
+		autoscript($PACKAGE, "postrm", "postrm-xfonts",
+			"s:#FONTDIRS#:".join(' ', @fontdirs).
+			":;s:#UPDATECMDS#:".join(' ', @updatecmds).":");
+	}
+}
