@@ -22,6 +22,9 @@ Wishlist items:
   they might have; still it would be nice to check them too, just to make
   debhelper more flexible.) One easy fix is to add umask 022 to dh_lib,
   however, there may be unforeseen ramifications of such a change.
+* All programs should also make sure the files they install are owned by
+  root.root. Situation is currently the same as with permissions above, plus
+  dh_installchangelogs is fixed.
 * something should add ldconfig calls properly to the postinst of packages
   that contain shared libraries. maybe dh_makeshlibs? But it wasn't designed
   to do that originally, and even worse, it is often run after

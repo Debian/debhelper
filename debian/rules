@@ -13,12 +13,18 @@ VERSION=$(shell expr "`dpkg-parsechangelog 2>/dev/null |grep Version:`" : '.*Ver
 export DH_VERBOSE=1
 
 build:
-# Nothing to do.
+	# Run regression tests.
+	$(MAKE) test
 
 clean:
 	./dh_testdir
 	./dh_testroot
 	./dh_clean
+
+test:
+	./dh_clean
+	perl -MTest::Harness -e 'runtests @ARGV' t/*
+	-rm -rf debian/tmp
 
 # Build architecture-dependent files here.
 binary-arch: build

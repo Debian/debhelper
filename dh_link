@@ -61,6 +61,10 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			}
 			$src=~s:/$::;
 		}
+		else {
+			# Make sure it's properly absolute.
+			$src="/$src";
+		}
 		
 		doit("ln","-sf",$src,"$TMP/$dest");
 	}

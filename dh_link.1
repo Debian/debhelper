@@ -24,14 +24,12 @@ ackage dh_link is told to act on. By default, this is the first binary
 package in debian/control, but if you use -p, -i, or -a flags, it will be 
 the first package specified by those flags.
 .P
-Be sure to only use file names relative to the package build
-directory. Ie, "/usr/bin/foo" should not be used, use "usr/bin/foo" instead.
-Also, be sure you
+Be sure you
 .B do
 specify the full filename to both the source and destination files (unlike
 you would do if you were using something like
 .BR ln (1)
-)
+).
 .P
 dh_link will generate symlinks that comply with debian policy - absolute
 when policy says they should be absolute, and relative links with as short a

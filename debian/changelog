@@ -1,3 +1,18 @@
+debhelper (1.2.68) unstable; urgency=low
+
+  * doc/README: updated example of using #DEBHELPER# in a perl script, with
+    help from Julian Gilbey.
+  * dh_link: generate absolute symlinks where appropriate. The links
+    generated before were wrong simetimes (#37774)
+  * Started writing a regression test suite for debhelper. Currently covers
+    only the above bugfix and a few more dh_link tests.
+  * Tossed Test.pm into the package (for regression tests) until we get perl
+    5.005 which contains that package. That file is licenced the same as perl.
+  * dh_installchangelogs: force all installed files to be owned by root
+    (#37655).
+
+ -- Joey Hess <joeyh@master.debian.org>  Sun, 16 May 1999 17:18:44 -0700
+
 debhelper (1.2.67) unstable; urgency=low
 
   * dh_installmodules: fixed type that made the program not work.
