@@ -1,10 +1,68 @@
 #!/usr/bin/perl -w
-#
-# Find dependencies on perl stuff
-# Remove .packlist files
+
+=head1 NAME
+
+dh_perl - calculates perl scripts & modules dependencies
+
+=cut
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_perl [debhelper options] [-k] [-d] [library dirs ...]
+
+=head1 DESCRIPTION
+
+dh_perl is a debhelper program that is responsible for generating
+the perl:Depends substitutions and adding them to substvars files.
+
+The program will look for the location of installed modules and will
+use this information to generate a dependency (at the present time
+it can only be perl5, perl5-thread, perl-5.X or perl-5.X-thread).
+The dependancy will be substituted into your package's control file
+wherever you place the token "${perl:Depends}".
+
+It will also look at #! lines of perl scripts in order to be able
+to calculate a dependency for perl scripts and not only perl modules.
+
+In addition it will automatically remove .packlist file and will
+remove the directory in which it was if it's empty. You can
+switch off this option by passing -k.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-k>
+
+Keep .packlist files.
+
+=item B<-d>
+
+In some specific cases you may want to depend on a -base package
+(ie perl-5.6-base or perl5-base). If so, you can pass
+the -d option to make dh_perl generate a dependency on the correct base
+package. This is only necessary for some packages that are included in the
+base system.
+
+=item I<library dirs>
+
+If your package installs perl modules in non-standard
+directories, you can make dh_perl check those directories by passing their
+names on the command line. It will only check usr/lib/perl5 by default.
+
+=back
+
+=head1 CONFORMS TO
+
+Debian policy, version 3.0.1
+
+Perl policy, version 1.0
+
+=cut
+
 init();
 
 my $perlext = '';
@@ -162,3 +220,15 @@ sub dep_from_script {
 	}
 	return $dep;
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

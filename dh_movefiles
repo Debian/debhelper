@@ -1,9 +1,64 @@
 #!/usr/bin/perl -w
-#
-# Move files out of debian/tmp, into subpackages.
+
+=head1 NAME
+
+dh_movefiles - move files out of debian/tmp into subpackages
+
+=cut
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_movefiles [debhelper options] [--sourcedir=dir] [file ...]
+
+=head1 DESCRIPTION
+
+dh_movefiles is a debhelper program that is responsible for moving files
+out of debian/tmp or some other directory and into other package build
+directories. This may be useful if your package has a Makefile that installs
+everything into debian/tmp, and you need to break that up into subpackages.
+
+Files named debian/package.files list the files to be moved, separated by
+whitespace. The filenames listed should be relative to debian/tmp/. You can
+also list directory names, and the whole directory will be moved. If you
+prefer, you can list the files to move on the command line and this will
+apply to the first package dh_movefiles is told to act on.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--sourcedir=>I<dir>
+
+Instead of moving files out of debian/tmp (the default), this option makes
+it move files out of some other directory. Since the entire contents of
+the sourcedir is moved, specifiying something like --sourcedir=/ is very
+unsafe, so to prevent mistakes, the sourcedir must be a relative filename;
+it cannot begin with a `/'.
+
+=item I<file ...>
+
+Lists files to move. The filenames listed should be relative to
+debian/tmp/. You can also list directory names, and the whole directory will
+be moved. It is an error to list files here unless you use -p, -i, or -a to
+tell dh_movefiles which subpackage to put them in.
+
+=back
+
+=head1 NOTES
+
+Note that files are always moved out of debian/tmp by default (even if you
+have instructed debhelper to use a compatability level higher than one,
+which does not otherwise use debian/tmp for anything at all). The idea
+behind this is that the package that is being built can be told to install
+into debian/tmp, and then files can be moved by dh_movefiles from that
+directory. Any files or directories that remain are ignored, and get
+deleted by dh_clean later.
+
+=cut
+
 init();
 
 my $ret=0;
@@ -83,3 +138,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 # packages that arn't always sure exactly which files need
 # to be moved.
 exit $ret;
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

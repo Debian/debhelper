@@ -1,10 +1,57 @@
 #!/usr/bin/perl -w
-#
-# Find dependancies. Simple dpkg-shlibdeps wrapper.
+
+=head1 NAME
+
+dh_shlibdeps - calculate shared library dependancies
+
+=cut
 
 use strict;
 use Cwd;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_shlibdeps [debhelper options] [-ldirectory] [-Xitem] [-- params]
+
+=head1 DESCRIPTION
+
+dh_shlibdeps is a debhelper program that is responsible for calculating
+shared library dependancies for packages.
+
+This program is merely a wrapper around L<dpkg-shlibdeps(1)> that calls it
+once for each package listed in the control file, passing it
+a list of ELF executables and shared libraries it has found.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-u>I<params>, B<--dpkg-shlibdeps-params=>I<params>
+
+=item B<--> I<params>
+
+Pass "params" to L<dpkg-shlibdeps(1)>.
+
+=item B<-X>I<item>, B<--exclude=>I<item>
+
+Exclude files that contain "item" anywhere in their filename from being
+passed to dpkg-shlibdeps. This will make their dependancies be ignored.
+This may be useful in some situations, but use it with caution. This option
+may be used more than once to exclude more than one thing.
+
+=item B<-l>I<directory>
+
+Before dpkg-shlibdeps is run, LD_LIBRARY_PATH will be set to the specified
+directory. This is useful for multi-binary packages where a library
+is built in one package and another package contains binaries linked
+against said library. Relative paths will be made absolute for the
+benefit of dpkg-shlibdeps.
+
+=back
+
+=cut
+
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -40,3 +87,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("dpkg-shlibdeps","-Tdebian/${ext}substvars",@{$dh{U_PARAMS}},'-dDepends',@filelist);
 	}
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

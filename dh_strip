@@ -1,10 +1,51 @@
 #!/usr/bin/perl -w
-#
-# Strip files.
+
+=head1 NAME
+
+dh_strip - strip executables, shared libraries, and some static libraries
+
+=cut
 
 use strict;
 use File::Find;
 use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+  dh_strip [debhelper options] [-Xitem]
+
+=head1 DESCRIPTION
+
+dh_strip is a debhelper program that is responsible for stripping
+executables, shared libraries, and static libraries that are not used for
+debugging.
+
+It assumes that files that have names like lib*_g.a are static libraries
+used in debugging, and will not strip them.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-X>I<item>, B<--exclude=>I<item>
+
+Exclude files that contain "item" anywhere in their filename from being
+stripped. You may use this option multiple times to build up a list of
+things to exclude.
+
+=back
+
+=head1 NOTES
+
+If the DEB_BUILD_OPTIONS environement variable contains "nostrip", nothing
+will be stripped, in accordance with Debian policy.
+
+=head1 CONFORMS TO
+
+Debian policy, version 3.0.1
+
+=cut
+
 init();
 
 # This variable can be used to turn off stripping (see Policy).
@@ -76,3 +117,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("strip","--strip-debug",$_);
 	}
 }
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut
