@@ -1,0 +1,53 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dh_desktop - Register .desktop files
+
+=cut
+
+use strict;
+use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+B<dh_desktop> [S<I<debhelper options>>] [B<-p<package>>]
+
+=head1 DESCRIPTION
+
+dh_desktop is a debhelper program that registers .desktop files.
+Currently this program does not handle installation of the files, though it
+may do so at a later date. It takes care of adding maintainer script
+fragements to call F<update-desktop-database>.
+
+=cut
+
+init();
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+  my $tmp=tmpdir($package);
+
+  # Only run if there are .desktop files installed
+  if (-d "$tmp/usr/share/applications") {
+    # Get a list of the desktop files
+    my $desktop_files = `find debian/$package/ -type f -name \*.desktop -printf '%p\n'`;
+    # If there actually were some desktop files...
+    if ($desktop_files && ! $dh{NOSCRIPTS}) {
+      # Don't add a dependency on desktop-file-utils as it may not be needed
+      autoscript($package,"postinst","postinst-desktop");
+      autoscript($package,"postrm","postrm-desktop");
+    }
+  }
+}
+
+=head1 SEE ALSO
+
+L<debhelper>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Ross Burton <ross@burtonini.com>
+
+=cut
