@@ -12,7 +12,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 	doit "rm -rf debian/$TMP"
 	doit "rm -f debian/${EXT}substvars"
 done
-doit "rm -f debian/files* $*"
+doit "rm -f debian/files* debian/*.debhelper $*"
 
 # Remove other temp files. I don't run this through doit becuase
 # I haven't figured out what I have to esacape to put it in quotes.

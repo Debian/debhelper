@@ -17,7 +17,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 	docs=""
 
 	if [ -e debian/${EXT}docs ]; then
-		docs=`cat debian/${EXT}docs | tr "\n" " "`
+		docs=`tr "\n" " " < debian/${EXT}docs`
 	fi
 
 	if [ "$PACKAGE" = "$MAINPACKAGE" -a "$*" ]; then

@@ -22,6 +22,16 @@ the DEBIAN directory:
 prefix these filenames with then name of the "package.", for example, 
 "foo.postinst".)
 .P
+The files postinst, preinst, postrm, and prerm are handled specially: If a
+corresponding file named debian/script.debhelper exists, the contents of that 
+file are merged into the script as follows: If the script exists, then 
+anywhere in it that "#DEBHELPER#" appears, the text of the .debhelper file is
+inserted. If the script does not exist, then a script is generated from the 
+.debhelper file. The .debhelper files are created by other debhelper programs,
+such as 
+.BR dh_installmenu (1)
+, and are shell scripts.
+.P
 In addition, it will generate a DEBIAN/control file, by running
 .BR dpkg-shlibdeps (1)
 and

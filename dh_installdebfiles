@@ -14,10 +14,30 @@ for PACKAGE in $DH_DOPACKAGES; do
 		doit "install -o root -g root -d debian/$TMP/DEBIAN"
 	fi
 
-	# Install executable files.
+	# Install debian install scripts.
+	# If any .debhelper files exist, add them into the scripts.
 	for file in postinst preinst prerm postrm; do
 		if [ -f debian/$EXT$file ]; then
-			doit "install -o root -g root -p debian/$EXT$file debian/$TMP/DEBIAN"
+			# Add this into the script, where it has #DEBHELPER#
+			if [ -f debian/$EXT$file.debhelper ]; then
+				verbose_echo "perl -pe \"s~#DEBHELPER#~qx{cat debian/$EXT$file.debhelper}~eg\" < debian/$EXT$file > debian/$TMP/DEBIAN/$EXT$file"
+				perl -pe "s~#DEBHELPER#~qx{cat debian/$EXT$file.debhelper}~eg" < debian/$EXT$file > debian/$TMP/DEBIAN/$EXT$file
+				doit "chown root.root debian/$TMP/DEBIAN/$EXT$file"
+				doit "chmod 755 debian/$TMP/DEBIAN/$EXT$file"
+			else
+				doit "install -o root -g root -p debian/$EXT$file debian/$TMP/DEBIAN/"
+			fi
+		else
+			# Auto-generate script header and add .debhelper
+			# content to it.
+			if [ -f debian/$EXT$file.debhelper ]; then
+				verbose_echo "echo '#!/bin/sh -e' > debian/$TMP/DEBIAN/$EXT$file"
+				echo '#!/bin/sh -e' > debian/$TMP/DEBIAN/$EXT$file
+				verbose_echo "cat debian/$EXT$file.debhelper >> debian/$TMP/DEBIAN/$EXT$file"
+				cat debian/$EXT$file.debhelper >> debian/$TMP/DEBIAN/$EXT$file
+				doit "chown root.root debian/$TMP/DEBIAN/$EXT$file"
+				doit "chmod 755 debian/$TMP/DEBIAN/$EXT$file"
+			fi
 		fi
 	done
 

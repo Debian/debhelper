@@ -5,6 +5,8 @@
 # If debian/menu file exists, save it to debian/$TMP/usr/lib/menu/$PACKAGE
 # If debian/menu-method file exists, save it to 
 # debian/$TMP/etc/menu-methods/$PACKAGE
+#
+# Also, add to postinst and postrm.
 
 PATH=debian:$PATH:/usr/lib/debhelper
 source dh_lib
@@ -18,6 +20,13 @@ for PACKAGE in $DH_DOPACKAGES; do
 			doit "install -d debian/$TMP/usr/lib/menu"
 		fi
 		doit "install -p -m644 debian/${EXT}menu debian/$TMP/usr/lib/menu/$PACKAGE"
+
+		# Add the scripts if a menu-method file doesn't exist.
+		# The scripts for menu-method handle everything these do, too.
+		if [ ! -e debian/${EXT}menu-method -a ! "$DH_NOSCRIPTS" ]; then
+			autoscript "postinst" "postinst-menu"
+			autoscript "postrm" "postrm-menu"
+		fi
 	fi
 
 	if [ -e debian/${EXT}menu-method ]; then
@@ -25,5 +34,10 @@ for PACKAGE in $DH_DOPACKAGES; do
 			doit "install -d debian/$TMP/etc/menu-methods"
 		fi
 		doit "install -p debian/${EXT}menu-method debian/$TMP/etc/menu-methods/$PACKAGE"
+
+		if [ ! "$DH_NOSCRIPTS" ]; then
+			autoscript "postinst" "postinst-menu-method" "s/#PACKAGE#/$PACKAGE/"
+			autoscript "postrm" "postrm-menu-method" "s/#PACKAGE#/$PACKAGE/"
+		fi
 	fi
 done

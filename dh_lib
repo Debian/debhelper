@@ -3,15 +3,17 @@
 # Run a command, and display the command to stdout if verbose mode is on.
 # All commands that modifiy files in debian/$TMP should be ran via this 
 # function.
+# Unfortunatly, this function doesn't work if your command uses redirection,
+# you will have to call verbose_echo by hand then.
 function doit() {
-	verbose_echo "$1"
-	$1
+	verbose_echo "$*"
+	$*
 }
 
 # Echo something if the verbose flag is on.
 function verbose_echo() {
 	if [ "$DH_VERBOSE" ]; then
-		echo "	$1"
+		echo "	$*"
 	fi
 }
 
@@ -40,10 +42,42 @@ function pkgext() {
 	fi
 }
 
+# Automatically add a shell script snippet to a debian script.
+# Only works if the script has #DEBHELPER# in it.
+#
+# Parameters:
+# 1: script to add to
+# 2: filename of snippet
+# 3: sed commands to run on the snippet. Ie, s/#PACKAGE#/$PACKAGE/
+function autoscript() {
+	autoscript_script=$1
+	autoscript_filename=$2
+	autoscript_sed=$3
+	autoscript_debscript=debian/`pkgext $PACKAGE`$autoscript_script.debhelper
+
+	if [ -e "$DH_AUTOSCRIPTDIR/$autoscript_filename" ]; then
+		autoscript_filename="$DH_AUTOSCRIPTDIR/$autoscript_filename"
+	else
+		if [ -e "/usr/lib/debhelper/autoscripts/$autoscript_filename" ]; then
+			autoscript_filename="/usr/lib/debhelper/autoscripts/$autoscript_filename"
+		else
+			error "/usr/lib/debhelper/autoscripts/$autoscript_filename does not exist"
+		fi
+	fi
+
+	# Running doit doesn't cut it here.
+	verbose_echo echo "# Automatically added by `basename $0` on `822-date`" ">>" $autoscript_debscript
+	echo "# Automatically added by `basename $0` on `822-date`" >> $autoscript_debscript
+	verbose_echo sed "$autoscript_sed" $autoscript_filename ">>" $autoscript_debscript
+	sed "$autoscript_sed" $autoscript_filename >> $autoscript_debscript
+	verbose_echo  echo "# End automatically added section" ">>" $autoscript_debscript
+	echo "# End automatically added section" >> $autoscript_debscript
+}
+
 # Argument processing and global variable initialization is below.
 
 # Parse command line.
-set -- `getopt viap: $*`
+set -- `getopt vianp: $*`
 
 for i; do
 	case "$i"
@@ -63,6 +97,10 @@ for i; do
 		-p)
 			DH_DOPACKAGES="$DH_DOPACKAGES $2"
 			shift
+			shift
+			;;
+		-n)
+			DH_NOSCRIPTS=1
 			shift
 			;;
 		--)

@@ -13,7 +13,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 	examples=""
 
 	if [ -e debian/${EXT}examples ]; then
-		examples=`cat debian/${EXT}examples | tr "\n" " "`
+		examples=`tr "\n" " " < debian/${EXT}examples`
 	fi
 
 	if [ "$PACKAGE" = "$MAINPACKAGE" -a "$*" ]; then
