@@ -17,8 +17,8 @@ sub find_man {
 	# Does its filename look like a man page?
 	# .ex files are examples installed by deb-make,
 	# we don't want those, or .in files, which are
-	# from configure.
-	if (! (-f $_ && /^.*\.[1-9].*$/ && ! /\.(ex|in)$/)) {
+	# from configure, nor do we want CVS .#* files.
+	if (! (-f $_ && /^.*\.[1-9].*$/ && ! /\.(ex|in)$/) && ! /^\.#/) {
 		return;
 	}
 	
