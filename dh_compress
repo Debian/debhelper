@@ -34,7 +34,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		# Note that all the excludes of odd things like _z are because
 		# gzip refuses to compress such files, assumming they are zip files.
 		# I looked at the gzip source to get the complete list of such
-		# extentions: ".gz", ".z", ".taz", ".tgz", "-gz", "-z", "_z"
+		# extensions: ".gz", ".z", ".taz", ".tgz", "-gz", "-z", "_z"
 		
 		push @files, split(/\n/,`
 			find usr/info usr/share/info usr/man usr/share/man usr/X11*/man -type f ! -name "*.gz" 2>/dev/null || true;

@@ -24,14 +24,14 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	}	
 
 	foreach $file (@undoc) {
-		$file=~s/.gz$//; # .gz extention is optional in input.
+		$file=~s/.gz$//; # .gz extension is optional in input.
 
 		# Determine what directory the file belongs in,
 		# /usr/share/man, or /usr/X11R6/man, and how the link to
 		# the undocuemtned.7 man page will look.
 		($section)=$file=~m/^.*\.(\d)/;
 		if (!$section) {
-			error("\"$file\" does not have an extention.");
+			error("\"$file\" does not have an extension.");
 		}	
 		if ($file=~/.*\.\dx/) {
 			$dir="usr/X11R6/man/man$section";
