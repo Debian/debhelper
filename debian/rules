@@ -83,6 +83,8 @@ binary-indep: build
 	./dh_perl
 	./dh_installdeb
 	./dh_gencontrol
+	# Clean up CVS directories copied in if I build from CVS tree.
+	find debian/debhelper -type d -name CVS | xargs rm -rf
 	./dh_md5sums
 	./dh_builddeb
 
