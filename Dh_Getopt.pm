@@ -111,6 +111,8 @@ sub parseopts {
 		"no-act" => \$options{NO_ACT},
 	
 		"init-script=s" => \$options{INIT_SCRIPT},
+		
+		"sourcedir=s" => \$options{SOURCEDIR},
 	);
 
 	if (!$ret) {

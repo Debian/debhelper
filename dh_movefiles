@@ -12,8 +12,18 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	$TMP=tmpdir($PACKAGE);
 	$files=pkgfile($PACKAGE,"files");
 
-	if (! -d "debian/tmp") {
-		error("debian/tmp does not exist.");
+	if ($dh{SOURCEDIR}) {
+		if ($dh{SOURCEDIR}=~m:^/:) {
+			error("The sourcedir must be a relative filename, not starting with `/'.");
+		}
+		$sourcedir=$dh{SOURCEDIR};
+	}
+	else {
+		$sourcedir="debian/tmp";
+	}
+
+	if (! -d $sourcedir) {
+		error("$sourcedir does not exist.");
 	}
 
 	@tomove=();
@@ -27,8 +37,8 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		push @tomove, @ARGV;
 	}
 
-	if (@tomove && $TMP eq "debian/tmp") {
-		error("I was asked to move files from debian/tmp to debian/tmp.");
+	if (@tomove && $TMP eq $sourcedir) {
+		error("I was asked to move files from $sourcedir to $sourcedir.");
 	}
 
 	if (@tomove) {
@@ -38,7 +48,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		# Now we need to expand wildcards in @tomove.
 		@filelist=();
 		foreach (@tomove) {
-			push @filelist, glob("debian/tmp/$_");
+			push @filelist, glob("$sourcedir/$_");
 		}
 		
 		# Order the files. First all real files, then symlinks. 
@@ -48,16 +58,16 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		foreach (@filelist) {
 			$file=$_;
 			$ret=1 if (! -e $file && ! -l $file);
-			$file=~s:^debian/tmp/+::;
-			complex_doit("(cd debian/tmp ; find $file ! -type d -and ! -type l -print || true) >> movelist");
+			$file=~s:^$sourcedir/+::;
+			complex_doit("(cd $sourcedir ; find $file ! -type d -and ! -type l -print || true) >> movelist");
 		}
 		foreach (@filelist) {
 			$file=$_;
 			$ret=1 if (! -e $file && ! -l $file);
-			$file=~s:^debian/tmp/+::;
-			complex_doit("(cd debian/tmp ; find $file ! -type d -and -type l -print || true) >> movelist");
+			$file=~s:^$sourcedir/+::;
+			complex_doit("(cd $sourcedir ; find $file ! -type d -and -type l -print || true) >> movelist");
 		}
-		complex_doit("(cd debian/tmp;tar --create --remove-files --files-from=../../movelist --file -) | (cd $TMP;tar xpf -)");
+		complex_doit("(cd $sourcedir;tar --create --remove-files --files-from=../../movelist --file -) | (cd $TMP;tar xpf -)");
 		doit("rm","-f","movelist");
 	}
 }
