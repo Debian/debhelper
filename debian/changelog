@@ -1,3 +1,18 @@
+debhelper (2.2.12) unstable; urgency=medium
+
+  * suidmanager is obsolete now, and so is dh_suidmanager. Instead,
+    packages that contain suid binaries should include the binaries suid in
+    the .deb, and dpkg-statoverride can override this. If this is done
+    to a program that previously used suidmanager, though, you need to
+    conflict with suidmanager (<< 0.50).
+  * Made dh_suidmanager check to see if it would have done anything before.
+    If so, it states that it is obsolete, and refer users to the man
+    page, which now explains the situation, and then aborts the build.
+    If it would have done nothing before, it just outputs a warning that
+    it is an obsolete program.
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 10 Jan 2001 13:17:50 -0800
+
 debhelper (2.2.11) unstable; urgency=medium
 
   * Fixed dh_installwm. Oops. Closes: #81124 
