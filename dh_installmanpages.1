@@ -10,7 +10,8 @@ automatically installing man pages into usr/man/ and usr/X11R6/man/ in
 package build directories.
 .P
 dh_installmanpages scans the current directory and all subdirectories for
-filenames that look like man pages. It uses
+filenames that look like man pages. (Note that only real files are looked
+at; symlinks are ignored.) It uses
 .BR file (1)
 to verify that the files are in the correct format. Then, based on the
 files' extensions, it installs them into the correct man directory.
@@ -18,6 +19,9 @@ files' extensions, it installs them into the correct man directory.
 All filenames specified as parameters will be skipped by dh_installmanpages.
 This is useful if by default it installs some man pages that you do not want
 to be installed.
+.P
+After the man page installation step, dh_installmanpages will check to see if
+any of the man pages are ".so" links. If so, it changes them to symlinks.
 .SH OPTIONS
 .TP
 .B \-v, \--verbose

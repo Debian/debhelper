@@ -2,7 +2,9 @@
 #
 # Automatically find and install man pages. However, do not install any man 
 # pages listed on the command line.
-# This is a little bit DWIMish, but still very handy.
+# Also change man pages with .so commands in them into symlinks.
+#
+# This is a little bit (hah!) DWIMish, but still very handy.
 
 PATH=debian:$PATH:/usr/lib/debhelper
 . dh_lib
@@ -15,12 +17,12 @@ for PACKAGE in $DH_DOPACKAGES; do
 	# .in files, which are from configure.
 	# We also need to exclude all debian/tmp type dirs.
 	EXCLUDE=`grep ^Package: debian/control | \
-		cut -d " " -f 2 | tac | tr "\n" "|"`
-	for file in `find * -name "*.[1-9]*" ! -name "*.ex" \
+		cut -d " " -f 2 | tr "\n" "|"`
+	for file in `find * -type f -name "*.[1-9]*" ! -name "*.ex" \
 		! -name "*.in" | egrep -v "^debian/(${EXCLUDE}tmp)/"`
 	do
 		# Make sure file thinks they are man pages.
-		if file $file|grep -q roff; then
+		if file -L $file|grep -q roff; then
 			if echo $file|grep -q /; then
 				NAME=`expr $file : '.*/\(.*\)'`
 			else
@@ -52,6 +54,18 @@ for PACKAGE in $DH_DOPACKAGES; do
 					doit "install -p -m644 $file $TMP/usr/$EXTDIR/man/$SECTION/$NAME"
 				fi
 			fi
+		fi
+	done
+
+	# Now the .so conversion.
+	for file in `find $TMP/usr/man $TMP/usr/X11*/man -type f -size -256c 2>/dev/null`
+	do
+		solink=expr "`head -1 $file`" : '\.so \(.*\)'
+		if [ "$solink" ]; then
+			doit "rm -f $file"
+			# The .so links include the subdir the page is in, 
+			# thus the ../
+			doit "ln -s ../$solink $file"
 		fi
 	done
 done
