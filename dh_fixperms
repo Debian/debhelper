@@ -42,8 +42,9 @@ for PACKAGE in $DH_DOPACKAGES; do
 	complex_doit "find $TMP/usr/man/ $TMP/usr/X11*/man/ -type f \
 		$FIND_OPTIONS -print0 2>/dev/null | xargs -0r chmod 644"
 
-	# ..and so are executable shared libraries (and .la files from libtool)
+	# ..and so are executable shared and static libraries 
+	# (and .la files from libtool)
 	complex_doit "find $TMP -perm -5 -type f \
-		\( -name "*.so*" -or -name "*.la" \) $FIND_OPTIONS -print0 \
+		\( -name "*.so*" -or -name "*.la" -or -name "*.a" \) $FIND_OPTIONS -print0 \
 		2>/dev/null | xargs -0r chmod a-X"
 done

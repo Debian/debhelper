@@ -13,6 +13,7 @@ init();
 
 # Check if a file is a man page, for use by File::Find.
 my @manpages;
+my @allpackages;
 sub find_man {
 	# Does its filename look like a man page?
 	# .ex files are examples installed by deb-make,
@@ -21,12 +22,20 @@ sub find_man {
 	if (! (-f $_ && /^.*\.[1-9].*$/ && ! /\.(ex|in)$/)) {
 		return;
 	}
+	
 	# It's not in a tmp directory is it?
 	if ($File::Find::dir=~m:debian/.*tmp.*:) {
 		return;
 	}
+	foreach $dir (@allpackages) {
+		if ($File::Find::dir=~m:debian/$dir:) {
+			return;
+		}
+	}
+	
 	# And file does think it's a real man page?
-	if (! `file $_`=~/roff/) {
+	my $type=`file $_`;
+	if ($type !~ m/:.*roff/) {
 		return;
 	}
 
@@ -68,6 +77,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 
 	# Find all filenames that look like man pages.
 	@manpages=();
+	@allpackages=GetPackages('');
 	find(\&find_man,'.'); # populates @manpages
 	
 	foreach $page (@manpages) {
