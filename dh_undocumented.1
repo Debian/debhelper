@@ -3,7 +3,7 @@
 dh_undocumented \- make symlinks to undocumented.7.gz man page
 .SH SYNOPSIS
 .B dh_undocumented
-.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir] [-A] [manpage ...]"
+.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir] [-A] [manpage ...]"
 .SH "DESCRIPTION"
 dh_undocumented is a debhelper program that is responsible for making
 symlinks to the
@@ -41,6 +41,10 @@ Install undocumented man page symlinks for all architecture dependent packages.
 .B \-i, \--indep
 Install undocumented man page symlinks for all architecture independent packages.
 .TP
+.B \--no-act
+Do not really do anything. If used with -v, the result is that this command
+will output a list of what it would have done.
+.TP
 .B \-ppackage, \--package=package
 Install undocumented man page symlinks for the package named "package".
 .TP
@@ -68,6 +72,9 @@ the control file will be effected.
 .TP
 .I DH_VERBOSE
 Enables verbose mode
+.TP
+.I DH_NO_ACT
+Enables no-act mode (see above).
 .SH "SEE ALSO"
 .BR /usr/doc/debhelper/README
 ,

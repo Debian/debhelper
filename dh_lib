@@ -9,7 +9,9 @@
 # involving redirection. Use complex_doit instead.
 doit() {
 	verbose_echo "$@"
-	eval '$@'
+	if [ ! "$DH_NO_ACT" ]; then
+		eval '$@'
+	fi
 }
 
 
@@ -17,7 +19,9 @@ doit() {
 # are evaled with double quotes. This version can handle compound commands.
 complex_doit() {
 	verbose_echo "$@"
-	eval "$@"
+	if [ ! "$DH_NO_ACT" ]; then
+		eval "$@"
+	fi
 }
 
 # Echo something if the verbose flag is on.

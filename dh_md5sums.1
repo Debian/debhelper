@@ -3,7 +3,7 @@
 dh_md5sums \- generate DEBIAN/md5sums file
 .SH SYNOPSIS
 .B dh_md5sums
-.I "[-x] [-v] [-a] [-i] [-Ptmpdir] [-ppackage]"
+.I "[-x] [-v] [-a] [-i] [--no-act] [-Ptmpdir] [-ppackage]"
 .SH "DESCRIPTION"
 dh_md5sums is a debhelper program that is responsible for generating
 a DEBIAN/md5sums file, which lists the md5sums of each file in the package.
@@ -22,6 +22,10 @@ Generate md5sums files for all architecture dependent packages.
 .TP
 .B \-i, \--indep
 Generate md5sums files for all architecture independent packages.
+.TP
+.B \--no-act
+Do not really do anything. If used with -v, the result is that this command
+will output a list of what it would have done.
 .TP
 .B \-ppackage, \--package=package
 Generate md5sums file for the package named "package".
@@ -44,6 +48,9 @@ the control file will be effected.
 .TP
 .I DH_VERBOSE
 Enables verbose mode
+.TP
+.I DH_NO_ACT
+Enables no-act mode (see above).
 .SH "SEE ALSO"
 .BR /usr/doc/debhelper/README
 .SH AUTHOR

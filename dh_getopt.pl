@@ -107,6 +107,8 @@ GetOptions(
 
 	"A" => \$all,
 	"all" => \$all,
+
+	"no-act" => \$no_act,
 );
 
 # Check to see if -V was specified. If so, but no parameters were passed,
@@ -121,10 +123,16 @@ if ($ENV{DH_VERBOSE} ne undef) {
 	$verbose=1;
 }
 
+# Check to see if DH_NO_ACT was set, if so, make sure no act mode is on.
+if ($ENV{DH_NO_ACT} ne undef) {
+	$no_act=1;
+}
+
 # Now output everything, in a format suitable for a shell to eval it. 
 # Note the last line sets $@ in the shell to whatever arguements remain.
 print qq{
 DH_VERBOSE='$verbose'
+DH_NO_ACT='$no_act'
 DH_DOPACKAGES='@packages'
 DH_DOINDEP='$indep'
 DH_DOARCH='$arch'

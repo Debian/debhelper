@@ -3,7 +3,7 @@
 dh_installchangelogs \- install changelogs into package build directories
 .SH SYNOPSIS
 .B dh_installchangelogs
-.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir] [upstream]"
+.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir] [upstream]"
 .SH "DESCRIPTION"
 dh_installchangelogs is a debhelper program that is responsible for installing
 changelogs into package build directories.
@@ -26,6 +26,10 @@ Install changelogs for all architecture dependent packages.
 .TP
 .B \-i, \--indep
 Install changelogs for all architecture independent packages.
+.TP
+.B \--no-act
+Do not really do anything. If used with -v, the result is that this command
+will output a list of what it would have done.
 .TP
 .B \-ppackage, \--package=package
 Install changelogs for the package named "package".
@@ -50,6 +54,9 @@ package.
 .TP
 .I DH_VERBOSE
 Enables verbose mode
+.TP
+.I DH_NO_ACT
+Enables no-act mode (see above).
 .SH "SEE ALSO"
 .BR /usr/doc/debhelper/README
 .SH "CONFORMS TO"

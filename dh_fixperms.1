@@ -3,7 +3,7 @@
 dh_fixperms \- fix permissions of files in package build directories
 .SH SYNOPSIS
 .B dh_fixperms
-.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir]"
+.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir]"
 .SH "DESCRIPTION"
 dh_fixperms is a debhelper program that is responsible for setting the
 permissions of files in package build directories to a sane state.
@@ -24,6 +24,10 @@ Fix permissions for all architecture dependent packages.
 .B \-i, \--indep
 Fix permissions for all architecture independent packages.
 .TP
+.B \--no-act
+Do not really do anything. If used with -v, the result is that this command
+will output a list of what it would have done.
+.TP
 .B \-ppackage, \--package=package
 Fix permissions for the package named "package".
 .TP
@@ -41,6 +45,9 @@ the control file will have their permissions fixed.
 .TP
 .I DH_VERBOSE
 Enables verbose mode
+.TP
+.I DH_NO_ACT
+Enables no-act mode (see above).
 .SH "SEE ALSO"
 .BR /usr/doc/debhelper/README
 .SH "CONFORMS TO"

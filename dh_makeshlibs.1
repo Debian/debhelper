@@ -3,7 +3,7 @@
 dh_makeshlibs \- automatically create shlibs file
 .SH SYNOPSIS
 .B dh_makeshlibs
-.I "[-v] [-a] [-i] [-mmajor] [-Ptmpdir] [-ppackage] [-mmajor] [-V[dependancies]]"
+.I "[-v] [-a] [-i] [--no-act] [-mmajor] [-Ptmpdir] [-ppackage] [-mmajor] [-V[dependancies]]"
 .SH "DESCRIPTION"
 dh_makeshlibs is a debhelper program that automatically scans for shared
 libraries, and generates a shlibs file for the libraries it finds.
@@ -20,6 +20,10 @@ Generate shlibs files for all architecture dependent packages.
 .TP
 .B \-i, \--indep
 Generate shlibs files for all architecture independent packages.
+.TP
+.B \--no-act
+Do not really do anything. If used with -v, the result is that this command
+will output a list of what it would have done.
 .TP
 .B \-ppackage, \--package=package
 Generate shlibs file for the package named "package".
@@ -67,6 +71,9 @@ the control file will be effected.
 .TP
 .I DH_VERBOSE
 Enables verbose mode
+.TP
+.I DH_NO_ACT
+Enables no-act mode (see above).
 .SH "SEE ALSO"
 .BR /usr/doc/debhelper/README
 .SH BUGS

@@ -3,7 +3,7 @@
 dh_installexamples \- install example files into package build directories
 .SH SYNOPSIS
 .B dh_installexamples
-.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir] [-A] [file ...]"
+.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir] [-A] [file ...]"
 .SH "DESCRIPTION"
 dh_installexamples is a debhelper program that is responsible for installing
 examples into usr/doc/package/examples in package build directories.
@@ -25,6 +25,10 @@ Install files for all architecture dependent packages.
 .TP
 .B \-i, \--indep
 Install files for all architecture independent packages.
+.TP
+.B \--no-act
+Do not really do anything. If used with -v, the result is that this command
+will output a list of what it would have done.
 .TP
 .B \-ppackage, \--package=package
 Install files for the package named "package".
@@ -55,6 +59,9 @@ directory, it will install the complete contents of the directory.
 .TP
 .I DH_VERBOSE
 Enables verbose mode
+.TP
+.I DH_NO_ACT
+Enables no-act mode (see above).
 .SH "SEE ALSO"
 .BR /usr/doc/debhelper/README
 .SH BUGS

@@ -3,7 +3,7 @@
 dh_installdeb \- install files into the DEBIAN directory
 .SH SYNOPSIS
 .B dh_installdeb
-.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir]"
+.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir]"
 .SH "DESCRIPTION"
 dh_installdeb is a debhelper program that is responsible for installing
 files into the DEBIAN directory in package build directories with the
@@ -43,6 +43,10 @@ Install files for all architecture dependent packages.
 .B \-i, \--indep
 Install files for all architecture independent packages.
 .TP
+.B \--no-act
+Do not really do anything. If used with -v, the result is that this command
+will output a list of what it would have done.
+.TP
 .B \-ppackage, \--package=package
 Install files for the package named "package".
 .TP
@@ -60,6 +64,9 @@ the control file will be effected.
 .TP
 .I DH_VERBOSE
 Enables verbose mode
+.TP
+.I DH_NO_ACT
+Enables no-act mode (see above).
 .SH "SEE ALSO"
 .BR /usr/doc/debhelper/README
 .SH "CONFORMS TO"

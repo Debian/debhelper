@@ -3,7 +3,7 @@
 dh_strip \- strip executables, shared libraries, and some static libraries.
 .SH SYNOPSIS
 .B dh_strip
-.I "[-v] [-a] [-i] [-Ptmpdir] [-ppackage]"
+.I "[-v] [-a] [-i] [--no-act] [-Ptmpdir] [-ppackage]"
 .SH "DESCRIPTION"
 dh_strip is a debhelper program that is responsible for stripping
 executables, shared libraries, and static libraries that are not used for
@@ -23,6 +23,10 @@ Strip files in all architecture dependent packages.
 Strip files in all architecture independent packages (likely, this is
 pointless :-).
 .TP
+.B \--no-act
+Do not really do anything. If used with -v, the result is that this command
+will output a list of what it would have done.
+.TP
 .B \-ppackage, \--package=package
 Strip files for the package named "package".
 .TP
@@ -40,6 +44,9 @@ the control file will have their files stripped.
 .TP
 .I DH_VERBOSE
 Enables verbose mode
+.TP
+.I DH_NO_ACT
+Enables no-act mode (see above).
 .SH "SEE ALSO"
 .BR /usr/doc/debhelper/README
 .SH "CONFORMS TO"

@@ -3,7 +3,7 @@
 dh_installdirs \- create subdirectories in package build directories
 .SH SYNOPSIS
 .B dh_installdirs
-.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir] [-A] [dir ...]"
+.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir] [-A] [dir ...]"
 .SH "DESCRIPTION"
 dh_installdirs is a debhelper program that is responsible for creating
 subdirectories in package build directories.
@@ -30,6 +30,10 @@ Create directories for all architecture dependent packages.
 .B \-i, \--indep
 Create directories for all architecture independent packages.
 .TP
+.B \--no-act
+Do not really do anything. If used with -v, the result is that this command
+will output a list of what it would have done.
+.TP
 .B \-ppackage, \--package=package
 Create directories for the package named "package".
 .TP
@@ -55,6 +59,9 @@ the control file will be effected.
 .TP
 .I DH_VERBOSE
 Enables verbose mode
+.TP
+.I DH_NO_ACT
+Enables no-act mode (see above).
 .SH "SEE ALSO"
 .BR /usr/doc/debhelper/README
 .SH BUGS

@@ -3,7 +3,7 @@
 dh_installmenu \- install debian menu files into package build directories
 .SH SYNOPSIS
 .B dh_installmenu
-.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir] [-n]"
+.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir] [-n]"
 .SH "DESCRIPTION"
 dh_installmenu is a debhelper program that is responsible for installing
 files used by the debian menu package into package build directories. 
@@ -34,6 +34,10 @@ Install menu files into all architecture dependent packages.
 .B \-i, \--indep
 Install menu files into all architecture independent packages.
 .TP
+.B \--no-act
+Do not really do anything. If used with -v, the result is that this command
+will output a list of what it would have done.
+.TP
 .B \-ppackage, \--package=package
 Install menu files into the package named "package".
 .TP
@@ -54,6 +58,9 @@ the control file will be effected.
 .TP
 .I DH_VERBOSE
 Enables verbose mode
+.TP
+.I DH_NO_ACT
+Enables no-act mode (see above).
 .SH "SEE ALSO"
 .BR /usr/doc/debhelper/README
 ,

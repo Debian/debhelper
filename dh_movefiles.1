@@ -3,7 +3,7 @@
 dh_movefiles \- moves files out of debian/tmp into subpackages
 .SH SYNOPSIS
 .B dh_movefiles
-.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir]"
+.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir]"
 .SH "DESCRIPTION"
 dh_movefiles is a debhelper program that is responsible for moving files out
 of debian/tmp and into other package build directories. This may be useful
@@ -23,6 +23,10 @@ Move files for all architecture dependent packages.
 .B \-i, \--indep
 Move files for all architecture independent packages.
 .TP
+.B \--no-act
+Do not really do anything. If used with -v, the result is that this command
+will output a list of what it would have done.
+.TP
 .B \-ppackage, \--package=package
 Move files for the package named "package".
 .TP
@@ -40,6 +44,9 @@ the control file will be effected.
 .TP
 .I DH_VERBOSE
 Enables verbose mode
+.TP
+.I DH_NO_ACT
+Enables no-act mode (see above).
 .SH "SEE ALSO"
 .BR /usr/doc/debhelper/README
 .SH AUTHOR

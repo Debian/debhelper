@@ -3,7 +3,7 @@
 dh_installcron \- install cron scripts into etc/cron.*
 .SH SYNOPSIS
 .B dh_installcron
-.I "[-v] [-a] [-i] [-ppackage] [-Ptmpdir]"
+.I "[-v] [-a] [-i] [--no-act] [-ppackage] [-Ptmpdir]"
 .SH "DESCRIPTION"
 dh_installcron is a debhelper program that is responsible for installing
 cron scripts into etc/cron.* in package build directories. The files 
@@ -23,6 +23,10 @@ Install cron files for all architecture dependent packages.
 .B \-i, \--indep
 Install cron files for all architecture independent packages.
 .TP
+.B \--no-act
+Do not really do anything. If used with -v, the result is that this command
+will output a list of what it would have done.
+.TP
 .B \-ppackage, \--package=package
 Install cron files for the package named "package".
 .TP
@@ -40,6 +44,9 @@ the control file will be effected.
 .TP
 .I DH_VERBOSE
 Enables verbose mode
+.TP
+.I DH_NO_ACT
+Enables no-act mode (see above).
 .SH "SEE ALSO"
 .BR /usr/doc/debhelper/README
 .SH "CONFORMS TO"
