@@ -53,9 +53,37 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		}
 		@files=@new;
 	}
+	
+	# Look for files with hard links. If we are going to compress both,
+	# we can preserve the hard link across the compression and save
+	# space in the end.
+	foreach (@files) {
+		($dev, $inode, undef, $nlink)=stat($_);
+		if ($nlink > 1) {
+			@{$hardlinks{$_}}=($dev,$inode);
+		}
+	}
+	# TODO: with the info we have now, we could remove the hard link files
+	# from the list of files to compress and save some time.
 
 	if (@files) {
 		doit("gzip","-9f",@files);
+	}
+	
+	# Now change over any files we can that used to be hard links so
+	# they are again.
+	my $old_dev='';
+	my $old_inode='';
+	my $old_fn='';
+	foreach (sort keys %hardlinks) {
+		if ($hardlinks{$_}[0] eq $old_dev &&
+		    $hardlinks{$_}[1] eq $old_inode) {
+		    	doit("rm","-f","$_.gz");
+			doit("ln","$old_fn.gz","$_.gz");
+		}	
+	    	$old_dev=$hardlinks{$_}[0];
+		$old_inode=$hardlinks{$_}[1];
+		$old_fn=$_;
 	}
 
 	chdir($olddir);

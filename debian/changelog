@@ -1,3 +1,16 @@
+debhelper (1.2.19) unstable; urgency=low
+
+  * dh_listpackages: new command. Takes the standard options taken by other
+    debhelper commands, and just outputs a list of the binary packages a
+    debhelper command would act on. Added because of bug #30626, and because
+    of wn's truely ugly use of debhelper internals to get the same info (and
+    because it's just 4 lines of code ;-).
+  * dh_compress: is now smart about compressing files that are hardlinks.
+    When possible, will only compress one file, delete the hardlinks, and
+    re-make hardlinks to the compressed file, saving some disk space.
+
+ -- Joey Hess <joeyh@master.debian.org>  Fri, 18 Dec 1998 22:26:41 -0500
+
 debhelper (1.2.18) unstable; urgency=medium
 
   * dh_fixperms: was not fixing permissions of files in usr/doc/ to 644,
