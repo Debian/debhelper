@@ -12,7 +12,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 
 	doit("rm", "-f", "$TMP/DEBIAN/shlibs");
 
-	open (FIND, "find $TMP -xtype f -name '*.so.*' |");
+	open (FIND, "find $TMP -xtype f -name '*.so*' |");
 	while (<FIND>) {
 		chomp;
 		# The second evil regexp is for db3, whose author should
