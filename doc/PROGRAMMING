@@ -156,34 +156,34 @@ Functions:
 
 Dh_Lib.pm also contains a number of functions you may find useful.
 
-doit()
+doit(@command)
 	Pass this function an array that is a 
 	shell command. It will run the command (unless $dh{NO_ACT} is set), and
 	if $dh{VERBOSE} is set, it will also output the command to stdout. You
 	should use this function for almost all commands your program performs
 	that manipulate files in the package build directories.
-complex_doit()
+complex_doit($command)
 	Pass this function a string that is a shell command, it will run it
 	similarly to how doit() does. You can pass more complicated commands 
 	to this (ie, commands involving piping redirection), however, you 
 	have to worry about things like escaping shell metacharacters.
-verbose_print()
+verbose_print($message)
 	Pass this command a string, and it will echo it if $dh{VERBOSE} is set.
-error()
+error($errormsg)
 	Pass this command a string, it will output it to standard error and
 	exit.
-warning()
+warning($message)
 	Pass this command a string, and it will output it to standard error
 	as a warning message.
-tmpdir()
+tmpdir($dir)
 	Pass this command the name of a binary package, it will return the
 	name of the tmp directory that will be used as this package's
 	package build directory. Typically, this will be "debian/package".
-compat()
+compat($num)
 	Pass this command a number, and if the current compatibility level
-	equals that number, it will return true. Looks at DH_COMPAT to get
-	the compatibility level.
-pkgfile()
+	is less than or equal to that number, it will return true.
+	Looks at DH_COMPAT to get the compatibility level.
+pkgfile($package, $basename)
 	Pass this command the name of a binary package, and the base name of a
 	file, and it will return the actual filename to use. This is used
 	for allowing debhelper programs to have configuration files in the
@@ -191,17 +191,17 @@ pkgfile()
 	package. The convention is that the files are named
 	debian/package.filename, and debian/filename is also allowable for
 	the $dh{MAINPACKAGE}. If the file does not exist, nothing is returned.
-pkgext()
+pkgext($package)
 	Pass this command the name of a binary package, and it will return
 	the name to prefix to files in debian/ for this package. For the
 	$dh{MAINPACKAGE}, it returns nothing (there is no prefix), for the other
 	packages, it returns "package.".
-isnative()
+isnative($package)
 	Pass this command the name of a package, it returns 1 if the package
 	is a native debian package.
 	As a side effect, $dh{VERSION} is set to the version number of the
 	package.
-autoscript()
+autoscript($package, $scriptname, $snippetname, $sedcommands)
 	Pass parameters:
 	 - binary package to be affected
 	 - script to add to
@@ -210,10 +210,26 @@ autoscript()
 	   (optional)
 	This command automatically adds shell script snippets to a debian
 	maintainer script (like the postinst or prerm).
-dirname()
+dirname($pathname)
 	Return directory part of pathname.
-basename()
+basename($pathname)
 	Return base of pathname,
+addsubstvar($package, $substvar, $deppackage, $verinfo, $remove)
+	This function adds a dependency on some package to the specified
+	substvar in a package's substvar's file. It needs all these
+	parameters:
+	- binary package that gets the item
+	- name of the substvar to add the item to
+	- the package that will be depended on
+	- version info for the package (optional) (ie: ">= 1.1")
+	- if this last parameter is passed, the thing that would be added
+	  is removed instead. This can be useful to ensure that a debhelper
+	  command is idempotent. Note that without this parameter, if you
+	  call the function twice with the same values it will only add one
+	  item to the substvars file.
+delsubstvar($package, $substvar)
+	This function removes the entire line for the substvar from the
+	package's shlibs file.
 
 -- Joey Hess <joeyh@debian.org>
 

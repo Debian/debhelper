@@ -12,7 +12,7 @@ use vars qw(@ISA @EXPORT %dh);
 @ISA=qw(Exporter);
 @EXPORT=qw(&init &doit &complex_doit &verbose_print &error &warning &tmpdir
 	    &pkgfile &pkgext &isnative &autoscript &filearray &GetPackages
-	    &basename &dirname &xargs %dh &compat);
+	    &basename &dirname &xargs %dh &compat &addsubstvar &delsubstvar);
 
 my $max_compat=4;
 
@@ -218,6 +218,12 @@ sub compat {
 	if (defined $ENV{DH_COMPAT}) {
 		$c=$ENV{DH_COMPAT};
 	}
+	elsif (-e 'debian/compat') {
+		# Try the file..
+		open (COMPAT_IN, "debian/compat") || die "debian/compat: $!";
+		$c=<COMPAT_IN>;
+		chomp $c;
+	}
 
 	if ($c > $max_compat) {
 		error("Sorry, but $max_compat is the highest compatibility level of debhelper currently supported.");
@@ -348,6 +354,64 @@ sub autoscript {
 	complex_doit("echo \"# Automatically added by ".basename($0)."\">> $outfile");
 	complex_doit("sed \"$sed\" $infile >> $outfile");
 	complex_doit("echo '# End automatically added section' >> $outfile");
+}
+
+# Removes a whole substvar line.
+sub delsubstvar {
+	my $package=shift;
+	my $substvar=shift;
+
+	my $ext=pkgext($package);
+	my $substvarfile="debian/${ext}substvars";
+
+	complex_doit("grep -v '^${substvar}=' $substvarfile > $substvarfile.new || true");
+	doit("mv", "$substvarfile.new","$substvarfile");
+}
+				
+# Adds a dependency on some package to the specified
+# substvar in a package's substvar's file.
+sub addsubstvar {
+	my $package=shift;
+	my $substvar=shift;
+	my $deppackage=shift;
+	my $verinfo=shift;
+	my $remove=shift;
+
+	my $ext=pkgext($package);
+	my $substvarfile="debian/${ext}substvars";
+	my $str=$deppackage;
+	$str.=" ($verinfo)" if length $verinfo;
+
+	# Figure out what the line will look like, based on what's there
+	# now, and what we're to add or remove.
+	my $line="";
+	if (-e $substvarfile) {
+		my %items;
+		open(SUBSTVARS_IN, "$substvarfile") || die "read $substvarfile: $!";
+		while (<SUBSTVARS_IN>) {
+			chomp;
+			if (/^\Q$substvar\E=(.*)/) {
+				%items = map { $_ => 1} split(", ", $1);
+				
+				last;
+			}
+		}
+		close SUBSTVARS_IN;
+		if (! $remove) {
+			$items{$str}=1;
+		}
+		else {
+			delete $items{$str};
+		}
+		$line=join(", ", keys %items);
+	}
+	elsif (! $remove) {
+		$line=$str;
+	}
+
+	if (length $line) {
+		 complex_doit("echo '${substvar}=$line' >> $substvarfile");
+	}
 }
 
 # Reads in the specified file, one word at a time, and returns an array of

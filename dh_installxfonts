@@ -26,7 +26,8 @@ install them into the correct location under etc/X11/fonts in your package
 build directory.
 
 Your package should should depend on xutils (>= 4.0.3) so that the
-update-fonts-* commands are available.
+update-fonts-* commands are available. (This program adds that dependency to
+${misc:Depends}.)
 
 This programt automatically generates the postinst and postrm commands needed
 to register X fonts.  See L<dh_installdeb(1)> for an explanation of how this
@@ -70,6 +71,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			"s:#CMDS#:".join("\n", map { "\t$_" } @cmds).":;");
 		autoscript($package, "postrm", "postrm-xfonts",
 			"s:#CMDS#:".join("\n", @cmds).":;");
+
+		addsubstvar($package, "misc:Depends", "xutils", ">= 4.0.3");
+	}
+	else {
+		# remove
+		addsubstvar($package, "misc:Depends", "xutils", ">= 4.0.3", 1);
 	}
 }
 

@@ -18,7 +18,7 @@ B<dh_perl> [S<I<debhelper options>>] [B<-d>] [S<I<library dirs ...>>]
 =head1 DESCRIPTION
 
 dh_perl is a debhelper program that is responsible for generating
-the perl:Depends substitutions and adding them to substvars files.
+the ${perl:Depends} substitutions and adding them to substvars files.
 
 The program will look at perl scripts and modules in your package,
 and will use this information to generate a dependency.
@@ -88,13 +88,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp = tmpdir($package);
 	my $ext = pkgext($package);
 
-	# For idempotency, remove anything this program might have
-	# previously added to the substvars file.
-	if (-e "debian/${ext}substvars") {
-		complex_doit("grep -v ^perl:Depends= debian/${ext}substvars > debian/${ext}substvars.new || true");
-		doit("mv", "debian/${ext}substvars.new","debian/${ext}substvars");
-	}
-
+	delsubstvar($package, "perl:Depends"); # for idempotency
+	
 	# Check also for alternate locations given on the command line
 	my @dirs = grep -d, map "$tmp/$_", $vendorlib, $vendorarch, @ARGV;
 
@@ -118,25 +113,24 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}, $tmp;
 
 	if ($deps) {
-		my $perl_depends = $perl;
+		my $version="";
 		if ($deps & XS_MODULE or $dh{V_FLAG_SET}) {
 			($version) = `dpkg -s $perl` =~ /^Version:\s*(\S+)/m
 				unless $version;
-			$perl_depends .= " (>= $version)";
+			$version = ">= $version";
 		}
 		elsif ($deps & PM_MODULE) {
-			$perl_depends .= " (>= $min_version)";
+			$version = ">= $min_version";
 		}
+		
+		# no need to depend on an un-versioned perl-base -- it's
+		# essential
+		addsubstvar($package, "perl:Depends", $perl, $version)
+			unless $perl eq 'perl-base' && ! length($version);
 
 		# add perlapi-<ver> for XS modules
-		$perl_depends .= ", perlapi-$Config{version}"
+		addsubstvar($package, "perl:Depends", "perlapi-$Config{version}")
 			if $deps & XS_MODULE;
-
-		# don't need to depend on an un-versioned perl-base, it's
-		# essential
-		unless ($perl_depends eq 'perl-base') {
-			complex_doit("echo 'perl:Depends=$perl_depends' >> debian/${ext}substvars");
-		}
 	}
 }
 

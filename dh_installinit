@@ -30,6 +30,12 @@ If a file named debian/package.default exists, then it is installed into
 etc/default/package in the package build directory, with "package" replaced
 by the package name.
 
+Historically this program generates postrm and prerm commands that run the
+init scripts by hand. In V4 mode, it uses the invoke-rc.d program instead.
+See L<debhelper(1)> for details about V4 mode. If you decide to use this, you
+should make your package depend on sysvinit (>= 2.80-1) (this dependency is
+added to ${misc:Depends} by this program in V4 mode).
+
 =head1 OPTIONS
 
 =over 4
@@ -133,25 +139,40 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$params="defaults";
 		}
 
+		my $substvaradded=0;
 		if (! $dh{NOSCRIPTS}) {
-			# -r on the command line sets R_FLAG. If it's set, there
-			# is no restart on upgrade.
+			# In v4 mode, use invoke-rc.d versions of the
+			# autoscripts; prior to that use the old,
+			# manual-invoking versions.
+			my $tailstr="";
+			if (! compat(3)) {
+				$tailstr="-invoke";
+				addsubstvar($package, "misc:Depends", "sysvinit", ">= 2.80-1");
+				$substvaradded=1;
+			}
+			# -r on the command line sets R_FLAG. If it's set,
+			# there  is no restart on upgrade.
 			if ($dh{R_FLAG}) {
-				autoscript($package,"postinst", "postinst-init-norestart",
+				autoscript($package,"postinst", "postinst-init-norestart$tailstr",
 					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
-				autoscript($package,"postrm","postrm-init",
-					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
-				autoscript($package,"prerm","prerm-init-norestart",
+				autoscript($package,"prerm","prerm-init-norestart$tailstr",
 					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
 			}
 			else {
-				autoscript($package,"postinst","postinst-init",
+				autoscript($package,"postinst","postinst-init$tailstr",
 					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
-				autoscript($package,"postrm","postrm-init",
-					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
-				autoscript($package,"prerm","prerm-init",
+				autoscript($package,"prerm","prerm-init$tailstr",
 					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
 			}
+			# This script just removes the links, so it's the
+			# same for all varients.
+			autoscript($package,"postrm","postrm-init",
+				"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
+		}
+
+		if (! $substvaradded) {
+			# Remove it, for idemotency's sake.
+			addsubstvar($package, "misc:Depends", "sysvinit", ">= 2.80-1", 1);
 		}
 	}
 }

@@ -1,3 +1,26 @@
+debhelper (3.4.4) unstable; urgency=low
+
+  * Introduced the debian/compat file. This is the new, preferred way to say
+    what debhelper compatability level your package uses. It has the big
+    advantage of being available to debhelper when you run it at the command
+    line, as well as in debian/rules.
+  * A new v4 feature: dh_installinit, in v4 mode, will use invoke-rc.d.
+    This is in v4 for testing, but I may well roll it back into v3 (and
+    earlier) once woody is released and I don't have to worry about breaking
+    things (and, presumably, once invoke-rc.d enters policy).
+  * Some debhelper commands will now build up a new substvars variable,
+    ${misc:Depends}, based on things they know your package needs to depend
+    on. For example, dh_installinit in v4 mode adds sysvinit (>= 2.80-1) to
+    that dep list, and dh_installxfonts adds a dep on xutils. This variable
+    should make it easier to keep track of what your package needs to depends
+    on, supplimenting the ${shlibs:Depends} and ${perl:Depends} substvars.
+    Hmm, this appears to be based loosely on an idea by Masato Taruishi
+    <taru@debian.org>, filtered through a long period of mulling it over.
+    Closes: #76352
+  * Use the addsubstvar function I wrote for the above in dh_perl too.
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 26 Jan 2002 23:30:51 -0500
+
 debhelper (3.4.3) unstable; urgency=low
 
   * Improved dh_installxfonts some more:
