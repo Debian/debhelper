@@ -27,10 +27,6 @@ my %options=Dh_Getopt::parseopts();
 $options{DOPACKAGES}=join " ",@{$options{DOPACKAGES}};
 if ($#{$options{EXCLUDE}} > -1) {
 	$options{EXCLUDE_GREP}=join '|', @{$options{EXCLUDE}};
-	foreach (@{$options{EXCLUDE}}) {
-		$options{EXCLUDE_FIND}.="-regex .*".quotemeta($_).".* -or ";
-	}
-	$options{EXCLUDE_FIND}=~s/ -or $//;
 }
 $options{EXCLUDE}=join " ",@{$options{EXCLUDE}};
 

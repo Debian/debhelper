@@ -1,47 +1,49 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Automatically generate shlibs files.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use Dh_Lib;
+init();
 
-for PACKAGE in $DH_DOPACKAGES; do
-	TMP=`tmpdir $PACKAGE`
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
 
-	if [ -e "$TMP/DEBIAN/shlibs" ]; then
-		error "$TMP/DEBIAN/shlibs already exists."
-	fi
+	if (-e "$TMP/DEBIAN/shlibs") {
+		error("$TMP/DEBIAN/shlibs already exists.");
+	}
 
-	for file in `find $TMP -type f -name "*.so.*" | tr "\n" " "` ; do
-		LIBRARY=`expr $file : ".*/\(.*\)\.so\..*"` || true
-		LIB_VERSION=`expr $file : ".*/.*\.so\.\(.*\)"` || true
-		if [ -z "$DH_M_PARAMS" ]; then
-			MAJOR=`expr $LIB_VERSION : "\([0-9]*\)\."` || true
-		else
-			MAJOR="$DH_M_PARAMS"
-		fi
-#		LIBSTUB=`expr $file : "\(.*\/.*\.so\)\..*"` || true
-		if [ ! -d "$TMP/DEBIAN" ] ; then
-			doit "install -d $TMP/DEBIAN"
-		fi
-		DEPS=$PACKAGE
-		if [ "$DH_V_FLAG_SET" ]; then
-			if [ "$DH_V_FLAG" ]; then
-				DEPS="$DH_V_FLAG"
-			else
-				# Call isnative becuase it sets $VERSION
+	open (FIND, "find $TMP -type f -name '*.so.*' |");
+	while (<FIND>) {
+		chomp;
+		($library, $major)=m#.*/(.*)\.so\.(\d*)\.#;
+		if (defined($dh{M_PARAMS}) && $dh{M_PARAMS} ne '') {
+			$major=$dh{M_PARAMS};
+		}
+		if (! -d "$TMP/DEBIAN") {
+			doit("install","-d","$TMP/DEBIAN");
+		}
+		$deps=$PACKAGE;
+		if ($dh{V_FLAG_SET}) {
+			if ($dh{V_FLAG} ne '') {
+				$deps=$dh{V_FLAG};
+			}	
+			else {
+				# Call isnative becuase it sets $dh{VERSION}
 				# as a side effect.
-				isnative || true
-				DEPS="$PACKAGE (>= $VERSION)"
-			fi
-		fi
-		if [ "$LIBRARY" -a "$MAJOR" -a "$DEPS" ]; then
-			complex_doit "echo '$LIBRARY $MAJOR $DEPS' >>$TMP/DEBIAN/shlibs"
-		fi
-	done
+				isnative($PACKAGE);
+				$deps="$PACKAGE (>= $dh{VERSION})";
+			}
+		}
+		if (defined($library) && defined($major) && defined($deps) && 
+		    $library ne '' && $major ne '' && $deps ne '') {
+			complex_doit("echo '$library $major $deps' >>$TMP/DEBIAN/shlibs");
+		}
+	}
+	close FIND;
 
-	if [ -e "$TMP/DEBIAN/shlibs" ]; then
-		doit "chmod 644 $TMP/DEBIAN/shlibs"
-		doit "chown root.root $TMP/DEBIAN/shlibs"
-	fi
-done
+	if (-e "$TMP/DEBIAN/shlibs") {
+		doit("chmod",644,"$TMP/DEBIAN/shlibs");
+		doit("chown","root.root","$TMP/DEBIAN/shlibs");
+	}
+}

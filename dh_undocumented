@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/usr/bin/perl -w
 #
 # Passed a list of undocumented man pages, generates symlinks to
 # undocumented.7.gz for those man pages.
@@ -6,48 +6,49 @@
 # Also, it looks for debian/undocumented files for more lists of
 # undocumented man pages.
 
-PATH=debian:$PATH:/usr/lib/debhelper
-. dh_lib
+BEGIN { push @INC, "debian", "/usr/lib/debhelper" }
+use Dh_Lib;
+init();
 
-for PACKAGE in $DH_DOPACKAGES; do
-        TMP=`tmpdir $PACKAGE`
-	undocumented=`pkgfile $PACKAGE undocumented`
+foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
+	$TMP=tmpdir($PACKAGE);
+	$undocumented=pkgfile($PACKAGE,"undocumented");
 
-	undoc=""
+	@undoc=();
+	if ($undocumented) {
+		@undoc=filearray($undocumented);
+	}
 
-	if [ "$undocumented" ]; then
-		undoc=`tr "\n" " " < $undocumented`
-	fi
+	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+		push @undoc, @ARGV;
+	}	
 
-	if [ \( "$PACKAGE" = "$DH_FIRSTPACKAGE" -o "$DH_PARAMS_ALL" \) \
-	     -a "$*" ]; then
-		undoc="$* $undoc"
-	fi
+	foreach $file (@undoc) {
+		$file=~s/.gz$//; # .gz extention is optional in input.
 
-	if [ "$undoc" ]; then
-		for file in $undoc; do
-			# Remove .gz extention from the filename, if present.
-			if [ `expr "$file" : '\(.*\).gz'` ]; then
-				file=`expr "$file" : '\(.*\).gz'`
-			fi
+		# Determine what directory the file belongs in,
+		# /usr/man, or /usr/X11R6/man, and how the link to
+		# the undocuemtned.7 man page will look.
+		($section)=$file=~m/^.*\.(\d)/;
+		if (!$section) {
+			error("\"$file\" does not have an extention.");
+		}	
+		if ($file=~/.*\.\dx/) {
+			$dir="usr/X11R6/man/man$section";
+			$reldir="../../../man/man7/";
+		}
+		elsif ($section != 7) {
+			$dir="usr/man/man$section";
+			$reldir="../man7/";
+		}
+		else {
+			$dir="usr/man/man$section";
+			$reldir="";
+		}
 
-			# Determine what directory the file belongs in,
-			# /usr/man, or /usr/X11R6/man.
-			section=`expr "$file" : '.*\.\([123456789]\)'` \
-				|| error "\"$file\" does not have an extention."
-			if [ `expr "$file" : '.*\.[123456789]\(x\)'` ] ; then
-				dir=usr/X11R6/man/man$section
-				reldir=../../../man
-			else
-				dir=usr/man/man$section
-				reldir=..
-			fi
-
-			if [ ! -d $TMP/$dir ]; then
-				doit "install -d $TMP/$dir"
-			fi
-
-			doit "ln -s $reldir/man7/undocumented.7.gz $TMP/$dir/$file.gz"
-		done
-	fi
-done
+		if (! -d "$TMP/$dir") {
+			doit("install","-d","$TMP/$dir");
+		}
+		doit("ln","-sf","${reldir}undocumented.7.gz","$TMP/$dir/$file.gz");
+	}
+}
