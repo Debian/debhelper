@@ -13,8 +13,11 @@ if (! defined $dh{DESTDIR}) {
 if (! defined $dh{FILENAME}) {
 	$dh{FILENAME}='';
 }
+else {
+	$dh{FILENAME}="/$dh{FILENAME}";
+}
 
 foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	$TMP=tmpdir($PACKAGE);
-	doit("dpkg","--build",$TMP,"$dh{DESTDIR}/$dh{FILENAME}",@{$dh{U_PARAMS}});
+	doit("dpkg","--build",$TMP,"$dh{DESTDIR}$dh{FILENAME}",@{$dh{U_PARAMS}});
 }
