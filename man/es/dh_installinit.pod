@@ -1,7 +1,7 @@
 # (c) 2003 Software in the Public Interest
 # Esta traducción ha sido realizada por Rubén Porras Campo <nahoo@inicia.es>
 # Está basada en la página de manual original:
-# versión 1.2 del CVS de
+# versión 1.4 del CVS de
 # /cvs/debian-doc/manpages/english/debhelper/dh_installinit.pod
 
 =head1 NOMBRE
@@ -80,9 +80,15 @@ normalmente.
 
 Se desaconseja el uso de esta opción, use --name en su lugar.
 
+=item B<--error-handler=>I<función>
+
+Invoca dicha función de la shell si la ejecución del script de init falla. La
+función debe proporcionarse en los scripts prerm y postinst, antes del símbolo
+#DEBHELPER#.
+
 =back
 
-=head1 NOTES
+=head1 NOTAS
 
 Esta orden no es idempotente. Debe llamarse a "dh_clean -k" entre invocaciones
 de esta orden. De otro modo, puede causar que los scripts de mantenimiento
