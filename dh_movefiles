@@ -40,16 +40,31 @@ for PACKAGE in $DH_DOPACKAGES; do
 		#
 		# (The echo is in here to expand wildcards. Note that 'ls'
 		# won't work properly.)
-		# The filelist is used, so even very weird filenames can be
+		# The file list is used, so even very weird filenames can be
 		# moved.
 		doit "rm -f movelist"
 		for i in `(cd debian/tmp; echo $tomove)`; do
-			complex_doit "(cd debian/tmp ; find $i ! -type d -and ! -type l -print) >> movelist"
+			if [ ! -e "debian/tmp/$i" ]; then
+				fail=1
+			fi
+			complex_doit "(cd debian/tmp ; find $i ! -type d -and ! -type l -print || true) >> movelist"
 		done
 		for i in `(cd debian/tmp; echo $tomove)`; do
-			complex_doit "(cd debian/tmp ; find $i ! -type d -and -type l -print) >> movelist"
+			if [ ! -e "debian/tmp/$i" ]; then
+				fail=1
+			fi
+			complex_doit "(cd debian/tmp ; find $i ! -type d -and -type l -print || true) >> movelist"
 		done
 		complex_doit "(cd debian/tmp;tar --create --remove-files --files-from=../../movelist --file -) | (cd $TMP;tar xpf -)"
 		doit "rm -f movelist"
 	fi
 done
+
+# If fail is set, we wern't actually able to find some 
+# files that were specified to be moved, and we should
+# exit with the code in fail. This program puts off 
+# exiting with an error until all files have been tried
+# to be moved, because this makes it easier for some 
+# packages that arn't always sure exactly which files need
+# to be moved.
+exit $fail

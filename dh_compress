@@ -8,8 +8,16 @@ PATH=debian:$PATH:/usr/lib/debhelper
 
 # Returns a list of all the files that we want to compress,
 # (ignoring any files we were asked to exclude on the command
-# line). Assummes we are already in the temp directory.
+# line). Assumes we are already in the temp directory.
 filelist () {
+	# First of all, deal with any files specified right on the command line.
+        if [ \( "$PACKAGE" = "$DH_FIRSTPACKAGE" -o "$DH_PARAMS_ALL" \) \
+             -a "$*" ]; then
+	     	# Convert to having each file on its own line
+		# so grep will work.
+		echo "$*" | tr " " "\n"
+	fi
+
 	if [ "$compress" ]; then
 		# The config file is a sh script that outputs the files to be compressed
 		# (typically using find).
@@ -28,7 +36,7 @@ filelist () {
 # Call only if DH_EXCLUDE_GREP is non-empty.
 filelist_excluded () {
 	# Use grep -F so we don't have to worry about regexp's.
-	(filelist | grep -v -F \
+	(filelist "$*" | grep -v -F \
 		"`echo "$DH_EXCLUDE_GREP" | tr "|" "\n"`") || true
 }
 
@@ -45,9 +53,9 @@ for PACKAGE in $DH_DOPACKAGES; do
 
 	# Get the list of files to compress.
 	if [ "$DH_EXCLUDE_GREP" ]; then
-		files=`filelist_excluded`
+		files=`filelist_excluded $*`
 	else
-		files=`filelist`
+		files=`filelist $*`
 	fi
 
 	if [ "$files" ]; then

@@ -157,6 +157,8 @@ foreach (@exclude) {
 }
 $exclude_find=~s/ -or $//;
 
+$include=join ' ', @include;
+
 # Remove excluded packages from the list of packages to act on.
 undef @package_list;
 foreach $package (@packages) {
