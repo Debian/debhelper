@@ -23,6 +23,6 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		if (! -d "$TMP/etc/cron.d") {
 			doit("install","-o","root","-g","root","-d","$TMP/etc/cron.d");
 		}	
-		doit("install","-m",644,"-o","root","-g","root","-d","$TMP/etc/cron.d");
+		doit("install","-m",644,$cron,"$TMP/etc/cron.d/$PACKAGE");
 	}
 }
