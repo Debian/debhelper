@@ -16,8 +16,8 @@ for PACKAGE in $DH_DOPACKAGES; do
 	fi
 
 	# Fix up premissions in usr/doc, setting everything to not exectable
-	# by default.
-	files=`find debian/$TMP/usr/doc -type f 2>/dev/null | tr "\n" " "` || true
+	# by default, but leave examples directories alone.
+	files=`find debian/$TMP/usr/doc -type f 2>/dev/null | grep -v /examples/ | tr "\n" " "` || true
 	if [ "$files" ]; then
 		doit "chmod 644 $files"
 	fi
