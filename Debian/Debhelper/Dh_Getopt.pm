@@ -48,6 +48,11 @@ sub AddPackage { my($option,$value)=@_;
 	}
 }
 
+# Adds packages to the list of debug packages.
+sub AddDebugPackage { my($option,$value)=@_;
+	push @{$options{DEBUGPACKAGES}}, $value;
+}
+
 # Add a package to a list of packages that should not be acted on.
 sub ExcludePackage { my($option,$value)=@_;
 	$exclude_package{$value}=1;
@@ -80,6 +85,8 @@ sub parseopts {
 		"p=s" => \&AddPackage,
 	        "package=s" => \&AddPackage,
 	
+		"dbg-package=s" => \&AddDebugPackage,
+		
 		"s" => \&AddPackage,
 		"same-arch" => \&AddPackage,
 	
@@ -152,6 +159,8 @@ sub parseopts {
 		"L|libpackage=s" => \$options{LIBPACKAGE},
 		
 		"name=s" => \$options{NAME},
+		
+		"keep-debug" => \$options{KEEP_DEBUG},
 		
 		"<>" => \&NonOption,
 	);

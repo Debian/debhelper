@@ -113,7 +113,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
 		$find_options="! \\( $dh{EXCLUDE_FIND} \\)";
 	}
-	foreach my $file (split(/\n/,`find $tmp -type f \\( -perm +111 -or -name "*.so*" \\) $find_options`)) {
+	foreach my $file (split(/\n/,`find $tmp -path $tmp/usr/lib/debug -prune -or -type f \\( -perm +111 -or -name "*.so*" \\) $find_options -print`)) {
 		# TODO this is slow, optimize. Ie, file can run once on
 		# multiple files..
 		$ff=`file "$file"`;

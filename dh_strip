@@ -12,7 +12,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_strip> [S<I<debhelper options>>] [B<-X>I<item>]
+B<dh_strip> [S<I<debhelper options>>] [B<-X>I<item>] [--dbg-package=package] [--keep-debug]
 
 =head1 DESCRIPTION
 
@@ -41,6 +41,28 @@ currently deal with stripping binary modules such as .o files.
 Exclude files that contain "item" anywhere in their filename from being
 stripped. You may use this option multiple times to build up a list of
 things to exclude.
+
+=item B<--dbg-package=>I<package>
+
+This option tells dh_strip that the given package has an associated "-dbg"
+package. dh_strip will, when stripping off the debug symbols of files in
+the given package, save them to independent files in the package build
+directory for the "-dbg" package.
+
+For example, you might have a package libfoo libfoo, and want to include a
+libfoo-dbg package that contains debugging symbols. The command "dh_strip
+--dbg-package=libfoo" will make dh_strip save the debugging symbols for
+usr/lib/libfoo.so.0 into usr/lib/debug/usr/lib/libfoo.so.0 in the package
+build directory for libfoo-dbg. If libfoo-dbg is installed, gdb wil
+automatically load up the debugging symbols from it when debugging libfoo.
+
+This option may be repeated to list more than one package.
+
+=item B<-k>, B<--keep-debug>
+
+Debug symbols will be retained, but split into an independant
+file in usr/lib/debug/ in the package build directory. --dbg-package
+is easier to use than this option, but this option is more flexible.
 
 =back
 
@@ -118,22 +140,57 @@ sub testfile {
 	}
 }
 
+sub make_debug {
+	my $file=shift;
+	my $tmp=shift;
+	my $desttmp=shift;
+
+	my ($base_file)=$file=~/^$tmp(.*)/;
+	my $debug_path=$desttmp."/usr/lib/debug/".$base_file;
+	my $debug_dir=dirname($debug_path);
+	if (! -d $debug_dir) {
+		doit("install", "-d", $debug_dir);
+	}
+	doit("objcopy", "--only-keep-debug", $file, $debug_path);
+	# No reason for this to be executable.
+	doit("chmod", 644, $debug_path);
+	return $debug_path;
+}
+
+sub attach_debug {
+	my $file=shift;
+	my $debug_path=shift;
+	doit("objcopy", "--add-gnu-debuglink", $debug_path, $file);
+}
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 
+	# Support for keeping the debugging symbols in a detached file.
+	my $keep_debug=$dh{KEEP_DEBUG};
+	my $debugtmp=$tmp;
+	if (ref $dh{DEBUGPACKAGES} && grep { $_ eq $package } @{$dh{DEBUGPACKAGES}}) {
+		$keep_debug=1;
+		$debugtmp=tmpdir($package."-dbg");
+	}
+	
 	@shared_libs=@executables=@static_libs=();
 	find(\&testfile,$tmp);
 
 	foreach (@shared_libs) {
+		my $debug_path = make_debug($_, $tmp, $debugtmp) if $keep_debug;
 		# Note that all calls to strip on shared libs
 		# *must* inclde the --strip-unneeded.
 		doit("strip","--remove-section=.comment",
 			"--remove-section=.note","--strip-unneeded",$_);
+		attach_debug($_, $debug_path) if $keep_debug;
 	}
 	
 	foreach (@executables) {
+		my $debug_path = make_debug($_, $tmp, $debugtmp) if $keep_debug;
 		doit("strip","--remove-section=.comment",
 			"--remove-section=.note",$_);
+ 		attach_debug($_, $debug_path) if $keep_debug
 	}
 
 	foreach (@static_libs) {
