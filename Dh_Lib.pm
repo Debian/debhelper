@@ -296,11 +296,11 @@ sub autoscript { my $package=shift; my $script=shift; my $filename=shift; my $se
 		$infile="$ENV{DH_AUTOSCRIPTDIR}/$filename";
 	}
 	else {
-		if (-e "/usr/lib/debhelper/autoscripts/$filename") {
-			$infile="/usr/lib/debhelper/autoscripts/$filename";
+		if (-e "/usr/share/debhelper/autoscripts/$filename") {
+			$infile="/usr/share/debhelper/autoscripts/$filename";
 		}
 		else {
-			error("/usr/lib/debhelper/autoscripts/$filename does not exist");
+			error("/usr/share/debhelper/autoscripts/$filename does not exist");
 		}
 	}
 
