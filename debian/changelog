@@ -1,3 +1,17 @@
+debhelper (0.53) unstable; urgency=low
+
+  * dh_installmanpages: ignore all man pages installed into debian/tmp
+    type directories. (#16933)
+  * dh_*: set up alternative name for files like debian/dirs; you may now
+    use debian/<mainpackage>.dirs too, for consistency. (#16934)
+  * dh_installdocs: if a debian/package.copyright file exists, use it in
+    preference to debian/copyright, so subpackages with varying copyrights
+    are supported. (#16935)
+  * Added dh_movefiles, which moves files out of debian/tmp into subpackages.
+    (#16932)
+
+ -- Joey Hess <joeyh@master.debian.org>  Sat, 10 Jan 1998 11:30:12 -0500
+
 debhelper (0.52) unstable; urgency=low
 
   * dh_compress: compress file belongs in debian/. It was looking in ./

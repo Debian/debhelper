@@ -13,7 +13,9 @@ for PACKAGE in $DH_DOPACKAGES; do
 	# Find all filenames that look like man pages.
 	# .ex files are examples installed by deb-make, we don't want those, or
 	# .in files, which are from configure.
-	for file in `find * -name "*.[1-9]*" ! -name "*.ex" ! -name "*.in" | grep -v ^$TMP`; do
+	# We also need to exclude all debian/tmp type dirs.
+	EXCLUDE=`grep ^Package: debian/control | cut -d " " -f 2 | tac | tr "\n" "|"`
+	for file in `find * -name "*.[1-9]*" ! -name "*.ex" ! -name "*.in" | egrep -v "^debian/(${EXCLUDE}tmp)"`; do
 		# Make sure file thinks they are man pages.
 		if file $file|grep -q roff; then
 			if echo $file|grep -q /; then

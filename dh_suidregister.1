@@ -16,9 +16,8 @@ package dh_installdocs is told to act on. By default, this is the first
 binary package in debian/control, but if you use -p, -i, or -a flags, 
 it will be the first package specified by those flags.
 .P
-The files debian/suid (for the first binary package in debian/control) or 
-debian/package.suid (for  each  additional package in debian/control) can 
-list other files to be registered.
+Files named debian/package.suid (or debian/suid for the first binary package
+in debian/control) can list other files to be registered.
 .P
 If neither of these methods is used to specify files, dh_suidregister will
 scan the package build directory for files that have suid permissions, and

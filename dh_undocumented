@@ -11,12 +11,12 @@ PATH=debian:$PATH:/usr/lib/debhelper
 
 for PACKAGE in $DH_DOPACKAGES; do
         TMP=`tmpdir $PACKAGE`
-	EXT=`pkgext $PACKAGE`
+	undocumented=`pkgfile $PACKAGE undocumented`
 
 	undoc=""
 
-	if [ -e debian/${EXT}undocumented ]; then
-		undoc=`tr "\n" " " < debian/${EXT}undocumented`
+	if [ "$undocumented" ]; then
+		undoc=`tr "\n" " " < $undocumented`
 	fi
 
 	if [ \( "$PACKAGE" = "$DH_FIRSTPACKAGE" -o "$DH_PARAMS_ALL" \) \

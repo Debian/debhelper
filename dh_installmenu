@@ -13,27 +13,28 @@ PATH=debian:$PATH:/usr/lib/debhelper
 
 for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
-	EXT=`pkgext $PACKAGE`
+	menu=`pkgfile $PACKAGE menu`
+	menu_method=`pkgfile $PACKAGE menu-method`
 
-	if [ -e debian/${EXT}menu ]; then
+	if [ "$menu" ]; then
 		if [ ! -d $TMP/usr/lib/menu ]; then
 			doit "install -d $TMP/usr/lib/menu"
 		fi
-		doit "install -p -m644 debian/${EXT}menu $TMP/usr/lib/menu/$PACKAGE"
+		doit "install -p -m644 $menu $TMP/usr/lib/menu/$PACKAGE"
 
 		# Add the scripts if a menu-method file doesn't exist.
 		# The scripts for menu-method handle everything these do, too.
-		if [ ! -e debian/${EXT}menu-method -a ! "$DH_NOSCRIPTS" ]; then
+		if [ ! "$menu_method" -a ! "$DH_NOSCRIPTS" ]; then
 			autoscript "postinst" "postinst-menu"
 			autoscript "postrm" "postrm-menu"
 		fi
 	fi
 
-	if [ -e debian/${EXT}menu-method ]; then
+	if [ "$menu_method" ]; then
 		if [ ! -d $TMP/etc/menu-methods ]; then
 			doit "install -d $TMP/etc/menu-methods"
 		fi
-		doit "install -p debian/${EXT}menu-method $TMP/etc/menu-methods/$PACKAGE"
+		doit "install -p $menu_method $TMP/etc/menu-methods/$PACKAGE"
 
 		if [ ! "$DH_NOSCRIPTS" ]; then
 			autoscript "postinst" "postinst-menu-method" "s/#PACKAGE#/$PACKAGE/"

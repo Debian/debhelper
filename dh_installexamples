@@ -8,12 +8,12 @@ PATH=debian:$PATH:/usr/lib/debhelper
 
 for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
-	EXT=`pkgext $PACKAGE`
+	file=`pkgfile $PACKAGE examples`
 
 	examples=""
 
-	if [ -e debian/${EXT}examples ]; then
-		examples=`tr "\n" " " < debian/${EXT}examples`
+	if [ "$file" ]; then
+		examples=`tr "\n" " " < $file`
 	fi
 
 	if [ \( "$PACKAGE" = "$DH_FIRSTPACKAGE" -o "$DH_PARAMS_ALL" \) \

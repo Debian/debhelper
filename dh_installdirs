@@ -7,7 +7,7 @@ PATH=debian:$PATH:/usr/lib/debhelper
 
 for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
-	EXT=`pkgext $PACKAGE`
+	file=`pkgfile $PACKAGE dirs`
 
 	if [ ! -d $TMP ]; then
 		doit "install -d $TMP"
@@ -15,8 +15,8 @@ for PACKAGE in $DH_DOPACKAGES; do
 
 	dirs=""
 
-	if [ -e debian/${EXT}dirs ]; then
-		dirs=`tr "\n" " " < debian/${EXT}dirs`
+	if [ "$file" ]; then
+		dirs=`tr "\n" " " < $file`
 	fi
 
 	if [ \( "$PACKAGE" = "$DH_FIRSTPACKAGE" -o "$DH_PARAMS_ALL" \) \

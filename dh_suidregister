@@ -11,12 +11,12 @@ PATH=debian:$PATH:/usr/lib/debhelper
 
 for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
-	EXT=`pkgext $PACKAGE`
+	suid=`pkgfile $PACKAGE suid`
 
 	files=""
 
-	if [ -e debian/${EXT}suid ]; then
-		files=`tr "\n" " " < debian/${EXT}suid`
+	if [ "$suid" ]; then
+		files=`tr "\n" " " < $suid`
 	fi
 
 	if [ \( "$PACKAGE" = "$DH_FIRSTPACKAGE" -o "$DH_PARAMS_ALL" \) \
@@ -24,7 +24,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 		files="$* $files"
 	fi
 
-	if [ ! "$files" -a ! -e debian/${EXT}suid ]; then
+	if [ ! "$files" -a ! "$suid" ]; then
 		# No files specified (and no empty debian/suid file), so
 		# guess what files to process.
 		files=`find $TMP -type f -perm +6000`

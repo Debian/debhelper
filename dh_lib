@@ -1,4 +1,6 @@
 # Library functions for debhelper programs.
+#
+# Joey Hess, GPL copyright 1997, 1998.
 
 # Run a command, and display the command to stdout if verbose mode is on.
 # All commands that modifiy files in $TMP should be ran via this 
@@ -156,91 +158,28 @@ get_arch_indep_packages() {
 
 # Argument processing and global variable initialization is below.
 
-# Parse command line.
-set -- `getopt xvidrnakVAp:P:u:m: $*`
-
-for i; do
-	case "$i"
-	in
-		-v)
-			DH_VERBOSE=1
-			shift
-			;;
-		-i)
-			get_arch_indep_packages
-			DH_DOPACKAGES="$DH_DOPACKAGES $INDEP_PACKAGES"
-			DH_DOINDEP=1
-			shift
-			;;
-		-a)
-			get_arch_indep_packages
-			DH_DOPACKAGES="$DH_DOPACKAGES $ARCH_PACKAGES"
-			DH_DOARCH=1
-			shift
-			;;
-		-p)
-			DH_DOPACKAGES="$DH_DOPACKAGES $2"
-			shift
-			shift
-			;;
-		-n)
-			DH_NOSCRIPTS=1
-			shift
-			;;
-		-x)	
-			DH_EXCLUDE=1
-			shift
-			;;
-		-d)
-			DH_D_FLAG=1
-			shift
-			;;
-		-r)
-			DH_R_FLAG=1
-			shift
-			;;
-		-k)
-			DH_K_FLAG=1
-			shift
-			;;
-		-P)
-			DH_TMPDIR="$2"
-			shift
-			shift
-			;;
-		-u)
-			DH_U_PARAMS="$2"
-			shift
-			shift
-			;;
-		-m)
-			DH_M_PARAMS="$2"
-			shift
-			shift
-			;;
-		-V)
-			DH_V_FLAG=1
-			shift
-			;;
-		-A)
-			DH_PARAMS_ALL=1
-			shift
-			;;
-		--)
-			shift
-			break
-			;;
-	esac
+# Check to see if an argument on the command line starts with a dash.
+# if so, we need to pass this off to the resource intensive perl.
+for arg; do
+	if expr "$arg" : '-' >/dev/null ; then
+		parseopt=1
+		break
+	fi
 done
+if [ "$parseopt" ]; then
+	parseopt=""
+	# Parse command line. I wrote a perl program to do this becuase
+	# getopt(1) is so broken. Note: the quotes around $@ are very
+	# important!
+	eval `dh_getopt.pl "$@"`
+	if [ "$DH_PARSE_ERROR" ]; then
+		error "$DH_PARSE_ERROR"
+	fi
+fi
 
 # Get the name of the main binary package (first one listed in
 # debian/control).
 MAINPACKAGE=`grep ^Package: debian/control | cut -d " " -f 2 | head -1`
-
-# Remove leading spaces from DH_DOPACKAGES.
-if expr "$DH_DOPACKAGES" : ' *.*' >/dev/null ; then
-	DH_DOPACKAGES_NEW=`expr "$DH_DOPACKAGES" : ' *\(.*\)'`
-fi
 
 # Check if packages to build have been specified, if not, fall back to 
 # the default, doing them all.
@@ -266,7 +205,7 @@ for PACKAGE in $DH_DOPACKAGES ; do
 done
 
 # Check to see if: DH_FIRSTPACKAGE is not the MAINPACKAGE, and
-# some command line arguemnts are passed. Display a warning, becuase
+# some command line arguements are passed. Display a warning, becuase
 # debhelper's behaviour has changed in this case.
 if [ "$DH_FIRSTPACKAGE" != "$MAINPACKAGE" -a "$*" ]; then
 	echo `basename $0`": Warning: my behavior has changed, and command line" >&2

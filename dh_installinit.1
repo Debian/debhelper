@@ -12,13 +12,10 @@ It also automatically generates the postinst and postrm and prerm commands
 needed to set up the symlinks in /etc/rc*.d/ and to start and stop the init
 scripts.
 .P
-If a file named debian/init exists, then it is installed into
-etc/init.d/package in the package build directory (with "package" replaced
-by the package name, unless the -d flag is specified, see below)
-.P
-For packages other than the first binary package listed in
-the control file, use debian/package.init instead (replace "package" with 
-the name of the package.)
+If a file named debian/package.init exists, then it is installed into
+etc/init.d/package in the package build directory, with "package" replaced
+by the packagename. (You may use debian/init for the first binary package
+listed in the control file.)
 .SH OPTIONS
 .TP
 .B \-v
