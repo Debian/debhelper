@@ -187,14 +187,27 @@ sub dirname { my $fn=shift;
 	return $fn;
 }
 
+# Pass in a number, will return true iff the current compatability level
+# is equal to that number.
+sub compat {
+	my $num=shift;
+	
+	my $c=1;
+	if (defined $ENV{DH_COMPAT}) {
+		$c=$ENV{DH_COMPAT};
+	}
+	
+	return ($c == $num);
+}
+
 # Pass it a name of a binary package, it returns the name of the tmp dir to
 # use, for that package.
-# This is for back-compatability with the debian/tmp tradition.
 sub tmpdir { my $package=shift;
 	if ($dh{TMPDIR}) {
 		return $dh{TMPDIR};
 	}
-	elsif ($package eq $dh{MAINPACKAGE}) {
+	elsif (compat(1) && $package eq $dh{MAINPACKAGE}) {
+		# This is for back-compatability with the debian/tmp tradition.
 		return "debian/tmp";
 	}
 	else {
