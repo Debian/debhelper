@@ -18,6 +18,10 @@ use Debian::Debhelper::Dh_Lib;
 dh_installinfo is a debhelper program that is responsible for installing
 info files and registering them with install-info.
 
+It determines some information about the info files by parsing them, in
+particular, it looks at the INFO-DIR-SECTION line to determine what section
+the info file belongs in.
+
 Any filenames specified as parameters will be installed into the first
 package dh_installinfo is told to act on. By default, this is the first
 binary package in debian/control, but if you use -p, -i, or -a flags, it

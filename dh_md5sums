@@ -70,7 +70,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 	
 	my $olddir=getcwd();
-	complex_doit("cd $tmp >/dev/null ; find * -type f $exclude ! -regex '^DEBIAN/.*' -print0 | xargs -r0 md5sum > DEBIAN/md5sums ; cd $olddir >/dev/null");
+	complex_doit("cd $tmp >/dev/null ; find * -type f $exclude ! -regex '^DEBIAN/.*' -print0 | xargs -r0 md5sum > DEBIAN/md5sums ; cd '$olddir' >/dev/null");
 	# If the file's empty, no reason to waste inodes on it.
 	if (-z "$tmp/DEBIAN/md5sums") {
 		doit("rm","-f","$tmp/DEBIAN/md5sums");
