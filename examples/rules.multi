@@ -19,24 +19,32 @@ build-stamp:
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp
+	rm -f build-stamp install-stamp
 
 	# Add here commands to clean up after the build process.
+	#-$(MAKE) clean
 	#-$(MAKE) distclean
 
 	dh_clean
 
+install: install-stamp
+install-stamp: build
+	dh_testdir
+	dh_testroot
+	dh_clean
+
+	# Add here commands to install the package into debian/tmp.
+	#$(MAKE) prefix=`pwd`/debian/tmp/usr install
+
+	touch install-stamp
+
 # Build architecture-independent files here.
-binary-indep: build
+binary-indep: build install
 #	dh_testversion
 	dh_testdir -i
 	dh_testroot -i
 	dh_clean -i -k
 	dh_installdirs -i
-
-        # Add here commands to install the files into debian/tmp
-        #$(MAKE) prefix=`pwd`/debian/tmp install
-
 	dh_movefiles -i
 	dh_installdocs -i
 	dh_installexamples -i
@@ -55,16 +63,12 @@ binary-indep: build
 	dh_builddeb -i
 
 # Build architecture-dependent files here.
-binary-arch: build
+binary-arch: build install
 #	dh_testversion
 	dh_testdir -a
 	dh_testroot -a
 	dh_clean -a -k
 	dh_installdirs -a
-
-	# Add here commands to install the files into debian/tmp
-	#$(MAKE) prefix=`pwd`/debian/tmp install
-
 	dh_movefiles -a
 	dh_installdocs -a
 	dh_installexamples -a
