@@ -27,8 +27,10 @@ DH_COMPAT=3 mode and above only).
 
 =item B<-m>I<major>, B<--major=>I<major>
 
-Instead of trying to guess the major number of the library from the
-filename of the library, use the major number specified after the -m parameter.
+Instead of trying to guess the major number of the library with objdump,
+use the major number specified after the -m parameter. This is much less
+useful than it used to be, back in the bad old days when this program
+looked at library filenames rather than using objdump.
 
 =item B<-V>, B<-V>I<dependancies>
 
@@ -68,14 +70,6 @@ file that looks something like:
 Generates a shlibs file that looks something like:
   libfoobar 1 libfoobar1 (>= 1.0)
 
-=head1 NOTES
-
-There is no guarantee that the program will get the shlibs file right. For
-example, it may not correctly guess the major number of your package. In
-cases like these (and perhaps in general, just to be safe), it is better to
-create a debian/shlibs file by hand, or force it to use the correct major
-number by specifying the -m parameter.
-
 =cut
 
 init();
@@ -90,19 +84,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	open (FIND, "find $tmp -xtype f -name '*.so*' |");
 	while (<FIND>) {
-		my $library;
-		my $major;
-	
-		chomp;
-		# The second evil regexp is for db3, whose author should
-		# be shot.
-		if (m#.*/([^/]*)\.so\.(\d*)\.?# || m#.*/([^/]*)-([^\s/]+)\.so$#) {
-			$library = $1;
-			$major = $2;
-		}
+		my ($library, $major) = 
+			`objdump -p $_` =~ m/\s+SONAME\s+(.+)\.so\.(.+)/;
+
 		if (defined($dh{M_PARAMS}) && $dh{M_PARAMS} ne '') {
 			$major=$dh{M_PARAMS};
 		}
+		
 		if (! -d "$tmp/DEBIAN") {
 			doit("install","-d","$tmp/DEBIAN");
 		}

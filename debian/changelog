@@ -1,3 +1,28 @@
+debhelper (3.0.9) unstable; urgency=low
+
+  * Modified to use dpkg-architecture instead of dpkg --print-architecture.
+    I hate this, and wish it wasn't necessary to make cross compiles for
+    the hurd work. Closes: #88494
+  * Now depends on debconf-utils for debconf-mergetemplates. Closes: #87321
+  * Continues to depend on lynx for html changelog conversions. Yes, these
+    and packages with translated debconf templates are rather rare, but
+    it makes more sense for debhelper to consistently depend on all utilities
+    it uses internally rather than force people to keep their dependancies
+    up to date with debhelper internals. If I decide tomorrow that w3m is
+    the better program to use to format html changelogs, I can make the
+    change and packages don't need to update their build dependancies.
+    Closes: #88464, #77743
+  * Test for init scripts before running them, since they are conffiles and
+    the admin may have removed them for some reason, and policy wants
+    us to deal with that gracefully.
+  * dh_makeshlibs: now uses objdump, should be more accurate. Closes:
+    #88426
+  * Wildcards have been supported for a while, Closes: #54197
+  * dh_installdocs and dh_link have been able to make doc-dir symlinks for
+    a while, Closes: #51225
+
+ -- Joey Hess <joeyh@debian.org>  Sun,  4 Mar 2001 15:48:45 -0800
+
 debhelper (3.0.8) unstable; urgency=low
 
   * dh_perl update
