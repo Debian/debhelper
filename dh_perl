@@ -11,11 +11,15 @@ my $lib_dir = 'usr/lib/perl5';
 
 # Figure out the version of perl. If $ENV{PERL} is set, query the perl binary
 # it points to, otherwise query perl directly.
-my $version=sprintf("%.3f", $]);
+#
+# This is pretty gawd-aweful ugly, because we need "5.00[45]"
+# and "5.[6789]" to be returned depending on perl version.
+my $version;
 if (defined $ENV{PERL}) {
-	# This is pretty gawd-aweful ugly, because we need "5.00[45]"
-	# and "5.[6789]" to be returned.
-	$version=`$ENV{PERL} -e '\$] < 5.006 ? printf "%.3f", \$] : printf "%vd\n", substr \$^V, 0, -1'`;
+	$version=`$ENV{PERL} -e '\$] < 5.006 ? printf "%.3f", \$] : printf "%vd", substr \$^V, 0, -1'`;
+}
+else {
+	$version=$] < 5.006 ? sprintf "%.3f", $] : sprintf "%vd", substr $^V, 0, -1;
 }
 
 # Cleaning the paths given on the command line
@@ -48,13 +52,13 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	if ($dirs) {
 	    foreach $file (split(/\n/,`find $dirs -type f \\( -name "*.pm" -or -name "*.so" \\)`)) {
 	        $found++;
-		if ($file =~ m<^$TMP/$re/(\d\.\d{3})/([^/]+)/>) {
+		if ($file =~ m<^$TMP/$re/(\d\.\d+)/([^/]+)/>) {
 			$v = $1;
 			$arch = $2;
 			check_module_version ($v, $version);
 			$v .= '-thread' if ($arch =~ /-thread/); 
 			$dep_arch = add_deps ($dep_arch, "perl-$v");
-		} elsif ($file =~ m<^$TMP/$re/(\d.\d{3})/>) {
+		} elsif ($file =~ m<^$TMP/$re/(\d.\d+)/>) {
 			$v = $1;
 			check_module_version ($v, $version);
 			$dep_arch = add_deps ($dep_arch, "perl-$v");
@@ -110,14 +114,14 @@ sub add_deps {
 	my ($dep, $new) = @_;
 	
         # If the $new-base package can exist then add $ext to $new
-	$new = "$new$ext" if ($new =~ m/^(?:perl5|perl-\d\.\d{3})$/);
+	$new = "$new$ext" if ($new =~ m/^(?:perl5|perl-\d\.\d+)$/);
 	
 	# If $new = perl5 or perl5-thread check if perl-X.XXX(-thread)?
 	# is not already in the dependencies
 	if ($new eq "perl5") {
-		return $dep if ($dep =~ m/(^|\s)perl-5\.\d{3}(\s|,|$)/);
+		return $dep if ($dep =~ m/(^|\s)perl-5\.\d+(\s|,|$)/);
 	} elsif ($new eq "perl5-thread") {
-		return $dep if ($dep =~ m/(^|\s)perl-5\.\d{3}-thread(\s|,|$)/);
+		return $dep if ($dep =~ m/(^|\s)perl-5\.\d+-thread(\s|,|$)/);
 	}
 	
 	if (not $dep) {
@@ -148,9 +152,9 @@ sub dep_from_script {
 			$dep = "perl5";
 		} elsif ($perl eq "perl-thread") {
 			$dep = "perl5-thread";
-		} elsif ($perl =~ m/^perl-\d\.\d{3}(?:-thread)?$/) {
+		} elsif ($perl =~ m/^perl-\d\.\d+(?:-thread)?$/) {
 			$dep = $perl;
-		} elsif ($perl =~ m/^perl(\d\.\d{3})(\d\d)$/) {
+		} elsif ($perl =~ m/^perl(\d\.\d+)(\d\d)$/) {
 			# Should never happen but ...
 			$dep = "perl-$1 (=$1.$2)";
 		}
