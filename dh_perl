@@ -55,7 +55,7 @@ directories by default.
 
 Debian policy, version 3.0.1
 
-Perl policy, version 1.15
+Perl policy, version 1.18
 
 =cut
 
@@ -63,6 +63,10 @@ init();
 
 my $vendorlib = substr $Config{vendorlib}, 1;
 my $vendorarch = substr $Config{vendorarch}, 1;
+
+# the installation dir for arch-indep modules changed to
+# /usr/share/perl5 in this version:
+my $min_version = '5.6.0-16';
 
 # Cleaning the paths given on the command line
 foreach (@ARGV) {
@@ -83,6 +87,13 @@ use constant XS_MODULE => 4;
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp = tmpdir($package);
 	my $ext = pkgext($package);
+
+	my @subs;
+	if (open IN, "debian/${ext}substvars")
+	{
+	    @subs = grep !/^perl:Depends=/, <IN>;
+	    close IN;
+	}
 
 	# Check also for alternate locations given on the command line
 	my @dirs = grep -d, map "$tmp/$_", $vendorlib, $vendorarch, @ARGV;
@@ -108,35 +119,33 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		close F;
 	    }, $tmp;
 
-	next unless $deps;
-
-	my $perl_depends = $perl;
-	if ($deps & XS_MODULE or $dh{V_FLAG_SET})
+	if ($deps)
 	{
-	    ($version) = `dpkg -s $perl` =~ /^Version:\s*(\S+)/m
-		unless $version;
+	    my $perl_depends = $perl;
+	    if ($deps & XS_MODULE or $dh{V_FLAG_SET})
+	    {
+		($version) = `dpkg -s $perl` =~ /^Version:\s*(\S+)/m
+		    unless $version;
 
-	    $perl_depends .= " (>= $version)";
+		$perl_depends .= " (>= $version)";
+	    }
+	    elsif ($deps & PM_MODULE)
+	    {
+		$perl_depends .= " (>= $min_version)";
+	    }
+
+	    # add perlapi-<ver> for XS modules
+	    $perl_depends .= ", perlapi-$Config{version}"
+		if $deps & XS_MODULE;
+
+	    # don't need to depend on an un-versioned perl-base, it's
+	    # essential
+	    push @subs, "perl:Depends=$perl_depends\n"
+		unless $perl_depends eq 'perl-base';
 	}
 
-	# add perlapi-<ver> for XS modules
-	$perl_depends .= ", perlapi-$Config{version}"
-	    if $deps & XS_MODULE;
-
-	# don't need to depend on an un-versioned perl-base, it's
-	# essential
-	next if $perl_depends eq 'perl-base';
-
-	if (-e "debian/${ext}substvars") {
-		open (IN, "<debian/${ext}substvars");
-		my @lines=grep { ! /^perl:Depends=/ } <IN>;
-		close IN;
-		open (OUT, ">debian/${ext}substvars");
-		print OUT @lines;
-	} else {
-		open (OUT, ">debian/${ext}substvars");
-	}
-	print OUT "perl:Depends=$perl_depends\n";
+	open OUT, ">debian/${ext}substvars";
+	print OUT @subs;
 	close OUT;
 }
 
