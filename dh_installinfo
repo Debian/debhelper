@@ -32,7 +32,7 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	foreach $file (@info) {
 		# Only register with install-info if this is a head file in
 		# a tree of info files.
-		if ($file=~/\.info$/ && ! $dh{NOSCRIPTS}) {
+		if ($file !~ /-\d+$/ && ! $dh{NOSCRIPTS}) {
 			# Figure out what section this file goes in.
 			my $section='';
 			open (IN, "<$file") || die "$file: $!";
