@@ -54,8 +54,8 @@ sub init {
 		foreach (@{$dh{EXCLUDE}}) {
 			$dh{EXCLUDE_FIND}.="-regex ".escape_shell(".*$_.*")." -or ";
 		}
+		$dh{EXCLUDE_FIND}=~s/ -or $//;
 	}
-	$dh{EXCLUDE_FIND}=~s/ -or $//;
 	
 	# Check to see if DH_VERBOSE environment variable was set, if so,
 	# make sure verbose is on.
