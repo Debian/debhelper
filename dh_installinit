@@ -138,7 +138,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$params="defaults";
 		}
 
-		my $substvaradded=0;
 		if (! $dh{NOSCRIPTS}) {
 			if (! $dh{NO_START}) {
 				# update-rc.d, and start script
@@ -165,11 +164,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			# removes rc.d links
 			autoscript($package,"postrm","postrm-init",
 				"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
-		}
-
-		if (! $substvaradded) {
-			# Remove it, for idemotency's sake.
-			addsubstvar($package, "misc:Depends", "sysvinit", ">= 2.80-1", 1);
 		}
 	}
 }
