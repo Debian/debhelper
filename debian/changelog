@@ -1,3 +1,13 @@
+debhelper (2.1.13) unstable; urgency=low
+
+  * Typo, Closes: #72932
+  * dh_makeshlibs: follow symlinks to files when looking for files that are
+    shared libraries. This allows it to catch files like
+    "liballeg-3.9.33.so" that are not in the *.so.* form it looks for, but
+    that doe have links to them that are in the right form. Closes: #72938
+
+ -- Joey Hess <joeyh@debian.org>  Sun,  1 Oct 2000 18:23:48 -0700
+
 debhelper (2.1.12) unstable; urgency=low
 
   * Rebuild to remove cvs junk, Closes: #72610
