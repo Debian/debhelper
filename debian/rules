@@ -18,25 +18,25 @@ VERSION=$(shell expr "`dpkg-parsechangelog 2>/dev/null |grep Version:`" : '.*Ver
 
 export DH_VERBOSE=1
 
-build: link-stamp test
+build: test
 # Nothing to do.	
 
-clean: link-stamp
+clean:
 	./dh_testdir
 	./dh_testroot
-	./dh_clean link-stamp
+	./dh_clean
 
-test: link-stamp
+test:
 	./dh_clean
 	DH_VERSION=10 perl -MTest::Harness -e 'runtests grep { ! /CVS/ } @ARGV' t/*
 	./dh_clean
 
 # Build architecture-dependent files here.
-binary-arch: link-stamp build
+binary-arch: build
 # Nothing to do.
 
 # Build architecture-independent files here.
-binary-indep: link-stamp build
+binary-indep: build
 	./dh_testdir
 	./dh_testroot
 	./dh_clean -k
@@ -58,7 +58,7 @@ binary-indep: link-stamp build
 	./dh_installmanpages
 	./dh_installinfo
 	# Fix up all man pages, filling in the modification time for them.
-	# Note this runs beofre the command below so debhelper.1 gets the right
+	# Note this runs before the command below so debhelper.1 gets the right
 	# date on it.
 	perl -mPOSIX -e ' \
 		foreach $$f (@ARGV) { \
@@ -73,7 +73,7 @@ binary-indep: link-stamp build
 		close OUT; \
 	}' debian/debhelper/usr/share/man/man1/*.1
 	# Fix up the debhelper.1 man page, substituting in a list of all
-	# debhelper commands. eek!
+	# debhelper commands. Eek!
 	perl -ne ' \
 		s/\\- /(1)\n/; \
 		$$collect.=".TP\n.BR $$_" if $$. eq 3 && /^dh_/; \
@@ -90,7 +90,6 @@ binary-indep: link-stamp build
 			close O; \
 		}' *.1
 	./dh_installchangelogs
-#	./dh_movefiles
 	./dh_link
 	./dh_compress
 	./dh_fixperms
@@ -99,11 +98,6 @@ binary-indep: link-stamp build
 	./dh_gencontrol
 	./dh_md5sums
 	./dh_builddeb
-
-# Fix links when checking out of cvs by calling this target.
-link-stamp:
-	sh -e debian/fixlinks
-	touch link-stamp
 
 # Update the debhelper web page. Not intended for use by anyone except the
 # author.
