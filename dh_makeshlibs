@@ -104,7 +104,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
 		$exclude="! \\( $dh{EXCLUDE_FIND} \\) ";
 	}
-	open (FIND, "find $tmp -type f -name '*.so*' $exclude |");
+	open (FIND, "find $tmp -type f \\( -name '*.so' -or -name '*.so.*' \\) $exclude |");
 	while (<FIND>) {
 		my ($library, $major);
 		my $objdump=`objdump -p $_`;
