@@ -2,26 +2,25 @@
 #
 # Find dependancies. Simple dpkg-shlibdeps wrapper.
 
+use strict;
 use Cwd;
 use Debian::Debhelper::Dh_Lib;
 init();
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
-	$EXT=pkgext($PACKAGE);
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $ext=pkgext($package);
 
 	my @filelist;
 	my $ff;
 
 	# Generate a list of ELF binaries in the package, ignoring any
 	# we were told to exclude.
-	if (! defined($dh{EXCLUDE_FIND}) || $dh{EXCLUDE_FIND} eq '') {
-		$find_options="";
-	}
-	else {
+	my $find_options='';
+	if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
 		$find_options="! \\( $dh{EXCLUDE_FIND} \\)";
 	}
-	foreach $file (split(/\n/,`find $TMP -type f \\( -perm +111 -or -name "*.so*" \\) $find_options`)) {
+	foreach my $file (split(/\n/,`find $tmp -type f \\( -perm +111 -or -name "*.so*" \\) $find_options`)) {
 		# TODO: this is slow, optimize. Ie, file can run once on multiple files..
 		$ff=`file "$file"`;
 		if ($ff=~m/ELF/ && $ff!~/statically linked/) {
@@ -38,6 +37,6 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			$ENV{'LD_LIBRARY_PATH'}=$dh{L_PARAMS};
 			verbose_print("LD_LIBRARY_PATH=$dh{L_PARAMS} \\");
 		}
-		doit("dpkg-shlibdeps","-Tdebian/${EXT}substvars",@{$dh{U_PARAMS}},'-dDepends',@filelist);
+		doit("dpkg-shlibdeps","-Tdebian/${ext}substvars",@{$dh{U_PARAMS}},'-dDepends',@filelist);
 	}
 }

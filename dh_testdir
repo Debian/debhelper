@@ -4,10 +4,11 @@
 # Tests for the existance of debian/control, and for the existance
 # of any other files you specify on the command line.
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 init();
 
-foreach $file ('debian/control', @ARGV) {
+foreach my $file ('debian/control', @ARGV) {
 	if (! -e $file) {
 		error("\"$file\" not found. Are you sure you are in the correct directory?");
 	}

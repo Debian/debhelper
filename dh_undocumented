@@ -6,29 +6,31 @@
 # Also, it looks for debian/undocumented files for more lists of
 # undocumented man pages.
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 init();
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
-	$undocumented=pkgfile($PACKAGE,"undocumented");
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $undocumented=pkgfile($package,"undocumented");
 
-	@undoc=();
+	my @undoc;
 	if ($undocumented) {
 		@undoc=filearray($undocumented);
 	}
 
-	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
 		push @undoc, @ARGV;
 	}	
 
-	foreach $file (@undoc) {
+	foreach my $file (@undoc) {
 		$file=~s/.gz$//; # .gz extension is optional in input.
 
 		# Determine what directory the file belongs in,
 		# /usr/share/man, or /usr/X11R6/man, and how the link to
 		# the undocuemtned.7 man page will look.
-		($section)=$file=~m/^.*\.(\d)/;
+		my ($dir, $reldir);
+		my ($section)=$file=~m/^.*\.(\d)/;
 		if (!$section) {
 			error("\"$file\" does not have an extension.");
 		}	
@@ -45,9 +47,9 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			$reldir="";
 		}
 
-		if (! -d "$TMP/$dir") {
-			doit("install","-d","$TMP/$dir");
+		if (! -d "$tmp/$dir") {
+			doit("install","-d","$tmp/$dir");
 		}
-		doit("ln","-sf","${reldir}undocumented.7.gz","$TMP/$dir/$file.gz");
+		doit("ln","-sf","${reldir}undocumented.7.gz","$tmp/$dir/$file.gz");
 	}
 }

@@ -6,6 +6,7 @@
 #
 # This is a little bit (hah!) DWIMish, but still very handy.
 
+use strict;
 use File::Find;
 use Debian::Debhelper::Dh_Lib;
 init();
@@ -26,7 +27,7 @@ sub find_man {
 	if ($File::Find::dir=~m:debian/.*tmp.*:) {
 		return;
 	}
-	foreach $dir (@allpackages) {
+	foreach my $dir (@allpackages) {
 		if ($File::Find::dir=~m:debian/\Q$dir\E:) {
 			return;
 		}
@@ -72,25 +73,25 @@ sub find_so_man {
 	}
 }
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
 
 	# Find all filenames that look like man pages.
 	@manpages=();
 	@allpackages=GetPackages('');
 	find(\&find_man,'.'); # populates @manpages
 	
-	foreach $page (@manpages) {
+	foreach my $page (@manpages) {
 		$page=~s:^\./::; # just for looks
 		
-		$basename=Debian::Debhelper::Dh_Lib::basename($page);
+		my $basename=basename($page);
 		
 		# Skip all files listed on command line.
 		my $install=1;
-		foreach $skip (@ARGV) {
+		foreach my $skip (@ARGV) {
 			# Look at basename of what's on connect line
 			# for backwards compatability.
-			if ($basename eq Debian::Debhelper::Dh_Lib::basename($skip)) {
+			if ($basename eq basename($skip)) {
 				$install=undef;
 				last;
 			}
@@ -105,13 +106,13 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 			
 			my ($section)=$basename=~m/.*\.([1-9])/;
 			
-			my $destdir="$TMP/usr/$extdir/man/man$section/";
+			my $destdir="$tmp/usr/$extdir/man/man$section/";
 			
 			# Handle translated man pages.
 			my $instname=$basename;
 			my ($langcode)=$basename=~m/.*\.([a-z][a-z])\.([1-9])/;
 			if (defined $langcode && $langcode ne '') {
-				$destdir="$TMP/usr/$extdir/man/$langcode/man$section/";
+				$destdir="$tmp/usr/$extdir/man/$langcode/man$section/";
 				$instname=~s/\.$langcode\./\./;
 			}
 			
@@ -128,12 +129,12 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 	
 	# Now the .so conversion.
 	@sofiles=@sodests=();
-	foreach $dir (qw{usr/share/man usr/X11R6/man}) {
-		if (-e "$TMP/$dir") {
-			find(\&find_so_man, "$TMP/$dir");
+	foreach my $dir (qw{usr/share/man usr/X11R6/man}) {
+		if (-e "$tmp/$dir") {
+			find(\&find_so_man, "$tmp/$dir");
 		}
 	}
-	foreach $sofile (@sofiles) {
+	foreach my $sofile (@sofiles) {
 		my $sodest=shift(@sodests);
 		doit "rm","-f",$sofile;
 		doit "ln","-sf",$sodest,$sofile;

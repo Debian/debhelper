@@ -2,6 +2,7 @@
 #
 # Strip files.
 
+use strict;
 use File::Find;
 use Debian::Debhelper::Dh_Lib;
 init();
@@ -20,8 +21,8 @@ sub testfile {
 
 	# See if we were asked to exclude this file.
 	# Note that we have to test on the full filename, including directory.
-	$fn="$File::Find::dir/$_";
-	foreach $f (@{$dh{EXCLUDE}}) {
+	my $fn="$File::Find::dir/$_";
+	foreach my $f (@{$dh{EXCLUDE}}) {
 		return if ($fn=~m/\Q$f\E/);
 	}
 
@@ -36,7 +37,7 @@ sub testfile {
 	}
 	
 	# Is it executable? -x isn't good enough, so we need to use stat.
-	(undef,undef,$mode,undef)=stat(_);
+	my (undef,undef,$mode,undef)=stat(_);
 	if ($mode & 0111) {
 		# Ok, expensive test.
 		my $type=`file $_`;
@@ -53,11 +54,11 @@ sub testfile {
 	}
 }
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
 
-	@shared_libs=@executables=@static_libs=();
-	find(\&testfile,$TMP);
+	my (@shared_libs, @executables, @static_libs);
+	find(\&testfile,$tmp);
 
 	foreach (@shared_libs) {
 		# Note that all calls to strip on shared libs

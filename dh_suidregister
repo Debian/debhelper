@@ -2,31 +2,32 @@
 #
 # Obsolete.
 
+use strict;
 use Debian::Debhelper::Dh_Lib;
 init();
 
 my $notused=1;
 
-foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
-	$TMP=tmpdir($PACKAGE);
-	$suid=pkgfile($PACKAGE,"suid");
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $suid=pkgfile($package,"suid");
 
 	# All this code is here just to see if we would have done something
 	# before..
 
-	@files=();
+	my @files;
 	if ($suid) {
-		@files=filearray($suid, $TMP);
+		@files=filearray($suid, $tmp);
 	}
 
-	if (($PACKAGE eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
 		push @files, @ARGV;
 	}
 
 	if (! @files && ! $suid) {
 		# No files specified (and no empty debian/suid file), so
 		# guess what files to process.
-		@files=split(/\n/,`find $TMP -type f -perm +6000`);
+		@files=split(/\n/,`find $tmp -type f -perm +6000`);
 	}
 
 	if (@files) {
