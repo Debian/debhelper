@@ -126,7 +126,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $strong_dep = 0;
 	my $look_for_pythonXY = 1;
 
-	# First, the case of python-foo
+	# First, the case of python-foo and pythonX.Y-foo
 	if ($package =~ /^python-/) {
 		$dep_on_python = 1;
 		$strong_dep = 1;
@@ -135,11 +135,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (grep { "$_" eq "$pack" } GetPackages()) {
 			addsubstvar($package, "python:Depends", $pack);
 		}
-		else {
-			push @dirs, "usr/lib/python$python_version/site-packages" ;
-			push @dirs_so, "usr/lib/python$python_version/site-packages" ;
-			$look_for_pythonXY = 0;
-		}
+	}
+	if ($package !~ /^python[0-9].[0-9]-/) {
+		push @dirs, "usr/lib/python$python_version/site-packages" ;
+		push @dirs_so, "usr/lib/python$python_version/site-packages" ;
+		$look_for_pythonXY = 0;
 	}
 
 	@dirs = grep -d, map "$tmp/$_", @dirs;
@@ -274,4 +274,3 @@ Josselin Mouette <joss@debian.org>
 most ideas stolen from Brendan O'Dea <bod@debian.org>
 
 =cut
-

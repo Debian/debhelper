@@ -162,7 +162,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			# Make sure it's properly absolute.
 			$src="/$src";
 		}
-		
+
+		if (-d "$tmp/$dest" && ! -l "$tmp/$dest") {
+			error("link destination $tmp/$dest is a directory");
+		}
 		doit("rm", "-f", "$tmp/$dest");
 		doit("ln","-sf", $src, "$tmp/$dest");
 	}
