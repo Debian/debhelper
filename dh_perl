@@ -88,11 +88,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp = tmpdir($package);
 	my $ext = pkgext($package);
 
-	my @subs;
-	if (open IN, "debian/${ext}substvars")
-	{
-	    @subs = grep !/^perl:Depends=/, <IN>;
-	    close IN;
+	# For idempotency, remove anything this program might have
+	# previously added to the substvars file.
+	if (-e "debian/${ext}substvars") {
+		complex_doit("grep -v ^perl:Depends= debian/${ext}substvars > debian/${ext}substvars.new || true");
+		doit("mv", "debian/${ext}substvars.new","debian/${ext}substvars");
 	}
 
 	# Check also for alternate locations given on the command line
@@ -104,49 +104,40 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		return unless -f;
 		$deps |= PM_MODULE if /\.pm$/;
 		$deps |= XS_MODULE if /\.so$/;
-	    }, @dirs if @dirs;
+	}, @dirs if @dirs;
 
 	# find scripts
 	find sub {
 		return unless -f and (-x or /\.pl$/);
 		local *F;
 		return unless open F, $_;
-		if (read F, local $_, 32 and m%^#!\s*/usr/bin/perl\s%)
-		{
-		    $deps |= PROGRAM;
+		if (read F, local $_, 32 and m%^#!\s*/usr/bin/perl\s%) {
+			$deps |= PROGRAM;
+		}
+		close F;
+	}, $tmp;
+
+	if ($deps) {
+		my $perl_depends = $perl;
+		if ($deps & XS_MODULE or $dh{V_FLAG_SET}) {
+			($version) = `dpkg -s $perl` =~ /^Version:\s*(\S+)/m
+				unless $version;
+			$perl_depends .= " (>= $version)";
+		}
+		elsif ($deps & PM_MODULE) {
+			$perl_depends .= " (>= $min_version)";
 		}
 
-		close F;
-	    }, $tmp;
+		# add perlapi-<ver> for XS modules
+		$perl_depends .= ", perlapi-$Config{version}"
+			if $deps & XS_MODULE;
 
-	if ($deps)
-	{
-	    my $perl_depends = $perl;
-	    if ($deps & XS_MODULE or $dh{V_FLAG_SET})
-	    {
-		($version) = `dpkg -s $perl` =~ /^Version:\s*(\S+)/m
-		    unless $version;
-
-		$perl_depends .= " (>= $version)";
-	    }
-	    elsif ($deps & PM_MODULE)
-	    {
-		$perl_depends .= " (>= $min_version)";
-	    }
-
-	    # add perlapi-<ver> for XS modules
-	    $perl_depends .= ", perlapi-$Config{version}"
-		if $deps & XS_MODULE;
-
-	    # don't need to depend on an un-versioned perl-base, it's
-	    # essential
-	    push @subs, "perl:Depends=$perl_depends\n"
-		unless $perl_depends eq 'perl-base';
+		# don't need to depend on an un-versioned perl-base, it's
+		# essential
+		unless ($perl_depends eq 'perl-base') {
+			complex_doit("echo 'perl:Depends=$perl_depends' >> debian/${ext}substvars");
+		}
 	}
-
-	open OUT, ">debian/${ext}substvars";
-	print OUT @subs;
-	close OUT;
 }
 
 =head1 SEE ALSO
