@@ -2,11 +2,10 @@ Debhelper is a collection of programs that can be used in debian/rules files
 to automate common tasks. For further documentation, see the man pages for
 dh_* commands.
 
-To help you get started, I've included an example of a debian/rules file
-that uses debhelper commands extensively. See
-/usr/doc/debhelper/examples/rules . These files are also useful as they give
-one good order you can run the different debhelper scripts in (though other
-variations are possible).
+To help you get started, I've included examples of debian/rules files
+that use debhelper commands extensively. See /usr/doc/debhelper/examples/ . 
+These files are also useful as they give one good order you can run the 
+various debhelper scripts in (though other variations are possible).
 
 
 Converting from debstd to debhelper:
@@ -76,7 +75,12 @@ All scripts that automatically generate code in this way let it be disabled
 by the -n parameter.
 
 Note that it will be shell code, so you cannot directly use it in a perl 
-script.
+script. If you would like to embed it into a perl script, here is one way to
+do that:
+
+print << `EOF`
+#DEBHELPER#
+EOF
 
 
 Notes on multiple binary packages:
@@ -100,7 +104,7 @@ following parameters:
 		times)
 
 These parameters are cumulative. If none are given, the tools default to
-effecting all packages.
+affecting all packages.
 
 See examples/rules.multi for an example of how to use this.
 

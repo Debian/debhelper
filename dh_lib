@@ -52,19 +52,26 @@ pkgext() {
 }
 
 # Returns 1 if the package is a native debian package, null otherwise.
+# Caches return code so it only needs to run dpkg-parsechangelog once.
 isnative() {
-	# Get the package version.
-	# Note that the 2>/dev/null is because a bug in dpkg-parsechangelog makes it
-	# output a bogus error message to stderr.
-	# If it actually has a real error, then the expr will fail, and this whole
-	# script will come crashing to a halt, which is good enough to inform
-	# the user something's wrong. :-)
-	VERSION=`expr "\`dpkg-parsechangelog 2>/dev/null\`" : \
-		'.*Version: \(.*\).*Distribution:'`
-	# Is this a native Debian package?
-	if expr "$VERSION" : '.*-' >/dev/null; then
-		return 1
+	if [ -z "$DH_ISNATIVE" ]; then
+		# Get the package version.
+		# Note that the 2>/dev/null is because a bug in dpkg-parsechangelog makes it
+		# output a bogus error message to stderr.
+		# If it actually has a real error, then the expr will fail, and this whole
+		# script will come crashing to a halt, which is good enough to inform
+		# the user something's wrong. :-)
+		VERSION=`expr "\`dpkg-parsechangelog 2>/dev/null\`" : \
+			'.*Version: \(.*\).*Distribution:'`
+		# Is this a native Debian package?
+		if expr "$VERSION" : '.*-' >/dev/null; then
+			DH_ISNATIVE=1
+		else
+			DH_ISNATIVE=0
+		fi
 	fi
+
+	return "$DH_ISNATIVE"
 }
 
 # Automatically add a shell script snippet to a debian script.
@@ -95,10 +102,46 @@ autoscript() {
 	complex_doit "echo '# End automatically added section' >> $autoscript_debscript"
 }
 
+# Sets 2 global variables, INDEP_PACKAGES is all the arch-independant
+# packages, ARCH_PACKAGES is the arch-dependant packages.
+get_arch_indep_packages() {
+	INDEP_PACKAGES=""
+	ARCH_PACKAGES=""
+	
+	# First, get the list of all binary packages.
+        # Notice we want the list in reverse order, thus the tac.
+	PACKAGES=`grep ^Package: debian/control | cut -d " " -f 2 | tac | tr "\n" " "`
+	# Remove trailing space.
+	PACKAGES=`expr "$PACKAGES" : '\(.*\) '`
+	# Loop on the list of architectures.
+	for ARCH in `grep ^Architecture: debian/control | cut -d " " -f 2` ; do
+		# Pull the last package off the list.
+		THISPKG=`expr "$PACKAGES" : '.* \(.*\)'` || true
+		if [ ! "$THISPKG" ]; then
+			THISPKG=$PACKAGES
+		fi
+		PACKAGES=`expr "$PACKAGES" : '\(.*\) .*'` || true
+	
+		if [ ! "$THISPKG" ]; then
+			error "debian/control invalid - too many Architecture lines or too few Package lines"
+		fi
+
+		if [ "$ARCH" = "all" ]; then
+			INDEP_PACKAGES="$INDEP_PACKAGES $THISPKG"
+		else
+			ARCH_PACKAGES="$ARCH_PACKAGES $THISPKG"
+		fi
+	done
+
+	if [ "$PACKAGES" ]; then
+		error "debian/control invalid - too many Architecure lines or too few Package lines"
+	fi
+}
+
 # Argument processing and global variable initialization is below.
 
 # Parse command line.
-set -- `getopt xvidrnakp:P:u: $*`
+set -- `getopt xvidrnakp:P:u:m: $*`
 
 for i; do
 	case "$i"
@@ -108,10 +151,14 @@ for i; do
 			shift
 			;;
 		-i)
+			get_arch_indep_packages
+			DH_DOPACKAGES="$DH_DOPACKAGES $INDEP_PACKAGES"
 			DH_DOINDEP=1
 			shift
 			;;
 		-a)
+			get_arch_indep_packages
+			DH_DOPACKAGES="$DH_DOPACKAGES $ARCH_PACKAGES"
 			DH_DOARCH=1
 			shift
 			;;
@@ -150,6 +197,11 @@ for i; do
 			shift
 			shift
 			;;
+		-m)
+			DH_M_PARAMS="$2"
+			shift
+			shift
+			;;
 		--)
 			shift
 			break
@@ -157,58 +209,42 @@ for i; do
 	esac
 done
 
-# Get the name of the main binary package.
+# Get the name of the main binary package (first one listed in
+# debian/control).
 MAINPACKAGE=`grep ^Package: debian/control | cut -d " " -f 2 | head -1`
 
-if [ "$DH_DOINDEP" -o "$DH_DOARCH" ]; then
-	# Figure out all the binary packages to be produced, by looking at the
-	# control file. Break it into 2 lists, INDEP_PACKAGES and ARCH_PACKAGES.
-	#
-	# First, get the list of all binary packages.
-	PACKAGES=`grep ^Package: debian/control | cut -d " " -f 2 | tr "\n" " "`
-	# Remove trailing space.
-	PACKAGES=`expr "$PACKAGES" : '\(.*\) '`
-	# Loop on the list of architectures. Note that we tac the result to reverse
-	# it, becuase we are going through the list of packages in reverse.
-	for ARCH in `grep ^Architecture: debian/control | tac | cut -d " " -f 2` ; do
-		THISPKG=`expr "$PACKAGES" : '.* \(.*\)'` || true
-		if [ ! "$THISPKG" ]; then
-			THISPKG=$PACKAGES
-		fi
-	        PACKAGES=`expr "$PACKAGES" : '\(.*\) .*'` || true
-		if [ ! "$THISPKG" ]; then
-			error "debian/control invalid - too many Architecture lines or too few Package lines"
-		fi
-		if [ "$ARCH" = "all" ]; then
-			INDEP_PACKAGES="$INDEP_PACKAGES $THISPKG"
-		else
-			ARCH_PACKAGES="$ARCH_PACKAGES $THISPKG"
-		fi
-	done
-
-	if [ "$PACKAGES" ]; then
-		error "debian/control invalid - too many Architecure lines or too few Package lines"
-	fi
-	if [ "$DH_DOINDEP" ]; then
-		DH_DOPACKAGES="$DH_DOPACKAGES $INDEP_PACKAGES"
-	fi
-	if [ "$DH_DOARCH" ]; then
-		DH_DOPACKAGES="$DH_DOPACKAGES $ARCH_PACKAGES"
-	fi
+# Remove leading spaces from DH_DOPACKAGES.
+if expr "$DH_DOPACKAGES" : ' *.*' >/dev/null ; then
+	DH_DOPACKAGES_NEW=`expr "$DH_DOPACKAGES" : ' *\(.*\)'`
 fi
 
 # Check if packages to build have been specified, if not, fall back to 
-# the default, doing them all. Note that DH_DOPACKAGES may have a leading
-# space and be empty otherwise.
-if [ ! "$DH_DOPACKAGES" -o "$DH_DOPACKAGES" = " " ]; then
+# the default, doing them all.
+if [ ! "$DH_DOPACKAGES" ]; then
 	if [ "$DH_DOINDEP" -o "$DH_DOARCH" ]; then
 		error "I have no package to build."
 	fi
-	DH_DOPACKAGES=`grep ^Package: debian/control | cut -d " " -f 2`
+	DH_DOPACKAGES=`grep ^Package: debian/control | cut -d " " -f 2 | tr "\n" " "`
 fi
 
 # Check to see if -P was specified. If so, we can only act on a single
 # package.
 if [ "$DH_TMPDIR" ] && echo "$DH_DOPACKAGES" | egrep -q '.+ .+' ; then
 	error "-P was specified, but multiple packages would be acted on."
+fi
+
+# Figure out which package is the first one we were instructed to build.
+# This package gets special treatement, files and directories specified on
+# the command line may effect it.
+for PACKAGE in $DH_DOPACKAGES ; do
+	DH_FIRSTPACKAGE="$PACKAGE"
+	break
+done
+
+# Check to see if: DH_FIRSTPACKAGE is not the MAINPACKAGE, and
+# some command line arguemnts are passed. Display a warning, becuase
+# debhelper's behaviour has changed in this case.
+if [ "$DH_FIRSTPACKAGE" != "$MAINPACKAGE" -a "$*" ]; then
+	echo `basename $0`": Warning: my behavior has changed, and command line" >&2
+	echo `basename $0`": arguments \"$*\" will apply to package \"$DH_FIRSTPACKAGE\"" >&2
 fi

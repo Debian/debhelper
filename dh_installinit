@@ -6,6 +6,12 @@
 PATH=debian:$PATH:/usr/lib/debhelper
 . dh_lib
 
+# This works around a bug in getopt(1), where it ignores some parameters.
+# Sigh.
+if [ "$*" ]; then
+	DH_U_PARAMS="$DH_U_PARAMS $*"
+fi
+
 for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
 	EXT=`pkgext $PACKAGE`

@@ -38,7 +38,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 			doit "install -m 644 -p debian/README.Debian $TMP/usr/doc/$PACKAGE/"
 		fi
 		if [ -f debian/TODO ]; then
-			if [ "$NATIVE" ]; then
+			if isnative; then
 				doit "install -m 655 -p debian/TODO $TMP/usr/doc/$PACKAGE/TODO"
 			else
 				doit "install -m 644 -p debian/TODO $TMP/usr/doc/$PACKAGE/TODO.Debian"

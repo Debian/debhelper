@@ -1,3 +1,12 @@
+debhelper (0.37) unstable; urgency=low
+
+  * dh_du: Fixed hardcoded debian/tmp.
+  * This change got lost by accident, redid it: Optimized out most of the
+    slowdown caused byusing dpkg-parsechangelog - now it's only called by
+    2 dh_* programs.
+
+ -- Joey Hess <joeyh@master.debian.org>  Sun, 28 Dec 1997 20:45:22 -0500
+
 debhelper (0.36) unstable; urgency=low
 
   * dh_undocumented: exit with an error message if the man page specified

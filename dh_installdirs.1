@@ -9,8 +9,9 @@ dh_installdirs is a debhelper program that is responsible for creating
 subdirectories in package build directories.
 .P
 Any directory names specified as parameters will be created in the package
-build directory of the first binary package listed in debian/control, if 
-dh_installdirs is acting on that package.
+build directory of the first package dh_installdirs is told to act on. By
+default, this is the first binary package in debian/control, but if you use 
+-p, -i, or -a flags, it will be the first package specified by those flags.
 .P
 A file named debian/dirs (for the first binary package in debian/control),
 or debian/package.dirs (for each additional package in debian/control) can
@@ -37,8 +38,8 @@ Create directories for the package named "package".
 Use "tmpdir" for package build directory. 
 .TP
 .B dir ...
-Create these directories in the package build directory of the first binary 
-package listed in debian/control, if we are acting on that package.
+Create these directories in the package build directory of the first package
+acted on.
 .SH NOTES
 The
 .B \-a

@@ -12,11 +12,11 @@ PATH=debian:$PATH:/usr/lib/debhelper
 
 UPSTREAM=$1
 
-if [ "$NATIVE" -a "$UPSTREAM" ]; then
+if isnative && [ "$UPSTREAM" ]; then
 	error "Cannot specify an upstream changelog for a native debian package."
 fi
 
-if [ "$NATIVE" ]; then
+if isnative; then
 	CHANGELOG_NAME=changelog
 else
 	CHANGELOG_NAME=changelog.Debian

@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-# Note that I have to refer to debhelper programs witrh ./, to make sure
+# Note that I have to refer to debhelper programs with ./, to make sure
 # I run the most current ones. That's also why there is a symlink to the 
 # current dh_lib in this debian/ directory.
 
@@ -7,17 +7,24 @@
 # be sure to use the new templates from this package.
 export DH_AUTOSCRIPTDIR=autoscripts
 
+# Figure out the current debhelper version.
+VERSION=$(shell expr "`dpkg-parsechangelog 2>/dev/null`" : \
+	'.*Version: \(.*\).*Distribution:')
+
 export DH_VERBOSE=1
 
 test_files=dh_lib
 
 build:
 	./dh_testdir $(test_files)
+	sed "s/#DEBHELPER_VERSION#/$(VERSION)/" < dh_testversion.in \
+		> dh_testversion
+	chmod 755 dh_testversion
 
 clean:
 	./dh_testdir $(test_files)
 	./dh_testroot
-	./dh_clean
+	./dh_clean dh_testversion
 
 # Build architecture-dependent files here.
 binary-arch: build
@@ -35,7 +42,7 @@ binary-indep: build
 	cp dh_lib debian/tmp/usr/lib/debhelper
 	cp -a autoscripts debian/tmp/usr/lib/debhelper
 
-	./dh_installdocs TODO README BUGS
+	./dh_installdocs TODO README
 	./dh_installexamples examples/*
 	./dh_installmenu
 	./dh_installmanpages

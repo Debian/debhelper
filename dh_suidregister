@@ -19,7 +19,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 		files=`tr "\n" " " < debian/${EXT}suid`
 	fi
 
-	if [ "$PACKAGE" = "$MAINPACKAGE" -a "$*" ]; then
+	if [ "$PACKAGE" = "$DH_FIRSTPACKAGE" -a "$*" ]; then
 		files="$* $files"
 	fi
 
