@@ -19,9 +19,8 @@ VERSION=$(shell expr "`dpkg-parsechangelog 2>/dev/null |grep Version:`" : '.*Ver
 
 export DH_VERBOSE=1
 
-build: link-stamp
-	# Run regression tests.
-	$(MAKE) test
+build: link-stamp test
+# Nothing to do.	
 
 clean: link-stamp
 	./dh_testdir
@@ -99,43 +98,16 @@ binary-indep: link-stamp build
 	./dh_md5sums
 	./dh_builddeb
 
-# Install in the proper location on my ftp server and web server. Not intended
-# for use by anyone except the author.
-OLD_VER=$(shell perl -e '<>;<>;while(<>){last if /^ --/};<>;$$_=<>;print m/\((.*?)\)/'<debian/changelog)
-dist: commit link-stamp
-	dpkg-buildpackage -rfakeroot -tc
-	if [ `hostname` = 'kite' ] ; then \
-		cp ../debhelper_$(VERSION).tar.gz ../../public; \
-		rm /home/ftp/pub/code/debhelper/* || true; \
-		cp debian/changelog /home/pub/programs/debhelper/CHANGES; \
-		echo $(VERSION) > /home/pub/programs/debhelper/LATEST-VERSION-IS; \
-		cd ..; rm -rf debhelper-$(OLD_VER); \
-		[ -f ../public/debhelper_$(OLD_VER).tar.gz ] && \
-		tar zxf ../public/debhelper_$(OLD_VER).tar.gz || \
-		tar zxf ../outdated/debhelper_$(OLD_VER).tar.gz; \
-		diff -r -u --new-file debhelper-$(OLD_VER) debhelper-$(VERSION) > \
-			/home/ftp/pub/code/debhelper/diffs/debhelper-$(VERSION).diff; \
-		gzip -9f /home/ftp/pub/code/debhelper/diffs/debhelper-$(VERSION).diff; \
-		cd /tmp; rm -f debhelper-$(OLD-VER); \
-        fi
-
+# Fix links when checking out of cvs by calling this target.
 link-stamp:
 	sh -e debian/fixlinks
 	touch link-stamp
 
-# This is for local use - it tags the current code with the debian version
-# number, then commits the current code using the contents of the changelog
-# as the cvs changelog, then increments the version number
-commit:
-	cvs -Q commit -m "`dpkg-parsechangelog | grep '^  '`"
-	cvs -Q tag rel-$(shell dpkg-parsechangelog | grep ^Version: \
-		|cut -d " " -f 2 |tr '.' '-')
-	
-new:
-	# Update w/o editing.
-	EDITOR=true dch -i 2>/dev/null
-	# Dch has to change the bloody directory name. Feh.
-	mv . ../debhelper
+# Update the debhelper web page. Not intended for use by anyone except the
+# author.
+installhook:
+	cp debian/changelog /home/pub/programs/debhelper/CHANGES
+	echo $(VERSION) > /home/pub/programs/debhelper/LATEST-VERSION-IS
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary dist
