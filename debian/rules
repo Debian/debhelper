@@ -47,9 +47,10 @@ binary-indep: link-stamp build
 		-exec install -p {} debian/debhelper/usr/bin \;
 	cp -a Dh_*.pm debian/debhelper/usr/share/debhelper
 	cp -a autoscripts debian/debhelper/usr/share/debhelper
+	rm -rf debian/debhelper/usr/share/debhelper/autoscripts/CVS
 
-	./dh_installdocs doc/*
-	./dh_installexamples examples/*
+	./dh_installdocs `echo doc/* | grep -v CVS`
+	./dh_installexamples `echo examples/* | grep -v CVS`
 	./dh_installmenu
 	./dh_installmanpages
 	./dh_installinfo
@@ -99,7 +100,7 @@ binary-indep: link-stamp build
 # Install in the proper location on my ftp server and web server. Not intended
 # for use by anyone except the author.
 OLD_VER=$(shell perl -e '<>;<>;while(<>){last if /^ --/};<>;$$_=<>;print m/\((.*?)\)/'<debian/changelog)
-dist: link-stamp
+dist: commit link-stamp
 	dpkg-buildpackage -rfakeroot -tc
 	if [ `hostname` = 'kite' ] ; then \
 		cp ../debhelper_$(VERSION).tar.gz ../../public; \
@@ -127,7 +128,6 @@ commit:
 	cvs -Q commit -m "`dpkg-parsechangelog | grep '^  '`"
 	cvs -Q tag rel-$(shell dpkg-parsechangelog | grep ^Version: \
 		|cut -d " " -f 2 |tr '.' '-')
-	$(MAKE) new
 	
 new:
 	# Update w/o editing.
