@@ -367,8 +367,10 @@ sub delsubstvar {
 	my $ext=pkgext($package);
 	my $substvarfile="debian/${ext}substvars";
 
-	complex_doit("grep -v '^${substvar}=' $substvarfile > $substvarfile.new || true");
-	doit("mv", "$substvarfile.new","$substvarfile");
+	if (-e $substvarfile) {
+		complex_doit("grep -v '^${substvar}=' $substvarfile > $substvarfile.new || true");
+		doit("mv", "$substvarfile.new","$substvarfile");
+	}
 }
 				
 # Adds a dependency on some package to the specified
