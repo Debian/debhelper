@@ -10,7 +10,7 @@ for PACKAGE in $DH_DOPACKAGES; do
 	TMP=`tmpdir $PACKAGE`
 	substvars=`pkgfile $PACKAGE substvars`
 	if [ "$substvars" ]; then
-		doit "rm -f debian/$substvars"
+		doit "rm -f $substvars"
 	fi
 	doit "rm -rf $TMP"
 done

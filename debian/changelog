@@ -1,3 +1,14 @@
+debhelper (0.54) unstable; urgency=low
+
+  * dh_lib: no longer call getopt(1) to parse options. I wrote my own
+    argument processor in perl.
+  * Added long versions of all arguments. TODO: document them.
+  * All parameters may now be passed values that include whitespace (ie,
+    dh_installinit -u"defaults 10")
+  * Now depends on perl (needs Getopt::Long).
+
+ -- Joey Hess <joeyh@master.debian.org>  Sat, 10 Jan 1998 15:44:09 -0500
+
 debhelper (0.53) unstable; urgency=low
 
   * dh_installmanpages: ignore all man pages installed into debian/tmp

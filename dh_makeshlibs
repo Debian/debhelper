@@ -24,9 +24,9 @@ for PACKAGE in $DH_DOPACKAGES; do
 		if [ ! -d "$TMP/DEBIAN" ] ; then
 			doit "install -d $TMP/DEBIAN"
 		fi
-		if [ "$DH_V_FLAG" ]; then
-			if [ "$*" ]; then
-				PACKAGE="$*"
+		if [ "$DH_V_FLAG_SET" ]; then
+			if [ "$DH_V_FLAG" ]; then
+				PACKAGE="$DH_V_FLAG"
 			else
 				# Call isnative becuase it sets $VERSION
 				# as a side effect.

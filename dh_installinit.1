@@ -18,33 +18,33 @@ by the packagename. (You may use debian/init for the first binary package
 listed in the control file.)
 .SH OPTIONS
 .TP
-.B \-v
+.B \-v, \--verbose
 Verbose mode; show all commands that modify the package build directory.
 .TP
-.B \-a
+.B \-a, \--arch
 Install init scripts into all architecture dependent packages.
 .TP
-.B \-i
+.B \-i, \--indep
 Install init scripts into all architecture independent packages.
 .TP
-.B \-ppackage
+.B \-ppackage, \--package=package
 Install init scripts into the package named "package".
 .TP
-.B \-Ptmpdir
+.B \-Ptmpdir, \--tmpdir=tmpdir
 Use "tmpdir" for package build directory. 
 .TP
-.B \-n
+.B \-n, \--noscripts
 Do not modify postinst/postrm/prerm scripts.
 .TP
-.B \-r
+.B \-r, \--no-restart-on-upgrade
 Do not restart daemon on upgrade.
 .TP
-.B \-d
+.B \-d, \--remove-d
 Remove trailing "d" from the name of the package, and use the result for the
 filename the init script is installed as in etc/init.d/ . This may be useful
 for daemons with named ending in "d".
 .TP
-.B \-uparams
+.B \-uparams, \--update-rcd-params=params
 Pass "params" to 
 .BR update-rc.d (8)
 If not specified, "default" will be passed to
@@ -57,13 +57,6 @@ and
 .B \-p
 arguments are cumulative. If none are specified, then all packages listed in
 the control file will be effected.
-.P
-Due to a bug in
-.BR getopt (1)
-, you cannot really text with spaces in it to the -u flag. However, this bug
-has been worked around, and it should appear to work. What it's really doing
-is looking at any parameters passed that are not known flags, and appending
-that text onto the end of the text specified by the -u flag.
 .SH ENVIRONMENT
 .TP
 .I DH_VERBOSE
