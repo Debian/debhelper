@@ -143,6 +143,8 @@ sub parseopts {
 		"h|help" => \&showhelp,
 
 		"mainpackage=s" => \$options{MAINPACKAGE},
+
+		"list-missing" => \$options{LIST_MISSING},
 		
 		"<>" => \&NonOption,
 	);

@@ -25,6 +25,12 @@ into usr/share/doc/package/changelog.Debian in the package build directory. (If
 files named debian/package.changelog exist, they will be used in preference
 to debian/changelog.)
 
+Parallelling the debian changelog handling, this program also takes care of
+debian NEWS files. If there is a debian/NEWS file, it is installed as
+usr/share/doc/package/NEWS for native packages, and as
+usr/share/doc/package/NEWS.Debian for non-native packages. debian/package.NEWS
+files can also be used.
+
 If an upstream changelog file is specified as an option, and the package is
 not a native debian package, then this upstream changelog will be installed
 as usr/share/doc/package/changelog in the package build directory. If the
@@ -67,16 +73,22 @@ if (isnative($dh{MAINPACKAGE}) && defined $upstream) {
 }
 
 my $changelog_name="changelog.Debian";
+my $news_name="NEWS.Debian";
 if (isnative($dh{MAINPACKAGE})) {
 	$changelog_name='changelog';
+	$news_name='NEWS';
 }
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $changelog=pkgfile($package,"changelog");
+	my $news=pkgfile($package,"NEWS");
 
 	if (!$changelog) {
 		$changelog="debian/changelog";
+	}
+	if (!$news) {
+		$news="debian/NEWS";
 	}
 
 	if (! -e $changelog) {
@@ -93,6 +105,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 	doit("install","-o",0,"-g",0,"-p","-m644",$changelog,
 		"$tmp/usr/share/doc/$package/$changelog_name");
+	if (-e $news) {
+		doit("install","-o",0,"-g",0,"-p","-m644",$news,
+			"$tmp/usr/share/doc/$package/$news_name");
+	}
 
 	if ($upstream) {
 		my $link_to;

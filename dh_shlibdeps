@@ -89,7 +89,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		$find_options="! \\( $dh{EXCLUDE_FIND} \\)";
 	}
 	foreach my $file (split(/\n/,`find $tmp -type f \\( -perm +111 -or -name "*.so*" \\) $find_options`)) {
-		# TODO: this is slow, optimize. Ie, file can run once on multiple files..
+		# TODO this is slow, optimize. Ie, file can run once on
+		# multiple files..
 		$ff=`file "$file"`;
 		if ($ff=~m/ELF/ && $ff!~/statically linked/) {
 			push @filelist,$file;
@@ -97,7 +98,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	if (@filelist) {
-		doit("dpkg-shlibdeps","-Tdebian/${ext}substvars",@{$dh{U_PARAMS}},'-dDepends',@filelist);
+		doit("dpkg-shlibdeps","-Tdebian/${ext}substvars",
+			@{$dh{U_PARAMS}},@filelist);
 	}
 }
 

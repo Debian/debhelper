@@ -1,3 +1,24 @@
+debhelper (4.0.19) unstable; urgency=low
+
+  * Make dh_installchangelogs install debian/NEWS files as well, as
+    NEWS.Debian. Make dh_compress always compress them. The idea is to make
+    these files be in a machine parsable form, like the debian changelog, but
+    only put newsworthy info into them. Automated tools can then display new
+    news on upgrade. It is hoped that if this catches on it will reduce the
+    abuse of debconf notes. See discussion on debian-devel for details.
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 14 Jul 2002 23:09:24 -0400
+
+debhelper (4.0.18) unstable; urgency=low
+
+  * Removed a seemingly useless -dDepends in dh_shlibdeps's call to
+    dpkg-shalibdeps; this allows for stuff like dh_shlibdeps -- -dRecommends
+    Closes: #152117
+  * Added a --list-missing parameter to dh_install, which calc may find
+    useful.
+
+ -- Joey Hess <joeyh@debian.org>  Sun,  7 Jul 2002 22:44:01 -0400
+
 debhelper (4.0.17) unstable; urgency=low
 
   * In dh_install, don't limit to -type f when doing the find due to -X.

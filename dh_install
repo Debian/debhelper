@@ -7,11 +7,12 @@ dh_install - install files into package build directories
 =cut
 
 use strict;
+use File::Find;
 use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_install> [B<-X>I<item>] [S<I<debhelper options>>] [S<I<file [...] dest>>]
+B<dh_install> [B<-X>I<item>] [B<--sutodest>] [B<--list-missing>] [S<I<debhelper options>>] [S<I<file [...] dest>>]
 
 =head1 DESCRIPTION
 
@@ -65,6 +66,19 @@ Note that if you list only a filename on a line by itself in a
 debian/package.install file, with no explicit destination, then dh_install
 will automatically guess the destination even if this flag is not set.
 
+=item B<--list-missing>
+
+This option makes dh_install keep track of the files it installs, and then at
+the end, compare that list with the files in debian/tmp. If any of the files
+(and symlinks) in debian/tmp were not installed to somewhere, it will
+warn on stderr about that.
+
+This may be useful if you have a large package and want to make sure that
+you don't miss installing newly added files in new upstream releases.
+
+Note that files that are excluded from being moved via the -X option are not
+warned about.
+
 =item B<--sourcedir=dir>
 
 Makes all source files relative to "dir". If this is specified, it is akin 
@@ -88,7 +102,7 @@ The files will be installed into the first package dh_install acts on.
 
 init();
 
-my $ret=0;
+my @installed;
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
@@ -134,6 +148,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				doit("install","-d","$tmp/$dest");
 			}
 
+			# Keep track of what's installed.
+			if ($dh{LIST_MISSING}) {
+				# Kill any extra slashes. Makes the
+				# @installed stuff more robust.
+				$src=~y:/:/:s;
+				$src=~s:/+$::;
+				push @installed, "\Q$src\E\/.*|\Q$src\E";
+			}
+			
 			if (-d $src && $exclude) {
 				my ($dir_basename) = basename($src);
 				# Pity there's no cp --exclude ..
@@ -145,6 +168,20 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				doit("cp", "-a", $src, "$tmp/$dest/");
 			}
 		}
+	}
+}
+
+if ($dh{LIST_MISSING}) {
+	my @missing;
+	my $installed=join("|", @installed);
+	$installed=qr{^$installed$};
+	find(sub {
+		-f || -l || return;
+		$_="$File::Find::dir/$_";
+		push @missing, $_ unless /$installed/;
+	}, './debian/tmp');
+	if (@missing) {
+		warning "$_ not installed" foreach @missing;
 	}
 }
 

@@ -95,7 +95,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# ".tgz", "-gz", "-z", "_z"
 		push @files, split(/\n/,`
 			find usr/info usr/share/info usr/man usr/share/man usr/X11*/man -type f ! -name "*.gz" 2>/dev/null || true;
-			find usr/doc usr/share/doc -type f \\( -size +4k -or -name "changelog*" \\) \\
+			find usr/doc usr/share/doc -type f \\( -size +4k -or -name "changelog*" -or -name "NEWS*" \\) \\
 				\\( -name changelog.html -or ! -iname "*.htm*" \\) \\
 				! -iname "*.gif" ! -iname "*.png" ! -iname "*.jpg" \\
 				! -iname "*.jpeg" ! -iname "*.gz" ! -iname "*.taz" \\
