@@ -13,7 +13,7 @@ to the new files.
 By default, dh_compress compresses files that debian policy mandates should
 be compressed, namely all files in usr/info, usr/man, usr/X11R6/man, and
 all files in usr/doc that are larger than 4k in size, except
-the copyright file, .html files and .gif files.
+the copyright file, .html files and .gif files, and all changelog files.
 .P
 If a debian/compress file exits, however, it will be ran as a shell script,
 and all filenames that the shell script outputs will be compressed instead
@@ -25,7 +25,8 @@ the same files as it would by default. This is a good starting point for
 customization of what files are compressed:
 .PP
  find usr/info usr/man usr/X11*/man -type f
- find usr/doc -type f -size +4k \\
+ find usr/doc -type f \\
+ 	\\( -size +4k -or -name "changelog*" \\) \\
  	! -name "*.htm*" ! -name "*.gif" \\
  	! -name "copyright"
 .SH OPTIONS
