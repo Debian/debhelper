@@ -83,7 +83,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		push @wm, @ARGV;
 	}
 
-	if (@wm && ! $dh{NOSCRIPTS}) {
+	if (! $dh{NOSCRIPTS}) {
 		foreach (@wm) {
 			autoscript($package,"postinst","postinst-wm","s:#WM#:$_:;s/#PRIORITY#/$dh{PRIORITY}/",);
 			autoscript($package,"prerm","prerm-wm","s:#WM#:$_:");
