@@ -81,6 +81,12 @@ preference to the files it normally installs.
 
 This parameter is deprecated, use the --name parameter instead.
 
+=item B<--error-handler=>I<function>
+
+Call the named shell function if running the init script fails. The
+function should be provided in the prerm and postinst scripts, before the
+#DEBHELPER# token.
+
 =back
 
 =head1 NOTES
@@ -148,33 +154,33 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if ($params eq '') {
 			$params="defaults";
 		}
-
+                
 		if (! $dh{NOSCRIPTS}) {
 			if (! $dh{NO_START}) {
 				# update-rc.d, and start script
 				autoscript($package,"postinst", "postinst-init",
-					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
+					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/;s/#ERROR_HANDLER#/$dh{ERROR_HANDLER}/");
 			
 				if ($dh{R_FLAG}) {
 					# stops script only on remove
 					autoscript($package,"prerm","prerm-init-norestart",
-						"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
+						"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/;s/#ERROR_HANDLER#/$dh{ERROR_HANDLER}/");
 				}
 				else {
 					# always stops script
 					autoscript($package,"prerm","prerm-init",
-						"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
+						"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/;s/#ERROR_HANDLER#/$dh{ERROR_HANDLER}/");
 				}
 			}
 			else {
 				# just update-rc.d
 				autoscript($package,"postinst", "postinst-init-nostart",
-					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
+					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/;s/#ERROR_HANDLER#/$dh{ERROR_HANDLER}/");
 			}
 
 			# removes rc.d links
 			autoscript($package,"postrm","postrm-init",
-				"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/");
+				"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/;s/#ERROR_HANDLER#/$dh{ERROR_HANDLER}/");
 		}
 	}
 }

@@ -100,6 +100,12 @@ sub init {
 	# This package gets special treatement: files and directories specified on
 	# the command line may affect it.
 	$dh{FIRSTPACKAGE}=${$dh{DOPACKAGES}}[0];
+
+	# If no error handling function was specified, just propigate
+	# errors out.
+	if (! exists $dh{ERROR_HANDLER} || ! defined $dh{ERROR_HANDLER}) {
+		$dh{ERROR_HANDLER}='exit $?';
+	}
 }
 
 # Pass it an array containing the arguments of a shell command like would

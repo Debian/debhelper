@@ -162,6 +162,8 @@ sub parseopts {
 		
 		"keep-debug" => \$options{KEEP_DEBUG},
 		
+		"error-handler=s" => \$options{ERROR_HANDLER},
+
 		"<>" => \&NonOption,
 	);
 

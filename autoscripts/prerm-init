@@ -1,7 +1,7 @@
 if [ -x "/etc/init.d/#SCRIPT#" ]; then
 	if [ -x /usr/sbin/invoke-rc.d ] ; then
-		invoke-rc.d #SCRIPT# stop
+		invoke-rc.d #SCRIPT# stop || #ERROR_HANDLER#
 	else
-		/etc/init.d/#SCRIPT# stop
+		/etc/init.d/#SCRIPT# stop || #ERROR_HANDLER#
 	fi
 fi
