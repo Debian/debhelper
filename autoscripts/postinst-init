@@ -1,8 +1,2 @@
-if [ -x "/etc/init.d/#SCRIPT#" ]; then
-	update-rc.d #SCRIPT# #INITPARMS# >/dev/null
-	if [ -x /usr/sbin/invoke-rc.d ]; then
-		invoke-rc.d #SCRIPT# start
-	else
-		/etc/init.d/#SCRIPT# start
-	fi
-fi
+update-rc.d #SCRIPT# #INITPARMS# >/dev/null
+/etc/init.d/#SCRIPT# start
