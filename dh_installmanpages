@@ -14,8 +14,11 @@ for PACKAGE in $DH_DOPACKAGES; do
 	# .ex files are examples installed by deb-make, we don't want those, or
 	# .in files, which are from configure.
 	# We also need to exclude all debian/tmp type dirs.
-	EXCLUDE=`grep ^Package: debian/control | cut -d " " -f 2 | tac | tr "\n" "|"`
-	for file in `find * -name "*.[1-9]*" ! -name "*.ex" ! -name "*.in" | egrep -v "^debian/(${EXCLUDE}tmp)/"`; do
+	EXCLUDE=`grep ^Package: debian/control | \
+		cut -d " " -f 2 | tac | tr "\n" "|"`
+	for file in `find * -name "*.[1-9]*" ! -name "*.ex" \
+		! -name "*.in" | egrep -v "^debian/(${EXCLUDE}tmp)/"`
+	do
 		# Make sure file thinks they are man pages.
 		if file $file|grep -q roff; then
 			if echo $file|grep -q /; then
@@ -34,12 +37,20 @@ for PACKAGE in $DH_DOPACKAGES; do
 			done
 			if [ "$install" ]; then
 				SECTION=man`expr $NAME : '.*\.\([123456789]\)'`
+				# Test to see if the filename ends with 'x',
+				# if so, this is an X man page.
+				echo $NAME
+				if expr $NAME : '.*\.[123456789]x' >/dev/null; then
+					EXTDIR="X11R6"
+				else
+					EXTDIR=""
+				fi
 				if [ ! -e $TMP/usr/man/$SECTION/$NAME -a \
 				     ! -e $TMP/usr/X11*/man/$SECTION/$NAME ]; then
-					if [ ! -d $TMP/usr/man/$SECTION ]; then
-						doit "install -d $TMP/usr/man/$SECTION"
+					if [ ! -d $TMP/usr/$EXTDIR/man/$SECTION ]; then
+						doit "install -d $TMP/usr/$EXTDIR/man/$SECTION"
 					fi
-					doit "install -p -m644 $file $TMP/usr/man/$SECTION/$NAME"
+					doit "install -p -m644 $file $TMP/usr/$EXTDIR/man/$SECTION/$NAME"
 				fi
 			fi
 		fi
