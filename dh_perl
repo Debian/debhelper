@@ -106,7 +106,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		return unless -f and (-x or /\.pl$/);
 		local *F;
 		return unless open F, $_;
-		if (read F, local $_, 32 and m%^#!\s*/usr/bin/perl\s%) {
+		if (read F, local $_, 32 and m%^#!\s*(/usr/bin/perl|/usr/bin/env\s+perl)\s%) {
 			$deps |= PROGRAM;
 		}
 		close F;
