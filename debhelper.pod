@@ -196,7 +196,7 @@ act on.
 
 =head2 Debhelper compatability levels
 
-From time to time, major non-backwards-compatabile changes need to be made
+From time to time, major non-backwards-compatible changes need to be made
 to debhelper, to keep it clean and well-designed as needs change and its
 author gains more experience. To prevent such major changes from breaking
 existing packages, the DH_COMPAT environment variable was introduced.
@@ -215,7 +215,7 @@ This mode is deprecated.
 
 =item V2
 
-Setting DH_COMPAT=2 causes debhelper to consitently use debian/<package>
+Setting DH_COMPAT=2 causes debhelper to consistently use debian/<package>
 as the package tree directory for every package that is built.
 
 =item V3
@@ -228,7 +228,7 @@ Setting DH_COMPAT=3 does everything V2 does, plus:
 =item -
 
 Debhelper config files support globbing via * and ?, when appropriate. To
-turn this off and use those characters raw, just prefix with a backspash.
+turn this off and use those characters raw, just prefix with a backslash.
 
 =item -
 
@@ -277,7 +277,7 @@ debhelper to your Build-Depends line in debian/control.
 
 =item DH_VERBOSE
 
-Se to 1 to enable verbose mode. Debhelper will output every command it runs
+Set to 1 to enable verbose mode. Debhelper will output every command it runs
 that modifies files on the build system.
 
 =item DH_COMPAT
@@ -286,12 +286,12 @@ Specifies what compatability level debhelper should run at. See above.
 
 =item DH_NO_ACT
 
-Se to 1 to enables no-act mode.
+Set to 1 to enable no-act mode.
 
 =item DH_OPTIONS
 
 Anything in this variable will be prepended to the command line
-arguments of all debhelper commands. This in useful in some situations,
+arguments of all debhelper commands. This is useful in some situations,
 for example, if you need to pass -p to all debhelper commands that will be
 run. If you use DH_OPTIONS, be sure to build depend on "debhelper >= 1.1.17" --
 older debhelpers will ignore it and do things you don't want them to. One very
