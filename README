@@ -3,7 +3,7 @@ to automate common tasks. For further documentation, see the man pages for
 dh_* commands.
 
 To help you get started, I've included an example of a debian/rules file
-that uses debhelper commands extensivly. See
+that uses debhelper commands extensively. See
 /usr/doc/debhelper/examples/rules . These files are also useful as they give
 one good order you can run the different debhelper scripts in (though other
 variations are possible).
@@ -12,8 +12,8 @@ variations are possible).
 Converting from debstd to debhelper:
 -----------------------------------
 
-Debhelper is designed to be mostly backwards compatable to debstd. I say
-mostly becuase I haven't made debhelper handle everything that debstd does
+Debhelper is designed to be mostly backwards compatible to debstd. I say
+mostly because I haven't made debhelper handle everything that debstd does
 yet, and in a few cases, it does things differently (and I hope, better).
 
 In general, you can switch over to using debhelper as follows. In your
@@ -44,19 +44,19 @@ Notice that the parameters sent to debstd get split up among the dh_*
 programs. The upstream changelog is passed to dh_installchangelogs, and the
 docs are passed to dh_installdocs.
 
-Debstd has many switches, that turn off differnt parts of it. So if you 
+Debstd has many switches, that turn off different parts of it. So if you 
 were using debstd -m to tell it not to automatically install manpages,
 for example, you can just comment out the dh_installmanpages line.
 
 Finally, debstd automatically modified postinst, postrm, etc scripts. Some
-of the dehelper apps do that too, but they do it differnently. Debstd just
-appends its commands to the end of the script. Debhelper reqyires that you
+of the dehelper apps do that too, but they do it differently. Debstd just
+appends its commands to the end of the script. Debhelper requires that you
 insert a tag into your scripts, that will tell debhelper where to insert
 commands. So if you have postinst, postrm, etc scripts, add a line reading
-"#DEBHELPER" to the end of them.
+"#DEBHELPER#" to the end of them.
 
 Once you think it's all set up properly, do a test build of your package. If 
-it works ok, I reccommend that you compare the new package and the old 
+it works ok, I recommend that you compare the new package and the old 
 debstd-generated package very closely. Pay special attention to the postint, 
 postrm, etc scripts.
 
@@ -88,7 +88,7 @@ because you need to generate the architecture dependent packages in the
 binary-arch debian/rules target, and the architecture independent packages
 in the binary-indep debian/rules target.
 
-To faciliatate this, as well as give you more control over which packages
+To facilitate this, as well as give you more control over which packages
 are acted on by debhelper programs, all debhelper programs accept the
 following parameters:
 
@@ -112,7 +112,7 @@ package listed in debian/control, and debian/<packagename> for each
 additional package.
 
 Sometimes, you might want to use some other temporary directory. This is
-supported by the -P flag. The direcotry to use is specified after -P, for
+supported by the -P flag. The directory to use is specified after -P, for
 example, "dh_installdocs -Pdebian/tmp", will use debian/tmp as the temporary
 directory. Note that if you use -P, the debhelper programs can only be
 acting on a single package at a time. So if you have a package that builds
