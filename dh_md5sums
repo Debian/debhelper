@@ -13,15 +13,15 @@ for PACKAGE in $DH_DOPACKAGES; do
 		doit "install -d $TMP/DEBIAN"
 	fi
 
-	complex_doit "find $TMP/* -type f ! -regex '^$TMP/DEBIAN/.*' | sed s:$TMP:: | sort > $TMP/DEBIAN/allfiles"
 	# Check if we should exclude conffiles.
 	if [ ! "$DH_INCLUDE" -a -r $TMP/DEBIAN/conffiles ]; then
-		complex_doit "sort $TMP/DEBIAN/conffiles | comm -13 - $TMP/DEBIAN/allfiles > $TMP/DEBIAN/allfiles.new"
-		doit "mv $TMP/DEBIAN/allfiles.new $TMP/DEBIAN/allfiles"
+		# Generate exclude regexp. Using perl here may be overkill,
+		# but it does insure conffiles with spaces in them work.
+		exclude=`perl -ne 'chomp; s/^\///; print "! -path \"$_\" "' $TMP/DEBIAN/conffiles`
 	fi
+
 	olddir=`pwd`
-	complex_doit "cd $TMP ; sed 's:^/::' < DEBIAN/allfiles | xargs md5sum > DEBIAN/md5sums ; cd $olddir"
+	complex_doit "cd $TMP ; find * -type f $exclude ! -regex '^DEBIAN/.*' -print0 | xargs -0 md5sum > DEBIAN/md5sums ; cd $olddir"
 	doit "chmod 644 $TMP/DEBIAN/md5sums"
 	doit "chown root.root $TMP/DEBIAN/md5sums"
-	doit "rm -f $TMP/DEBIAN/allfiles"
 done
