@@ -29,23 +29,23 @@ debian/package.logcheck.ignore.paranoid are installed if present.
 init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
-    my $tmp=tmpdir($package);
+	my $tmp=tmpdir($package);
 
-    foreach my $type (qw{ignore.d.workstation ignore.d.server
-			     ignore.d.paranoid cracking.d
-			     violations.d violations.ignore.d}) {
-	my $typenod=$type;
-	$typenod=~s/\.d//;
-	my $logcheck=pkgfile($package,"logcheck.$typenod");
-	if ($logcheck) {
-	    if (! -d "$tmp/etc/logcheck/$type") {
-		doit("install","-o",0,"-g",0,"-d","$tmp/etc/logcheck/$type");
-	    }
-	    my $packagenodot=$package; # run-parts..
-	    $packagenodot=~s/\./_/g;
-	    doit("install","-m",600,$logcheck,"$tmp/etc/logcheck/$type/$packagenodot");
+	foreach my $type (qw{ignore.d.workstation ignore.d.server
+	                     ignore.d.paranoid cracking.d
+                             violations.d violations.ignore.d}) {
+		my $typenod=$type;
+		$typenod=~s/\.d//;
+		my $logcheck=pkgfile($package,"logcheck.$typenod");
+		if ($logcheck) {
+			if (! -d "$tmp/etc/logcheck/$type") {
+				doit("install","-o",0,"-g",0,"-d","$tmp/etc/logcheck/$type");
+			}
+			my $packagenodot=$package; # run-parts..
+			$packagenodot=~s/\./_/g;
+			doit("install","-m","0644",$logcheck,"$tmp/etc/logcheck/$type/$packagenodot");
+		}
 	}
-    }
 }
 
 =head1 SEE ALSO
