@@ -45,7 +45,7 @@ sub init {
 
 	# Another way to set excludes.
 	if (exists $ENV{DH_ALWAYS_EXCLUDE} && length $ENV{DH_ALWAYS_EXCLUDE}) {
-		push @{$dh{EXCLUDE}}, $ENV{DH_ALWAYS_EXCLUDE};
+		push @{$dh{EXCLUDE}}, split(":", $ENV{DH_ALWAYS_EXCLUDE});
 	}
 	
 	# Generate EXCLUDE_FIND.

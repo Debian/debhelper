@@ -39,9 +39,9 @@ build-stamp:
 		        	s/#LIST#/$$collect/; \
 				print; \
 			}; \
-		}' `find . -type f -perm +1 -maxdepth 1 -name "dh_*" | sort` > debhelper.7
+		}' `find . -type f -perm +100 -maxdepth 1 -name "dh_*" | sort` > debhelper.7
 	# Turn all executables into man pages.
-	find . -type f -perm +1 -maxdepth 1 -name "dh_*" \
+	find . -type f -perm +100 -maxdepth 1 -name "dh_*" \
 		-exec pod2man -c Debhelper -r "$(VERSION)" {} {}.1 \;
 	printf "package Debian::Debhelper::Dh_Version;\n\$$version='$(VERSION)';" > \
 		Debian/Debhelper/Dh_Version.pm
