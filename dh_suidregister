@@ -49,7 +49,15 @@ foreach $PACKAGE (@{$dh{DOPACKAGES}}) {
 		(undef,undef,$mode,undef,$uid,$gid,undef) = stat("$TMP/$file");
 		# Now come up with the user and group names for the uid and gid.
 		$user=getpwuid($uid);
+		if (! defined $user) {
+			warning("$file has odd uid $uid, not in /etc/passwd");
+			$user=$uid;
+		}
 		$group=getgrgid($gid);
+		if (! defined $group) {
+			warning("$file has odd gid $gid not in /etc/group");
+			$group=$gid;
+		}
 		# Note that I have to print mode in ocal, stripping file type.
 		$sedstr=sprintf("s:#FILE#:$file:;s/#PACKAGE#/$PACKAGE/;s/#OWNER#/$user/;s/#GROUP#/$group/;s/#PERMS#/%#o/",
 			        $mode & 07777);
