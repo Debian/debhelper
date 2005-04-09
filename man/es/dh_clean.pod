@@ -14,11 +14,11 @@ B<dh_clean> [S<I<debhelper opciones>>] [B<-k>] [B<-d>] [B<-X>I<elemento>] [S<I<f
 
 =head1 DESCRIPCIÓN
 
-dh_clean es un programa de debhelper responsable limpiar después de que el
-paquete sea construido. Elimina los directorios de construcción del paquete, y
-otros ficheros incluyendo debian/files, y toda la basura que han ido dejando
-otras órdenes de debhelper. También elimina ficheros comunes que no deben
-aparecer en un diff de Debian:
+dh_clean es un programa de debhelper responsable de limpiar ficheros y
+directorios temporales después de construir el paquete. Elimina los directorios
+de construcción del paquete, y otros ficheros incluyendo debian/files, y todos
+los ficheros auxiliares que han ido dejando otras órdenes de debhelper. También
+elimina ficheros comunes que no deberían aparecer en un diff de Debian:
   #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS core .deps/* *.P
 
 =head1 OPCIONES
@@ -27,12 +27,12 @@ aparecer en un diff de Debian:
 
 =item B<-k>, B<--keep>
 
-No elimina debian/files. Cuando quiere usar esto? Cunado un debian/rules tenga
-dos objetivos binarios que construyen paquetes .deb diferentes; por ejemplo, un
-objetivo es binary-arch, y el otro es binary-indep, o un objetivo construye una
-biblioteca compartida, y el otro un paquete -dev. Si en estos casos no usa -k,
-se eliminará debian/files en el medio, y los cambios sólo contendrán los del
-último paquete binario construido.
+No elimina debian/files. ¿Cuándo usaría esta opción? Cuando un debian/rules
+tenga dos objetivos binarios que construyen paquetes .deb diferentes; por
+ejemplo, un objetivo es binary-arch, y el otro es binary-indep, o un objetivo
+construye una biblioteca compartida, y el otro un paquete -dev. Si en estos
+casos no usa -k, se eliminará debian/files en el medio, y los cambios sólo
+contendrán los del último paquete binario construido.
 
 =item B<-d>, B<--dirs-only>
 
