@@ -5,6 +5,9 @@ debhelper (4.2.33) UNRELEASED; urgency=low
     update-modules to indicate /etc/modules.conf is not automatically
     generated, we can ignore that return code since it's not a condition that
     should fail an installation. Closes: #165400
+  * dh_md5sums: Don't pass "." to find, so results don't have ./ prepended,
+    which broke exclusion of conffiles. Thanks, Damir Dzeko
+    (note: this was broken in version 4.1.22)
 
  -- Joey Hess <joeyh@debian.org>  Sat,  9 Apr 2005 17:27:12 -0400
 
