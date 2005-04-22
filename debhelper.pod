@@ -237,22 +237,22 @@ act on.
 From time to time, major non-backwards-compatible changes need to be made
 to debhelper, to keep it clean and well-designed as needs change and its
 author gains more experience. To prevent such major changes from breaking
-existing packages, the concept of debhelper compatability levels was 
-introduced. You tell debhelper which compatability level it should use, and
+existing packages, the concept of debhelper compatibility levels was 
+introduced. You tell debhelper which compatibility level it should use, and
 it modifies its behavior in various ways.
 
-You tell debhelper what compatability level to use by writing a number to
+Tell debhelper what compatibility level to use by writing a number to
 debian/compat. For example, to turn on V4 mode:
 
   % echo 4 > debian/compat
 
-These are the available compatablity levels:
+These are the available compatibility levels:
 
 =over 4
 
 =item V1
 
-This is the original debhelper compatability level, and so it is the default
+This is the original debhelper compatibility level, and so it is the default
 one. In this mode, debhelper will use debian/tmp as the package tree
 directory for the first binary package listed in the control file, while using
 debian/<package> for all other packages listed in the control file.
@@ -286,7 +286,7 @@ Every file in etc/ is automatically flagged as a conffile by dh_installdeb.
 
 =item V4
 
-This is the reccommended mode of operation. It does everything V3 does,
+This is the recommended mode of operation. It does everything V3 does,
 plus:
 
 =over 8
@@ -294,7 +294,7 @@ plus:
 =item -
 
 dh_makeshlibs -V will not include the debian part of the version number in
-the generated dependancy line in the shlibs file.
+the generated dependency line in the shlibs file.
 
 =item -
 
@@ -344,9 +344,9 @@ debian/<package>/usr/lib/menu/ before installing the menu files, etc.
 
 Once your package uses debhelper to build, be sure to add
 debhelper to your Build-Depends line in debian/control. You should
-build-depend on a verson of debhelper equal to (or greater than) the
-debhelper compatability level your package uses. So if your package used
-compatability level 4:
+build-depend on a version of debhelper equal to (or greater than) the
+debhelper compatibility level your package uses. So if your package used
+compatibility level 4:
 
   Build-Depends: debhelper (>= 4)
 
