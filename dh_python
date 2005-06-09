@@ -96,6 +96,7 @@ foreach (@python_allversions) {
 # Check for -V
 my $usepython = "python$python_version";
 if($dh{V_FLAG_SET}) {
+	$python_version = $dh{V_FLAG};
 	$usepython = $dh{V_FLAG};
 	$usepython =~ s/^/python/;
 	if (! grep { $_ eq $usepython } @python_allversions) {
