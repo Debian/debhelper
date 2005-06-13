@@ -44,19 +44,18 @@ things to exclude.
 
 =item B<--dbg-package=>I<package>
 
-This option tells dh_strip that the given package has an associated "-dbg"
-package. dh_strip will, when stripping off the debug symbols of files in
-the given package, save them to independent files in the package build
-directory for the "-dbg" package.
+Causes dh_strip to save debug symbols stripped from the packages it acts on
+as independent files in the package build directory of the specified debugging
+package.
 
-For example, you might have a package named libfoo, and want to include a
-libfoo-dbg package that contains debugging symbols. The command "dh_strip
---dbg-package=libfoo" will make dh_strip save the debugging symbols for
-usr/lib/libfoo.so.0 into usr/lib/debug/usr/lib/libfoo.so.0 in the package
-build directory for libfoo-dbg. If libfoo-dbg is installed, gdb will
-automatically load up the debugging symbols from it when debugging libfoo.
+For example, if your packages are lifoo and foo and you want to include a
+foo-dbg package with debugging symbols, use dh_strip --dbg-to=foo-dbg.
 
-This option may be repeated to list more than one package.
+Note that this option behaves significantly different in debhelper
+compatibility levels 4 and below. Instead of specifying the name of a debug
+package to put symbols in, it specifies a package (or packages) which
+should have separated debug symbols, and the separated symbols are placed
+in packages with "-dbg" added to their name.
 
 Note that if you use this option, your package should build-depend on
 binutils (>= 2.14.90.0.7).
@@ -180,9 +179,19 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# Support for keeping the debugging symbols in a detached file.
 	my $keep_debug=$dh{KEEP_DEBUG};
 	my $debugtmp=$tmp;
-	if (ref $dh{DEBUGPACKAGES} && grep { $_ eq $package } @{$dh{DEBUGPACKAGES}}) {
-		$keep_debug=1;
-		$debugtmp=tmpdir($package."-dbg");
+	if (! compat(4)) {
+		if (ref $dh{DEBUGPACKAGES}) {
+			$keep_debug=1;
+			# Note that it's only an array for the v4 stuff;
+			# for v5 only one value is used.
+			$debugtmp=tmpdir(@{$dh{DEBUGPACKAGES}}[0]);
+		}
+	}
+	else
+		if (ref $dh{DEBUGPACKAGES} && grep { $_ eq $package } @{$dh{DEBUGPACKAGES}}) {
+			$keep_debug=1;
+			$debugtmp=tmpdir($package."-dbg");
+		}
 	}
 	
 	@shared_libs=@executables=@static_libs=();

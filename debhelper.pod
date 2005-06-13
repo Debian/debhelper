@@ -72,6 +72,9 @@ files. Documentation or example files to install, files to move, and so on.
 When appropriate, in cases like these, you can use standard shell wildcard
 characters ('?' and '*' and '[..]' character classes) in the files.
 
+You can also put comments in these files; lines beginning with "#" are
+ignored.
+
 =head1 SHARED DEBHELPER OPTIONS
 
 The following command line options are supported by all debhelper programs.
@@ -256,12 +259,15 @@ This is the original debhelper compatibility level, and so it is the default
 one. In this mode, debhelper will use debian/tmp as the package tree
 directory for the first binary package listed in the control file, while using
 debian/<package> for all other packages listed in the control file.
+
 This mode is deprecated.
 
 =item V2
 
 In this mode, debhelper will consistently use debian/<package>
 as the package tree directory for every package that is built.
+
+This mode is deprecated.
 
 =item V3
 
@@ -312,6 +318,27 @@ dh_link will correct existing links to conform with policy.
 
 =back
 
+=item V5
+
+This mode is still under development. Its changes from V4 are:
+
+=over 8
+
+=item -
+
+Comments are ignored in debhelper config files.
+
+=item -
+
+dh_strip --dbg-package now specifies the name of a package to put debugging
+symbols in, not the packages to take the symbols from.
+
+=item -
+
+dh_installdocs skips installing empty files.
+
+=back
+
 =back
 
 =head2 Doc directory symlinks
@@ -340,7 +367,7 @@ In general, if any debhelper program needs a directory to exist under
 debian/, it will create it. I haven't bothered to document this in all the
 man pages, but for example, dh_installdeb knows to make debian/<package>/DEBIAN/
 before trying to put files there, dh_installmenu knows you need a
-debian/<package>/usr/lib/menu/ before installing the menu files, etc.
+debian/<package>/usr/share/menu/ before installing the menu files, etc.
 
 Once your package uses debhelper to build, be sure to add
 debhelper to your Build-Depends line in debian/control. You should

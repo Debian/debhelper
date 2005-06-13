@@ -1,20 +1,9 @@
 #!/usr/bin/make -f
-# Note that I have to refer to debhelper programs with ./, to make sure
-# I run the most current ones.
-#
 # This is _not_ a good example of a debhelper rules file.
 # See examples/ for some good examples.
 
-# Ensure that builds are self-hosting, which means I have to use the .pm
-# files in this package, not any that may be on the system.
-export PERL5LIB=.
-
-# If any automatic script generation is done in building this package, 
-# be sure to use the new templates from this package.
-export DH_AUTOSCRIPTDIR=autoscripts
-
 # This generates a list of synopses of debhelper commands, and substitutes
-# it in to the #LIST# line on the man page fed to it on stdin. Must be passes
+# it in to the #LIST# line on the man page fed to it on stdin. Must be passed
 # parameters of all the executables or pod files to get the synopses from.
 # (Like I said, this is not a good example of a debhelper rules file..)
 MAKEMANLIST=perl -e ' \
@@ -65,37 +54,37 @@ build-stamp:
 	touch build-stamp
 
 clean:
-	./dh_testdir
-	./dh_testroot
-	./dh_clean *.1 *.7 *-stamp Debian/Debhelper/Dh_Version.pm
+	./run dh_testdir
+	./run dh_testroot
+	./run dh_clean *.1 *.7 *-stamp Debian/Debhelper/Dh_Version.pm
 
 test: test-stamp
 test-stamp:
-	./dh_clean
-	DH_VERSION=10 perl -MTest::Harness -e 'runtests grep { ! /CVS/ && ! /\.svn/ } @ARGV' t/*
-	./dh_clean
+	./run dh_clean
+	./run perl -MTest::Harness -e 'runtests grep { ! /CVS/ && ! /\.svn/ } @ARGV' t/*
+	./run dh_clean
 	touch test-stamp
 
 binary-indep: build
-	./dh_testdir
-	./dh_testroot
-	./dh_clean -k
-	./dh_install -X .1 dh_* usr/bin
-	./dh_install Debian/Debhelper/*.pm $(PERLLIBDIR)/Debian/Debhelper/
-	./dh_install autoscripts usr/share/debhelper
-	./dh_installdocs doc/*
-	./dh_installexamples examples/*
-	./dh_installman *.1 *.7
-	./dh_installchangelogs
-	./dh_shlibdeps
-	./dh_link
-	./dh_compress
-	./dh_fixperms
-	./dh_perl
-	./dh_installdeb
-	./dh_gencontrol
-	./dh_md5sums
-	./dh_builddeb
+	./run dh_testdir
+	./run dh_testroot
+	./run dh_clean -k
+	./run dh_install -X .1 dh_* usr/bin
+	./run dh_install Debian/Debhelper/*.pm $(PERLLIBDIR)/Debian/Debhelper/
+	./run dh_install autoscripts usr/share/debhelper
+	./run dh_installdocs doc/*
+	./run dh_installexamples examples/*
+	./run dh_installman *.1 *.7
+	./run dh_installchangelogs
+	./run dh_shlibdeps
+	./run dh_link
+	./run dh_compress
+	./run dh_fixperms
+	./run dh_perl
+	./run dh_installdeb
+	./run dh_gencontrol
+	./run dh_md5sums
+	./run dh_builddeb
 
 # Update the debhelper web page. Not intended for use by anyone except the
 # author.

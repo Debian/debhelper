@@ -16,7 +16,7 @@ use vars qw(@ISA @EXPORT %dh);
 	    &compat &addsubstvar &delsubstvar &excludefile &package_arch
 	    &is_udeb &udeb_filename &debhelper_script_subst);
 
-my $max_compat=4;
+my $max_compat=5;
 
 sub init {
 	# If DH_OPTIONS is set, prepend it @ARGV.
@@ -245,31 +245,43 @@ sub dirname {
 
 # Pass in a number, will return true iff the current compatibility level
 # is less than or equal to that number.
-sub compat {
-	my $num=shift;
+{
+	my $warned_compat=0;
+	my $c;
+
+	sub compat {
+		my $num=shift;
 	
-	my $c=1;
-	if (defined $ENV{DH_COMPAT}) {
-		$c=$ENV{DH_COMPAT};
-	}
-	elsif (-e 'debian/compat') {
-		# Try the file..
-		open (COMPAT_IN, "debian/compat") || error "debian/compat: $!";
-		my $l=<COMPAT_IN>;
-		if (! defined $l || ! length $l) {
-			warning("debian/compat is empty, assuming level $c");
+		if (! defined $c) {
+			$c=1;
+			if (defined $ENV{DH_COMPAT}) {
+				$c=$ENV{DH_COMPAT};
+			}
+			elsif (-e 'debian/compat') {
+				# Try the file..
+				open (COMPAT_IN, "debian/compat") || error "debian/compat: $!";
+				my $l=<COMPAT_IN>;
+				if (! defined $l || ! length $l) {
+					warning("debian/compat is empty, assuming level $c");
+				}
+				else {
+					chomp $l;
+					$c=$l;
+				}
+			}
 		}
-		else {
-			chomp $l;
-			$c=$l
+
+		if ($c < 3 && ! $warned_compat) {
+			warning("Compatibility levels before 4 are deprecated.");
+			$warned_compat=1;
 		}
-	}
+	
+		if ($c > $max_compat) {
+			error("Sorry, but $max_compat is the highest compatibility level supported by this debhelper.");
+		}
 
-	if ($c > $max_compat) {
-		error("Sorry, but $max_compat is the highest compatibility level of debhelper currently supported.");
+		return ($c <= $num);
 	}
-
-	return ($c <= $num);
 }
 
 # Pass it a name of a binary package, it returns the name of the tmp dir to
@@ -492,6 +504,11 @@ sub filedoublearray {
 	my @ret;
 	open (DH_FARRAY_IN, $file) || error("cannot read $file: $1");
 	while (<DH_FARRAY_IN>) {
+		chomp;
+		# Only ignore comments and empty lines in v5 mode.
+		if (! compat(4)) {
+			next if /^#/ || /^$/;
+		}
 		my @line;
 		# Only do glob expansion in v3 mode.
 		#

@@ -23,7 +23,7 @@ interface with the debian menu package. See L<dh_installdeb(1)> for an
 explanation of how this works.
 
 If a file named debian/package.menu exists, then it is installed into
-usr/lib/menu/package in the package build directory. This is a debian menu
+usr/share/menu/package in the package build directory. This is a debian menu
 file. See L<menufile(5)> for its format.
 
 If a file named debian/package.menu-method exits, then it is installed into
@@ -50,10 +50,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $menu_method=pkgfile($package,"menu-method");
 	
 	if ($menu ne '') {
-		if (! -d "$tmp/usr/lib/menu") {
-			doit("install","-d","$tmp/usr/lib/menu");
+		if (! -d "$tmp/usr/share/menu") {
+			doit("install","-d","$tmp/usr/share/menu");
 		}
-		doit("install","-p","-m644",$menu,"$tmp/usr/lib/menu/$package");
+		doit("install","-p","-m644",$menu,"$tmp/usr/share/menu/$package");
 		
 		# Add the scripts if a menu-method file doesn't exist.
 		# The scripts for menu-method handle everything these do, too.

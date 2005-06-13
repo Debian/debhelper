@@ -1,10 +1,31 @@
-debhelper (4.2.38) UNRELEASED; urgency=low
+debhelper (4.9.0) unstable; urgency=low
 
+  * Begin work on compatability level 5. The set of changes in this mode is
+    still being determined, and will be until debhelper version 5.0 is 
+    released, so use at your own risk.
+  * dh_strip: In v5, make --dbg-package specify a single debugging package
+    that gets the debugging symbols from the other packages acted on.
+    Closes: #230588
+  * In v5, ignore comments in config files. Only comments at the start of
+    lines are ignored. Closes: #206422
+  * In v5, also ignore empty lines in config files. Closes: #212162
+  * In v5, empty files are skipped by dh_installdocs.
+  * Use v5 to build debhelper.
+  * Add deprecation warnings for debhelper v1 and v2.
   * Document getpackages in PROGRAMMING.
   * Add another test-case for dh_link.
   * dh_python: Minimal fix from Joss for -V to make it search the right
     site-packages directories. Closes: #312661
-  * 
+  * Make compat() cache the expensive bits, since we run it more and more,
+    including twice per config file line now..
+  * Add a "run" program to source tree to make local testing easier
+    and simplfy the rules file.
+  * Man page typo fixes. Closes: #305806, #305816
+  * dh_installmenu: menus moved to /usr/share/menu. Closes: #228618
+    Anyone with a binary executable menu file is SOL but there are none in
+    debian currently.
+  * Removed old versioned build deps for stuff that shipped in sarge or
+    earlier, mostly to shut up linda and lintian's stupid messages.
 
  -- Joey Hess <joeyh@debian.org>  Thu,  9 Jun 2005 10:01:20 -0400
 
