@@ -96,7 +96,6 @@ foreach (@python_allversions) {
 # Check for -V
 my $usepython = "python$python_version";
 if($dh{V_FLAG_SET}) {
-	$python_version = $dh{V_FLAG};
 	$usepython = $dh{V_FLAG};
 	$usepython =~ s/^/python/;
 	if (! grep { $_ eq $usepython } @python_allversions) {
@@ -140,8 +139,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 	}
 	if ($package !~ /^python[0-9].[0-9]-/) {
-		push @dirs, "usr/lib/python$python_version/site-packages" ;
-		push @dirs_so, "usr/lib/python$python_version/site-packages" ;
+		push @dirs, "usr/lib/$usepython/site-packages";
+		push @dirs_so, "usr/lib/$usepython/site-packages";
 		$look_for_pythonXY = 0;
 	}
 

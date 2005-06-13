@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 use Test;
-plan(tests => 7);
+plan(tests => 8);
 
 # It used to not make absolute links in this situation, and it should.
 # #37774
@@ -10,6 +10,8 @@ ok(readlink("debian/debhelper/usr/lib/bar"), "/etc/foo");
 # let's make sure it makes simple relative links ok.
 system("./dh_link","usr/bin/foo","usr/bin/bar");
 ok(readlink("debian/debhelper/usr/bin/bar"), "foo");
+system("./dh_link","sbin/foo","sbin/bar");
+ok(readlink("debian/debhelper/sbin/bar"), "foo");
 
 # ok, more complex relative links.
 system("./dh_link","usr/lib/1","usr/bin/2");
