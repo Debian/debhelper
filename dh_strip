@@ -187,7 +187,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$debugtmp=tmpdir(@{$dh{DEBUGPACKAGES}}[0]);
 		}
 	}
-	else
+	else {
 		if (ref $dh{DEBUGPACKAGES} && grep { $_ eq $package } @{$dh{DEBUGPACKAGES}}) {
 			$keep_debug=1;
 			$debugtmp=tmpdir($package."-dbg");
