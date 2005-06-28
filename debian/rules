@@ -33,10 +33,10 @@ POD2MAN=pod2man -c Debhelper -r "$(VERSION)"
 build: test build-stamp
 build-stamp:
 	# Build all the man pages.
-	find . -type f -perm +100 -maxdepth 1 -name "dh_*" \
+	find . -maxdepth 1 -type f -perm +100 -name "dh_*" \
 		-exec $(POD2MAN) {} {}.1 \;
 	$(POD2MAN) --section=7 debhelper.pod | \
-		$(MAKEMANLIST) `find . -type f -perm +100 -maxdepth 1 -name "dh_*" | sort` > debhelper.7
+		$(MAKEMANLIST) `find . -maxdepth 1 -type f -perm +100 -name "dh_*" | sort` > debhelper.7
 	# Translated pages.
 	set -e; \
 	for dir in man/*; do \
