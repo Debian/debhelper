@@ -1,3 +1,15 @@
+debhelper (4.9.4) unstable; urgency=low
+
+  * dh_clean: switch to using complex_doit for the evil find command
+    and quoting everything explicitly rather than the doit approach used
+    before. This way all uses of EXCLUDE_FIND will use complex_doit, which
+    is necesary for sanity.
+  * Dh_Lib: Make COMPLEX_DOIT properly escape wildcards for use with
+    complex_doit. Before they were unescaped, which could lead to subtle
+    breakage.
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 19 Jul 2005 12:47:30 -0400
+
 debhelper (4.9.3) unstable; urgency=high
 
   * Fix typo in postrm-modules fragment. Closes: #316069

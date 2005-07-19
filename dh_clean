@@ -87,19 +87,16 @@ if (! $dh{D_FLAG}) {
 	# See if some files that would normally be deleted are excluded.
 	my $find_options='';
 	if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
-		$find_options="-a ! ( $dh{EXCLUDE_FIND} )";
+		$find_options="-a ! \\( $dh{EXCLUDE_FIND} \\)";
 	}
 
 	# Remove other temp files.
-	# (The \s+ is important, \s won't work because find would get null
-	# parameters). Note that you _don't_ quote wildcards used by find
-	# in here.
-	doit(split(/\s+/,"find . -type f -a
-	        ( -name #*# -o -name .*~ -o -name *~ -o -name DEADJOE
-		 -o -name *.orig -o -name *.rej -o -name *.bak
-		 -o -name .*.orig -o -name .*.rej -o -name .SUMS
-		 -o -name TAGS -o -name core -o ( -path */.deps/* -a -name *.P )
-		) $find_options -exec rm -f {} ;"));
+	complex_doit("find . -type f -a \\
+	        \\( -name '#*#' -o -name '.*~' -o -name '*~' -o -name DEADJOE \\
+		 -o -name '*.orig' -o -name '*.rej' -o -name '*.bak' \\
+		 -o -name '.*.orig' -o -name .*.rej -o -name '.SUMS' \\
+		 -o -name TAGS -o -name core -o \\( -path '*/.deps/*' -a -name '*.P' \\) \\
+		\\) $find_options -exec rm -f {} \\;");
 
 	# Stupid autoconf cache directory.
 	doit("rm", "-rf", "autom4te.cache")

@@ -14,7 +14,7 @@ use vars qw(@ISA @EXPORT %dh);
 	    &pkgfile &pkgext &pkgfilename &isnative &autoscript &filearray
 	    &filedoublearray &getpackages &basename &dirname &xargs %dh
 	    &compat &addsubstvar &delsubstvar &excludefile &package_arch
-	    &is_udeb &udeb_filename &debhelper_script_subst);
+	    &is_udeb &udeb_filename &debhelper_script_subst &escape_shell);
 
 my $max_compat=5;
 
@@ -56,7 +56,7 @@ sub init {
 			my $x=$_;
 			$x=escape_shell($x);
 			$x=~s/\./\\./g;
-			$dh{EXCLUDE_FIND}.="-regex .*$x.* -or ";
+			$dh{EXCLUDE_FIND}.="-regex .\\*$x.\\* -or ";
 		}
 		$dh{EXCLUDE_FIND}=~s/ -or $//;
 	}
