@@ -138,7 +138,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (! defined $dh{AUTODEST} && @$set > 1) {
 			$dest=pop @$set;
 		}
-		# glob now, relative to srcdir
+		if (! compat(4)) { # check added in v5
+			# glob now, relative to srcdir
+			if (! map { glob "$srcdir/$_" } @$set) {
+				error("missing files (@$set), aborting");
+			}
+		}
 		foreach my $src (map { glob "$srcdir/$_" } @$set) { 
 			next if excludefile($src);
 		
