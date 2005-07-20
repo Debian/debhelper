@@ -99,13 +99,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# This constructs the body of a 'sed' c\ expression which
 		# is parsed by the shell in double-quotes
 		my $dirs = join("$ebs\n", @dirs);
-		pop @justdirs; # don't remove directories in /usr/local
+		pop @justdirs; # don't remove directories directly in /usr/local
 		my $justdirs = join("$ebs\n", @justdirs);
 		if (! $dh{NOSCRIPTS}) { 
 			autoscript($package,"postinst", "postinst-usrlocal",
 				   "/#DIRS#/ c${ebs}\n${dirs}");
 			autoscript($package,"prerm", "prerm-usrlocal",
-				   "/#JUSTDIRS#/ c${ebs}\n${justdirs}");
+				   "/#JUSTDIRS#/ c${ebs}\n${justdirs}") if length $justdirs;
 		}
 	}
 }
