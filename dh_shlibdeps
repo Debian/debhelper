@@ -135,7 +135,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			@opts,@{$dh{U_PARAMS}},@filelist);
 
 		if ($dh{L_PARAMS}) {
-			$ENV{LD_LIBRARY_PATH}=$ld_library_path_orig;
+			if (defined $ld_library_path_orig) {
+				$ENV{LD_LIBRARY_PATH}=$ld_library_path_orig;
+			}
+			else {
+				delete $ENV{LD_LIBRARY_PATH};
+			}
 		}
 	}
 }
