@@ -1,0 +1,7 @@
+PO4A-HEADER:mode=after;position=AUTOR;beginboundary=\=head1
+
+=head1 TRADUCTOR
+
+Traducción de Rubén Porras Campo <debian-l10n-spanish@lists.debian.org>
+
+=cut

@@ -6,14 +6,16 @@
 # it in to the #LIST# line on the man page fed to it on stdin. Must be passed
 # parameters of all the executables or pod files to get the synopses from.
 # (Like I said, this is not a good example of a debhelper rules file..)
+# For correct conversion of pod tag (like S< >) #LIST# must be substituted in 
+# pod file and not in the troff file
 MAKEMANLIST=perl -e ' \
 		undef $$/; \
 		foreach (@ARGV) { \
 		        open (IN, $$_) or die "$$_: $$!"; \
 		        $$file=<IN>; \
 		        close IN; \
-		        if ($$file=~m/=head1 .*\n\n(.*?) - (.*?)\n/m) { \
-		                $$collect.=".IP $$1(1)\n$$2\n"; \
+		        if ($$file=~m/=head1 .*?\n\n(.*?) - (.*?)\n\n/s) { \
+		                $$collect.="=item $$1(1)\n\n$$2\n\n"; \
 		        } \
 		} \
 		END { \
@@ -32,12 +34,16 @@ POD2MAN=pod2man -c Debhelper -r "$(VERSION)"
 
 build: test build-stamp
 build-stamp:
-	# Build all the man pages.
+	# Build all the man pages then generate LIST before convert to man
 	find . -maxdepth 1 -type f -perm +100 -name "dh_*" \
 		-exec $(POD2MAN) {} {}.1 \;
-	$(POD2MAN) --section=7 debhelper.pod | \
-		$(MAKEMANLIST) `find . -maxdepth 1 -type f -perm +100 -name "dh_*" | sort` > debhelper.7
+	cat debhelper.pod | \
+		$(MAKEMANLIST) `find . -maxdepth 1 -type f -perm +100 -name "dh_*" | sort` | \
+		$(POD2MAN) --section=7  > debhelper.7
 	# Translated pages.
+	# Generate translated files .pod from <ll>.po and put them in man/<ll> directories
+	po4a po/po4a.cfg 
+	# Generate dh_*.pod then generate LIST before convert to man
 	set -e; \
 	for dir in man/*; do \
 		lang=`basename $$dir`; \
@@ -45,8 +51,9 @@ build-stamp:
 			prog=`basename $$file | sed 's/.pod//'`; \
 			$(POD2MAN) $$file $$prog.$$lang.1; \
 		done; \
-		$(POD2MAN) --section=7 $$dir/debhelper.pod | \
-			$(MAKEMANLIST) `find $$dir -type f -maxdepth 1 -name "dh_*.pod" | sort` > debhelper.$$lang.7; \
+		cat $$dir/debhelper.pod | \
+			$(MAKEMANLIST) `find $$dir -type f -maxdepth 1 -name "dh_*.pod" | sort` | \
+			$(POD2MAN) --section=7 > debhelper.$$lang.7; \
 	done
 	
 	printf "package Debian::Debhelper::Dh_Version;\n\$$version='$(VERSION)';" > \
