@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2005-09-22 23:12+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2005-09-18 00:11+0200\n"
 "Last-Translator: Rubén Porras Campo <debian-l10n-spanish@lists.debian.org>\n"
 "Language-Team: SPANISH <debian-l10n-spanish@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -507,6 +507,8 @@ msgid ""
 "For example, if your packages are lifoo and foo and you want to include a "
 "foo-dbg package with debugging symbols, use dh_strip --dbg-to=foo-dbg."
 msgstr ""
+"Por ejemplo, si sus paquetes son libtal y tal y quiere incluir una paquete"
+"tal-dbg con símbolos de depuración, use dh_strip --dbg-to=tal-dbg."
 
 # type: textblock
 #: dh_strip:54
@@ -517,6 +519,12 @@ msgid ""
 "have separated debug symbols, and the separated symbols are placed in "
 "packages with \"-dbg\" added to their name."
 msgstr ""
+"Tenga en cuenta que esta opción se comporta de forma significativamente"
+"distinta en los niveles de compatibilidad de debhelper 4 o inferiores. En"
+"lugar de especificar el nombre de un paquete de depuración en el que poner"
+"los símbolos, especifica un paquete (o paquetes) que deben tener símbolos"
+"de depuración separados, y los símbolos separados son colocados en paquetes"
+"con \"-dbg\" al final de su nombre"
 
 # type: textblock
 #: dh_strip:60
@@ -616,7 +624,6 @@ msgstr ""
 
 # type: textblock
 #: dh_compress:5
-#, fuzzy
 msgid ""
 "dh_compress - compress files and fix symlinks in package build directories"
 msgstr ""
@@ -1542,7 +1549,8 @@ msgstr ""
 msgid ""
 "You can also put comments in these files; lines beginning with \"#\" are "
 "ignored."
-msgstr ""
+msgstr "También puede poner comentarios en estos ficheros, simplemente"
+"comience las líneas con el símbolo \"#\""
 
 # type: =head1
 #: debhelper.pod:78
@@ -1819,6 +1827,8 @@ msgid ""
 "All debhelper commands that automatically generate code in this way let it "
 "be disabled by the -n parameter (see above)."
 msgstr ""
+"Todas las opciones de debhelper que generan código automáticamente de esta"
+"manera se pueden deshabilitar con el parámetro -n (ver arriba)."
 
 # type: textblock
 #: debhelper.pod:194
@@ -2004,7 +2014,7 @@ msgstr ""
 # type: textblock
 #: debhelper.pod:263 debhelper.pod:270
 msgid "This mode is deprecated."
-msgstr ""
+msgstr "Este modo está desaconsejado."
 
 # type: =item
 #: debhelper.pod:265
@@ -2115,24 +2125,27 @@ msgstr "V5"
 # type: textblock
 #: debhelper.pod:323
 msgid "This mode is still under development. Its changes from V4 are:"
-msgstr ""
+msgstr "Esté modo todavía está en desarrollo. Los cambios respecto a V4 son:"
 
 # type: textblock
 #: debhelper.pod:329
 msgid "Comments are ignored in debhelper config files."
-msgstr ""
+msgstr "Se ignoran los comentarios en los ficheros de configuración de "
+"debhelper."
 
 # type: textblock
 #: debhelper.pod:333
 msgid ""
 "dh_strip --dbg-package now specifies the name of a package to put debugging "
 "symbols in, not the packages to take the symbols from."
-msgstr ""
+msgstr "dh_strip --dbg-paquete ahora especifica el nombre del paquete en el que "
+"se colocan los símbolos de depuración, no los paquetes desde los que obtener "
+"los símbolos."
 
 # type: textblock
 #: debhelper.pod:338
 msgid "dh_installdocs skips installing empty files."
-msgstr ""
+msgstr "dh_installdocs no instala ficheros vacíos."
 
 # type: =head2
 #: debhelper.pod:344
@@ -2358,9 +2371,8 @@ msgstr "Web de Debhelper."
 
 # type: textblock
 #: dh_clean:5
-#, fuzzy
 msgid "dh_clean - clean up package build directories"
-msgstr "dh_clean - limpia los directorios de construcción del paquete"
+msgstr "dh_clean - limpia los directorios de construcción de los paquetes"
 
 # type: textblock
 #: dh_clean:14
@@ -3076,6 +3088,15 @@ msgid ""
 "file. The .debhelper files may be created by other debhelper programs, and "
 "are shell script fragments."
 msgstr ""
+"Los ficheros con el nombre debian/paquete.config y debian/paquete.templates "
+"se instalan en el directorio DEBIAN en el directorio de construcción del "
+"paquete. Si existe un fichero con el nombre debian/paquete.config.debhelper, "
+"los contenidos de ese fichero se mezclan con los del script «config» del "
+"siguiente modo: Si el script existe, entonces en todos los sitios donde "
+"aparezca «#DEBHELPER#», se inserta el texto del fichero .debhelper. Si no "
+"existe, se genera desde el fichero .debhelper. Los ficheros .debhelper pueden "
+"ser creados por otros programas de debhelper, y son fragmentos de scripts "
+"línea de órdenes."
 
 # type: textblock
 #: dh_installdebconf:34
