@@ -66,17 +66,19 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		debhelper_script_subst($package, $script);
 	}
 
-	# Install non-executable files
-	foreach my $file (qw{shlibs conffiles}) {
-		my $f=pkgfile($package,$file);
-		if ($f) {
-			doit("install","-o",0,"-g",0,"-m",644,"-p",$f,"$tmp/DEBIAN/$file");
+	if (! is_udeb($package)) {
+		# Install non-executable files
+		foreach my $file (qw{shlibs conffiles}) {
+			my $f=pkgfile($package,$file);
+			if ($f) {
+				doit("install","-o",0,"-g",0,"-m",644,"-p",$f,"$tmp/DEBIAN/$file");
+			}
 		}
 	}
 
 	# Automatic conffiles registration: If it is in /etc, it is a
 	# conffile.
-	if (! compat(2) && -d "$tmp/etc") {
+	if (! compat(2) && -d "$tmp/etc" && ! is_udeb($package)) {
 		complex_doit("find $tmp/etc -type f -printf '/etc/%P\n' >> $tmp/DEBIAN/conffiles");
 		# Anything found?
 		if (-z "$tmp/DEBIAN/conffiles") {
