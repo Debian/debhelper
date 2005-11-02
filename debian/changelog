@@ -1,3 +1,18 @@
+debhelper (5.0.0) unstable; urgency=low
+
+  * debhelper v5 mode is finalised and the new recommended compatability
+    level. Unless your package uses dh_strip --dbg-package, switching to v5
+    is 99.999% unlikely to change anything in a package, and it allows
+    adding comments to all your debhelper config files, so I recommend making
+    the switch as soon as this version reaches testing.
+  * debhelper.1: Explicitly document that docs describe latest compat
+    level and changes from earlier levels are concentrated in the
+    "Debhelper compatibility levels" section of debhelper.1. Closes: #336906
+  * Deprecate v3.
+  * dh_install: Add package name to missing files error. Closes: #336908 
+
+ -- Joey Hess <joeyh@debian.org>  Tue,  1 Nov 2005 18:54:29 -0500
+
 debhelper (4.9.15) unstable; urgency=low
 
   * Patches from Ghe Rivero to fix outdated paths in French and Spanish
@@ -295,8 +310,8 @@ debhelper (4.2.19) unstable; urgency=HIGH
 
 debhelper (4.2.18) unstable; urgency=low
 
-  * Add dh_shlibdeps see also. Closes: #261367a
-  * Update dh_gconf man page for new schema location. Closes: #264378a
+  * Add dh_shlibdeps see also. Closes: #261367
+  * Update dh_gconf man page for new schema location. Closes: #264378
   * debhelper.7 man page typo fix. Closes: #265603
 
  -- Joey Hess <joeyh@debian.org>  Fri, 13 Aug 2004 19:16:51 -0300
@@ -439,7 +454,7 @@ debhelper (4.2.1) unstable; urgency=low
     - Remove DTD changes since docbook-xml not supports xml catalogs.
     - Bump scrollkeeper dep to 0.3.14-5.
   * dh_installinfo: remove info stuff on update as well as remove.
-    Policy is unclear/wrong. Closes: #231937a
+    Policy is unclear/wrong. Closes: #231937
 
  -- Joey Hess <joeyh@debian.org>  Mon,  9 Feb 2004 18:20:40 -0500
 

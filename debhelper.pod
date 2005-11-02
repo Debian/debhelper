@@ -245,9 +245,16 @@ introduced. You tell debhelper which compatibility level it should use, and
 it modifies its behavior in various ways.
 
 Tell debhelper what compatibility level to use by writing a number to
-debian/compat. For example, to turn on V4 mode:
+debian/compat. For example, to turn on V5 mode:
 
-  % echo 4 > debian/compat
+  % echo 5 > debian/compat
+
+Unless otherwise indicated, all debhelper documentation assumes that you
+are using the most recent compatability level, and in most cases does not
+indicate if the behavior is different in an earlier compatability level, so
+if you are not using the most recent compatability level, you're advised to
+read below for notes about what is different in earlier compatability
+levels.
 
 These are the available compatibility levels:
 
@@ -290,10 +297,11 @@ Every file in etc/ is automatically flagged as a conffile by dh_installdeb.
 
 =back
 
+This mode is deprecated.
+
 =item V4
 
-This is the recommended mode of operation. It does everything V3 does,
-plus:
+Changes from V3 are:
 
 =over 8
 
@@ -320,7 +328,8 @@ dh_link will correct existing links to conform with policy.
 
 =item V5
 
-This mode is still under development. Its changes from V4 are:
+This is the recommended mode of operation. It does everything V4 does,
+plus:
 
 =over 8
 
@@ -373,9 +382,9 @@ Once your package uses debhelper to build, be sure to add
 debhelper to your Build-Depends line in debian/control. You should
 build-depend on a version of debhelper equal to (or greater than) the
 debhelper compatibility level your package uses. So if your package used
-compatibility level 4:
+compatibility level 5:
 
-  Build-Depends: debhelper (>= 4)
+  Build-Depends: debhelper (>= 5)
 
 =head1 ENVIRONMENT
 

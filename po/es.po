@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2005-10-22 13:43-0400\n"
+"POT-Creation-Date: 2005-11-01 18:19-0500\n"
 "PO-Revision-Date: 2005-09-18 00:11+0200\n"
 "Last-Translator: Rubén Porras Campo <debian-l10n-spanish@lists.debian.org>\n"
 "Language-Team: SPANISH <debian-l10n-spanish@lists.debian.org>\n"
@@ -127,7 +127,7 @@ msgstr ""
 #: dh_installppp:56 dh_compress:189 dh_md5sums:86 dh_installexamples:102
 #: dh_installcron:61 dh_installinit:188 dh_usrlocal:113 dh_gconf:58
 #: dh_installmodules:102 dh_installmenu:79 dh_installlogrotate:50
-#: debhelper.pod:424 dh_clean:109 dh_undocumented:28 dh_testversion:74
+#: debhelper.pod:433 dh_clean:109 dh_undocumented:28 dh_testversion:74
 #: dh_testdir:43 dh_shlibdeps:148 dh_scrollkeeper:75 dh_installdirs:87
 #: dh_link:206 dh_installdebconf:135 dh_installmime:84 dh_installwm:94
 #: dh_installdeb:93 dh_builddeb:78 dh_gencontrol:73 dh_install:251
@@ -175,7 +175,7 @@ msgstr "Este programa es parte de debhelper."
 #: dh_installppp:62 dh_compress:195 dh_md5sums:92 dh_installexamples:108
 #: dh_installcron:67 dh_installinit:194 dh_usrlocal:119 dh_gconf:64
 #: dh_installmodules:108 dh_installmenu:87 dh_installlogrotate:56
-#: debhelper.pod:438 dh_clean:115 dh_undocumented:34 dh_testversion:80
+#: debhelper.pod:447 dh_clean:115 dh_undocumented:34 dh_testversion:80
 #: dh_testdir:49 dh_shlibdeps:154 dh_scrollkeeper:81 dh_installdirs:93
 #: dh_link:212 dh_installdebconf:141 dh_installmime:90 dh_installwm:100
 #: dh_installdeb:99 dh_builddeb:84 dh_gencontrol:79 dh_install:257
@@ -191,7 +191,7 @@ msgstr "AUTOR"
 #: dh_installpam:60 dh_installemacsen:116 dh_installinfo:130 dh_strip:229
 #: dh_installppp:64 dh_compress:197 dh_md5sums:94 dh_installexamples:110
 #: dh_installcron:69 dh_installinit:196 dh_installmodules:110
-#: dh_installmenu:89 dh_installlogrotate:58 debhelper.pod:440 dh_clean:117
+#: dh_installmenu:89 dh_installlogrotate:58 debhelper.pod:449 dh_clean:117
 #: dh_undocumented:36 dh_testversion:82 dh_testdir:51 dh_shlibdeps:156
 #: dh_installdirs:95 dh_link:214 dh_installdebconf:143 dh_installmime:92
 #: dh_installwm:102 dh_installdeb:101 dh_builddeb:86 dh_gencontrol:81
@@ -1319,8 +1319,8 @@ msgid ""
 "share/menu/package in the package build directory. This is a debian menu "
 "file. See L<menufile(5)> for its format."
 msgstr ""
-"Si existe el fichero llamado debian/paquete.menu, se instala en usr/share/menu/"
-"paquete en el directorio de construcción. Este es un fichero de menú de "
+"Si existe el fichero llamado debian/paquete.menu, se instala en usr/share/"
+"menu/paquete en el directorio de construcción. Este es un fichero de menú de "
 "Debian. Lea L<menufile(5)> para detalles acerca del formato."
 
 # type: textblock
@@ -1973,18 +1973,19 @@ msgstr ""
 
 # type: textblock
 #: debhelper.pod:247
+#, fuzzy
 msgid ""
 "Tell debhelper what compatibility level to use by writing a number to debian/"
-"compat. For example, to turn on V4 mode:"
+"compat. For example, to turn on V5 mode:"
 msgstr ""
 "Para especificar un nivel de compatibilidad debes de escribir un número en "
 "debian/compat. Por ejemplo, para activar el modo V4:"
 
 # type: verbatim
 #: debhelper.pod:250
-#, no-wrap
+#, fuzzy, no-wrap
 msgid ""
-"  % echo 4 > debian/compat\n"
+"  % echo 5 > debian/compat\n"
 "\n"
 msgstr ""
 "  % echo 4 > debian/compat\n"
@@ -1992,16 +1993,26 @@ msgstr ""
 
 # type: textblock
 #: debhelper.pod:252
+msgid ""
+"Unless otherwise indicated, all debhelper documentation assumes that you are "
+"using the most recent compatability level, and in most cases does not "
+"indicate if the behavior is different in an earlier compatability level, so "
+"if you are not using the most recent compatability level, you're advised to "
+"read below for notes about what is different in earlier compatability levels."
+msgstr ""
+
+# type: textblock
+#: debhelper.pod:259
 msgid "These are the available compatibility levels:"
 msgstr "Los niveles de compatibilidad disponibles son:"
 
 # type: =item
-#: debhelper.pod:256
+#: debhelper.pod:263
 msgid "V1"
 msgstr "V1"
 
 # type: textblock
-#: debhelper.pod:258
+#: debhelper.pod:265
 msgid ""
 "This is the original debhelper compatibility level, and so it is the default "
 "one. In this mode, debhelper will use debian/tmp as the package tree "
@@ -2014,17 +2025,17 @@ msgstr ""
 "fichero de control. Se desaconseja su uso."
 
 # type: textblock
-#: debhelper.pod:263 debhelper.pod:270
+#: debhelper.pod:270 debhelper.pod:277 debhelper.pod:300
 msgid "This mode is deprecated."
 msgstr "Este modo está desaconsejado."
 
 # type: =item
-#: debhelper.pod:265
+#: debhelper.pod:272
 msgid "V2"
 msgstr "V2"
 
 # type: textblock
-#: debhelper.pod:267
+#: debhelper.pod:274
 msgid ""
 "In this mode, debhelper will consistently use debian/<package> as the "
 "package tree directory for every package that is built."
@@ -2033,24 +2044,24 @@ msgstr ""
 "árbol de directorios para cada paquete que se construya."
 
 # type: =item
-#: debhelper.pod:272
+#: debhelper.pod:279
 msgid "V3"
 msgstr "V3"
 
 # type: textblock
-#: debhelper.pod:274
+#: debhelper.pod:281
 msgid "This mode works like V2, with the following additions:"
 msgstr "Este modo funciona como el V2 con los siguientes añadidos:"
 
 # type: =item
-#: debhelper.pod:278 debhelper.pod:283 debhelper.pod:287 debhelper.pod:300
-#: debhelper.pod:305 debhelper.pod:310 debhelper.pod:315 debhelper.pod:327
-#: debhelper.pod:331 debhelper.pod:336
+#: debhelper.pod:285 debhelper.pod:290 debhelper.pod:294 debhelper.pod:308
+#: debhelper.pod:313 debhelper.pod:318 debhelper.pod:323 debhelper.pod:336
+#: debhelper.pod:340 debhelper.pod:345
 msgid "-"
 msgstr "-"
 
 # type: textblock
-#: debhelper.pod:280
+#: debhelper.pod:287
 msgid ""
 "Debhelper config files support globbing via * and ?, when appropriate. To "
 "turn this off and use those characters raw, just prefix with a backslash."
@@ -2060,13 +2071,13 @@ msgstr ""
 "prefijo una barra invertida."
 
 # type: textblock
-#: debhelper.pod:285
+#: debhelper.pod:292
 msgid "dh_makeshlibs makes the postinst and postrm scripts call ldconfig."
 msgstr ""
 "dh_makeshlibs hace que los scripts postinst y postrm ejecuten ldconfig."
 
 # type: textblock
-#: debhelper.pod:289
+#: debhelper.pod:296
 msgid ""
 "Every file in etc/ is automatically flagged as a conffile by dh_installdeb."
 msgstr ""
@@ -2074,19 +2085,17 @@ msgstr ""
 "conffiles."
 
 # type: =item
-#: debhelper.pod:293
+#: debhelper.pod:302
 msgid "V4"
 msgstr "V4"
 
 # type: textblock
-#: debhelper.pod:295
-msgid ""
-"This is the recommended mode of operation. It does everything V3 does, plus:"
+#: debhelper.pod:304
+msgid "Changes from V3 are:"
 msgstr ""
-"Este es el modo de operación aconsejado. Hace lo mismo que V3 y además:"
 
 # type: textblock
-#: debhelper.pod:302
+#: debhelper.pod:310
 msgid ""
 "dh_makeshlibs -V will not include the debian part of the version number in "
 "the generated dependency line in the shlibs file."
@@ -2095,7 +2104,7 @@ msgstr ""
 "generado en la línea de dependencias del fichero shlibs."
 
 # type: textblock
-#: debhelper.pod:307
+#: debhelper.pod:315
 msgid ""
 "You are encouraged to put the new ${misc:Depends} into debian/control to "
 "supplement the ${shlibs:Depends} field."
@@ -2104,7 +2113,7 @@ msgstr ""
 "reemplazar el campo ${shlibs:Depends}."
 
 # type: textblock
-#: debhelper.pod:312
+#: debhelper.pod:320
 msgid ""
 "dh_fixperms will make all files in bin/ directories and in etc/init.d "
 "executable."
@@ -2113,30 +2122,33 @@ msgstr ""
 "etc/init.d."
 
 # type: textblock
-#: debhelper.pod:317
+#: debhelper.pod:325
 msgid "dh_link will correct existing links to conform with policy."
 msgstr ""
 "dh_link corregirá los enlaces existentes para ajustarse a la política de "
 "debian."
 
 # type: =item
-#: debhelper.pod:321
+#: debhelper.pod:329
 msgid "V5"
 msgstr "V5"
 
 # type: textblock
-#: debhelper.pod:323
-msgid "This mode is still under development. Its changes from V4 are:"
-msgstr "Esté modo todavía está en desarrollo. Los cambios respecto a V4 son:"
+#: debhelper.pod:331
+#, fuzzy
+msgid ""
+"This is the recommended mode of operation. It does everything V4 does, plus:"
+msgstr ""
+"Este es el modo de operación aconsejado. Hace lo mismo que V3 y además:"
 
 # type: textblock
-#: debhelper.pod:329
+#: debhelper.pod:338
 msgid "Comments are ignored in debhelper config files."
 msgstr ""
 "Se ignoran los comentarios en los ficheros de configuración de debhelper."
 
 # type: textblock
-#: debhelper.pod:333
+#: debhelper.pod:342
 msgid ""
 "dh_strip --dbg-package now specifies the name of a package to put debugging "
 "symbols in, not the packages to take the symbols from."
@@ -2146,17 +2158,17 @@ msgstr ""
 "los símbolos."
 
 # type: textblock
-#: debhelper.pod:338
+#: debhelper.pod:347
 msgid "dh_installdocs skips installing empty files."
 msgstr "dh_installdocs no instala ficheros vacíos."
 
 # type: =head2
-#: debhelper.pod:344
+#: debhelper.pod:353
 msgid "Doc directory symlinks"
 msgstr "Enlaces a los directorios Doc"
 
 # type: textblock
-#: debhelper.pod:346
+#: debhelper.pod:355
 msgid ""
 "Sometimes it is useful to make a package not contain a /usr/share/doc/"
 "package directory at all, instead placing just a dangling symlink in the "
@@ -2178,12 +2190,12 @@ msgstr ""
 "colgante y no tratará de instalar un fichero de copyright o changelog."
 
 # type: =head2
-#: debhelper.pod:355
+#: debhelper.pod:364
 msgid "udebs"
 msgstr "udebs"
 
 # type: textblock
-#: debhelper.pod:357
+#: debhelper.pod:366
 msgid ""
 "Debhelper includes support for udebs. To create a udeb with debhelper, add "
 "\"XC-Package-Type: udeb\" to the package's stanza in debian/control, and "
@@ -2201,12 +2213,12 @@ msgstr ""
 "preinst, postrm, prerm, y de configuración, etc."
 
 # type: =head2
-#: debhelper.pod:364
+#: debhelper.pod:373
 msgid "Other notes"
 msgstr "Otras notas"
 
 # type: textblock
-#: debhelper.pod:366
+#: debhelper.pod:375
 msgid ""
 "In general, if any debhelper program needs a directory to exist under "
 "debian/, it will create it. I haven't bothered to document this in all the "
@@ -2222,12 +2234,13 @@ msgstr ""
 "archivos del menú, etc."
 
 # type: textblock
-#: debhelper.pod:372
+#: debhelper.pod:381
+#, fuzzy
 msgid ""
 "Once your package uses debhelper to build, be sure to add debhelper to your "
 "Build-Depends line in debian/control. You should build-depend on a version "
 "of debhelper equal to (or greater than) the debhelper compatibility level "
-"your package uses. So if your package used compatibility level 4:"
+"your package uses. So if your package used compatibility level 5:"
 msgstr ""
 "Una vez que su paquete usa debhelper para construirse, asegurese de añadir "
 "debhelper a sus dependencias de construcción en debian/control.  Debería "
@@ -2236,27 +2249,27 @@ msgstr ""
 "paquete usa el nivel de compatibilidad 4:"
 
 # type: verbatim
-#: debhelper.pod:378
-#, no-wrap
+#: debhelper.pod:387
+#, fuzzy, no-wrap
 msgid ""
-"  Build-Depends: debhelper (>= 4)\n"
+"  Build-Depends: debhelper (>= 5)\n"
 "\n"
 msgstr ""
 "  Build-Depends: debhelper (>= 4)\n"
 "\n"
 
 # type: =head1
-#: debhelper.pod:380
+#: debhelper.pod:389
 msgid "ENVIRONMENT"
 msgstr "ENTORNO"
 
 # type: =item
-#: debhelper.pod:384
+#: debhelper.pod:393
 msgid "DH_VERBOSE"
 msgstr "DH_VERBOSE"
 
 # type: textblock
-#: debhelper.pod:386
+#: debhelper.pod:395
 msgid ""
 "Set to 1 to enable verbose mode. Debhelper will output every command it runs "
 "that modifies files on the build system."
@@ -2266,12 +2279,12 @@ msgstr ""
 "construcción."
 
 # type: =item
-#: debhelper.pod:389
+#: debhelper.pod:398
 msgid "DH_COMPAT"
 msgstr "DH_COMPAT"
 
 # type: textblock
-#: debhelper.pod:391
+#: debhelper.pod:400
 msgid ""
 "Temporarily specifies what compatibility level debhelper should run at, "
 "overriding any value in debian/compat."
@@ -2280,22 +2293,22 @@ msgstr ""
 "debhelper, ignorando cualquier valor en debian/compat."
 
 # type: =item
-#: debhelper.pod:394
+#: debhelper.pod:403
 msgid "DH_NO_ACT"
 msgstr "DH_NO_ACT"
 
 # type: textblock
-#: debhelper.pod:396
+#: debhelper.pod:405
 msgid "Set to 1 to enable no-act mode."
 msgstr "Poner a 1 para habilitar el modo no-act."
 
 # type: =item
-#: debhelper.pod:398
+#: debhelper.pod:407
 msgid "DH_OPTIONS"
 msgstr "DH_OPTIONS"
 
 # type: textblock
-#: debhelper.pod:400
+#: debhelper.pod:409
 msgid ""
 "Anything in this variable will be prepended to the command line arguments of "
 "all debhelper commands. This is useful in some situations, for example, if "
@@ -2311,12 +2324,12 @@ msgstr ""
 "Lea la documentación de make para los detalles sobre como hacer esto."
 
 # type: =item
-#: debhelper.pod:406
+#: debhelper.pod:415
 msgid "DH_ALWAYS_EXCLUDE"
 msgstr "DH_ALWAYS_EXCLUDE"
 
 # type: textblock
-#: debhelper.pod:408
+#: debhelper.pod:417
 msgid ""
 "If set, this adds the value the variable is set to to the -X options of all "
 "commands that support the -X option. Moreover, dh_builddeb will rm -rf "
@@ -2327,7 +2340,7 @@ msgstr ""
 "coincida con el valor en el árbol de construcción."
 
 # type: textblock
-#: debhelper.pod:412
+#: debhelper.pod:421
 msgid ""
 "This can be useful if you are doing a build from a CVS source tree, in which "
 "case setting DH_ALWAYS_EXCLUDE=CVS will prevent any CVS directories from "
@@ -2344,7 +2357,7 @@ msgstr ""
 "sitio donde se construya el paquete."
 
 # type: textblock
-#: debhelper.pod:419
+#: debhelper.pod:428
 msgid ""
 "Multiple things to exclude can be separated with colons, as in "
 "DH_ALWAYS_EXCLUDE=CVS:.svn"
@@ -2353,22 +2366,22 @@ msgstr ""
 "puntos, p. ej.: DH_ALWAYS_EXCLUDE=CVS:.svn"
 
 # type: =item
-#: debhelper.pod:428
+#: debhelper.pod:437
 msgid "F</usr/share/doc/debhelper/examples/>"
 msgstr "F</usr/share/doc/debhelper/examples/>"
 
 # type: textblock
-#: debhelper.pod:430
+#: debhelper.pod:439
 msgid "A set of example debian/rules files that use debhelper."
 msgstr "Varios ficheros de ejemplo debian/rules que usan debhelper."
 
 # type: =item
-#: debhelper.pod:432
+#: debhelper.pod:441
 msgid "L<http://kitenet.net/programs/debhelper/>"
 msgstr "L<http://kitenet.net/programs/debhelper/>"
 
 # type: textblock
-#: debhelper.pod:434
+#: debhelper.pod:443
 msgid "Debhelper web site."
 msgstr "Web de Debhelper."
 
@@ -5189,3 +5202,8 @@ msgstr ""
 #: dh_installlogcheck:59
 msgid "Jon Middleton <jjm@debian.org>"
 msgstr "Jon Middleton <jjm@debian.org>"
+
+# type: textblock
+#~ msgid "This mode is still under development. Its changes from V4 are:"
+#~ msgstr ""
+#~ "Esté modo todavía está en desarrollo. Los cambios respecto a V4 son:"
