@@ -1,0 +1,11 @@
+#!/usr/bin/perl
+use Test;
+
+my @progs=grep { -x $_ } glob("dh_*");
+my @libs=glob("Debian/Debhelper/*.pm");
+
+plan(tests => (@progs + @libs));
+
+foreach my $file (@progs, @libs) {
+	ok(system("perl -c $file >/dev/null 2>&1"), 0);
+}
