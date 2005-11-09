@@ -7,5 +7,6 @@ my @libs=glob("Debian/Debhelper/*.pm");
 plan(tests => (@progs + @libs));
 
 foreach my $file (@progs, @libs) {
+	print "# Testing $file\n";
 	ok(system("perl -c $file >/dev/null 2>&1"), 0);
 }

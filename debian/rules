@@ -32,7 +32,11 @@ PERLLIBDIR=$(shell perl -MConfig -e 'print $$Config{vendorlib}')
 
 POD2MAN=pod2man -c Debhelper -r "$(VERSION)"
 
-build: test build-stamp
+version:
+	printf "package Debian::Debhelper::Dh_Version;\n\$$version='$(VERSION)';" > \
+		Debian/Debhelper/Dh_Version.pm
+
+build: version test build-stamp
 build-stamp:
 	find . -maxdepth 1 -type f -perm +100 -name "dh_*" \
 		-exec $(POD2MAN) {} {}.1 \;
@@ -52,8 +56,6 @@ build-stamp:
 			$(POD2MAN) --section=7 > debhelper.$$lang.7; \
 	done
 	
-	printf "package Debian::Debhelper::Dh_Version;\n\$$version='$(VERSION)';" > \
-		Debian/Debhelper/Dh_Version.pm
 	touch build-stamp
 
 clean:
@@ -62,7 +64,7 @@ clean:
 	./run dh_clean *.1 *.7 *-stamp Debian/Debhelper/Dh_Version.pm
 	rm -rf man
 
-test: test-stamp
+test: version test-stamp
 test-stamp:
 	./run dh_clean
 	./run perl -MTest::Harness -e 'runtests grep { ! /CVS/ && ! /\.svn/ } @ARGV' t/*
