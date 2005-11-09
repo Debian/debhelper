@@ -42,7 +42,7 @@ build-stamp:
 		-exec $(POD2MAN) {} {}.1 \;
 	cat debhelper.pod | \
 		$(MAKEMANLIST) `find . -maxdepth 1 -type f -perm +100 -name "dh_*" | sort` | \
-		$(POD2MAN) --section=7  > debhelper.7
+		$(POD2MAN) --name="debhelper" --section=7  > debhelper.7
 	po4a po/po4a.cfg 
 	set -e; \
 	for dir in man/*; do \
