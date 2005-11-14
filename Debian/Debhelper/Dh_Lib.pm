@@ -616,7 +616,7 @@ sub getpackages {
 			if ($package &&
 			    (($type eq 'indep' && $arch eq 'all') ||
 			     ($type eq 'arch' && $arch ne 'all') ||
-			     ($type eq 'same' && ($arch eq 'any' || $arch =~ /\b$buildarch\b/)) ||
+			     ($type eq 'same' && ($arch eq 'any' || $arch =~ /(^|\s)$buildarch(\s|$)/)) ||
 			     ! $type)) {
 				push @list, $package;
 				$package="";

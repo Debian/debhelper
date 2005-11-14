@@ -32,6 +32,9 @@ PERLLIBDIR=$(shell perl -MConfig -e 'print $$Config{vendorlib}')
 
 POD2MAN=pod2man -c Debhelper -r "$(VERSION)"
 
+# l10n to be built is determined from .po files
+LANGS=$(notdir $(basename $(wildcard man/po4a/po/*.po)))
+
 version:
 	printf "package Debian::Debhelper::Dh_Version;\n\$$version='$(VERSION)';" > \
 		Debian/Debhelper/Dh_Version.pm
@@ -43,10 +46,10 @@ build-stamp:
 	cat debhelper.pod | \
 		$(MAKEMANLIST) `find . -maxdepth 1 -type f -perm +100 -name "dh_*" | sort` | \
 		$(POD2MAN) --name="debhelper" --section=7  > debhelper.7
-	po4a po/po4a.cfg 
+	po4a man/po4a/po4a.cfg 
 	set -e; \
-	for dir in man/*; do \
-		lang=`basename $$dir`; \
+	for lang in $(LANGS); do \
+		dir=man/$$lang; \
 		for file in $$dir/dh_*.pod; do \
 			prog=`basename $$file | sed 's/.pod//'`; \
 			$(POD2MAN) $$file $$prog.$$lang.1; \
@@ -62,7 +65,9 @@ clean:
 	./run dh_testdir
 	./run dh_testroot
 	./run dh_clean *.1 *.7 *-stamp Debian/Debhelper/Dh_Version.pm
-	rm -rf man
+	for lang in $(LANGS); do \
+		rm -rf man/$$lang; \
+	done;
 
 test: version test-stamp
 test-stamp:
