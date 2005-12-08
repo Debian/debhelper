@@ -1,3 +1,6 @@
-if [ "$1" = "configure" ] && [ -x "`which update-modules 2>/dev/null`" ]; then
-	update-modules >/dev/null || [ "$?" = 3 ]
+if [ "$1" = "configure" ]; then
+	if [ -x "`which update-modules 2>/dev/null`" ]; then
+		update-modules >/dev/null || [ "$?" = 3 ]
+	fi
+	depmod -a || true
 fi
