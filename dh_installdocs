@@ -127,7 +127,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 		foreach my $doc (@docs) {
 			next if excludefile($doc);
-			next if ! -s $doc && ! compat(4); # ignore empty BUGS, etc
+			next if -e $doc && ! -s $doc && ! compat(4); # ignore empty BUGS, etc
 			if (-d $doc && $exclude) {
 			    my ($dir_basename) = basename($doc);
 			    # Pity there's no cp --exclude ..
