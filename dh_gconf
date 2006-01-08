@@ -25,16 +25,7 @@ gconf-schemas.
 If a file named debian/package.gconf-defaults exists, then it is
 installed into usr/share/gconf/defaults/10_package in the package build
 directory, with "package" replaced by the package name. Some postinst and
-postrm fragments will be generated to launch update-gconf-defaults. The
-syntax of this file consists of lines containing the key name, some
-white space, and the key value, which can be an integer, a boolean, a
-float, a string or a list of strings. Example:
-
-  /apps/myprogram/frob_number	42
-  /apps/myprogram/do_foo	true
-  /apps/myprogram/priority	1.25
-  /apps/myprogram/name		"Gotcha !"
-  /apps/myprogram/names		[Ha ha!,Let's keep serious,Ho ho!]
+postrm fragments will be generated to launch update-gconf-defaults.
 
 The gconf-schemas and update-gconf-defaults scripts are provided by the
 gconf2 package. An appropriate dependency will be generated in
@@ -47,9 +38,9 @@ ${misc:Depends}.
 =item B<--priority> I<priority>
 
 Use I<priority> (which should be a 2-digit number) as the defaults
-priority instead of 10. Children distributions are encouraged to use 20
-for their branding, CDD distributions to use 50, and site-specific
-packages should use 90 or more.
+priority instead of 10. Higher values than ten can be used by 
+derived distributions (20), CDD distributions (50), or site-specific
+packages (90).
 
 =cut
 
