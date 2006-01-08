@@ -105,6 +105,9 @@ sub expand_path {
 	foreach $entry (@respath) {
 		$result .= '/' . $entry;
 	}
+	if (! defined $result) {
+		$result="/"; # special case
+	}
 	return $result;
 }
 
@@ -175,11 +178,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# top level directories, leave it absolute.
 		my @src_dirs=split(m:/+:,$src);
 		my @dest_dirs=split(m:/+:,$dest);
-		if ($src_dirs[0] eq $dest_dirs[0]) {
+		if (@src_dirs > 0 && $src_dirs[0] eq $dest_dirs[0]) {
 		    	# Figure out how much of a path $src and $dest
 			# share in common.
 			my $x;
-			for ($x=0; $x<$#src_dirs && $src_dirs[$x] eq $dest_dirs[$x]; $x++) {}
+			for ($x=0; $x<@src_dirs && $src_dirs[$x] eq $dest_dirs[$x]; $x++) {}
 			# Build up the new src.
 			$src="";
 			for (1..$#dest_dirs - $x) {
@@ -187,6 +190,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			}
 			for ($x .. $#src_dirs) {
 				$src.=$src_dirs[$_]."/";
+			}
+			if ($x > $#src_dirs && ! length $src) {
+				$src.="."; # special case
 			}
 			$src=~s:/$::;
 		}
