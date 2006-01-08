@@ -1,11 +1,20 @@
 debhelper (5.0.13) UNRELEASED; urgency=low
 
+  [ Joey Hess ]
   * debhelper(7): document previous dh_install v5 change re wildcarding.
   * dh_link: add special case handling for paths to a directory containing the
     link. Closes: #346405
   * dh_link: add special case handling for link to /
 
- -- Joey Hess <joeyh@debian.org>  Sat,  7 Jan 2006 23:06:43 -0500
+  [ Josselin Mouette ]
+  * dh_python: make use of python-support for packages providing private
+    modules or python-only modules. This should greatly reduce the
+    number of packages needing to transition together with python.
+  * postinst-python: don't build the .pyo files, they aren't even used!
+  * dh_gconf: add support for debian/package.gconf-defaults, to provide
+    defaults for a package without patching the schemas.
+
+ -- Joey Hess <joeyh@debian.org>  Sat,  7 Jan 2006 23:28:44 -0500
 
 debhelper (5.0.12) unstable; urgency=low
 

@@ -19,20 +19,61 @@ dh_gconf is a debhelper program that is responsible for registering
 GConf schemas.
 
 It automatically generates the postinst and prerm fragments needed
-to register and unregister the schemas in usr/share/gconf/schemas.
-These fragments will use gconftool-2, so the package should depend on
-gconf2. This program will add an appropriate dependency to ${misc:Depends}.
+to register and unregister the schemas in usr/share/gconf/schemas, using
+gconf-schemas.
 
-The postinst script will also signal gconfd-2 so that the newly installed
-schemas are available straight away.
+If a file named debian/package.gconf-defaults exists, then it is
+installed into usr/share/gconf/defaults/10_package in the package build
+directory, with "package" replaced by the package name. Some postinst and
+postrm fragments will be generated to launch update-gconf-defaults. The
+syntax of this file consists of lines containing the key name, some
+white space, and the key value, which can be an integer, a boolean, a
+float, a string or a list of strings. Example:
+
+  /apps/myprogram/frob_number	42
+  /apps/myprogram/do_foo	true
+  /apps/myprogram/priority	1.25
+  /apps/myprogram/name		"Gotcha !"
+  /apps/myprogram/names		[Ha ha!,Let's keep serious,Ho ho!]
+
+The gconf-schemas and update-gconf-defaults scripts are provided by the
+gconf2 package. An appropriate dependency will be generated in
+${misc:Depends}.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--priority> I<priority>
+
+Use I<priority> (which should be a 2-digit number) as the defaults
+priority instead of 10. Children distributions are encouraged to use 20
+for their branding, CDD distributions to use 50, and site-specific
+packages should use 90 or more.
 
 =cut
 
 init();
 
+my $priority=10;
+if (defined $dh{PRIORITY}) {
+	$priority=$dh{PRIORITY};
+}
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
+	
+	my $gconf_dep = 0;
+	my $defaults = pkgfile($package,"gconf-defaults");
+	if ($defaults ne '') {
+		doit("mkdir","-p","$tmp/usr/share/gconf/defaults");
+		doit("install","-p","-m644",$defaults,"$tmp/usr/share/gconf/defaults/${priority}_$package");
+		autoscript($package,"postinst","postinst-gconf-defaults");
+		autoscript($package,"postrm","postrm-gconf-defaults");
+		addsubstvar($package, "misc:Depends", "gconf2 (>= 2.12.1-1)");
+		$gconf_dep = 1;
+	}
+
 	my $old_schemas_dir = "$tmp/etc/gconf/schemas";
 	my $new_schemas_dir = "$tmp/usr/share/gconf/schemas";
 
@@ -50,7 +91,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			autoscript($package,"postinst","postinst-gconf","s%#SCHEMAS#%$schemas%");
 			autoscript($package,"prerm","prerm-gconf","s%#SCHEMAS#%$schemas%");
 			autoscript($package,"postrm","postrm-gconf","s%#SCHEMAS#%$schemas%");
-			addsubstvar($package, "misc:Depends", "gconf2 (>= 2.10.1-2)");
+			addsubstvar($package, "misc:Depends", "gconf2 (>= 2.10.1-2)") unless $gconf_dep;
 		}
 	}
 }
@@ -64,5 +105,6 @@ This program is a part of debhelper.
 =head1 AUTHOR
 
 Ross Burton <ross@burtonini.com>
+Josselin Mouette <joss@debian.org>
 
 =cut
