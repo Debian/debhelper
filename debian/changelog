@@ -1,3 +1,15 @@
+debhelper (5.0.14) unstable; urgency=low
+
+  * dh_installinit: If run with -o, do the inverse of -n and only
+    set up maintainer script snippets, w/o installing any files.
+    Useful for those edge cases where the init script is provided by upstream
+    and not easily installed by dh_installinit but where it's worth letting
+    it manage the maintainer scripts anyway. Closes: #140881, #184980
+  * -o might be added for other similar commands later if there is any
+    reason to. And yeah, it means that -no is close to a no-op..
+
+ -- Joey Hess <joeyh@debian.org>  Sun,  8 Jan 2006 17:21:52 -0500
+
 debhelper (5.0.13) unstable; urgency=low
 
   [ Joey Hess ]

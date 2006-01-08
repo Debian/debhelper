@@ -38,6 +38,13 @@ by the package name.
 
 Do not modify postinst/postrm/prerm scripts.
 
+=item B<-o>, B<--onlyscripts>
+
+Only modify postinst/postrm/prerm scripts, do not actually install any init
+script or default files. May be useful if the init script is shipped and/or
+installed by upstream in a way that doesn't make it easy to let
+dh_installinit find it.
+
 =item B<-r>, B<--no-restart-on-upgrade>
 
 Do not restart init script on upgrade.
@@ -80,6 +87,8 @@ if a file in the debian/ directory exists that looks like
 preference to the files it normally installs.
 
 This parameter is deprecated, use the --name parameter instead.
+
+=item B<
 
 =item B<--error-handler=>I<function>
 
@@ -130,20 +139,22 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	      pkgfile($package,"init.d");
 	my $default=pkgfile($package,'default');
 
-	if ($default ne '') {
+	if ($default ne '' && ! $dh{ONLYSCRIPTS}) {
 		if (! -d "$tmp/etc/default") {
 			doit("install","-d","$tmp/etc/default");
 		}
 		doit("install","-p","-m644",$default,"$tmp/etc/default/$script");
 	}
 
-	if ($init ne '') {
-		if (! -d "$tmp/etc/init.d") {
-			doit("install","-d","$tmp/etc/init.d");
+	if ($init ne '' || $dh{ONLYSCRIPTS}) {
+		if (! $dh{ONLYSCRIPTS}) {
+			if (! -d "$tmp/etc/init.d") {
+				doit("install","-d","$tmp/etc/init.d");
+			}
+		
+			doit("install","-p","-m755",$init,"$tmp/etc/init.d/$script");
 		}
-
-		doit("install","-p","-m755",$init,"$tmp/etc/init.d/$script");
-
+		
 		# This is set by the -u "foo" command line switch, it's
 		# the parameters to pass to update-rc.d. If not set,
 		# we have to say "defaults".

@@ -94,7 +94,9 @@ sub parseopts {
 		"no-package=s" => \&ExcludePackage,
 	
 		"n" => \$options{NOSCRIPTS},
-		"noscripts" => \$options{NOSCRIPTS},
+		"noscripts" => \$options{ONLYSCRIPTS},
+		"o" => \$options{ONLYSCRIPTS},
+		"onlyscripts" => \$options{ONLYSCRIPTS},
 
 		"x" => \$options{INCLUDE_CONFFILES}, # is -x for some unknown historical reason..
 		"include-conffiles" => \$options{INCLUDE_CONFFILES},
