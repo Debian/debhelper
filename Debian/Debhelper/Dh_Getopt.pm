@@ -94,7 +94,7 @@ sub parseopts {
 		"no-package=s" => \&ExcludePackage,
 	
 		"n" => \$options{NOSCRIPTS},
-		"noscripts" => \$options{ONLYSCRIPTS},
+		"noscripts" => \$options{NOSCRIPTS},
 		"o" => \$options{ONLYSCRIPTS},
 		"onlyscripts" => \$options{ONLYSCRIPTS},
 
