@@ -40,15 +40,18 @@ If you use this program, your package should build-depend on python.
 
 If your package installs python modules in non-standard directories, you
 can make dh_python check those directories by passing their names on the
-command line. By default, it will check /usr/lib/$PACKAGE,
-/usr/share/$PACKAGE, /usr/lib/games/$PACKAGE, /usr/share/games/$PACKAGE
-and /usr/lib/python?.?/site-packages.
+command line. By default, it will check /usr/lib/site-python,
+/usr/lib/$PACKAGE, /usr/share/$PACKAGE, /usr/lib/games/$PACKAGE,
+/usr/share/games/$PACKAGE and /usr/lib/python?.?/site-packages.
+
+Note: only /usr/lib/site-python, /usr/lib/python?.?/site-packages and the
+extra names on the command line are searched for binary (.so) modules.
 
 =item B<-V> I<version>
 
 If the .py files your package ships are meant to be used by a specific
 pythonX.Y version, you can use this option to specify the desired version,
-such as 2.3.
+such as 2.3. Do not use if you ship modules in /usr/lib/site-python.
 
 =item B<-n>, B<--noscripts>
 
@@ -68,19 +71,22 @@ init();
 
 my $python = 'python';
 
-# The current python version
+# The current python major version
+my $python_major;
 my $python_version = `$python -V 2>&1`;
 if (! defined $python_version || $python_version eq "") {
 	error("Python is not installed, aborting. (Probably forgot to Build-Depend on python.)");
 }
 elsif ($python_version =~ m/^Python\s+(\d+)\.(\d+)(\.\d+)*/) {
 	$python_version = "$1.$2" ;
+	$python_major = $1 ;
 } else { 
 	error("Unable to parse python version out of \"$python_version\".");
 }
 
 # The next python version
 my $python_nextversion = $python_version + 0.1;
+my $python_nextmajor = $python_major + 1;
 
 my @python_allversions = ('1.5','2.1','2.2','2.3','2.4');
 foreach (@python_allversions) {
@@ -115,11 +121,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	delsubstvar($package, "python:Depends");
 
-	my @dirs = ("usr/lib/$package", "usr/share/$package", "usr/lib/games/$package", "usr/share/games/$package", @ARGV );
+	my @dirs = ("usr/lib/site-python", "usr/lib/$package", "usr/share/$package", "usr/lib/games/$package", "usr/share/games/$package", @ARGV );
+	my @dirs_so = ("usr/lib/site-python", @ARGV );
 
 	my $dep_on_python = 0;
 	my $strong_dep = 0;
-	my $dep_on_py_support = 0;
 	my $look_for_pythonXY = 1;
 
 	# First, the case of python-foo and pythonX.Y-foo
@@ -134,10 +140,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 	if ($package !~ /^python[0-9].[0-9]-/) {
 		push @dirs, "usr/lib/$usepython/site-packages";
+		push @dirs_so, "usr/lib/$usepython/site-packages";
 		$look_for_pythonXY = 0;
 	}
 
 	@dirs = grep -d, map "$tmp/$_", @dirs;
+	@dirs_so = grep -d, map "$tmp/$_", @dirs_so;
 
 	my $deps = 0;
 	my %verdeps = ();
@@ -161,35 +169,19 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}, $tmp;
 
 	# Look for python modules
-	my $dirlist = "";
-	my $gen_dirlist = "";
-	my $moved_module = 0;
-	my $move_dir = "/usr/share/python-support/$package";
+	my $dirlist="";
 	if (@dirs) {
 		foreach my $curdir (@dirs) {
 			my $has_module = 0;
-			my $has_bin_module = 0;
 			$curdir =~ s%^$tmp/%%;
 			find sub {
 				return unless -f;
 				if (/\.py$/) {
 					$has_module = 1;
 					doit(("rm","-f",$_."c",$_."o"));
-				} elsif (/\.so$/) {
-					$has_bin_module = 1;
 				}
 			}, "$tmp/$curdir" ;
-			if ($has_module && $has_bin_module == 0) {
-				$dep_on_py_support = 1;
-				if ($curdir eq "usr/lib/$usepython/site-packages") {
-					doit(("mkdir","-p","$tmp$move_dir"));
-					complex_doit("mv \"$tmp/$curdir/\"* \"$tmp$move_dir\"/");
-					doit(("rmdir","-p","--ignore-fail-on-non-empty","$tmp/$curdir"));
-					$moved_module=1;
-				} else {
-					$gen_dirlist="$gen_dirlist /$curdir";
-				}
-			} elsif ($has_module) {  # We have both kinds of modules
+			if ($has_module) {
 				if ($dh{V_FLAG_SET}) {
 					$verdeps{$usepython} |= PY_MODULE_NONSTANDARD;
 				} else {
@@ -197,7 +189,17 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				}
 				$dirlist="$dirlist /$curdir";
 			}
-			if ($has_bin_module) {
+		}
+	}
+	if (@dirs_so) {
+		foreach my $curdir (@dirs_so) {
+			my $has_module = 0;
+			$curdir =~ s%^$tmp/%%;
+			find sub {
+				return unless -f;
+				$has_module = 1 if /\.so$/;
+			}, "$tmp/$curdir" ;
+			if ($has_module) {
 				if ($dh{V_FLAG_SET}) {
 					$verdeps{$usepython} |= SO_MODULE_NONSTANDARD;
 				}
@@ -210,24 +212,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	# Dependencies on current python
 	$dep_on_python = 1 if $deps;
-	$strong_dep = 1 if($deps & SO_MODULE);
+	$strong_dep = 1 if($deps & (PY_MODULE|SO_MODULE));
 
 	if ($dep_on_python) {
 		addsubstvar($package, "python:Depends", $python, ">= $python_version");
 		if ($strong_dep) {
 			addsubstvar($package, "python:Depends", $python, "<< $python_nextversion");
-		}
-	}
-
-	if ($dep_on_py_support) {
-		addsubstvar($package, "python:Depends", "python-support");
-		if ($gen_dirlist ne "") {
-			autoscript($package, "postinst", "postinst-python-support", "s,#OPTIONS#,-b,;s,#DIRS#,$gen_dirlist,");
-			autoscript($package, "prerm", "prerm-python-support", "s,#OPTIONS#,-b,;s,#DIRS#,$gen_dirlist,");
-		}
-		if ($moved_module) {
-			autoscript($package, "postinst", "postinst-python-support", "s,#OPTIONS#,-i,;s,#DIRS#,$move_dir,");
-			autoscript($package, "prerm", "prerm-python-support", "s,#OPTIONS#,-i,;s,#DIRS#,$move_dir,");
+		} else {
+			addsubstvar($package, "python:Depends", $python, "<< $python_nextmajor");
 		}
 	}
 
