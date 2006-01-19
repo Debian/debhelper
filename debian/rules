@@ -65,9 +65,7 @@ clean:
 	./run dh_testdir
 	./run dh_testroot
 	./run dh_clean *.1 *.7 *-stamp Debian/Debhelper/Dh_Version.pm
-	for lang in $(LANGS); do \
-		rm -rf man/$$lang; \
-	done;
+	po4a --rm-translations man/po4a/po4a.cfg
 
 test: version test-stamp
 test-stamp:
