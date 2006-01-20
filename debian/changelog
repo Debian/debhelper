@@ -1,8 +1,14 @@
 debhelper (5.0.18) UNRELEASED; urgency=low
 
   * Improved po4a cleaning. Closes: #348521
+  * Reverted change in 4.1.9, so generation of EXCLUDE_FIND escapes "." to
+    "\\.", which turns into "\." after being run through the shell, and
+    prevents find from treating -X.svn as a regexp that matches files such
+    as foo/svn.vim. (It's safe to do this now that all uses of EXCLUDE_FIND are
+    via complex_doit(), which was not the case of dh_clean when this change
+    was originally made.) Closes: #349070
 
- -- Joey Hess <joeyh@debian.org>  Wed, 18 Jan 2006 16:12:13 -0500
+ -- Joey Hess <joeyh@debian.org>  Fri, 20 Jan 2006 16:56:00 -0500
 
 debhelper (5.0.17) unstable; urgency=low
 

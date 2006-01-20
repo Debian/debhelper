@@ -55,7 +55,7 @@ sub init {
 		foreach (@{$dh{EXCLUDE}}) {
 			my $x=$_;
 			$x=escape_shell($x);
-			$x=~s/\./\\./g;
+			$x=~s/\./\\\\./g;
 			$dh{EXCLUDE_FIND}.="-regex .\\*$x.\\* -or ";
 		}
 		$dh{EXCLUDE_FIND}=~s/ -or $//;
