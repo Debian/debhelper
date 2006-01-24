@@ -27,7 +27,7 @@ extension of ".3perl"). If your .TH line is incorrect or missing, the program
 may guess wrong based on the file extension.
 
 It also supports translated man pages, by looking for extensions
-like .ll.8 and .ll_LL.8
+like .ll.8 and .ll_LL.8, or by use of the --language switch.
 
 If dh_installman seems to install a man page into the wrong section or with
 the wrong extension, this is because the man page has the wrong section
@@ -36,8 +36,7 @@ dh_installman will follow suit.  See to L<man(7)> for details about the .TH
 section. If dh_installman seems to install a man page into a directory
 like /usr/share/man/pl/man1/, that is because your program has a
 name like "foo.pl", and dh_installman assumes that means it is translated
-into Polish. There is currently no support for resolving this ambiguity;
-programs in debian should probably not have extensions like that anyway.
+into Polish. Use --language=C to avoid this.
 
 Any man page filenames specified as parameters will be installed into the
 first package dh_installman is told to act on. By default, this is the
@@ -59,6 +58,11 @@ is acting on contain ".so" links. If so, it changes them to symlinks.
 
 Install all files specified by command line parameters in ALL packages
 acted on.
+
+=item B<--language>=ll
+
+Use this to specify that the man pages being acted on are written in the
+specified language.
 
 =item I<manpage ...>
 
@@ -138,14 +142,22 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		my ($instname)=$basename=~m/^(.*)\./;
 	
 		my $destdir="$tmp/usr/share/man/man$realsection/";
-		# Translated man pages are typically specified by adding the
-		# language code to the filename, so detect that and
-		# redirect to appropriate directory, stripping the code.
-		my ($langcode)=$basename=~m/.*\.([a-z][a-z](?:_[A-Z][A-Z])?)\.(?:[1-9]|man)/;
-		if (defined $langcode && $langcode ne '') {
-			$destdir="$tmp/usr/share/man/$langcode/man$realsection/";
+		my $langcode;
+		if (! exists $dh{LANGUAGE}) {
+			# Translated man pages are typically specified by adding the
+			# language code to the filename, so detect that and
+			# redirect to appropriate directory, stripping the code.
+			($langcode)=$basename=~m/.*\.([a-z][a-z](?:_[A-Z][A-Z])?)\.(?:[1-9]|man)/;
 			# Strip the language code from the instname.
 			$instname=~s/\.$langcode$//;
+		}
+		elsif ($dh{LANGUAGE} ne 'C') {
+			$langcode=$dh{LANGUAGE};
+			($instname)=$basename=~m/(.*?)\./;
+		}
+		
+		if (defined $langcode && $langcode ne '') {
+			$destdir="$tmp/usr/share/man/$langcode/man$realsection/";
 		}
 		$destdir=~tr:/:/:s; # just for looks
 
