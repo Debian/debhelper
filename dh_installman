@@ -143,7 +143,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	
 		my $destdir="$tmp/usr/share/man/man$realsection/";
 		my $langcode;
-		if (! exists $dh{LANGUAGE}) {
+		if (! defined $dh{LANGUAGE} || ! exists $dh{LANGUAGE}) {
 			# Translated man pages are typically specified by adding the
 			# language code to the filename, so detect that and
 			# redirect to appropriate directory, stripping the code.
