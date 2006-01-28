@@ -125,6 +125,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			@opts=("-L".tmpdir($dh{LIBPACKAGE}."/DEBIAN/shlibs"));
 		}
 		
+		push @opts, "-tudeb" if is_udeb($package);
+		
 		my $ld_library_path_orig=$ENV{LD_LIBRARY_PATH};
 		if ($dh{L_PARAMS}) {
 			$ENV{LD_LIBRARY_PATH}=$dh{L_PARAMS};
