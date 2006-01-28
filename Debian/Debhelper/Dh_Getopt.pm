@@ -166,6 +166,8 @@ sub parseopts {
 		
 		"error-handler=s" => \$options{ERROR_HANDLER},
 		
+		"add-udeb=s" => \$options{SHLIBS_UDEB},
+		
 		"language=s" => \$options{LANGUAGE},
 
 		"<>" => \&NonOption,
