@@ -2,8 +2,12 @@ debhelper (5.0.23) UNRELEASED; urgency=low
 
   * dh_strip: remove binutils build-dep lines since stable has a new enough
     version. Closes: #350607
+  * dh_installdebconf: drop all support for old-style translated debconf
+    templates files via debconf-mergetemplate (keep a warning if any are
+    found, for now). Allows dropping debhelper's dependency on 
+    debconf-utils. Closes: #331796
 
- -- Joey Hess <joeyh@debian.org>  Mon, 30 Jan 2006 16:57:21 -0500
+ -- Joey Hess <joeyh@debian.org>  Mon, 20 Feb 2006 16:35:50 -0500
 
 debhelper (5.0.22) unstable; urgency=low
 

@@ -41,20 +41,10 @@ do it right.
 
 =head1 LOCALIZED TEMPLATE FILES
 
-Debconf also supports localized template files, and this program has some
-support to aid is working with them. It is best to keep the translations in
-.po files under debian/po, and merge them only at build time. See 
-L<po2debconf(1)> and L<debconf-getlang(1)> for details.
-
-This program will look to see if you have a debian/po directory and if so will
-automatically call L<po2debconf(1)> to generate a merged templates file. Or 
-if you have debian/templates.ll files, it will use the older 
-L<debconf-mergetemplate(1)> program to merge those together.
-
-Note that if your package has a debian/po directory it should build-depend on po-debconf.
-
-For example, if you have a German translation,
-strings from debian/po/de.po are merged with debian/package.templates.
+This program will look to see if you have a debian/po directory and if so
+will automatically call L<po2debconf(1)> to generate a merged templates
+file containing the translations. For this to work, your package should
+build-depend on po-debconf.
 
 =head1 OPTIONS
 
@@ -66,8 +56,7 @@ Do not modify postrm script.
 
 =item B<--> I<params>
 
-Pass the params to po2debconf, if it is run or debconf-mergetemplate, if it
-is run.
+Pass the params to po2debconf.
 
 =back
 
@@ -95,21 +84,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	
 	if ($templates ne '') {
 		# Are there old-style translated templates?
-		my @trans=(glob("$templates.??"), glob("$templates.??_??"));
+		if (glob("$templates.??"), glob("$templates.??_??")) {
+			warning "Ignoring debian/templates.ll files. Switch to po-debconf!";
+		}
 
 		umask(0022); # since I do a redirect below
 		
-		# Look for po directory.
 		if (-d "debian/po") {
-			if (@trans) {
-				warning "ignoring debian/templates.ll files in favour of debian/po directory";
-			}
 			complex_doit("po2debconf @extraparams $templates > $tmp/DEBIAN/templates");
-		}
-		elsif (@trans) {
-			complex_doit("debconf-mergetemplate --drop-old-templates @extraparams @trans $templates > $tmp/DEBIAN/templates");
-			chmod 0644, "$tmp/DEBIAN/templates";
-			chown 0, 0, "$tmp/DEBIAN/templates";
 		}
 		else {
 			doit("install", "-o", 0, "-g", 0, "-m", 644, "-p",
