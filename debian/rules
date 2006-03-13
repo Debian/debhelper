@@ -26,7 +26,7 @@ MAKEMANLIST=perl -e ' \
 		}'
 
 # Figure out the `current debhelper version.
-VERSION=$(shell expr "`dpkg-parsechangelog 2>/dev/null |grep Version:`" : '.*Version: \(.*\)')
+VERSION=$(shell expr "`dpkg-parsechangelog |grep Version:`" : '.*Version: \(.*\)')
 
 PERLLIBDIR=$(shell perl -MConfig -e 'print $$Config{vendorlib}')
 

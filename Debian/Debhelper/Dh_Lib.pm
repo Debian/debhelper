@@ -553,7 +553,7 @@ sub excludefile {
 	sub buildarch {
   		return $arch if defined $arch;
 
-		$arch=`dpkg-architecture -qDEB_HOST_ARCH 2>/dev/null` || error($!);
+		$arch=`dpkg-architecture -qDEB_HOST_ARCH 2>/dev/null` || error("dpkg-architecture failed");
 		chomp $arch;
 		return $arch;
 	}
