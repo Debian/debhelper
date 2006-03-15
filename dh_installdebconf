@@ -100,8 +100,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	# I'm going with debconf 0.5 because it was the first
-	# "modern" one.
-	my $debconfdep="debconf (>= 0.5) | debconf-2.0";
+	# "modern" one. udebs just need cdebconf.
+	my $debconfdep=is_udeb($package) ? "cdebconf-udeb" : "debconf (>= 0.5) | debconf-2.0";
 	if ($config ne '' || $templates ne '') {
 		addsubstvar($package, "misc:Depends", $debconfdep);
 	}
