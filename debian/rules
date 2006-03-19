@@ -94,13 +94,6 @@ binary-indep: build
 	./run dh_md5sums
 	./run dh_builddeb
 
-# Update the debhelper web page. Not intended for use by anyone except the
-# author.
-DIR=/home/web/kitenet.net/programs/debhelper
-installhook:
-	cp debian/changelog $(DIR)/CHANGES
-	echo -n $(VERSION) > $(DIR)/LATEST-VERSION-IS
-
 binary-arch:
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary
