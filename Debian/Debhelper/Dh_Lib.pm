@@ -104,7 +104,7 @@ sub init {
 	# If no error handling function was specified, just propigate
 	# errors out.
 	if (! exists $dh{ERROR_HANDLER} || ! defined $dh{ERROR_HANDLER}) {
-		$dh{ERROR_HANDLER}='exit $?';
+		$dh{ERROR_HANDLER}='exit \$?';
 	}
 }
 

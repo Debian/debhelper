@@ -1,3 +1,16 @@
+debhelper (5.0.26) unstable; urgency=high
+
+  * dh_installinit: Fix badly generated code in maint scripts that used
+     || exit 0   instead of the intended
+     || exit $?
+    due to a bad shell expansion and caused invoke-rc.d errors to be
+    ignored. Closes: #337664
+
+    Note: This has been broken since version 4.2.12 and has affected many
+    packages.
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 22 Mar 2006 19:33:38 -0500
+
 debhelper (5.0.25) unstable; urgency=low
 
   * dh_installdebconf: For udebs, misc:Depends will now contain cdebconf-udeb.
