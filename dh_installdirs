@@ -18,13 +18,13 @@ B<dh_installdirs> [S<I<debhelper options>>] [B<-A>] [S<I<dir ...>>]
 dh_installdirs is a debhelper program that is responsible for creating
 subdirectories in package build directories.
 
+A file named debian/package.dirs can list directories to be created.
+Separate the directory names with whitespace.
+
 Any directory names specified as parameters will be created in the package
 build directory of the first package dh_installdirs is told to act on. By
 default, this is the first binary package in debian/control, but if you use
 -p, -i, or -a flags, it will be the first package specified by those flags.
-
-A file named debian/package.dirs can list other directories to be created.
-Separate the directory names with whitespace.
 
 Be sure to only use directory names relative to the package build
 directory. Ie, "/usr/bin" should not be used, use "usr/bin" instead.
