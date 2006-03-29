@@ -205,6 +205,11 @@ sub find_so_man {
 	}
 	my $l=<SOTEST>;
 	close SOTEST;
+
+	if (! defined $l) {
+		error("failed to read $_");
+	}
+	
 	if ($l=~m/\.so\s+(.*)\s*/) {
 		my $solink=$1;
 		# This test is here to prevent links like ... man8/../man8/foo.8
