@@ -171,7 +171,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				complex_doit("echo '$line' >>$tmp/DEBIAN/shlibs");
 				if (defined($dh{SHLIBS_UDEB}) && $dh{SHLIBS_UDEB} ne '') {
 					my $udeb_deps = $deps;
-					$udeb_deps =~ s/$package/$dh{SHLIBS_UDEB}/e;
+					$udeb_deps =~ s/\Q$package\E/$dh{SHLIBS_UDEB}/e;
 			    		$line="udeb: "."$library $major $udeb_deps";
 					push @udeb_lines, $line;
 				}
