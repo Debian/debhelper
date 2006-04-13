@@ -26,7 +26,7 @@ be compressed, namely all files in usr/share/info, usr/share/man,
 usr/X11R6/man, files in usr/share/doc that are larger than 4k in size,
 (except the copyright file, .html and .css files, and files that appear to be
 already compressed based on their extensions), and all changelog files. Plus
-PCF fonts underneath usr/X11R6/lib/X11/fonts/
+PCF fonts underneath usr/X11R6/lib/X11/fonts/ and usr/share/fonts/X11/
 
 If a debian/package.compress file exists, however, it will be ran as a shell
 script, and all filenames that the shell script outputs will be compressed
@@ -103,7 +103,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				! -iname "*-gz"  ! -iname "*-z" ! -iname "*_z" \\
 				! -iname "*.jar" ! -iname "*.zip" ! -iname "*.css" \\
 				! -name "copyright" 2>/dev/null || true;
-			find usr/X11R6/lib/X11/fonts -type f -name "*.pcf" 2>/dev/null || true;
+			find usr/X11R6/lib/X11/fonts usr/share/fonts/X11 -type f -name "*.pcf" 2>/dev/null || true;
 		`);
 	}
 

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2006-03-30 15:23-0500\n"
+"POT-Creation-Date: 2006-04-13 10:48+0200\n"
 "PO-Revision-Date: 2005-09-18 00:11+0200\n"
 "Last-Translator: Rubén Porras Campo <debian-l10n-spanish@lists.debian.org>\n"
 "Language-Team: SPANISH <debian-l10n-spanish@lists.debian.org>\n"
@@ -136,7 +136,7 @@ msgstr ""
 #: dh_installman:229 dh_testroot:26 dh_movefiles:162 dh_desktop:43
 #: dh_suidregister:117 dh_installchangelogs:125 dh_python:266
 #: dh_installdocs:233 dh_installcatalogs:105 dh_installmanpages:197
-#: dh_installxfonts:83 dh_installlogcheck:51
+#: dh_installxfonts:85 dh_installlogcheck:51
 msgid "SEE ALSO"
 msgstr "VÉASE ADEMÁS"
 
@@ -151,7 +151,7 @@ msgstr "VÉASE ADEMÁS"
 #: dh_makeshlibs:202 dh_perl:142 dh_fixperms:109 dh_listpackages:30
 #: dh_installman:231 dh_testroot:28 dh_movefiles:164 dh_suidregister:119
 #: dh_installchangelogs:127 dh_python:268 dh_installdocs:235
-#: dh_installcatalogs:107 dh_installmanpages:199 dh_installxfonts:85
+#: dh_installcatalogs:107 dh_installmanpages:199 dh_installxfonts:87
 #: dh_installlogcheck:53
 msgid "L<debhelper(7)>"
 msgstr "L<debhelper(7)>"
@@ -167,7 +167,7 @@ msgstr "L<debhelper(7)>"
 #: dh_gencontrol:77 dh_install:255 dh_makeshlibs:204 dh_perl:144
 #: dh_fixperms:111 dh_listpackages:32 dh_installman:233 dh_testroot:30
 #: dh_movefiles:166 dh_desktop:47 dh_suidregister:121 dh_installchangelogs:129
-#: dh_python:270 dh_installdocs:237 dh_installmanpages:201 dh_installxfonts:87
+#: dh_python:270 dh_installdocs:237 dh_installmanpages:201 dh_installxfonts:89
 msgid "This program is a part of debhelper."
 msgstr "Este programa es parte de debhelper."
 
@@ -184,7 +184,7 @@ msgstr "Este programa es parte de debhelper."
 #: dh_installman:235 dh_testroot:32 dh_movefiles:168 dh_desktop:49
 #: dh_suidregister:123 dh_installchangelogs:131 dh_python:272
 #: dh_installdocs:239 dh_installcatalogs:111 dh_installmanpages:203
-#: dh_installxfonts:89 dh_installlogcheck:57
+#: dh_installxfonts:91 dh_installlogcheck:57
 msgid "AUTHOR"
 msgstr "AUTOR"
 
@@ -199,7 +199,7 @@ msgstr "AUTOR"
 #: dh_install:259 dh_makeshlibs:208 dh_fixperms:115 dh_listpackages:36
 #: dh_installman:237 dh_testroot:34 dh_movefiles:170 dh_suidregister:125
 #: dh_installchangelogs:133 dh_installdocs:241 dh_installmanpages:205
-#: dh_installxfonts:91
+#: dh_installxfonts:93
 msgid "Joey Hess <joeyh@debian.org>"
 msgstr "Joey Hess <joeyh@debian.org>"
 
@@ -638,13 +638,14 @@ msgstr ""
 
 # type: textblock
 #: dh_compress:24
+#, fuzzy
 msgid ""
 "By default, dh_compress compresses files that debian policy mandates should "
 "be compressed, namely all files in usr/share/info, usr/share/man, usr/X11R6/"
 "man, files in usr/share/doc that are larger than 4k in size, (except the "
 "copyright file, .html and .css files, and files that appear to be already "
 "compressed based on their extensions), and all changelog files. Plus PCF "
-"fonts underneath usr/X11R6/lib/X11/fonts/"
+"fonts underneath usr/X11R6/lib/X11/fonts/ and usr/share/fonts/X11/"
 msgstr ""
 "Por omisión, dh_compress comprime los ficheros que las normas de Debian "
 "obligan a comprimir, es decir, todos los ficheros en usr/share/info, usr/"
@@ -3072,10 +3073,10 @@ msgstr "Hace de bar.1 un enlace simbólico a foo.1"
 
 # type: verbatim
 #: dh_link:71
-#, no-wrap
+#, fuzzy, no-wrap
 msgid ""
 " dh_link var/lib/foo usr/lib/foo \\\n"
-"   usr/X11R6/man/man1/foo.1x usr/share/man/man1/bar.1\n"
+"   usr/share/man/man1/foo.1 usr/share/man/man1/bar.1\n"
 "\n"
 msgstr ""
 " dh_link var/lib/foo usr/lib/foo \\\n"
@@ -3084,9 +3085,10 @@ msgstr ""
 
 # type: textblock
 #: dh_link:74
+#, fuzzy
 msgid ""
 "Make /usr/lib/foo/ be a link to /var/lib/foo/, and bar.1 be a symlink to the "
-"X man page foo.1x"
+"foo.1"
 msgstr ""
 "Hace de /usr/lib/foo/ un enlace a /var/lib/foo/, y de bar.1 un enlace "
 "simbólico a la página de manual de X foo.1x"
@@ -5161,8 +5163,9 @@ msgstr ""
 
 # type: textblock
 #: dh_installxfonts:28
+#, fuzzy
 msgid ""
-"Your package should depend on xutils (>= 4.0.3) so that the update-fonts-* "
+"Your package should depend on xfonts-utils so that the update-fonts-* "
 "commands are available. (This program adds that dependency to ${misc:"
 "Depends}.)"
 msgstr ""

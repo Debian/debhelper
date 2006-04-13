@@ -25,7 +25,7 @@ directory, and if you have fonts.alias or fonts.scale files, you should
 install them into the correct location under etc/X11/fonts in your package
 build directory.
 
-Your package should depend on xutils (>= 4.0.3) so that the
+Your package should depend on xfonts-utils so that the
 update-fonts-* commands are available. (This program adds that dependency to
 ${misc:Depends}.)
 
@@ -47,12 +47,14 @@ init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
-	my $XFONTDIR="$tmp/usr/X11R6/lib/X11/fonts/";
 
 	# Find all font directories in the package build directory.
-	opendir DIR, $XFONTDIR || next;
-	my @fontdirs = grep { -d "$XFONTDIR/$_" && !/^\./ } (readdir DIR);
-	closedir DIR;
+	my @fontdirs;
+	foreach my $parentdir ("$tmp/usr/X11R6/lib/X11/fonts/", "$tmp/usr/share/fonts/X11/") {
+		opendir DIR, $parentdir || next;
+		@fontdirs = grep { -d "$parentdir/$_" && !/^\./ } (readdir DIR);
+		closedir DIR;
+	}
 
 	if (@fontdirs) {
 		# Figure out what commands the postinst and postrm will need 
@@ -72,11 +74,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		autoscript($package, "postrm", "postrm-xfonts",
 			"s:#CMDS#:".join(";", @cmds).":;");
 
-		addsubstvar($package, "misc:Depends", "xutils", ">= 4.0.3");
+		addsubstvar($package, "misc:Depends", "xfonts-utils");
 	}
 	else {
 		# remove
-		addsubstvar($package, "misc:Depends", "xutils", ">= 4.0.3", 1);
+		addsubstvar($package, "misc:Depends", "xfonts-utils", "", 1);
 	}
 }
 

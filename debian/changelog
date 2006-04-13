@@ -1,3 +1,14 @@
+debhelper (5.0.29) unstable; urgency=low
+
+  * dh_installxfonts: Random hack to deal with X font dirs moving to
+    /usr/share/fonts/X11/ -- look there for fonts as well as in the old
+    location, although the old location probably won't be seen by X anymore.
+  * dh_installxfonts: Generate misc:Depends on new xfonts-utils.
+  * dh_compress: compress pcm fonts under usr/share/fonts/X11/
+  * dh_link: change example that used X11R6 directory.
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 13 Apr 2006 10:29:29 +0200
+
 debhelper (5.0.28) unstable; urgency=low
 
   * dh_makeshlibs: Fix udeb package name regexp. Closes: #361677
