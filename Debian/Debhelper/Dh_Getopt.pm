@@ -190,7 +190,8 @@ sub parseopts {
 		if ($options{DOINDEP} || $options{DOARCH} || $options{DOSAME}) {
 			# User specified that all arch (in)dep package be
 			# built, and there are none of that type.
-			error("I have no package to build");
+			warning("I have no package to build");
+			exit(0);
 		}
 		push @{$options{DOPACKAGES}},getpackages();
 	}

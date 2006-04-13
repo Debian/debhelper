@@ -1,3 +1,13 @@
+debhelper (5.0.30) unstable; urgency=low
+
+  * Convert the "I have no packages to build" error into a warning. Am I
+    really the first person to run into the case of a source package that
+    builds an arch all package and an single-arch package? In this case,
+    the binary-arch target needs to use -s and do nothing when run on some
+    other arch, and debhelper will now support this.
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 14 Apr 2006 00:35:55 +0200
+
 debhelper (5.0.29) unstable; urgency=low
 
   * dh_installxfonts: Random hack to deal with X font dirs moving to
