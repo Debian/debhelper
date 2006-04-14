@@ -46,7 +46,7 @@ build-stamp:
 	cat debhelper.pod | \
 		$(MAKEMANLIST) `find . -maxdepth 1 -type f -perm +100 -name "dh_*" | sort` | \
 		$(POD2MAN) --name="debhelper" --section=7  > debhelper.7
-	po4a -f man/po4a/po4a.cfg 
+	po4a man/po4a/po4a.cfg 
 	set -e; \
 	for lang in $(LANGS); do \
 		dir=man/$$lang; \
@@ -66,6 +66,9 @@ clean:
 	./run dh_testroot
 	./run dh_clean *.1 *.7 *-stamp Debian/Debhelper/Dh_Version.pm
 	po4a --rm-translations --rm-backups man/po4a/po4a.cfg
+	for lang in $(LANGS); do \
+		rmdir man/$$lang; \
+	done;
 
 test: version test-stamp
 test-stamp:
