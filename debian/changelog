@@ -8,7 +8,17 @@ debhelper (5.0.31) UNRELEASED; urgency=low
   * Change build-depends for po4a. New version (0.24.1).
   * Add code for removing empty "lang" directories into man/ when cleaning.
 
- -- Joey Hess <joeyh@debian.org>  Fri, 14 Apr 2006 11:04:23 +0200
+  [ Joey Hess ]
+  * dh_installxfonts: pass --x11r7-layout to update-fonts-* commands to ensure
+    they use the right new directory. Closes: #362820
+  * dh_installxfonts: also, alias files have moved from /etc/X11/fonts/* to
+    /etc/X11/fonts/X11R7/*, update call to update-fonts-alias and the man page
+    accordingly; packages containing alias files will need to switch to the
+    new directory on their own.
+  * dh_installudev: correct documentation for --name. Closes: #363028
+  * Fix broken directory removal code.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 17 Apr 2006 16:01:11 -0400
 
 debhelper (5.0.30) unstable; urgency=low
 
