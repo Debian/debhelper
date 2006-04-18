@@ -72,8 +72,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	$filename=~s/\.udev$/.rules/;
 
 	if ($rules_file) {
-		if (! -e "$tmp/etc/udev") {
-			doit("install","-d","$tmp/etc/udev");
+		if (! -e "$tmp/etc/udev/rules.d") {
+			doit("install","-d","$tmp/etc/udev/rules.d");
 		}
 		doit("install","-m","0644",$rules_file,"$tmp/etc/udev/$filename");
 
