@@ -66,7 +66,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				if -f "$tmp/etc/X11/fonts/X11R7/$f/$package.scale";
 			push @cmds, "update-fonts-dir --x11r7-layout $f";
 			push @cmds, "update-fonts-alias --x11r7-layout $f"
-				if -f "$tmp/etc/X11/fonts/$f/$package.alias";
+				if -f "$tmp/etc/X11/fonts/X11R7/$f/$package.alias";
 		}
 
 		autoscript($package, "postinst", "postinst-xfonts",
