@@ -85,6 +85,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (@sgmlinstalled) {
 		addsubstvar($package, "misc:Depends", "sgml-base", ">= $sgmlbasever");
 
+		if (! -d "$tmpdir/etc/sgml") {
+			doit("install","-d","-m755","$tmpdir/etc/sgml");
+		}
+
 		if (! $dh{NOSCRIPTS}) {
 			my $ordcats = join(" ", @sgmlinstalled);
 			my $centralcat = "/etc/sgml/$package.cat";
