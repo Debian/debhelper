@@ -148,14 +148,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			# language code to the filename, so detect that and
 			# redirect to appropriate directory, stripping the code.
 			($langcode)=$basename=~m/.*\.([a-z][a-z](?:_[A-Z][A-Z])?)\.(?:[1-9]|man)/;
-			if (defined $langcode && $langcode ne '') {
-				# Strip the language code from the instname.
-				$instname=~s/\.$langcode$//;
-			}
 		}
 		elsif ($dh{LANGUAGE} ne 'C') {
 			$langcode=$dh{LANGUAGE};
-			($instname)=$basename=~m/(.*?)\./;
+		}
+		
+		if (defined $langcode && $langcode ne '') {
+			# Strip the language code from the instname.
+			$instname=~s/\.$langcode$//;
 		}
 		
 		if (defined $langcode && $langcode ne '') {
