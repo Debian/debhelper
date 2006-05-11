@@ -1,10 +1,13 @@
-debhelper (5.0.35) UNRELEASED; urgency=low
+debhelper (5.0.35) unstable; urgency=low
 
-  * dh_installman: When --language is used, be smarter about stripping 
+  * dh_installman: When --language is used, be smarter about stripping
     language codes from man page filenames. Only strip things that look like
     codes that match the specified languages. Closes: #366645
+  * dh_installxfonts: /etc/X11/fonts/X11R7 is deprecated, back to looking in
+    old location, and not passing --x11r7-layout to update-fonts-alias and
+    update-fonts-scale (but still to update-fonts-dir). Closes: #366234
 
- -- Joey Hess <joeyh@debian.org>  Wed, 10 May 2006 20:07:40 -0400
+ -- Joey Hess <joeyh@debian.org>  Wed, 10 May 2006 20:09:00 -0400
 
 debhelper (5.0.34) unstable; urgency=low
 
