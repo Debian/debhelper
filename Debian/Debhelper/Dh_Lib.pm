@@ -559,6 +559,18 @@ sub excludefile {
 	}
 }
 
+# Passed an arch and a list of arches to match against, returns true if matched
+sub samearch {
+	my $arch=shift;
+	my @archlist=split(/\s+/,shift);
+
+	foreach my $a (@archlist) {
+		system("dpkg-architecture", "-a$arch", "-i$a") == 0 && return 1;
+	}
+
+	return 0;
+}
+
 # Returns a list of packages in the control file.
 # Must pass "arch" or "indep" or "same" to specify arch-dependant or
 # -independant or same arch packages. If nothing is specified, returns all
@@ -616,7 +628,7 @@ sub getpackages {
 			if ($package &&
 			    (($type eq 'indep' && $arch eq 'all') ||
 			     ($type eq 'arch' && $arch ne 'all') ||
-			     ($type eq 'same' && ($arch eq 'any' || $arch =~ /(^|\s)$buildarch(\s|$)/)) ||
+			     ($type eq 'same' && ($arch eq 'any' || samearch($buildarch, $arch) ||
 			     ! $type)) {
 				push @list, $package;
 				$package="";
