@@ -18,7 +18,7 @@ B<dh_installmodules> [S<I<debhelper options>>] [B<-n>] [B<--name=>I<name>]
 =head1 DESCRIPTION
 
 dh_installmodules is a debhelper program that is responsible for
-registering kernel modules with modutils.
+registering kernel modules.
 
 Files named debian/package.modules will be installed as
 etc/modutils/package in the package build directory. This is for use by
@@ -29,7 +29,7 @@ module-init-tools's version of modprobe.
 Then postinst and postrm commands are automatically generated to register
 the modules when the package is installed. See L<dh_installdeb(1)> for an
 explanation of how this works. Note that this will be done for any
-package this program acts on which has either a package.modules file, or
+package this program acts on which has either a package.modules or
 has .o or .ko files in /lib/modules.
 
 =head1 OPTIONS
@@ -42,10 +42,10 @@ Do not modify postinst/postrm scripts.
 
 =item B<--name=>I<name>
 
-Use "name" as the filename the modules file is installed in
-etc/modutils/. When this parameter is used, dh_installmodules looks for and
-installs files named debian/package.name.modules instead of the usual
-debian/package.modules.
+When this parameter is used, dh_installmodules looks for and
+installs files named debian/package.name.modules and
+debian/package.name.modprobe instead of the usual
+debian/package.modules and debian/package.modprobe
 
 =back
 
