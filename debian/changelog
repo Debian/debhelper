@@ -1,3 +1,18 @@
+debhelper (5.0.37) UNRELEASED; urgency=low
+
+  * dh_installmodules: depmod -a is no longer run during boot, so if a module
+    package is installed for a kernel other than the running kernel, just
+    running depmod -a in the postinst is no longer sufficient. Instead, run
+    depmod -a -F /boot/System.map-<kvers> <kvers>
+    The kernel version is guessed at based on the path to the modules in the
+    package. Closes: #301424
+  * Note: behavior change due to the above: The mere existence of a
+    debian/package.modules file will no longer make dh_installmodules add code
+    to maintainer scripts.
+  * Untested.
+
+ -- Joey Hess <joeyh@debian.org>  Fri,  9 Jun 2006 16:47:44 -0400
+
 debhelper (5.0.36) unstable; urgency=low
 
   [ Valery Perrin ]

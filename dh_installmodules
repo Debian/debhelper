@@ -26,11 +26,10 @@ modutils. Files named debian/package.modprobe will be installed in
 etc/modprobe.d/package in the package build directory, to be used by
 module-init-tools's version of modprobe.
 
-Then postinst and postrm commands are automatically generated to register
-the modules when the package is installed. See L<dh_installdeb(1)> for an
-explanation of how this works. Note that this will be done for any
-package this program acts on which has either a package.modules or
-has .o or .ko files in /lib/modules.
+Kernel modules are searched for in the package build directory and if
+found, postinst and postrm commands are automatically generated to 
+run depmod and register the modules when the package is installed. See
+L<dh_installdeb(1)> for an explanation of how this works.
 
 =head1 OPTIONS
 
@@ -59,14 +58,26 @@ instances of the same text to be added to maintainer scripts.
 
 init();
 
-# Returns true if there are any .o or .ko files in the passed directory.
+# Looks for kernel modules in the passed directory. If any are found,
+# returns the kernel version (or versions) that the modules seem to be for.
 sub find_kernel_modules {
 	my $searchdir=shift;
-	my @results=();
+	my %versions;
 
 	return unless -d $searchdir;
-	find(sub { push @results, $_ if /\.k?o$/ }, $searchdir);
-	return @results > 0;
+	find(sub {
+		if (/\.k?o$/) {
+			my $kvers=$File::Find::dir=~m!lib/modules/([^/]+)/!;
+			if (! defined $kvers || ! length $kvers) {
+				warning("Cannot determine kernel version for module $File::Find::name");
+			}
+			else {
+				$versions{$kvers}=1;
+			}
+		}
+	}, $searchdir);
+
+	return keys %versions;
 }
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -92,10 +103,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("install","-m","0644",$modprobe_file,"$tmp/etc/modprobe.d/".pkgfilename($package));
 	}
 	
-	if (! $dh{NOSCRIPTS} &&
-	    ($modutils_file || find_kernel_modules("$tmp/lib/modules"))) {
-			autoscript($package,"postinst","postinst-modules","s/#PACKAGE#/$package/");
-			autoscript($package,"postrm","postrm-modules","s/#PACKAGE#/$package/");
+	if (! $dh{NOSCRIPTS}) {
+		foreach my $kvers (find_kernel_modules("$tmp/lib/modules")) {
+			autoscript($package,"postinst","postinst-modules","s/#KVERS#/$kvers/");
+			autoscript($package,"postrm","postrm-modules","s/#KVERS#/$kvers/");
+		}
 	}
 }
 

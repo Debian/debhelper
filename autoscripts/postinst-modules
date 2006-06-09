@@ -2,5 +2,7 @@ if [ "$1" = "configure" ]; then
 	if [ -x "`which update-modules 2>/dev/null`" ]; then
 		update-modules >/dev/null || [ "$?" = 3 ]
 	fi
-	depmod -a || true
+	if [ -e /boot/System.map-#KVERS# ]; then
+		depmod -a -F /boot/System.map-#KVERS# #KVERS# || true
+	fi
 fi
