@@ -67,7 +67,7 @@ sub find_kernel_modules {
 	return unless -d $searchdir;
 	find(sub {
 		if (/\.k?o$/) {
-			my $kvers=$File::Find::dir=~m!lib/modules/([^/]+)/!;
+			my ($kvers)=$File::Find::dir=~m!lib/modules/([^/]+)/!;
 			if (! defined $kvers || ! length $kvers) {
 				warning("Cannot determine kernel version for module $File::Find::name");
 			}
@@ -105,8 +105,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	
 	if (! $dh{NOSCRIPTS}) {
 		foreach my $kvers (find_kernel_modules("$tmp/lib/modules")) {
-			autoscript($package,"postinst","postinst-modules","s/#KVERS#/$kvers/");
-			autoscript($package,"postrm","postrm-modules","s/#KVERS#/$kvers/");
+			autoscript($package,"postinst","postinst-modules","s/#KVERS#/$kvers/g");
+			autoscript($package,"postrm","postrm-modules","s/#KVERS#/$kvers/g");
 		}
 	}
 }
