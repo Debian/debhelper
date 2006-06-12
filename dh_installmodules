@@ -104,6 +104,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 	
 	if (! $dh{NOSCRIPTS}) {
+		if ($modutils_file) {
+			autoscript($package,"postinst","postinst-update-modules");
+			autoscript($package,"postrm","postrm-update-modules");
+		}
+
 		foreach my $kvers (find_kernel_modules("$tmp/lib/modules")) {
 			autoscript($package,"postinst","postinst-modules","s/#KVERS#/$kvers/g");
 			autoscript($package,"postrm","postrm-modules","s/#KVERS#/$kvers/g");

@@ -1,6 +1,3 @@
-if [ -x "`which update-modules 2>/dev/null`" ]; then
-	update-modules >/dev/null || [ "$?" = 3 ]
-fi
 if [ -e /boot/System.map-#KVERS# ]; then
 	depmod -a -F /boot/System.map-#KVERS# #KVERS# || true
 fi

@@ -1,4 +1,4 @@
-debhelper (5.0.37) UNRELEASED; urgency=low
+debhelper (5.0.37) unstable; urgency=low
 
   * dh_installmodules: depmod -a is no longer run during boot, so if a module
     package is installed for a kernel other than the running kernel, just
@@ -6,14 +6,11 @@ debhelper (5.0.37) UNRELEASED; urgency=low
     depmod -a -F /boot/System.map-<kvers> <kvers>
     The kernel version is guessed at based on the path to the modules in the
     package. Closes: #301424
-  * Note: behavior change due to the above: The mere existence of a
-    debian/package.modules file will no longer make dh_installmodules add code
-    to maintainer scripts.
   * dh_installxfonts: In postrm, run the deregistraton code even on upgrade,
     in case an upgrade involves moving fonts around (or removing or renaming
     fonts). Closes: #372686
 
- -- Joey Hess <joeyh@debian.org>  Sun, 11 Jun 2006 12:29:14 -0400
+ -- Joey Hess <joeyh@debian.org>  Sun, 11 Jun 2006 21:17:38 -0400
 
 debhelper (5.0.36) unstable; urgency=low
 
