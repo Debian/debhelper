@@ -36,7 +36,7 @@ POD2MAN=pod2man -c Debhelper -r "$(VERSION)"
 LANGS=$(notdir $(basename $(wildcard man/po4a/po/*.po)))
 
 version:
-	printf "package Debian::Debhelper::Dh_Version;\n\$$version='$(VERSION)';" > \
+	printf "package Debian::Debhelper::Dh_Version;\n\$$version='$(VERSION)';\n1" > \
 		Debian/Debhelper/Dh_Version.pm
 
 build: version test build-stamp
