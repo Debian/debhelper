@@ -1,17 +1,71 @@
-NOTE: debhelper has been NMUed. That NMU will need to be investigated and/or
-merged before any further debhelper releases can be made.
-
 debhelper (5.0.38) UNRELEASED; urgency=low
 
   [ Valery Perrin ]
   * Update french translation with recent change in dh_installmodules
   
   [ Joey Hess]
+  * ACK last three NMUs with thanks to Raphael Hertzog for making the best of
+    a difficult situation.
+  * Revert all dh_python changes. Closes: #381389, #378604
+  * Conflict with python-support << 0.5.3 and python-central << 0.5.5.
+  * Make dh_python do nothing if debian/pycompat is found.
+    The new versions of dh_pysupport or dh_pycentral will take care of
+    everything dh_python used to do in this situation.
+  * dh_python is now deprecated. Closes: #358392, #253582, #189474
   * move po4a to Build-Depends as it's run in clean.
   * Add size test, which fails on any debhelper program of more than 150
     lines. This is not a joke, and 100 lines would be better.
 
- -- Joey Hess <joeyh@debian.org>  Sun,  2 Jul 2006 18:11:49 -0400
+ -- Joey Hess <joeyh@debian.org>  Sun,  1 Oct 2006 13:07:40 -0400
+
+debhelper (5.0.37.3) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Update of dh_python
+    - when buidling for a non-standard Python version, generate more
+      reasonable Depends like "python (>= X.Y) | pythonX.Y"
+      Closes: #375576
+    - fix handling of private extensions. Closes: #375948
+    - fix parsing of XS-Python-Version, it didn't work if only fixed versions
+      were listed in XS-Python-Version.
+    - fix use of unitialized value. Closes: #374776
+    - fix typos in POD documentation. Closes: #375936
+
+ -- Raphael Hertzog <hertzog@debian.org>  Mon, 10 Jul 2006 13:20:06 +0200
+
+debhelper (5.0.37.2) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Update of dh_python
+    - vastly refactored, easier to understand, and the difference
+      between old policy and new policy is easier to grasp
+    - it supports an -X option which can be used to not scan some files
+    - uses debian/pyversions as reference source of information for
+      dependencies but also parse the XS-Python-Version header as fallback.
+    - ${python:Versions}'s default value is XS-Python-Version's value
+      instead of "all" when the package doesn't depend on a
+      specific python version. Closes: #373853
+    - always generate ${python:Provides} and leave the responsibility to the
+      maintainer to not use ${python:Provides} if he doesn't want the
+      provides.
+    - uses debian/pycompat or DH_PYCOMPAT as reference field to run in new
+      policy mode. The presence of XS-Python-Version will also trigger the
+      new policy mode (this is for short-term compatibility, it may be removed in
+      the not too-distant future).
+      DH_PYCOMPAT=1 is the default mode and is compatible to the old policy.
+      DH_PYCOMPAT=2 is the new mode and is compatible with the new policy.
+  * Use "grep ^Version:" instead of "grep Version:" on the output of
+    dpkg-parsechangelog since the above changelog entry matched "Version:" and
+    thus made the build fail.
+
+ -- Raphael Hertzog <hertzog@debian.org>  Sat, 17 Jun 2006 20:44:29 +0200
+
+debhelper (5.0.37.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Integrate the new dh_python implementing the new Python policy. Closes: #370833
+
+ -- Raphael Hertzog <hertzog@debian.org>  Mon, 12 Jun 2006 08:58:22 +0200
 
 debhelper (5.0.37) unstable; urgency=low
 

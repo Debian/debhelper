@@ -3,13 +3,15 @@
 # Debhelper is supposed to consist of small, simple, easy to understand
 # programs. Programs growing in size and complexity without bounds is a
 # bug.
-use Test;
+use Test::More;
 
-my @progs=grep { -x $_ } glob("dh_*");
+# exclude dh_python since it's deprecated
+my @progs=grep { -x $_ && !/dh_python/ } glob("dh_*");
 
 plan(tests => (@progs + @progs));
 
 foreach my $file (@progs) {
+
 	my $lines=0;
 	my $maxlength=0;
 	open(IN, $file) || die "open: $!";
@@ -23,6 +25,6 @@ foreach my $file (@progs) {
 	}
 	close IN;
 	print "# $file has $lines lines, max length is $maxlength\n";
-	ok($lines < 150);
-	ok($maxlength < 160);
+	ok($lines < 150, $file);
+	ok($maxlength < 160, $file);
 }
