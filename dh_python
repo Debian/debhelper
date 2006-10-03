@@ -18,7 +18,7 @@ B<dh_python> [S<I<debhelper options>>] [B<-n>] [B<-V> I<version>] [S<I<module di
 
 Note: This program is deprecated. You should use dh_pysupport or
 dh_pycentral instead. This program will do nothing if debian/pycompat
-exists.
+or a Python-Version control file field exists.
 
 dh_python is a debhelper program that is responsible for generating the
 ${python:Depends} substitutions and adding them to substvars files. It
@@ -77,8 +77,13 @@ if (-e "debian/pycompat") {
 	warning("Doing nothing since dh_pycompat exists; dh_pysupport or dh_pycentral should do the work. You can remove dh_python from your rules file.");
 	exit 0;
 }
-
-warning("This program is deprecated, you should use dh_pysupport or dh_pycentral instead.");
+elsif (`grep Python-Version: debian/control`) {
+	warning("Doing nothing since Python-Version is set; dh_pysupport or dh_pycentral should do the work. You can remove dh_python from your rules file.");
+	exit 0;
+}
+else {
+	warning("This program is deprecated, you should use dh_pysupport or dh_pycentral instead.");
+}
 
 my $python = 'python';
 
