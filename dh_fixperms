@@ -85,7 +85,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		"-perm -5 -name '*.pm' $find_options -print0",
 		"2>/dev/null | xargs -0r chmod a-X");
 	
-	# v4 only
+	# v4 and up
 	if (! compat(3)) {
 		# Programs in the bin and init.d dirs should be executable..
 		for my $dir (qw{usr/bin bin usr/sbin sbin usr/games etc/init.d}) {

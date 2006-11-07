@@ -43,7 +43,7 @@ a path as possible. It will also create any subdirectories it needs to to put
 the symlinks in.
 
 dh_link also scans the package build tree for existing symlinks which do not
-conform to debian policy, and corrects them (v4 only).
+conform to debian policy, and corrects them (v4 or later).
 
 =head1 OPTIONS
 
@@ -138,7 +138,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		error("parameters list a link without a destination.");
 	}
 
-	# v4 only and only if there is a temp dir already
+	# v4 or later and only if there is a temp dir already
 	if (! compat(3) && -e $tmp) {
 		# Scan for existing links and add them to @links, so they
 		# are recreated policy conformant.

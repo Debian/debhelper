@@ -18,9 +18,9 @@ B<dh_installinfo> [S<I<debhelper options>>] [B<-A>] [B<-n>] [S<I<file ...>>]
 dh_installinfo is a debhelper program that is responsible for installing
 info files and registering the files it installs with install-info.
 
-It determines some information about the info files by parsing them, in
-particular, it looks at the INFO-DIR-SECTION line to determine what section
-the info file belongs in.
+Note that install-info determines some information about the info files by
+parsing them, in particular, it looks at the INFO-DIR-SECTION line to
+determine what section the info file belongs in.
 
 Any filenames specified as parameters will be installed into the first
 package dh_installinfo is told to act on. By default, this is the first
@@ -90,30 +90,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# Only register with install-info if this is a head file in
 		# a tree of info files.
 		if ($file !~ /-\d+$/ && ! $dh{NOSCRIPTS}) {
-			# Figure out what section this file goes in.
-			my $section='';
-			open (IN, "<$file") || die "$file: $!";
-			while (<IN>) {
-				if (/INFO-DIR-SECTION\s+(.*)/) {
-					$section=$1;
-					last;
-				}
-			}
-			close IN;
-			
 			my $fn="/usr/share/info/".basename($file);
 			
-			if ($section ne '') {
-				$section=~s:/:\\/:g; # allow / in section.
-				$section=~s/\&/\\&/g; # escape sed specials
-				$section=~s/(\\[0-9])/\\\\$1/g; # more sed specials
-				autoscript($package,"postinst","postinst-info",
-					"s/#SECTION#/$section/g;s:#FILE#:$fn:");
-			}
-			else {
-				autoscript($package,"postinst","postinst-info-nosection",
-					"s:#FILE#:$fn:");
-			}
+			autoscript($package,"postinst","postinst-info",
+				"s:#FILE#:$fn:");
 			autoscript($package,"prerm","prerm-info", "s:#FILE#:$fn:");
 		}
 	}
