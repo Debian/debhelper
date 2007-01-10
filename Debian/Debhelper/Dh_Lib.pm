@@ -616,7 +616,7 @@ sub getpackages {
 		if (/^Architecture:\s*(.*)/) {
 			$arch=$1;
 		}
-		if (/^X[BC]*-Package-Type:\s*(.*)/) {
+		if (/^(?:X[BC]*-)?Package-Type:\s*(.*)/) {
 			$package_type=$1;
 		}
 		
