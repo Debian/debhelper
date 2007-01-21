@@ -69,6 +69,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $rules_file=pkgfile($package,"udev");
 	my $filename=basename($rules_file);
+	if ($filename eq 'udev') {
+		$filename = "$package.udev";
+	}
 	$filename=~s/\.udev$/.rules/;
 
 	if ($rules_file) {
