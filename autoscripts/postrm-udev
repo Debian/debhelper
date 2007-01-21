@@ -1,4 +1,5 @@
 if [ "$1" = purge ]; then
-	[ -L /etc/udev/rules.d/#PRIO##FILE# ] && \
-	rm /etc/udev/rules.d/#PRIO##FILE#
+	if [ -L /etc/udev/rules.d/#PRIO##FILE# ]; then
+		rm /etc/udev/rules.d/#PRIO##FILE#
+	fi
 fi
