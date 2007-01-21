@@ -144,7 +144,7 @@ sub parseopts {
 
 		"filename=s" => \$options{FILENAME},
 		
-		"priority=i" => \$options{PRIORITY},
+		"priority=s" => \$options{PRIORITY},
 		
 		"flavor=s" => \$options{FLAVOR},
 
