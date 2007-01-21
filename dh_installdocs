@@ -125,12 +125,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if ($dh{EXCLUDE_FIND}) {
 			$exclude = ' -and ! \( '.$dh{EXCLUDE_FIND}.' \)';
 		}
+		if (! compat(4)) {
+			# ignore empty files in subdirs
+			$exclude .= ' -and ! -empty';
+		}
 		foreach my $doc (@docs) {
 			next if excludefile($doc);
-			next if -e $doc && ! -s $doc && ! compat(4); # ignore empty BUGS, etc
-			if (-d $doc && $exclude) {
+			next if -e $doc && ! -s $doc && ! compat(4); # ignore empty files
+			if (-d $doc && length $exclude) {
 			    my ($dir_basename) = basename($doc);
-			    # Pity there's no cp --exclude ..
 			    my $pwd=`pwd`;
 			    chomp $pwd;
 			    complex_doit("cd $doc/.. && find $dir_basename \\( -type f -or -type l \\)$exclude -exec cp --parents -dp {} $pwd/$tmp/usr/share/doc/$package \\;");
