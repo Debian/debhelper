@@ -4,7 +4,6 @@
 
 dh_installudev - install udev rules files
 
-
 =cut
 
 use strict;
@@ -25,7 +24,8 @@ etc/udev/package.rules in the package build directory.
 
 Then postinst and postrm commands are automatically generated to enable
 the rules file when the package is first installed, by creating a symlink
-to it in the /etc/udev/rules.d/ directory. See L<dh_installdeb(1)> for an
+to it in the /etc/udev/rules.d/ directory. These commands are inserted into
+the maintainer scripts by dh_installdeb. See L<dh_installdeb(1)> for an
 explanation of how this works.
 
 =head1 OPTIONS
