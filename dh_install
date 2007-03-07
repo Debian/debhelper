@@ -214,7 +214,7 @@ if ($dh{LIST_MISSING} || $dh{FAIL_MISSING}) {
 		}
 	}, $srcdir);
 	if (@missing) {
-		warning "$_ exists in debian/tmp but is not installed to anywhere" foreach @missing;
+		warning "$_ exists in $srcdir but is not installed to anywhere" foreach @missing;
 		if ($dh{FAIL_MISSING}) {
 			error("missing files, aborting");
 		}
