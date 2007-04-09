@@ -353,6 +353,28 @@ dh_install errors out if wildcards expand to nothing.
 
 =back
 
+=item V6
+
+This mode is still under development. Currently it has these differences
+compared to V5:
+
+=over 8
+
+=item -
+
+dh_installwm will install a slave manpage link for x-window-manager.1.gz.
+
+=item -
+
+dh_builddeb did not previously delete everything matching
+DH_ALWAYS_EXCLUDE, if it was set to a list of things to exclude, such as
+"CVS:.svn". Now it does.
+
+=item -
+
+dh_installman allows overwriting existing man pages in the package build
+directory. In previous compatability levels it silently refuses to do this.
+
 =back
 
 =head2 Doc directory symlinks

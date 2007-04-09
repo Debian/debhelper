@@ -2,8 +2,23 @@ debhelper (5.0.44) UNRELEASED; urgency=low
 
   * dh_installudev: Don't fail if the link already somehow exists on initial
     package install. Closes: #415717
+  * prerm and postrm scripts are now generated in a reverse order than
+    preinst and postinst scripts. For example, if a package uses
+    dh_pysupport before dh_installinit, the prerm will first stop the init
+    script and then remove the python files.
+  * Introducing beginning of v6 mode.
+  * dh_installwm: In v6 mode, install a slave manpage link for
+    x-window-manager.1.gz. Done in v6 mode because some window managers
+    probably work around this longstanding debhelper bug by registering the
+    slave on their own. This bug was only fixable once programs moved out of
+    /usr/X11R6. Closes: #85963
+  * dh_builddeb: In v6 mode, fix bug in DH_ALWAYS_EXCLUDE handling, to work
+    the same as all the other code in debhelper. This could only be fixed in
+    v6 mode because packages may potentially legitimately rely on the old
+    buggy behavior. Closes: #242834
+  * dh_installman: In v6 mode, overwrite exsiting man pages. Closes: #288250
 
- -- Joey Hess <joeyh@debian.org>  Mon, 09 Apr 2007 14:37:48 -0400
+ -- Joey Hess <joeyh@debian.org>  Mon, 09 Apr 2007 15:18:22 -0400
 
 debhelper (5.0.43) unstable; urgency=low
 

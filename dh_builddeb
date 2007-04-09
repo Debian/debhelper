@@ -60,8 +60,15 @@ else {
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	if (exists $ENV{DH_ALWAYS_EXCLUDE} && length $ENV{DH_ALWAYS_EXCLUDE}) {
-		complex_doit("find $tmp -name $_ | xargs rm -rf")
-			foreach split(":", $ENV{DH_ALWAYS_EXCLUDE});
+		if (! compat(5)) {
+			complex_doit("find $tmp $dh{EXCLUDE_FIND} | xargs rm -rf");
+		}
+		else {
+			# Old broken code here for compatability. Does not
+			# remove everything.
+			complex_doit("find $tmp -name $_ | xargs rm -rf")
+				foreach split(":", $ENV{DH_ALWAYS_EXCLUDE});
+		}
 	}
 	if (! is_udeb($package)) {
 		doit("dpkg-deb", @{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$dh{FILENAME});

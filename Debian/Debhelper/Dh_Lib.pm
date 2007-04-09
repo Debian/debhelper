@@ -16,7 +16,7 @@ use vars qw(@ISA @EXPORT %dh);
 	    &compat &addsubstvar &delsubstvar &excludefile &package_arch
 	    &is_udeb &udeb_filename &debhelper_script_subst &escape_shell);
 
-my $max_compat=5;
+my $max_compat=6;
 
 sub init {
 	# If DH_OPTIONS is set, prepend it @ARGV.
@@ -405,7 +405,7 @@ sub autoscript {
 	my $filename=shift;
 	my $sed=shift || "";
 
-	# This is the file we will append to.
+	# This is the file we will modify.
 	my $outfile="debian/".pkgext($package)."$script.debhelper";
 
 	# Figure out what shell script snippet to use.
@@ -423,9 +423,19 @@ sub autoscript {
 		}
 	}
 
-	complex_doit("echo \"# Automatically added by ".basename($0)."\">> $outfile");
-	complex_doit("sed \"$sed\" $infile >> $outfile");
-	complex_doit("echo '# End automatically added section' >> $outfile");
+	if (-e $outfile && ($script eq 'postrm' || $script eq 'prerm')) {
+		# Add fragments to top so they run in reverse order when removing.
+		complex_doit("echo \"# Automatically added by ".basename($0)."\"> $outfile.new");
+		complex_doit("sed \"$sed\" $infile >> $outfile.new");
+		complex_doit("echo '# End automatically added section' >> $outfile.new");
+		complex_doit("cat $outfile >> $outfile.new");
+		complex_doit("mv $outfile.new $outfile");
+	}
+	else {
+		complex_doit("echo \"# Automatically added by ".basename($0)."\">> $outfile");
+		complex_doit("sed \"$sed\" $infile >> $outfile");
+		complex_doit("echo '# End automatically added section' >> $outfile");
+	}
 }
 
 # Removes a whole substvar line.

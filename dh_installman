@@ -163,14 +163,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 		$destdir=~tr:/:/:s; # just for looks
 
-		if (! -e "$destdir/$instname.$section" && 
-		    ! -l "$destdir/$instname.$section") {
-			if (! -d $destdir) {
-				doit "install","-d",$destdir;
-			}
-			doit "install","-p","-m644",$page,
-				"$destdir$instname.$section$gz";
+		next if -l "$destdir/$instname.$section";
+		next if compat(5) && -e "$destdir/$instname.$section";
+
+		if (! -d $destdir) {
+			doit "install","-d",$destdir;
 		}
+		doit "install","-p","-m644",$page,
+			"$destdir$instname.$section$gz";
 		
 	}
 
