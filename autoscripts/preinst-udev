@@ -1,12 +1,12 @@
 if [ "$1" = install ] || [ "$1" = upgrade ]; then
-	if [ -e /etc/udev/#FILE# ]; then
-		if [ "`md5sum \"/etc/udev/#FILE#\" | sed -e \"s/ .*//\"`" = \
-		     "`sed -n -e \"/^Conffiles:/,/^[^ ]/{\\\\' /etc/udev/#FILE#'{s/.* //;p}}\" /var/lib/dpkg/status`" ]
+	if [ -e "#OLD#" ]; then
+		if [ "`md5sum \"#OLD#\" | sed -e \"s/ .*//\"`" = \
+		     "`sed -n -e \"/^Conffiles:/,/^[^ ]/{\\\\' #OLD#'{s/.* //;p}}\" /var/lib/dpkg/status`" ]
 		then
-			rm -f /etc/udev/#FILE#
+			rm -f "#OLD#"
 		fi
 	fi
-	if [ -L /etc/udev/rules.d/#PRIO##FILE# ]; then
-		rm -f /etc/udev/rules.d/#PRIO##FILE#
+	if [ -L "#RULE#" ]; then
+		rm -f "#RULE#"
 	fi
 fi

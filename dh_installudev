@@ -77,8 +77,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 		doit("install","-m","0644",$rules_file,"$tmp/etc/udev/rules.d/$dh{PRIORITY}$filename");
 		if (! $dh{NOSCRIPTS}) {
-			autoscript($package,"preinst","preinst-udev","s/#FILE#/$filename/g;s/#PRIO#/$dh{PRIORITY}/g");
-			autoscript($package,"postinst","postinst-udev","s/#FILE#/$filename/g;s/#PRIO#/$dh{PRIORITY}/g");
+			my $old="/etc/udev/$filename";
+			my $rule="/etc/udev/rules.d/$dh{PRIORITY}$filename";
+			autoscript($package,"preinst","preinst-udev","s!#OLD#!$old!/g;s!#RULE#!$rule!g");
+			autoscript($package,"postinst","postinst-udev","s!#OLD#!$old!/g;s!#RULE#!$rule!g");
 		}
 	}
 }
