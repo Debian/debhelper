@@ -6,6 +6,8 @@ debhelper (5.0.45) UNRELEASED; urgency=low
   * That fixes the longstanding bug that the symlink was only made on brand
     new installs of the package, rather than on upgrade to the first version
     that includes the udev rules file. Closes: #359614
+  * This avoids the need to run udevcontrol reload_rules, since inotify 
+    will see the file has changed. Closes: #414537
   * dh_installudev: Add preinst and postinst code to handle cleanly moving
     the rules file to the new location on upgrade.
   * This would be a good time for the many packages that manage rules files
