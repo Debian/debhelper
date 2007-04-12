@@ -19,22 +19,15 @@ B<dh_installudev> [S<I<debhelper options>>] [B<-n>] [B<--name=>I<name>] [B<--pri
 dh_installudev is a debhelper program that is responsible for
 installing udev rules files.
 
-Files named debian/package.udev will be installed as
-etc/udev/package.rules in the package build directory.
+Files named debian/package.udev will be installed in
+etc/udev/rules.d/ in the package build directory.
 
-Then postinst and postrm commands are automatically generated to enable
-the rules file when the package is first installed, by creating a symlink
-to it in the /etc/udev/rules.d/ directory. These commands are inserted into
-the maintainer scripts by dh_installdeb. See L<dh_installdeb(1)> for an
-explanation of how this works.
+Code is added to the preinst and postinst to handle the upgrade from the
+old udev rules file location.
 
 =head1 OPTIONS
 
 =over 4
-
-=item B<-n>, B<--noscripts>
-
-Do not modify postinst/postrm scripts.
 
 =item B<--name=>I<name>
 
@@ -46,13 +39,17 @@ debian/package.udev.
 
 Sets the priority string of the rules.d symlink. Default is z60.
 
-=back
+=item B<-n>, B<--noscripts>
+
+Do not modify postinst/postrm scripts.
 
 =head1 NOTES
 
 Note that this command is not idempotent. "dh_clean -k" should be called
 between invocations of this command. Otherwise, it may cause multiple
 instances of the same text to be added to maintainer scripts.
+
+=back
 
 =cut
 
@@ -78,13 +75,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (! -e "$tmp/etc/udev/rules.d") {
 			doit("install","-d","$tmp/etc/udev/rules.d");
 		}
-		doit("install","-m","0644",$rules_file,"$tmp/etc/udev/$filename");
-
+		doit("install","-m","0644",$rules_file,"$tmp/etc/udev/rules.d/$dh{PRIORITY}$filename");
 		if (! $dh{NOSCRIPTS}) {
-			autoscript($package,"postinst","postinst-udev",
-				"s/#FILE#/$filename/g;s/#PRIO#/$dh{PRIORITY}/g");
-			autoscript($package,"postrm","postrm-udev",
-				"s/#FILE#/$filename/g;s/#PRIO#/$dh{PRIORITY}/g");
+			autoscript($package,"preinst","preinst-udev","s/#FILE#/$filename/g;s/#PRIO#/$dh{PRIORITY}/g");
+			autoscript($package,"postinst","postinst-udev","s/#FILE#/$filename/g;s/#PRIO#/$dh{PRIORITY}/g");
 		}
 	}
 }

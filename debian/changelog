@@ -1,3 +1,18 @@
+debhelper (5.0.45) UNRELEASED; urgency=low
+
+  * dh_installudev: Install udev rules directly into /etc/udev/rules.d/, not
+    using the symlinks. MD has agreed that this is more appropriate for most
+    packages.
+  * That fixes the longstanding bug that the symlink was only made on brand
+    new installs of the package, rather than on upgrade to the first version
+    that includes the udev rules file. Closes: #359614
+  * dh_installudev: Add preinst and postinst code to handle cleanly moving
+    the rules file to the new location on upgrade.
+  * This would be a good time for the many packages that manage rules files
+    w/o using dh_installudev to begin to use it..
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 12 Apr 2007 15:35:20 -0400
+
 debhelper (5.0.44) unstable; urgency=low
 
   * dh_installudev: Don't fail if the link already somehow exists on initial

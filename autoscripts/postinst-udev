@@ -1,3 +1,9 @@
-if [ "$1" = configure -a -z "$2" ]; then
-	ln -sf ../#FILE# /etc/udev/rules.d/#PRIO##FILE#
+if [ "$1" = configure ]; then
+	if [ -e /etc/udev/#FILE# ]; then
+		echo "Preserving user changes to /etc/udev/rules.d/#PRIO##FILE# ..."
+		if [ -e /etc/udev/rules.d/#PRIO##FILE# ]; then
+			mv -f /etc/udev/rules.d/#PRIO##FILE# /etc/udev/rules.d/#PRIO##FILE#.dpkg-new
+		fi
+		mv -f /etc/udev/#FILE# /etc/udev/rules.d/#PRIO##FILE#
+	fi
 fi
