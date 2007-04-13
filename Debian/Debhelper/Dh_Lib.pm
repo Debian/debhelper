@@ -423,7 +423,8 @@ sub autoscript {
 		}
 	}
 
-	if (-e $outfile && ($script eq 'postrm' || $script eq 'prerm')) {
+	if (-e $outfile && ($script eq 'postrm' || $script eq 'prerm')
+	   && !compat(5)) {
 		# Add fragments to top so they run in reverse order when removing.
 		complex_doit("echo \"# Automatically added by ".basename($0)."\"> $outfile.new");
 		complex_doit("sed \"$sed\" $infile >> $outfile.new");
