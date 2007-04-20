@@ -18,8 +18,8 @@ B<dh_installwm> [S<I<debhelper options>>] [B<-n>] [B<--priority=>I<n>] [S<I<wm .
 dh_installwm is a debhelper program that is responsible for
 generating the postinst and postrm commands that register a window manager
 with L<update-alternatives(8)>. The window manager's man page is also 
-registered as a slave symlink (in v6 mode and up), and is assumed to be
-located in /usr/share/man/man1/<wm>.1.gz.
+registered as a slave symlink (in v6 mode and up), if it is found in 
+usr/share/man/man1/ in the package build directory.
 
 Any window manager programs specified as parameters will be registered in
 the first package dh_installwm is told to act on. By default, this is the
@@ -73,7 +73,7 @@ if (@ARGV) {
 }
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
-#	my $tmp=tmpdir($package);
+	my $tmp=tmpdir($package);
 	my $file=pkgfile($package,"wm");
 
 	my @wm;
@@ -86,9 +86,20 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	if (! $dh{NOSCRIPTS}) {
-		foreach (@wm) {
-			autoscript($package,"postinst","postinst-wm","s:#WM#:$_:;s/#PRIORITY#/$dh{PRIORITY}/",);
-			autoscript($package,"prerm","prerm-wm","s:#WM#:$_:");
+WM:		foreach my $wm (@wm) {
+			autoscript($package,"prerm","prerm-wm","s:#WM#:$wm:");
+
+			my $wmman;
+			if (! compat(5)) {
+				foreach my $ext (".1", ".1x") {
+					$wmman="/usr/share/man/man1/".basename($wm).$ext;
+					if (-e "$tmp$wmman" || -e "$tmp$wmman.gz") {
+						autoscript($package,"postinst","postinst-wm","s:#WM#:$wm:;s:#WMMAN#:$wmman.gz:;s/#PRIORITY#/$dh{PRIORITY}/",);
+						next WM;
+					}
+				}
+			}
+			autoscript($package,"postinst","postinst-wm-noman","s:#WM#:$wm:;s/#PRIORITY#/$dh{PRIORITY}/",);
 		}
 	}
 }
