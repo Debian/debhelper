@@ -656,6 +656,10 @@ sub getpackages {
 sub package_arch {
 	my $package=shift;
 	
+	if (! exists $package_arches{$package}) {
+		warning "package $package is not in control info";
+		return buildarch();
+	}
 	return $package_arches{$package} eq 'all' ? "all" : buildarch();
 }
 
@@ -663,6 +667,10 @@ sub package_arch {
 sub is_udeb {
 	my $package=shift;
 	
+	if (! exists $package_types{$package}) {
+		warning "package $package is not in control info";
+		return 0;
+	}
 	return $package_types{$package} eq 'udeb';
 }
 
