@@ -1,0 +1,15 @@
+if [ "$1" = "remove" ]; then
+	for dir in #DIRLIST#; do
+		if [ -d "$dir" ]; then
+			if [ -f "$dir"/index.theme ] && \
+			   [ -f "$dir"/icon-theme.cache ] && \
+			   which gtk-update-icon-cache >/dev/null 2>&1
+			then
+				gtk-update-icon-cache --force --quiet "$dir"
+			else
+				rm -f "$dir"/icon-theme.cache
+				rmdir -p --ignore-fail-on-non-empty "$dir"
+			fi
+		fi
+	done
+fi

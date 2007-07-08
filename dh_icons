@@ -1,0 +1,73 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dh_icons - Update Freedesktop icon caches
+
+=cut
+
+use strict;
+use File::Find;
+use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+B<dh_icons> [S<I<debhelper options>>] [B<-n>]
+
+=head1 DESCRIPTION
+
+dh_icons is a debhelper program that updates Freedesktop icon caches
+when needed, using the gtk-update-icon-cache program provided by GTK+2.0.
+Currently this program does not handle installation of the files, though it
+may do so at a later date. It takes care of adding maintainer script
+fragments to call F<gtk-update-icon-cache>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-n>, B<--noscripts>
+
+Do not modify maintainer scripts.
+
+=cut
+
+init();
+
+my $baseicondir="/usr/share/icons";
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $icondir="$tmp$baseicondir";
+	if (-d $icondir) {
+		my @dirlist;
+		opendir(DIRHANDLE, $icondir);
+		while (my $subdir = readdir(DIRHANDLE)) {
+			next if $subdir =~ /^\./;
+			my $needs_cache = 0;
+			find sub {
+				$needs_cache = 1 if -f and (/\.png$/ or /\.svg$/ or /\.jpg$/);
+			}, "$icondir/$subdir" ;
+			push @dirlist, "$baseicondir/$subdir" if $needs_cache;
+		}
+		if (@dirlist and ! $dh{NOSCRIPTS}) {
+			my $list=join(" ", @dirlist);
+			autoscript($package,"postinst","postinst-icons","s%#DIRLIST#%$list%");
+			autoscript($package,"postrm","postrm-icons","s%#DIRLIST#%$list%");
+		}
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Ross Burton <ross@burtonini.com>
+Jordi Mallach <jordi@debian.org>
+Josselin Mouette <joss@debian.org>
+
+=cut
