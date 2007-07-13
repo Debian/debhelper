@@ -1,6 +1,6 @@
 if which gtk-update-icon-cache >/dev/null 2>&1; then
 	for dir in #DIRLIST#; do
-		if [ -f "$dir"/icon-theme.cache ]; then
+		if [ -f "$dir"/index.theme ] && [ -f "$dir"/icon-theme.cache ]; then
 			gtk-update-icon-cache --force --quiet "$dir"
 		fi
 	done
