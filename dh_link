@@ -166,6 +166,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 		$src=~s:^/::;
 		$dest=~s:^/::;
+		
+		if ($src eq $dest) {
+			warning("skipping link from $src to self");
+			next;
+		}
 
 		# Make sure the directory the link will be in exists.
 		my $basedir=dirname("$tmp/$dest");
@@ -182,7 +187,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		    	# Figure out how much of a path $src and $dest
 			# share in common.
 			my $x;
-			for ($x=0; $x<@src_dirs && $src_dirs[$x] eq $dest_dirs[$x]; $x++) {}
+			for ($x=0; $x < @src_dirs && $src_dirs[$x] eq $dest_dirs[$x]; $x++) {}
 			# Build up the new src.
 			$src="";
 			for (1..$#dest_dirs - $x) {

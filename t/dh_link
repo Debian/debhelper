@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 use Test;
-plan(tests => 12);
+plan(tests => 13);
 
 # It used to not make absolute links in this situation, and it should.
 # #37774
@@ -33,6 +33,10 @@ system("./dh_link","usr","usr/lib/geant4/c");
 ok(readlink("debian/debhelper/usr/lib/geant4/c"), "../..");
 system("./dh_link","/","usr/lib/geant4/d");
 ok(readlink("debian/debhelper/usr/lib/geant4/d"), "/");
+
+# Link to self.
+system("./dh_link usr/lib/foo usr/lib/foo 2>/dev/null");
+ok(! -l "debian/debhelper/usr/lib/foo");
 
 # Make sure the link conversion didn't change any of the previously made
 # links.
