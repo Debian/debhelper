@@ -181,7 +181,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$keep_debug=1;
 			# Note that it's only an array for the v4 stuff;
 			# for v5 only one value is used.
-			$debugtmp=tmpdir(@{$dh{DEBUGPACKAGES}}[0]);
+			my $debugpackage=@{$dh{DEBUGPACKAGES}}[0];
+			if (! grep { $_ eq $debugpackage } getpackages()) {
+				error("debug package $debugpackage is not listed in the control file");
+			}
+			$debugtmp=tmpdir($debugpackage);
 		}
 	}
 	else {
