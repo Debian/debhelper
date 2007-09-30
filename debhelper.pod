@@ -119,6 +119,16 @@ are not architecture independent.
 Do not act on the specified package even if an -a, -i, or -p option lists
 the package as one that should be acted on.
 
+=item B<--ignore=>I<file>
+
+Ignore the specified file. This can be used if debian/ contains a debhelper
+config file that a debhelper command should not act on. Note that
+debian/compat, debian/control, and debian/changelog can't be ignored, but
+then, there should never be a reason to ignore those files.
+
+For example, if upstream ships a debian/init that you don't want
+dh_installinit to install, use --ignore=debian/init
+
 =item B<-P>I<tmpdir>, B<--tmpdir=>I<tmpdir>
 
 Use "tmpdir" for package build directory. The default is debian/<package>

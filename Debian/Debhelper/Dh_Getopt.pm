@@ -63,6 +63,11 @@ sub AddExclude { my($option,$value)=@_;
 	push @{$options{EXCLUDE}},$value;
 }
 
+# Add a file to the ignore list.
+sub AddIgnore { my($option,$file)=@_;
+	$options{IGNORE}->{$file}=1;
+}
+
 # This collects non-options values.
 sub NonOption {
 	push @{$options{ARGV}}, @_;
@@ -103,6 +108,8 @@ sub parseopts {
 	
 		"X=s" => \&AddExclude,
 		"exclude=s" => \&AddExclude,
+		
+		"ignore=s" => \&AddIgnore,
 	
 		"d" => \$options{D_FLAG},
 		"remove-d" => \$options{D_FLAG},

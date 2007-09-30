@@ -320,18 +320,22 @@ sub pkgfile {
 		$filename="$dh{NAME}.$filename";
 	}
 	
-	if (-f "debian/$package.$filename.".buildarch()) {
-		return "debian/$package.$filename.".buildarch();
+	my @try=("debian/$package.$filename.".buildarch(),
+		 "debian/$package.$filename");
+	if ($package eq $dh{MAINPACKAGE}) {
+		push @try, "debian/$filename";
 	}
-	elsif (-f "debian/$package.$filename") {
-		return "debian/$package.$filename";
+	
+	foreach my $file (@try) {
+		if (-f $file &&
+		    (! $dh{IGNORE} || ! exists $dh{IGNORE}->{$file})) {
+			return $file;
+		}
+
 	}
-	elsif ($package eq $dh{MAINPACKAGE} && -f "debian/$filename") {
-		return "debian/$filename";
-	}
-	else {
-		return "";
-	}
+
+	return "";
+
 }
 
 # Pass it a name of a binary package, it returns the name to prefix to files
