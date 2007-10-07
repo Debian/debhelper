@@ -70,7 +70,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		complex_doit("rm -f debian/$ext*.debhelper");
 	}
 	
-	doit ("rm","-rf",$tmp)
+	doit ("rm","-rf",$tmp."/")
 		unless excludefile($tmp);
 }
 
