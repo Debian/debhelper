@@ -27,6 +27,7 @@ the DEBIAN directory:
   package.prerm
   package.shlibs
   package.conffiles
+  package.triggers
 
 The postinst, preinst, postrm, and prerm are handled specially: If a
 corresponding file named debian/package.script.debhelper exists, the contents
@@ -68,7 +69,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	if (! is_udeb($package)) {
 		# Install non-executable files
-		foreach my $file (qw{shlibs conffiles}) {
+		foreach my $file (qw{shlibs conffiles triggers}) {
 			my $f=pkgfile($package,$file);
 			if ($f) {
 				doit("install","-o",0,"-g",0,"-m",644,"-p",$f,"$tmp/DEBIAN/$file");
