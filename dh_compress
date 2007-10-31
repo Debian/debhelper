@@ -28,12 +28,12 @@ usr/X11R6/man, files in usr/share/doc that are larger than 4k in size,
 already compressed based on their extensions), and all changelog files. Plus
 PCF fonts underneath usr/X11R6/lib/X11/fonts/ and usr/share/fonts/X11/
 
-If a debian/package.compress file exists, however, it will be ran as a shell
-script, and all filenames that the shell script outputs will be compressed
-instead of the default files. The shell script will be run from
-inside the package build directory. Note though that using -X is a much
-better idea in general; you should only use a debian/package.compress file
-if you really have to.
+If a debian/package.compress file exists, the default files are not
+compressed. Instead, the debian/packages.compress is ran as a shell
+script, and all filenames that the shell script outputs will be compressed.
+The shell script will be run from inside the package build directory. Note
+though that using -X is a much better idea in general; you should only use a
+debian/package.compress file if you really need to.
 
 =head1 OPTIONS
 
