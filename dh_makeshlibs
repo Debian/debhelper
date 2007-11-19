@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-dh_makeshlibs - automatically create shlibs file
+dh_makeshlibs - automatically create shlibs file and call dpkg-gensymbols
 
 =cut
 
@@ -11,7 +11,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_makeshlibs> [S<I<debhelper options>>] [B<-m>I<major>] [B<-V>I<[dependencies]>] [B<-n>] [B<-X>I<item>]
+B<dh_makeshlibs> [S<I<debhelper options>>] [B<-m>I<major>] [B<-V>I<[dependencies]>] [B<-n>] [B<-X>I<item>] [S<B<--> I<params>>]
 
 =head1 DESCRIPTION
 
@@ -19,7 +19,12 @@ dh_makeshlibs is a debhelper program that automatically scans for shared
 libraries, and generates a shlibs file for the libraries it finds.
 
 It also adds a call to ldconfig in the postinst and postrm scripts (in
-V3 mode and above only) to any packages which it finds shared libraries in.
+V3 mode and above only) to any packages in which it finds shared libraries.
+
+If a L<dpkg-gensymbols(1)> symbol file is found in debian/package.symbols
+(or debian/package.symbols.arch), dpkg-gensymbols will be called
+to process and install the symbols file. Packages using symbols files
+should Build-Depend on dpkg-dev (>= 1.14.8).
 
 =head1 OPTIONS
 
@@ -68,6 +73,10 @@ from being treated as shared libraries.
 
 Create an additional line for udebs in the shlibs file and use "udeb" as the
 package name for udebs to depend on instead of the regular library package.
+
+=item B<--> I<params>
+
+Pass "params" to L<dpkg-gensymbols(1)>.
 
 =back
 
@@ -194,6 +203,24 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (-e "$tmp/DEBIAN/shlibs") {
 		doit("chmod",644,"$tmp/DEBIAN/shlibs");
 		doit("chown","0:0","$tmp/DEBIAN/shlibs");
+	}
+
+	# dpkg-gensymbols files
+	my $symbols=pkgfile($package, "symbols");
+	if (-e $symbols) {
+		# This is done rather than using dpkg-gensymbols
+		# own search for symbols files, since that search
+		# is not 100% compatible with debhelper. (For example,
+		# this supports --ignore being used.)
+		if (! -d "$tmp/DEBIAN") {
+			doit("install","-d","$tmp/DEBIAN");
+		}
+		doit("cp", $symbols, "$tmp/DEBIAN/symbols");
+		doit("dpkg-gensymbols", "-p$package", "-O$tmp/DEBIAN/symbols",
+			"-P$tmp", @{$dh{U_PARAMS}});
+		if (-s "$tmp/DEBIAN/symbols" == 0) {
+			doit("rm", "-f", "$tmp/DEBIAN/symbols");
+		}
 	}
 }
 
