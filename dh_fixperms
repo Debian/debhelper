@@ -23,10 +23,10 @@ dh_fixperms makes all files in usr/share/doc in the package build directory
 (excluding files in the examples/ directory) be mode 644. It also changes
 the permissions of all man pages to mode 644. It makes all files be owned
 by root, and it removes group and other write permission from all files. It
-removes execute permissions from any libraries that have it set. It makes
-all files in bin/ directories, /usr/games/ and etc/init.d executable (since
-v4). Finally, it removes the setuid and setgid bits from all files in the
-package.
+removes execute permissions from any libraries, headers, perl modules, or
+desktop files that have it set. It makes all files in bin/ directories,
+/usr/games/ and etc/init.d executable (since v4). Finally, it removes the
+setuid and setgid bits from all files in the package.
 
 =head1 OPTIONS
 
@@ -76,7 +76,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		"2>/dev/null | xargs -0r chmod 644");
 	
 	# ..and header files ..
-	complex_doit("find $tmp/usr/include  -type f $find_options -print0",
+	complex_doit("find $tmp/usr/include -type f $find_options -print0",
+		"2>/dev/null | xargs -0r chmod 644");
+	
+	# ..and desktop files ..
+	complex_doit("find $tmp/usr/share/applications -type f $find_options -print0",
 		"2>/dev/null | xargs -0r chmod 644");
 	
 	# .. and perl modules.
