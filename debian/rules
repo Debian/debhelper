@@ -56,7 +56,7 @@ build-stamp:
 		done; \
 		cat $$dir/debhelper.pod | \
 			$(MAKEMANLIST) `find $$dir -type f -maxdepth 1 -name "dh_*.pod" | sort` | \
-			$(POD2MAN) --section=7 > debhelper.$$lang.7; \
+			$(POD2MAN) --name="debhelper" --section=7 > debhelper.$$lang.7; \
 	done
 	
 	touch build-stamp
