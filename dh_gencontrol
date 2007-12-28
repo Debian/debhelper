@@ -21,7 +21,7 @@ proper permissions.
 
 This program is merely a wrapper around L<dpkg-gencontrol(1)>, which calls
 it once for each package being acted on, and passes in some additional
-useful flags including "-isp". 
+useful flags.
 
 =head1 OPTIONS
 
@@ -60,7 +60,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (is_udeb($package)) {
 		push @command, "-n".udeb_filename($package);
 	}
-	doit(@command, "-l$changelog", "-isp", "-Tdebian/${ext}substvars", 
+	doit(@command, "-l$changelog", "-Tdebian/${ext}substvars", 
 		"-P$tmp",@{$dh{U_PARAMS}});
 
 	# This chmod is only necessary if the user sets the umask to
