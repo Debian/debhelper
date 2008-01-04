@@ -1,6 +1,12 @@
 debhelper (5.0.64) UNRELEASED; urgency=low
 
   * dh_gencontrol: Stop passing -isp, it's the default now. Closes: #458114
+  * dh_shlibdeps: Update documentation for -L and -l. dpkg-shlibdeps is now
+    much smarter, and these options are almost never needed. Closes: #459226
+  * dh_shlibdeps: If a relative path is specified in -l, don't prepend the pwd
+    to it, instead just prepend a slash to make it absolute. dpkg-shlibdeps
+    has changed how it used LD_LIBRARY_PATH, so making it point into the
+    package build directory won't work.
 
  -- Joey Hess <joeyh@debian.org>  Fri, 28 Dec 2007 15:45:39 -0500
 
