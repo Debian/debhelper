@@ -7,6 +7,10 @@ debhelper (5.0.64) UNRELEASED; urgency=low
     to it, instead just prepend a slash to make it absolute. dpkg-shlibdeps
     has changed how it used LD_LIBRARY_PATH, so making it point into the
     package build directory won't work.
+  * dh_shlibdeps: Change "-L pkg" to cause "-Sdebian/pkg" to be passed to
+    dpkg-shlibdeps. The old behavior of passing -L to dpkg-shlibdeps didn't
+    affect where it looked for symbols files. Closes: #459224
+  * Depend on dpkg-dev 1.14.15, the first to support dpkg-shlibdeps -S.
 
  -- Joey Hess <joeyh@debian.org>  Fri, 28 Dec 2007 15:45:39 -0500
 
