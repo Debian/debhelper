@@ -136,10 +136,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			    my ($dir_basename) = basename($doc);
 			    my $pwd=`pwd`;
 			    chomp $pwd;
-			    complex_doit("cd $doc/.. && find $dir_basename \\( -type f -or -type l \\)$exclude -exec cp --parents -dp {} $pwd/$tmp/usr/share/doc/$package \\;");
+			    complex_doit("cd '$doc/..' && find '$dir_basename' \\( -type f -or -type l \\)$exclude -exec cp --parents -dp {} $pwd/$tmp/usr/share/doc/$package \\;");
 			}
 			else {
-				doit("cp","-a",$doc,"$tmp/usr/share/doc/$package");
+				doit("cp", "-a", $doc, "$tmp/usr/share/doc/$package");
 			}
 		}
 		doit("chown","-R","0:0","$tmp/usr/share/doc");
