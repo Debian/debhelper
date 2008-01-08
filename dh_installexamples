@@ -78,9 +78,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			doit("install","-d","$tmp/usr/share/doc/$package/examples");
 		}
 		
-		my $exclude = '';
+		my $exclude = '-type f';
 		if ($dh{EXCLUDE_FIND}) {
-			$exclude = ' -and ! \( '.$dh{EXCLUDE_FIND}.' \)';
+			$exclude .= ' -and ! \( '.$dh{EXCLUDE_FIND}.' \)';
 		}
 		
 		foreach my $example (@examples) {
@@ -89,7 +89,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				my ($dir_basename) = basename($example);
 				my $pwd=`pwd`;
 				chomp $pwd;
-				complex_doit("cd '$example/..' && find '$dir_basename' -type f$exclude -exec cp --parents -dp {} $pwd/$tmp/usr/share/doc/$package/examples \\;");
+				complex_doit("cd '$example/..' && find '$dir_basename' $exclude -exec cp --parents -dp {} $pwd/$tmp/usr/share/doc/$package/examples \\;");
 			}
 			else {
 				doit("cp", "-a", $example, "$tmp/usr/share/doc/$package/examples");
