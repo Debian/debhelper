@@ -8,7 +8,6 @@ dh_installdocs - install documentation into package build directories
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
-use Cwd q{abs_path};
 
 =head1 SYNOPSIS
 
@@ -134,11 +133,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			next if excludefile($doc);
 			next if -e $doc && ! -s $doc && ! compat(4); # ignore empty files
 			if (-d $doc && length $exclude) {
-				my ($dir_basename) = basename(abs_path($doc));
+				my $basename = basename($doc);
+				my $dir = ($basename eq '.') ? $doc : "$doc/..";
 				my $pwd=`pwd`;
 				chomp $pwd;
 				$exclude='\\( -type f -or -type l \\)'.$exclude;
-				complex_doit("cd '$doc/..' && find '$dir_basename' $exclude -exec cp --parents -dp {} $pwd/$tmp/usr/share/doc/$package \\;");
+				complex_doit("cd '$dir' && find '$basename' $exclude -exec cp --parents -dp {} $pwd/$tmp/usr/share/doc/$package \\;");
 			}
 			else {
 				doit("cp", "-a", $doc, "$tmp/usr/share/doc/$package");

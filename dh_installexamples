@@ -8,7 +8,6 @@ dh_installexamples - install example files into package build directories
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
-use Cwd q{abs_path};
 
 =head1 SYNOPSIS
 
@@ -87,11 +86,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		foreach my $example (@examples) {
 			next if excludefile($example);
 			if (-d $example && $exclude) {
-				my ($dir_basename) = basename(abs_path($example));
+				my $basename = basename($example);
+				my $dir = ($basename eq '.') ? $example : "$example/..";
 				my $pwd=`pwd`;
 				chomp $pwd;
 				$exclude = '-type f'.$exclude;
-				complex_doit("cd '$example/..' && find '$dir_basename' $exclude -exec cp --parents -dp {} $pwd/$tmp/usr/share/doc/$package/examples \\;");
+				complex_doit("cd '$dir' && find '$basename' $exclude -exec cp --parents -dp {} $pwd/$tmp/usr/share/doc/$package/examples \\;");
 			}
 			else {
 				doit("cp", "-a", $example, "$tmp/usr/share/doc/$package/examples");
