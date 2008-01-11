@@ -1,3 +1,12 @@
+debhelper (6.0.1) UNRELEASED; urgency=low
+
+  * dh_installdocs/examples: Don't unnecessarily use the exclude code path.
+  * Avoid infiinite recursion when told to install a directory ending with
+    "/." (slashdot effect?). Indeed, arbitrarily complex paths can be used
+    now, although there's really no point in using them. Closes: #253234
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 11 Jan 2008 13:38:10 -0500
+
 debhelper (6.0.0) unstable; urgency=low
 
   * dh_gencontrol: Stop passing -isp, it's the default now. Closes: #458114
