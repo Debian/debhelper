@@ -90,8 +90,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				my $dir = ($basename eq '.') ? $example : "$example/..";
 				my $pwd=`pwd`;
 				chomp $pwd;
-				$exclude = '-type f'.$exclude;
-				complex_doit("cd '$dir' && find '$basename' $exclude -exec cp --parents -dp {} $pwd/$tmp/usr/share/doc/$package/examples \\;");
+				my $exclude2 = '-type f'.$exclude;
+				complex_doit("cd '$dir' && find '$basename' -type f$exclude -exec cp --parents -dp {} $pwd/$tmp/usr/share/doc/$package/examples \\;");
 			}
 			else {
 				doit("cp", "-a", $example, "$tmp/usr/share/doc/$package/examples");
