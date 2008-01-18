@@ -12,7 +12,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_link> [S<I<debhelper options>>] [B<-A>] [S<I<source destination ...>>]
+B<dh_link> [S<I<debhelper options>>] [B<-A>] [B<-X>I<item>] [S<I<source destination ...>>]
 
 =head1 DESCRIPTION
 
@@ -53,6 +53,11 @@ conform to debian policy, and corrects them (v4 or later).
 
 Create any links specified by command line parameters in ALL packages
 acted on, not just the first.
+
+=item B<-Xitem>, B<--exclude=item>
+
+Do not correct symlinks that contain "item" anywhere in their filename from
+being corrected to comply with debian policy.
 
 =item I<source destination ...>
 
@@ -145,6 +150,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		find(
 			sub {
 				return unless -l;
+				return if excludefile($_);
 				my $dir=$File::Find::dir;
 				$dir=~s/^\Q$tmp\E//;
 				my $target = readlink($_);
