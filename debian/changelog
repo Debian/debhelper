@@ -2,6 +2,11 @@ debhelper (6.0.3) UNRELEASED; urgency=low
 
   * dh_link: -X can be used to avoid it modifying symlinks to be compliant
     with policy. Closes: #461392
+  * dh_shlibdeps: Rather than skipping everything in /usr/lib/debug,
+    which can include debug libraries that dpkg-shlibdeps should look at,
+    only skip the subdirectories of it that contain separate debugging
+    symbols. (Hardcoding the names of those directories is not the best
+    implementation, but it will do for now.) Closes: #461339
 
  -- Joey Hess <joeyh@debian.org>  Fri, 18 Jan 2008 12:29:15 -0500
 
