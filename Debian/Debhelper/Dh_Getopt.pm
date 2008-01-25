@@ -121,6 +121,7 @@ sub parseopts {
 	
 		"k" => \$options{K_FLAG},
 		"keep" => \$options{K_FLAG},
+		"keep-debug" => \$options{K_FLAG},
 
 		"P=s" => \$options{TMPDIR},
 		"tmpdir=s" => \$options{TMPDIR},
@@ -168,8 +169,6 @@ sub parseopts {
 		"L|libpackage=s" => \$options{LIBPACKAGE},
 		
 		"name=s" => \$options{NAME},
-		
-		"keep-debug" => \$options{KEEP_DEBUG},
 		
 		"error-handler=s" => \$options{ERROR_HANDLER},
 		

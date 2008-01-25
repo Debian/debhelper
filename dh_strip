@@ -149,6 +149,10 @@ sub make_debug {
 	my $file=shift;
 	my $tmp=shift;
 	my $desttmp=shift;
+	
+	# Don't try to copy debug symbols out if the file is already
+	# stripped.
+	return unless get_file_type($file) =~ /not stripped/;
 
 	my ($base_file)=$file=~/^\Q$tmp\E(.*)/;
 	my $debug_path=$desttmp."/usr/lib/debug/".$base_file;
@@ -156,9 +160,7 @@ sub make_debug {
 	if (! -d $debug_dir) {
 		doit("install", "-d", $debug_dir);
 	}
-	if (! -e $debug_path) {
-		doit("objcopy", "--only-keep-debug", $file, $debug_path);
-	}
+	doit("objcopy", "--only-keep-debug", $file, $debug_path);
 	# No reason for this to be executable.
 	doit("chmod", 644, $debug_path);
 	return $debug_path;
@@ -174,7 +176,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 
 	# Support for keeping the debugging symbols in a detached file.
-	my $keep_debug=$dh{KEEP_DEBUG};
+	my $keep_debug=$dh{K_FLAG};
 	my $debugtmp=$tmp;
 	if (! compat(4)) {
 		if (ref $dh{DEBUGPACKAGES}) {
@@ -204,14 +206,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# *must* inclde the --strip-unneeded.
 		doit("strip","--remove-section=.comment",
 			"--remove-section=.note","--strip-unneeded",$_);
-		attach_debug($_, $debug_path) if $keep_debug;
+		attach_debug($_, $debug_path) if defined $debug_path;
 	}
 	
 	foreach (@executables) {
 		my $debug_path = make_debug($_, $tmp, $debugtmp) if $keep_debug;
 		doit("strip","--remove-section=.comment",
 			"--remove-section=.note",$_);
- 		attach_debug($_, $debug_path) if $keep_debug
+ 		attach_debug($_, $debug_path) if defined $debug_path;
 	}
 
 	foreach (@static_libs) {
