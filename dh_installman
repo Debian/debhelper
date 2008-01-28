@@ -183,7 +183,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 		complex_doit "man --recode UTF-8 \Q$instpage\E > \Q$instpage.new\E";
 		doit "chmod",644,"$instpage.new";
-		doit "mv","$instpage.new",$instpage;
+		doit "mv","-f","$instpage.new",$instpage;
 	}
 
 	# Now the .so conversion.
