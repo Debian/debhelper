@@ -492,7 +492,7 @@ sub addsubstvar {
 		else {
 			delete $items{$str};
 		}
-		$line=join(", ", keys %items);
+		$line=join(", ", sort keys %items);
 	}
 	elsif (! $remove) {
 		$line=$str;
