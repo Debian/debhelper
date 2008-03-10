@@ -38,11 +38,6 @@ like /usr/share/man/pl/man1/, that is because your program has a
 name like "foo.pl", and dh_installman assumes that means it is translated
 into Polish. Use --language=C to avoid this.
 
-dh_installman will use man to guess the character encoding of each manual
-page and convert it to UTF-8. If the guesswork fails for some reason, you
-can override it using an encoding declaration. See L<manconv(1)> for
-details.
-
 Any man page filenames specified as parameters will be installed into the
 first package dh_installman is told to act on. By default, this is the
 first binary package in debian/control, but if you use -p, -i, or -a flags,
@@ -54,6 +49,11 @@ installed.
 After the man page installation step, dh_installman will check to see if
 any of the man pages in the temporary directories of any of the packages it
 is acting on contain ".so" links. If so, it changes them to symlinks.
+
+Also, dh_installman will use man to guess the character encoding of each
+manual page and convert it to UTF-8. If the guesswork fails for some
+reason, you can override it using an encoding declaration. See
+L<manconv(1)> for details.
 
 =head1 OPTIONS
 
@@ -97,9 +97,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $file=pkgfile($package,"manpages");
 	my @manpages;
 
-	if ($file) {
-		@manpages=filearray($file, ".");
-	}
+	@manpages=filearray($file, ".") if $file;
 
 	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
 		push @manpages, @ARGV;
@@ -137,8 +135,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 		# Now get the numeric component of the section.
 		my ($realsection)=$section=~m/^(\d)/ if defined $section;
-		
-		# If there is no numeric section, bail.
 		if (! $realsection) {
 			error("Could not determine section for $page");
 		}
@@ -181,9 +177,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		else {
 			doit "install","-p","-m644",$page,$instpage;
 		}
-		complex_doit "man --recode UTF-8 \Q$instpage\E > \Q$instpage.new\E";
-		doit "chmod",644,"$instpage.new";
-		doit "mv","-f","$instpage.new",$instpage;
 	}
 
 	# Now the .so conversion.
@@ -197,6 +190,18 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		my $sodest=shift(@sodests);
 		doit "rm","-f",$sofile;
 		doit "ln","-sf",$sodest,$sofile;
+	}
+
+	# Now utf-8 conversion.
+	foreach my $dir (qw{usr/share/man usr/X11R6/man}) {
+		if (-e "$tmp/$dir") {
+			find(sub {
+				return unless -f $_;
+				complex_doit "man --recode UTF-8 ./\Q$_\E > \Q$_.new\E";
+				doit "chmod",644,"$_.new";
+				doit "mv","-f","$_.new",$_;
+			}, "$tmp/$dir");
+		}
 	}
 }
 
