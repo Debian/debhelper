@@ -196,7 +196,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	foreach my $dir (qw{usr/share/man usr/X11R6/man}) {
 		if (-e "$tmp/$dir") {
 			find(sub {
-				return unless -f $_;
+				return if ! -f $_ || -l $_;
 				complex_doit "man --recode UTF-8 ./\Q$_\E > \Q$_.new\E";
 				doit "chmod",644,"$_.new";
 				doit "mv","-f","$_.new",$_;
