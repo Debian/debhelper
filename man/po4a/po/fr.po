@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: debhelper manpages\n"
-"POT-Creation-Date: 2008-03-10 18:31-0400\n"
+"POT-Creation-Date: 2008-03-25 14:08-0400\n"
 "PO-Revision-Date: 2006-11-19 20:50+0100\n"
 "Last-Translator: Valery Perrin <valery.perrin.debian@free.fr>\n"
 "Language-Team: French <debian-l10n-french@lists.debian.org>\n"
@@ -1180,7 +1180,7 @@ msgstr ""
 #: dh_installman:246 dh_installmenu:80 dh_installmime:85 dh_installmodules:116
 #: dh_installpam:52 dh_install:251 dh_installppp:56 dh_installwm:107
 #: dh_installxfonts:86 dh_link:223 dh_listpackages:28 dh_makeshlibs:222
-#: dh_md5sums:86 dh_movefiles:162 dh_perl:140 dh_python:282 dh_scrollkeeper:76
+#: dh_md5sums:86 dh_movefiles:162 dh_perl:152 dh_python:282 dh_scrollkeeper:76
 #: dh_shlibdeps:159 dh_strip:224 dh_suidregister:117 dh_testdir:43
 #: dh_testroot:26 dh_testversion:74 dh_undocumented:28 dh_usrlocal:114
 msgid "SEE ALSO"
@@ -1218,7 +1218,7 @@ msgstr "Le site internet de debhelper."
 #: dh_installmime:91 dh_installmodules:122 dh_installpam:58 dh_install:257
 #: dh_installppp:62 dh_installwm:113 dh_installxfonts:92 dh_link:229
 #: dh_listpackages:34 dh_makeshlibs:228 dh_md5sums:92 dh_movefiles:168
-#: dh_perl:146 dh_python:288 dh_scrollkeeper:82 dh_shlibdeps:165 dh_strip:230
+#: dh_perl:158 dh_python:288 dh_scrollkeeper:82 dh_shlibdeps:165 dh_strip:230
 #: dh_suidregister:123 dh_testdir:49 dh_testroot:32 dh_testversion:80
 #: dh_undocumented:34 dh_usrlocal:120
 msgid "AUTHOR"
@@ -1270,7 +1270,7 @@ msgstr ""
 #: dh_installinit:33 dh_installlogrotate:22 dh_installmanpages:40
 #: dh_installman:58 dh_installmenu:34 dh_installmime:31 dh_installmodules:39
 #: dh_installpam:24 dh_install:43 dh_installppp:26 dh_installwm:32 dh_link:48
-#: dh_makeshlibs:28 dh_md5sums:28 dh_movefiles:32 dh_perl:28 dh_python:39
+#: dh_makeshlibs:28 dh_md5sums:28 dh_movefiles:32 dh_perl:31 dh_python:39
 #: dh_scrollkeeper:32 dh_shlibdeps:26 dh_strip:35 dh_testdir:23
 #: dh_testversion:34 dh_usrlocal:39
 msgid "OPTIONS"
@@ -1331,7 +1331,7 @@ msgstr ""
 #: dh_installmime:87 dh_installmodules:118 dh_installpam:54 dh_install:253
 #: dh_installppp:58 dh_installwm:109 dh_installxfonts:88 dh_link:225
 #: dh_listpackages:30 dh_makeshlibs:224 dh_md5sums:88 dh_movefiles:164
-#: dh_perl:142 dh_python:284 dh_strip:226 dh_suidregister:119 dh_testdir:45
+#: dh_perl:154 dh_python:284 dh_strip:226 dh_suidregister:119 dh_testdir:45
 #: dh_testroot:28 dh_testversion:76 dh_undocumented:30 dh_usrlocal:116
 msgid "L<debhelper(7)>"
 msgstr "L<debhelper(7)>"
@@ -1345,7 +1345,7 @@ msgstr "L<debhelper(7)>"
 #: dh_installman:250 dh_installmenu:86 dh_installmime:89 dh_installmodules:120
 #: dh_installpam:56 dh_install:255 dh_installppp:60 dh_installwm:111
 #: dh_installxfonts:90 dh_link:227 dh_listpackages:32 dh_makeshlibs:226
-#: dh_md5sums:90 dh_movefiles:166 dh_perl:144 dh_python:286 dh_scrollkeeper:80
+#: dh_md5sums:90 dh_movefiles:166 dh_perl:156 dh_python:286 dh_scrollkeeper:80
 #: dh_shlibdeps:163 dh_strip:228 dh_suidregister:121 dh_testdir:47
 #: dh_testroot:30 dh_testversion:78 dh_undocumented:32 dh_usrlocal:118
 msgid "This program is a part of debhelper."
@@ -1546,7 +1546,7 @@ msgid "Add these files to the list of files to compress."
 msgstr "Ajoute ces fichiers à la liste des fichiers à comprimer."
 
 # type: =head1
-#: dh_compress:61 dh_perl:58 dh_python:66 dh_strip:74 dh_usrlocal:55
+#: dh_compress:61 dh_perl:61 dh_python:66 dh_strip:74 dh_usrlocal:55
 msgid "CONFORMS TO"
 msgstr "CONFORMITÉ"
 
@@ -4619,7 +4619,8 @@ msgstr ""
 
 # type: textblock
 #: dh_perl:5
-msgid "dh_perl - calculates perl dependencies"
+#, fuzzy
+msgid "dh_perl - calculates perl dependencies and cleans up after MakeMaker"
 msgstr "dh_perl - détermine les dépendances Perl"
 
 # type: textblock
@@ -4652,13 +4653,20 @@ msgstr ""
 "substitution a lieu dans le fichier S<« control »> du paquet, à l'emplacement "
 "où est indiqué S<« ${perl:Depends} »>."
 
+# type: textblock
+#: dh_perl:28
+msgid ""
+"dh_perl also cleans up empty directories that MakeMaker can generate when "
+"installing perl modules."
+msgstr ""
+
 # type: =item
-#: dh_perl:32
+#: dh_perl:35
 msgid "B<-d>"
 msgstr "B<-d>"
 
 # type: textblock
-#: dh_perl:34
+#: dh_perl:37
 msgid ""
 "In some specific cases you may want to depend on perl-base rather than the "
 "full perl package. If so, you can pass the -d option to make dh_perl "
@@ -4672,7 +4680,7 @@ msgstr ""
 "le système de base."
 
 # type: textblock
-#: dh_perl:39
+#: dh_perl:42
 msgid ""
 "Note that this flag may cause no dependency on perl-base to be generated at "
 "all. perl-base is Essential, so its dependency can be left out, unless a "
@@ -4683,12 +4691,12 @@ msgstr ""
 "peut être omise, à moins qu'une dépendance de version soit nécessaire."
 
 # type: =item
-#: dh_perl:43
+#: dh_perl:46
 msgid "B<-V>"
 msgstr "B<-V>"
 
 # type: textblock
-#: dh_perl:45
+#: dh_perl:48
 msgid ""
 "By default, scripts and architecture independent modules don't depend on any "
 "specific version of perl.  The -V option causes the current version of the "
@@ -4699,12 +4707,12 @@ msgstr ""
 "spécifier la version en cours du paquet perl (ou perl-base avec -d)."
 
 # type: =item
-#: dh_perl:49
+#: dh_perl:52
 msgid "I<library dirs>"
 msgstr "I<bibliothèque répertoires>"
 
 # type: textblock
-#: dh_perl:51
+#: dh_perl:54
 msgid ""
 "If your package installs perl modules in non-standard directories, you can "
 "make dh_perl check those directories by passing their names on the command "
@@ -4716,17 +4724,17 @@ msgstr ""
 "les répertoires vendorlib et vendorarch."
 
 # type: textblock
-#: dh_perl:60 dh_strip:76
+#: dh_perl:63 dh_strip:76
 msgid "Debian policy, version 3.0.1"
 msgstr "Charte Debian, version 3.0.1"
 
 # type: textblock
-#: dh_perl:62
+#: dh_perl:65
 msgid "Perl policy, version 1.18"
 msgstr "Charte Perl, version 1.18"
 
 # type: textblock
-#: dh_perl:148
+#: dh_perl:160
 msgid "Brendan O'Dea <bod@debian.org>"
 msgstr "Brendan O'Dea <bod@debian.org>"
 

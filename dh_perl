@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-dh_perl - calculates perl dependencies
+dh_perl - calculates perl dependencies and cleans up after MakeMaker
 
 =cut
 
@@ -24,6 +24,9 @@ The program will look at perl scripts and modules in your package,
 and will use this information to generate a dependency on perl or
 perlapi. The dependency will be substituted into your package's control
 file wherever you place the token "${perl:Depends}".
+
+dh_perl also cleans up empty directories that MakeMaker can generate when
+installing perl modules.
 
 =head1 OPTIONS
 
@@ -134,6 +137,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# add perlapi-<ver> for XS modules
 		addsubstvar($package, "perl:Depends", "perlapi-$Config{version}")
 			if $deps & XS_MODULE;
+	}
+
+	# MakeMaker always makes lib and share dirs, but typically
+	# only one directory is installed into.
+	foreach my $dir ("$tmp/usr/share/perl5", "$tmp/usr/lib/perl5") {
+		if (-d $dir) {
+			doit("rmdir", "--ignore-fail-on-non-empty", "--parents",
+				"$dir");
+		}
 	}
 }
 
