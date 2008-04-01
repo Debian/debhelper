@@ -197,9 +197,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (-e "$tmp/$dir") {
 			find(sub {
 				return if ! -f $_ || -l $_;
-				complex_doit "man --recode UTF-8 ./\Q$_\E > \Q$_.new\E";
-				doit "chmod",644,"$_.new";
-				doit "mv","-f","$_.new",$_;
+				my ($tmp, $orig)=($_.".new", $_);
+				complex_doit "man --recode UTF-8 ./\Q$orig\E > \Q$tmp\E";
+				# recode uncompresses compressed pages
+				doit "rm", "-f", $orig if s/\.(gz|Z)$//;
+				doit "chmod", 644, $tmp;
+				doit "mv", "-f", $tmp, $_;
 			}, "$tmp/$dir");
 		}
 	}
