@@ -46,7 +46,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			next if $subdir =~ /^\./;
 			my $needs_cache = 0;
 			find sub {
-				$needs_cache = 1 if -f and (/\.png$/ or /\.svg$/ or /\.jpg$/);
+				$needs_cache = 1 if -f and (/\.png$/ or /\.svg$/ or /\.xpm$/ or /\.icon$/);
 			}, "$icondir/$subdir" ;
 			push @dirlist, "$baseicondir/$subdir" if $needs_cache;
 		}
