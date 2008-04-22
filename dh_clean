@@ -20,7 +20,7 @@ package is built. It removes the package build directories, and removes some
 other files including debian/files, and any detritus left behind by other
 debhelper commands. It also removes common files that should not appear in a
 debian diff:
-  #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS core .deps/* *.P
+  #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS .deps/* *.P
 
 =head1 OPTIONS
 
@@ -95,7 +95,7 @@ if (! $dh{D_FLAG}) {
 	        \\( -name '#*#' -o -name '.*~' -o -name '*~' -o -name DEADJOE \\
 		 -o -name '*.orig' -o -name '*.rej' -o -name '*.bak' \\
 		 -o -name '.*.orig' -o -name .*.rej -o -name '.SUMS' \\
-		 -o -name TAGS -o -name core -o \\( -path '*/.deps/*' -a -name '*.P' \\) \\
+		 -o -name TAGS -o \\( -path '*/.deps/*' -a -name '*.P' \\) \\
 		\\) -exec rm -f {} \\; \\) -o \\
 		\\( -type d -a -name autom4te.cache -prune -exec rm -rf {} \\; \\) \\)");
 }
