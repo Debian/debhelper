@@ -1,0 +1,104 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dh_auto_configure - automatically configure a package prior to building
+
+=cut
+
+use strict;
+use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+B<dh_auto_configure> [S<I<debhelper options>>] [S<B<--> I<params>>]
+
+=head1 DESCRIPTION
+
+dh_auto_configure is a debhelper program that tries to automatically
+configure a package prior to building. It looks for and runs
+a ./configure script, or Makefile.PL. A standard set of parameters is
+determined and passed to the program that is run. If no program to run
+is found, dh_auto_configure will exit without doing anything.
+
+This is intended to work for about 90% of packages. If it doesn't work,
+you're encoruaged to skip using dh_auto_configure at all, and just run
+./configure or its equivilant by hand.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--> I<params>
+
+Pass "params" to the program that is run. These can be used to suppliment
+or override the standard parameters that dh_auto_configure passes.
+
+=back
+
+=cut
+
+init();
+
+sub dpkg_architecture_value {
+	my $var=shift;
+	my $value=`dpkg-architecture -q$var 2>/dev/null` || error("dpkg-architecture failed");
+	chomp $value;
+	return $value;
+}
+
+sub sourcepackage {
+	open (CONTROL, 'debian/control') ||
+		error("cannot read debian/control: $!\n");
+	while (<CONTROL>) {
+		chomp;
+		s/\s+$//;
+		if (/^Source:\s*(.*)/) {
+			close CONTROL;
+			return $1;
+		}
+	}
+
+	close CONTROL;
+	error("could not find Source: line in control file.");
+}
+
+if (-x "configure") {
+	# Standard set of options for configure.
+	my @opts;
+	push @opts, "--build=".dpkg_architecture_value("DEB_BUILD_GNU_TYPE");
+	push @opts, "--prefix=/usr";
+	push @opts, "--includedir=\${prefix}/include";
+	push @opts, "--mandir=\${prefix}/share/man";
+	push @opts, "--infodir=\${prefix}/share/info";
+	push @opts, "--sysconfdir=/etc";
+	push @opts, "--localstatedir=/var";
+	push @opts, "--libexecdir=\${prefix}/lib/".sourcepackage();
+	push @opts, "--disable-maintainer-mode";
+	push @opts, "--disable-dependency-tracking";
+	# Provide --host only if different from --build, as recommended in
+	# autotools-dev README.Debian: When provided (even if equal) autotools
+	# 2.52+ switches to cross-compiling mode.
+	if (dpkg_architecture_value("DEB_BUILD_GNU_TYPE") ne dpkg_architecture_value("DEB_HOST_GNU_TYPE")) {
+		push @opts, "--host=".dpkg_architecture_value("DEB_HOST_GNU_TYPE");
+	}
+	doit("./configure", @opts, @{$dh{U_PARAMS}});
+}
+elsif (-e "Makefile.PL") {
+	doit("perl Makefile.PL", "INSTALLDIRS=vendor", @{$dh{U_PARAMS}});
+}
+elsif (-e "setup.py") {
+	doit("python setup.py", "build", @{$dh{U_PARAMS}});
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut
