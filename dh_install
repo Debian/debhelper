@@ -40,6 +40,10 @@ package that builds multiple binary packages. You can use the upstream
 Makefile to install it all into debian/tmp, and then use dh_install to copy
 directories and files from there into the proper package build directories.
 
+From debhelper compatability level 7 on, if --sourcedir is not specified,
+dh_install will install files from debian/tmp if the directory contains the
+files. Otherwise, it will install files from the current directory.
+
 =head1 OPTIONS
 
 =over 4
@@ -138,13 +142,26 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (! defined $dh{AUTODEST} && @$set > 1) {
 			$dest=pop @$set;
 		}
+
+		my @filelist;
+		foreach my $glob (@$set) {
+			my @found = glob "$srcdir/$glob";
+			if (! compat(6)) {
+				# Fall back to looking in debian/tmp.
+				if (! @found || ! -e $found[0]) {
+					@found = glob "debian/tmp/$glob";
+				}
+			}
+			push @filelist, @found;
+		}
+
 		if (! compat(4)) { # check added in v5
 			# glob now, relative to srcdir
-			if (! map { glob "$srcdir/$_" } @$set) {
+			if (! @filelist) {
 				error("$package missing files (@$set), aborting");
 			}
 		}
-		foreach my $src (map { glob "$srcdir/$_" } @$set) { 
+		foreach my $src (@filelist) { 
 			next if excludefile($src);
 		
 			if (! defined $dest) {

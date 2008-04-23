@@ -1,4 +1,4 @@
-debhelper (6.0.13) UNRELEASED; urgency=low
+debhelper (7.0.0) UNRELEASED; urgency=low
 
   * dh_clean: Don't delete core dumps. (Too DWIM, and "core" is not
     necessarily a core dump.) Closes: #477391
@@ -18,6 +18,12 @@ debhelper (6.0.13) UNRELEASED; urgency=low
     setup.py to install. Supports the PREFIX=/usr special case needed by
     MakeMaker Makefiles. (Support for cmake and other build systems planned
     but not yet implemented.)
+  * New v7 mode, which only has one change from v6, and is the new
+    recommended default.
+  * dh_install: if --sourcedir is not specified, first look for files in
+    debian/tmp, and then will look in the current directory. This allows
+    dh_install to interoperate with dh_auto_install without needing any
+    special parameters.
 
  -- Joey Hess <joeyh@debian.org>  Tue, 22 Apr 2008 17:54:20 -0400
 

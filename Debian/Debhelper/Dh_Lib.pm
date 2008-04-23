@@ -16,7 +16,7 @@ use vars qw(@ISA @EXPORT %dh);
 	    &compat &addsubstvar &delsubstvar &excludefile &package_arch
 	    &is_udeb &udeb_filename &debhelper_script_subst &escape_shell);
 
-my $max_compat=6;
+my $max_compat=7;
 
 sub init {
 	# If DH_OPTIONS is set, prepend it @ARGV.

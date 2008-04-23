@@ -364,8 +364,7 @@ dh_install errors out if wildcards expand to nothing.
 
 =item V6
 
-This is the recommended mode of operation. It does everything V5 does,
-plus:
+Changes from V5 are:
 
 =over 8
 
@@ -390,6 +389,23 @@ DH_ALWAYS_EXCLUDE, if it was set to a list of things to exclude, such as
 
 dh_installman allows overwriting existing man pages in the package build
 directory. In previous compatability levels it silently refuses to do this.
+
+=back
+
+=item V7
+
+This is the recommended mode of operation.
+
+Changes from V6 are:
+
+=over 8
+
+=item -
+
+dh_install, if --sourcedir is not specified, will first look for files in
+debian/tmp, and then will look in the current directory. This allows
+dh_install to interoperate with dh_auto_install without needing any special
+parameters.
 
 =back
 
