@@ -1,92 +1,26 @@
 #!/usr/bin/make -f
-# This is _not_ a good example of a debhelper rules file.
-# See examples/ for some good examples.
+# Each debhelper command in this rules file has to be run using ./run,
+# to ensure that the commands and libraries in the source tree are used,
+# rather than the installed ones.
 
-# This generates a list of synopses of debhelper commands, and substitutes
-# it in to the #LIST# line on the man page fed to it on stdin. Must be passed
-# parameters of all the executables or pod files to get the synopses from.
-# (Like I said, this is not a good example of a debhelper rules file..)
-# For correct conversion of pod tags (like S< >) #LIST# must be substituted in
-# the pod file and not in the troff file.
-MAKEMANLIST=perl -e ' \
-		undef $$/; \
-		foreach (@ARGV) { \
-		        open (IN, $$_) or die "$$_: $$!"; \
-		        $$file=<IN>; \
-		        close IN; \
-		        if ($$file=~m/=head1 .*?\n\n(.*?) - (.*?)\n\n/s) { \
-		                $$collect.="=item $$1(1)\n\n$$2\n\n"; \
-		        } \
-		} \
-		END { \
-			while (<STDIN>) { \
-		        	s/\#LIST\#/$$collect/; \
-				print; \
-			}; \
-		}'
-
-# Figure out the `current debhelper version.
-VERSION=$(shell expr "`dpkg-parsechangelog |grep Version:`" : '.*Version: \(.*\)')
-
-PERLLIBDIR=$(shell perl -MConfig -e 'print $$Config{vendorlib}')
-
-POD2MAN=pod2man -c Debhelper -r "$(VERSION)"
-
-# l10n to be built is determined from .po files
-LANGS=$(notdir $(basename $(wildcard man/po4a/po/*.po)))
-
-version:
-	printf "package Debian::Debhelper::Dh_Version;\n\$$version='$(VERSION)';\n1" > \
-		Debian/Debhelper/Dh_Version.pm
-
-build: version test build-stamp
-build-stamp:
-	find . -maxdepth 1 -type f -perm +100 -name "dh_*" \
-		-exec $(POD2MAN) {} {}.1 \;
-	cat debhelper.pod | \
-		$(MAKEMANLIST) `find . -maxdepth 1 -type f -perm +100 -name "dh_*" | sort` | \
-		$(POD2MAN) --name="debhelper" --section=7  > debhelper.7
-	po4a man/po4a/po4a.cfg 
-	set -e; \
-	for lang in $(LANGS); do \
-		dir=man/$$lang; \
-		for file in $$dir/dh_*.pod; do \
-			prog=`basename $$file | sed 's/.pod//'`; \
-			$(POD2MAN) $$file $$prog.$$lang.1; \
-		done; \
-		cat $$dir/debhelper.pod | \
-			$(MAKEMANLIST) `find $$dir -type f -maxdepth 1 -name "dh_*.pod" | sort` | \
-			$(POD2MAN) --name="debhelper" --section=7 > debhelper.$$lang.7; \
-	done
-	
-	touch build-stamp
+build:
+	./run dh_auto_configure
+	./run dh_auto_build
+	./run dh_auto_test
 
 clean:
 	./run dh_testdir
 	./run dh_testroot
-	./run dh_clean *.1 *.7 *-stamp Debian/Debhelper/Dh_Version.pm
-	po4a --rm-translations --rm-backups man/po4a/po4a.cfg
-	for lang in $(LANGS); do \
-		if [ -e man/$$lang ]; then rmdir man/$$lang; fi; \
-	done;
-
-test: version test-stamp
-test-stamp:
+	./run dh_auto_clean
 	./run dh_clean
-	./run perl -MTest::Harness -e 'runtests grep { ! /CVS/ && ! /\.svn/ } @ARGV' t/*
-	./run dh_clean
-	touch test-stamp
 
 binary-indep: build
 	./run dh_testdir
 	./run dh_testroot
 	./run dh_clean -k
-	./run dh_install -X .1 dh_* usr/bin
-	./run dh_install Debian/Debhelper/*.pm $(PERLLIBDIR)/Debian/Debhelper/
-	./run dh_install autoscripts usr/share/debhelper
-	./run dh_installdocs doc/*
-	./run dh_installexamples examples/*
-	./run dh_installman *.1 *.7
+	./run dh_installdocs
+	./run dh_installexamples
+	./run dh_installman
 	./run dh_installchangelogs
 	./run dh_link
 	./run dh_compress

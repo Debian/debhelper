@@ -49,6 +49,7 @@ if (-e "Makefile" || -e "makefile" || -e "GNUmakefile") {
 		# "Making target".
 		my $ret=`LANG=C $ENV{MAKE} --question $target 2>/dev/null`;
 		chomp $ret;
+		print ">>$ret for $target\n";
 		if ($ret =~ /^Making \Q$target\E/m) {
 			doit($ENV{MAKE}, $target, @{$dh{U_PARAMS}});
 			last;
