@@ -17,9 +17,8 @@ policy changes, and packages that use them will require only a rebuild to
 comply with the new policy.
 
 A typical debian/rules file that uses debhelper will call several debhelper
-commands in sequence. Debhelper commands are all named with a "dh_" prefix.
-Examples of rules files that use debhelper are in
-F</usr/share/doc/debhelper/examples/>
+commands in sequence, or use L<dh(1)> to automate this process. Examples of
+rules files that use debhelper are in F</usr/share/doc/debhelper/examples/>
 
 To create a new debian package using debhelper, you can just copy one of
 the sample rules files and edit it by hand. Or you can try the dh-make
@@ -184,9 +183,6 @@ B<-a>, B<-i>, B<-p>, and B<-s> parameters. These parameters are cumulative.
 If none are given, debhelper programs default to acting on all packages listed
 in the control file.
 
-See F</usr/share/doc/debhelper/examples/rules.multi> for an example of how to
-use this in a package that generates multiple binary packages.
-
 =head2 Automatic generation of debian install scripts
 
 Some debhelper commands will automatically generate parts of debian
@@ -256,9 +252,9 @@ introduced. You tell debhelper which compatibility level it should use, and
 it modifies its behavior in various ways.
 
 Tell debhelper what compatibility level to use by writing a number to
-debian/compat. For example, to turn on V5 mode:
+debian/compat. For example, to turn on V7 mode:
 
-  % echo 5 > debian/compat
+  % echo 7 > debian/compat
 
 Unless otherwise indicated, all debhelper documentation assumes that you
 are using the most recent compatibility level, and in most cases does not
@@ -443,9 +439,9 @@ Once your package uses debhelper to build, be sure to add
 debhelper to your Build-Depends line in debian/control. You should
 build-depend on a version of debhelper equal to (or greater than) the
 debhelper compatibility level your package uses. So if your package used
-compatibility level 6:
+compatibility level 7:
 
-  Build-Depends: debhelper (>= 6)
+  Build-Depends: debhelper (>= 7)
 
 =head1 ENVIRONMENT
 
