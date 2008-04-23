@@ -23,7 +23,7 @@ is found, dh_auto_configure will exit without doing anything.
 
 This is intended to work for about 90% of packages. If it doesn't work,
 you're encoruaged to skip using dh_auto_configure at all, and just run
-./configure or its equivilant by hand.
+./configure or its equivilant manually.
 
 =head1 OPTIONS
 
@@ -85,10 +85,7 @@ if (-x "configure") {
 	doit("./configure", @opts, @{$dh{U_PARAMS}});
 }
 elsif (-e "Makefile.PL") {
-	doit("perl Makefile.PL", "INSTALLDIRS=vendor", @{$dh{U_PARAMS}});
-}
-elsif (-e "setup.py") {
-	doit("python setup.py", "build", @{$dh{U_PARAMS}});
+	doit("perl", "Makefile.PL", "INSTALLDIRS=vendor", @{$dh{U_PARAMS}});
 }
 
 =head1 SEE ALSO
