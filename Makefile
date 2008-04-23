@@ -65,8 +65,8 @@ install:
 		$(DESTDIR)/usr/share/debhelper/autoscripts \
 		$(DESTDIR)$(PERLLIBDIR)
 	install $(shell find -maxdepth 1 -mindepth 1 -name dh_\* |grep -v \.1\$) $(DESTDIR)/usr/bin
-	install autoscripts/* $(DESTDIR)/usr/share/debhelper/autoscripts
-	install Debian/Debhelper/*.pm $(DESTDIR)$(PERLLIBDIR)
+	install -m 0644 autoscripts/* $(DESTDIR)/usr/share/debhelper/autoscripts
+	install -m 0644 Debian/Debhelper/*.pm $(DESTDIR)$(PERLLIBDIR)
 
 test: version
 	./run perl -MTest::Harness -e 'runtests grep { ! /CVS/ && ! /\.svn/ } @ARGV' t/*
