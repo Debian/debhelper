@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-dh_auto_test - automatically runs a package's test suites
+dh_auto_clean - automatically cleans up after a build
 
 =cut
 
@@ -11,20 +11,19 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_auto_test> [S<I<debhelper options>>] [S<B<--> I<params>>]
+B<dh_auto_clean> [S<I<debhelper options>>] [S<B<--> I<params>>]
 
 =head1 DESCRIPTION
 
-dh_auto_test is a debhelper program that tries to automatically run a
-package's test suite. If there's a Makefile and it contains a "test"
-or "check" target, then this is  done by running make (or MAKE, if the
-environment variable is set). If the test suite fails, the command will
-exit nonzero. If there's no test suite, it will exit zero without doing
-anything.
+dh_auto_clean is a debhelper program that tries to automatically clean up
+after a package build. If there's a Makefile and it contains a "distclean",
+"realclean", or "clean" target, then this is  done by running make (or MAKE,
+if the environment variable is set). If there is a setup.py, it is run to
+clean the package.
 
-This is intended to work for about 90% of packages with a test suite. If it
-doesn't work, you're encoruaged to skip using dh_auto_test at all, and
-just run the test suite manually.
+This is intended to work for about 90% of packages. If it doesn't work, or
+tries to use the wrong clean target, you're encoruaged to skip using
+dh_auto_test at all, and just run make clean manually.
 
 =head1 OPTIONS
 
@@ -33,7 +32,7 @@ just run the test suite manually.
 =item B<--> I<params>
 
 Pass "params" to the program that is run. These can be used to suppliment
-or override the any standard parameters that dh_auto_test passes.
+or override the any standard parameters that dh_auto_clean passes.
 
 =back
 
@@ -43,7 +42,7 @@ init();
 
 if (-e "Makefile" || -e "makefile" || -e "GNUmakefile") {
 	$ENV{MAKE}="make" unless exists $ENV{MAKE};
-	foreach my $target (qw{test check}) {
+	foreach my $target (qw{distclean realclean clean}) {
 		# Make --question returns false if the target is
 		# up-to-date. But we still want to run the target in this
 		# case. So ceck if a target exists by seeing if make outputs
@@ -56,6 +55,10 @@ if (-e "Makefile" || -e "makefile" || -e "GNUmakefile") {
 		}
 	}
 }
+elsif (-e "setup.py") {
+	doit("python setup.py", "clean", "-a", @{$dh{U_PARAMS}});
+}
+
 
 =head1 SEE ALSO
 
