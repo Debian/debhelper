@@ -67,13 +67,11 @@ if (-e "Makefile" || -e "makefile" || -e "GNUmakefile") {
 		push @params, "PREFIX=/usr";
 	}
 	foreach my $target (qw{install}) {
-		# Make --question returns false if the target is
-		# up-to-date. But we still want to run the target in this
-		# case. So check if a target exists by seeing if make outputs
-		# "Making target".
-		my $ret=`LANG=C $ENV{MAKE} --question $target 2>/dev/null`;
+		# Use make -n to check to see if the target would do
+		# anything. There's no good way to test if a target exists.
+		my $ret=`$ENV{MAKE} -s -n $target 2>/dev/null`;
 		chomp $ret;
-		if ($ret =~ /^Making \Q$target\E/m) {
+		if (length $ret) {
 			doit($ENV{MAKE}, $target,
 				@params,
 				@{$dh{U_PARAMS}});
