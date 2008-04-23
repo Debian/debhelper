@@ -1,0 +1,65 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dh_auto_test - automatically runs a package's test suites
+
+=cut
+
+use strict;
+use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+B<dh_auto_test> [S<I<debhelper options>>] [S<B<--> I<params>>]
+
+=head1 DESCRIPTION
+
+dh_auto_test is a debhelper program that tries to automatically run a
+package's test suite. If there's a Makefile and it contains a "test"
+or "check" target, then this is  done by running make (or MAKE, if the
+environment variable is set). If the test suite fails, the command will
+exit nonzero. If there's no test suite, it will exit zero without doing
+anything.
+
+This is intended to work for about 90% of packages with a test suite. If it
+doesn't work, you're encoruaged to skip using dh_auto_test at all, and
+just run the test suite manually.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--> I<params>
+
+Pass "params" to the program that is run. These can be used to suppliment
+or override the any standard parameters that dh_auto_test passes.
+
+=back
+
+=cut
+
+init();
+
+if (-e "Makefile" || -e "makefile" || -e "GNUmakefile") {
+	foreach my $target (qw{test check}) {
+		my $ret=system("make --question $target >/dev/null 2>&1");
+		if ($ret == 0) {
+			doit(exists $ENV{MAKE} ? $ENV{MAKE} : "make",
+				$target, @{$dh{U_PARAMS}});
+			last;
+		}
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

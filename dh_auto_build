@@ -16,7 +16,8 @@ B<dh_auto_build> [S<I<debhelper options>>] [S<B<--> I<params>>]
 =head1 DESCRIPTION
 
 dh_auto_build is a debhelper program that tries to automatically
-build a package. If a Makefile is found, this is done by running make.
+build a package. If a Makefile is found, this is done by running make (or
+MAKE, if the environment variable is set).
 If there's a setup.py, it is run to build the package.
 
 This is intended to work for about 90% of packages. If it doesn't work,
@@ -30,7 +31,7 @@ build process manually.
 =item B<--> I<params>
 
 Pass "params" to the program that is run. These can be used to suppliment
-or override the standard parameters that dh_auto_build passes.
+or override any standard parameters that dh_auto_build passes.
 
 =back
 
@@ -39,7 +40,7 @@ or override the standard parameters that dh_auto_build passes.
 init();
 
 if (-e "Makefile" || -e "makefile" || -e "GNUmakefile") {
-	doit($ENV{MAKE}, @{$dh{U_PARAMS}});
+	doit(exists $ENV{MAKE} ? $ENV{MAKE} : "make", @{$dh{U_PARAMS}});
 }
 elsif (-e "setup.py") {
 	doit("python setup.py", "build", @{$dh{U_PARAMS}});
