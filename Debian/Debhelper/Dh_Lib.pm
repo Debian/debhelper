@@ -108,6 +108,24 @@ sub init {
 	}
 }
 
+# Run at exit. Add the command to the log files for the packages it acted
+# on, if it's exiting successfully.
+sub END {
+	if ($? == 0) {
+		my $cmd=basename($0);
+		# dh_clean deletes the log, so should not recreate it at
+		# the end
+		if ($cmd ne "dh_clean") {
+			foreach my $package (@{$dh{DOPACKAGES}}) {
+				my $ext=pkgext($package);
+				open(LOG, ">>", "debian/${ext}log.debhelper") || error("failed to write to log");
+				print LOG $cmd."\n";
+				close LOG;
+			}
+		}
+	}
+}
+
 # Pass it an array containing the arguments of a shell command like would
 # be run by exec(). It turns that into a line like you might enter at the
 # shell, escaping metacharacters and quoting arguments that contain spaces.
