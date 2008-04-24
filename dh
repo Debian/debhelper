@@ -150,20 +150,24 @@ instead run the commands by hand.
 Another common case is wanting to run some code manually after a particular
 debhelper command is run.
 
-	binary-arch: install
-		dh binary-arch --until dh_fixperms
+	install: build
+		dh install --until dh_fixperms
 		# dh_fixperms has run, now override it for one program
 		chmod 4755 debian/foo/usr/bin/foo
 		# and continue
-		dh binary-arch --after dh_fixperms
+		dh install --after dh_fixperms
 
-It's also fine to run debhelper commands before starting the dh sequence.
+It's also fine to run debhelper commands before starting a dh sequence.
 Just be sure to use the B<--remaining> option to ensure that commands
 that normally come before those in the sequence are still run.
 
+	install:
+		dh_installdocs README TODO
+		dh_installchangelogs Changes
+		dh install --remaining
+
         binary-arch: install
                 dh_strip -X foo
-                dh_fixperms -X bar
                 dh binary-arch --remaining
 
 =cut
@@ -231,6 +235,7 @@ $sequences{install} = [@{$sequences{build}}, qw{
 	dh_fixperms
 }];
 my @b=qw{
+	dh_installdeb
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
