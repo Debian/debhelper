@@ -115,7 +115,7 @@ sub END {
 		my $cmd=basename($0);
 		# dh_clean deletes the log, so should not recreate it at
 		# the end
-		if ($cmd ne "dh_clean") {
+		if ($cmd ne "dh_clean" && $cmd ne "dh") {
 			foreach my $package (@{$dh{DOPACKAGES}}) {
 				my $ext=pkgext($package);
 				open(LOG, ">>", "debian/${ext}debhelper.log") || error("failed to write to log");
