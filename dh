@@ -159,11 +159,13 @@ debhelper command is run.
 		# and continue
 		dh install --after dh_fixperms
 
-It's also fine to run debhelper commands before starting a dh sequence.
-Just be sure to use the B<--remaining> option to ensure that commands
-that normally come before those in the sequence are still run.
+It's also fine to run debhelper commands early. Just make sure that at
+least dh_prep is run from the squence first, and be sure to use the
+B<--remaining> option to ensure that commands that normally come before
+those in the sequence are still run.
 
 	install:
+		dh_install --until dh_prep
 		dh_installdocs README TODO
 		dh_installchangelogs Changes
 		dh install --remaining
