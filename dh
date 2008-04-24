@@ -221,7 +221,7 @@ $sequences{install} = [@{$sequences{build}}, qw{
 	dh_gconf
 	dh_icons
 	dh_perl
-	dh_python
+	dh_pysupport
 	dh_scrollkeeper
 	dh_usrlocal
 
@@ -241,6 +241,13 @@ $sequences{binary} = [@{$sequences{install}}, qw{
 	dh_shlibdeps
 }, @b];
 $sequences{'binary-arch'} = [@{$sequences{binary}}];
+
+# Third-party commands can be listed in the sequences, but should be
+# listed here as well. They will not be run if not present.
+my %thirdparty=(
+	dh_pycompat => 1,
+	dh_pysupport => 1,
+);
 
 # Get the sequence of commands to run.
 if (! @ARGV) {
@@ -348,6 +355,11 @@ sub run {
 	# dh_clean -k is a special case
 	if ($command eq 'dh_clean' && $sequence ne 'clean') {
 		unshift @options, "-k";
+	}
+
+	# If a third party command is not in /usr/bin, don't try to run it.
+	if ($thirdparty{$command} && ! -x "/usr/bin/$command") {
+		return;
 	}
 
 	# The 4 spaces is a kind of half indent.
