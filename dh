@@ -172,6 +172,7 @@ that normally come before those in the sequence are still run.
 my @ARGV_orig=@ARGV;
 
 init();
+inhibit_log();
 
 # Definitions of sequences.
 my %sequences;
@@ -188,7 +189,7 @@ $sequences{clean} = [qw{
 }];
 $sequences{install} = [@{$sequences{build}}, qw{
 	dh_testroot
-	dh_clean
+	dh_prep
 	dh_installdirs
 	dh_auto_install
 
@@ -291,6 +292,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# Run commands in the sequence that come after the
 		# specified command.
 		$startpoint{$package}=command_pos($dh{AFTER}, @sequence) + 1;
+		# Write a dummy log entry indicating that the specified
+		# command was, in fact, run. This handles the case where
+		# no commands remain to run after it, communicating to
+		# future dh instances that the specified command should not
+		# be run again.
+		writelog($package, $sequence[$startpoint{$package}-1]);
 	}
 	elsif ($dh{REMAINING}) {
 		# Start at the beginning so all remaining commands will get
@@ -352,11 +359,6 @@ sub run {
 	my $command=shift;
 	my @options=@_;
 	
-	# dh_clean -k is a special case
-	if ($command eq 'dh_clean' && $sequence ne 'clean') {
-		unshift @options, "-k";
-	}
-
 	# If a third party command is not in /usr/bin, don't try to run it.
 	if ($thirdparty{$command} && ! -x "/usr/bin/$command") {
 		return;
@@ -389,6 +391,16 @@ sub loadlog {
 	}
 	close LOG;
 	return @log;
+}
+		
+sub writelog {
+	my $package=shift;
+	my $cmd=shift;
+	my $ext=pkgext($package);
+	
+	open(LOG, ">>", "debian/${ext}debhelper.log") || error("failed to write to log");
+	print LOG $cmd."\n";
+	close LOG;
 }
 
 =head1 SEE ALSO

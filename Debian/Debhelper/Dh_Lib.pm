@@ -14,7 +14,8 @@ use vars qw(@ISA @EXPORT %dh);
 	    &pkgfile &pkgext &pkgfilename &isnative &autoscript &filearray
 	    &filedoublearray &getpackages &basename &dirname &xargs %dh
 	    &compat &addsubstvar &delsubstvar &excludefile &package_arch
-	    &is_udeb &udeb_filename &debhelper_script_subst &escape_shell);
+	    &is_udeb &udeb_filename &debhelper_script_subst &escape_shell
+	    &inhibit_log);
 
 my $max_compat=7;
 
@@ -110,20 +111,21 @@ sub init {
 
 # Run at exit. Add the command to the log files for the packages it acted
 # on, if it's exiting successfully.
+my $write_log=1;
 sub END {
-	if ($? == 0) {
+	if ($? == 0 && $write_log) {
 		my $cmd=basename($0);
-		# dh_clean deletes the log, so should not recreate it at
-		# the end
-		if ($cmd ne "dh_clean" && $cmd ne "dh") {
-			foreach my $package (@{$dh{DOPACKAGES}}) {
-				my $ext=pkgext($package);
-				open(LOG, ">>", "debian/${ext}debhelper.log") || error("failed to write to log");
-				print LOG $cmd."\n";
-				close LOG;
-			}
+		foreach my $package (@{$dh{DOPACKAGES}}) {
+			my $ext=pkgext($package);
+			open(LOG, ">>", "debian/${ext}debhelper.log") || error("failed to write to log");
+			print LOG $cmd."\n";
+			close LOG;
 		}
 	}
+}
+
+sub inhibit_log {
+	$write_log=0;
 }
 
 # Pass it an array containing the arguments of a shell command like would

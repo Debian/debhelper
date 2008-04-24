@@ -33,13 +33,8 @@ The debian/clean file can list other files to be removed.
 
 =item B<-k>, B<--keep>
 
-Do not delete debian/files, or files listed in debian/clean. When do you
-want to use this? Anytime you have a debian/rules that has 2 binary targets
-that build different .deb packages; for example, one target is binary-arch,
-and the other is binary-indep, or one target builds the shared library, and
-the other the -dev package. If you didn't use -k in these cases, then
-debian/files would be deleted in the middle, and your changes file will
-only contain the last binary package that was built.
+This causes L<dh_prep(1)> to be run instead of dh_clean, for backwards
+compatibility.
 
 =item B<-d>, B<--dirs-only>
 
@@ -61,6 +56,12 @@ Delete these files too.
 =cut
 
 init();
+inhibit_log();
+
+if ($dh{K_FLAG}) {
+	# dh_prep will be emulated (mostly) by the code below.
+	# TODO deprecation warning
+}
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
