@@ -31,7 +31,7 @@ POD2MAN=pod2man -c Debhelper -r "$(VERSION)"
 LANGS=$(notdir $(basename $(wildcard man/po4a/po/*.po)))
 
 build: version
-	find . -maxdepth 1 -type f -perm +100 -name "dh_*" \
+	find . -maxdepth 1 -type f -perm +100 -name "dh*" \
 		-exec $(POD2MAN) {} {}.1 \;
 	cat debhelper.pod | \
 		$(MAKEMANLIST) `find . -maxdepth 1 -type f -perm +100 -name "dh_*" | sort` | \
@@ -40,7 +40,7 @@ build: version
 	set -e; \
 	for lang in $(LANGS); do \
 		dir=man/$$lang; \
-		for file in $$dir/dh_*.pod; do \
+		for file in $$dir/dh*.pod; do \
 			prog=`basename $$file | sed 's/.pod//'`; \
 			$(POD2MAN) $$file $$prog.$$lang.1; \
 		done; \
@@ -64,7 +64,7 @@ install:
 	install -d $(DESTDIR)/usr/bin \
 		$(DESTDIR)/usr/share/debhelper/autoscripts \
 		$(DESTDIR)$(PERLLIBDIR)
-	install $(shell find -maxdepth 1 -mindepth 1 -name dh_\* |grep -v \.1\$) $(DESTDIR)/usr/bin
+	install $(shell find -maxdepth 1 -mindepth 1 -name dh\* |grep -v \.1\$) $(DESTDIR)/usr/bin
 	install -m 0644 autoscripts/* $(DESTDIR)/usr/share/debhelper/autoscripts
 	install -m 0644 Debian/Debhelper/*.pm $(DESTDIR)$(PERLLIBDIR)
 
