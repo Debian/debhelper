@@ -30,12 +30,16 @@ NEWS.Debian files. If there is a debian/NEWS file, it is installed as
 usr/share/doc/package/NEWS.Debian. debian/package.NEWS files can also be
 used.
 
-If an upstream changelog file is specified as an option, then this upstream
-changelog will be installed as usr/share/doc/package/changelog in the
-package build directory. If the changelog is a html file (determined by
-file extension), it will be installed as
-usr/share/doc/package/changelog.html instead, and will be converted to
-plain text with html2text to generate usr/share/doc/package/changelog.
+An upstream changelog file may be specified as an option. If none is
+specified, a few common filenames are tried. (In compatability level 7 and
+above.)
+
+If there is an upstream changelog file, it will be be installed as
+usr/share/doc/package/changelog in the package build directory. If the
+changelog is a html file (determined by file extension), it will be
+installed as usr/share/doc/package/changelog.html instead, and will be
+converted to plain text with html2text to generate
+usr/share/doc/package/changelog.
 
 =head1 OPTIONS
 
@@ -60,10 +64,19 @@ Install this file as the upstream changelog.
 init();
 
 my $upstream=shift;
-
 my $changelog_name="changelog.Debian";
-if (isnative($dh{MAINPACKAGE}) && ! defined $upstream) {
-	$changelog_name='changelog';
+if (! defined $upstream) {
+	if (! isnative($dh{MAINPACKAGE}) && !compat(6)) {
+		foreach my $name (qw{ChangeLog Changelog Changes CHANGES changelog}) {
+			if (-e $name) {
+				$upstream=$name;
+				last;
+			}
+		}
+	}
+	if (isnative($dh{MAINPACKAGE})) {
+		$changelog_name='changelog';
+	}
 }
 my $news_name="NEWS.Debian";
 
@@ -100,7 +113,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			"$tmp/usr/share/doc/$package/$news_name");
 	}
 
-	if ($upstream) {
+	if (defined $upstream) {
 		my $link_to;
 		if ($upstream=~m/\.html?$/i) {
 			# HTML changelog

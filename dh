@@ -369,8 +369,9 @@ sub run {
 		return;
 	}
 
-	# The 4 spaces is a kind of half indent.
-	print "    ".escape_shell($command, @options)."\n";
+	# 3 space indent lines the command being run up under the 
+	# sequence name after "dh ".
+	print "   ".escape_shell($command, @options)."\n";
 
 	if (! $dh{NO_ACT}) {
 		my $ret=system($command, @options);

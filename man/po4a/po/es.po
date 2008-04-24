@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2008-04-23 21:24-0400\n"
+"POT-Creation-Date: 2008-04-24 00:14-0400\n"
 "PO-Revision-Date: 2005-09-18 00:11+0200\n"
 "Last-Translator: Rubén Porras Campo <debian-l10n-spanish@lists.debian.org>\n"
 "Language-Team: SPANISH <debian-l10n-spanish@lists.debian.org>\n"
@@ -14,17 +14,17 @@ msgstr ""
 "Content-Transfer-Encoding: ENCODING\n"
 
 # type: =head1
-#: debhelper.pod:1 dh_builddeb:3 dh_compress:3 dh_desktop:3 dh_fixperms:3
-#: dh_gconf:3 dh_gencontrol:3 dh_installcatalogs:3 dh_installchangelogs:3
-#: dh_installcron:3 dh_installdebconf:3 dh_installdeb:3 dh_installdirs:3
-#: dh_installdocs:3 dh_installemacsen:3 dh_installexamples:3 dh_installinfo:3
-#: dh_installinit:3 dh_installlogcheck:3 dh_installlogrotate:3
-#: dh_installmanpages:3 dh_installman:3 dh_installmenu:3 dh_installmime:3
-#: dh_installmodules:3 dh_installpam:3 dh_install:3 dh_installppp:3
-#: dh_installwm:3 dh_installxfonts:3 dh_link:3 dh_listpackages:3
-#: dh_makeshlibs:3 dh_md5sums:3 dh_movefiles:3 dh_perl:3 dh_python:3
-#: dh_scrollkeeper:3 dh_shlibdeps:3 dh_strip:3 dh_suidregister:3 dh_testdir:3
-#: dh_testroot:3 dh_testversion:3 dh_undocumented:3 dh_usrlocal:3
+#: debhelper.pod:1 dh_builddeb:3 dh_clean:3 dh_compress:3 dh_desktop:3
+#: dh_fixperms:3 dh_gconf:3 dh_gencontrol:3 dh_installcatalogs:3
+#: dh_installchangelogs:3 dh_installcron:3 dh_installdebconf:3 dh_installdeb:3
+#: dh_installdirs:3 dh_installdocs:3 dh_installemacsen:3 dh_installexamples:3
+#: dh_installinfo:3 dh_installinit:3 dh_installlogcheck:3
+#: dh_installlogrotate:3 dh_installmanpages:3 dh_installman:3 dh_installmenu:3
+#: dh_installmime:3 dh_installmodules:3 dh_installpam:3 dh_install:3
+#: dh_installppp:3 dh_installwm:3 dh_installxfonts:3 dh_link:3
+#: dh_listpackages:3 dh_makeshlibs:3 dh_md5sums:3 dh_movefiles:3 dh_perl:3
+#: dh_python:3 dh_scrollkeeper:3 dh_shlibdeps:3 dh_strip:3 dh_suidregister:3
+#: dh_testdir:3 dh_testroot:3 dh_testversion:3 dh_undocumented:3 dh_usrlocal:3
 msgid "NAME"
 msgstr "NOMBRE"
 
@@ -780,7 +780,7 @@ msgstr "Este modo funciona como el V2 con los siguientes añadidos:"
 #: debhelper.pod:320 debhelper.pod:325 debhelper.pod:330 debhelper.pod:342
 #: debhelper.pod:346 debhelper.pod:351 debhelper.pod:355 debhelper.pod:367
 #: debhelper.pod:372 debhelper.pod:378 debhelper.pod:384 debhelper.pod:399
-#: debhelper.pod:406
+#: debhelper.pod:406 debhelper.pod:410 debhelper.pod:414
 msgid "-"
 msgstr "-"
 
@@ -959,13 +959,25 @@ msgstr ""
 msgid "dh_clean will read debian/clean and delete files listed there."
 msgstr ""
 
+# type: textblock
+#: debhelper.pod:412
+msgid "dh_clean will delete toplevel *-stamp files."
+msgstr ""
+
+# type: textblock
+#: debhelper.pod:416
+msgid ""
+"dh_installchangelogs will guess at what file is the upstream changelog if "
+"none is specified."
+msgstr ""
+
 # type: =head2
-#: debhelper.pod:414
+#: debhelper.pod:423
 msgid "Doc directory symlinks"
 msgstr "Enlaces a los directorios Doc"
 
 # type: textblock
-#: debhelper.pod:416
+#: debhelper.pod:425
 msgid ""
 "Sometimes it is useful to make a package not contain a /usr/share/doc/"
 "package directory at all, instead placing just a dangling symlink in the "
@@ -987,12 +999,12 @@ msgstr ""
 "colgante y no tratará de instalar un fichero de copyright o changelog."
 
 # type: =head2
-#: debhelper.pod:425
+#: debhelper.pod:434
 msgid "udebs"
 msgstr "udebs"
 
 # type: textblock
-#: debhelper.pod:427
+#: debhelper.pod:436
 msgid ""
 "Debhelper includes support for udebs. To create a udeb with debhelper, add "
 "\"XC-Package-Type: udeb\" to the package's stanza in debian/control, and "
@@ -1010,12 +1022,12 @@ msgstr ""
 "preinst, postrm, prerm, y de configuración, etc."
 
 # type: =head2
-#: debhelper.pod:434
+#: debhelper.pod:443
 msgid "Other notes"
 msgstr "Otras notas"
 
 # type: textblock
-#: debhelper.pod:436
+#: debhelper.pod:445
 msgid ""
 "In general, if any debhelper program needs a directory to exist under "
 "debian/, it will create it. I haven't bothered to document this in all the "
@@ -1031,7 +1043,7 @@ msgstr ""
 "archivos del menú, etc."
 
 # type: textblock
-#: debhelper.pod:442
+#: debhelper.pod:451
 #, fuzzy
 msgid ""
 "Once your package uses debhelper to build, be sure to add debhelper to your "
@@ -1046,7 +1058,7 @@ msgstr ""
 "paquete usa el nivel de compatibilidad 4:"
 
 # type: verbatim
-#: debhelper.pod:448
+#: debhelper.pod:457
 #, fuzzy, no-wrap
 msgid ""
 "  Build-Depends: debhelper (>= 7)\n"
@@ -1056,17 +1068,17 @@ msgstr ""
 "\n"
 
 # type: =head1
-#: debhelper.pod:450
+#: debhelper.pod:459
 msgid "ENVIRONMENT"
 msgstr "ENTORNO"
 
 # type: =item
-#: debhelper.pod:454
+#: debhelper.pod:463
 msgid "DH_VERBOSE"
 msgstr "DH_VERBOSE"
 
 # type: textblock
-#: debhelper.pod:456
+#: debhelper.pod:465
 msgid ""
 "Set to 1 to enable verbose mode. Debhelper will output every command it runs "
 "that modifies files on the build system."
@@ -1076,12 +1088,12 @@ msgstr ""
 "construcción."
 
 # type: =item
-#: debhelper.pod:459
+#: debhelper.pod:468
 msgid "DH_COMPAT"
 msgstr "DH_COMPAT"
 
 # type: textblock
-#: debhelper.pod:461
+#: debhelper.pod:470
 msgid ""
 "Temporarily specifies what compatibility level debhelper should run at, "
 "overriding any value in debian/compat."
@@ -1090,22 +1102,22 @@ msgstr ""
 "debhelper, ignorando cualquier valor en debian/compat."
 
 # type: =item
-#: debhelper.pod:464
+#: debhelper.pod:473
 msgid "DH_NO_ACT"
 msgstr "DH_NO_ACT"
 
 # type: textblock
-#: debhelper.pod:466
+#: debhelper.pod:475
 msgid "Set to 1 to enable no-act mode."
 msgstr "Poner a 1 para habilitar el modo no-act."
 
 # type: =item
-#: debhelper.pod:468
+#: debhelper.pod:477
 msgid "DH_OPTIONS"
 msgstr "DH_OPTIONS"
 
 # type: textblock
-#: debhelper.pod:470
+#: debhelper.pod:479
 msgid ""
 "Anything in this variable will be prepended to the command line arguments of "
 "all debhelper commands. This is useful in some situations, for example, if "
@@ -1121,12 +1133,12 @@ msgstr ""
 "Lea la documentación de make para los detalles sobre como hacer esto."
 
 # type: =item
-#: debhelper.pod:476
+#: debhelper.pod:485
 msgid "DH_ALWAYS_EXCLUDE"
 msgstr "DH_ALWAYS_EXCLUDE"
 
 # type: textblock
-#: debhelper.pod:478
+#: debhelper.pod:487
 msgid ""
 "If set, this adds the value the variable is set to to the -X options of all "
 "commands that support the -X option. Moreover, dh_builddeb will rm -rf "
@@ -1137,7 +1149,7 @@ msgstr ""
 "coincida con el valor en el árbol de construcción."
 
 # type: textblock
-#: debhelper.pod:482
+#: debhelper.pod:491
 msgid ""
 "This can be useful if you are doing a build from a CVS source tree, in which "
 "case setting DH_ALWAYS_EXCLUDE=CVS will prevent any CVS directories from "
@@ -1154,7 +1166,7 @@ msgstr ""
 "sitio donde se construya el paquete."
 
 # type: textblock
-#: debhelper.pod:489
+#: debhelper.pod:498
 msgid ""
 "Multiple things to exclude can be separated with colons, as in "
 "DH_ALWAYS_EXCLUDE=CVS:.svn"
@@ -1163,9 +1175,9 @@ msgstr ""
 "puntos, p. ej.: DH_ALWAYS_EXCLUDE=CVS:.svn"
 
 # type: =head1
-#: debhelper.pod:494 dh_builddeb:85 dh_clean:121 dh_compress:189 dh_desktop:47
+#: debhelper.pod:503 dh_builddeb:85 dh_clean:126 dh_compress:189 dh_desktop:47
 #: dh_fixperms:110 dh_gconf:90 dh_gencontrol:73 dh_installcatalogs:111
-#: dh_installchangelogs:125 dh_installcron:61 dh_installdebconf:118
+#: dh_installchangelogs:138 dh_installcron:61 dh_installdebconf:118
 #: dh_installdeb:94 dh_installdirs:83 dh_installdocs:237 dh_installemacsen:109
 #: dh_installexamples:103 dh_installinfo:103 dh_installinit:197
 #: dh_installlogcheck:51 dh_installlogrotate:50 dh_installmanpages:197
@@ -1179,29 +1191,29 @@ msgid "SEE ALSO"
 msgstr "VÉASE ADEMÁS"
 
 # type: =item
-#: debhelper.pod:498
+#: debhelper.pod:507
 msgid "F</usr/share/doc/debhelper/examples/>"
 msgstr "F</usr/share/doc/debhelper/examples/>"
 
 # type: textblock
-#: debhelper.pod:500
+#: debhelper.pod:509
 msgid "A set of example debian/rules files that use debhelper."
 msgstr "Varios ficheros de ejemplo debian/rules que usan debhelper."
 
 # type: =item
-#: debhelper.pod:502
+#: debhelper.pod:511
 msgid "L<http://kitenet.net/~joey/code/debhelper/>"
 msgstr "L<http://kitenet.net/~joey/code/debhelper/>"
 
 # type: textblock
-#: debhelper.pod:504
+#: debhelper.pod:513
 msgid "Debhelper web site."
 msgstr "Web de Debhelper."
 
 # type: =head1
-#: debhelper.pod:508 dh_builddeb:91 dh_clean:127 dh_compress:195 dh_desktop:53
+#: debhelper.pod:517 dh_builddeb:91 dh_clean:132 dh_compress:195 dh_desktop:53
 #: dh_fixperms:116 dh_gconf:96 dh_gencontrol:79 dh_installcatalogs:117
-#: dh_installchangelogs:131 dh_installcron:67 dh_installdebconf:124
+#: dh_installchangelogs:144 dh_installcron:67 dh_installdebconf:124
 #: dh_installdeb:100 dh_installdirs:89 dh_installdocs:243
 #: dh_installemacsen:115 dh_installexamples:109 dh_installinfo:109
 #: dh_installinit:203 dh_installlogcheck:57 dh_installlogrotate:56
@@ -1216,8 +1228,8 @@ msgid "AUTHOR"
 msgstr "AUTOR"
 
 # type: textblock
-#: debhelper.pod:510 dh_builddeb:93 dh_clean:129 dh_compress:197
-#: dh_fixperms:118 dh_gencontrol:81 dh_installchangelogs:133 dh_installcron:69
+#: debhelper.pod:519 dh_builddeb:93 dh_clean:134 dh_compress:197
+#: dh_fixperms:118 dh_gencontrol:81 dh_installchangelogs:146 dh_installcron:69
 #: dh_installdebconf:126 dh_installdeb:102 dh_installdirs:91
 #: dh_installdocs:245 dh_installemacsen:117 dh_installexamples:111
 #: dh_installinfo:111 dh_installinit:205 dh_installlogrotate:58
@@ -1256,7 +1268,7 @@ msgstr ""
 
 # type: =head1
 #: dh_builddeb:21 dh_clean:30 dh_compress:38 dh_fixperms:31 dh_gconf:34
-#: dh_gencontrol:26 dh_installcatalogs:44 dh_installchangelogs:40
+#: dh_gencontrol:26 dh_installcatalogs:44 dh_installchangelogs:44
 #: dh_installcron:24 dh_installdebconf:50 dh_installdirs:28 dh_installdocs:51
 #: dh_installemacsen:35 dh_installexamples:29 dh_installinfo:37
 #: dh_installinit:33 dh_installlogrotate:22 dh_installmanpages:40
@@ -1313,8 +1325,8 @@ msgid "Pass I<params> to L<dpkg-deb(1)> when it is used to build the package."
 msgstr "Pasa I<parámetros> a L<dpkg-deb(1)> cuando se construye el paquete."
 
 # type: textblock
-#: dh_builddeb:87 dh_clean:123 dh_compress:191 dh_fixperms:112 dh_gconf:92
-#: dh_gencontrol:75 dh_installcatalogs:113 dh_installchangelogs:127
+#: dh_builddeb:87 dh_clean:128 dh_compress:191 dh_fixperms:112 dh_gconf:92
+#: dh_gencontrol:75 dh_installcatalogs:113 dh_installchangelogs:140
 #: dh_installcron:63 dh_installdebconf:120 dh_installdeb:96 dh_installdirs:85
 #: dh_installdocs:239 dh_installemacsen:111 dh_installexamples:105
 #: dh_installinfo:105 dh_installinit:199 dh_installlogcheck:53
@@ -1328,8 +1340,8 @@ msgid "L<debhelper(7)>"
 msgstr "L<debhelper(7)>"
 
 # type: textblock
-#: dh_builddeb:89 dh_clean:125 dh_compress:193 dh_desktop:51 dh_fixperms:114
-#: dh_gconf:94 dh_gencontrol:77 dh_installchangelogs:129 dh_installcron:65
+#: dh_builddeb:89 dh_clean:130 dh_compress:193 dh_desktop:51 dh_fixperms:114
+#: dh_gconf:94 dh_gencontrol:77 dh_installchangelogs:142 dh_installcron:65
 #: dh_installdebconf:122 dh_installdeb:98 dh_installdirs:87 dh_installdocs:241
 #: dh_installemacsen:113 dh_installexamples:107 dh_installinfo:107
 #: dh_installinit:201 dh_installlogrotate:54 dh_installmanpages:201
@@ -1341,6 +1353,11 @@ msgstr "L<debhelper(7)>"
 #: dh_testroot:30 dh_testversion:78 dh_undocumented:32 dh_usrlocal:118
 msgid "This program is a part of debhelper."
 msgstr "Este programa es parte de debhelper."
+
+# type: textblock
+#: dh_clean:5
+msgid "dh_clean - clean up package build directories"
+msgstr "dh_clean - limpia los directorios de construcción de los paquetes"
 
 # type: textblock
 #: dh_clean:14
@@ -1360,7 +1377,7 @@ msgid ""
 "other files including debian/files, and any detritus left behind by other\n"
 "debhelper commands. It also removes common files that should not appear in a\n"
 "debian diff:\n"
-"  #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS .deps/* *.P\n"
+"  #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS .deps/* *.P *-stamp\n"
 "\n"
 msgstr ""
 "dh_clean es un programa de debhelper responsable de limpiar ficheros y\n"
@@ -1387,36 +1404,24 @@ msgstr ""
 "instalar."
 
 # type: =item
-#: dh_clean:34 dh_installchangelogs:44
+#: dh_clean:34 dh_installchangelogs:48
 msgid "B<-k>, B<--keep>"
 msgstr "B<-k>, B<--keep>"
 
 # type: textblock
 #: dh_clean:36
-#, fuzzy
 msgid ""
-"Do not delete debian/files, or files listed in debian/clean. When do you "
-"want to use this? Anytime you have a debian/rules that has 2 binary targets "
-"that build different .deb packages; for example, one target is binary-arch, "
-"and the other is binary-indep, or one target builds the shared library, and "
-"the other the -dev package. If you didn't use -k in these cases, then debian/"
-"files would be deleted in the middle, and your changes file will only "
-"contain the last binary package that was built."
+"This causes L<dh_prep(1)> to be run instead of dh_clean, for backwards "
+"compatibility."
 msgstr ""
-"No elimina debian/files. ¿Cuándo usaría esta opción? Cuando un debian/rules "
-"tenga dos objetivos binarios que construyen paquetes .deb diferentes; por "
-"ejemplo, un objetivo es binary-arch, y el otro es binary-indep, o un "
-"objetivo construye una biblioteca compartida, y el otro un paquete -dev. Si "
-"en estos casos no usa -k, se eliminará debian/files en el medio, y los "
-"cambios sólo contendrán los del último paquete binario construido."
 
 # type: =item
-#: dh_clean:44
+#: dh_clean:39
 msgid "B<-d>, B<--dirs-only>"
 msgstr "B<-d>, B<--dirs-only>"
 
 # type: textblock
-#: dh_clean:46
+#: dh_clean:41
 msgid ""
 "Only clean the package build directories, do not clean up any other files at "
 "all."
@@ -1425,12 +1430,12 @@ msgstr ""
 "otro tipo de ficheros en absoluto."
 
 # type: =item
-#: dh_clean:49
+#: dh_clean:44
 msgid "B<-X>I<item> B<--exclude=>I<item>"
 msgstr "B<-X>I<elemento> B<--exclude=>I<elemento>"
 
 # type: textblock
-#: dh_clean:51
+#: dh_clean:46
 msgid ""
 "Exclude files that contain \"item\" anywhere in their filename from being "
 "deleted, even if they would normally be deleted. You may use this option "
@@ -1441,13 +1446,13 @@ msgstr ""
 "opción si quiere excluir una lista de ficheros."
 
 # type: =item
-#: dh_clean:55 dh_compress:55 dh_installdocs:69 dh_installexamples:38
+#: dh_clean:50 dh_compress:55 dh_installdocs:69 dh_installexamples:38
 #: dh_installinfo:50 dh_installmanpages:44 dh_movefiles:49 dh_testdir:27
 msgid "I<file ...>"
 msgstr "I<fichero ...>"
 
 # type: textblock
-#: dh_clean:57
+#: dh_clean:52
 msgid "Delete these files too."
 msgstr "Borra también estos ficheros."
 
@@ -1860,11 +1865,12 @@ msgid "Do not modify F<postinst>/F<postrm>/F<prerm> scripts."
 msgstr "No modifica los scripts de F<postinst>/F<postrm>/F<prerm>."
 
 # type: textblock
-#: dh_installcatalogs:56 dh_installemacsen:56 dh_installinfo:59
-#: dh_installinit:101 dh_installmime:43 dh_installmodules:58 dh_installwm:53
-#: dh_scrollkeeper:44 dh_usrlocal:51
+#: dh_installcatalogs:56 dh_installdocs:93 dh_installemacsen:56
+#: dh_installinfo:59 dh_installinit:101 dh_installmime:43 dh_installmodules:58
+#: dh_installwm:53 dh_scrollkeeper:44 dh_usrlocal:51
+#, fuzzy
 msgid ""
-"Note that this command is not idempotent. \"dh_clean -k\" should be called "
+"Note that this command is not idempotent. L<dh_prep(1)> should be called "
 "between invocations of this command. Otherwise, it may cause multiple "
 "instances of the same text to be added to maintainer scripts."
 msgstr ""
@@ -1938,12 +1944,20 @@ msgstr ""
 # type: textblock
 #: dh_installchangelogs:33
 msgid ""
-"If an upstream changelog file is specified as an option, then this upstream "
-"changelog will be installed as usr/share/doc/package/changelog in the "
-"package build directory. If the changelog is a html file (determined by file "
-"extension), it will be installed as usr/share/doc/package/changelog.html "
-"instead, and will be converted to plain text with html2text to generate usr/"
-"share/doc/package/changelog."
+"An upstream changelog file may be specified as an option. If none is "
+"specified, a few common filenames are tried. (In compatability level 7 and "
+"above.)"
+msgstr ""
+
+# type: textblock
+#: dh_installchangelogs:37
+#, fuzzy
+msgid ""
+"If there is an upstream changelog file, it will be be installed as usr/share/"
+"doc/package/changelog in the package build directory. If the changelog is a "
+"html file (determined by file extension), it will be installed as usr/share/"
+"doc/package/changelog.html instead, and will be converted to plain text with "
+"html2text to generate usr/share/doc/package/changelog."
 msgstr ""
 "Si se especifica como opción un fichero de cambios del desarrollador "
 "principal, el fichero de cambios del desarrollador principal se instalará en "
@@ -1954,7 +1968,7 @@ msgstr ""
 "changelog."
 
 # type: textblock
-#: dh_installchangelogs:46
+#: dh_installchangelogs:50
 msgid ""
 "Keep the original name of the upstream changelog. This will be accomplished "
 "by installing the upstream changelog as \"changelog\", and making a symlink "
@@ -1971,12 +1985,12 @@ msgstr ""
 "cambios."
 
 # type: =item
-#: dh_installchangelogs:52
+#: dh_installchangelogs:56
 msgid "I<upstream>"
 msgstr "I<upstream>"
 
 # type: textblock
-#: dh_installchangelogs:54
+#: dh_installchangelogs:58
 msgid "Install this file as the upstream changelog."
 msgstr ""
 "Instala este fichero como el fichero de cambios del desarrollador principal."
@@ -2459,17 +2473,6 @@ msgstr ""
 "Dese cuenta de que dh_installdocs copiará alegremente jerarquías de "
 "directorios enteras si usted lo pide (similar a -a). Si se le pide instalar "
 "un directorio instalará todos sus contenidos."
-
-# type: textblock
-#: dh_installdocs:93
-msgid ""
-"Note that this command is not idempotent. \"dh_clean B<-k>\" should be "
-"called between invocations of this command. Otherwise, it may cause multiple "
-"instances of the same text to be added to maintainer scripts."
-msgstr ""
-"Esta orden no es idempotente. Debe llamarse a \"dh_clean -k\" entre "
-"invocaciones de esta orden. De otro modo, puede causar que los scripts de "
-"mantenimiento contengan partes duplicadas."
 
 # type: textblock
 #: dh_installemacsen:5
@@ -5462,8 +5465,33 @@ msgid "Andrew Stribblehill <ads@debian.org>"
 msgstr "Andrew Stribblehill <ads@debian.org>"
 
 # type: textblock
-#~ msgid "dh_clean - clean up package build directories"
-#~ msgstr "dh_clean - limpia los directorios de construcción de los paquetes"
+#, fuzzy
+#~ msgid ""
+#~ "Do not delete debian/files, or files listed in debian/clean. When do you "
+#~ "want to use this? Anytime you have a debian/rules that has 2 binary "
+#~ "targets that build different .deb packages; for example, one target is "
+#~ "binary-arch, and the other is binary-indep, or one target builds the "
+#~ "shared library, and the other the -dev package. If you didn't use -k in "
+#~ "these cases, then debian/files would be deleted in the middle, and your "
+#~ "changes file will only contain the last binary package that was built."
+#~ msgstr ""
+#~ "No elimina debian/files. ¿Cuándo usaría esta opción? Cuando un debian/"
+#~ "rules tenga dos objetivos binarios que construyen paquetes .deb "
+#~ "diferentes; por ejemplo, un objetivo es binary-arch, y el otro es binary-"
+#~ "indep, o un objetivo construye una biblioteca compartida, y el otro un "
+#~ "paquete -dev. Si en estos casos no usa -k, se eliminará debian/files en "
+#~ "el medio, y los cambios sólo contendrán los del último paquete binario "
+#~ "construido."
+
+# type: textblock
+#~ msgid ""
+#~ "Note that this command is not idempotent. \"dh_clean B<-k>\" should be "
+#~ "called between invocations of this command. Otherwise, it may cause "
+#~ "multiple instances of the same text to be added to maintainer scripts."
+#~ msgstr ""
+#~ "Esta orden no es idempotente. Debe llamarse a \"dh_clean -k\" entre "
+#~ "invocaciones de esta orden. De otro modo, puede causar que los scripts de "
+#~ "mantenimiento contengan partes duplicadas."
 
 # type: textblock
 #~ msgid ""
