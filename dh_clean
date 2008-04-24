@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-
+exit 1;
 =head1 NAME
 
 dh_clean - clean up package build directories
@@ -73,6 +73,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# These are all debhelper temp files, and so it is safe to 
 		# wildcard them.
 		complex_doit("rm -f debian/$ext*.debhelper");
+		
+		if (! $dh{K_FLAG}) {
+			doit("rm","-f","debian/${ext}debhelper.log");
+		}
 	}
 	
 	doit ("rm","-rf",$tmp."/")

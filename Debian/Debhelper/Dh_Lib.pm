@@ -118,7 +118,7 @@ sub END {
 		if ($cmd ne "dh_clean") {
 			foreach my $package (@{$dh{DOPACKAGES}}) {
 				my $ext=pkgext($package);
-				open(LOG, ">>", "debian/${ext}log.debhelper") || error("failed to write to log");
+				open(LOG, ">>", "debian/${ext}debhelper.log") || error("failed to write to log");
 				print LOG $cmd."\n";
 				close LOG;
 			}

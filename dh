@@ -29,7 +29,7 @@ used to set an option like "-v" or "-X" or "-N", as well as for more
 specialised options.
 
 Each debhelper command will record when it's successfully run in
-debian/package.log.debhelper. (Which dh_clean deletes.) So dh can tell
+debian/package.debhelper.log. (Which dh_clean deletes.) So dh can tell
 which commands have already been run, for which packages, and skip running
 those commands again.
 
@@ -367,7 +367,12 @@ sub run {
 
 	if (! $dh{NO_ACT}) {
 		my $ret=system($command, @options);
-		exit($ret) if $ret != 0;
+		if ($ret >> 8 != 0) {
+			exit $ret >> 8;
+		}
+		elsif ($ret) {
+			exit 1;
+		}
 	}
 }
 
@@ -376,7 +381,7 @@ sub loadlog {
 	my $ext=pkgext($package);
 	
 	my @log;
-	open(LOG, "<", "debian/${ext}log.debhelper");
+	open(LOG, "<", "debian/${ext}debhelper.log");
 	while (<LOG>) {
 		chomp;
 		push @log, $_;
