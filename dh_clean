@@ -33,13 +33,13 @@ The debian/clean file can list other files to be removed.
 
 =item B<-k>, B<--keep>
 
-Do not delete debian/files. When do you want to use this? Anytime you have a
-debian/rules that has 2 binary targets that build different .deb packages;
-for example, one target is binary-arch, and the other is binary-indep, or
-one target builds the shared library, and the other the -dev package. If you
-didn't use -k in these cases, then debian/files would be deleted in the
-middle, and your changes file will only contain the last binary package that
-was built.
+Do not delete debian/files, or files listed in debian/clean. When do you
+want to use this? Anytime you have a debian/rules that has 2 binary targets
+that build different .deb packages; for example, one target is binary-arch,
+and the other is binary-indep, or one target builds the shared library, and
+the other the -dev package. If you didn't use -k in these cases, then
+debian/files would be deleted in the middle, and your changes file will
+only contain the last binary package that was built.
 
 =item B<-d>, B<--dirs-only>
 
@@ -83,14 +83,14 @@ if (! $dh{D_FLAG}) {
 	if (@ARGV) {
 		doit("rm","-f","--",@ARGV);
 	}
-	
-	if (!compat(6) && -e "debian/clean") {
-		my @clean=grep { ! excludefile($_) }
-			filearray("debian/clean", ".");
-		doit("rm","-f","--",@clean) if @clean;
-	}
 
 	if (! $dh{K_FLAG}) {
+		if (!compat(6) && -e "debian/clean") {
+			my @clean=grep { ! excludefile($_) }
+				filearray("debian/clean", ".");
+			doit("rm","-f","--",@clean) if @clean;
+		}
+
 		doit("rm","-f","debian/files")
 			unless excludefile("debian/files");
 	}
