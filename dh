@@ -254,10 +254,10 @@ $sequences{'binary-arch'} = [@{$sequences{binary}}];
 
 # Third-party commands can be listed in the sequences, but should be
 # listed here as well. They will not be run if not present.
-my %thirdparty=(
-	dh_pycompat => 1,
-	dh_pysupport => 1,
-);
+my %thirdparty=map { $_ => 1 } qw{
+	dh_pycompat
+	dh_pysupport
+};
 
 # Get the sequence of commands to run.
 if (! @ARGV) {
@@ -270,14 +270,24 @@ if (! exists $sequences{$sequence}) {
 }
 my @sequence=@{$sequences{$sequence}};
 
+# The list of all packages that can be acted on.
+my @packages=@{$dh{DOPACKAGES}};
+
 # Get the options to pass to commands in the sequence.
 # Filter out options intended only for this program.
 my @options;
 if ($sequence eq 'binary-arch') {
 	push @options, "-a";
+	# as an optimisation, remove from the list any packages
+	# that are not arch dependent
+	my %arch_packages = map { $_ => 1 } getpackages("arch");
+	@packages = grep { $arch_packages{$_} } @packages;
 }
 elsif ($sequence eq 'binary-indep') {
 	push @options, "-i";
+	# ditto optimisation for arch indep
+	my %indep_packages = map { $_ => 1 } getpackages("indep");
+	@packages = grep { $indep_packages{$_} } @packages;
 }
 while (@ARGV_orig) {
 	my $opt=shift @ARGV_orig;
@@ -295,7 +305,7 @@ while (@ARGV_orig) {
 # Figure out at what point in the sequence to start for each package.
 my %logged;
 my %startpoint;
-foreach my $package (@{$dh{DOPACKAGES}}) {
+foreach my $package (@packages) {
 	my @log=loadlog($package);
 	if ($dh{AFTER}) {
 		# Run commands in the sequence that come after the
@@ -342,14 +352,14 @@ elsif ($dh{BEFORE}) {
 foreach my $i (0..$stoppoint) {
 	# Figure out which packages need to run this command.
 	my @exclude;
-	foreach my $package (@{$dh{DOPACKAGES}}) {
+	foreach my $package (@packages) {
 		if ($startpoint{$package} > $i ||
 		    $logged{$package}{$sequence[$i]}) {
 			push @exclude, $package;
 		}
 	}
 	
-	if (@exclude eq @{$dh{DOPACKAGES}}) {
+	if (@exclude eq @packages) {
 		# Command already done for all packages.
 		next;
 	}
