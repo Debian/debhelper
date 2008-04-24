@@ -20,7 +20,7 @@ package is built. It removes the package build directories, and removes some
 other files including debian/files, and any detritus left behind by other
 debhelper commands. It also removes common files that should not appear in a
 debian diff:
-  #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS .deps/* *.P
+  #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS .deps/* *.P *-stamp
 
 It does not run "make clean" to clean up after the build process. Use
 L<dh_auto_clean(1)> to do that.
@@ -118,6 +118,10 @@ if (! $dh{D_FLAG}) {
 
 doit('rm', '-rf', 'debian/tmp') if -x 'debian/tmp' && ! compat(1) &&
                                    ! excludefile("debian/tmp");
+
+if (!compat(6)) {
+	complex_doit('rm -f *-stamp');
+}
 
 =head1 SEE ALSO
 
