@@ -25,6 +25,8 @@ debian diff:
 It does not run "make clean" to clean up after the build process. Use
 L<dh_auto_clean(1)> to do that.
 
+The debian/clean file can list other files to be removed.
+
 =head1 OPTIONS
 
 =over 4
@@ -80,6 +82,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 if (! $dh{D_FLAG}) {
 	if (@ARGV) {
 		doit("rm","-f","--",@ARGV);
+	}
+	
+	if (!compat(6) && -e "debian/clean") {
+		my @clean=grep { ! excludefile($_) }
+			filearray("debian/clean", ".");
+		doit("rm","-f","--",@clean) if @clean;
 	}
 
 	if (! $dh{K_FLAG}) {

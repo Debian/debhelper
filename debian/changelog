@@ -18,12 +18,14 @@ debhelper (7.0.0) UNRELEASED; urgency=low
     setup.py to install. Supports the PREFIX=/usr special case needed by
     MakeMaker Makefiles. (Support for cmake and other build systems planned
     but not yet implemented.)
-  * New v7 mode, which only has one change from v6, and is the new
+  * New v7 mode, which only has two changes from v6, and is the new
     recommended default.
   * dh_install: In v7 mode, if --sourcedir is not specified, first look for
     files in debian/tmp, and then will look in the current directory. This
     allows dh_install to interoperate with dh_auto_install without needing any
     special parameters.
+  * dh_clean: In v7 mode, read debian/clean and delete all files listed
+    therein.
   * dh: New program that runs a series of debhelper commands in a sequence.
     This can be used to construct very short rules files (as short as 3
     lines), while still exposing the full power of debhelper when it's
