@@ -286,6 +286,7 @@ while (@ARGV_orig) {
 my %logged;
 my %startpoint;
 foreach my $package (@{$dh{DOPACKAGES}}) {
+	my @log=loadlog($package);
 	if ($dh{AFTER}) {
 		# Run commands in the sequence that come after the
 		# specified command.
@@ -300,7 +301,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# Find the last logged command that is in the sequence, and
 		# continue with the next command after it. If no logged
 		# command is in the sequence, we're starting at the beginning.. 			
-		my @log=loadlog($package);
 		$startpoint{$package}=0;
 COMMAND:	foreach my $command (reverse @log) {
 			foreach my $i (0..$#sequence) {
@@ -381,7 +381,7 @@ sub loadlog {
 	my $ext=pkgext($package);
 	
 	my @log;
-	open(LOG, "<", "debian/${ext}debhelper.log");
+	open(LOG, "<", "debian/${ext}debhelper.log") || return;
 	while (<LOG>) {
 		chomp;
 		push @log, $_;

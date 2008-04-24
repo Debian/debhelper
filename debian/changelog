@@ -1,9 +1,9 @@
 debhelper (7.0.0) UNRELEASED; urgency=low
 
-  * dh_clean: Don't delete core dumps. (Too DWIM, and "core" is not
-    necessarily a core dump.) Closes: #477391
-  * Record debhelper commands that successfully finish in a per-package log
-    file.
+  * dh: New program that runs a series of debhelper commands in a sequence.
+    This can be used to construct very short rules files (as short as 3
+    lines), while still exposing the full power of debhelper when it's
+    needed.
   * dh_auto_configure: New program, automates running ./configure,
     Makefile.PL, and python distutils. Calls them with exactly the same
     options as cdbs does by default, and allows adding/overriding options.
@@ -19,19 +19,17 @@ debhelper (7.0.0) UNRELEASED; urgency=low
     MakeMaker Makefiles. (Support for cmake and other build systems planned
     but not yet implemented.)
   * New v7 mode, which only has two changes from v6, and is the new
-    recommended default.
+    recommended default, especially when using dh.
   * dh_install: In v7 mode, if --sourcedir is not specified, first look for
     files in debian/tmp, and then will look in the current directory. This
     allows dh_install to interoperate with dh_auto_install without needing any
     special parameters.
   * dh_clean: In v7 mode, read debian/clean and delete all files listed
     therein.
-  * dh: New program that runs a series of debhelper commands in a sequence.
-    This can be used to construct very short rules files (as short as 3
-    lines), while still exposing the full power of debhelper when it's
-    needed.
   * Add a Makefile and simplify this package's own rules file using
     all the new toys.
+  * dh_clean: Don't delete core dumps. (Too DWIM, and "core" is not
+    necessarily a core dump.) Closes: #477391
 
  -- Joey Hess <joeyh@debian.org>  Tue, 22 Apr 2008 17:54:20 -0400
 
