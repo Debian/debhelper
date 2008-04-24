@@ -177,8 +177,8 @@ sub parseopts {
 		"language=s" => \$options{LANGUAGE},
 
 		"until=s" => \$options{UNTIL},
-		"before=s" => \$options{BEFORE},
 		"after=s" => \$options{AFTER},
+		"before=s" => \$options{BEFORE},
 		"remaining" => \$options{REMAINING},
 
 		"<>" => \&NonOption,

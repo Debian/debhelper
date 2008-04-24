@@ -58,19 +58,45 @@ Run commands in the sequence that come after I<cmd>.
 
 Run all commands in the sequence that have yet to be run.
 
-=head1 COMMAND SPECIFICATON
+=head1 COMMAND SPECIFICATION
 
 I<cmd> can be a full name of a debhelper command, or a substring. It'll first
 search for a command in the sequence exactly matching the name, to avoid any
 ambiguity. If there are multiple substring matches, the last one in the
 sequence will be used.
 
+=cut
+
+sub command_pos {
+	my $command=shift;
+	my @sequence=@_;
+
+	foreach my $i (0..$#sequence) {
+		if ($command eq $sequence[$i]) {
+			return $i;
+		}
+	}
+
+	my @matches;
+	foreach my $i (0..$#sequence) {
+		if ($sequence[$i] =~ /\Q$command\E/) {
+			push @matches, $i;
+		}
+	}
+	if (! @matches) {
+		error "command specification \"$command\" does not match any command in the sequence"
+	}
+	else {
+		return pop @matches;
+	}
+}
+
 =head1 EXAMPLES
 
 To see what commands are included in a sequence, without actually doing
 anything:
 
-	dh binary-arch -n
+	dh binary-arch --no-act
 
 This is a very simple rules file, for packages where the default seqences of
 commands work with no additional options.
@@ -160,7 +186,9 @@ $sequences{clean} = [qw{
 	dh_auto_clean
 	dh_clean
 }];
-$sequences{install} = [@{$sequences{build}}, "dh_testroot", "dh_clean -k", qw{
+$sequences{install} = [@{$sequences{build}}, qw{
+	dh_testroot
+	dh_clean
 	dh_installdirs
 	dh_auto_install
 
@@ -181,6 +209,8 @@ $sequences{install} = [@{$sequences{build}}, "dh_testroot", "dh_clean -k", qw{
 	dh_installmenu
 	dh_installmime
 	dh_installmodules
+	dh_installlogcheck
+	dh_installlogrotate
 	dh_installpam
 	dh_installppp
 	dh_installudev
@@ -190,12 +220,10 @@ $sequences{install} = [@{$sequences{build}}, "dh_testroot", "dh_clean -k", qw{
 	dh_desktop
 	dh_gconf
 	dh_icons
-	dh_logcheck
-	dh_logrotate
 	dh_perl
 	dh_python
 	dh_scrollkeeper
-	dh_uselocal
+	dh_usrlocal
 
 	dh_link
 	dh_compress
@@ -214,7 +242,7 @@ $sequences{binary} = [@{$sequences{install}}, qw{
 }, @b];
 $sequences{'binary-arch'} = [@{$sequences{binary}}];
 
-# Sequence parameter.
+# Get the sequence of commands to run.
 if (! @ARGV) {
 	error "specify a sequence to run";
 }
@@ -223,6 +251,7 @@ if (! exists $sequences{$sequence}) {
 	error "Unknown sequence $sequence (chose from: ".
 		join(" ", sort keys %sequences).")";
 }
+my @sequence=@{$sequences{$sequence}};
 
 # Get the options to pass to commands in the sequence.
 # Filter out options intended only for this program.
@@ -246,17 +275,103 @@ while (@ARGV_orig) {
 	push @options, $opt;
 }
 
-@options=grep {
-	$_ ne $sequence && !/^--?(before|after|remaining)$/
-} @options;
-
-foreach my $cmd (@{$sequences{$sequence}}) {
-	print "$cmd @options\n";
+# Figure out at what point in the sequence to start for each package.
+my %logged;
+my %startpoint;
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	if ($dh{AFTER}) {
+		# Run commands in the sequence that come after the
+		# specified command.
+		$startpoint{$package}=command_pos($dh{AFTER}, @sequence) + 1;
+	}
+	elsif ($dh{REMAINING}) {
+		# Start at the beginning so all remaining commands will get
+		# run.
+		$startpoint{$package}=0;
+	}
+	else {
+		# Find the last logged command that is in the sequence, and
+		# continue with the next command after it. If no logged
+		# command is in the sequence, we're starting at the beginning.. 			
+		my @log=loadlog($package);
+		$startpoint{$package}=0;
+COMMAND:	foreach my $command (reverse @log) {
+			foreach my $i (0..$#sequence) {
+				if ($command eq $sequence[$i]) {
+					$startpoint{$package}=$i+1;
+					last COMMAND;
+				}
+			}
+		}
+	}
 }
 
-foreach my $package (@{$dh{DOPACKAGES}}) {
-	my $tmp=tmpdir($package);
+# Figure out what point in the sequence to go to.
+my $stoppoint=$#sequence;
+if ($dh{UNTIL}) {
+	$stoppoint=command_pos($dh{UNTIL}, @sequence);
+}
+elsif ($dh{BEFORE}) {
+	$stoppoint=command_pos($dh{BEFORE}, @sequence) - 1;
+}
+
+# Now run the commands in the sequence.
+foreach my $i (0..$stoppoint) {
+	# Figure out which packages need to run this command.
+	my @exclude;
+	foreach my $package (@{$dh{DOPACKAGES}}) {
+		if ($startpoint{$package} > $i ||
+		    $logged{$package}{$sequence[$i]}) {
+			push @exclude, $package;
+		}
+	}
+	
+	if (@exclude eq @{$dh{DOPACKAGES}}) {
+		# Command already done for all packages.
+		next;
+	}
+	elsif (! @exclude) {
+		# Run command for all packages.
+		run($sequence[$i], @options);
+	}
+	else {
+		# Run command for only a subset of packages.
+		run($sequence[$i], @options,
+			map { "-N$_" } @exclude);
+	}
+}
+
+sub run {
+	my $command=shift;
+	my @options=@_;
+	
+	# dh_clean -k is a special case
+	if ($command eq 'dh_clean' && $sequence ne 'clean') {
+		unshift @options, "-k";
+	}
+
+	# The 4 spaces is a kind of half indent.
+	print "    ".escape_shell($command, @options)."\n";
+
+	if (! $dh{NO_ACT}) {
+		my $ret=system($command, @options);
+		exit($ret) if $ret != 0;
+	}
+}
+
+sub loadlog {
+	my $package=shift;
 	my $ext=pkgext($package);
+	
+	my @log;
+	open(LOG, "<", "debian/${ext}log.debhelper");
+	while (<LOG>) {
+		chomp;
+		push @log, $_;
+		$logged{$package}{$_}=1;
+	}
+	close LOG;
+	return @log;
 }
 
 =head1 SEE ALSO

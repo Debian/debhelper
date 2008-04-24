@@ -2,40 +2,9 @@
 # Each debhelper command in this rules file has to be run using ./run,
 # to ensure that the commands and libraries in the source tree are used,
 # rather than the installed ones.
-
-build:
-	./run dh_auto_configure
-	./run dh_auto_build
-	./run dh_auto_test
-
-clean:
-	./run dh_testdir
-	./run dh_testroot
-	./run dh_auto_clean
-	./run dh_clean
-
-binary-indep: build
-	./run dh_testdir
-	./run dh_testroot
-	./run dh_clean -k
-	./run dh_auto_install
-	./run dh_installdocs
-	./run dh_installexamples
-	./run dh_installman
-	./run dh_installchangelogs
-	./run dh_link
-	./run dh_compress
-	./run dh_fixperms
-	./run dh_perl
-	./run dh_installdeb
-	./run dh_gencontrol
-	./run dh_md5sums
-	./run dh_builddeb
+%:
+	./run dh $@
 
 # Not intended for use by anyone except the author.
 announcedir:
 	@echo ${HOME}/src/joeywiki/code/debhelper/news
-
-binary-arch:
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary
