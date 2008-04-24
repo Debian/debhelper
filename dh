@@ -24,10 +24,6 @@ they only work on binary independent packages, and commands in the
 binary-arch sequences are passed the "-a" option to ensure they only work
 on architecture dependent packages.
 
-Options passed to dh are passed on to each command it runs. This can be
-used to set an option like "-v" or "-X" or "-N", as well as for more
-specialised options.
-
 Each debhelper command will record when it's successfully run in
 debian/package.debhelper.log. (Which dh_clean deletes.) So dh can tell
 which commands have already been run, for which packages, and skip running
@@ -57,6 +53,12 @@ Run commands in the sequence that come after I<cmd>.
 =item B<--remaining>
 
 Run all commands in the sequence that have yet to be run.
+
+=back
+
+All other options passed to dh are passed on to each command it runs. This
+can be used to set an option like "-v" or "-X" or "-N", as well as for more
+specialised options.
 
 =head1 COMMAND SPECIFICATION
 
