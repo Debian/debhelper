@@ -18,8 +18,8 @@ B<dh_auto_clean> [S<I<debhelper options>>] [S<B<--> I<params>>]
 dh_auto_clean is a debhelper program that tries to automatically clean up
 after a package build. If there's a Makefile and it contains a "distclean",
 "realclean", or "clean" target, then this is  done by running make (or MAKE,
-if the environment variable is set). If there is a setup.py, it is run to
-clean the package.
+if the environment variable is set). If there is a setup.py or Build.PL, it
+is run to clean the package.
 
 This is intended to work for about 90% of packages. If it doesn't work, or
 tries to use the wrong clean target, you're encoruaged to skip using
@@ -54,9 +54,11 @@ if (-e "Makefile" || -e "makefile" || -e "GNUmakefile") {
 	}
 }
 elsif (-e "setup.py") {
-	doit("python setup.py", "clean", "-a", @{$dh{U_PARAMS}});
+	doit("python", "setup.py", "clean", "-a", @{$dh{U_PARAMS}});
 }
-
+elsif (-e "Build.PL" && -e "Build") {
+	doit("perl", "Build", "--allow_mb_mismatch", 1, "distclean", @{$dh{U_PARAMS}});
+}
 
 =head1 SEE ALSO
 

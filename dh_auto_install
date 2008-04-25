@@ -19,7 +19,7 @@ B<dh_auto_install> [S<I<debhelper options>>] [S<B<--> I<params>>]
 dh_auto_install is a debhelper program that tries to automatically install
 built files. If there's a Makefile and it contains a "install" target,
 then this is done by running make (or MAKE, if the environment variable is
-set). If there is a setup.py, it is used.
+set). If there is a setup.py or Build.PL, it is used.
 
 The files are installed into debian/<package>/ if there is only one binary
 package to act on. In the multiple binary package case, the files are
@@ -80,12 +80,15 @@ if (-e "Makefile" || -e "makefile" || -e "GNUmakefile") {
 	}
 }
 elsif (-e "setup.py") {
-	doit("python setup.py", "install", 
+	doit("python", "setup.py", "install", 
 		"--root=$destdir",
 		"--no-compile", "-O0",
 		@{$dh{U_PARAMS}});
 }
-
+elsif (-e "Build.PL" && -e "Build") {
+	doit("perl", "Build", "install", "destdir=$destdir",
+		"create_packlist=0", @{$dh{U_PARAMS}});
+}
 
 =head1 SEE ALSO
 

@@ -16,10 +16,10 @@ B<dh_auto_configure> [S<I<debhelper options>>] [S<B<--> I<params>>]
 =head1 DESCRIPTION
 
 dh_auto_configure is a debhelper program that tries to automatically
-configure a package prior to building. It looks for and runs
-a ./configure script, or Makefile.PL. A standard set of parameters is
-determined and passed to the program that is run. If no program to run
-is found, dh_auto_configure will exit without doing anything.
+configure a package prior to building. It looks for and runs a ./configure
+script, Makefile.PL, or Build.PL. A standard set of parameters is
+determined and passed to the program that is run. If no program to run is
+found, dh_auto_configure will exit without doing anything.
 
 This is intended to work for about 90% of packages. If it doesn't work,
 you're encoruaged to skip using dh_auto_configure at all, and just run
@@ -89,6 +89,10 @@ elsif (-e "Makefile.PL") {
 	# # always return the default without waiting for user input.
 	$ENV{PERL_MM_USE_DEFAULT}=1;
 	doit("perl", "Makefile.PL", "INSTALLDIRS=vendor", @{$dh{U_PARAMS}});
+}
+elsif (-e "Build.PL") {
+	$ENV{PERL_MM_USE_DEFAULT}=1; # Module::Build can also use this.
+	doit("perl", "Build.PL", "installdirs=vendor", @{$dh{U_PARAMS}});
 }
 
 =head1 SEE ALSO
