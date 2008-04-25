@@ -67,9 +67,11 @@ my $upstream=shift;
 my $changelog_name="changelog.Debian";
 if (! defined $upstream) {
 	if (! isnative($dh{MAINPACKAGE}) && !compat(6)) {
-		foreach my $name (qw{ChangeLog Changelog Changes CHANGES changelog}) {
-			if (-e $name) {
-				$upstream=$name;
+		my @files=sort glob("*");
+		foreach my $name (qw{changelog changes}) {
+			my @matches=grep { lc $_ eq $name } @files;
+			if (@matches) {
+				$upstream=shift @matches;
 				last;
 			}
 		}
