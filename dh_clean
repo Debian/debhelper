@@ -22,10 +22,13 @@ debhelper commands. It also removes common files that should not appear in a
 debian diff:
   #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS .deps/* *.P *-stamp
 
+The debian/clean file can list other files to be removed.
+
 It does not run "make clean" to clean up after the build process. Use
 L<dh_auto_clean(1)> to do that.
 
-The debian/clean file can list other files to be removed.
+dh_clean (or "dh clean") should be the last debhelper command run in the
+clean target in debian/rules.
 
 =head1 OPTIONS
 
