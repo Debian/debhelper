@@ -117,7 +117,8 @@ sub END {
 		my $cmd=basename($0);
 		foreach my $package (@{$dh{DOPACKAGES}}) {
 			my $ext=pkgext($package);
-			open(LOG, ">>", "debian/${ext}debhelper.log") || error("failed to write to log: $!");
+			my $log="debian/${ext}debhelper.log";
+			open(LOG, ">>", $log) || error("failed to write to ${log}: $!");
 			print LOG $cmd."\n";
 			close LOG;
 		}
