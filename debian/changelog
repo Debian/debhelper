@@ -2,6 +2,12 @@ debhelper (7.0.3) unstable; urgency=low
 
   * dh: Fix man page typos. Closes: #477933
   * Add missing $! to error message when the log can't be opened.
+  * One problem with the log files is that if dh_clean is not the last command
+    run, they will be left behind. This is a particular problem on build
+    daemons that use real root. Especially if cdbs is used, since it runs
+    dh_listpackages after clean, thereby leaving behind log files that
+    only root can touch. Avoid this particular special case by inhibiting
+    logging by dh_listpackages.
 
  -- Joey Hess <joeyh@debian.org>  Tue, 29 Apr 2008 01:40:03 -0400
 
