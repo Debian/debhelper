@@ -54,6 +54,10 @@ if (-e "Makefile" || -e "makefile" || -e "GNUmakefile") {
 		}
 	}
 }
+elsif (-e "Build.PL" && -e "Build") {
+	$ENV{MAKE}="make" unless exists $ENV{MAKE};
+	doit($ENV{MAKE}, 'test', @{$dh{U_PARAMS}});
+}
 
 =head1 SEE ALSO
 
