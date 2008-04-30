@@ -2,7 +2,7 @@
 #
 # Library functions for debhelper programs, perl version.
 #
-# Joey Hess, GPL copyright 1997-2000.
+# Joey Hess, GPL copyright 1997-2008.
 
 package Debian::Debhelper::Dh_Lib;
 use strict;
