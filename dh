@@ -11,7 +11,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh> sequence [B<--until> I<cmd>] [B<--before> I<cmd>] [B<--after> I<cmd>] [B<--remaining>] [S<I<debhelper options>>]
+B<dh> sequence [B<--until> I<cmd>] [B<--before> I<cmd>] [B<--after> I<cmd>] [B<--remaining>] [B<--with> I<addon>] [S<I<debhelper options>>]
 
 =head1 DESCRIPTION
 
@@ -54,6 +54,14 @@ Run commands in the sequence that come after I<cmd>.
 
 Run all commands in the sequence that have yet to be run.
 
+=item B<--with> I<addon>
+
+Add the debhelper commands specified by the given addon to appropriate places
+in the sequence of commands that is run. This option can be repeated more
+than once, and is used when there is a third-party package that provides
+debhelper commands. See "SEQUENCE ADDONS" below for documentation about what
+such packages should do to be supported by --with.
+
 =back
 
 All other options passed to dh are passed on to each command it runs. This
@@ -66,6 +74,22 @@ I<cmd> can be a full name of a debhelper command, or a substring. It'll first
 search for a command in the sequence exactly matching the name, to avoid any
 ambiguity. If there are multiple substring matches, the last one in the
 sequence will be used.
+
+=head1 SEQUENCE ADDONS
+
+When B<--with> I<addon> is used, dh loads the perl module
+Debian::Debhelper::Sequence::I<addon>. Two functions are provided to let
+the module add its commands to sequences:
+
+=over 4
+
+=item Debian::Debhelper::Dh_Lib::insert_before(existing_command, new_command)
+
+Insert I<new_command> in sequences before I<existing_command>.
+
+=item Debian::Debhelper::Dh_Lib::insert_after(existing_command, new_command)
+
+Insert I<new_command> in sequences after I<existing_command>.
 
 =cut
 
@@ -230,7 +254,6 @@ $sequences{install} = [@{$sequences{build}}, qw{
 	dh_gconf
 	dh_icons
 	dh_perl
-	dh_pysupport
 	dh_scrollkeeper
 	dh_usrlocal
 
@@ -252,12 +275,45 @@ $sequences{binary} = [@{$sequences{install}}, qw{
 }, @b];
 $sequences{'binary-arch'} = [@{$sequences{binary}}];
 
-# Third-party commands can be listed in the sequences, but should be
-# listed here as well. They will not be run if not present.
-my %thirdparty=map { $_ => 1 } qw{
-	dh_pycentral
-	dh_pysupport
-};
+# --with python-support is enabled by default, at least for now
+push @{$dh{WITH}}, "python-support";
+
+# sequence addon interface
+sub _insert {
+	my $offset=shift;
+	my $existing=shift;
+	my $new=shift;
+	foreach my $sequence (keys %sequences) {
+		my @list=@{$sequences{$sequence}};
+		next unless grep $existing, @list;
+		my @new;
+		foreach my $command (@list) {
+			if ($command eq $existing) {
+				push @new, $new if $offset < 0;
+				push @new, $command;
+				push @new, $new if $offset > 0;
+			}
+			else {
+				push @new, $command;
+			}
+		}
+		$sequences{$sequence}=\@new;
+	}
+}
+sub insert_before {
+	_insert(-1, @_);
+}
+sub insert_after {
+	_insert(1, @_);
+}
+foreach my $addon (@{$dh{WITH}}) {
+	my $mod="Debian::Debhelper::Sequence::$addon";
+	$mod=~s/-/_/g;
+	eval "use $mod";
+	if ($@) {
+		error("--with $addon not supported or failed to load module $mod");
+	}
+}
 
 # Get the sequence of commands to run.
 if (! @ARGV) {
@@ -378,11 +434,6 @@ sub run {
 	my $command=shift;
 	my @options=@_;
 	
-	# If a third party command is not in /usr/bin, don't try to run it.
-	if ($thirdparty{$command} && ! -x "/usr/bin/$command") {
-		return;
-	}
-
 	# 3 space indent lines the command being run up under the 
 	# sequence name after "dh ".
 	print "   ".escape_shell($command, @options)."\n";

@@ -68,6 +68,11 @@ sub AddIgnore { my($option,$file)=@_;
 	$options{IGNORE}->{$file}=1;
 }
 
+# Add an item to the with list.
+sub AddWith { my($option,$value)=@_;
+	push @{$options{WITH}},$value;
+}
+
 # This collects non-options values.
 sub NonOption {
 	push @{$options{ARGV}}, @_;
@@ -180,6 +185,7 @@ sub parseopts {
 		"after=s" => \$options{AFTER},
 		"before=s" => \$options{BEFORE},
 		"remaining" => \$options{REMAINING},
+		"with=s" => \&AddWith,
 
 		"<>" => \&NonOption,
 	);

@@ -1,3 +1,17 @@
+debhelper (7.0.8) unstable; urgency=low
+
+  * dh: Add an interface that third-party packages providing debhelper commands
+    can use to insert them into a command sequence. 
+    (See dh(1), "SEQUENCE ADDONS".)
+  * dh: --with=foo can be used to include such third-party commands.
+    So, for example, --with=cli could add the dh_cli* commands from
+    cli-common.
+  * Moved python-support special case out of dh and into a python-support
+    sequence addon. --with=python-support is enabled by default to avoid
+    breaking backwards compatability.
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 04 May 2008 16:10:54 -0400
+
 debhelper (7.0.7) unstable; urgency=low
 
   * dh_installxfonts: Fix precidence problem that exposes a new warning
