@@ -1,6 +1,11 @@
 debhelper (7.0.9) UNRELEASED; urgency=low
 
   * rules.tiny: Typo fix. Closes: #479647
+  * dh_installinit: Add --restart-after-upgrade, which avoids stopping a
+    daemon in the prerm, and instead restarts it in the postinst, keeping
+    its downtime minimal. Since some daemons could break if files are upgraded
+    while they're running, it's not the default. It might become the default
+    in a future (v8) compatability level. Closes: #471060
 
  -- Joey Hess <joeyh@debian.org>  Mon, 05 May 2008 18:53:10 -0400
 

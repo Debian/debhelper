@@ -123,6 +123,7 @@ sub parseopts {
 		"r" => \$options{R_FLAG},
 		"no-restart-on-upgrade" => \$options{R_FLAG},
 		"no-start" => \$options{NO_START},
+		"R|restart-after-upgrade" => \$options{RESTART_AFTER_UPGRADE},
 	
 		"k" => \$options{K_FLAG},
 		"keep" => \$options{K_FLAG},

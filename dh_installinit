@@ -11,7 +11,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_installinit> [S<I<debhelper options>>] [B<--name=>I<name>] [B<-n>] [B<-r>] [B<-d>] [S<B<--> I<params>>]
+B<dh_installinit> [S<I<debhelper options>>] [B<--name=>I<name>] [B<-n>] [B<-R>] [B<-r>] [B<-d>] [S<B<--> I<params>>]
 
 =head1 DESCRIPTION
 
@@ -45,9 +45,20 @@ script or default files. May be useful if the init script is shipped and/or
 installed by upstream in a way that doesn't make it easy to let
 dh_installinit find it.
 
+=item B<-R>, B<--restart-after-upgrade>
+
+Do not stop the init script until after the package upgrade has been
+completed. This is different than the default behavior, which stops the
+script in the prerm, and starts it again in the postinst.
+
+This can be useful for daemons that should not have a possibly long
+downtime during upgrade. But you should make sure that the daemon will not
+get confused by the package being upgraded while it's running before using
+this option.
+
 =item B<-r>, B<--no-restart-on-upgrade>
 
-Do not restart init script on upgrade.
+Do not stop init script on upgrade.
 
 =item B<--no-start>
 
@@ -166,11 +177,19 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
                 
 		if (! $dh{NOSCRIPTS}) {
 			if (! $dh{NO_START}) {
-				# update-rc.d, and start script
-				autoscript($package,"postinst", "postinst-init",
-					"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/;s/#ERROR_HANDLER#/$dh{ERROR_HANDLER}/");
+				if ($dh{RESTART_AFTER_UPGRADE}) {
+					# update-rc.d, and restart (or
+					# start if new install) script
+					autoscript($package,"postinst", "postinst-init-restart",
+						"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/;s/#ERROR_HANDLER#/$dh{ERROR_HANDLER}/");
+				}
+				else {
+					# update-rc.d, and start script
+					autoscript($package,"postinst", "postinst-init",
+						"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/;s/#ERROR_HANDLER#/$dh{ERROR_HANDLER}/");
+				}
 			
-				if ($dh{R_FLAG}) {
+				if ($dh{R_FLAG} || $dh{RESTART_AFTER_UPGRADE}) {
 					# stops script only on remove
 					autoscript($package,"prerm","prerm-init-norestart",
 						"s/#SCRIPT#/$script/;s/#INITPARMS#/$params/;s/#ERROR_HANDLER#/$dh{ERROR_HANDLER}/");
