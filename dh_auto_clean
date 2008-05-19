@@ -55,6 +55,9 @@ if (-e "Makefile" || -e "makefile" || -e "GNUmakefile") {
 }
 elsif (-e "setup.py") {
 	doit("python", "setup.py", "clean", "-a", @{$dh{U_PARAMS}});
+	# The setup.py might import files, leading to python creating pyc
+	# files.
+	doit('find', '.', '-name', '*.pyc', '-exec', 'rm', '{}', ';');
 }
 elsif (-e "Build.PL" && -e "Build") {
 	doit("perl", "Build", "--allow_mb_mismatch", 1, "distclean", @{$dh{U_PARAMS}});
