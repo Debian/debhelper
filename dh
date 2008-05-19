@@ -91,6 +91,10 @@ Insert I<new_command> in sequences before I<existing_command>.
 
 Insert I<new_command> in sequences after I<existing_command>.
 
+=item Debian::Debhelper::Dh_Lib::remove_command(existing_command)
+
+Remove I<existing_command> from the list of commands to run.
+
 =back
 
 =cut
@@ -307,6 +311,13 @@ sub insert_before {
 }
 sub insert_after {
 	_insert(1, @_);
+}
+sub remove_command {
+	my $command=shift;
+	foreach my $sequence (keys %sequences) {
+		$sequences{$sequence}=[grep { $_ ne $command } @{$sequences{$sequence}}];
+	}
+	
 }
 foreach my $addon (@{$dh{WITH}}) {
 	my $mod="Debian::Debhelper::Sequence::$addon";
