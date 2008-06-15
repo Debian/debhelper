@@ -142,14 +142,17 @@ This is a simple rules file that is a good starting place for customisation.
 
 	#!/usr/bin/make -f
 
-	build:
+	build: build-stamp
 		dh build
+		touch build-stamp
 
 	clean:
 		dh clean
 
-	install: build
+	install: build install-stamp
+	install-stamp:
 		dh install
+		touch install-stamp
 
 	binary-arch: install
 		dh binary-arch
@@ -165,40 +168,48 @@ and then finished up by running the rest of the sequence. You could also
 run ./configure by hand, instead of bothering with using dh_auto_configure.
 And if necessary, you can add commands to run automake, etc here too.
 
-	build:
+	build: build-stamp
+	build-stamp:
 		dh build --before configure
 		dh_auto_configure -- --kitchen-sink=yes
 		dh build --after configure
+		touch build-stamp
 
 Here's how to skip two automated in a row (configure and build), and
 instead run the commands by hand.
 
-	build:
+	build: build-stamp
+	build-stamp:
 		dh build --before configure
 		./mondoconfig
 		make universe-explode-in-delight
 		dh build --after build
+		touch build-stamp
 
 Another common case is wanting to run some code manually after a particular
 debhelper command is run.
 
-	install: build
+	install: build install-stamp
+	install-stamp:
 		dh install --until dh_fixperms
 		# dh_fixperms has run, now override it for one program
 		chmod 4755 debian/foo/usr/bin/foo
 		# and continue
 		dh install --after dh_fixperms
+		touch install-stamp
 
 It's also fine to run debhelper commands early. Just make sure that at
 least dh_prep is run from the sequence first, and be sure to use the
 B<--remaining> option to ensure that commands that normally come before
 those in the sequence are still run.
 
-	install:
+	install: build install-stamp
+	install-stamp:
 		dh install --until dh_prep
 		dh_installdocs README TODO
 		dh_installchangelogs Changes
 		dh install --remaining
+		touch install-stamp
 
         binary-arch: install
                 dh_strip -X foo

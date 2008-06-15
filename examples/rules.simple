@@ -1,13 +1,17 @@
 #!/usr/bin/make -f
 
-build:
+build: build-stamp
+build-stamp:
 	dh build
+	touch build-stamp
 
 clean:
 	dh clean
 
-install: build
+install: build install-stamp
+install-stamp:
 	dh install
+	touch install-stamp
 
 binary-arch: install
 	dh binary-arch
