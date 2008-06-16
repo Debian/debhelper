@@ -64,7 +64,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			complex_doit("find $tmp $dh{EXCLUDE_FIND} | xargs rm -rf");
 		}
 		else {
-			# Old broken code here for compatability. Does not
+			# Old broken code here for compatibility. Does not
 			# remove everything.
 			complex_doit("find $tmp -name $_ | xargs rm -rf")
 				foreach split(":", $ENV{DH_ALWAYS_EXCLUDE});
