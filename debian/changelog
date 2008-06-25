@@ -1,3 +1,14 @@
+debhelper (7.0.13) unstable; urgency=low
+
+  * dh_auto_install: Rather than looking at the number of binary packages
+    being acted on, look at the total number of binary packages in the
+    source package when deciding whether to install to debian/package or
+    debian/tmp. This avoids inconsistencies when building mixed arch all+any
+    packages using the binary-indep and binary-arch targets.
+    Closes: #487938
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 25 Jun 2008 12:27:02 -0400
+
 debhelper (7.0.12) unstable; urgency=medium
 
   * Correct docs about dh_install and debian/tmp in v7 mode. It first looks in

@@ -22,8 +22,8 @@ then this is done by running make (or MAKE, if the environment variable is
 set). If there is a setup.py or Build.PL, it is used.
 
 The files are installed into debian/<package>/ if there is only one binary
-package to act on. In the multiple binary package case, the files are
-instead installed into debian/tmp/, and should be moved from there to the
+package. In the multiple binary package case, the files are instead
+installed into debian/tmp/, and should be moved from there to the
 appropriate package build directory using L<dh_install(1)> or
 L<dh_movefiles(1)>.
 
@@ -51,7 +51,8 @@ or override the any standard parameters that dh_auto_clean passes.
 init();
 
 my $destdir;
-if (@{$dh{DOPACKAGES}} > 1) {
+my @allpackages=getpackages();
+if (@allpackages > 1) {
 	$destdir="debian/tmp";
 }
 else {
