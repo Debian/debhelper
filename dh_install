@@ -40,9 +40,9 @@ package that builds multiple binary packages. You can use the upstream
 Makefile to install it all into debian/tmp, and then use dh_install to copy
 directories and files from there into the proper package build directories.
 
-From debhelper compatibility level 7 on, if --sourcedir is not specified,
-dh_install will install files from debian/tmp if the directory contains the
-files. Otherwise, it will install files from the current directory.
+From debhelper compatibility level 7 on, dh_install will fall back to
+looking in debian/tmp for files, if it doesn't find them in the current
+directory (or whereever you've told it to look using --srcdir).
 
 =head1 OPTIONS
 
