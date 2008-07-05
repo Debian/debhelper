@@ -293,7 +293,7 @@ $sequences{binary} = [@{$sequences{install}}, qw{
 $sequences{'binary-arch'} = [@{$sequences{binary}}];
 
 # --with python-support is enabled by default, at least for now
-push @{$dh{WITH}}, "python-support";
+unshift @{$dh{WITH}}, "python-support";
 
 # sequence addon interface
 sub _insert {
