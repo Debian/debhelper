@@ -36,8 +36,7 @@ clean target in debian/rules.
 
 =item B<-k>, B<--keep>
 
-This causes L<dh_prep(1)> to be run instead of dh_clean, for backwards
-compatibility.
+This is deprecated, use L<dh_prep(1)> instead.
 
 =item B<-d>, B<--dirs-only>
 
@@ -122,7 +121,7 @@ if (! $dh{D_FLAG}) {
 doit('rm', '-rf', 'debian/tmp') if -x 'debian/tmp' && ! compat(1) &&
                                    ! excludefile("debian/tmp");
 
-if (!compat(6)) {
+if (!compat(6) && !$dh{K_FLAG}) {
 	complex_doit('rm -f *-stamp');
 }
 
