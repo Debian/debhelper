@@ -372,11 +372,11 @@ elsif ($sequence eq 'binary-indep') {
 while (@ARGV_orig) {
 	my $opt=shift @ARGV_orig;
 	next if $opt eq $sequence;
-	if ($opt =~ /^--?(after|until|before)$/) {
+	if ($opt =~ /^--?(after|until|before|with)$/) {
 		shift @ARGV_orig;
 		next;
 	}
-	elsif ($opt =~ /^--?(no-act|remaining|(after|until|before)=)/) {
+	elsif ($opt =~ /^--?(no-act|remaining|(after|until|before|with)=)/) {
 		next;
 	}
 	push @options, $opt;
