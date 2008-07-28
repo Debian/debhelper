@@ -58,6 +58,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		push @command, "-p$package";
 	}
 	if (is_udeb($package)) {
+		push @command, "-UHomepage";
 		push @command, "-n".udeb_filename($package);
 	}
 	doit(@command, "-l$changelog", "-Tdebian/${ext}substvars", 
