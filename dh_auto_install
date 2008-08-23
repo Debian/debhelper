@@ -63,10 +63,13 @@ $destdir=cwd()."/".$destdir;
 if (-e "Makefile" || -e "makefile" || -e "GNUmakefile") {
 	$ENV{MAKE}="make" unless exists $ENV{MAKE};
 	my @params="DESTDIR=$destdir";
-	# Special case for MakeMaker.
-	if (-e "Makefile.PL") {
+
+	# Special case for MakeMaker generated Makefiles.
+	if (-e "Makefile" &&
+	    system('grep -q "generated automatically by MakeMaker" Makefile') == 0) {
 		push @params, "PREFIX=/usr";
 	}
+
 	foreach my $target (qw{install}) {
 		# Use make -n to check to see if the target would do
 		# anything. There's no good way to test if a target exists.
