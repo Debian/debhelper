@@ -42,6 +42,8 @@ init();
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $ext=pkgext($package);
+
+	my $substvars="debian/${ext}substvars";
 	
 	my $changelog=pkgfile($package,'changelog');
 	if (! $changelog) {
@@ -52,6 +54,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("install","-o",0,"-g",0,"-d","$tmp/DEBIAN");
 	}
 
+	# avoid gratuitous warning
+	if (! -e $substvars || system("grep -q '^misc:Depends=' $substvars") != 0) {
+		complex_doit("echo misc:Depends= >> $substvars");
+	}
+	
 	# Generate and install control file.
 	my @command="dpkg-gencontrol";
 	if (getpackages() > 1) {
@@ -61,7 +68,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		push @command, "-UHomepage";
 		push @command, "-n".udeb_filename($package);
 	}
-	doit(@command, "-l$changelog", "-Tdebian/${ext}substvars", 
+	doit(@command, "-l$changelog", "-T$substvars", 
 		"-P$tmp",@{$dh{U_PARAMS}});
 
 	# This chmod is only necessary if the user sets the umask to
