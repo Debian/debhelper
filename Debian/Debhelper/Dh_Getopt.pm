@@ -141,7 +141,7 @@ sub parseopts {
 	);
 
 	if (!$ret) {
-		warning("warning: this unknown option will be a fatal error in a future debhelper release");
+		warning("warning: unknown options will be a fatal error in a future debhelper release");
 		#error("unknown option; aborting");
 	}
 	
