@@ -64,11 +64,6 @@ sub AddIgnore { my($option,$file)=@_;
 	$dh{IGNORE}->{$file}=1;
 }
 
-# Add an item to the with list.
-sub AddWith { my($option,$value)=@_;
-	push @{$dh{WITH}},$value;
-}
-
 # This collects non-options values.
 sub NonOption {
 	push @{$dh{ARGV}}, @_;
@@ -81,6 +76,8 @@ sub parseopts {
 	my $ret=GetOptions(
 		"v" => \$dh{VERBOSE},
 		"verbose" => \$dh{VERBOSE},
+
+		"no-act" => \$dh{NO_ACT},
 	
 		"i" => \&AddPackage,
 		"indep" => \&AddPackage,
@@ -90,99 +87,53 @@ sub parseopts {
 	
 		"p=s" => \&AddPackage,
 	        "package=s" => \&AddPackage,
+		
+		"N=s" => \&ExcludePackage,
+		"no-package=s" => \&ExcludePackage,
 	
 		"dbg-package=s" => \&AddDebugPackage,
 		
 		"s" => \&AddPackage,
 		"same-arch" => \&AddPackage,
 	
-		"N=s" => \&ExcludePackage,
-		"no-package=s" => \&ExcludePackage,
-	
 		"n" => \$dh{NOSCRIPTS},
 		"noscripts" => \$dh{NOSCRIPTS},
 		"o" => \$dh{ONLYSCRIPTS},
 		"onlyscripts" => \$dh{ONLYSCRIPTS},
 
-		"x" => \$dh{INCLUDE_CONFFILES}, # is -x for some unknown historical reason..
-		"include-conffiles" => \$dh{INCLUDE_CONFFILES},
-	
 		"X=s" => \&AddExclude,
 		"exclude=s" => \&AddExclude,
 		
-		"ignore=s" => \&AddIgnore,
-	
 		"d" => \$dh{D_FLAG},
-		"remove-d" => \$dh{D_FLAG},
-		"dirs-only" => \$dh{D_FLAG},
-	
-		"r" => \$dh{R_FLAG},
-		"no-restart-on-upgrade" => \$dh{R_FLAG},
-		"no-start" => \$dh{NO_START},
-		"R|restart-after-upgrade" => \$dh{RESTART_AFTER_UPGRADE},
 	
 		"k" => \$dh{K_FLAG},
 		"keep" => \$dh{K_FLAG},
-		"keep-debug" => \$dh{K_FLAG},
 
 		"P=s" => \$dh{TMPDIR},
 		"tmpdir=s" => \$dh{TMPDIR},
 
 		"u=s", => \$dh{U_PARAMS},
-		"update-rcd-params=s", => \$dh{U_PARAMS},
-	        "dpkg-shlibdeps-params=s", => \$dh{U_PARAMS},
-		"dpkg-gencontrol-params=s", => \$dh{U_PARAMS},
-
-		"l=s", => \$dh{L_PARAMS},
-
-		"m=s", => \$dh{M_PARAMS},
-		"major=s" => \$dh{M_PARAMS},
 
 		"V:s", => \$dh{V_FLAG},
-		"version-info:s" => \$dh{V_FLAG},
 
 		"A" => \$dh{PARAMS_ALL},
 		"all" => \$dh{PARAMS_ALL},
-
-		"no-act" => \$dh{NO_ACT},
 	
-		"init-script=s" => \$dh{INIT_SCRIPT},
-		
 		"sourcedir=s" => \$dh{SOURCEDIR},
 		
 		"destdir=s" => \$dh{DESTDIR},
-
-		"filename=s" => \$dh{FILENAME},
 		
 		"priority=s" => \$dh{PRIORITY},
 		
-		"flavor=s" => \$dh{FLAVOR},
-
-		"autodest" => \$dh{AUTODEST},
-
 		"h|help" => \&showhelp,
 
 		"mainpackage=s" => \$dh{MAINPACKAGE},
 
-		"list-missing" => \$dh{LIST_MISSING},
-
-		"fail-missing" => \$dh{FAIL_MISSING},
-		
-		"L|libpackage=s" => \$dh{LIBPACKAGE},
-		
 		"name=s" => \$dh{NAME},
-		
+
 		"error-handler=s" => \$dh{ERROR_HANDLER},
 		
-		"add-udeb=s" => \$dh{SHLIBS_UDEB},
-		
-		"language=s" => \$dh{LANGUAGE},
-
-		"until=s" => \$dh{UNTIL},
-		"after=s" => \$dh{AFTER},
-		"before=s" => \$dh{BEFORE},
-		"remaining" => \$dh{REMAINING},
-		"with=s" => \&AddWith,
+		"ignore=s" => \&AddIgnore,
 
 		%options,
 
@@ -190,7 +141,8 @@ sub parseopts {
 	);
 
 	if (!$ret) {
-		error("unknown option; aborting");
+		warning("warning: this unknown option will be a fatal error in a future debhelper release");
+		#error("unknown option; aborting");
 	}
 	
 	# Check to see if -V was specified. If so, but no parameters were

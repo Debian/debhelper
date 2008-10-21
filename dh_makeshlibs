@@ -104,7 +104,11 @@ Generates a shlibs file that looks something like:
 
 =cut
 
-init();
+init(options => {
+	"m=s", => \$dh{M_PARAMS},
+	"major=s" => \$dh{M_PARAMS},
+	"version-info:s" => \$dh{V_FLAG},
+});
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if is_udeb($package);

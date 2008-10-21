@@ -57,7 +57,9 @@ Delete these files too.
 
 =cut
 
-init();
+init(options => {
+	"dirs-only" => \$dh{D_FLAG},
+});
 inhibit_log();
 
 if ($dh{K_FLAG}) {

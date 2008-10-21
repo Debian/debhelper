@@ -106,27 +106,19 @@ switch		variable	description
 -X		EXCLUDE		exclude a something from processing (you
 				decide what this means for your program)
 				(This is an array)
-                EXCLUDE_FIND	same as DH_EXCLUDE, except all items are put
+-X              EXCLUDE_FIND	same as EXCLUDE, except all items are put
 				into a string in a way that they will make
 				find find them. (Use ! in front to negate
 				that, of course) Note that this should
 				only be used inside complex_doit(), not in
 				doit().
--x		INCLUDE_CONFFILES
-				include conffiles. It's -x for obscure
-				historical reasons.
 -d		D_FLAG		you decide what this means to your program
--r		R_FLAG		you decide what this means to your program
--k		K_FLAG		you decide what this means to your program
+-k		K_FLAG		used to turn on keeping of something
 -P		TMPDIR		package build directory (implies only one
 				package is being acted on)
 -u		U_PARAMS	will be set to a string, that is typically
 				parameters your program passes on to some
 				other program. (This is an array)
--m		M_PARAMS	will be set to a string, you decide what it
-				means to your program
--l		L_PARAMS	will be set to a string, you decide what it
-				means to your program
 -V		V_FLAG		will be set to a string, you decide what it
 				means to your program
 -V		V_FLAG_SET	will be 1 if -V was specified, even if no
@@ -136,23 +128,14 @@ switch		variable	description
 				those processed here), will apply to all 
 				binary packages the program acts on, not just
 				the first
---init-script	INIT_SCRIPT	will be set to a string, which specifies an
-				init script name (probably only
-				dh_installinit will ever use this)
---sourcedir	SOURCEDIR	will be set to a string (probably only
-				dh_movefiles will ever use this)
---destdir	DESTDIR		will be set to a string (probably only
-				dh_builddeb will ever use this)
---filename	FILENAME	will be set to a string
---flavor	FLAVOR		will be set to a string (probably only
-				dh_installemacsen will ever use this)
---number	PRIORITY	will be set to a number (deprecated)
+--sourcedir	SOURCEDIR	will be set to a string
+--destdir	DESTDIR		will be set to a string
 --priority	PRIORITY	will be set to a number
+--mainpackage	MAINPACKAGE	controls which package is treated as the
+				main package to act on
 --name		NAME		a name to use for installed files, instead of
 				the package name
 --error-handler	ERROR_HANDLER	a function to call on error
---language	LANGUAGE	specify what language a file is in
---add-udeb	SHLIBS_UDEB	used by dh_makeshlibs
 
 Any additional command line parameters that do not start with "-" will be 
 ignored, and you can access them later just as you normally would.

@@ -115,7 +115,15 @@ instances of the same text to be added to maintainer scripts.
 
 =cut
 
-init();
+init(options => {
+	"r" => \$dh{R_FLAG},
+	"no-restart-on-upgrade" => \$dh{R_FLAG},
+	"no-start" => \$dh{NO_START},
+	"R|restart-after-upgrade" => \$dh{RESTART_AFTER_UPGRADE},
+	"init-script=s" => \$dh{INIT_SCRIPT},
+	"update-rcd-params=s", => \$dh{U_PARAMS},
+	"remove-d" => \$dh{D_FLAG},
+});
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);

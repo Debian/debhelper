@@ -43,7 +43,10 @@ being listed in the md5sums file.
 
 =cut
 
-init();
+init(options => {
+	"x" => \$dh{INCLUDE_CONFFILES}, # is -x for some unknown historical reason..
+	"include-conffiles" => \$dh{INCLUDE_CONFFILES},
+});
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if is_udeb($package);

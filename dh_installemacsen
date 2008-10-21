@@ -59,7 +59,9 @@ instances of the same text to be added to maintainer scripts.
 
 =cut
 
-init();
+init(options => {
+	"flavor=s" => \$dh{FLAVOR},
+});
 
 if (! defined $dh{PRIORITY}) {
 	$dh{PRIORITY}=50;

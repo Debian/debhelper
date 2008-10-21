@@ -82,10 +82,15 @@ libfoo, and is installed into /usr/lib/bar/, you can make libfoo-bin depend
 on libbar1 as follows:
 
 	dh_shlibdeps -Llibbar1 -l/usr/lib/bar
-
+	
 =cut
 
-init();
+init(options => {
+	"L|libpackage=s" => \$dh{LIBPACKAGE},
+	"add-udeb=s" => \$dh{SHLIBS_UDEB},
+	"dpkg-shlibdeps-params=s", => \$dh{U_PARAMS},
+	"l=s", => \$dh{L_PARAMS},
+});
 
 if ($dh{L_PARAMS}) {
 	my @paths=();

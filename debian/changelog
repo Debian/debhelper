@@ -1,4 +1,4 @@
-debhelper (7.0.18) UNRELEASED; urgency=low
+debhelper (7.1.0) UNRELEASED; urgency=low
 
   * dh_installchangelogs: Fall back to looking for changelog files ending
     with ".txt". Closes: #498460
@@ -8,6 +8,20 @@ debhelper (7.0.18) UNRELEASED; urgency=low
   * Allow individual debhelper programs to define their own special options
     by passing a hash to init(), which is later passed on the Getopt::Long. 
     Closes: #370823
+  * Move many command-specific options to only be accepted by the command
+    that uses them. Affected options are:
+    -x, -r, -R, -l, -L, -m,
+    --include-conffiles, --no-restart-on-upgrade, --no-start,
+    --restart-after-upgrade, --init-script, --filename, --flavor, --autodest,
+    --libpackage, --add-udeb, --dpkg-shlibdeps-params,
+    --dpkg-gencontrol-params, --update-rcd-params, --major, --remove-d,
+    --dirs-only, --keep-debug, --version-info, --list-missing, --fail-missing,
+    --language, --until, --after, --before, --remaining, --with
+  * If any third-party debhelper commands use any of the above options,
+    they will be broken, and need to be changed to pass options to init().
+  * To avoid breaking rules files that pass options to commands that do not
+    use them, debhelper will now only warn if it encounters an unknown
+    option. This will be converted back to an error later.
 
  -- Joey Hess <joeyh@debian.org>  Wed, 10 Sep 2008 13:58:00 -0400
 

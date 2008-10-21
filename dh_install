@@ -109,7 +109,11 @@ The files will be installed into the first package dh_install acts on.
 
 =cut
 
-init();
+init(options => {
+	"autodest" => \$dh{AUTODEST},
+	"list-missing" => \$dh{LIST_MISSING},
+	"fail-missing" => \$dh{FAIL_MISSING},
+});
 
 my @installed;
 

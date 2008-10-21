@@ -77,7 +77,9 @@ Debian policy, version 3.0.1
 
 =cut
 
-init();
+init(options => {
+	"keep-debug" => \$dh{K_FLAG},
+});
 
 # This variable can be used to turn off stripping (see Policy).
 if (defined $ENV{DEB_BUILD_OPTIONS} && $ENV{DEB_BUILD_OPTIONS} =~ /nostrip/) {

@@ -221,7 +221,16 @@ those in the sequence are still run.
 # Stash this away before init modifies it.
 my @ARGV_orig=@ARGV;
 
-init();
+init(options => {
+	"until=s" => \$dh{UNTIL},
+	"after=s" => \$dh{AFTER},
+	"before=s" => \$dh{BEFORE},
+	"remaining" => \$dh{REMAINING},
+	"with=s" => sub {
+		my ($option,$value)=@_;
+		push @{$dh{WITH}},$value;
+	},
+});
 inhibit_log();
 
 # Definitions of sequences.

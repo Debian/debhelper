@@ -43,7 +43,9 @@ package.
 
 =cut
 
-init();
+init(options => {
+	"filename=s" => \$dh{FILENAME},
+});
 
 # Set the default destination directory.
 if (! defined $dh{DESTDIR}) {
