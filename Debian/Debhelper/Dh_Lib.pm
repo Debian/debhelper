@@ -20,6 +20,8 @@ use vars qw(@ISA @EXPORT %dh);
 my $max_compat=7;
 
 sub init {
+	my %params=@_;
+
 	# If DH_OPTIONS is set, prepend it @ARGV.
 	if (defined($ENV{DH_OPTIONS})) {
 		# Ignore leading/trailing whitespace.
@@ -42,7 +44,7 @@ sub init {
 	if ($parseopt) {
 		eval "use Debian::Debhelper::Dh_Getopt";
 		error($!) if $@;
-		%dh=Debian::Debhelper::Dh_Getopt::parseopts();
+		Debian::Debhelper::Dh_Getopt::parseopts($params{options});
 	}
 
 	# Another way to set excludes.

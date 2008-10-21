@@ -77,6 +77,13 @@ All debhelper programs should respond to certain arguments, such as -v, -i,
 -a, and -p. To help you make this work right, Dh_Lib.pm handles argument
 processing. Just call init().
 
+You can add support for additional options to your command by passing an
+options hash to init(). The hash is then passed on the Getopt::Long to
+parse the command line options. For example, to add a --foo option, which
+sets $dh{FOO}:
+
+init(options => { foo => \$dh{FOO} });
+
 After argument processing, some global variables are used to hold the
 results; programs can use them later. These variables are elements of the
 %dh hash.
@@ -149,8 +156,6 @@ switch		variable	description
 
 Any additional command line parameters that do not start with "-" will be 
 ignored, and you can access them later just as you normally would.
-
-If you need a new command line option, just ask me, and I will add it.
 
 Global variables:
 ----------------
