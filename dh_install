@@ -48,11 +48,6 @@ directory (or whereever you've told it to look using --srcdir).
 
 =over 4
 
-=item B<-Xitem>, B<--exclude=item>
-
-Exclude files that contain "item" anywhere in their filename from
-being installed.
-
 =item B<--autodest>
 
 Guess as the destination directory to install things to. If this is
@@ -71,6 +66,11 @@ itself in a
 debian/package.install file, with no explicit destination, then dh_install
 will automatically guess the destination even if this flag is not set.
 
+=item B<--fail-missing>
+
+This option is like --list-missing, except if a file was missed, it will
+not only list the missing files, but also fail with a nonzero exit code. 
+
 =item B<--list-missing>
 
 This option makes dh_install keep track of the files it installs, and then at
@@ -84,11 +84,6 @@ you don't miss installing newly added files in new upstream releases.
 Note that files that are excluded from being moved via the -X option are not
 warned about.
 
-=item B<--fail-missing>
-
-This option is like --list-missing, except if a file was missed, it will
-not only list the missing files, but also fail with a nonzero exit code. 
-
 =item B<--sourcedir=dir>
 
 Makes all source files be found under dir. If this is specified, it is
@@ -99,6 +94,11 @@ package.files file to package.install and call dh_install with
 "--sourcedir=debian/tmp" appended to the command. This will
 approximate dh_movefiles behaviour, except it will copy files instead
 of moving them.
+
+=item B<-Xitem>, B<--exclude=item>
+
+Exclude files that contain "item" anywhere in their filename from
+being installed.
 
 =item I<file [...] dest>
 
