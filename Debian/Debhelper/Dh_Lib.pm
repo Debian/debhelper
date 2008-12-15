@@ -22,28 +22,14 @@ my $max_compat=7;
 sub init {
 	my %params=@_;
 
-	# If DH_OPTIONS is set, prepend it @ARGV.
-	if (defined($ENV{DH_OPTIONS})) {
-		# Ignore leading/trailing whitespace.
-		$ENV{DH_OPTIONS}=~s/^\s+//;
-		$ENV{DH_OPTIONS}=~s/\s+$//;
-		unshift @ARGV,split(/\s+/,$ENV{DH_OPTIONS});
-	}
-
-	# Check to see if an argument on the command line starts with a dash.
-	# if so, we need to pass this off to the resource intensive 
+	# Check to see if an option line starts with a dash,
+	# or DH_OPTIONS is set.
+	# If so, we need to pass this off to the resource intensive 
 	# Getopt::Long, which I'd prefer to avoid loading at all if possible.
-	my $parseopt=undef;
-	my $arg;
-	foreach $arg (@ARGV) {
-		if ($arg=~m/^-/) {
-			$parseopt=1;
-			last;
-		}       
-	}
-	if ($parseopt) {
+	if ((defined $ENV{DH_OPTIONS} && length $ENV{DH_OPTIONS}) ||
+	    grep /^-/, @ARGV) {
 		eval "use Debian::Debhelper::Dh_Getopt";
-		error($!) if $@;
+		error($@) if $@;
 		Debian::Debhelper::Dh_Getopt::parseopts($params{options});
 	}
 

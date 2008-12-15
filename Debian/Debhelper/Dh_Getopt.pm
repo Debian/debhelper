@@ -69,11 +69,11 @@ sub NonOption {
 	push @{$dh{ARGV}}, @_;
 }
 
-# Parse options and set %dh values.
-sub parseopts {
+sub getoptions {
+	my $array=shift;
 	my %options=%{shift()} if ref $_[0];
 
-	my $ret=GetOptions(
+	Getopt::Long::GetOptionsFromArray($array,
 		"v" => \$dh{VERBOSE},
 		"verbose" => \$dh{VERBOSE},
 
@@ -138,8 +138,28 @@ sub parseopts {
 		%options,
 
 		"<>" => \&NonOption,
-	);
+	)
+}
 
+# Parse options and set %dh values.
+sub parseopts {
+	my $options=shift;
+	
+	# DH_OPTIONS can contain additional options
+	# to be parsed like @ARGV, but with unknown options
+	# skipped.
+	my @ARGV_extra;
+	if (defined $ENV{DH_OPTIONS}) {
+		$ENV{DH_OPTIONS}=~s/^\s+//;
+		$ENV{DH_OPTIONS}=~s/\s+$//;
+		@ARGV_extra=split(/\s+/,$ENV{DH_OPTIONS});
+		my $ret=getoptions(\@ARGV_extra, $options);
+		if (!$ret) {
+			warning("warning: ignored unknown options in DH_OPTIONS");
+		}
+	}
+
+	my $ret=getoptions(\@ARGV, $options);
 	if (!$ret) {
 		warning("warning: unknown options will be a fatal error in a future debhelper release");
 		#error("unknown option; aborting");
@@ -195,7 +215,7 @@ sub parseopts {
 	# Anything left in @ARGV is options that appeared after a --
 	# These options are added to the U_PARAMS array, while the
 	# non-option values we collected replace them in @ARGV;
-	push @{$dh{U_PARAMS}}, @ARGV;
+	push @{$dh{U_PARAMS}}, @ARGV, @ARGV_extra;
 	@ARGV=@{$dh{ARGV}} if exists $dh{ARGV};
 }
 

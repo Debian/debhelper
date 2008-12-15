@@ -4,6 +4,12 @@ debhelper (7.1.1) UNRELEASED; urgency=low
   * Fix some docs that refered to --srcdir rather than --sourcedir.
     Closes: #504742
   * Add Vcs-Browser field. Closes: #507804
+  * Ignore unknown options in DH_OPTIONS. Debhelper will always ignore
+    such options, even when unknown command-line options are converted back
+    to an error. This allows (ab)using DH_OPTIONS to pass command-specific
+    options.
+    (Note that getopt will warn about such unknown options. Eliminating this
+    warning without reimplementing much of Getopt::Long wasn't practical.)
 
  -- Joey Hess <joeyh@debian.org>  Mon, 03 Nov 2008 18:50:03 -0500
 

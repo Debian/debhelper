@@ -477,10 +477,13 @@ Set to 1 to enable no-act mode.
 =item DH_OPTIONS
 
 Anything in this variable will be prepended to the command line arguments
-of all debhelper commands. This is useful in some situations, for example,
-if you need to pass -p to all debhelper commands that will be run. One good
-way to set DH_OPTIONS is by using "Target-specific Variable Values" in your
-debian/rules file. See the make documentation for details on doing this.
+of all debhelper commands. Command-specific options will be ignored by 
+commands that do not support them. 
+
+This is useful in some situations, for example, if you need to pass -p to
+all debhelper commands that will be run. One good way to set DH_OPTIONS is
+by using "Target-specific Variable Values" in your debian/rules file. See
+the make documentation for details on doing this.
 
 =item DH_ALWAYS_EXCLUDE
 
