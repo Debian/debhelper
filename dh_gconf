@@ -27,6 +27,11 @@ installed into usr/share/gconf/defaults/10_package in the package build
 directory, with "package" replaced by the package name. Some postinst and
 postrm fragments will be generated to launch update-gconf-defaults.
 
+If a file named debian/package.gconf-mandatory exists, then it is
+installed into usr/share/gconf/mandatory/10_package in the package build
+directory, with "package" replaced by the package name, and similar
+postinst and postrm fragments will be generated.
+
 The gconf-schemas and update-gconf-defaults scripts are provided by the
 gconf2 package. An appropriate dependency will be generated in
 ${misc:Depends}.
@@ -57,13 +62,22 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	
 	my $gconf_dep = 0;
+	my $mandatory = pkgfile($package, "gconf-mandatory");
+	if ($mandatory ne '') {
+		doit("mkdir","-p","$tmp/usr/share/gconf/mandatory");
+		doit("install","-p","-m644",$mandatory,"$tmp/usr/share/gconf/mandatory/${priority}_$package");
+		autoscript($package,"postinst","postinst-gconf-defaults","s%#OPT#%--mandatory%");
+		autoscript($package,"postrm","postrm-gconf-defaults","s%#OPT#%--mandatory%");
+		addsubstvar($package, "misc:Depends", "gconf2 (>= 2.24.0-5)");
+		$gconf_dep = 1;
+	}
 	my $defaults = pkgfile($package,"gconf-defaults");
 	if ($defaults ne '') {
 		doit("mkdir","-p","$tmp/usr/share/gconf/defaults");
 		doit("install","-p","-m644",$defaults,"$tmp/usr/share/gconf/defaults/${priority}_$package");
-		autoscript($package,"postinst","postinst-gconf-defaults");
-		autoscript($package,"postrm","postrm-gconf-defaults");
-		addsubstvar($package, "misc:Depends", "gconf2 (>= 2.12.1-1)");
+		autoscript($package,"postinst","postinst-gconf-defaults","s%#OPT#%%");
+		autoscript($package,"postrm","postrm-gconf-defaults","s%#OPT#%%");
+		addsubstvar($package, "misc:Depends", "gconf2 (>= 2.12.1-1)") unless $gconf_dep;
 		$gconf_dep = 1;
 	}
 
