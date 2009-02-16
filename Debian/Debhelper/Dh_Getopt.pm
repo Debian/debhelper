@@ -159,6 +159,14 @@ sub parseopts {
 		}
 	}
 
+	# DH_INTERNAL_OPTIONS is used to pass additional options from
+	# dh through an override target to a command.
+	if (defined $ENV{DH_INTERNAL_OPTIONS}) {
+		$ENV{DH_INTERNAL_OPTIONS}=~s/^\s+//;
+		$ENV{DH_INTERNAL_OPTIONS}=~s/\s+$//;
+		unshift @ARGV, split(/\s+/,$ENV{DH_INTERNAL_OPTIONS});
+	}
+
 	my $ret=getoptions(\@ARGV, $options);
 	if (!$ret) {
 		warning("warning: unknown options will be a fatal error in a future debhelper release");
