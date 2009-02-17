@@ -182,6 +182,15 @@ after a particular debhelper command is run.
 		dh_fixperms
 		chmod 4755 debian/foo/usr/bin/foo
 
+If the package's source tree might get files with names
+like build or clean in it, the rules file would not
+run targets with the same names. This issue can be worked
+around by passing -B to make.
+
+	#!/usr/bin/make -Bf
+	%:
+		dh $@
+
 =cut
 
 # Stash this away before init modifies it.
@@ -311,8 +320,10 @@ if (! @ARGV) {
 	error "specify a sequence to run";
 }
 my $sequence=shift;
-if ($sequence eq 'debian/rules') {
+if ($sequence eq 'debian/rules' ||
+    $sequence =~ /^override_dh_/) {
 	# make -B causes the rules file to be run as a target
+	# and support completly empty override targets
 	exit 0
 }	
 elsif (! exists $sequences{$sequence}) {
