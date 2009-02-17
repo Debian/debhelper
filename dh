@@ -385,7 +385,7 @@ foreach my $package (@packages) {
 		# no commands remain to run after it, communicating to
 		# future dh instances that the specified command should not
 		# be run again.
-		writelog($package, $sequence[$startpoint{$package}-1]);
+		writelog($sequence[$startpoint{$package}-1], $package);
 	}
 	elsif ($dh{REMAINING}) {
 		# Start at the beginning so all remaining commands will get
@@ -479,7 +479,7 @@ sub run {
 			# been run by the rules file target.
 			my %packages=map { $_ => 1 } @packages;
 			map { delete $packages{$_} } @exclude;
-			Debian::Debhelper::Dh_Lib::write_log($override_command, keys %packages);
+			writelog($override_command, keys %packages);
 		}
 	}
 }
@@ -498,15 +498,9 @@ sub loadlog {
 	close LOG;
 	return @log;
 }
-		
+
 sub writelog {
-	my $package=shift;
-	my $cmd=shift;
-	my $ext=pkgext($package);
-	
-	open(LOG, ">>", "debian/${ext}debhelper.log") || error("failed to write to log");
-	print LOG $cmd."\n";
-	close LOG;
+	Debian::Debhelper::Dh_Lib::write_log(@_);
 }
 
 {
