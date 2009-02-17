@@ -191,6 +191,13 @@ around by passing -B to make.
 	%:
 		dh $@
 
+If your package is a python package, dh will use dh_pysupport by
+default. This is how to use dh_pycentral instead.
+
+	#!/usr/bin/make -f
+	%:
+		dh --with python_central
+
 =cut
 
 # Stash this away before init modifies it.
