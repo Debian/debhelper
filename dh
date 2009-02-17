@@ -320,7 +320,11 @@ if (! @ARGV) {
 	error "specify a sequence to run";
 }
 my $sequence=shift;
-if (! exists $sequences{$sequence}) {
+if ($sequence eq 'debian/rules') {
+	# make -B causes the rules file to be run as a target
+	exit 0
+}	
+elsif (! exists $sequences{$sequence}) {
 	error "Unknown sequence $sequence (choose from: ".
 		join(" ", sort keys %sequences).")";
 }
