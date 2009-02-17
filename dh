@@ -504,24 +504,27 @@ sub rules_explicit_target {
 	# Checks if a specified target exists as an explicit target
 	# in debian/rules. 
 	my $target=shift;
-	my $processing_targets = 0;
-	my $not_a_target = 0;
 	
 	if (! $rules_parsed) {	
+		my $processing_targets = 0;
+		my $not_a_target = 0;
 		open(MAKE, "make -Rrnpsf debian/rules debhelper-fail-me 2>/dev/null |");
 		while (<MAKE>) {
 			if ($processing_targets) {
 				if (/^# Not a target:/) {
 					$not_a_target = 1;
-				} else {
-					if (!$not_a_target && /^([^#:]+)::?/ && !exists $targets{$1}) {
+				}
+				else {
+					if (!$not_a_target && /^([^#:]+)::?/) {
 						# Target is defined.
-						# NOTE: if it is a depenency of .PHONY it will be
+						# NOTE: if it is a depenency
+						# of .PHONY it will be
 						# defined too but that's ok.
 						$targets{$1} = 1;
 					}
-					# "Not a target:" is always followed by a target name,
-					# so resetting this one here is safe.
+					# "Not a target:" is always followed by
+					# a target name, so resetting this one
+					# here is safe.
 					$not_a_target = 0;
 				}
 			} elsif (/^# Files$/) {
