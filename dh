@@ -140,14 +140,14 @@ anything:
 This is a very simple rules file, for packages where the default sequences of
 commands work with no additional options.
 
-	#!/usr/bin/make -Bf
+	#!/usr/bin/make -f
 	%:
 		dh $@
 
 Often you'll want to pass an option to a specific debhelper command. The
 easy way to do with is by adding an override target for that command.
 	
-	#!/usr/bin/make -Bf
+	#!/usr/bin/make -f
 	%:
 		dh $@
 
@@ -161,7 +161,7 @@ Sometimes the automated dh_auto_configure and dh_auto_build can't guess
 what to do for a strange package. Here's how to avoid running either
 and instead run your own commands.
 
-	#!/usr/bin/make -Bf
+	#!/usr/bin/make -f
 	%:
 		dh $@
 
@@ -174,7 +174,7 @@ and instead run your own commands.
 Another common case is wanting to do something manually before or
 after a particular debhelper command is run.
 
-	#!/usr/bin/make -Bf
+	#!/usr/bin/make -f
 	%:
 		dh $@
 
@@ -185,7 +185,7 @@ after a particular debhelper command is run.
 If your package is a python package, dh will use dh_pysupport by
 default. This is how to use dh_pycentral instead.
 
-	#!/usr/bin/make -Bf
+	#!/usr/bin/make -f
 	%:
 		dh --with python-central
 
