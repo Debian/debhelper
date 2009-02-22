@@ -162,8 +162,7 @@ sub doit {
 	verbose_print(escape_shell(@_));
 
 	if (! $dh{NO_ACT}) {
-		my $ret=system(@_);
-		$ret == 0 || error("command returned error code $ret");
+		system(@_) == 0 || _error_exitcode($_[0]);
 	}
 }
 
@@ -176,9 +175,21 @@ sub complex_doit {
 	
 	if (! $dh{NO_ACT}) {
 		# The join makes system get a scalar so it forks off a shell.
-		system(join(" ",@_)) == 0
-			|| error("command returned error code");
+		system(join(" ", @_)) == 0 || _error_exitcode(join(" ", @_))
 	}			
+}
+
+sub _error_exitcode {
+	my $command=shift;
+	if ($? == -1) {
+		error("$command failed to to execute: $!");
+	}
+	elsif ($? & 127) {
+		error("$command died with signal ".($? & 127));
+        }
+	else {
+		error("$command returned exit code ".($? >> 8));
+	}
 }
 
 # Run a command that may have a huge number of arguments, like xargs does.
