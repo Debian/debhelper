@@ -66,10 +66,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (getpackages() > 1) {
 		push @command, "-p$package";
 	}
-	if (is_udeb($package)) {
-		push @command, "-UHomepage";
-		push @command, "-n".udeb_filename($package);
-	}
 	doit(@command, "-l$changelog", "-T$substvars", 
 		"-P$tmp",@{$dh{U_PARAMS}});
 
