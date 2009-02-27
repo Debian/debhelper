@@ -1,19 +1,8 @@
 debhelper (7.2.0) UNRELEASED; urgency=low
 
-  * dh: debian/rules override targets can change what is run
-    for a specific debhelper command in a sequence.
-    (Thanks Modestas Vainius for the improved makefile parser.)
-  * dh: Redid all the examples to use override targets, since these
-    eliminate all annoying boilerplate and are much easier to understand
-    than the old method.
-  * Remove rules.simple example, there's little need to use explcit targets
-    with dh anymore.
   * dh: Fix typo. Closes: #509754
   * debhelper.pod: Fix typo. Closes: #510180
   * dh_gconf: Support mandatory settings. Closes: #513923
-  * dh: Support debian/rules calling make with -B,
-    which is useful to avoid issues with phony implicit
-    rules (see bug #509756).
   * Improve error messages when child commands fail.
   * Depend on dpkg-dev 1.14.19, the first to support Package-Type
     fields in dpkg-gencontrol.
@@ -65,6 +54,25 @@ debhelper (7.1.0) experimental; urgency=low
     option. This will be converted back to an error later.
 
  -- Joey Hess <joeyh@debian.org>  Wed, 10 Sep 2008 13:58:00 -0400
+
+debhelper (7.0.50) unstable; urgency=low
+
+  * This release is designed to be easily backportable to stable,
+    to support the new style of rules file that I expect many packages will
+    use.
+  * dh: debian/rules override targets can change what is run
+    for a specific debhelper command in a sequence.
+    (Thanks Modestas Vainius for the improved makefile parser.)
+  * dh: Redid all the examples to use override targets, since these
+    eliminate all annoying boilerplate and are much easier to understand
+    than the old method.
+  * Remove rules.simple example, there's little need to use explicit targets
+    with dh anymore.
+  * dh: Support debian/rules calling make with -B,
+    which is useful to avoid issues with phony implicit
+    rules (see bug #509756).
+ 
+ -- Joey Hess <joeyh@debian.org>  Fri, 27 Feb 2009 15:25:52 -0500
 
 debhelper (7.0.17) unstable; urgency=low
 

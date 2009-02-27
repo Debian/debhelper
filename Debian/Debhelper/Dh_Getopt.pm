@@ -172,7 +172,7 @@ sub parseopts {
 		warning("warning: unknown options will be a fatal error in a future debhelper release");
 		#error("unknown option; aborting");
 	}
-	
+
 	# Check to see if -V was specified. If so, but no parameters were
 	# passed, the variable will be defined but empty.
 	if (defined($dh{V_FLAG})) {
