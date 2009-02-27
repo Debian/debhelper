@@ -81,6 +81,14 @@ sub NonOption {
 # Parse options and return a hash of the values.
 sub parseopts {
 	undef %options;
+
+	# DH_INTERNAL_OPTIONS is used to pass additional options from
+	# dh through an override target to a command.
+	if (defined $ENV{DH_INTERNAL_OPTIONS}) {
+		$ENV{DH_INTERNAL_OPTIONS}=~s/^\s+//;
+		$ENV{DH_INTERNAL_OPTIONS}=~s/\s+$//;
+		unshift @ARGV, split(/\s+/,$ENV{DH_INTERNAL_OPTIONS});
+	}
 	
 	my $ret=GetOptions(
 		"v" => \$options{VERBOSE},
@@ -190,20 +198,11 @@ sub parseopts {
 
 		"<>" => \&NonOption,
 	);
-
-	# DH_INTERNAL_OPTIONS is used to pass additional options from
-	# dh through an override target to a command.
-	if (defined $ENV{DH_INTERNAL_OPTIONS}) {
-		$ENV{DH_INTERNAL_OPTIONS}=~s/^\s+//;
-		$ENV{DH_INTERNAL_OPTIONS}=~s/\s+$//;
-		unshift @ARGV, split(/\s+/,$ENV{DH_INTERNAL_OPTIONS});
-	}
-
-	my $ret=getoptions(\@ARGV, $options);
+	
 	if (!$ret) {
 		error("unknown option; aborting");
 	}
-	
+
 	# Check to see if -V was specified. If so, but no parameters were
 	# passed, the variable will be defined but empty.
 	if (defined($options{V_FLAG})) {
