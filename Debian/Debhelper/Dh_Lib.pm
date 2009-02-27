@@ -31,15 +31,9 @@ sub init {
 	# Check to see if an argument on the command line starts with a dash.
 	# if so, we need to pass this off to the resource intensive 
 	# Getopt::Long, which I'd prefer to avoid loading at all if possible.
-	my $parseopt=undef;
-	my $arg;
-	foreach $arg (@ARGV) {
-		if ($arg=~m/^-/) {
-			$parseopt=1;
-			last;
-		}       
-	}
-	if ($parseopt) {
+	if ((defined $ENV{DH_OPTIONS} && length $ENV{DH_OPTIONS}) ||
+ 	    (defined $ENV{DH_INTERNAL_OPTIONS} && length $ENV{DH_INTERNAL_OPTIONS}) ||
+	    grep /^-/, @ARGV) {
 		eval "use Debian::Debhelper::Dh_Getopt";
 		error($!) if $@;
 		%dh=Debian::Debhelper::Dh_Getopt::parseopts();
@@ -114,14 +108,20 @@ sub init {
 my $write_log=1;
 sub END {
 	if ($? == 0 && $write_log) {
-		my $cmd=basename($0);
-		foreach my $package (@{$dh{DOPACKAGES}}) {
-			my $ext=pkgext($package);
-			my $log="debian/${ext}debhelper.log";
-			open(LOG, ">>", $log) || error("failed to write to ${log}: $!");
-			print LOG $cmd."\n";
-			close LOG;
-		}
+		write_log(basename($0), @{$dh{DOPACKAGES}});
+	}
+}	
+
+sub write_log {
+	my $cmd=shift;
+	my @packages=@_;
+
+	foreach my $package (@packages) {
+		my $ext=pkgext($package);
+		my $log="debian/${ext}debhelper.log";
+		open(LOG, ">>", $log) || error("failed to write to ${log}: $!");
+		print LOG $cmd."\n";
+		close LOG;
 	}
 }
 

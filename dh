@@ -11,7 +11,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh> sequence [B<--until> I<cmd>] [B<--before> I<cmd>] [B<--after> I<cmd>] [B<--remaining>] [B<--with> I<addon>] [S<I<debhelper options>>]
+B<dh> sequence [B<--with> I<addon>] [B<--until> I<cmd>] [B<--before> I<cmd>] [B<--after> I<cmd>] [B<--remaining>] [S<I<debhelper options>>]
 
 =head1 DESCRIPTION
 
@@ -34,9 +34,24 @@ that is in the specified sequence. It then continues with the next command
 in the sequence. The B<--until>, B<--before>, B<--after>, and B<--remaining>
 options can override this behavior.
 
+If debian/rules contains a target with a name like "override_I<dh_command>",
+then when it gets to that command in the sequence, dh will run that
+target from the rules file, rather than running the actual command. The
+override target can then run the command with additional options, or run
+entirely different commands instead. (Note that to use this feature,
+you should Build-Depend on debhelper 7.2 or above.)
+
 =head1 OPTIONS
 
 =over 4
+
+=item B<--with> I<addon>
+
+Add the debhelper commands specified by the given addon to appropriate places
+in the sequence of commands that is run. This option can be repeated more
+than once, and is used when there is a third-party package that provides
+debhelper commands. See "SEQUENCE ADDONS" below for documentation about what
+such packages should do to be supported by --with.
 
 =item B<--until> I<cmd>
 
@@ -53,14 +68,6 @@ Run commands in the sequence that come after I<cmd>.
 =item B<--remaining>
 
 Run all commands in the sequence that have yet to be run.
-
-=item B<--with> I<addon>
-
-Add the debhelper commands specified by the given addon to appropriate places
-in the sequence of commands that is run. This option can be repeated more
-than once, and is used when there is a third-party package that provides
-debhelper commands. See "SEQUENCE ADDONS" below for documentation about what
-such packages should do to be supported by --with.
 
 =back
 
@@ -137,83 +144,43 @@ commands work with no additional options.
 	%:
 		dh $@
 
-This is a simple rules file that is a good starting place for customisation.
-(It's also available in F</usr/share/doc/debhelper/examples/rules.simple>
+Often you'll want to pass an option to a specific debhelper command. The
+easy way to do with is by adding an override target for that command.
+	
+	#!/usr/bin/make -f
+	%:
+		dh $@
+
+	override_dh_strip:
+		dh_strip -Xfoo
+		
+	override_dh_installdocs:
+		dh_installdocs README TODO
+
+Sometimes the automated dh_auto_configure and dh_auto_build can't guess
+what to do for a strange package. Here's how to avoid running either
+and instead run your own commands.
 
 	#!/usr/bin/make -f
+	%:
+		dh $@
 
-	build: build-stamp
-		dh build
-		touch build-stamp
-
-	clean:
-		dh clean
-
-	install: build install-stamp
-	install-stamp:
-		dh install
-		touch install-stamp
-
-	binary-arch: install
-		dh binary-arch
-
-	binary-indep: install
-		dh binary-indep
-
-	binary: binary-arch binary-indep
-
-Often you'll want to pass an option to ./configure. This uses dh to run all
-commands before L<dh_auto_configure(1)>, then runs that command by hand,
-and then finished up by running the rest of the sequence. You could also
-run ./configure by hand, instead of bothering with using dh_auto_configure.
-And if necessary, you can add commands to run automake, etc here too.
-
-	build: build-stamp
-	build-stamp:
-		dh build --before configure
-		dh_auto_configure -- --kitchen-sink=yes
-		dh build --after configure
-		touch build-stamp
-
-Here's how to skip two automated steps in a row (configure and build), and
-instead run the commands by hand.
-
-	build: build-stamp
-	build-stamp:
-		dh build --before configure
+	override_dh_auto_configure:
 		./mondoconfig
+
+	override_dh_auto_build:
 		make universe-explode-in-delight
-		dh build --after build
-		touch build-stamp
 
-Another common case is wanting to run some code manually after a particular
-debhelper command is run.
+Another common case is wanting to do something manually before or
+after a particular debhelper command is run.
 
-	install: build install-stamp
-	install-stamp:
-		dh install --until dh_fixperms
-		# dh_fixperms has run, now override it for one program
+	#!/usr/bin/make -f
+	%:
+		dh $@
+
+	override_dh_fixperms:
+		dh_fixperms
 		chmod 4755 debian/foo/usr/bin/foo
-		# and continue
-		dh install --after dh_fixperms
-		touch install-stamp
-
-It's also fine to run debhelper commands early. Just make sure that at
-least dh_prep is run from the sequence first, and be sure to use the
-B<--remaining> option to ensure that commands that normally come before
-those in the sequence are still run.
-
-	install: build install-stamp
-	install-stamp:
-		dh install --until dh_prep
-		dh_installdocs README TODO
-		dh_installchangelogs Changes
-		dh install --remaining
-		touch install-stamp
-
-        binary-arch: install
-                dh_strip -X foo
-                dh binary-arch --remaining
 
 =cut
 
@@ -443,21 +410,33 @@ foreach my $i (0..$stoppoint) {
 		# Command already done for all packages.
 		next;
 	}
-	elsif (! @exclude) {
-		# Run command for all packages.
-		run($sequence[$i], @options);
-	}
-	else {
-		# Run command for only a subset of packages.
-		run($sequence[$i], @options,
-			map { "-N$_" } @exclude);
-	}
+
+	run($sequence[$i], \@packages, \@exclude, @options);
 }
 
 sub run {
 	my $command=shift;
+	my @packages=@{shift()};
+	my @exclude=@{shift()};
 	my @options=@_;
 	
+	# Check for override targets in debian/rules and
+	# run them instead of running the command directly.
+	my $override_command;
+	if (rules_explicit_target("override_".$command)) {
+		$override_command=$command;
+		# This passes the options through to commands called
+		# inside the target.
+		$ENV{DH_INTERNAL_OPTIONS}=join(" ", @options);
+		$command="debian/rules";
+		@options="override_".$override_command;
+	}
+	else {
+		# If some packages are excluded, add flags
+		# to prevent them from being acted on.
+		push @options, map { "-N$_" } @exclude;
+	}
+
 	# 3 space indent lines the command being run up under the 
 	# sequence name after "dh ".
 	print "   ".escape_shell($command, @options)."\n";
@@ -469,6 +448,16 @@ sub run {
 		}
 		elsif ($ret) {
 			exit 1;
+		}
+
+		if (defined $override_command) {
+			delete $ENV{DH_INTERNAL_OPTIONS};
+			# Need to handle logging for overriden commands here,
+			# because the actual debhelper command may not have
+			# been run by the rules file target.
+			my %packages=map { $_ => 1 } @packages;
+			map { delete $packages{$_} } @exclude;
+			Debian::Debhelper::Dh_Lib::write_log($override_command, keys %packages);
 		}
 	}
 }
@@ -496,6 +485,31 @@ sub writelog {
 	open(LOG, ">>", "debian/${ext}debhelper.log") || error("failed to write to log");
 	print LOG $cmd."\n";
 	close LOG;
+}
+
+{
+my %targets;
+my $rules_parsed;
+
+sub rules_explicit_target {
+	# Checks if a specified target exists as an explicit target
+	# in debian/rules. 
+	# Currently this is accomplished via a stupid makefile parser.
+	my $target=shift;
+	
+	if (! $rules_parsed) {	
+		open(IN, "<debian/rules") || warning("dh cannot read debian/rules: $!");
+		while (<IN>) {
+			if (/^([a-zA-Z_]+):/) {
+				$targets{$1}=1;
+			}
+		}
+		close IN;
+	}
+
+	return exists $targets{$target};
+}
+
 }
 
 =head1 SEE ALSO
