@@ -515,7 +515,7 @@ sub rules_explicit_target {
 	if (! $rules_parsed) {	
 		my $processing_targets = 0;
 		my $not_a_target = 0;
-		open(MAKE, "make -Rrnpsf debian/rules debhelper-fail-me 2>/dev/null |");
+		open(MAKE, "LANG=C make -Rrnpsf debian/rules debhelper-fail-me 2>/dev/null |");
 		while (<MAKE>) {
 			if ($processing_targets) {
 				if (/^# Not a target:/) {
