@@ -21,7 +21,7 @@ dh_installmodules is a debhelper program that is responsible for
 registering kernel modules.
 
 Files named debian/package.modprobe will be installed in
-etc/modprobe.d/package in the package build directory, to be used by
+etc/modprobe.d/package.conf in the package build directory, to be used by
 module-init-tools's version of modprobe.
 
 Kernel modules are searched for in the package build directory and if
@@ -102,7 +102,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (! -e "$tmp/etc/modprobe.d") {
 			doit("install","-d","$tmp/etc/modprobe.d");
 		}
-		doit("install","-m","0644",$modprobe_file,"$tmp/etc/modprobe.d/".pkgfilename($package));
+		my $old="/etc/modprobe.d/".pkgfilename($package);
+		my $new=$old.".conf";
+		doit("install","-m","0644",$modprobe_file,"$tmp/$new");
+		autoscript($package,"preinst","preinst-moveconffile","s!#OLD#!$old!g;s!#PACKAGE#!$package!g");
+		autoscript($package,"postinst","postinst-moveconffile","s!#OLD#!$old!g;s!#NEW#!$new!g");
 	}
 	
 	if (! $dh{NOSCRIPTS}) {

@@ -79,8 +79,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (! $dh{NOSCRIPTS}) {
 			my $old="/etc/udev/$filename";
 			my $rule="/etc/udev/rules.d/$dh{PRIORITY}$filename";
-			autoscript($package,"preinst","preinst-udev","s!#OLD#!$old!g;s!#RULE#!$rule!g;s!#PACKAGE#!$package!g");
-			autoscript($package,"postinst","postinst-udev","s!#OLD#!$old!g;s!#RULE#!$rule!g");
+			autoscript($package,"preinst","preinst-moveconffile","s!#OLD#!$old!g;s!#PACKAGE#!$package!g");
+			autoscript($package,"postinst","postinst-moveconffile","s!#OLD#!$old!g;s!#NEW#!$rule!g");
+			autoscript($package,"preinst","preinst-udev","s!#RULE#!$rule!g");
 		}
 	}
 }

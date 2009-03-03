@@ -1,3 +1,16 @@
+debhelper (7.2.2) UNRELEASED; urgency=low
+
+  * dh_installmodules: Give files in /etc/modprobe.d a .conf
+    syntax, as required by new module-init-tools.
+  * dh_installmodules: Add preinst and postinst code to handle
+    cleanly renaming the modprobe.d files on upgrade.
+  * Two updates to conffile moving code from wiki:
+    - Support case where the conffile name is a substring of another
+      conffile's name.
+    - Support case where dpkg-query says the file is obsolete.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 02 Mar 2009 20:46:10 -0500
+
 debhelper (7.2.1) experimental; urgency=low
 
   * Merged debhelper 7.0.52.

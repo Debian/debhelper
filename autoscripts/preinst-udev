@@ -1,11 +1,4 @@
 if [ "$1" = install ] || [ "$1" = upgrade ]; then
-	if [ -e "#OLD#" ]; then
-		if [ "`md5sum \"#OLD#\" | sed -e \"s/ .*//\"`" = \
-		     "`dpkg-query -W -f='${Conffiles}' #PACKAGE# | sed -n -e \"\\\\' #OLD#'s/.* //p\"`" ]
-		then
-			rm -f "#OLD#"
-		fi
-	fi
 	if [ -L "#RULE#" ]; then
 		rm -f "#RULE#"
 	fi
