@@ -18,18 +18,17 @@ B<dh_installmenu> [S<B<debhelper options>>] [B<-n>]
 dh_installmenu is a debhelper program that is responsible for installing
 files used by the debian menu package into package build directories.
 
-It also automatically generates the postinst and postrm commands needed to
-interface with the debian menu package. These commands are inserted into
-the maintainer scripts by dh_installdeb. See L<dh_installdeb(1)> for an
-explanation of how this works.
-
 If a file named debian/package.menu exists, then it is installed into
 usr/share/menu/package in the package build directory. This is a debian menu
 file. See L<menufile(5)> for its format.
 
 If a file named debian/package.menu-method exits, then it is installed into
 etc/menu-methods/package in the package build directory. This is a debian
-menu method file.
+menu method file. In this case, dh_installmenu also automatically generates
+the postinst and postrm commands needed to
+interface with the debian menu package. These commands are inserted into
+the maintainer scripts by dh_installdeb. See L<dh_installdeb(1)> for an
+explanation of how this works.
 
 =head1 OPTIONS
 
@@ -55,13 +54,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			doit("install","-d","$tmp/usr/share/menu");
 		}
 		doit("install","-p","-m644",$menu,"$tmp/usr/share/menu/$package");
-		
-		# Add the scripts if a menu-method file doesn't exist.
-		# The scripts for menu-method handle everything these do, too.
-		if ($menu_method eq "" && ! $dh{NOSCRIPTS}) {
-			autoscript($package,"postinst","postinst-menu");
-			autoscript($package,"postrm","postrm-menu")
-		}
 	}
 
 	if ($menu_method ne '') {
