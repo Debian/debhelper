@@ -23,27 +23,27 @@ This helper program installs the following files if they are found:
 
 =over 3
 
-=item B<debian/package.bug-script>, B<debian/bug-script>
+=item B<debian/package.bug-script>
 
 It is the script to be run by the bug reporting program for generating a bug
-report template. This file is installed as F<usr/share/bug/package> into the
+report template. This file is installed as F<usr/share/bug/package> in the
 package build directory if no other types of bug reporting customization
 files are going to be installed for the package in question. Otherwise,
 this file is installed as F<usr/share/bug/package/script>. Finally, the
 installed script is given execute permissions.
 
-=item B<debian/package.bug-control>, B<debian/bug-control>
+=item B<debian/package.bug-control>
 
 It is the bug control file containing some directions for the bug reporting
-tool. This file is installed as F<usr/share/bug/package/control> into the
+tool. This file is installed as F<usr/share/bug/package/control> in the
 package build directory.
 
-=item B<debian/package.bug-presubj>, B<debian/bug-presubj> 
+=item B<debian/package.bug-presubj>
 
 The contents of this file are displayed to the user by the bug reporting
 tool before allowing the user to write a bug report on the package to the
 Debian Bug Tracking System. This file is installed as
-F<usr/share/bug/package/control> into the package build directory.
+F<usr/share/bug/package/control> in the package build directory.
 
 =back
 
@@ -91,16 +91,18 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 	
 	# If there is only a bug script to install, install it as
-	# /usr/share/bug/$package (unless this path is a directory)
+	# usr/share/bug/$package (unless this path is a directory)
 	if (! -d $dir && scalar(keys(%bugfiles)) == 1 && exists $bugfiles{script}) {
 		doit("install","-D","-p","-m755",$bugfiles{script},$dir);
-	} elsif (scalar(keys(%bugfiles)) > 0) {
+	}
+	elsif (scalar(keys(%bugfiles)) > 0) {
 		if (-f $dir) {
 			# Move usr/share/bug/$package to usr/share/bug/$package/script
 			doit("mv", $dir, "${dir}.tmp");
 			doit("install","-d",$dir);
 			doit("mv", "${dir}.tmp", "$dir/script");
-		} elsif (! -d $dir) {
+		}
+		elsif (! -d $dir) {
 			doit("install","-d",$dir);
 		}
 		while (my ($type, $srcfile) = each(%bugfiles)) {
@@ -111,14 +113,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# Ensure that the bug script is executable
 	if (-f $dir) {
 		chmod 0755, $dir;
-	} elsif (-f "$dir/script") {
+	}
+	elsif (-f "$dir/script") {
 		chmod 0755, "$dir/script";
 	}
 }
 
 =head1 SEE ALSO
 
-F</usr/share/doc/reportbug/README.developers.gz> (needs B<reportbug> package installed)
+F</usr/share/doc/reportbug/README.developers.gz>
 
 L<debhelper(1)>
 
