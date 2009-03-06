@@ -11,7 +11,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_installdocs> [S<I<debhelper options>>] [B<-A>] [B<-n>] [B<-X>I<item>] [S<I<file ...>>]
+B<dh_installdocs> [S<I<debhelper options>>] [B<-A>] [B<-X>I<item>] [S<I<file ...>>]
 
 =head1 DESCRIPTION
 
@@ -40,10 +40,8 @@ debian/package.TODO can be used to specify files for subpackages.
 Files named debian/package.docs can list other files to be installed.
 
 Files named debian/package.doc-base, will be installed as doc-base control
-files, and will make this program automatically generate the postinst and
-prerm commands needed to interface with the doc-base package. Note that the
-doc-id will be determined from the "Document:" entry in the
-doc-base control file in question.
+files. Note that the doc-id will be determined from the "Document:" entry
+in the doc-base control file in question.
 
 If your package needs to register more than one document, you need multiple
 files. To accomplish this, you can use files named debian/package.doc-base.*
@@ -56,10 +54,6 @@ files. To accomplish this, you can use files named debian/package.doc-base.*
 
 Install all files specified by command line parameters in ALL packages
 acted on.
-
-=item B<-n>, B<--noscripts>
-
-Do not modify postinst/prerm scripts.
 
 =item B<-Xitem>, B<--exclude=item>
 
@@ -223,14 +217,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	foreach my $fn (keys %doc_ids) {
 		doit("install","-g",0,"-o",0,"-m644","-p","debian/$fn",
 		     "$tmp/usr/share/doc-base/$doc_ids{$fn}");
-		if (! $dh{NOSCRIPTS}) {
-			autoscript($package,"postinst","postinst-doc-base",
-				"s/#DOC-ID#/$doc_ids{$fn}/",
-			);
-			autoscript($package,"prerm","prerm-doc-base",
-				"s/#DOC-ID#/$doc_ids{$fn}/",
-			);
-		}
 	}
 }
 
