@@ -11,7 +11,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_installchangelogs> [S<I<debhelper options>>] [B<-k>] [I<upstream>]
+B<dh_installchangelogs> [S<I<debhelper options>>] [B<-k>] [B<-X>I<item>] [I<upstream>]
 
 =head1 DESCRIPTION
 
@@ -53,6 +53,11 @@ that to the original name of the changelog file. This can be useful if the
 upstream changelog has an unusual name, or if other documentation in the
 package refers to the changelog file.
 
+=item B<-Xitem>, B<--exclude=item>
+
+Exclude upstream changelog files that contain "item" anywhere in their
+filename from being installed.
+
 =item I<upstream>
 
 Install this file as the upstream changelog.
@@ -69,7 +74,9 @@ if (! defined $upstream) {
 	if (! isnative($dh{MAINPACKAGE}) && !compat(6)) {
 		my @files=sort glob("*");
 		foreach my $name (qw{changelog changes changelog.txt changes.txt}) {
-			my @matches=grep { lc $_ eq $name && -s $_ } @files;
+			my @matches=grep {
+				lc $_ eq $name && -s $_ && ! excludefile($_)
+			} @files;
 			if (@matches) {
 				$upstream=shift @matches;
 				last;
