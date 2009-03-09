@@ -1,9 +1,13 @@
-debhelper (7.2.5) UNRELEASED; urgency=low
+debhelper (7.2.5) unstable; urgency=low
 
   * Set MODULEBUILDRC=/dev/null when running perl Build scripts
     to avoid ~/.modulebuildrc influencing the build. Closes: #517423
+  * dh_installmenus: Revert removal of update-menus calls. Closes: #518919
+    Menu refuses to add unconfigured packages to the menu, and thus
+    omits packages when triggered, unfortunatly. I hope its behavior will
+    change.
 
- -- Joey Hess <joeyh@debian.org>  Mon, 09 Mar 2009 13:23:34 -0400
+ -- Joey Hess <joeyh@debian.org>  Mon, 09 Mar 2009 16:20:41 -0400
 
 debhelper (7.2.4) unstable; urgency=low
 
