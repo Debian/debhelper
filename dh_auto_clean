@@ -60,6 +60,7 @@ elsif (-e "setup.py") {
 	doit('find', '.', '-name', '*.pyc', '-exec', 'rm', '{}', ';');
 }
 elsif (-e "Build.PL" && -e "Build") {
+	$ENV{MODULEBUILDRC} = "/dev/null";
 	doit("perl", "Build", "--allow_mb_mismatch", 1, "distclean", @{$dh{U_PARAMS}});
 }
 

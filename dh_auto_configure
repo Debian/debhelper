@@ -92,6 +92,7 @@ elsif (-e "Makefile.PL") {
 }
 elsif (-e "Build.PL") {
 	$ENV{PERL_MM_USE_DEFAULT}=1; # Module::Build can also use this.
+	$ENV{MODULEBUILDRC} = "/dev/null";
 	doit("perl", "Build.PL", "installdirs=vendor", @{$dh{U_PARAMS}});
 }
 
