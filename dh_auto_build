@@ -46,6 +46,7 @@ elsif (-e "setup.py") {
 	doit("python", "setup.py", "build", @{$dh{U_PARAMS}});
 }
 elsif (-e "Build.PL" && -e "Build") {
+	$ENV{MODULEBUILDRC} = "/dev/null";
 	doit("perl", "Build", @{$dh{U_PARAMS}});
 }
 

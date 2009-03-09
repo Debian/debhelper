@@ -55,6 +55,7 @@ if (-e "Makefile" || -e "makefile" || -e "GNUmakefile") {
 	}
 }
 elsif (-e "Build.PL" && -e "Build") {
+	$ENV{MODULEBUILDRC} = "/dev/null";
 	doit(qw/perl Build test/, @{$dh{U_PARAMS}});
 }
 

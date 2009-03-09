@@ -90,6 +90,7 @@ elsif (-e "setup.py") {
 		@{$dh{U_PARAMS}});
 }
 elsif (-e "Build.PL" && -e "Build") {
+	$ENV{MODULEBUILDRC} = "/dev/null";
 	doit("perl", "Build", "install", "destdir=$destdir",
 		"create_packlist=0", @{$dh{U_PARAMS}});
 }
