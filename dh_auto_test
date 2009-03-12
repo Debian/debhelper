@@ -37,9 +37,18 @@ or override the any standard parameters that dh_auto_test passes.
 
 =back
 
+=head1 NOTES
+
+If the DEB_BUILD_OPTIONS environment variable contains "nocheck", no
+tests will be performed.
+
 =cut
 
 init();
+
+if (defined $ENV{DEB_BUILD_OPTIONS} && $ENV{DEB_BUILD_OPTIONS} =~ /nocheck/) {
+	exit 0;
+}
 
 if (-e "Makefile" || -e "makefile" || -e "GNUmakefile") {
 	$ENV{MAKE}="make" unless exists $ENV{MAKE};
