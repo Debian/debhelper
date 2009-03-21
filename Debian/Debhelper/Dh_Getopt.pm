@@ -145,10 +145,39 @@ sub getoptions {
 sub parseopts {
 	my $options=shift;
 	
+	my @ARGV_extra;
+
+	# DH_INTERNAL_OPTIONS is used to pass additional options from
+	# dh through an override target to a command.
+	if (defined $ENV{DH_INTERNAL_OPTIONS}) {
+		$ENV{DH_INTERNAL_OPTIONS}=~s/^\s+//;
+		$ENV{DH_INTERNAL_OPTIONS}=~s/\s+$//;
+		@ARGV_extra=split(/\s+/,$ENV{DH_INTERNAL_OPTIONS});
+		my $ret=getoptions(\@ARGV_extra, $options);
+		if (!$ret) {
+			warning("warning: unknown options will be a fatal error in a future debhelper release");
+			#error("unknown option; aborting");
+		}
+
+		# Avoid forcing acting on packages specified in
+		# DH_INTERNAL_OPTIONS. This way, -p can be specified
+		# at the command line to act on a specific package, and if
+		# nothing is specified, the excludes will cause the set of
+		# packages DH_INTERNAL_OPTIONS specifies to be acted on.
+		foreach my $package (getpackages()) {
+			if (! grep { $_ eq $package } @{$dh{DOPACKAGES}}) {
+				$exclude_package{$package}=1;
+			}
+		}
+		delete $dh{DOPACKAGES};
+		delete $dh{DOINDEP};
+		delete $dh{DOARCH};
+		delete $dh{DOSAME};
+	}
+	
 	# DH_OPTIONS can contain additional options
 	# to be parsed like @ARGV, but with unknown options
 	# skipped.
-	my @ARGV_extra;
 	if (defined $ENV{DH_OPTIONS}) {
 		$ENV{DH_OPTIONS}=~s/^\s+//;
 		$ENV{DH_OPTIONS}=~s/\s+$//;
@@ -157,14 +186,6 @@ sub parseopts {
 		if (!$ret) {
 			warning("warning: ignored unknown options in DH_OPTIONS");
 		}
-	}
-
-	# DH_INTERNAL_OPTIONS is used to pass additional options from
-	# dh through an override target to a command.
-	if (defined $ENV{DH_INTERNAL_OPTIONS}) {
-		$ENV{DH_INTERNAL_OPTIONS}=~s/^\s+//;
-		$ENV{DH_INTERNAL_OPTIONS}=~s/\s+$//;
-		unshift @ARGV, split(/\s+/,$ENV{DH_INTERNAL_OPTIONS});
 	}
 
 	my $ret=getoptions(\@ARGV, $options);
@@ -186,7 +207,7 @@ sub parseopts {
 		if ($dh{DOINDEP} || $dh{DOARCH} || $dh{DOSAME}) {
 			# User specified that all arch (in)dep package be
 			# built, and there are none of that type.
-			warning("I have no package to build");
+			warning("You asked that all arch in(dep) packages be built, but there are none of that type.");
 			exit(0);
 		}
 		push @{$dh{DOPACKAGES}},getpackages();
@@ -208,9 +229,9 @@ sub parseopts {
 	}
 	@{$dh{DOPACKAGES}}=@package_list;
 
-	# If there are no packages to act on now, it's an error.
 	if (! defined $dh{DOPACKAGES} || ! @{$dh{DOPACKAGES}}) {
-		error("I have no package to build");
+		warning("No packages to build.");
+		exit(0);
 	}
 
 	if (defined $dh{U_PARAMS}) {
