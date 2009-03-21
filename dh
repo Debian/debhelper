@@ -443,6 +443,10 @@ sub run {
 	my @exclude=@{shift()};
 	my @options=@_;
 	
+	# If some packages are excluded, add flags
+	# to prevent them from being acted on.
+	push @options, map { "-N$_" } @exclude;
+
 	# Check for override targets in debian/rules and
 	# run them instead of running the command directly.
 	my $override_command;
@@ -453,11 +457,6 @@ sub run {
 		$ENV{DH_INTERNAL_OPTIONS}=join(" ", @options);
 		$command="debian/rules";
 		@options="override_".$override_command;
-	}
-	else {
-		# If some packages are excluded, add flags
-		# to prevent them from being acted on.
-		push @options, map { "-N$_" } @exclude;
 	}
 
 	# 3 space indent lines the command being run up under the 
