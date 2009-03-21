@@ -164,9 +164,11 @@ sub parseopts {
 		# at the command line to act on a specific package, and if
 		# nothing is specified, the excludes will cause the set of
 		# packages DH_INTERNAL_OPTIONS specifies to be acted on.
-		foreach my $package (getpackages()) {
-			if (! grep { $_ eq $package } @{$dh{DOPACKAGES}}) {
-				$exclude_package{$package}=1;
+		if (defined $dh{DOPACKAGES}) {
+			foreach my $package (getpackages()) {
+				if (! grep { $_ eq $package } @{$dh{DOPACKAGES}}) {
+					$exclude_package{$package}=1;
+				}
 			}
 		}
 		delete $dh{DOPACKAGES};
