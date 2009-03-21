@@ -74,9 +74,6 @@ sub init {
 	# Check if packages to build have been specified, if not, fall back to
 	# the default, doing them all.
 	if (! defined $dh{DOPACKAGES} || ! @{$dh{DOPACKAGES}}) {
-		if ($dh{DOINDEP} || $dh{DOARCH} || $dh{DOSAME}) {
-			error("You asked that all arch in(dep) packages be built, but there are none of that type.");
-		}
 		push @{$dh{DOPACKAGES}},@allpackages;
 	}
 
