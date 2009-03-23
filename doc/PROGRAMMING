@@ -250,5 +250,12 @@ getpackages($type)
 inhibit_log()
 	Prevent logging the program's successful finish to
 	debian/*debhelper.log
+load_log($package, $hashref)
+	Loads the log file for the given package and returns a list of
+	logged commands.
+	(Passing a hashref also causes it to populate the hash.)
+write_log($cmd, $package ...)
+	Writes the log files for the specified package(s), adding
+	the cmd to the end.
 
 -- Joey Hess <joeyh@debian.org>
