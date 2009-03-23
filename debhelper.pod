@@ -118,6 +118,14 @@ are not architecture independent.
 Do not act on the specified package even if an -a, -i, or -p option lists
 the package as one that should be acted on.
 
+=item B<--remaining-packages>
+
+Do not act on the packages which have already been acted on by this debhelper
+command earlier (i.e. if the command is present in the package debhelper log).
+For example, if you need to call the command with special options only for a
+couple of binary packages, pass this option to the last call of the command to
+process the rest of packages with default settings. 
+
 =item B<--ignore=>I<file>
 
 Ignore the specified file. This can be used if debian/ contains a debhelper

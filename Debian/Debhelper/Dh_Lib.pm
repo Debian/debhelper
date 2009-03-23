@@ -15,7 +15,7 @@ use vars qw(@ISA @EXPORT %dh);
 	    &filedoublearray &getpackages &basename &dirname &xargs %dh
 	    &compat &addsubstvar &delsubstvar &excludefile &package_arch
 	    &is_udeb &udeb_filename &debhelper_script_subst &escape_shell
-	    &inhibit_log);
+	    &inhibit_log &load_log &write_log);
 
 my $max_compat=7;
 
@@ -102,7 +102,22 @@ sub END {
 	if ($? == 0 && $write_log) {
 		write_log(basename($0), @{$dh{DOPACKAGES}});
 	}
-}	
+}
+
+sub load_log {
+	my ($package, $db)=@_;
+	my $ext=pkgext($package);
+
+	my @log;
+	open(LOG, "<", "debian/${ext}debhelper.log") || return;
+	while (<LOG>) {
+		chomp;
+		push @log, $_;
+		$db->{$package}{$_}=1 if defined $db;
+	}
+	close LOG;
+	return @log;
+}
 
 sub write_log {
 	my $cmd=shift;
