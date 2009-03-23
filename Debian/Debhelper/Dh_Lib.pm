@@ -15,7 +15,7 @@ use vars qw(@ISA @EXPORT %dh);
 	    &filedoublearray &getpackages &basename &dirname &xargs %dh
 	    &compat &addsubstvar &delsubstvar &excludefile &package_arch
 	    &is_udeb &udeb_filename &debhelper_script_subst &escape_shell
-	    &inhibit_log &load_log);
+	    &inhibit_log &load_log &write_log);
 
 my $max_compat=7;
 
