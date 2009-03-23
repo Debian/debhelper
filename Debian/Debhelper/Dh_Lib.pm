@@ -113,7 +113,7 @@ sub load_log {
 	while (<LOG>) {
 		chomp;
 		push @log, $_;
-		$db->{$package}{$_}=1 if (defined $db);
+		$db->{$package}{$_}=1 if defined $db;
 	}
 	close LOG;
 	return @log;
