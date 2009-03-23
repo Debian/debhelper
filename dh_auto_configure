@@ -40,29 +40,6 @@ or override the standard parameters that dh_auto_configure passes.
 
 init();
 
-sub dpkg_architecture_value {
-	my $var=shift;
-	my $value=`dpkg-architecture -q$var 2>/dev/null` || error("dpkg-architecture failed");
-	chomp $value;
-	return $value;
-}
-
-sub sourcepackage {
-	open (CONTROL, 'debian/control') ||
-		error("cannot read debian/control: $!\n");
-	while (<CONTROL>) {
-		chomp;
-		s/\s+$//;
-		if (/^Source:\s*(.*)/) {
-			close CONTROL;
-			return $1;
-		}
-	}
-
-	close CONTROL;
-	error("could not find Source: line in control file.");
-}
-
 if (-x "configure") {
 	# Standard set of options for configure.
 	my @opts;

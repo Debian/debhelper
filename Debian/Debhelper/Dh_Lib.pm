@@ -15,7 +15,8 @@ use vars qw(@ISA @EXPORT %dh);
 	    &filedoublearray &getpackages &basename &dirname &xargs %dh
 	    &compat &addsubstvar &delsubstvar &excludefile &package_arch
 	    &is_udeb &udeb_filename &debhelper_script_subst &escape_shell
-	    &inhibit_log &load_log &write_log);
+	    &inhibit_log &load_log &write_log &dpkg_architecture_value
+	    &sourcepackage);
 
 my $max_compat=7;
 
@@ -600,15 +601,21 @@ sub excludefile {
         return 0;
 }
 
+sub dpkg_architecture_value {
+	my $var = shift;
+	my $value=`dpkg-architecture -q$var 2>/dev/null` || error("dpkg-architecture failed");
+	chomp $value;
+	return $value;
+}
+
 # Returns the build architecture. (Memoized)
 {
 	my $arch;
 	
 	sub buildarch {
-  		return $arch if defined $arch;
-
-		$arch=`dpkg-architecture -qDEB_HOST_ARCH 2>/dev/null` || error("dpkg-architecture failed");
-		chomp $arch;
+		if (!defined $arch) {
+		    $arch=dpkg_architecture_value('DEB_HOST_ARCH');
+		}
 		return $arch;
 	}
 }
@@ -623,6 +630,23 @@ sub samearch {
 	}
 
 	return 0;
+}
+
+# Returns source package name
+sub sourcepackage {
+	open (CONTROL, 'debian/control') ||
+	    error("cannot read debian/control: $!\n");
+	while (<CONTROL>) {
+		chomp;
+		s/\s+$//;
+		if (/^Source:\s*(.*)/) {
+			close CONTROL;
+			return $1;
+		}
+	}
+
+	close CONTROL;
+	error("could not find Source: line in control file.");
 }
 
 # Returns a list of packages in the control file.
