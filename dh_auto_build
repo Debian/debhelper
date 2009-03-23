@@ -7,7 +7,7 @@ dh_auto_build - automatically builds a package
 =cut
 
 use strict;
-use Debian::Debhelper::Dh_Lib;
+use Debian::Debhelper::Dh_Buildsystems;
 
 =head1 SYNOPSIS
 
@@ -37,18 +37,8 @@ or override any standard parameters that dh_auto_build passes.
 
 =cut
 
-init();
-
-if (-e "Makefile" || -e "makefile" || -e "GNUmakefile") {
-	doit(exists $ENV{MAKE} ? $ENV{MAKE} : "make", @{$dh{U_PARAMS}});
-}
-elsif (-e "setup.py") {
-	doit("python", "setup.py", "build", @{$dh{U_PARAMS}});
-}
-elsif (-e "Build.PL" && -e "Build") {
-	$ENV{MODULEBUILDRC} = "/dev/null";
-	doit("perl", "Build", @{$dh{U_PARAMS}});
-}
+my $manager = new Debian::Debhelper::Dh_Buildsystems;
+$manager->run_dh_auto_tool();
 
 =head1 SEE ALSO
 

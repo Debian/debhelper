@@ -7,7 +7,7 @@ dh_auto_clean - automatically cleans up after a build
 =cut
 
 use strict;
-use Debian::Debhelper::Dh_Lib;
+use Debian::Debhelper::Dh_Buildsystems;
 
 =head1 SYNOPSIS
 
@@ -38,31 +38,8 @@ or override the any standard parameters that dh_auto_clean passes.
 
 =cut
 
-init();
-
-if (-e "Makefile" || -e "makefile" || -e "GNUmakefile") {
-	$ENV{MAKE}="make" unless exists $ENV{MAKE};
-	foreach my $target (qw{distclean realclean clean}) {
-		# Use make -n to check to see if the target would do
-		# anything. There's no good way to test if a target exists.
-		my $ret=`$ENV{MAKE} -s -n $target 2>/dev/null`;
-		chomp $ret;
-		if (length $ret) {
-			doit($ENV{MAKE}, $target, @{$dh{U_PARAMS}});
-			last;
-		}
-	}
-}
-elsif (-e "setup.py") {
-	doit("python", "setup.py", "clean", "-a", @{$dh{U_PARAMS}});
-	# The setup.py might import files, leading to python creating pyc
-	# files.
-	doit('find', '.', '-name', '*.pyc', '-exec', 'rm', '{}', ';');
-}
-elsif (-e "Build.PL" && -e "Build") {
-	$ENV{MODULEBUILDRC} = "/dev/null";
-	doit("perl", "Build", "--allow_mb_mismatch", 1, "distclean", @{$dh{U_PARAMS}});
-}
+my $manager = new Debian::Debhelper::Dh_Buildsystems;
+$manager->run_dh_auto_tool();
 
 =head1 SEE ALSO
 

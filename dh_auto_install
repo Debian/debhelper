@@ -8,6 +8,7 @@ dh_auto_install - automatically runs make install or similar
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+use Debian::Debhelper::Dh_Buildsystems;
 use Cwd;
 
 =head1 SYNOPSIS
@@ -48,7 +49,8 @@ or override the any standard parameters that dh_auto_install passes.
 
 =cut
 
-init();
+my $manager = new Debian::Debhelper::Dh_Buildsystems;
+$manager->init_dh_auto_tool();
 
 my $destdir;
 my @allpackages=getpackages();
@@ -60,40 +62,7 @@ else {
 }
 $destdir=cwd()."/".$destdir;
 
-if (-e "Makefile" || -e "makefile" || -e "GNUmakefile") {
-	$ENV{MAKE}="make" unless exists $ENV{MAKE};
-	my @params="DESTDIR=$destdir";
-
-	# Special case for MakeMaker generated Makefiles.
-	if (-e "Makefile" &&
-	    system('grep -q "generated automatically by MakeMaker" Makefile') == 0) {
-		push @params, "PREFIX=/usr";
-	}
-
-	foreach my $target (qw{install}) {
-		# Use make -n to check to see if the target would do
-		# anything. There's no good way to test if a target exists.
-		my $ret=`$ENV{MAKE} -s -n $target 2>/dev/null`;
-		chomp $ret;
-		if (length $ret) {
-			doit($ENV{MAKE}, $target,
-				@params,
-				@{$dh{U_PARAMS}});
-			last;
-		}
-	}
-}
-elsif (-e "setup.py") {
-	doit("python", "setup.py", "install", 
-		"--root=$destdir",
-		"--no-compile", "-O0",
-		@{$dh{U_PARAMS}});
-}
-elsif (-e "Build.PL" && -e "Build") {
-	$ENV{MODULEBUILDRC} = "/dev/null";
-	doit("perl", "Build", "install", "destdir=$destdir",
-		"create_packlist=0", @{$dh{U_PARAMS}});
-}
+$manager->run_dh_auto_tool($destdir);
 
 =head1 SEE ALSO
 
