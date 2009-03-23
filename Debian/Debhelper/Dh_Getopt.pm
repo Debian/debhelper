@@ -91,6 +91,8 @@ sub getoptions {
 		"N=s" => \&ExcludePackage,
 		"no-package=s" => \&ExcludePackage,
 	
+		"remaining-packages" => \$dh{EXCLUDE_LOGGED},
+	
 		"dbg-package=s" => \&AddDebugPackage,
 		
 		"s" => \&AddPackage,
@@ -222,6 +224,10 @@ sub parseopts {
 	my $package;
 	my %packages_seen;
 	foreach $package (@{$dh{DOPACKAGES}}) {
+		if (defined($dh{EXCLUDE_LOGGED}) &&
+		    grep { $_ eq basename($0) } load_log($package)) {
+			$exclude_package{$package}=1;
+		}
 		if (! $exclude_package{$package}) {
 			if (! exists $packages_seen{$package}) {
 				$packages_seen{$package}=1;

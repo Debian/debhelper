@@ -376,7 +376,7 @@ while (@ARGV_orig) {
 my %logged;
 my %startpoint;
 foreach my $package (@packages) {
-	my @log=loadlog($package);
+	my @log=load_log($package, \%logged);
 	if ($dh{AFTER}) {
 		# Run commands in the sequence that come after the
 		# specified command.
@@ -482,21 +482,6 @@ sub run {
 			writelog($override_command, keys %packages);
 		}
 	}
-}
-
-sub loadlog {
-	my $package=shift;
-	my $ext=pkgext($package);
-	
-	my @log;
-	open(LOG, "<", "debian/${ext}debhelper.log") || return;
-	while (<LOG>) {
-		chomp;
-		push @log, $_;
-		$logged{$package}{$_}=1;
-	}
-	close LOG;
-	return @log;
 }
 
 sub writelog {
