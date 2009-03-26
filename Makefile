@@ -36,7 +36,7 @@ build: version
 	cat debhelper.pod | \
 		$(MAKEMANLIST) `find . -maxdepth 1 -type f -perm +100 -name "dh_*" | sort` | \
 		$(POD2MAN) --name="debhelper" --section=7  > debhelper.7
-	po4a man/po4a/po4a.cfg 
+	po4a -L UTF-8 man/po4a/po4a.cfg 
 	set -e; \
 	for lang in $(LANGS); do \
 		dir=man/$$lang; \
