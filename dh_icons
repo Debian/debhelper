@@ -46,6 +46,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		opendir(DIRHANDLE, $icondir);
 		while (my $subdir = readdir(DIRHANDLE)) {
 			next if $subdir =~ /^\./;
+			next if $subdir eq "gnome";
+			next if $subdir eq "hicolor";
 			my $needs_cache = 0;
 			find sub {
 				$needs_cache = 1 if -f and (/\.png$/ or /\.svg$/ or /\.xpm$/ or /\.icon$/);
