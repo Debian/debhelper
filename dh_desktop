@@ -36,7 +36,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# usr/share/applications and thus might need
 		# update-desktop-database be called. Other desktop
 		# files don't.
-		my $desktop_files = `find $tmp/usr/share/applications -type f -name \\*.desktop -execdir grep -q "^MimeType" '{}' \\; -printf '%p\n'`;
+		my $desktop_files = `find $tmp/usr/share/applications -type f -name \\*.desktop -exec grep -q "^MimeType" '{}' \\; -printf '%p\n'`;
 		if ($desktop_files && ! $dh{NOSCRIPTS}) {
 			autoscript($package,"postinst","postinst-desktop");
 			autoscript($package,"postrm","postrm-desktop");
