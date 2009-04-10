@@ -13,6 +13,7 @@ use Exporter qw( import );
 our @EXPORT_OK = qw( DEFAULT_BUILD_DIRECTORY );
 
 # IMPORTANT: more specific buildsystems should go first
+# XXX JEH as noted, this has to match historical order for back-compat
 my @BUILDSYSTEMS = (
     "autotools",
     "cmake",
@@ -34,6 +35,7 @@ sub new {
 	    'o_system' => undef,
 	    'loaded_buildsystems' => [] }, $cls);
 
+	# XXX JEH AFAICS, these 2 env variables are never used or documented
 	if (!exists $opts{noenv}) {
 		if (exists $ENV{DH_AUTO_BUILDDIRECTORY}) {
 			$self->_set_build_directory_option("env", $ENV{DH_AUTO_BUILDDIRECTORY});
@@ -69,6 +71,8 @@ sub get_options {
 }
 
 sub _set_build_directory_option {
+	# XXX JEH option argument is not used, would be less confusing to
+	# not pass extra getopt value in
 	my ($self, $option, $value) = @_;
 	if (!$value || $value eq "auto") {
 		# Autogenerate build directory name
@@ -79,6 +83,7 @@ sub _set_build_directory_option {
 	}
 }
 
+# XXX JEH this sub is not used
 sub _dump_options {
 	my $self=shift;
 	for my $opt (qw(o_dir o_system)) {
@@ -103,6 +108,8 @@ sub _get_buildsystem_module {
 }
 
 sub load_buildsystem {
+	# XXX JEH the $system param is never passed
+	# by any call to this function
 	my ($self, $action, $system) = @_;
 
 	if (!defined $system) {
@@ -155,6 +162,7 @@ sub run_dh_auto_tool {
 	my $toolname = basename($0);
 	my $buildsystem;
 
+	# XXX JEH does this if ever not fire?
 	if (!exists $self->{initialized}) {
 		$self->init_dh_auto_tool();
 	}
@@ -171,5 +179,12 @@ sub run_dh_auto_tool {
 	}
 	return 0;
 }
+
+# XXX JEH generally, why does this need to be an OO object at all?
+# The entire state stored in this object is o_dir and o_system;
+# and the object is used as a singleton. So why not have a single sub
+# that parses the command line, loads the specified system, and uses it,
+# passing it the build directory. It would be both shorter and easier to
+# understand.
 
 1;

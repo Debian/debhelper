@@ -37,6 +37,16 @@ sub configure_impl {
 	push @opts, "--infodir=\${prefix}/share/info";
 	push @opts, "--sysconfdir=/etc";
 	push @opts, "--localstatedir=/var";
+	# XXX JEH this is where the sheer evil of Dh_Buildsystem_Chdir
+	# becomes evident. Why is exec_in_topdir needed here?
+	# Because:
+	# - The parent class happens to be derived from Dh_Buildsystem_Chdir.
+	# - sourcepage() happens to, like many other parts of debhelper's
+	#   library, assume it's being run in the top of the source tree,
+	#   and fails if it's not.
+	# Having to worry about interactions like that for every line of
+	# every derived method is simply not acceptable.
+	# Dh_Buildsystem_Chdir must die! -- JEH
 	push @opts, "--libexecdir=\${prefix}/lib/" . $self->exec_in_topdir(\&sourcepackage);
 	push @opts, "--disable-maintainer-mode";
 	push @opts, "--disable-dependency-tracking";
@@ -48,6 +58,10 @@ sub configure_impl {
 		push @opts, "--host=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE");
 	}
 
+	# XXX JEH the reason it needs to use get_toppath here,
+	# but does not need to in the is_buildable method is not clear,
+	# unless one is familiar with the implementation of its parent
+	# class. I think that speaks to a bad design..
 	doit($self->get_toppath("configure"), @opts, @_);
 }
 

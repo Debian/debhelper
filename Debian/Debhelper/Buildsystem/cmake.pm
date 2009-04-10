@@ -42,7 +42,12 @@ sub configure_impl {
 	$self->_add_cmake_flag("CMAKE_SKIP_RPATH", "ON");
 	$self->_add_cmake_flag("CMAKE_VERBOSE_MAKEFILE", "ON");
 	# TODO: LDFLAGS
+	# XXX JEH why are we using a method and an object
+	# field to build up a simple one-time-use list?
+	# 	my @flags;
+	# 	push @flags, ... if $foo
 
+	# XXX JEH again a non-sequitor get_topdir. 
 	doit("cmake", $self->get_topdir(), @{$self->{cmake_flags}}, @_);
 }
 

@@ -39,6 +39,8 @@ sub new {
 
 sub configure_impl {
 	my $self=shift;
+	# XXX JEH I think the below comment is inherited from elsewhere;
+	# doesn't really make sense now.
 	$ENV{PERL_MM_USE_DEFAULT}=1; # Module::Build can also use this.
 	doit("perl", "Build.PL", "installdirs=vendor", @_);
 }

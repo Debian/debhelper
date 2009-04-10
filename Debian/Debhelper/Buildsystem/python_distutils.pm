@@ -28,6 +28,8 @@ sub get_builddir_option {
 	return;
 }
 
+# XXX JEH the default for all these methods is to do nothing successfully.
+# So either this, or those default stubs, need to be removed.
 sub configure_impl {
 	# Do nothing
 	1;
@@ -38,6 +40,7 @@ sub build_impl {
 	doit("python", "setup.py", "build", @_);
 }
 
+# XXX JEH see anove comment
 sub test_impl {
 	1;
 }

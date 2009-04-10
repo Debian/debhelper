@@ -3,6 +3,8 @@
 # Copyright: © 2008-2009 Modestas Vainius
 # License: GPL-2+
 
+# XXX JEH file name does not match package name (Bases vs Basic)
+# That will cause problems when using 'use' to load the module.
 package Debian::Debhelper::Dh_Buildsystem_Basic;
 
 use Cwd;
@@ -12,10 +14,13 @@ use Debian::Debhelper::Dh_Lib;
 # Build system name. Defaults to the last component of the package
 # name. Do not override this method unless you know what you are
 # doing.
+# XXX JEH s/package/class/ in above comment for clarity..
 sub NAME {
 	my $self = shift;
 	my $cls = ref($self) || $self;
 	return ($cls =~ m/^.+::([^:]+)$/) ? $1 : "[invalid package name]";
+	# XXX JEH s/package/class/ in above message for clarity..
+	# (maybe dying on this unusual error would be better tho?)
 }
 
 # Description of the build system to be shown to the users.
@@ -25,6 +30,11 @@ sub DESCRIPTION {
 
 sub new {
 	my ($cls, $builddir) = @_;
+	# XXX JEH probably would be better to use named parameters here
+	# Also, if the builddir value is not specified, it could use
+	# DEFAULT_BUILD_DIRECTORY here. Which would allow moving that
+	# sub from Dh_Buildsystems to here, since it would no longer need
+	# to be used there.
 	my $self = bless({ builddir => $builddir }, $cls);
 	if (!defined($builddir) || $builddir eq ".") {
 		$self->{builddir} = undef;
@@ -73,6 +83,20 @@ sub get_buildpath {
 	}
 }
 
+# XXX JEH this method seems entirely useless.
+# 	$self->invoke_impl('foo', @_);
+# 	$self->foo(@_);
+# The second is easier to both read and write.
+#
+# Turns out that one build system overrides this method,
+# perl_build uses it to set an env vatiable before each method
+# call. But that's unnecessary; it could just set it in its constructor.
+#
+# And there's another version of this method in the derifed class below,
+# which just adds another parameter to the method call. That is used only
+# by the python_distutils build system, to add a --build-base parameter
+# to two calls to python. It could be manually added to those two calls
+# with less fuss.
 sub invoke_impl {
 	my $self=shift;
 	my $method=shift;
@@ -84,6 +108,10 @@ sub invoke_impl {
 # building, testing, install and cleaning source packages.
 # These methods are wrappers around respective *_impl() methods
 # which are supposed to do real buildsystem specific work. 
+
+# XXX JEH if invoke_impl is done away with, these can be replaced
+# with the bodies of the foo_impl methods they call. That layer of
+# indirection is not really needed.
 
 sub configure {
 	my $self=shift;
@@ -115,6 +143,8 @@ sub clean {
 # source. Arbitary number of custom action arguments might be passed.
 # Default implementations do nothing.
 
+
+
 sub configure_impl {
 	my $self=shift;
 	1;
@@ -131,6 +161,10 @@ sub test_impl {
 }
 
 # destdir parameter specifies where to install files.
+# XXX JEH I don't see where this destdir parameter is passed in
+# to a call to $object->install ? In Dh_Buildsystems it does:
+#                 return $buildsystem->$toolname(@_, @{$dh{U_PARAMS}});
+# Which passes a different parameter, to ALL these methods.
 sub install_impl {
 	my $self=shift;
 	my $destdir=shift;
@@ -149,6 +183,9 @@ use base 'Debian::Debhelper::Dh_Buildsystem_Basic';
 
 # Derived class can call this method in its constructor to enforce
 # outside-source building even if the user didn't request it.
+#
+# XXX JEH is there a reason for this to be in
+# Dh_Buildsystem_Option instead of the base class?
 sub enforce_outside_source_building {
 	my ($self, $builddir) = @_;
 	if (!defined $self->{builddir}) {
@@ -163,6 +200,8 @@ sub get_builddir_option {
 	return;
 }
 
+# XXX JEH if the reasoning for removing invoke_impl from above is followed,
+# then this whole derived class ends up not being needed.
 sub invoke_impl {
 	my $self=shift;
 	my $method=shift;
@@ -176,6 +215,11 @@ sub invoke_impl {
 }
 
 package Debian::Debhelper::Dh_Buildsystem_Chdir;
+
+# XXX JEH I'm very leery of code that chdirs, it can be very hard to follow
+# and cause a lot of mess. (As we'll see in the buildsystem modules that
+# use this class.) It seems to me that this entire class could be
+# basically replaced by a doit_in_builddir() function.
 
 use Cwd;
 use File::Spec;
