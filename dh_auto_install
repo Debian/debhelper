@@ -49,8 +49,7 @@ or override the any standard parameters that dh_auto_install passes.
 
 =cut
 
-my $manager = new Debian::Debhelper::Dh_Buildsystems;
-$manager->init_dh_auto_tool();
+buildsystems_init();
 
 my $destdir;
 my @allpackages=getpackages();
@@ -62,7 +61,7 @@ else {
 }
 $destdir=cwd()."/".$destdir;
 
-$manager->run_dh_auto_tool($destdir);
+buildsystems_do("install", $destdir);
 
 =head1 SEE ALSO
 

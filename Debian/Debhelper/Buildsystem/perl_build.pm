@@ -8,26 +8,27 @@ package Debian::Debhelper::Buildsystem::perl_build;
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
-use Debian::Debhelper::Dh_Buildsystem_Bases;
 use base 'Debian::Debhelper::Dh_Buildsystem_Basic';
 
 sub DESCRIPTION {
 	"support for building Perl Build.PL based packages (in-source only)"
 }
 
-sub is_buildable {
+sub is_auto_buildable {
 	my ($self, $action) = @_;
-	my $ret = (-e "Build.PL");
+
+	# Handles everything
+	my $ret = -e "Build.PL";
 	if ($action ne "configure") {
-		$ret &= (-e "Build");
+		$ret &&= -e "Build";
 	}
 	return $ret;
 }
 
-sub invoke_impl {
+sub do_perl {
 	my $self=shift;
 	$ENV{MODULEBUILDRC} = "/dev/null";
-	return $self->SUPER::invoke_impl(@_);
+	doit("perl", @_);
 }
 
 sub new {
@@ -37,33 +38,31 @@ sub new {
 	return $self;
 }
 
-sub configure_impl {
+sub configure {
 	my $self=shift;
-	# XXX JEH I think the below comment is inherited from elsewhere;
-	# doesn't really make sense now.
-	$ENV{PERL_MM_USE_DEFAULT}=1; # Module::Build can also use this.
-	doit("perl", "Build.PL", "installdirs=vendor", @_);
+	$ENV{PERL_MM_USE_DEFAULT}=1;
+	$self->do_perl("Build.PL", "installdirs=vendor", @_);
 }
 
-sub build_impl {
+sub build {
 	my $self=shift;
-	doit("perl", "Build", @_);
+	$self->do_perl("Build", @_);
 }
 
-sub test_impl {
+sub test {
 	my $self=shift;
-	doit(qw/perl Build test/, @_);
+	$self->do_perl("Build", "test", @_);
 }
 
-sub install_impl {
+sub install {
 	my $self=shift;
 	my $destdir=shift;
-	doit("perl", "Build", "install", "destdir=$destdir", "create_packlist=0", @_);
+	$self->do_perl("Build", "install", "destdir=$destdir", "create_packlist=0", @_);
 }
 
-sub clean_impl {
+sub clean {
 	my $self=shift;
-	doit("perl", "Build", "--allow_mb_mismatch", 1, "distclean", @_);
+	$self->do_perl("Build", "--allow_mb_mismatch", 1, "distclean", @_);
 }
 
 1;

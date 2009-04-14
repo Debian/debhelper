@@ -9,54 +9,47 @@ package Debian::Debhelper::Buildsystem::python_distutils;
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
-use Debian::Debhelper::Dh_Buildsystem_Bases;
-use base 'Debian::Debhelper::Dh_Buildsystem_Option';
+use base 'Debian::Debhelper::Dh_Buildsystem_Basic';
 
 sub DESCRIPTION {
 	"support for building Python distutils based packages"
 }
 
-sub is_buildable {
-	return -e "setup.py";
-}
-
-sub get_builddir_option {
+sub is_auto_buildable {
 	my $self=shift;
-	if ($self->get_builddir()) {
-		return "--build-base=". $self->get_builddir();
+	my $action=shift;
+
+	# Handle build install clean; the rest - next class
+	if (grep(/^\Q$action\E$/, qw{build install clean})) {
+		return -e "setup.py";
 	}
-	return;
+	return 0;
 }
 
-# XXX JEH the default for all these methods is to do nothing successfully.
-# So either this, or those default stubs, need to be removed.
-sub configure_impl {
-	# Do nothing
-	1;
-}
-
-sub build_impl {
+sub setup_py {
 	my $self=shift;
-	doit("python", "setup.py", "build", @_);
+	my $act=shift;
+
+	if ($self->get_builddir()) {
+		unshift @_, "--build-base=" . $self->get_builddir();
+	}
+	doit("python", "setup.py", $act, @_);
 }
 
-# XXX JEH see anove comment
-sub test_impl {
-	1;
+sub build {
+	my $self=shift;
+	$self->setup_py("build", @_);
 }
 
-sub install_impl {
+sub install {
 	my $self=shift;
 	my $destdir=shift;
-
-	doit("python", "setup.py", "install", 
-	     "--root=$destdir",
-	     "--no-compile", "-O0", @_);
+	$self->setup_py("install", "--root=$destdir", "--no-compile", "-O0", @_);
 }
 
-sub clean_impl {
+sub clean {
 	my $self=shift;
-	doit("python", "setup.py", "clean", "-a", @_);
+	$self->setup_py("clean", "-a", @_);
 	# The setup.py might import files, leading to python creating pyc
 	# files.
 	doit('find', '.', '-name', '*.pyc', '-exec', 'rm', '{}', ';');

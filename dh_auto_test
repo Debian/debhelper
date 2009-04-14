@@ -48,8 +48,8 @@ if (defined $ENV{DEB_BUILD_OPTIONS} && $ENV{DEB_BUILD_OPTIONS} =~ /nocheck/) {
 	exit 0;
 }
 
-my $manager = new Debian::Debhelper::Dh_Buildsystems;
-$manager->run_dh_auto_tool();
+buildsystems_init();
+buildsystems_do();
 
 =head1 SEE ALSO
 

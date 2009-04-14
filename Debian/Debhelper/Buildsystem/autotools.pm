@@ -15,17 +15,18 @@ sub DESCRIPTION {
 	"support for building GNU Autotools based packages"
 }
 
-sub is_buildable {
+sub is_auto_buildable {
 	my $self=shift;
-	my ($action) = @_;
+	my $action=shift;
+
+	# Handle configure; the rest - next class
 	if ($action eq "configure") {
 		return -x "configure";
-	} else {
-		return $self->SUPER::is_buildable(@_);
 	}
+	return 0;
 }
 
-sub configure_impl {
+sub configure {
 	my $self=shift;
 
 	# Standard set of options for configure.
@@ -37,17 +38,7 @@ sub configure_impl {
 	push @opts, "--infodir=\${prefix}/share/info";
 	push @opts, "--sysconfdir=/etc";
 	push @opts, "--localstatedir=/var";
-	# XXX JEH this is where the sheer evil of Dh_Buildsystem_Chdir
-	# becomes evident. Why is exec_in_topdir needed here?
-	# Because:
-	# - The parent class happens to be derived from Dh_Buildsystem_Chdir.
-	# - sourcepage() happens to, like many other parts of debhelper's
-	#   library, assume it's being run in the top of the source tree,
-	#   and fails if it's not.
-	# Having to worry about interactions like that for every line of
-	# every derived method is simply not acceptable.
-	# Dh_Buildsystem_Chdir must die! -- JEH
-	push @opts, "--libexecdir=\${prefix}/lib/" . $self->exec_in_topdir(\&sourcepackage);
+	push @opts, "--libexecdir=\${prefix}/lib/" . sourcepackage();
 	push @opts, "--disable-maintainer-mode";
 	push @opts, "--disable-dependency-tracking";
 	# Provide --host only if different from --build, as recommended in
@@ -62,7 +53,9 @@ sub configure_impl {
 	# but does not need to in the is_buildable method is not clear,
 	# unless one is familiar with the implementation of its parent
 	# class. I think that speaks to a bad design..
-	doit($self->get_toppath("configure"), @opts, @_);
+	# XXX MDX It should be more explicit now.
+	$self->mkdir_builddir();
+	$self->doit_in_builddir($self->get_rel2builddir_path("configure"), @opts, @_);
 }
 
 1;
