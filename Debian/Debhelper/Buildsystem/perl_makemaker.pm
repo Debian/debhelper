@@ -21,11 +21,16 @@ sub is_auto_buildable {
 	if ($action eq "install") {
 		# This hack is needed to keep full 100% compatibility with previous
 		# debhelper versions.
+		# XXX JEH perl_makemaker comes before makefile, so
+		# couldn't it instead just test for Makefile.PL?
 		if (-e "Makefile" &&
 		    system('grep -q "generated automatically by MakeMaker" Makefile') == 0) {
 			return 1;
 		}
 	}
+	# XXX JEH why test for configure here? If building or cleaning, and
+	# a Makefile.PL exists, we know this class can handle those
+	# actions -- it does so by inheriting from the makefile class.
 	elsif ($action eq "configure") {
 		return -e "Makefile.PL";
 	}
@@ -52,18 +57,13 @@ sub configure {
 sub install {
 	my $self=shift;
 	my $destdir=shift;
-	# XXX JEH This is a really unfortunate breaking of the
-	# encapsulation of the perl_makefile module. Perhaps it would be
-	# better for that module to contain some hack that injects that
-	# test into this one?
-	# XXX MDX Solved. perl_makemaker will need come before makefile in
-	# @BUILDSYSTEMS. See also hack in is_auto_buildable().
-	# This is a safety check needed to keep 100% compatibility with
-	# earlier debhelper behaviour. This if is very unlikely to be false.
+	# XXX JEH this test seems redundant with the one in
+	# is_auto_buildable, if we get here we know that one succeeded.
 	if (-e "Makefile" &&
 	    system('grep -q "generated automatically by MakeMaker" Makefile') == 0) {
 		$self->SUPER::install($destdir, "PREFIX=/usr", @_);
-	} else {
+	}
+	else {
 		$self->SUPER::install($destdir, @_);
 	}
 }

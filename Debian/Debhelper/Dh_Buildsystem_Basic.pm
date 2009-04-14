@@ -36,12 +36,6 @@ sub DEFAULT_BUILD_DIRECTORY {
 	"obj-" . dpkg_architecture_value("DEB_BUILD_GNU_TYPE");
 }
 
-# XXX JEH Turns out that one build system overrides this method,
-# perl_build uses it to set an env vatiable before each method
-# call. But that's unnecessary; it could just set it in its constructor.
-# XXX MDX See comment below. is_auto is currently unused but I think it
-# is a good addition to the API for future cases.
-
 # Constructs a new build system object. Named parameters:
 # - builddir - specifies build directory to use. If not specified,
 #              in-source build will be performed. If undef or empty,
@@ -143,12 +137,6 @@ sub get_rel2builddir_path {
 	}
 	return $path;
 }
-
-# XXX JEH I'm very leery of code that chdirs, it can be very hard to follow
-# and cause a lot of mess. (As we'll see in the buildsystem modules that
-# use this class.) It seems to me that this entire class could be
-# basically replaced by a doit_in_builddir() function.
-# XXX MDX implemented.
 
 sub _mkdir {
 	my ($cls, $dir)=@_;
@@ -260,11 +248,6 @@ sub test {
 }
 
 # destdir parameter specifies where to install files.
-# XXX JEH I don't see where this destdir parameter is passed in
-# to a call to $object->install ? In Dh_Buildsystems it does:
-#                 return $buildsystem->$toolname(@_, @{$dh{U_PARAMS}});
-# Which passes a different parameter, to ALL these methods.
-# XXX MDX destdir is used in the dh_auto_install tool.
 sub install {
 	my $self=shift;
 	my $destdir=shift;

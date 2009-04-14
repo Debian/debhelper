@@ -10,11 +10,6 @@ use strict;
 use Debian::Debhelper::Dh_Lib;
 use base 'Debian::Debhelper::Dh_Buildsystem_Basic';
 
-# XXX JEH setting this env var is dodgy,
-# probably better to test if it exists with a default value.
-# (Factor out to helper function?)
-# XXX MDX Done. See new().
-
 sub get_makecmd_C {
 	my $self=shift;
 	if ($self->get_builddir()) {
@@ -25,6 +20,12 @@ sub get_makecmd_C {
 
 # XXX JEH I *like* this. Yay for factoring out ugly ugly stuff!
 # XXX MDX TODO: this could use dh debian/rules parser.
+# XXX JEH That one checks for explicit only targets, while we want
+#         implicit targets here too. I think the current code is ok;
+#         it's a bonus that it checks if the target it empty.
+#         Hmm, one problem is that if a target exists but will run no
+#         commands since it's already built, the approach below will return
+#         nothing and assume it doesn't exist.
 sub exists_make_target {
 	my ($self, $target) = @_;
 	my $makecmd=$self->get_makecmd_C();

@@ -27,6 +27,7 @@ our @EXPORT=qw(&buildsystems_init &buildsystems_do &load_buildsystem);
 #   perl_makemaker (+configure +install (special hack); the rest - next class)
 #   makefile (+build +test +install +clean; configure - next class)
 #   perl_build (handles everything)
+# XXX JEH I think that makes sense..
 
 # Historical order must be kept for backwards compatibility. New
 # buildsystems MUST be added to the END of the list.
@@ -56,9 +57,6 @@ sub create_buildsystem_instance {
 }
 
 sub load_buildsystem {
-	# XXX JEH the $system param is never passed
-	# by any call to this function
-	# XXX MDX Yes, it was sort of redudant. But see buildsystems_do() now.
 	my ($action, $system)=@_;
 	if (defined $system) {
 		my $inst = create_buildsystem_instance($system);
@@ -88,10 +86,11 @@ sub list_buildsystems {
 sub buildsystems_init {
 	my %args=@_;
 
-	# XXX JEH AFAICS, these 2 env variables are never used or documented
-	# XXX MDX They are used (see below), not documented though.
 	# TODO: Not documented in the manual pages yet.
 	# Initialize options from environment variables
+	# XXX JEH I think these should be my variables, they are only used
+	# inside this one file so putting them in the global %dh hash seems
+	# unnecessary.
 	if (exists $ENV{DH_AUTO_BUILDDIRECTORY}) {
 		$dh{BUILDDIR} = $ENV{DH_AUTO_BUILDDIRECTORY};
 	}
@@ -126,10 +125,6 @@ sub buildsystems_do {
 		$action =~ s/^dh_auto_//;
 	}
 
-	# XXX JEH does this if ever not fire?
-	# XXX MDX See dh_auto_install. I'm removing this anyway
-	# and making buildsystem_init() call in dh_auto_* mandatory.
-
 	if (grep(/^\Q$action\E$/, qw{configure build test install clean}) == 0) {
 		error("unrecognized auto action: ".basename($0));
 	}
@@ -142,17 +137,5 @@ sub buildsystems_do {
 	}
 	return 0;
 }
-
-# XXX JEH generally, why does this need to be an OO object at all?
-# The entire state stored in this object is o_dir and o_system;
-# and the object is used as a singleton. So why not have a single sub
-# that parses the command line, loads the specified system, and uses it,
-# passing it the build directory. It would be both shorter and easier to
-# understand.
-# XXX I refactored this into a module rather than OO class. I do not agree
-# about a single sub though as it is more complicated than that and
-# I think it is more clear to have the code segmented a bit. See also
-# dh_auto_install why both buildsystems_init() and buildsystems_do()
-# are needed.
 
 1;

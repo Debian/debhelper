@@ -49,11 +49,6 @@ sub configure {
 		push @opts, "--host=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE");
 	}
 
-	# XXX JEH the reason it needs to use get_toppath here,
-	# but does not need to in the is_buildable method is not clear,
-	# unless one is familiar with the implementation of its parent
-	# class. I think that speaks to a bad design..
-	# XXX MDX It should be more explicit now.
 	$self->mkdir_builddir();
 	$self->doit_in_builddir($self->get_rel2builddir_path("configure"), @opts, @_);
 }

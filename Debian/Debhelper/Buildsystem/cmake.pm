@@ -42,9 +42,6 @@ sub configure {
 	push @flags, "-DCMAKE_SKIP_RPATH=ON";
 	push @flags, "-DCMAKE_VERBOSE_MAKEFILE=ON";
 
-	# XXX JEH again a non-sequitor get_topdir.
-	# XXX MDX I cannot avoid it as I need to pass the path to the sourcedir
-	# to cmake which is relative to the builddir.
 	$self->mkdir_builddir();
 	$self->doit_in_builddir("cmake", $self->get_rel2builddir_path(), @flags);
 }
