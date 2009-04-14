@@ -3,6 +3,9 @@
 # Copyright: © 2008-2009 Modestas Vainius
 # License: GPL-2+
 
+# XXX JEH maybe rename this class to Debian::Debhelper::Dh_Buildsystem?
+# XXX JEH also it seems the functions in Dh_Buildsystems could be merged
+#     into this same file.
 package Debian::Debhelper::Dh_Buildsystem_Basic;
 
 use strict;
@@ -51,11 +54,18 @@ sub DEFAULT_BUILD_DIRECTORY {
 # is_auto_buildable in the constructor, and only have the constructor
 # succeed if it can handle the source? That would also eliminate the 
 # delayed warning mess in enforce_in_source_building.
+#
+# (In turn that could be used to remove the pre_action, since that's the
+# only use of it -- the post_action is currently unused too. It could be
+# argued that these should be kept in case later buildsystems need them
+# though.)
+#
 # AFAICS, there is only one reason you need an instance of the object
 # if it can't build -- to list build systems. But that only needs
 # DESCRIPTION and NAME, which could be considered to be class methods,
 # rather than object methods -- no need to construct an instance of the
 # class before calling those.
+#
 # I see that if --buildsystem is manually specified to override,
 # the is_auto_buildable test is completely skipped. So if this change were
 # made, you'd not be able to skip the test, and some --buildsystem choices
@@ -157,6 +167,7 @@ sub get_rel2builddir_path {
 
 sub _mkdir {
 	my ($cls, $dir)=@_;
+	# XXX JEH is there any reason not to just doit("mkdir") ?
 	if (-e $dir && ! -d $dir) {
 		error("error: unable to create '$dir': object already exists and is not a directory");
 	}
@@ -172,6 +183,8 @@ sub _mkdir {
 
 sub _cd {
 	my ($cls, $dir)=@_;
+	# XXX JEH I think this should verbose_print("cd $dir")
+	# then the verbose_prints in doit_in_builddir are unnecessary.
 	if (! $dh{NO_ACT}) {
 		chdir $dir or error("error: unable to chdir to $dir");
 	}
@@ -180,7 +193,7 @@ sub _cd {
 # Creates a build directory. Returns 1 if the directory was created
 # or 0 if it already exists or there is no need to create it.
 sub mkdir_builddir {
-	my $self=shift;
+	my $self=shift;a
 	if ($self->get_builddir()) {
 		return $self->_mkdir($self->get_builddir());
 	}
@@ -209,6 +222,7 @@ sub doit_in_builddir {
 # In case of outside-source tree building, whole build directory
 # gets wiped (if it exists) and 1 is returned. Otherwise, nothing
 # is done and 0 is returned.
+# XXX JEH only makefile.pm uses this, move it there?
 sub clean_builddir {
 	my $self=shift;
 	if ($self->get_builddir()) {
