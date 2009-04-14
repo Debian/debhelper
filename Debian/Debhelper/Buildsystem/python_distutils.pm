@@ -20,6 +20,8 @@ sub is_auto_buildable {
 	my $action=shift;
 
 	# Handle build install clean; the rest - next class
+	# XXX JEH shouldn't it also handle configure? It would be handled
+	# by doing nothing, but that's what's appropriate for python.
 	if (grep(/^\Q$action\E$/, qw{build install clean})) {
 		return -e "setup.py";
 	}

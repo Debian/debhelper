@@ -19,6 +19,12 @@ sub is_auto_buildable {
 
 	# Handles everything
 	my $ret = -e "Build.PL";
+	# XXX JEH what happens here if they run dh_auto_build,
+	# forgetting dh_auto_configure? I think it will just
+	# think it's not auto buildable and, assuming no other buildsystems
+	# succeed, silently do nothing. Perhaps it would be better, then,
+	# to omit the test below. Then, it would try to run ./Build
+	# which doesn't exist, which should result in a semi-useful error.
 	if ($action ne "configure") {
 		$ret &&= -e "Build";
 	}

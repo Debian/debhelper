@@ -20,6 +20,16 @@ sub is_auto_buildable {
 	my $action=shift;
 
 	# Handle configure; the rest - next class
+	# XXX JEH 
+	# Currently, if there is a configure script, and dh_auto_build
+	# is run w/o dh_auto_configure having been run, there's no
+	# Makefile, so the next class's detection routine also fails, and
+	# presumably all do, resulting in dh_auto_build doing nothing
+	# and silently "succeeding".
+	# So, why not always test for configure? Then, for ! configure
+	# actions, it would use the methods inherited from its parent
+	# class. In the above example, that will try to run "make" w/o a
+	# Makefile, which prints a useful error.
 	if ($action eq "configure") {
 		return -x "configure";
 	}
