@@ -107,6 +107,7 @@ sub buildsystems_init {
 	    "builddirectory:s" => $set_builddir,
 
 	    "m=s" => \$dh{BUILDSYS},
+	    # XXX JEH Let's only keep one spelling of this.
 	    "build-system=s" => \$dh{BUILDSYS},
 	    "buildsystem=s" => \$dh{BUILDSYS},
 

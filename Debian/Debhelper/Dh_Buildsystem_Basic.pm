@@ -46,6 +46,23 @@ sub DEFAULT_BUILD_DIRECTORY {
 # Constructor SHOULD NOT be used to initialize build environment because
 # constructed class may not be eventually used to build the package (if e.g.
 # is_auto_buildable() returns 0).
+#
+# XXX JEH the above comment begs the question: Why not test
+# is_auto_buildable in the constructor, and only have the constructor
+# succeed if it can handle the source? That would also eliminate the 
+# delayed warning mess in enforce_in_source_building.
+# AFAICS, there is only one reason you need an instance of the object
+# if it can't build -- to list build systems. But that only needs
+# DESCRIPTION and NAME, which could be considered to be class methods,
+# rather than object methods -- no need to construct an instance of the
+# class before calling those.
+# I see that if --buildsystem is manually specified to override,
+# the is_auto_buildable test is completely skipped. So if this change were
+# made, you'd not be able to skip the test, and some --buildsystem choices
+# might cause an error. OTOH, those seem to be cases where it would later
+# fail anyway. The real use cases for --buildsystem, such as forcing use of
+# cmake when there are both a CMakeLists.txt and a Makefile, would still
+# work.
 sub new {
 	my ($cls, %opts)=@_;
 
