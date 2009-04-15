@@ -4,13 +4,6 @@
 # Copyright: © 2008-2009 Modestas Vainius
 # License: GPL-2+
 
-# XXX JEH also it seems the functions in Dh_Buildsystems could be merged
-#     into this same file.
-# XXX MDX I disagree. I think that mixing OO class and non-OO functions in the
-# same file is a bad style. What is more, these two modules have different
-# purposes (Dh_Buildsystems is an agregator of Dh_Buildsystem and its
-# derivatives). Moreover, we don't want Dh_Buildsystem to inherit from Exporter
-# (like Dh_Buildsystems do), do we?
 package Debian::Debhelper::Dh_Buildsystem;
 
 use strict;
@@ -68,13 +61,6 @@ sub DEFAULT_BUILD_DIRECTORY {
 # delayed warning mess in enforce_in_source_building.
 # XXX MDX Yes, that warning stuff was a mess. I implemented your
 #         idea partitially.
-#
-# XXX JEH (In turn that could be used to remove the pre_action, since that's the
-# only use of it -- the post_action is currently unused too. It could be
-# argued that these should be kept in case later buildsystems need them
-# though.)
-# XXX MDX Well, I think we could keep them (now both empty) for the reason
-#         you mention.
 #
 # XXX JEH AFAICS, there is only one reason you need an instance of the object
 # if it can't build -- to list build systems. But that only needs
@@ -263,11 +249,6 @@ sub doit_in_builddir {
 # In case of outside-source tree building, whole build directory
 # gets wiped (if it exists) and 1 is returned. Otherwise, nothing
 # is done and 0 is returned.
-# XXX JEH only makefile.pm uses this, move it there?
-# XXX MDX Well true, but I think this one is good to have for API
-# completeness near to mkdir_builddir and doit_in_builddir above.
-# I don't have strong feelings about it, but it looks more common
-# function than makefile specific to me.
 sub clean_builddir {
 	my $self=shift;
 	if ($self->get_builddir()) {

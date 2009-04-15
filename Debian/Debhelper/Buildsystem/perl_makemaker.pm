@@ -19,15 +19,7 @@ sub check_auto_buildable {
 	my ($action)=@_;
 
 	# Handles configure, install; the rest - next class
-	if ($action eq "install") {
-		return -e "Makefile.PL";
-	}
-	# XXX JEH why test for configure here? If building or cleaning, and
-	# a Makefile.PL exists, we know this class can handle those
-	# actions -- it does so by inheriting from the makefile class.
-	# XXX MDX Yes. But that's again different behaviour from current
-	#         (see comment in autotools.mk). Your call.
-	elsif ($action eq "configure") {
+	if ($action eq "install" || $action eq "configure") {
 		return -e "Makefile.PL";
 	}
 	else {

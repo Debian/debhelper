@@ -13,22 +13,6 @@ use Debian::Debhelper::Dh_Lib;
 use base 'Exporter';
 our @EXPORT=qw(&buildsystems_init &buildsystems_do &load_buildsystem);
 
-# XXX JEH as noted, this has to match historical order for back-compat
-# XXX MDX Current dh_auto_* look like:
-# configure: autotools, perl_makemaker, perl_build
-# build:     makefile, python_distutils, perl_build
-# test:      makefile, perl_build
-# install:   makefile (with perl_makermaker) hack, python_distutils, perl_build
-# clean:     makefile, python_distutils, perl_build
-# So historical @BUILDSYSTEMS order (as per autodetection, see
-# check_auto_buildable() of the respective classes):
-#   autotools (+configure; the rest - next class)
-#   perl_makemaker (+configure +install (special hack); the rest - next class)
-#   makefile (+build +test +install +clean; configure - next class)
-#   python_distutils (handles everything)
-#   perl_build (handles everything)
-# XXX JEH I think that makes sense..
-
 # Historical order must be kept for backwards compatibility. New
 # buildsystems MUST be added to the END of the list.
 our @BUILDSYSTEMS = (

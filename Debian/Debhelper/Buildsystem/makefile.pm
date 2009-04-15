@@ -58,9 +58,6 @@ sub check_auto_buildable {
 	my ($action) = @_;
 
 	# Handles build, test, install, clean; configure - next class
-	# XXX JEH shouldn't it also handle configure, just as a no-op?
-	# XXX MDX No, then cmake.mk would have no chance of hitting for
-	#         no good reason.
 	if (grep /^\Q$action\E$/, qw{build test install clean}) {
 		# This is always called in the source directory, but generally
 		# Makefiles are created (or live) in the the build directory.
