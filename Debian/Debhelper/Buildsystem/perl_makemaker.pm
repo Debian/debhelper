@@ -14,23 +14,19 @@ sub DESCRIPTION {
 	"support for building Perl MakeMaker based packages (in-source only)"
 }
 
-sub is_auto_buildable {
-	my ($self, $action)=@_;
+sub check_auto_buildable {
+	my $self=shift;
+	my ($action)=@_;
 
 	# Handles configure, install; the rest - next class
 	if ($action eq "install") {
-		# This hack is needed to keep full 100% compatibility with previous
-		# debhelper versions.
-		# XXX JEH perl_makemaker comes before makefile, so
-		# couldn't it instead just test for Makefile.PL?
-		if (-e "Makefile" &&
-		    system('grep -q "generated automatically by MakeMaker" Makefile') == 0) {
-			return 1;
-		}
+		return -e "Makefile.PL";
 	}
 	# XXX JEH why test for configure here? If building or cleaning, and
 	# a Makefile.PL exists, we know this class can handle those
 	# actions -- it does so by inheriting from the makefile class.
+	# XXX MDX Yes. But that's again different behaviour from current
+	#         (see comment in autotools.mk). Your call.
 	elsif ($action eq "configure") {
 		return -e "Makefile.PL";
 	}
@@ -57,15 +53,7 @@ sub configure {
 sub install {
 	my $self=shift;
 	my $destdir=shift;
-	# XXX JEH this test seems redundant with the one in
-	# is_auto_buildable, if we get here we know that one succeeded.
-	if (-e "Makefile" &&
-	    system('grep -q "generated automatically by MakeMaker" Makefile') == 0) {
-		$self->SUPER::install($destdir, "PREFIX=/usr", @_);
-	}
-	else {
-		$self->SUPER::install($destdir, @_);
-	}
+	$self->SUPER::install($destdir, "PREFIX=/usr", @_);
 }
 
 1;

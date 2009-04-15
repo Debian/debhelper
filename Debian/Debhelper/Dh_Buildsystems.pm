@@ -21,11 +21,11 @@ our @EXPORT=qw(&buildsystems_init &buildsystems_do &load_buildsystem);
 # install:   makefile (with perl_makermaker) hack, python_distutils, perl_build
 # clean:     makefile, python_distutils, perl_build
 # So historical @BUILDSYSTEMS order (as per autodetection, see
-# is_auto_buildable() of the respective classes):
+# check_auto_buildable() of the respective classes):
 #   autotools (+configure; the rest - next class)
-#   python_distutils (+build +install +clean; the rest - next class)
 #   perl_makemaker (+configure +install (special hack); the rest - next class)
 #   makefile (+build +test +install +clean; configure - next class)
+#   python_distutils (handles everything)
 #   perl_build (handles everything)
 # XXX JEH I think that makes sense..
 
@@ -33,12 +33,16 @@ our @EXPORT=qw(&buildsystems_init &buildsystems_do &load_buildsystem);
 # buildsystems MUST be added to the END of the list.
 our @BUILDSYSTEMS = (
     "autotools",
-    "python_distutils",
     "perl_makemaker",
     "makefile",
+    "python_distutils",
     "perl_build",
     "cmake",
 );
+
+my $opt_buildsys;
+my $opt_builddir;
+my $opt_list;
 
 sub create_buildsystem_instance {
 	my $system=shift;
@@ -50,8 +54,8 @@ sub create_buildsystem_instance {
 		error("unable to load buildsystem class '$system': $@");
 	}
 
-	if (!exists $bsopts{builddir} && exists $dh{BUILDDIR}) {
-		$bsopts{builddir} = $dh{BUILDDIR};
+	if (!exists $bsopts{builddir} && defined $opt_builddir) {
+		$bsopts{builddir} = ($opt_builddir eq "") ? undef : $opt_builddir;
 	}
 	return $module->new(%bsopts);
 }
@@ -66,8 +70,8 @@ sub load_buildsystem {
 	else {
 		# Try to determine build system automatically
 		for $system (@BUILDSYSTEMS) {
-			my $inst = create_buildsystem_instance($system, is_auto=>1);
-			if ($inst->is_auto_buildable($action)) {
+			my $inst = create_buildsystem_instance($system, build_action=>$action);
+			if ($inst->is_buildable()) {
 				verbose_print("Selected buildsystem (auto): ". $inst->NAME());
 				return $inst;
 			}
@@ -76,43 +80,28 @@ sub load_buildsystem {
 	return;
 }
 
-sub list_buildsystems {
-	for my $system (@BUILDSYSTEMS) {
-		my $inst = create_buildsystem_instance($system);
-		printf("%s - %s.\n", $inst->NAME(), $inst->DESCRIPTION());
-	}
-}
-
 sub buildsystems_init {
 	my %args=@_;
 
 	# TODO: Not documented in the manual pages yet.
 	# Initialize options from environment variables
-	# XXX JEH I think these should be my variables, they are only used
-	# inside this one file so putting them in the global %dh hash seems
-	# unnecessary.
 	if (exists $ENV{DH_AUTO_BUILDDIRECTORY}) {
-		$dh{BUILDDIR} = $ENV{DH_AUTO_BUILDDIRECTORY};
+		$opt_builddir = $ENV{DH_AUTO_BUILDDIRECTORY};
 	}
 	if (exists $ENV{DH_AUTO_BUILDSYSTEM}) {
-		$dh{BUILDSYS} = $ENV{DH_AUTO_BUILDSYSTEM};
+		$opt_buildsys = $ENV{DH_AUTO_BUILDSYSTEM};
 	}
 
 	# Available command line options
-	my $list_bs = sub { list_buildsystems(); exit 0 };
-	my $set_builddir = sub { $dh{BUILDDIR} = $_[1] };
 	my %options = (
-	    "b:s" => $set_builddir,
-	    "build-directory:s" => $set_builddir,
-	    "builddirectory:s" => $set_builddir,
+	    "b:s" => \$opt_builddir,
+	    "builddirectory:s" => \$opt_builddir,
 
-	    "m=s" => \$dh{BUILDSYS},
-	    # XXX JEH Let's only keep one spelling of this.
-	    "build-system=s" => \$dh{BUILDSYS},
-	    "buildsystem=s" => \$dh{BUILDSYS},
+	    "m=s" => \$opt_buildsys,
+	    "buildsystem=s" => \$opt_buildsys,
 
-	    "l" => $list_bs,
-	    "--list" => $list_bs,
+	    "l" => \$opt_list,
+	    "--list" => \$opt_list,
 	);
 	map { $args{options}{$_} = $options{$_} } keys(%options);
 	Debian::Debhelper::Dh_Lib::init(%args);
@@ -127,10 +116,40 @@ sub buildsystems_do {
 	}
 
 	if (grep(/^\Q$action\E$/, qw{configure build test install clean}) == 0) {
-		error("unrecognized auto action: ".basename($0));
+		error("unrecognized build action: " . $action);
 	}
 
-	my $buildsystem = load_buildsystem($action, $dh{BUILDSYS});
+	if ($opt_list) {
+		# List buildsystems (including auto and specified status)
+		my $auto_found;
+		my $specified_found;
+		print "STATUS (* auto, + specified) NAME - DESCRIPTION", "\n";
+		for my $system (@BUILDSYSTEMS) {
+			my $inst = create_buildsystem_instance($system, build_action => undef);
+			my $is_specified = defined $opt_buildsys && $opt_buildsys eq $inst->NAME();
+			my $status;
+			if ($is_specified) {
+				$status = "+";
+				$specified_found = 1;
+			}
+			elsif (!$auto_found && $inst->check_auto_buildable($action)) {
+				$status = "*";
+				$auto_found = 1;
+			}
+			else {
+				$status = " ";
+			}
+			printf("%s %s - %s.\n", $status, $inst->NAME(), $inst->DESCRIPTION());
+		}
+		# List a 3rd party buildsystem too.
+		if (!$specified_found && defined $opt_buildsys) {
+			my $inst = create_buildsystem_instance($opt_buildsys, build_action => undef);
+			printf("+ %s - %s.\n", $inst->NAME(), $inst->DESCRIPTION());
+		}
+		exit 0;
+	}
+
+	my $buildsystem = load_buildsystem($action, $opt_buildsys);
 	if (defined $buildsystem) {
 		$buildsystem->pre_action($action);
 		$buildsystem->$action(@_, @{$dh{U_PARAMS}});

@@ -14,11 +14,11 @@ sub DESCRIPTION {
 	"support for building CMake based packages (outside-source tree only)"
 }
 
-sub is_auto_buildable {
+sub check_auto_buildable {
 	my $self=shift;
 	my ($action)=@_;
 	my $ret = -e "CMakeLists.txt";
-	$ret &&= $self->SUPER::is_auto_buildable(@_) if $action ne "configure";
+	$ret &&= $self->SUPER::check_auto_buildable(@_) if $action ne "configure";
 	return $ret;
 }
 

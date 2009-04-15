@@ -8,13 +8,13 @@ package Debian::Debhelper::Buildsystem::perl_build;
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
-use base 'Debian::Debhelper::Dh_Buildsystem_Basic';
+use base 'Debian::Debhelper::Dh_Buildsystem';
 
 sub DESCRIPTION {
 	"support for building Perl Build.PL based packages (in-source only)"
 }
 
-sub is_auto_buildable {
+sub check_auto_buildable {
 	my ($self, $action) = @_;
 
 	# Handles everything
@@ -25,6 +25,8 @@ sub is_auto_buildable {
 	# succeed, silently do nothing. Perhaps it would be better, then,
 	# to omit the test below. Then, it would try to run ./Build
 	# which doesn't exist, which should result in a semi-useful error.
+	# XXX MDX Agreed. But it would not be fully backwards compatible
+	#         (see comment in autotools.mk why). Your call.
 	if ($action ne "configure") {
 		$ret &&= -e "Build";
 	}

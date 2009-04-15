@@ -9,23 +9,14 @@ package Debian::Debhelper::Buildsystem::python_distutils;
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
-use base 'Debian::Debhelper::Dh_Buildsystem_Basic';
+use base 'Debian::Debhelper::Dh_Buildsystem';
 
 sub DESCRIPTION {
 	"support for building Python distutils based packages"
 }
 
-sub is_auto_buildable {
-	my $self=shift;
-	my $action=shift;
-
-	# Handle build install clean; the rest - next class
-	# XXX JEH shouldn't it also handle configure? It would be handled
-	# by doing nothing, but that's what's appropriate for python.
-	if (grep(/^\Q$action\E$/, qw{build install clean})) {
-		return -e "setup.py";
-	}
-	return 0;
+sub check_auto_buildable {
+	return -e "setup.py";
 }
 
 sub setup_py {

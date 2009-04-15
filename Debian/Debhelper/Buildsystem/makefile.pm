@@ -8,7 +8,7 @@ package Debian::Debhelper::Buildsystem::makefile;
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
-use base 'Debian::Debhelper::Dh_Buildsystem_Basic';
+use base 'Debian::Debhelper::Dh_Buildsystem';
 
 sub get_makecmd_C {
 	my $self=shift;
@@ -18,14 +18,6 @@ sub get_makecmd_C {
 	return $self->{makecmd};
 }
 
-# XXX JEH I *like* this. Yay for factoring out ugly ugly stuff!
-# XXX MDX TODO: this could use dh debian/rules parser.
-# XXX JEH That one checks for explicit only targets, while we want
-#         implicit targets here too. I think the current code is ok;
-#         it's a bonus that it checks if the target it empty.
-#         Hmm, one problem is that if a target exists but will run no
-#         commands since it's already built, the approach below will return
-#         nothing and assume it doesn't exist.
 sub exists_make_target {
 	my ($self, $target) = @_;
 	my $makecmd=$self->get_makecmd_C();
@@ -61,12 +53,14 @@ sub new {
 	return $self;
 }
 
-sub is_auto_buildable {
+sub check_auto_buildable {
 	my $self=shift;
 	my ($action) = @_;
 
 	# Handles build, test, install, clean; configure - next class
 	# XXX JEH shouldn't it also handle configure, just as a no-op?
+	# XXX MDX No, then cmake.mk would have no chance of hitting for
+	#         no good reason.
 	if (grep /^\Q$action\E$/, qw{build test install clean}) {
 		# This is always called in the source directory, but generally
 		# Makefiles are created (or live) in the the build directory.

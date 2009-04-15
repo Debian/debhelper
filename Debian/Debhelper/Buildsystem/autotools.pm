@@ -15,9 +15,9 @@ sub DESCRIPTION {
 	"support for building GNU Autotools based packages"
 }
 
-sub is_auto_buildable {
+sub check_auto_buildable {
 	my $self=shift;
-	my $action=shift;
+	my ($action)=@_;
 
 	# Handle configure; the rest - next class
 	# XXX JEH 
@@ -30,6 +30,10 @@ sub is_auto_buildable {
 	# actions, it would use the methods inherited from its parent
 	# class. In the above example, that will try to run "make" w/o a
 	# Makefile, which prints a useful error.
+	# XXX MDX I'm all for it but this will differ from current dh_auto_build
+	#         behaviour (which is that dh_auto_build doesn't fail if
+	#         dh_auto_configure was not run). It is your call whether you are
+	#         willing to break this aspect of backwards compatibility.
 	if ($action eq "configure") {
 		return -x "configure";
 	}
