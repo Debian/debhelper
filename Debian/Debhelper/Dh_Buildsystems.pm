@@ -48,7 +48,6 @@ sub load_buildsystem {
 	my ($action, $system)=@_;
 	if (defined $system) {
 		my $inst = create_buildsystem_instance($system);
-		verbose_print("Selected buildsystem (specified): ".$inst->NAME());
 		return $inst;
 	}
 	else {
@@ -56,7 +55,6 @@ sub load_buildsystem {
 		for $system (@BUILDSYSTEMS) {
 			my $inst = create_buildsystem_instance($system, build_action=>$action);
 			if ($inst->is_buildable()) {
-				verbose_print("Selected buildsystem (auto): ". $inst->NAME());
 				return $inst;
 			}
 		}
