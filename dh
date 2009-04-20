@@ -50,8 +50,8 @@ you should Build-Depend on debhelper 7.0.50 or above.)
 Add the debhelper commands specified by the given addon to appropriate places
 in the sequence of commands that is run. This option can be repeated more
 than once, and is used when there is a third-party package that provides
-debhelper commands. See "SEQUENCE ADDONS" below for documentation about what
-such packages should do to be supported by --with.
+debhelper commands. See the PROGRAMMING file for documentation about
+the sequence addon interface.
 
 =item B<--until> I<cmd>
 
@@ -81,26 +81,6 @@ I<cmd> can be a full name of a debhelper command, or a substring. It'll first
 search for a command in the sequence exactly matching the name, to avoid any
 ambiguity. If there are multiple substring matches, the last one in the
 sequence will be used.
-
-=head1 SEQUENCE ADDONS
-
-When B<--with> I<addon> is used, dh loads the perl module
-Debian::Debhelper::Sequence::I<addon>. Two functions are provided to let
-the module add its commands to sequences:
-
-=over 4
-
-=item Debian::Debhelper::Dh_Lib::insert_before(existing_command, new_command)
-
-Insert I<new_command> in sequences before I<existing_command>.
-
-=item Debian::Debhelper::Dh_Lib::insert_after(existing_command, new_command)
-
-Insert I<new_command> in sequences after I<existing_command>.
-
-=item Debian::Debhelper::Dh_Lib::remove_command(existing_command)
-
-Remove I<existing_command> from the list of commands to run.
 
 =back
 
