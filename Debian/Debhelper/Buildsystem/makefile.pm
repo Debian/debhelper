@@ -43,7 +43,7 @@ sub make_first_existing_target {
 }
 
 sub DESCRIPTION {
-	"support for building Makefile based packages (make && make install)"
+	"simple Makefile"
 }
 
 sub new {

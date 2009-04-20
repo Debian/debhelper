@@ -11,7 +11,7 @@ use Debian::Debhelper::Dh_Lib;
 use base 'Debian::Debhelper::Buildsystem';
 
 sub DESCRIPTION {
-	"support for building Perl Build.PL based packages (in-source only)"
+	"Perl Module::Build (Build.PL)"
 }
 
 sub check_auto_buildable {

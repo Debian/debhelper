@@ -11,7 +11,7 @@ use Debian::Debhelper::Dh_Lib;
 use base 'Debian::Debhelper::Buildsystem::makefile';
 
 sub DESCRIPTION {
-	"support for building CMake based packages (outside-source tree only)"
+	"CMake (CMakeLists.txt)"
 }
 
 sub check_auto_buildable {

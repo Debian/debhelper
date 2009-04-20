@@ -11,7 +11,7 @@ use Debian::Debhelper::Dh_Lib;
 use base 'Debian::Debhelper::Buildsystem::makefile';
 
 sub DESCRIPTION {
-	"support for building Perl MakeMaker based packages (in-source only)"
+	"Perl ExtUtils::MakeMaker (Makefile.PL)"
 }
 
 sub check_auto_buildable {

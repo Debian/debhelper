@@ -12,7 +12,7 @@ use Debian::Debhelper::Dh_Lib;
 use base 'Debian::Debhelper::Buildsystem::makefile';
 
 sub DESCRIPTION {
-	"support for building GNU Autotools based packages"
+	"GNU Autotools (configure)"
 }
 
 sub check_auto_buildable {

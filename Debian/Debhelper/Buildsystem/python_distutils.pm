@@ -12,7 +12,7 @@ use Debian::Debhelper::Dh_Lib;
 use base 'Debian::Debhelper::Buildsystem';
 
 sub DESCRIPTION {
-	"support for building Python distutils based packages"
+	"Python distutils"
 }
 
 sub check_auto_buildable {
