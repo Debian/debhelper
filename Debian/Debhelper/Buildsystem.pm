@@ -4,7 +4,7 @@
 # Copyright: © 2008-2009 Modestas Vainius
 # License: GPL-2+
 
-package Debian::Debhelper::Dh_Buildsystem;
+package Debian::Debhelper::Buildsystem;
 
 use strict;
 use warnings;

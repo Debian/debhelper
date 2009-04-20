@@ -8,7 +8,7 @@ package Debian::Debhelper::Buildsystem::perl_build;
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
-use base 'Debian::Debhelper::Dh_Buildsystem';
+use base 'Debian::Debhelper::Buildsystem';
 
 sub DESCRIPTION {
 	"support for building Perl Build.PL based packages (in-source only)"

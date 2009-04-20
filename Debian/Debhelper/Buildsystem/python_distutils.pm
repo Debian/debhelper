@@ -9,7 +9,7 @@ package Debian::Debhelper::Buildsystem::python_distutils;
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
-use base 'Debian::Debhelper::Dh_Buildsystem';
+use base 'Debian::Debhelper::Buildsystem';
 
 sub DESCRIPTION {
 	"support for building Python distutils based packages"

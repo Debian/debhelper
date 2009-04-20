@@ -8,7 +8,7 @@ package Debian::Debhelper::Buildsystem::makefile;
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
-use base 'Debian::Debhelper::Dh_Buildsystem';
+use base 'Debian::Debhelper::Buildsystem';
 
 sub get_makecmd_C {
 	my $this=shift;
