@@ -46,26 +46,18 @@ Debhelper programs should default to doing exactly what policy says to do.
 
 There are always exceptions. Just ask me.
 
-Introducing Dh_Lib.pm:
----------------------
+Introducing Dh_Lib:
+------------------
 
-Dh_Lib.pm is the library used by all debhelper programs to parse their
+Dh_Lib is the library used by all debhelper programs to parse their
 arguments and set some useful variables. It's not mandatory that your
 program use Dh_Lib.pm, but it will make it a lot easier to keep it in sync
 with the rest of debhelper if it does, so this is highly encouraged.
 
-(There used to be a version of Dh_lib.pm that was a library of functions for
-shell scripts. If you want to write a debhelper command that is a shell
-script, I can dig up that old library for you. Only the perl one is
-supported now, though.)
-
-Use Dh_Lib.pm like this:
+Use Dh_Lib like this:
 
 use Debian::Debhelper::Dh_Lib
 init();
-
-The BEGIN block is there to make perl look for the module in all the right
-places.
 
 The init() function causes Dh_lib to parse the command line and do some other
 initialization tasks.
@@ -257,5 +249,22 @@ load_log($package, $hashref)
 write_log($cmd, $package ...)
 	Writes the log files for the specified package(s), adding
 	the cmd to the end.
+
+Sequence Addons
+---------------
+
+The dh(1) command has a --with <addon> parameter that ca be used to load
+a sequence addon named Debian::Debhelper::Sequence::<addon>. 
+These addons can add/remove commands to the dh command sequences, by calling
+some functions from Dh_Lib:
+
+insert_before($existing_command, $new_command)
+	Insert $new_command in sequences before $existing_command
+
+insert_after($existing_command, $new_command)
+	Insert $new_command in sequences after $existing_command
+
+remove_command($existing_command)
+	Remove $existing_command from the list of commands to run.
 
 -- Joey Hess <joeyh@debian.org>
