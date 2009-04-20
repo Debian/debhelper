@@ -95,31 +95,29 @@ sub buildsystems_list {
 	my $action=shift;
 
 	# List buildsystems (including auto and specified status)
-	my $auto_found;
-	my $specified_found;
-	print "STATUS (* auto, + specified) NAME - DESCRIPTION", "\n";
+	my ($auto, $specified);
 	for my $system (@BUILDSYSTEMS) {
 		my $inst = create_buildsystem_instance($system, build_action => undef);
 		my $is_specified = defined $opt_buildsys && $opt_buildsys eq $inst->NAME();
-		my $status;
-		if ($is_specified) {
-			$status = "+";
-			$specified_found = 1;
+		if (! defined $specified && defined $opt_buildsys && $opt_buildsys eq $inst->NAME()) {
+			$specified = $inst->NAME();
 		}
-		elsif (!$auto_found && $inst->check_auto_buildable($action)) {
-			$status = "*";
-			$auto_found = 1;
+		elsif (! defined $auto && $inst->check_auto_buildable($action)) {
+			$auto = $inst->NAME();
 		}
-		else {
-			$status = " ";
-		}
-		printf("%s %s - %s.\n", $status, $inst->NAME(), $inst->DESCRIPTION());
+		printf("%s - %s\n", $inst->NAME(), $inst->DESCRIPTION());
 	}
-	# List a 3rd party buildsystem too.
-	if (!$specified_found && defined $opt_buildsys) {
+	# List a specified 3rd party buildsystem too.
+	if (! defined $specified && defined $opt_buildsys) {
 		my $inst = create_buildsystem_instance($opt_buildsys, build_action => undef);
-		printf("+ %s - %s.\n", $inst->NAME(), $inst->DESCRIPTION());
+		printf("%s - %s.\n", $inst->NAME(), $inst->DESCRIPTION());
+		$specified = $inst->NAME();
 	}
+	print "\n";
+	print "Auto-selected: $auto\n" if defined $auto;
+	print "Specified: $specified\n" if defined $specified;
+	print "No system auto-selected or specified\n"
+		if ! defined $auto && ! defined $specified;
 }
 
 sub buildsystems_do {
