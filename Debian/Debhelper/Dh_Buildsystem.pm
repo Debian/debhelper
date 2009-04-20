@@ -44,7 +44,7 @@ sub DEFAULT_BUILD_DIRECTORY {
 # Constructs a new build system object. Named parameters:
 # - builddir -     specifies build directory to use. If not specified,
 #                  in-source build will be performed. If undef or empty,
-#                  default DEFAULT_BUILD_DIRECTORY will be used.
+#                  DEFAULT_BUILD_DIRECTORY will be used.
 # - build_action - set this parameter to the name of the build action
 #                  if you want the object to determine its is_buidable
 #                  status automatically (with check_auto_buildable()).
@@ -54,41 +54,6 @@ sub DEFAULT_BUILD_DIRECTORY {
 # Derived class can override the constructor to initialize common object
 # parameters and execute commands to configure build environment if
 # is_buildable flag is set on the object.
-#
-# XXX JEH the above comment begs the question: Why not test
-# is_auto_buildable in the constructor, and only have the constructor
-# succeed if it can handle the source? That would also eliminate the 
-# delayed warning mess in enforce_in_source_building.
-# XXX MDX Yes, that warning stuff was a mess. I implemented your
-#         idea partitially.
-#
-# XXX JEH AFAICS, there is only one reason you need an instance of the object
-# if it can't build -- to list build systems. But that only needs
-# DESCRIPTION and NAME, which could be considered to be class methods,
-# rather than object methods -- no need to construct an instance of the
-# class before calling those.
-# XXX MDX Well yeah, they used to be (and still can be used) as such. But I
-#         implemented a new feature to show force/auto_buildable status
-#         while listing buildsystems. That feature needs an instance.
-
-# XXX JEH I see that if --buildsystem is manually specified to override,
-# the is_auto_buildable test is completely skipped. So if this change were
-# made, you'd not be able to skip the test, and some --buildsystem choices
-# might cause an error. OTOH, those seem to be cases where it would later
-# fail anyway. The real use cases for --buildsystem, such as forcing use of
-# cmake when there are both a CMakeLists.txt and a Makefile, would still
-# work.
-# XXX MDX 1) If buildsystem is forced, there might be a good reason for it.
-#            What is more, that check as it is now is for *auto* stuff only.
-#            In general, it cannot be used to reliably check if the source
-#            will be buildable or not.
-#         2) Your last sentence is not entirely true. Backwards compatibility
-#            is also a huge limitation. The check_auto_buildable() should always
-#            fail if it is not possible to add a new buildsystem in the backwards
-#            compatible manner. See also my comments in the makefile.pm.
-#         3) What is more, I implemented skipping of the auto buildable check,
-#            so this is no longer the issue.
-
 sub new {
 	my ($cls, %opts)=@_;
 
