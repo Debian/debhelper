@@ -91,6 +91,37 @@ sub buildsystems_init {
 	Debian::Debhelper::Dh_Lib::init(%args);
 }
 
+sub buildsystems_list {
+	my $action=shift;
+
+	# List buildsystems (including auto and specified status)
+	my $auto_found;
+	my $specified_found;
+	print "STATUS (* auto, + specified) NAME - DESCRIPTION", "\n";
+	for my $system (@BUILDSYSTEMS) {
+		my $inst = create_buildsystem_instance($system, build_action => undef);
+		my $is_specified = defined $opt_buildsys && $opt_buildsys eq $inst->NAME();
+		my $status;
+		if ($is_specified) {
+			$status = "+";
+			$specified_found = 1;
+		}
+		elsif (!$auto_found && $inst->check_auto_buildable($action)) {
+			$status = "*";
+			$auto_found = 1;
+		}
+		else {
+			$status = " ";
+		}
+		printf("%s %s - %s.\n", $status, $inst->NAME(), $inst->DESCRIPTION());
+	}
+	# List a 3rd party buildsystem too.
+	if (!$specified_found && defined $opt_buildsys) {
+		my $inst = create_buildsystem_instance($opt_buildsys, build_action => undef);
+		printf("+ %s - %s.\n", $inst->NAME(), $inst->DESCRIPTION());
+	}
+}
+
 sub buildsystems_do {
 	my $action=shift;
 
@@ -104,32 +135,7 @@ sub buildsystems_do {
 	}
 
 	if ($opt_list) {
-		# List buildsystems (including auto and specified status)
-		my $auto_found;
-		my $specified_found;
-		print "STATUS (* auto, + specified) NAME - DESCRIPTION", "\n";
-		for my $system (@BUILDSYSTEMS) {
-			my $inst = create_buildsystem_instance($system, build_action => undef);
-			my $is_specified = defined $opt_buildsys && $opt_buildsys eq $inst->NAME();
-			my $status;
-			if ($is_specified) {
-				$status = "+";
-				$specified_found = 1;
-			}
-			elsif (!$auto_found && $inst->check_auto_buildable($action)) {
-				$status = "*";
-				$auto_found = 1;
-			}
-			else {
-				$status = " ";
-			}
-			printf("%s %s - %s.\n", $status, $inst->NAME(), $inst->DESCRIPTION());
-		}
-		# List a 3rd party buildsystem too.
-		if (!$specified_found && defined $opt_buildsys) {
-			my $inst = create_buildsystem_instance($opt_buildsys, build_action => undef);
-			printf("+ %s - %s.\n", $inst->NAME(), $inst->DESCRIPTION());
-		}
+		buildsystems_list($action);
 		exit 0;
 	}
 
