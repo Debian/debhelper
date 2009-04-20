@@ -160,22 +160,6 @@ sub get_rel2builddir_path {
 	return $path;
 }
 
-sub _mkdir {
-	my ($cls, $dir)=@_;
-	# XXX JEH is there any reason not to just doit("mkdir") ?
-	# XXX MDX Replaced below part. This call is there to be
-	# more verbose about errors (if accidently $dir in
-	# non-dir form and to test for ! -d $dir.
-	if (-e $dir && ! -d $dir) {
-		error("error: unable to create '$dir': object already exists and is not a directory");
-	}
-	elsif (! -d $dir) {
-		doit("mkdir", $dir);
-		return 1;
-	}
-	return 0;
-}
-
 sub _cd {
 	my ($cls, $dir)=@_;
 	if (! $dh{NO_ACT}) {
@@ -184,14 +168,12 @@ sub _cd {
 	}
 }
 
-# Creates a build directory. Returns 1 if the directory was created
-# or 0 if it already exists or there is no need to create it.
+# Creates a build directory.
 sub mkdir_builddir {
 	my $self=shift;
 	if ($self->get_builddir()) {
-		return $self->_mkdir($self->get_builddir());
+		doit("mkdir", "-p", $self->get_builddir());
 	}
-	return 0;
 }
 
 # Changes working directory the build directory (if needed), calls doit(@_)
