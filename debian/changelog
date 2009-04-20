@@ -1,3 +1,20 @@
+debhelper (7.3.0) UNRELEASED; urgency=low
+
+  * Modular object oriented dh_auto_* buildsystem support,
+    contributed by Modestas Vainius
+    - dh_auto_* --builddirectory can now be used to specify a build
+      directory to use for out of source building, for build systems
+      that support it. Closes: #480577
+    - dh_auto_* --buildsystem can now be used to override the autodetected
+      build system, or force use of a third-party class.
+    - dh_auto_* --list can be used to list available and selected build
+      systems.
+    - Adds support for cmake.
+    - Historical dh_auto_* behavior should be preserved despite these
+      large changes..
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 20 Apr 2009 16:26:08 -0400
+
 debhelper (7.2.8) unstable; urgency=low
 
   * dh_desktop: Now a deprecated no-op, since desktop-file-utils
