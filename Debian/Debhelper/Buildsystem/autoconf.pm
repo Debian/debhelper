@@ -1,10 +1,10 @@
-# A buildsystem plugin for handling autotools based projects
+# A buildsystem plugin for handling autoconf based projects
 #
 # Copyright: © 2008 Joey Hess
 #            © 2008-2009 Modestas Vainius
 # License: GPL-2+
 
-package Debian::Debhelper::Buildsystem::autotools;
+package Debian::Debhelper::Buildsystem::autoconf;
 
 use strict;
 use File::Spec;
@@ -12,7 +12,7 @@ use Debian::Debhelper::Dh_Lib;
 use base 'Debian::Debhelper::Buildsystem::makefile';
 
 sub DESCRIPTION {
-	"GNU Autotools (configure)"
+	"GNU Autoconf (configure)"
 }
 
 sub check_auto_buildable {
@@ -42,8 +42,8 @@ sub configure {
 	push @opts, "--disable-maintainer-mode";
 	push @opts, "--disable-dependency-tracking";
 	# Provide --host only if different from --build, as recommended in
-	# autotools-dev README.Debian: When provided (even if equal) autotools
-	# 2.52+ switches to cross-compiling mode.
+	# autotools-dev README.Debian: When provided (even if equal)
+	# autoconf 2.52+ switches to cross-compiling mode.
 	if (dpkg_architecture_value("DEB_BUILD_GNU_TYPE")
 	    ne dpkg_architecture_value("DEB_HOST_GNU_TYPE")) {
 		push @opts, "--host=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE");

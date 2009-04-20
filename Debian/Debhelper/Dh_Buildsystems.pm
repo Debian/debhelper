@@ -16,7 +16,7 @@ our @EXPORT=qw(&buildsystems_init &buildsystems_do &load_buildsystem);
 # Historical order must be kept for backwards compatibility. New
 # buildsystems MUST be added to the END of the list.
 our @BUILDSYSTEMS = (
-    "autotools",
+    "autoconf",
     "perl_makemaker",
     "makefile",
     "python_distutils",
