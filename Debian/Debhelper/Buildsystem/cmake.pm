@@ -15,23 +15,23 @@ sub DESCRIPTION {
 }
 
 sub check_auto_buildable {
-	my $self=shift;
+	my $this=shift;
 	my ($action)=@_;
 	my $ret = -e "CMakeLists.txt";
-	$ret &&= $self->SUPER::check_auto_buildable(@_) if $action ne "configure";
+	$ret &&= $this->SUPER::check_auto_buildable(@_) if $action ne "configure";
 	return $ret;
 }
 
 sub new {
 	my $class=shift;
-	my $self=$class->SUPER::new(@_);
+	my $this=$class->SUPER::new(@_);
 	# Enforce outside-source tree builds.
-	$self->enforce_outside_source_building();
-	return $self;
+	$this->enforce_outside_source_building();
+	return $this;
 }
 
 sub configure {
-	my $self=shift;
+	my $this=shift;
 	my @flags;
 
 	# Standard set of cmake flags
@@ -42,8 +42,8 @@ sub configure {
 	push @flags, "-DCMAKE_SKIP_RPATH=ON";
 	push @flags, "-DCMAKE_VERBOSE_MAKEFILE=ON";
 
-	$self->mkdir_builddir();
-	$self->doit_in_builddir("cmake", $self->get_rel2builddir_path(), @flags);
+	$this->mkdir_builddir();
+	$this->doit_in_builddir("cmake", $this->get_rel2builddir_path(), @flags);
 }
 
 1;

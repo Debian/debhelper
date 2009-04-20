@@ -20,29 +20,29 @@ sub check_auto_buildable {
 }
 
 sub setup_py {
-	my $self=shift;
+	my $this=shift;
 	my $act=shift;
 
-	if ($self->get_builddir()) {
-		unshift @_, "--build-base=" . $self->get_builddir();
+	if ($this->get_builddir()) {
+		unshift @_, "--build-base=" . $this->get_builddir();
 	}
 	doit("python", "setup.py", $act, @_);
 }
 
 sub build {
-	my $self=shift;
-	$self->setup_py("build", @_);
+	my $this=shift;
+	$this->setup_py("build", @_);
 }
 
 sub install {
-	my $self=shift;
+	my $this=shift;
 	my $destdir=shift;
-	$self->setup_py("install", "--root=$destdir", "--no-compile", "-O0", @_);
+	$this->setup_py("install", "--root=$destdir", "--no-compile", "-O0", @_);
 }
 
 sub clean {
-	my $self=shift;
-	$self->setup_py("clean", "-a", @_);
+	my $this=shift;
+	$this->setup_py("clean", "-a", @_);
 	# The setup.py might import files, leading to python creating pyc
 	# files.
 	doit('find', '.', '-name', '*.pyc', '-exec', 'rm', '{}', ';');

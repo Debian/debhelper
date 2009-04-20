@@ -20,8 +20,8 @@ our $DEB_BUILD_GNU_TYPE = dpkg_architecture_value("DEB_BUILD_GNU_TYPE");
 # name. Do not override this method unless you know what you are
 # doing.
 sub NAME {
-	my $self=shift;
-	my $class = ref($self) || $self;
+	my $this=shift;
+	my $class = ref($this) || $this;
 	if ($class =~ m/^.+::([^:]+)$/) {
 		return $1;
 	}
@@ -57,30 +57,30 @@ sub DEFAULT_BUILD_DIRECTORY {
 sub new {
 	my ($class, %opts)=@_;
 
-	my $self = bless({ builddir => undef, is_buildable => 1 }, $class);
+	my $this = bless({ builddir => undef, is_buildable => 1 }, $class);
 	if (exists $opts{builddir}) {
 		if ($opts{builddir}) {
-			$self->{builddir} = $opts{builddir};
+			$this->{builddir} = $opts{builddir};
 		}
 		else {
-			$self->{builddir} = $self->DEFAULT_BUILD_DIRECTORY();
+			$this->{builddir} = $this->DEFAULT_BUILD_DIRECTORY();
 		}
 	}
 	if (exists $opts{build_action}) {
 		if (defined $opts{build_action}) {
-			$self->{is_buildable} = $self->check_auto_buildable($opts{build_action});
+			$this->{is_buildable} = $this->check_auto_buildable($opts{build_action});
 		}
 		else {
-			$self->{is_buildable} = 0;
+			$this->{is_buildable} = 0;
 		}
 	}
-	return $self;
+	return $this;
 }
 
 # Test is_buildable flag of the object.
 sub is_buildable {
-	my $self=shift;
-	return $self->{is_buildable};
+	my $this=shift;
+	return $this->{is_buildable};
 }
 
 # This instance method is called to check if the build system is capable
@@ -91,10 +91,10 @@ sub is_buildable {
 # used in conjuction with @Dh_Buildsystems::BUILDSYSTEMS.
 #
 # This method is supposed to be called with source root directory being
-# working directory. Use $self->get_buildpath($path) method to get full
+# working directory. Use $this->get_buildpath($path) method to get full
 # path to the files in the build directory.
 sub check_auto_buildable {
-	my $self=shift;
+	my $this=shift;
 	my ($action) = @_;
 	return 0;
 }
@@ -102,38 +102,38 @@ sub check_auto_buildable {
 # Derived class can call this method in its constructor
 # to enforce in-source building even if the user requested otherwise.
 sub enforce_in_source_building {
-	my $self=shift;
-	if ($self->{builddir}) {
+	my $this=shift;
+	if ($this->{builddir}) {
 		# Do not emit warning unless the object is buildable.
-		if ($self->is_buildable()) {
-			warning("warning: " . $self->NAME() .
+		if ($this->is_buildable()) {
+			warning("warning: " . $this->NAME() .
 			    " does not support building outside-source. In-source build enforced.");
 		}
-		$self->{builddir} = undef;
+		$this->{builddir} = undef;
 	}
 }
 
 # Derived class can call this method in its constructor to enforce
 # outside-source building even if the user didn't request it.
 sub enforce_outside_source_building {
-	my ($self, $builddir) = @_;
-	if (!defined $self->{builddir}) {
-		$self->{builddir} = ($builddir && $builddir ne ".") ? $builddir : $self->DEFAULT_BUILD_DIRECTORY();
+	my ($this, $builddir) = @_;
+	if (!defined $this->{builddir}) {
+		$this->{builddir} = ($builddir && $builddir ne ".") ? $builddir : $this->DEFAULT_BUILD_DIRECTORY();
 	}
 }
 
 # Get path to the specified build directory
 sub get_builddir {
-	my $self=shift;
-	return $self->{builddir};
+	my $this=shift;
+	return $this->{builddir};
 }
 
 # Construct absolute path to the file from the given path that is relative
 # to the build directory.
 sub get_buildpath {
-	my ($self, $path) = @_;
-	if ($self->get_builddir()) {
-		return File::Spec->catfile($self->get_builddir(), $path);
+	my ($this, $path) = @_;
+	if ($this->get_builddir()) {
+		return File::Spec->catfile($this->get_builddir(), $path);
 	}
 	else {
 		return File::Spec->catfile('.', $path);
@@ -145,7 +145,7 @@ sub get_buildpath {
 # If $path is not given, returns relative path to the root of the
 # source tree from the build directory.
 sub get_rel2builddir_path {
-	my $self=shift;
+	my $this=shift;
 	my $path=shift;
 
 	if (defined $path) {
@@ -154,8 +154,8 @@ sub get_rel2builddir_path {
 	else {
 		$path = Cwd::getcwd();
 	}
-	if ($self->get_builddir()) {
-		return File::Spec->abs2rel($path, Cwd::abs_path($self->get_builddir()));
+	if ($this->get_builddir()) {
+		return File::Spec->abs2rel($path, Cwd::abs_path($this->get_builddir()));
 	}
 	return $path;
 }
@@ -170,22 +170,22 @@ sub _cd {
 
 # Creates a build directory.
 sub mkdir_builddir {
-	my $self=shift;
-	if ($self->get_builddir()) {
-		doit("mkdir", "-p", $self->get_builddir());
+	my $this=shift;
+	if ($this->get_builddir()) {
+		doit("mkdir", "-p", $this->get_builddir());
 	}
 }
 
 # Changes working directory the build directory (if needed), calls doit(@_)
 # and changes working directory back to the source directory.
 sub doit_in_builddir {
-	my $self=shift;
-	if ($self->get_builddir()) {
-		my $builddir = $self->get_builddir();
-		my $sourcedir = $self->get_rel2builddir_path();
-		$self->_cd($builddir);
+	my $this=shift;
+	if ($this->get_builddir()) {
+		my $builddir = $this->get_builddir();
+		my $sourcedir = $this->get_rel2builddir_path();
+		$this->_cd($builddir);
 		doit(@_);
-		$self->_cd($sourcedir);
+		$this->_cd($sourcedir);
 	}
 	else {
 		doit(@_);
@@ -197,10 +197,10 @@ sub doit_in_builddir {
 # gets wiped (if it exists) and 1 is returned. Otherwise, nothing
 # is done and 0 is returned.
 sub clean_builddir {
-	my $self=shift;
-	if ($self->get_builddir()) {
-		if (-d $self->get_builddir()) {
-			doit("rm", "-rf", $self->get_builddir());
+	my $this=shift;
+	if ($this->get_builddir()) {
+		if (-d $this->get_builddir()) {
+			doit("rm", "-rf", $this->get_builddir());
 		}
 		return 1;
 	}
@@ -212,7 +212,7 @@ sub clean_builddir {
 # Action name is passed as an argument. Derived classes overriding this
 # method should also call SUPER implementation of it.
 sub pre_action {
-	my $self=shift;
+	my $this=shift;
 	my ($action)=@_;
 }
 
@@ -220,7 +220,7 @@ sub pre_action {
 # Action name is passed as an argument. Derived classes overriding this
 # method should also call SUPER implementation of it.
 sub post_action {
-	my $self=shift;
+	my $this=shift;
 	my ($action)=@_;
 }
 
@@ -233,25 +233,25 @@ sub post_action {
 # source. Arbitary number of custom action arguments might be
 # passed. Default implementations do nothing.
 sub configure {
-	my $self=shift;
+	my $this=shift;
 }
 
 sub build {
-	my $self=shift;
+	my $this=shift;
 }
 
 sub test {
-	my $self=shift;
+	my $this=shift;
 }
 
 # destdir parameter specifies where to install files.
 sub install {
-	my $self=shift;
+	my $this=shift;
 	my $destdir=shift;
 }
 
 sub clean {
-	my $self=shift;
+	my $this=shift;
 }
 
 1;

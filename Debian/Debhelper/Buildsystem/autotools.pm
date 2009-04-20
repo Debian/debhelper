@@ -16,7 +16,7 @@ sub DESCRIPTION {
 }
 
 sub check_auto_buildable {
-	my $self=shift;
+	my $this=shift;
 	my ($action)=@_;
 
 	# Handle configure; the rest - next class
@@ -27,7 +27,7 @@ sub check_auto_buildable {
 }
 
 sub configure {
-	my $self=shift;
+	my $this=shift;
 
 	# Standard set of options for configure.
 	my @opts;
@@ -49,8 +49,8 @@ sub configure {
 		push @opts, "--host=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE");
 	}
 
-	$self->mkdir_builddir();
-	$self->doit_in_builddir($self->get_rel2builddir_path("configure"), @opts, @_);
+	$this->mkdir_builddir();
+	$this->doit_in_builddir($this->get_rel2builddir_path("configure"), @opts, @_);
 }
 
 1;

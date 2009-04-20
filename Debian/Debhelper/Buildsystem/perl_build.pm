@@ -15,7 +15,7 @@ sub DESCRIPTION {
 }
 
 sub check_auto_buildable {
-	my ($self, $action) = @_;
+	my ($this, $action) = @_;
 
 	# Handles everything
 	my $ret = -e "Build.PL";
@@ -26,43 +26,43 @@ sub check_auto_buildable {
 }
 
 sub do_perl {
-	my $self=shift;
+	my $this=shift;
 	$ENV{MODULEBUILDRC} = "/dev/null";
 	doit("perl", @_);
 }
 
 sub new {
 	my $class=shift;
-	my $self= $class->SUPER::new(@_);
-	$self->enforce_in_source_building();
-	return $self;
+	my $this= $class->SUPER::new(@_);
+	$this->enforce_in_source_building();
+	return $this;
 }
 
 sub configure {
-	my $self=shift;
+	my $this=shift;
 	$ENV{PERL_MM_USE_DEFAULT}=1;
-	$self->do_perl("Build.PL", "installdirs=vendor", @_);
+	$this->do_perl("Build.PL", "installdirs=vendor", @_);
 }
 
 sub build {
-	my $self=shift;
-	$self->do_perl("Build", @_);
+	my $this=shift;
+	$this->do_perl("Build", @_);
 }
 
 sub test {
-	my $self=shift;
-	$self->do_perl("Build", "test", @_);
+	my $this=shift;
+	$this->do_perl("Build", "test", @_);
 }
 
 sub install {
-	my $self=shift;
+	my $this=shift;
 	my $destdir=shift;
-	$self->do_perl("Build", "install", "destdir=$destdir", "create_packlist=0", @_);
+	$this->do_perl("Build", "install", "destdir=$destdir", "create_packlist=0", @_);
 }
 
 sub clean {
-	my $self=shift;
-	$self->do_perl("Build", "--allow_mb_mismatch", 1, "distclean", @_);
+	my $this=shift;
+	$this->do_perl("Build", "--allow_mb_mismatch", 1, "distclean", @_);
 }
 
 1;

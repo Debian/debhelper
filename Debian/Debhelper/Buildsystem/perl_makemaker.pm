@@ -15,7 +15,7 @@ sub DESCRIPTION {
 }
 
 sub check_auto_buildable {
-	my $self=shift;
+	my $this=shift;
 	my ($action)=@_;
 
 	# Handles configure, install; the rest - next class
@@ -29,13 +29,13 @@ sub check_auto_buildable {
 
 sub new {
 	my $class=shift;
-	my $self=$class->SUPER::new(@_);
-	$self->enforce_in_source_building();
-	return $self;
+	my $this=$class->SUPER::new(@_);
+	$this->enforce_in_source_building();
+	return $this;
 }
 
 sub configure {
-	my $self=shift;
+	my $this=shift;
 	# If set to a true value then MakeMaker's prompt function will
 	# # always return the default without waiting for user input.
 	$ENV{PERL_MM_USE_DEFAULT}=1;
@@ -43,9 +43,9 @@ sub configure {
 }
 
 sub install {
-	my $self=shift;
+	my $this=shift;
 	my $destdir=shift;
-	$self->SUPER::install($destdir, "PREFIX=/usr", @_);
+	$this->SUPER::install($destdir, "PREFIX=/usr", @_);
 }
 
 1;

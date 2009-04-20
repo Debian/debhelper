@@ -11,16 +11,16 @@ use Debian::Debhelper::Dh_Lib;
 use base 'Debian::Debhelper::Dh_Buildsystem';
 
 sub get_makecmd_C {
-	my $self=shift;
-	if ($self->get_builddir()) {
-		return $self->{makecmd} . " -C " . $self->get_builddir();
+	my $this=shift;
+	if ($this->get_builddir()) {
+		return $this->{makecmd} . " -C " . $this->get_builddir();
 	}
-	return $self->{makecmd};
+	return $this->{makecmd};
 }
 
 sub exists_make_target {
-	my ($self, $target) = @_;
-	my $makecmd=$self->get_makecmd_C();
+	my ($this, $target) = @_;
+	my $makecmd=$this->get_makecmd_C();
 
 	# Use make -n to check to see if the target would do
 	# anything. There's no good way to test if a target exists.
@@ -30,12 +30,12 @@ sub exists_make_target {
 }
 
 sub make_first_existing_target {
-	my $self=shift;
+	my $this=shift;
 	my $targets=shift;
 
 	foreach my $target (@$targets) {
-		if ($self->exists_make_target($target)) {
-			$self->doit_in_builddir($self->{makecmd}, $target, @_);
+		if ($this->exists_make_target($target)) {
+			$this->doit_in_builddir($this->{makecmd}, $target, @_);
 			return $target;
 		}
 	}
@@ -48,46 +48,46 @@ sub DESCRIPTION {
 
 sub new {
 	my $class=shift;
-	my $self=$class->SUPER::new(@_);
-	$self->{makecmd} = (exists $ENV{MAKE}) ? $ENV{MAKE} : "make";
-	return $self;
+	my $this=$class->SUPER::new(@_);
+	$this->{makecmd} = (exists $ENV{MAKE}) ? $ENV{MAKE} : "make";
+	return $this;
 }
 
 sub check_auto_buildable {
-	my $self=shift;
+	my $this=shift;
 	my ($action) = @_;
 
 	# Handles build, test, install, clean; configure - next class
 	if (grep /^\Q$action\E$/, qw{build test install clean}) {
 		# This is always called in the source directory, but generally
 		# Makefiles are created (or live) in the the build directory.
-		return -e $self->get_buildpath("Makefile") ||
-		       -e $self->get_buildpath("makefile") ||
-		       -e $self->get_buildpath("GNUmakefile");
+		return -e $this->get_buildpath("Makefile") ||
+		       -e $this->get_buildpath("makefile") ||
+		       -e $this->get_buildpath("GNUmakefile");
 	}
 	return 0;
 }
 
 sub build {
-	my $self=shift;
-	$self->doit_in_builddir($self->{makecmd}, @_);
+	my $this=shift;
+	$this->doit_in_builddir($this->{makecmd}, @_);
 }
 
 sub test {
-	my $self=shift;
-	$self->make_first_existing_target(['test', 'check'], @_);
+	my $this=shift;
+	$this->make_first_existing_target(['test', 'check'], @_);
 }
 
 sub install {
-	my $self=shift;
+	my $this=shift;
 	my $destdir=shift;
-	$self->make_first_existing_target(['install'], "DESTDIR=$destdir", @_);
+	$this->make_first_existing_target(['install'], "DESTDIR=$destdir", @_);
 }
 
 sub clean {
-	my $self=shift;
-	if (!$self->clean_builddir()) {
-		$self->make_first_existing_target(['distclean', 'realclean', 'clean'], @_);
+	my $this=shift;
+	if (!$this->clean_builddir()) {
+		$this->make_first_existing_target(['distclean', 'realclean', 'clean'], @_);
 	}
 }
 
