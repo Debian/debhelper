@@ -47,8 +47,8 @@ sub DESCRIPTION {
 }
 
 sub new {
-	my $cls=shift;
-	my $self=$cls->SUPER::new(@_);
+	my $class=shift;
+	my $self=$class->SUPER::new(@_);
 	$self->{makecmd} = (exists $ENV{MAKE}) ? $ENV{MAKE} : "make";
 	return $self;
 }

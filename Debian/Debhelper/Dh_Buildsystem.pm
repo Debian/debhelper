@@ -21,12 +21,12 @@ our $DEB_BUILD_GNU_TYPE = dpkg_architecture_value("DEB_BUILD_GNU_TYPE");
 # doing.
 sub NAME {
 	my $self=shift;
-	my $cls = ref($self) || $self;
-	if ($cls =~ m/^.+::([^:]+)$/) {
+	my $class = ref($self) || $self;
+	if ($class =~ m/^.+::([^:]+)$/) {
 		return $1;
 	}
 	else {
-		error("ınvalid buildsystem class name: $cls");
+		error("ınvalid buildsystem class name: $class");
 	}
 }
 
@@ -55,9 +55,9 @@ sub DEFAULT_BUILD_DIRECTORY {
 # parameters and execute commands to configure build environment if
 # is_buildable flag is set on the object.
 sub new {
-	my ($cls, %opts)=@_;
+	my ($class, %opts)=@_;
 
-	my $self = bless({ builddir => undef, is_buildable => 1 }, $cls);
+	my $self = bless({ builddir => undef, is_buildable => 1 }, $class);
 	if (exists $opts{builddir}) {
 		if ($opts{builddir}) {
 			$self->{builddir} = $opts{builddir};
@@ -161,7 +161,7 @@ sub get_rel2builddir_path {
 }
 
 sub _cd {
-	my ($cls, $dir)=@_;
+	my ($this, $dir)=@_;
 	if (! $dh{NO_ACT}) {
 		verbose_print("cd $dir");
 		chdir $dir or error("error: unable to chdir to $dir");

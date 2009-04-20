@@ -32,8 +32,8 @@ sub do_perl {
 }
 
 sub new {
-	my $cls=shift;
-	my $self= $cls->SUPER::new(@_);
+	my $class=shift;
+	my $self= $class->SUPER::new(@_);
 	$self->enforce_in_source_building();
 	return $self;
 }
