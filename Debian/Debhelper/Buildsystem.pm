@@ -32,7 +32,7 @@ sub NAME {
 
 # Description of the build system to be shown to the users.
 sub DESCRIPTION {
-	"basic debhelper build system class (please provide description)";
+	error("class lacking a DESCRIPTION");
 }
 
 # Default build directory. Can be overriden in the derived
@@ -160,19 +160,19 @@ sub get_rel2builddir_path {
 	return $path;
 }
 
-sub _cd {
-	my ($this, $dir)=@_;
-	if (! $dh{NO_ACT}) {
-		verbose_print("cd $dir");
-		chdir $dir or error("error: unable to chdir to $dir");
-	}
-}
-
 # Creates a build directory.
 sub mkdir_builddir {
 	my $this=shift;
 	if ($this->get_builddir()) {
 		doit("mkdir", "-p", $this->get_builddir());
+	}
+}
+
+sub _cd {
+	my ($this, $dir)=@_;
+	if (! $dh{NO_ACT}) {
+		verbose_print("cd $dir");
+		chdir $dir or error("error: unable to chdir to $dir");
 	}
 }
 
