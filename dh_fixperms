@@ -105,6 +105,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			"-name '*.ali' $find_options -print0",
 			"2>/dev/null | xargs -0r chmod uga-w");
 	}
+
+	# Lintian overrides should never be executable, too.
+	if (-d "$tmp/usr/share/lintian") {
+		complex_doit("find $tmp/usr/share/lintian/overrides",
+			"-type f $find_options -print0",
+			"2>/dev/null | xargs -0r chmod 644");
+	}
 }
 
 =head1 SEE ALSO
