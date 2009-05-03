@@ -82,6 +82,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# ..and desktop files ..
 	complex_doit("find $tmp/usr/share/applications -type f $find_options -print0",
 		"2>/dev/null | xargs -0r chmod 644");
+
+	# ..and OCaml native-code shared objects ..
+	complex_doit("find $tmp -perm -5 -type f",
+		"\\( -name '*.cmxs' \\) $find_options -print0",
+		"2>/dev/null | xargs -0r chmod 644");
 	
 	# .. and perl modules.
 	complex_doit("find $tmp/usr/lib/perl5 $tmp/usr/share/perl5 -type f",
