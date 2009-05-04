@@ -53,6 +53,10 @@ than once, and is used when there is a third-party package that provides
 debhelper commands. See the PROGRAMMING file for documentation about
 the sequence addon interface.
 
+=item B<--without> I<addon>
+
+The inverse of --with, disables using the given addon.
+
 =item B<--until> I<cmd>
 
 Run commands in the sequence until and including I<cmd>, then stop.
@@ -172,6 +176,10 @@ default. This is how to use dh_pycentral instead.
 # Stash this away before init modifies it.
 my @ARGV_orig=@ARGV;
 
+# python-support is enabled by default, at least for now
+# (and comes first so python-central loads later and can disable it).
+unshift @ARGV, "--with=python-support";
+
 init(options => {
 	"until=s" => \$dh{UNTIL},
 	"after=s" => \$dh{AFTER},
@@ -180,6 +188,10 @@ init(options => {
 	"with=s" => sub {
 		my ($option,$value)=@_;
 		push @{$dh{WITH}},$value;
+	},
+	"without=s" => sub {
+		my ($option,$value)=@_;
+		@{$dh{WITH}} = grep { $_ ne $value } @{$dh{WITH}};
 	},
 });
 inhibit_log();
@@ -252,9 +264,6 @@ $sequences{binary} = [@{$sequences{install}}, qw{
 	dh_shlibdeps
 }, @b];
 $sequences{'binary-arch'} = [@{$sequences{binary}}];
-
-# --with python-support is enabled by default, at least for now
-unshift @{$dh{WITH}}, "python-support";
 
 # sequence addon interface
 sub _insert {
@@ -339,11 +348,11 @@ elsif ($sequence eq 'binary-indep') {
 while (@ARGV_orig) {
 	my $opt=shift @ARGV_orig;
 	next if $opt eq $sequence;
-	if ($opt =~ /^--?(after|until|before|with)$/) {
+	if ($opt =~ /^--?(after|until|before|with|without)$/) {
 		shift @ARGV_orig;
 		next;
 	}
-	elsif ($opt =~ /^--?(no-act|remaining|(after|until|before|with)=)/) {
+	elsif ($opt =~ /^--?(no-act|remaining|(after|until|before|with|without)=)/) {
 		next;
 	}
 	push @options, $opt;
