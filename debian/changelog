@@ -3,6 +3,9 @@ debhelper (7.2.10) UNRELEASED; urgency=low
   * Close COMPAT_IN filehandle. Closes: #527464
   * dh_auto_configure: Clarify man page re adding configure
     parameters. Closes: #527256
+  * dh_auto_configure: Pass packlist=0 when running Makefile.PL,
+    in case it is a Build.PL passthru, to avoid it creating
+    the .packlist file. Closes: #527990
 
  -- Joey Hess <joeyh@debian.org>  Thu, 07 May 2009 16:33:25 -0400
 
