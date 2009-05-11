@@ -15,6 +15,34 @@ debhelper (7.3.0) UNRELEASED; urgency=low
 
  -- Joey Hess <joeyh@debian.org>  Mon, 20 Apr 2009 16:26:08 -0400
 
+debhelper (7.2.11) UNRELEASED; urgency=low
+
+  * dh: Support --with addon,addon,...
+    Closes: #528178
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 11 May 2009 14:50:33 -0400
+
+debhelper (7.2.10) unstable; urgency=low
+
+  * Close COMPAT_IN filehandle. Closes: #527464
+  * dh_auto_configure: Clarify man page re adding configure
+    parameters. Closes: #527256
+  * dh_auto_configure: Pass packlist=0 when running Makefile.PL,
+    in case it is a Build.PL passthru, to avoid it creating
+    the .packlist file. Closes: #527990
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 10 May 2009 13:07:08 -0400
+
+debhelper (7.2.9) unstable; urgency=low
+
+  * dh_fixperms: Ensure lintian overrides are mode 644.
+    (Patch from #459548)
+  * dh_fixperms: Fix permissions of OCaml .cmxs files. Closes: #526221
+  * dh: Add --without to allow disabling sequence addons (particularly
+    useful to disable the default python-support addon).
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 04 May 2009 14:46:53 -0400
+
 debhelper (7.2.8) unstable; urgency=low
 
   * dh_desktop: Now a deprecated no-op, since desktop-file-utils

@@ -301,6 +301,7 @@ sub dirname {
 				# Try the file..
 				open (COMPAT_IN, "debian/compat") || error "debian/compat: $!";
 				my $l=<COMPAT_IN>;
+				close COMPAT_IN;
 				if (! defined $l || ! length $l) {
 					warning("debian/compat is empty, assuming level $c");
 				}

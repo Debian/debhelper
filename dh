@@ -11,7 +11,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh> sequence [B<--with> I<addon>] [B<--until> I<cmd>] [B<--before> I<cmd>] [B<--after> I<cmd>] [B<--remaining>] [S<I<debhelper options>>]
+B<dh> sequence [B<--with> I<addon>[,I<addon>,...]] [B<--until> I<cmd>] [B<--before> I<cmd>] [B<--after> I<cmd>] [B<--remaining>] [S<I<debhelper options>>]
 
 =head1 DESCRIPTION
 
@@ -45,13 +45,18 @@ you should Build-Depend on debhelper 7.0.50 or above.)
 
 =over 4
 
-=item B<--with> I<addon>
+=item B<--with> I<addon>[,I<addon>,...]
 
 Add the debhelper commands specified by the given addon to appropriate places
 in the sequence of commands that is run. This option can be repeated more
-than once, and is used when there is a third-party package that provides
+than once, or multiple addons can be listed, separated by commas.
+This is used when there is a third-party package that provides
 debhelper commands. See the PROGRAMMING file for documentation about
 the sequence addon interface.
+
+=item B<--without> I<addon>
+
+The inverse of --with, disables using the given addon.
 
 =item B<--until> I<cmd>
 
@@ -167,10 +172,21 @@ default. This is how to use dh_pycentral instead.
 	%:
 		dh --with python-central $@
 
+To patch your package using quilt, you can tell dh to use quilt's dh
+sequence addons like this:
+	
+	#!/usr/bin/make -f
+	%:
+		dh --with quilt $@
+
 =cut
 
 # Stash this away before init modifies it.
 my @ARGV_orig=@ARGV;
+
+# python-support is enabled by default, at least for now
+# (and comes first so python-central loads later and can disable it).
+unshift @ARGV, "--with=python-support";
 
 init(options => {
 	"until=s" => \$dh{UNTIL},
@@ -179,7 +195,11 @@ init(options => {
 	"remaining" => \$dh{REMAINING},
 	"with=s" => sub {
 		my ($option,$value)=@_;
-		push @{$dh{WITH}},$value;
+		push @{$dh{WITH}},split(",", $value);
+	},
+	"without=s" => sub {
+		my ($option,$value)=@_;
+		@{$dh{WITH}} = grep { $_ ne $value } @{$dh{WITH}};
 	},
 });
 inhibit_log();
@@ -252,9 +272,6 @@ $sequences{binary} = [@{$sequences{install}}, qw{
 	dh_shlibdeps
 }, @b];
 $sequences{'binary-arch'} = [@{$sequences{binary}}];
-
-# --with python-support is enabled by default, at least for now
-unshift @{$dh{WITH}}, "python-support";
 
 # sequence addon interface
 sub _insert {
@@ -339,11 +356,11 @@ elsif ($sequence eq 'binary-indep') {
 while (@ARGV_orig) {
 	my $opt=shift @ARGV_orig;
 	next if $opt eq $sequence;
-	if ($opt =~ /^--?(after|until|before|with)$/) {
+	if ($opt =~ /^--?(after|until|before|with|without)$/) {
 		shift @ARGV_orig;
 		next;
 	}
-	elsif ($opt =~ /^--?(no-act|remaining|(after|until|before|with)=)/) {
+	elsif ($opt =~ /^--?(no-act|remaining|(after|until|before|with|without)=)/) {
 		next;
 	}
 	push @options, $opt;
