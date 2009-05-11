@@ -11,7 +11,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh> sequence [B<--with> I<addon>] [B<--until> I<cmd>] [B<--before> I<cmd>] [B<--after> I<cmd>] [B<--remaining>] [S<I<debhelper options>>]
+B<dh> sequence [B<--with> I<addon>[,I<addon>,...]] [B<--until> I<cmd>] [B<--before> I<cmd>] [B<--after> I<cmd>] [B<--remaining>] [S<I<debhelper options>>]
 
 =head1 DESCRIPTION
 
@@ -45,11 +45,12 @@ you should Build-Depend on debhelper 7.0.50 or above.)
 
 =over 4
 
-=item B<--with> I<addon>
+=item B<--with> I<addon>[,I<addon>,...]
 
 Add the debhelper commands specified by the given addon to appropriate places
 in the sequence of commands that is run. This option can be repeated more
-than once, and is used when there is a third-party package that provides
+than once, or multiple addons can be listed, separated by commas.
+This is used when there is a third-party package that provides
 debhelper commands. See the PROGRAMMING file for documentation about
 the sequence addon interface.
 
@@ -194,7 +195,7 @@ init(options => {
 	"remaining" => \$dh{REMAINING},
 	"with=s" => sub {
 		my ($option,$value)=@_;
-		push @{$dh{WITH}},$value;
+		push @{$dh{WITH}},split(",", $value);
 	},
 	"without=s" => sub {
 		my ($option,$value)=@_;
