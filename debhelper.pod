@@ -62,9 +62,10 @@ debian/control, debhelper will use debian/foo if no debian/package.foo
 file can be found.
 
 In some rare cases, you may want to have different versions of these files
-for different architectures. If files named debian/package.foo.arch
-exist, where "arch" is the same as the output of 
-"dpkg-architecture -qDEB_HOST_ARCH",
+for different architectures or OSes. If files named debian/package.foo.arch
+or debian/package.foo.os exist, where "arch" and "os" are the same as the
+output of  "dpkg-architecture -qDEB_HOST_ARCH" /
+"dpkg-architecture -qDEB_HOST_ARCH_OS",
 then they will be used in preference to other, more general files.
 
 In many cases, these config files are used to specify various types of
