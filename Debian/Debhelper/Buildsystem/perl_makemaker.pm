@@ -40,7 +40,7 @@ sub configure {
 	# # always return the default without waiting for user input.
 	$ENV{PERL_MM_USE_DEFAULT}=1;
 	doit("perl", "Makefile.PL", "INSTALLDIRS=vendor",
-		"create_packlist=0", "--skipdeps",
+		"create_packlist=0",
 		@_);
 }
 

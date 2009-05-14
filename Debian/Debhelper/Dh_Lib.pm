@@ -347,12 +347,15 @@ sub tmpdir {
 #
 # It tries several filenames:
 #   * debian/package.filename.buildarch
+#   * debian/package.filename.buildos
 #   * debian/package.filename
-#   * debian/file (if the package is the main package)
-# If --name was specified then tonly the first two are tried, and they must
-# have the name after the pacage name:
+#   * debian/filename (if the package is the main package)
+# If --name was specified then the files
+# must have the name after the package name:
 #   * debian/package.name.filename.buildarch
+#   * debian/package.name.filename.buildos
 #   * debian/package.name.filename
+#   * debian/name.filename (if the package is the main package)
 sub pkgfile {
 	my $package=shift;
 	my $filename=shift;
@@ -362,6 +365,7 @@ sub pkgfile {
 	}
 	
 	my @try=("debian/$package.$filename.".buildarch(),
+		 "debian/$package.$filename.".buildos(),
 		 "debian/$package.$filename");
 	if ($package eq $dh{MAINPACKAGE}) {
 		push @try, "debian/$filename";
@@ -618,6 +622,19 @@ sub dpkg_architecture_value {
 		    $arch=dpkg_architecture_value('DEB_HOST_ARCH');
 		}
 		return $arch;
+	}
+}
+
+# Returns the build OS. (Memoized)
+{
+	my $os;
+
+	sub buildos {
+		return $os if defined $os;
+
+		$os=`dpkg-architecture -qDEB_HOST_ARCH_OS 2>/dev/null` || error("dpkg-architecture failed");
+		chomp $os;
+		return $os;
 	}
 }
 
