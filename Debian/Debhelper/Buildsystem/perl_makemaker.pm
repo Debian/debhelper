@@ -39,6 +39,9 @@ sub configure {
 	# If set to a true value then MakeMaker's prompt function will
 	# # always return the default without waiting for user input.
 	$ENV{PERL_MM_USE_DEFAULT}=1;
+	# This prevents  Module::Install from interactive behavior.
+	$ENV{PERL_AUTOINSTALL}="--skipdeps";
+
 	doit("perl", "Makefile.PL", "INSTALLDIRS=vendor",
 		"create_packlist=0",
 		@_);
