@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-dh_scrollkeeper - generate ScrollKeeper registration scripts
+dh_scrollkeeper - deprecated no-op
 
 =cut
 
@@ -15,63 +15,15 @@ B<dh_scrollkeeper> [S<I<debhelper options>>] [B<-n>] [S<I<directory>>]
 
 =head1 DESCRIPTION
 
-B<dh_scrollkeeper> is a debhelper program that handles correctly
-registering OMF files that it finds in package build trees with
-ScrollKeeper.
-
-This command automatically adds maintainer script snippets for registering
-and unregistering files with ScrollKeeper (unless B<-n> is used). These
-snippets are inserted into the maintainer scripts by dh_installdeb. See
-L<dh_installdeb(1)> for an explanation of Debhelper maintainer script
-snippets.
-
-It will also change any DTD declarations in the OMF and DocBook files
-to refer to local files instead of remote URLs. This change does not
-modify the source files, but the files in the package build tree.
-
-=head1 OPTIONS
-
-=over 4
-
-=item B<-n>, B<--noscripts>
-
-Do not modify F<postinst>/F<postrm> scripts.
-
-=back
-
-=head1 NOTES
-
-Note that this command is not idempotent. L<dh_prep(1)> should be
-called between invocations of this command. Otherwise, it may cause
-multiple instances of the same text to be added to maintainer scripts.
+dh_scrollkeeper was a debhelper program that handled 
+registering OMF files for ScrollKeeper. However, it no longer does
+anything, and is now deprecated.
 
 =cut
 
 init();
 
-# This is a list of paths where DocBook files might be stored.
-my @xml_paths = (
-	'usr/share/gnome/help' # GNOME Help
-);
-
-# Append the remaining command line arguments
-push @xml_paths, @ARGV if @ARGV;
-
-foreach my $package (@{$dh{DOPACKAGES}}) {
-	my $tmp=tmpdir($package);
-	
-	# Only run if there have been OMF files installed
-	if (-d "$tmp/usr/share/omf") {
-		# Get a list of the OMF files
-		my @omf_files = `find $tmp/usr/share/omf -type f -printf '%p\n'`;
-		if (@omf_files) {
-			if (! $dh{NOSCRIPTS}) {
-				autoscript($package,"postinst","postinst-scrollkeeper");
-				autoscript($package,"postrm","postrm-scrollkeeper");
-			}
-		}
-	}
-}
+warning("This program is deprecated, and does nothing anymore.");
 
 =head1 SEE ALSO
 
