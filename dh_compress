@@ -24,9 +24,10 @@ to the new files.
 By default, dh_compress compresses files that debian policy mandates should
 be compressed, namely all files in usr/share/info, usr/share/man,
 usr/X11R6/man, files in usr/share/doc that are larger than 4k in size,
-(except the copyright file, .html and .css files, and files that appear to be
-already compressed based on their extensions), and all changelog files. Plus
-PCF fonts underneath usr/X11R6/lib/X11/fonts/ and usr/share/fonts/X11/
+(except the copyright file, .html and .css files, image files, and files
+that appear to be already compressed based on their extensions), and all
+changelog files. Plus PCF fonts underneath usr/X11R6/lib/X11/fonts/ and
+usr/share/fonts/X11/
 
 If a debian/package.compress file exists, the default files are not
 compressed. Instead, the debian/packages.compress is ran as a shell
@@ -42,7 +43,7 @@ debian/package.compress file if you really need to.
 =item B<-X>I<item>, B<--exclude=>I<item>
 
 Exclude files that contain "item" anywhere in their filename from being
-compressed. For example, -X.jpeg will exclude jpeg files from compression.
+compressed. For example, -X.tiff will exclude tiff files from compression.
 You may use this option multiple times to build up a list of things to
 exclude. You can accomplish the same thing by using a debian/compress file,
 but this is easier.
@@ -102,6 +103,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				! -iname "*.tgz" ! -iname "*.z" ! -iname "*.bz2" \\
 				! -iname "*-gz"  ! -iname "*-z" ! -iname "*_z" \\
 				! -iname "*.jar" ! -iname "*.zip" ! -iname "*.css" \\
+				! -iname "*.svg" ! -iname "*.svgz" \\
 				! -name "index.sgml" \\
 				! -name "copyright" 2>/dev/null || true;
 			find usr/X11R6/lib/X11/fonts usr/share/fonts/X11 -type f -name "*.pcf" 2>/dev/null || true;
