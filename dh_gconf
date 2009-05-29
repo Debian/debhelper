@@ -67,7 +67,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("mkdir","-p","$tmp/usr/share/gconf/mandatory");
 		doit("install","-p","-m644",$mandatory,"$tmp/usr/share/gconf/mandatory/${priority}_$package");
 		autoscript($package,"postinst","postinst-gconf-defaults","s%#OPT#%--mandatory%");
-		autoscript($package,"postrm","postrm-gconf-defaults","s%#OPT#%--mandatory%");
 		addsubstvar($package, "misc:Depends", "gconf2 (>= 2.24.0-5)");
 		$gconf_dep = 1;
 	}
