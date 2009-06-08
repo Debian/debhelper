@@ -9,9 +9,10 @@ package Debian::Debhelper::Dh_Buildsystems;
 use strict;
 use warnings;
 use Debian::Debhelper::Dh_Lib;
+use File::Spec;
 
 use base 'Exporter';
-our @EXPORT=qw(&buildsystems_init &buildsystems_do &load_buildsystem);
+our @EXPORT=qw(&buildsystems_init &buildsystems_do &load_buildsystem &load_all_buildsystems);
 
 # Historical order must be kept for backwards compatibility. New
 # buildsystems MUST be added to the END of the list.
@@ -62,6 +63,40 @@ sub load_buildsystem {
 	return;
 }
 
+sub load_all_buildsystems {
+	my $incs=shift || \@INC;
+	my (%buildsystems, @buildsystems);
+
+	for my $inc (@$incs) {
+		my $path = File::Spec->catdir($inc, "Debian/Debhelper/Buildsystem");
+		if (-d $path) {
+			for my $module_path (glob "$path/*.pm") {
+				my $name = basename($module_path);
+				$name =~ s/\.pm$//;
+				next if exists $buildsystems{$name};
+				$buildsystems{$name} = create_buildsystem_instance($name, @_);
+			}
+		}
+	}
+
+	# Push debhelper built-in buildsystems first
+	for my $name (@BUILDSYSTEMS) {
+		error("Debhelper built-in buildsystem '$name' could not be found/loaded")
+		    if not exists $buildsystems{$name};
+		push @buildsystems, $buildsystems{$name};
+		delete $buildsystems{$name};
+	}
+
+	# The rest are 3rd party buildsystems
+	for my $name (keys %buildsystems) {
+		my $inst = $buildsystems{$name};
+		$inst->{thirdparty} = 1;
+		push @buildsystems, $inst;
+	}
+
+	return @buildsystems;
+}
+
 sub buildsystems_init {
 	my %args=@_;
 
@@ -90,22 +125,18 @@ sub buildsystems_list {
 
 	# List buildsystems (including auto and specified status)
 	my ($auto, $specified);
-	for my $system (@BUILDSYSTEMS) {
-		my $inst = create_buildsystem_instance($system, build_step => undef);
+	my @buildsystems = load_all_buildsystems(undef, build_step => undef);
+	for my $inst (@buildsystems) {
 		my $is_specified = defined $opt_buildsys && $opt_buildsys eq $inst->NAME();
 		if (! defined $specified && defined $opt_buildsys && $opt_buildsys eq $inst->NAME()) {
 			$specified = $inst->NAME();
 		}
-		elsif (! defined $auto && $inst->check_auto_buildable($step)) {
+		elsif (! defined $auto && ! $inst->{thirdparty} && $inst->check_auto_buildable($step)) {
 			$auto = $inst->NAME();
 		}
-		printf("%s - %s\n", $inst->NAME(), $inst->DESCRIPTION());
-	}
-	# List a specified 3rd party buildsystem too.
-	if (! defined $specified && defined $opt_buildsys) {
-		my $inst = create_buildsystem_instance($opt_buildsys, build_step => undef);
-		printf("%s - %s.\n", $inst->NAME(), $inst->DESCRIPTION());
-		$specified = $inst->NAME();
+		printf("%s - %s", $inst->NAME(), $inst->DESCRIPTION());
+		print " [3rd party]" if $inst->{thirdparty};
+		print "\n";
 	}
 	print "\n";
 	print "Auto-selected: $auto\n" if defined $auto;
