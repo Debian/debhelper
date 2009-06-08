@@ -71,9 +71,9 @@ sub NonOption {
 
 sub getoptions {
 	my $array=shift;
-	my %options=%{shift()} if ref $_[0];
+	my $extraoptions=shift;
 
-	Getopt::Long::GetOptionsFromArray($array,
+	my %options=(
 		"v" => \$dh{VERBOSE},
 		"verbose" => \$dh{VERBOSE},
 
@@ -137,24 +137,42 @@ sub getoptions {
 		
 		"ignore=s" => \&AddIgnore,
 
-		%options,
-
 		"<>" => \&NonOption,
-	)
+	);
+	
+	# Merge extra options and cancel default ones as needed (undef)
+	if (defined $extraoptions) {
+		for my $opt (keys %$extraoptions) {
+			if (defined $extraoptions->{$opt}) {
+				$options{$opt}=$extraoptions->{$opt};
+			}
+			else {
+				delete $options{$opt};
+			}
+		}
+	}
+
+	Getopt::Long::GetOptionsFromArray($array, %options);
+}
+
+sub split_options_string {
+	my $str=shift;
+
+	$str=~s/^\s+//;
+	return map { $_=~s/\\(\s)/$1/g; $_=~s/\s+$//g; $_ } split(/(?<!\\)\s+/,$str);
 }
 
 # Parse options and set %dh values.
 sub parseopts {
 	my $options=shift;
+	my $extra_args=shift;
 	
 	my @ARGV_extra;
 
 	# DH_INTERNAL_OPTIONS is used to pass additional options from
 	# dh through an override target to a command.
 	if (defined $ENV{DH_INTERNAL_OPTIONS}) {
-		$ENV{DH_INTERNAL_OPTIONS}=~s/^\s+//;
-		$ENV{DH_INTERNAL_OPTIONS}=~s/\s+$//;
-		@ARGV_extra=split(/\s+/,$ENV{DH_INTERNAL_OPTIONS});
+		@ARGV_extra=split_options_string($ENV{DH_INTERNAL_OPTIONS});
 		my $ret=getoptions(\@ARGV_extra, $options);
 		if (!$ret) {
 			warning("warning: unknown options will be a fatal error in a future debhelper release");
@@ -183,13 +201,20 @@ sub parseopts {
 	# to be parsed like @ARGV, but with unknown options
 	# skipped.
 	if (defined $ENV{DH_OPTIONS}) {
-		$ENV{DH_OPTIONS}=~s/^\s+//;
-		$ENV{DH_OPTIONS}=~s/\s+$//;
-		@ARGV_extra=split(/\s+/,$ENV{DH_OPTIONS});
+		@ARGV_extra=split_options_string($ENV{DH_OPTIONS});
 		my $ret=getoptions(\@ARGV_extra, $options);
 		if (!$ret) {
 			warning("warning: ignored unknown options in DH_OPTIONS");
 		}
+	}
+
+	if (defined $extra_args) {
+		my @extra_opts=split_options_string($extra_args);
+		my $ret=getoptions(\@extra_opts, $options);
+		if (!$ret) {
+			warning("warning: ignored unknown options");
+		}
+		push @ARGV_extra, @extra_opts;
 	}
 
 	my $ret=getoptions(\@ARGV, $options);

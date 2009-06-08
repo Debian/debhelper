@@ -29,10 +29,10 @@ sub init {
 	# Getopt::Long, which I'd prefer to avoid loading at all if possible.
 	if ((defined $ENV{DH_OPTIONS} && length $ENV{DH_OPTIONS}) ||
  	    (defined $ENV{DH_INTERNAL_OPTIONS} && length $ENV{DH_INTERNAL_OPTIONS}) ||
-	    grep /^-/, @ARGV) {
+ 	    (defined $params{extra_args}) || grep /^-/, @ARGV) {
 		eval "use Debian::Debhelper::Dh_Getopt";
 		error($@) if $@;
-		Debian::Debhelper::Dh_Getopt::parseopts($params{options});
+		Debian::Debhelper::Dh_Getopt::parseopts($params{options}, $params{extra_args});
 	}
 
 	# Another way to set excludes.

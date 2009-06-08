@@ -65,27 +65,23 @@ sub load_buildsystem {
 sub buildsystems_init {
 	my %args=@_;
 
-	# TODO: Not documented in the manual pages yet.
-	# Initialize options from environment variables
-	if (exists $ENV{DH_AUTO_BUILDDIRECTORY}) {
-		$opt_builddir = $ENV{DH_AUTO_BUILDDIRECTORY};
-	}
-	if (exists $ENV{DH_AUTO_BUILDSYSTEM}) {
-		$opt_buildsys = $ENV{DH_AUTO_BUILDSYSTEM};
-	}
-
 	# Available command line options
 	my %options = (
 	    "b:s" => \$opt_builddir,
 	    "builddirectory:s" => \$opt_builddir,
 
-	    "m=s" => \$opt_buildsys,
+	    "c=s" => \$opt_buildsys,
 	    "buildsystem=s" => \$opt_buildsys,
 
 	    "l" => \$opt_list,
 	    "--list" => \$opt_list,
 	);
-	map { $args{options}{$_} = $options{$_} } keys(%options);
+	$args{options}{$_} = $options{$_} foreach keys(%options);
+
+	# Pass options from the DH_AUTO_OPTIONS environment variable
+	if (defined $ENV{DH_AUTO_OPTIONS}) {
+		$args{extra_args} = $ENV{DH_AUTO_OPTIONS};
+	}
 	Debian::Debhelper::Dh_Lib::init(%args);
 }
 
