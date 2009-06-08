@@ -1,5 +1,5 @@
 # A buildsystem plugin for handling CMake based projects.
-# It enforces outside-source building.
+# It enforces out of source tree building.
 #
 # Copyright: © 2008-2009 Modestas Vainius
 # License: GPL-2+
@@ -25,8 +25,8 @@ sub check_auto_buildable {
 sub new {
 	my $class=shift;
 	my $this=$class->SUPER::new(@_);
-	# Enforce outside-source tree builds.
-	$this->enforce_outside_source_building();
+	# Enforce out of source tree building.
+	$this->enforce_out_of_source_building();
 	return $this;
 }
 

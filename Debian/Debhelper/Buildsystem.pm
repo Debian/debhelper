@@ -43,7 +43,7 @@ sub DEFAULT_BUILD_DIRECTORY {
 
 # Constructs a new build system object. Named parameters:
 # - builddir -     specifies build directory to use. If not specified,
-#                  in-source build will be performed. If undef or empty,
+#                  in source build will be performed. If undef or empty,
 #                  DEFAULT_BUILD_DIRECTORY will be used.
 # - build_step -   set this parameter to the name of the build step
 #                  if you want the object to determine its is_buidable
@@ -100,22 +100,22 @@ sub check_auto_buildable {
 }
 
 # Derived class can call this method in its constructor
-# to enforce in-source building even if the user requested otherwise.
+# to enforce in source building even if the user requested otherwise.
 sub enforce_in_source_building {
 	my $this=shift;
 	if ($this->{builddir}) {
 		# Do not emit warning unless the object is buildable.
 		if ($this->is_buildable()) {
 			warning("warning: " . $this->NAME() .
-			    " does not support building outside-source. In-source build enforced.");
+			    " does not support building out of source tree. In source building enforced.");
 		}
 		$this->{builddir} = undef;
 	}
 }
 
 # Derived class can call this method in its constructor to enforce
-# outside-source building even if the user didn't request it.
-sub enforce_outside_source_building {
+# out of source building even if the user didn't request it.
+sub enforce_out_of_source_building {
 	my ($this, $builddir) = @_;
 	if (!defined $this->{builddir}) {
 		$this->{builddir} = ($builddir && $builddir ne ".") ? $builddir : $this->DEFAULT_BUILD_DIRECTORY();
@@ -193,7 +193,7 @@ sub doit_in_builddir {
 	return 1;
 }
 
-# In case of outside-source tree building, whole build directory
+# In case of out of source tree building, whole build directory
 # gets wiped (if it exists) and 1 is returned. Otherwise, nothing
 # is done and 0 is returned.
 sub clean_builddir {
