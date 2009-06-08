@@ -17,10 +17,10 @@ sub DESCRIPTION {
 
 sub check_auto_buildable {
 	my $this=shift;
-	my ($action)=@_;
+	my ($step)=@_;
 
 	# Handle configure; the rest - next class
-	if ($action eq "configure") {
+	if ($step eq "configure") {
 		return -x "configure";
 	}
 	return 0;

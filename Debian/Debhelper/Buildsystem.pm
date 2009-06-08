@@ -45,7 +45,7 @@ sub DEFAULT_BUILD_DIRECTORY {
 # - builddir -     specifies build directory to use. If not specified,
 #                  in-source build will be performed. If undef or empty,
 #                  DEFAULT_BUILD_DIRECTORY will be used.
-# - build_action - set this parameter to the name of the build action
+# - build_step -   set this parameter to the name of the build step
 #                  if you want the object to determine its is_buidable
 #                  status automatically (with check_auto_buildable()).
 #                  Do not pass this parameter if is_buildable flag should
@@ -66,9 +66,9 @@ sub new {
 			$this->{builddir} = $this->DEFAULT_BUILD_DIRECTORY();
 		}
 	}
-	if (exists $opts{build_action}) {
-		if (defined $opts{build_action}) {
-			$this->{is_buildable} = $this->check_auto_buildable($opts{build_action});
+	if (exists $opts{build_step}) {
+		if (defined $opts{build_step}) {
+			$this->{is_buildable} = $this->check_auto_buildable($opts{build_step});
 		}
 		else {
 			$this->{is_buildable} = 0;
@@ -84,7 +84,7 @@ sub is_buildable {
 }
 
 # This instance method is called to check if the build system is capable
-# to auto build a source package. Additional argument $action describes
+# to auto build a source package. Additional argument $step describes
 # which operation the caller is going to perform (either configure,
 # build, test, install or clean). You must override this method for the
 # build system module to be ever picked up automatically. This method is
@@ -95,7 +95,7 @@ sub is_buildable {
 # path to the files in the build directory.
 sub check_auto_buildable {
 	my $this=shift;
-	my ($action) = @_;
+	my ($step) = @_;
 	return 0;
 }
 
@@ -208,20 +208,20 @@ sub clean_builddir {
 }
 
 
-# Instance method that is called before performing any action (see below).
+# Instance method that is called before performing any step (see below).
 # Action name is passed as an argument. Derived classes overriding this
 # method should also call SUPER implementation of it.
-sub pre_action {
+sub pre_step {
 	my $this=shift;
-	my ($action)=@_;
+	my ($step)=@_;
 }
 
-# Instance method that is called after performing any action (see below).
+# Instance method that is called after performing any step (see below).
 # Action name is passed as an argument. Derived classes overriding this
 # method should also call SUPER implementation of it.
-sub post_action {
+sub post_step {
 	my $this=shift;
-	my ($action)=@_;
+	my ($step)=@_;
 }
 
 # The instance methods below provide support for configuring,
@@ -229,8 +229,8 @@ sub post_action {
 # In case of failure, the method may just error() out.
 #
 # These methods should be overriden by derived classes to
-# implement buildsystem specific actions needed to build the
-# source. Arbitary number of custom action arguments might be
+# implement buildsystem specific steps needed to build the
+# source. Arbitary number of custom step arguments might be
 # passed. Default implementations do nothing.
 sub configure {
 	my $this=shift;

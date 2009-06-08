@@ -16,10 +16,10 @@ sub DESCRIPTION {
 
 sub check_auto_buildable {
 	my $this=shift;
-	my ($action)=@_;
+	my ($step)=@_;
 
 	# Handles configure, install; the rest - next class
-	if ($action eq "install" || $action eq "configure") {
+	if ($step eq "install" || $step eq "configure") {
 		return -e "Makefile.PL";
 	}
 	else {

@@ -16,9 +16,9 @@ sub DESCRIPTION {
 
 sub check_auto_buildable {
 	my $this=shift;
-	my ($action)=@_;
+	my ($step)=@_;
 	my $ret = -e "CMakeLists.txt";
-	$ret &&= $this->SUPER::check_auto_buildable(@_) if $action ne "configure";
+	$ret &&= $this->SUPER::check_auto_buildable(@_) if $step ne "configure";
 	return $ret;
 }
 

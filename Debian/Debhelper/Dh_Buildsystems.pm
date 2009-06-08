@@ -45,7 +45,7 @@ sub create_buildsystem_instance {
 }
 
 sub load_buildsystem {
-	my ($action, $system)=@_;
+	my ($step, $system)=@_;
 	if (defined $system) {
 		my $inst = create_buildsystem_instance($system);
 		return $inst;
@@ -53,7 +53,7 @@ sub load_buildsystem {
 	else {
 		# Try to determine build system automatically
 		for $system (@BUILDSYSTEMS) {
-			my $inst = create_buildsystem_instance($system, build_action=>$action);
+			my $inst = create_buildsystem_instance($system, build_step=>$step);
 			if ($inst->is_buildable()) {
 				return $inst;
 			}
@@ -90,24 +90,24 @@ sub buildsystems_init {
 }
 
 sub buildsystems_list {
-	my $action=shift;
+	my $step=shift;
 
 	# List buildsystems (including auto and specified status)
 	my ($auto, $specified);
 	for my $system (@BUILDSYSTEMS) {
-		my $inst = create_buildsystem_instance($system, build_action => undef);
+		my $inst = create_buildsystem_instance($system, build_step => undef);
 		my $is_specified = defined $opt_buildsys && $opt_buildsys eq $inst->NAME();
 		if (! defined $specified && defined $opt_buildsys && $opt_buildsys eq $inst->NAME()) {
 			$specified = $inst->NAME();
 		}
-		elsif (! defined $auto && $inst->check_auto_buildable($action)) {
+		elsif (! defined $auto && $inst->check_auto_buildable($step)) {
 			$auto = $inst->NAME();
 		}
 		printf("%s - %s\n", $inst->NAME(), $inst->DESCRIPTION());
 	}
 	# List a specified 3rd party buildsystem too.
 	if (! defined $specified && defined $opt_buildsys) {
-		my $inst = create_buildsystem_instance($opt_buildsys, build_action => undef);
+		my $inst = create_buildsystem_instance($opt_buildsys, build_step => undef);
 		printf("%s - %s.\n", $inst->NAME(), $inst->DESCRIPTION());
 		$specified = $inst->NAME();
 	}
@@ -119,27 +119,27 @@ sub buildsystems_list {
 }
 
 sub buildsystems_do {
-	my $action=shift;
+	my $step=shift;
 
-	if (!defined $action) {
-		$action = basename($0);
-		$action =~ s/^dh_auto_//;
+	if (!defined $step) {
+		$step = basename($0);
+		$step =~ s/^dh_auto_//;
 	}
 
-	if (grep(/^\Q$action\E$/, qw{configure build test install clean}) == 0) {
-		error("unrecognized build action: " . $action);
+	if (grep(/^\Q$step\E$/, qw{configure build test install clean}) == 0) {
+		error("unrecognized build step: " . $step);
 	}
 
 	if ($opt_list) {
-		buildsystems_list($action);
+		buildsystems_list($step);
 		exit 0;
 	}
 
-	my $buildsystem = load_buildsystem($action, $opt_buildsys);
+	my $buildsystem = load_buildsystem($step, $opt_buildsys);
 	if (defined $buildsystem) {
-		$buildsystem->pre_action($action);
-		$buildsystem->$action(@_, @{$dh{U_PARAMS}});
-		$buildsystem->post_action($action);
+		$buildsystem->pre_step($step);
+		$buildsystem->$step(@_, @{$dh{U_PARAMS}});
+		$buildsystem->post_step($step);
 	}
 	return 0;
 }

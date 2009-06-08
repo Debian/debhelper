@@ -55,10 +55,10 @@ sub new {
 
 sub check_auto_buildable {
 	my $this=shift;
-	my ($action) = @_;
+	my ($step) = @_;
 
 	# Handles build, test, install, clean; configure - next class
-	if (grep /^\Q$action\E$/, qw{build test install clean}) {
+	if (grep /^\Q$step\E$/, qw{build test install clean}) {
 		# This is always called in the source directory, but generally
 		# Makefiles are created (or live) in the the build directory.
 		return -e $this->get_buildpath("Makefile") ||

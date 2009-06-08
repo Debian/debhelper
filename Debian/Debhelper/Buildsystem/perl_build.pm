@@ -15,11 +15,11 @@ sub DESCRIPTION {
 }
 
 sub check_auto_buildable {
-	my ($this, $action) = @_;
+	my ($this, $step) = @_;
 
 	# Handles everything
 	my $ret = -e "Build.PL";
-	if ($action ne "configure") {
+	if ($step ne "configure") {
 		$ret &&= -e "Build";
 	}
 	return $ret;
