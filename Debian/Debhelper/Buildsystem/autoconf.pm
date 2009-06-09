@@ -7,8 +7,6 @@
 package Debian::Debhelper::Buildsystem::autoconf;
 
 use strict;
-use File::Spec;
-use Debian::Debhelper::Dh_Lib;
 use base 'Debian::Debhelper::Buildsystem::makefile';
 
 sub DESCRIPTION {
@@ -21,7 +19,7 @@ sub check_auto_buildable {
 
 	# Handle configure; the rest - next class
 	if ($step eq "configure") {
-		return -x "configure";
+		return -x $this->get_sourcepath("configure");
 	}
 	return 0;
 }
@@ -50,7 +48,7 @@ sub configure {
 	}
 
 	$this->mkdir_builddir();
-	$this->doit_in_builddir($this->get_rel2builddir_path("configure"), @opts, @_);
+	$this->doit_in_builddir($this->get_source_rel2builddir("configure"), @opts, @_);
 }
 
 1;

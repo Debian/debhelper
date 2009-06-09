@@ -7,13 +7,14 @@
 package Debian::Debhelper::Buildsystem::makefile;
 
 use strict;
-use Debian::Debhelper::Dh_Lib;
+use Debian::Debhelper::Dh_Lib qw(escape_shell);
 use base 'Debian::Debhelper::Buildsystem';
 
 sub get_makecmd_C {
 	my $this=shift;
-	if ($this->get_builddir()) {
-		return $this->{makecmd} . " -C " . $this->get_builddir();
+	my $buildpath = $this->get_buildpath();
+	if ($buildpath ne '.') {
+		return $this->{makecmd} . " -C " . escape_shell($buildpath);
 	}
 	return $this->{makecmd};
 }
@@ -86,7 +87,7 @@ sub install {
 
 sub clean {
 	my $this=shift;
-	if (!$this->clean_builddir()) {
+	if (!$this->rmdir_builddir()) {
 		$this->make_first_existing_target(['distclean', 'realclean', 'clean'], @_);
 	}
 }

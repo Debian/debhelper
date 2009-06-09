@@ -7,7 +7,6 @@
 package Debian::Debhelper::Buildsystem::cmake;
 
 use strict;
-use Debian::Debhelper::Dh_Lib;
 use base 'Debian::Debhelper::Buildsystem::makefile';
 
 sub DESCRIPTION {
@@ -17,7 +16,7 @@ sub DESCRIPTION {
 sub check_auto_buildable {
 	my $this=shift;
 	my ($step)=@_;
-	my $ret = -e "CMakeLists.txt";
+	my $ret = -e $this->get_sourcepath("CMakeLists.txt");
 	$ret &&= $this->SUPER::check_auto_buildable(@_) if $step ne "configure";
 	return $ret;
 }
@@ -43,7 +42,7 @@ sub configure {
 	push @flags, "-DCMAKE_VERBOSE_MAKEFILE=ON";
 
 	$this->mkdir_builddir();
-	$this->doit_in_builddir("cmake", $this->get_rel2builddir_path(), @flags);
+	$this->doit_in_builddir("cmake", $this->get_source_rel2builddir(), @flags);
 }
 
 1;

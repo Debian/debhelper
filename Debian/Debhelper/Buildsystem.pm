@@ -8,7 +8,7 @@ package Debian::Debhelper::Buildsystem;
 
 use strict;
 use warnings;
-use Cwd;
+use Cwd ();
 use File::Spec;
 use Debian::Debhelper::Dh_Lib;
 
@@ -42,9 +42,15 @@ sub DEFAULT_BUILD_DIRECTORY {
 }
 
 # Constructs a new build system object. Named parameters:
-# - builddir -     specifies build directory to use. If not specified,
-#                  in source build will be performed. If undef or empty,
-#                  DEFAULT_BUILD_DIRECTORY will be used.
+# - sourcedir-     specifies source directory (relative to the current (top)
+#                  directory) where the sources to be built live. If not
+#                  specified or empty, defaults to the current directory.
+# - builddir -     specifies build directory to use. Path is relative to the
+#                  source directory unless it starts with ./, then it is
+#                  assumed to be relative to the top directory. If undef or
+#                  empty, DEFAULT_BUILD_DIRECTORY relative to the source
+#                  directory will be used. If not specified, in source build
+#                  will be attempted.
 # - build_step -   set this parameter to the name of the build step
 #                  if you want the object to determine its is_buidable
 #                  status automatically (with check_auto_buildable()).
@@ -57,13 +63,33 @@ sub DEFAULT_BUILD_DIRECTORY {
 sub new {
 	my ($class, %opts)=@_;
 
-	my $this = bless({ builddir => undef, is_buildable => 1 }, $class);
+	my $this = bless({ sourcedir => '.',
+	                   builddir => undef,
+	                   is_buildable => 1 }, $class);
+
+	if (exists $opts{sourcedir}) {
+		# Get relative sourcedir abs_path (without symlinks)
+		my $curdir = Cwd::getcwd();
+		my $abspath = Cwd::abs_path($opts{sourcedir});
+		if (! -d $abspath || $abspath !~ /^\Q$curdir\E/) {
+			error("Invalid or non-existing path to the source directory: ".$opts{sourcedir});
+		}
+		$this->{sourcedir} = File::Spec->abs2rel($abspath, $curdir);
+	}
 	if (exists $opts{builddir}) {
 		if ($opts{builddir}) {
-			$this->{builddir} = $opts{builddir};
+			if ($opts{builddir} =~ m!^\./(.*)!) {
+				# Specified as relative to the current directory
+				$this->{builddir} = $1;
+			}
+			else {
+				# Specified as relative to the source directory
+				$this->{builddir} = $this->_canonpath($this->get_sourcepath($opts{builddir}));
+			}
 		}
 		else {
-			$this->{builddir} = $this->DEFAULT_BUILD_DIRECTORY();
+			# Relative to the source directory by default
+			$this->{builddir} = $this->get_sourcepath($this->DEFAULT_BUILD_DIRECTORY());
 		}
 	}
 	if (exists $opts{build_step}) {
@@ -122,42 +148,108 @@ sub enforce_out_of_source_building {
 	}
 }
 
-# Get path to the specified build directory
+# Enhanced version of File::Spec::canonpath. It collapses ..
+# too so it may return invalid path if symlinks are involved.
+# On the other hand, it does not need for the path to exist.
+sub _canonpath {
+	my ($this, $path)=@_;
+	my @canon;
+	my $back=0;
+	for my $comp (split(m%/+%, $path)) {
+		if ($comp eq '.') {
+			next;
+		}
+		elsif ($comp eq '..') {
+			if (@canon > 0) { pop @canon; }  else { $back++; }
+		}
+		else {
+			push @canon, $comp;
+		}
+	}
+	return (@canon + $back > 0) ? join('/', ('..')x$back, @canon) : '.';
+}
+
+# Given both $path and $base are relative to the same directory,
+# converts and returns path of $path being relative the $base.
+sub _rel2rel {
+	my ($this, $path, $base, $root)=@_;
+	$root = File::Spec->rootdir() if !defined $root;
+	
+	return File::Spec->abs2rel(
+	    File::Spec->rel2abs($path, $root),
+	    File::Spec->rel2abs($base, $root)
+	);
+}
+
+# Get path to the source directory
+# (relative to the current (top) directory)
+sub get_sourcedir {
+	my $this=shift;
+	return $this->{sourcedir};
+}
+
+# Convert path relative to the source directory to the path relative
+# to the current (top) directory.
+sub get_sourcepath {
+	my ($this, $path)=@_;
+	return File::Spec->catfile($this->get_sourcedir(), $path);
+}
+
+# Get path to the build directory if it was specified
+# (relative to the current (top) directory). undef otherwise.
 sub get_builddir {
 	my $this=shift;
 	return $this->{builddir};
 }
 
-# Construct absolute path to the file from the given path that is relative
-# to the build directory.
+# Convert path that is relative to the build directory to the path
+# that is relative to the current (top) directory.
+# If $path is not specified, always returns build directory path
+# relative to the current (top) directory regardless if builddir was
+# specified or not.
 sub get_buildpath {
-	my ($this, $path) = @_;
-	if ($this->get_builddir()) {
-		return File::Spec->catfile($this->get_builddir(), $path);
+	my ($this, $path)=@_;
+	my $builddir = $this->get_builddir() || $this->get_sourcedir();
+	if (defined $path) {
+		return File::Spec->catfile($builddir, $path);
 	}
-	else {
-		return File::Spec->catfile('.', $path);
-	}
+	return $builddir;
 }
 
-# When given a relative path in the source tree, converts it
-# to the path that is relative to the build directory.
-# If $path is not given, returns relative path to the root of the
-# source tree from the build directory.
-sub get_rel2builddir_path {
+# When given a relative path to the source directory, converts it
+# to the path that is relative to the build directory. If $path is
+# not given, returns a path to the source directory that is relative
+# to the build directory.
+sub get_source_rel2builddir {
 	my $this=shift;
 	my $path=shift;
 
-	if (defined $path) {
-		$path = File::Spec->catfile(Cwd::getcwd(), $path);
-	}
-	else {
-		$path = Cwd::getcwd();
-	}
+	my $dir = '.';
 	if ($this->get_builddir()) {
-		return File::Spec->abs2rel($path, Cwd::abs_path($this->get_builddir()));
+		$dir = $this->_rel2rel($this->get_sourcedir(), $this->get_builddir());
 	}
-	return $path;
+	if (defined $path) {
+		return File::Spec->catfile($dir, $path);
+	}
+	return $dir;
+}
+
+# When given a relative path to the build directory, converts it
+# to the path that is relative to the source directory. If $path is
+# not given, returns a path to the build directory that is relative
+# to the source directory.
+sub get_build_rel2sourcedir {
+	my $this=shift;
+	my $path=shift;
+
+	my $dir = '.';
+	if ($this->get_builddir()) {
+		$dir = $this->_rel2rel($this->get_builddir(), $this->get_sourcedir());
+	}
+	if (defined $path) {
+		return File::Spec->catfile($dir, $path);
+	}
+	return $dir;
 }
 
 # Creates a build directory.
@@ -176,16 +268,35 @@ sub _cd {
 	}
 }
 
-# Changes working directory the build directory (if needed), calls doit(@_)
-# and changes working directory back to the source directory.
+# Changes working directory to the source directory (if needed)
+# calls doit(@_) and changes working directory back to the top
+# directory.
+sub doit_in_sourcedir {
+	my $this=shift;
+	if ($this->get_sourcedir() ne '.') {
+		my $sourcedir = get_sourcedir();
+		my $curdir = Cwd::getcwd();
+		$this->_cd($sourcedir);
+		doit(@_);
+		$this->_cd($this->_rel2rel($curdir, $sourcedir, $curdir));
+	}
+	else {
+		doit(@_);
+	}
+	return 1;
+}
+
+# Changes working directory to the build directory (if needed),
+# calls doit(@_) and changes working directory back to the top
+# directory.
 sub doit_in_builddir {
 	my $this=shift;
-	if ($this->get_builddir()) {
-		my $builddir = $this->get_builddir();
-		my $sourcedir = $this->get_rel2builddir_path();
-		$this->_cd($builddir);
+	if ($this->get_buildpath() ne '.') {
+		my $buildpath = $this->get_buildpath();
+		my $curdir = Cwd::getcwd();
+		$this->_cd($buildpath);
 		doit(@_);
-		$this->_cd($sourcedir);
+		$this->_cd($this->_rel2rel($curdir, $buildpath, $curdir));
 	}
 	else {
 		doit(@_);
@@ -196,11 +307,12 @@ sub doit_in_builddir {
 # In case of out of source tree building, whole build directory
 # gets wiped (if it exists) and 1 is returned. Otherwise, nothing
 # is done and 0 is returned.
-sub clean_builddir {
+sub rmdir_builddir {
 	my $this=shift;
 	if ($this->get_builddir()) {
-		if (-d $this->get_builddir()) {
-			doit("rm", "-rf", $this->get_builddir());
+		my $buildpath = $this->get_buildpath();
+		if (-d $buildpath) {
+			doit("rm", "-rf", $buildpath);
 		}
 		return 1;
 	}

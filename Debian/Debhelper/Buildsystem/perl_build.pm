@@ -7,7 +7,6 @@
 package Debian::Debhelper::Buildsystem::perl_build;
 
 use strict;
-use Debian::Debhelper::Dh_Lib;
 use base 'Debian::Debhelper::Buildsystem';
 
 sub DESCRIPTION {
@@ -18,9 +17,9 @@ sub check_auto_buildable {
 	my ($this, $step) = @_;
 
 	# Handles everything
-	my $ret = -e "Build.PL";
+	my $ret = -e $this->get_sourcepath("Build.PL");
 	if ($step ne "configure") {
-		$ret &&= -e "Build";
+		$ret &&= -e $this->get_sourcepath("Build");
 	}
 	return $ret;
 }
@@ -28,7 +27,7 @@ sub check_auto_buildable {
 sub do_perl {
 	my $this=shift;
 	$ENV{MODULEBUILDRC} = "/dev/null";
-	doit("perl", @_);
+	$this->doit_in_sourcedir("perl", @_);
 }
 
 sub new {

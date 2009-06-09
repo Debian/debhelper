@@ -26,6 +26,7 @@ our @BUILDSYSTEMS = (
 );
 
 my $opt_buildsys;
+my $opt_sourcedir;
 my $opt_builddir;
 my $opt_list;
 
@@ -41,6 +42,9 @@ sub create_buildsystem_instance {
 
 	if (!exists $bsopts{builddir} && defined $opt_builddir) {
 		$bsopts{builddir} = ($opt_builddir eq "") ? undef : $opt_builddir;
+	}
+	if (!exists $bsopts{sourcedir} && defined $opt_sourcedir) {
+		$bsopts{sourcedir} = ($opt_sourcedir eq "") ? undef : $opt_sourcedir;
 	}
 	return $module->new(%bsopts);
 }
@@ -102,6 +106,10 @@ sub buildsystems_init {
 
 	# Available command line options
 	my %options = (
+	    "d" => undef, # cancel default D_FLAG option spec
+	    "d=s" => \$opt_sourcedir,
+	    "sourcedirectory=s" => \$opt_sourcedir,
+	
 	    "b:s" => \$opt_builddir,
 	    "builddirectory:s" => \$opt_builddir,
 

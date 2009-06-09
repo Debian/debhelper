@@ -7,7 +7,6 @@
 package Debian::Debhelper::Buildsystem::perl_makemaker;
 
 use strict;
-use Debian::Debhelper::Dh_Lib;
 use base 'Debian::Debhelper::Buildsystem::makefile';
 
 sub DESCRIPTION {
@@ -20,7 +19,7 @@ sub check_auto_buildable {
 
 	# Handles configure, install; the rest - next class
 	if ($step eq "install" || $step eq "configure") {
-		return -e "Makefile.PL";
+		return -e $this->get_sourcepath("Makefile.PL");
 	}
 	else {
 		return 0;
@@ -42,9 +41,9 @@ sub configure {
 	# This prevents  Module::Install from interactive behavior.
 	$ENV{PERL_AUTOINSTALL}="--skipdeps";
 
-	doit("perl", "Makefile.PL", "INSTALLDIRS=vendor",
-		"create_packlist=0",
-		@_);
+	$this->doit_in_sourcedir("perl", "Makefile.PL", "INSTALLDIRS=vendor",
+	    "create_packlist=0",
+	    @_);
 }
 
 sub install {

@@ -8,7 +8,6 @@
 package Debian::Debhelper::Buildsystem::python_distutils;
 
 use strict;
-use Debian::Debhelper::Dh_Lib;
 use base 'Debian::Debhelper::Buildsystem';
 
 sub DESCRIPTION {
@@ -16,7 +15,8 @@ sub DESCRIPTION {
 }
 
 sub check_auto_buildable {
-	return -e "setup.py";
+	my $this=shift;
+	return -e $this->get_sourcepath("setup.py");
 }
 
 sub setup_py {
@@ -24,9 +24,9 @@ sub setup_py {
 	my $act=shift;
 
 	if ($this->get_builddir()) {
-		unshift @_, "--build-base=" . $this->get_builddir();
+		unshift @_, "--build-base=" . $this->get_build_rel2sourcedir();
 	}
-	doit("python", "setup.py", $act, @_);
+	$this->doit_in_sourcedir("python", "setup.py", $act, @_);
 }
 
 sub build {
@@ -45,7 +45,7 @@ sub clean {
 	$this->setup_py("clean", "-a", @_);
 	# The setup.py might import files, leading to python creating pyc
 	# files.
-	doit('find', '.', '-name', '*.pyc', '-exec', 'rm', '{}', ';');
+	$this->doit_in_sourcedir('find', '.', '-name', '*.pyc', '-exec', 'rm', '{}', ';');
 }
 
 1;
