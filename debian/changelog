@@ -18,6 +18,32 @@ debhelper (7.3.0) UNRELEASED; urgency=low
 
  -- Joey Hess <joeyh@debian.org>  Mon, 20 Apr 2009 16:26:08 -0400
 
+debhelper (7.2.16) unstable; urgency=low
+
+  * dh_gconf: Add missed half of postrm fragment removal. Closes: #531035
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 11 Jun 2009 12:50:33 -0400
+
+debhelper (7.2.15) unstable; urgency=low
+
+  * dh_strip, dh_shlibdeps: Add support for OCaml shared libraries.
+    (Stephane Glondu) Closes: #527272, #532701
+  * dh_compress: Avoid compressing .svg and .sgvz files, since these
+    might be used as images on a html page, and also to avoid needing
+    to special case the .svgz extension when compressing svg.
+    Closes: #530253
+  * dh_scrollkeeper: Now a deprecated no-op. Closes: #530806
+  * dh_gconf: Remove postrm fragment that handled schema migration
+    from /etc to /usr. Closes: #531035
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 10 Jun 2009 17:14:07 -0400
+
+debhelper (7.2.14) unstable; urgency=low
+
+  * dh: Avoid writing log after override_dh_clean is run. Closes: #529228
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 18 May 2009 12:49:32 -0400
+
 debhelper (7.2.13) unstable; urgency=low
 
   * dh_auto_configure: Pass --skipdeps safely via PERL_AUTOINSTALL.

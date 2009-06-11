@@ -252,7 +252,6 @@ $sequences{install} = [@{$sequences{build}}, qw{
 	dh_gconf
 	dh_icons
 	dh_perl
-	dh_scrollkeeper
 	dh_usrlocal
 
 	dh_link
@@ -471,9 +470,13 @@ sub run {
 			# Need to handle logging for overriden commands here,
 			# because the actual debhelper command may not have
 			# been run by the rules file target.
-			my %packages=map { $_ => 1 } @packages;
-			map { delete $packages{$_} } @exclude;
-			write_log($override_command, keys %packages);
+			# (But avoid logging for dh_clean since it removes
+			# the log earlier.)
+			if ($override_command ne 'dh_clean') {
+				my %packages=map { $_ => 1 } @packages;
+				map { delete $packages{$_} } @exclude;
+				write_log($override_command, keys %packages);
+			}
 		}
 	}
 }
