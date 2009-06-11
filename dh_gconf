@@ -96,7 +96,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if ($schemas ne '') {
 			autoscript($package,"postinst","postinst-gconf","s%#SCHEMAS#%$schemas%");
 			autoscript($package,"prerm","prerm-gconf","s%#SCHEMAS#%$schemas%");
-			autoscript($package,"postrm","postrm-gconf","s%#SCHEMAS#%$schemas%");
 			addsubstvar($package, "misc:Depends", "gconf2 (>= 2.10.1-2)") unless $gconf_dep;
 		}
 	}
