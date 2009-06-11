@@ -172,9 +172,9 @@ sub buildsystems_do {
 
 	my $buildsystem = load_buildsystem($step, $opt_buildsys);
 	if (defined $buildsystem) {
-		$buildsystem->pre_step($step);
+		$buildsystem->pre_building_step($step);
 		$buildsystem->$step(@_, @{$dh{U_PARAMS}});
-		$buildsystem->post_step($step);
+		$buildsystem->post_building_step($step);
 	}
 	return 0;
 }

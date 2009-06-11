@@ -323,7 +323,7 @@ sub rmdir_builddir {
 # Instance method that is called before performing any step (see below).
 # Action name is passed as an argument. Derived classes overriding this
 # method should also call SUPER implementation of it.
-sub pre_step {
+sub pre_building_step {
 	my $this=shift;
 	my ($step)=@_;
 }
@@ -331,7 +331,7 @@ sub pre_step {
 # Instance method that is called after performing any step (see below).
 # Action name is passed as an argument. Derived classes overriding this
 # method should also call SUPER implementation of it.
-sub post_step {
+sub post_building_step {
 	my $this=shift;
 	my ($step)=@_;
 }
