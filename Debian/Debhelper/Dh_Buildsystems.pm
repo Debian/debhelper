@@ -49,16 +49,20 @@ sub create_buildsystem_instance {
 	return $module->new(%bsopts);
 }
 
+# Similar to create_buildsystem_instance(), but it attempts to autoselect
+# a buildsystem if none was specified. In case autoselection fails, undef
+# is returned.
 sub load_buildsystem {
-	my ($step, $system)=@_;
+	my $system=shift;
+	my $step=shift;
 	if (defined $system) {
-		my $inst = create_buildsystem_instance($system);
+		my $inst = create_buildsystem_instance($system, @_);
 		return $inst;
 	}
 	else {
 		# Try to determine build system automatically
 		for $system (@BUILDSYSTEMS) {
-			my $inst = create_buildsystem_instance($system);
+			my $inst = create_buildsystem_instance($system, @_);
 			if ($inst->check_auto_buildable($step)) {
 				return $inst;
 			}
@@ -170,7 +174,7 @@ sub buildsystems_do {
 		exit 0;
 	}
 
-	my $buildsystem = load_buildsystem($step, $opt_buildsys);
+	my $buildsystem = load_buildsystem($opt_buildsys, $step);
 	if (defined $buildsystem) {
 		$buildsystem->pre_building_step($step);
 		$buildsystem->$step(@_, @{$dh{U_PARAMS}});
