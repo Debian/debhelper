@@ -77,20 +77,7 @@ sub new {
 		$this->{sourcedir} = File::Spec->abs2rel($abspath, $curdir);
 	}
 	if (exists $opts{builddir}) {
-		if ($opts{builddir}) {
-			if ($opts{builddir} =~ m!^\./(.*)!) {
-				# Specified as relative to the current directory
-				$this->{builddir} = $1;
-			}
-			else {
-				# Specified as relative to the source directory
-				$this->{builddir} = $this->_canonpath($this->get_sourcepath($opts{builddir}));
-			}
-		}
-		else {
-			# Relative to the source directory by default
-			$this->{builddir} = $this->get_sourcepath($this->DEFAULT_BUILD_DIRECTORY());
-		}
+		$this->_set_builddir($opts{builddir});
 	}
 	if (exists $opts{build_step}) {
 		if (defined $opts{build_step}) {
@@ -101,6 +88,36 @@ sub new {
 		}
 	}
 	return $this;
+}
+
+# Private method to set a build directory. If undef, use default.
+# Do $this->{builddir} = undef or pass $this->get_sourcedir() to
+# unset the build directory.
+sub _set_builddir {
+	my $this=shift;
+	my $builddir=shift;
+	if ($builddir) {
+		if ($builddir =~ m!^\./(.*)!) {
+			# Specified as relative to the current directory
+			$this->{builddir} = $1;
+		}
+		else {
+			# Specified as relative to the source directory
+			$this->{builddir} = $this->get_sourcepath($builddir);
+		}
+	}
+	else {
+		# Relative to the source directory by default
+		$this->{builddir} = $this->get_sourcepath($this->DEFAULT_BUILD_DIRECTORY());
+	}
+
+	# Canonicalize. If build directory ends up the same as source directory, drop it
+	if (defined $this->{builddir}) {
+		$this->{builddir} = $this->_canonpath($this->{builddir});
+		if ($this->{builddir} eq $this->get_sourcedir()) {
+			$this->{builddir} = undef;
+		}
+	}
 }
 
 # Test is_buildable flag of the object.
@@ -143,8 +160,13 @@ sub enforce_in_source_building {
 # out of source building even if the user didn't request it.
 sub enforce_out_of_source_building {
 	my ($this, $builddir) = @_;
-	if (!defined $this->{builddir}) {
-		$this->{builddir} = ($builddir && $builddir ne ".") ? $builddir : $this->DEFAULT_BUILD_DIRECTORY();
+	if (!defined $this->get_builddir()) {
+		$this->_set_builddir($builddir);
+		# The build directory might have been dropped if it matched the
+		# source directory. Just set to default in this case.
+		if (!defined $this->get_builddir()) {
+			$this->_set_builddir();
+		}
 	}
 }
 
