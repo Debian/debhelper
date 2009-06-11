@@ -70,6 +70,6 @@ install:
 	install -m 0644 Debian/Debhelper/Sequence/*.pm $(DESTDIR)$(PERLLIBDIR)/Sequence
 
 test: version
-	./run perl -MTest::Harness -e 'runtests grep { ! /CVS/ && ! /\.svn/ } @ARGV' t/*
+	./run perl -MTest::Harness -e 'runtests grep { ! /CVS/ && ! /\.svn/ && -f && -x } @ARGV' t/* t/buildsystems/*
 	# clean up log etc
 	./run dh_clean
