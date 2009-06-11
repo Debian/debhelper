@@ -7,6 +7,7 @@
 package Debian::Debhelper::Buildsystem::autoconf;
 
 use strict;
+use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value sourcepackage);
 use base 'Debian::Debhelper::Buildsystem::makefile';
 
 sub DESCRIPTION {
