@@ -305,20 +305,28 @@ sub doit_in_builddir {
 }
 
 # In case of out of source tree building, whole build directory
-# gets wiped (if it exists) and 1 is returned. Otherwise, nothing
-# is done and 0 is returned.
+# gets wiped (if it exists) and 1 is returned. If build directory
+# had 2 or more levels, empty parent directories are also deleted.
+# If build directory does not exist, nothing is done and 0 is returned.
 sub rmdir_builddir {
 	my $this=shift;
 	if ($this->get_builddir()) {
 		my $buildpath = $this->get_buildpath();
-		if (-d $buildpath) {
+		if (-d $buildpath && ! $dh{NO_ACT}) {
 			doit("rm", "-rf", $buildpath);
+			# If build directory had 2 or more levels, delete empty
+			# parent directories until the source directory level.
+			my @spdir = File::Spec->splitdir($this->get_build_rel2sourcedir());
+			my $peek;
+			pop @spdir;
+			while (($peek=pop(@spdir)) && $peek ne '.' && $peek ne '..') {
+				last if ! rmdir($this->get_sourcepath(File::Spec->catdir(@spdir, $peek)));
+			}
 		}
 		return 1;
 	}
 	return 0;
 }
-
 
 # Instance method that is called before performing any step (see below).
 # Action name is passed as an argument. Derived classes overriding this
