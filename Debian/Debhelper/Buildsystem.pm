@@ -51,21 +51,16 @@ sub DEFAULT_BUILD_DIRECTORY {
 #                  empty, DEFAULT_BUILD_DIRECTORY relative to the source
 #                  directory will be used. If not specified, in source build
 #                  will be attempted.
-# - build_step -   set this parameter to the name of the build step
-#                  if you want the object to determine its is_buidable
-#                  status automatically (with check_auto_buildable()).
-#                  Do not pass this parameter if is_buildable flag should
-#                  be forced to true or set this parameter to undef if
-#                  is_buildable flag should be false.
 # Derived class can override the constructor to initialize common object
-# parameters and execute commands to configure build environment if
-# is_buildable flag is set on the object.
+# parameters. Do NOT use constructor to execute commands or otherwise
+# configure/setup build environment. There is absolutely no guarantee the
+# constructed object will be used to build something. Use pre_building_step(),
+# $build_step() or post_building_step() methods for this.
 sub new {
 	my ($class, %opts)=@_;
 
 	my $this = bless({ sourcedir => '.',
-	                   builddir => undef,
-	                   is_buildable => 1 }, $class);
+	                   builddir => undef, }, $class);
 
 	if (exists $opts{sourcedir}) {
 		# Get relative sourcedir abs_path (without symlinks)
@@ -78,14 +73,6 @@ sub new {
 	}
 	if (exists $opts{builddir}) {
 		$this->_set_builddir($opts{builddir});
-	}
-	if (exists $opts{build_step}) {
-		if (defined $opts{build_step}) {
-			$this->{is_buildable} = $this->check_auto_buildable($opts{build_step});
-		}
-		else {
-			$this->{is_buildable} = 0;
-		}
 	}
 	return $this;
 }
@@ -120,12 +107,6 @@ sub _set_builddir {
 	}
 }
 
-# Test is_buildable flag of the object.
-sub is_buildable {
-	my $this=shift;
-	return $this->{is_buildable};
-}
-
 # This instance method is called to check if the build system is capable
 # to auto build a source package. Additional argument $step describes
 # which operation the caller is going to perform (either configure,
@@ -146,12 +127,8 @@ sub check_auto_buildable {
 # to enforce in source building even if the user requested otherwise.
 sub enforce_in_source_building {
 	my $this=shift;
-	if ($this->{builddir}) {
-		# Do not emit warning unless the object is buildable.
-		if ($this->is_buildable()) {
-			warning("warning: " . $this->NAME() .
-			    " does not support building out of source tree. In source building enforced.");
-		}
+	if ($this->get_builddir()) {
+		$this->{warn_insource} = 1;
 		$this->{builddir} = undef;
 	}
 }
@@ -356,6 +333,14 @@ sub rmdir_builddir {
 sub pre_building_step {
 	my $this=shift;
 	my ($step)=@_;
+
+	# Warn if in source building was enforced but build directory was
+	# specified. See enforce_in_source_building().
+	if ($this->{warn_insource}) {
+		warning("warning: " . $this->NAME() .
+		    " does not support building out of source tree. In source building enforced.");
+		delete $this->{warn_insource};
+	}
 }
 
 # Instance method that is called after performing any step (see below).

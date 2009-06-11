@@ -58,8 +58,8 @@ sub load_buildsystem {
 	else {
 		# Try to determine build system automatically
 		for $system (@BUILDSYSTEMS) {
-			my $inst = create_buildsystem_instance($system, build_step=>$step);
-			if ($inst->is_buildable()) {
+			my $inst = create_buildsystem_instance($system);
+			if ($inst->check_auto_buildable($step)) {
 				return $inst;
 			}
 		}
@@ -133,7 +133,7 @@ sub buildsystems_list {
 
 	# List buildsystems (including auto and specified status)
 	my ($auto, $specified);
-	my @buildsystems = load_all_buildsystems(undef, build_step => undef);
+	my @buildsystems = load_all_buildsystems(undef);
 	for my $inst (@buildsystems) {
 		my $is_specified = defined $opt_buildsys && $opt_buildsys eq $inst->NAME();
 		if (! defined $specified && defined $opt_buildsys && $opt_buildsys eq $inst->NAME()) {
