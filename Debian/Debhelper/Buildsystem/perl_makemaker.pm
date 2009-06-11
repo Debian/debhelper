@@ -17,13 +17,22 @@ sub check_auto_buildable {
 	my $this=shift;
 	my ($step)=@_;
 
-	# Handles configure, install; the rest - next class
-	if ($step eq "install" || $step eq "configure") {
-		return -e $this->get_sourcepath("Makefile.PL");
+	# Handles everything if Makefile.PL exists. Otherwise - next class.
+	if (-e $this->get_sourcepath("Makefile.PL")) {
+		if ($step eq "install" || $step eq "configure") {
+			return 1;
+		}
+		else {
+			# This is backwards compatible (with << 7.3) until build, test and
+			# clean steps are not reimplemented in the backwards compatibility
+			# breaking way. However, this is absolutely necessary for
+			# enforce_in_source_building() to work in corner cases in build,
+			# test and clean steps as the next class (makefile) does not
+			# enforce it.
+			return $this->SUPER::check_auto_buildable(@_);
+		}
 	}
-	else {
-		return 0;
-	}
+	return 0;
 }
 
 sub new {
