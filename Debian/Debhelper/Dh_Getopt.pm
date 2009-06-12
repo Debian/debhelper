@@ -173,11 +173,11 @@ sub parseopts {
 	# dh through an override target to a command.
 	if (defined $ENV{DH_INTERNAL_OPTIONS}) {
 		@ARGV_extra=split_options_string($ENV{DH_INTERNAL_OPTIONS});
-		my $ret=getoptions(\@ARGV_extra, $options);
-		if (!$ret) {
-			warning("warning: unknown options will be a fatal error in a future debhelper release");
-			#error("unknown option; aborting");
-		}
+		# Unknown options will be silently ignored.
+		my $oldwarn=$SIG{__WARN__};
+		$SIG{__WARN__}=sub {};
+		getoptions(\@ARGV_extra, $options);
+		$SIG{__WARN__}=$oldwarn;
 
 		# Avoid forcing acting on packages specified in
 		# DH_INTERNAL_OPTIONS. This way, -p can be specified
