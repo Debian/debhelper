@@ -159,7 +159,7 @@ sub _canonpath {
 # converts and returns path of $path being relative the $base.
 sub _rel2rel {
 	my ($this, $path, $base, $root)=@_;
-	$root = File::Spec->rootdir() if !defined $root;
+	$root = "/tmp" if !defined $root;
 	
 	return File::Spec->abs2rel(
 	    File::Spec->rel2abs($path, $root),

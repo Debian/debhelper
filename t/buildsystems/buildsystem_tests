@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 224;
+use Test::More tests => 227;
 
 use strict;
 use warnings;
@@ -63,12 +63,15 @@ is( $BS_CLASS->_canonpath("path/to/../forward/../../somewhere"),
     "somewhere","_canonpath no2" );
 is( $BS_CLASS->_canonpath("path/to/../../../somewhere"),
     "../somewhere","_canonpath no3" );
+is( $BS_CLASS->_canonpath("./"), ".", "_canonpath no4" );
 is( $BS_CLASS->_rel2rel("path/my/file", "path/my"),
     "file", "_rel2rel no1" );
 is( $BS_CLASS->_rel2rel("path/dir/file", "path/my"),
     "../dir/file", "_rel2rel no2" );
 is( $BS_CLASS->_rel2rel("file", "/root/path/my", "/root"),
     "../../file", "_rel2rel no3" );
+is( $BS_CLASS->_rel2rel(".", "."), ".", "_rel2rel no4" );
+is( $BS_CLASS->_rel2rel("path", "path/"), ".", "_rel2rel no5" );
 
 ### Test Buildsystem class path API methods under different configurations
 sub test_buildsystem_paths_api {
