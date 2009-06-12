@@ -137,7 +137,7 @@ sub buildsystems_list {
 
 	# List buildsystems (including auto and specified status)
 	my ($auto, $specified);
-	my @buildsystems = load_all_buildsystems(undef);
+	my @buildsystems = load_all_buildsystems();
 	for my $inst (@buildsystems) {
 		my $is_specified = defined $opt_buildsys && $opt_buildsys eq $inst->NAME();
 		if (! defined $specified && defined $opt_buildsys && $opt_buildsys eq $inst->NAME()) {
