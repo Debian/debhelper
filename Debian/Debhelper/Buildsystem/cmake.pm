@@ -24,8 +24,9 @@ sub check_auto_buildable {
 sub new {
 	my $class=shift;
 	my $this=$class->SUPER::new(@_);
-	# Enforce out of source tree building.
-	$this->enforce_out_of_source_building();
+	my %args=@_;
+	# Enforce out of source tree building (soft mode).
+	$this->enforce_out_of_source_building($args{builddir});
 	return $this;
 }
 
