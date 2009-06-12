@@ -126,24 +126,24 @@ $bs = $BS_CLASS->new(builddir => undef, sourcedir => "autoconf");
 %tmp = (
 	"get_sourcedir()" => "autoconf",
 	"get_sourcepath(a/b)" => "autoconf/a/b",
-	"get_builddir()" => "autoconf/$default_builddir",
-	"get_buildpath()" => "autoconf/$default_builddir",
-	"get_buildpath(a/b)" =>  "autoconf/$default_builddir/a/b",
-	"get_source_rel2builddir()" => "..",
-	"get_source_rel2builddir(a/b)" => "../a/b",
-	"get_build_rel2sourcedir()" => "$default_builddir",
-	"get_build_rel2sourcedir(a/b)" => "$default_builddir/a/b",
+	"get_builddir()" => "$default_builddir",
+	"get_buildpath()" => "$default_builddir",
+	"get_buildpath(a/b)" =>  "$default_builddir/a/b",
+	"get_source_rel2builddir()" => "../autoconf",
+	"get_source_rel2builddir(a/b)" => "../autoconf/a/b",
+	"get_build_rel2sourcedir()" => "../$default_builddir",
+	"get_build_rel2sourcedir(a/b)" => "../$default_builddir/a/b",
 );
 test_buildsystem_paths_api($bs, "default builddir, sourcedir=autoconf", \%tmp);
 
-# Enforced out of source tree building
+# Enforce "hard" out of source tree building
 # sourcedir=builddir=autoconf hence default builddir is implied
-$bs = $BS_CLASS->new(builddir => "./autoconf", sourcedir => "autoconf/");
+$bs = $BS_CLASS->new(builddir => "autoconf", sourcedir => "autoconf/");
 $bs->enforce_out_of_source_building();
-test_buildsystem_paths_api($bs, "out of source enforced, sourcedir=autoconf/", \%tmp);
+test_buildsystem_paths_api($bs, "hard out of source enforced, sourcedir=builddir", \%tmp);
 
 # sourcedir=autoconf (builddir should be dropped)
-$bs = $BS_CLASS->new(builddir => ".", sourcedir => "autoconf");
+$bs = $BS_CLASS->new(builddir => "autoconf", sourcedir => "autoconf");
 %tmp = (
 	"get_sourcedir()" => "autoconf",
 	"get_sourcepath(a/b)" => "autoconf/a/b",
@@ -157,13 +157,18 @@ $bs = $BS_CLASS->new(builddir => ".", sourcedir => "autoconf");
 );
 test_buildsystem_paths_api($bs, "no builddir, sourcedir=autoconf", \%tmp);
 
+# Enforce "soft" out of source tree building when
+# sourcedir=builddir=autoconf hence builddir should be dropped.
+$bs->enforce_out_of_source_building("autoconf");
+test_buildsystem_paths_api($bs, "soft out of source enforced, sourcedir=builddir", \%tmp);
+
 # builddir=bld/dir, sourcedir=autoconf. Should be the same as sourcedir=autoconf.
 $bs = $BS_CLASS->new(builddir => "bld/dir", sourcedir => "autoconf");
 $bs->enforce_in_source_building();
 test_buildsystem_paths_api($bs, "in source enforced, sourcedir=autoconf", \%tmp);
 
-# builddir=../bld/dir (relative to the sourcedir)
-$bs = $BS_CLASS->new(builddir => "../bld/dir/", sourcedir => "autoconf");
+# builddir=../bld/dir (relative to the curdir)
+$bs = $BS_CLASS->new(builddir => "bld/dir/", sourcedir => "autoconf");
 %tmp = (
 	"get_sourcedir()" => "autoconf",
 	"get_sourcepath(a/b)" => "autoconf/a/b",
@@ -176,10 +181,6 @@ $bs = $BS_CLASS->new(builddir => "../bld/dir/", sourcedir => "autoconf");
 	"get_build_rel2sourcedir(a/b)" => "../bld/dir/a/b",
 );
 test_buildsystem_paths_api($bs, "builddir=../bld/dir, sourcedir=autoconf", \%tmp);
-
-# Builddir relative to the pwd (same path as above).
-$bs = $BS_CLASS->new(builddir => "./bld/dir", sourcedir => "autoconf");
-test_buildsystem_paths_api($bs, "builddir=./bld/dir, sourcedir=autoconf", \%tmp);
 
 ### Test if all buildsystems can be loaded
 @bs = load_all_buildsystems([ $INC[0] ]);
@@ -220,7 +221,7 @@ $tmpdir = tempdir("tmp.XXXXXX");
 $builddir = "$tmpdir/builddir";
 mkdir $builddir;
 %tmp = (
-	builddir => 'builddir',
+	builddir => "$tmpdir/builddir",
 	sourcedir => $tmpdir
 );
 
@@ -349,7 +350,7 @@ if (defined \$bs) {
 EOF
 }
 
-is_deeply( process_stdout("DH_AUTO_OPTIONS='--builddirectory=bld\\ dir --sourcedirectory autoconf' $^X -- -",
+is_deeply( process_stdout("DH_AUTO_OPTIONS='--builddirectory=autoconf/bld\\ dir --sourcedirectory autoconf' $^X -- -",
                           get_load_bs_source(undef, "configure")),
     [ 'NAME=autoconf', 'builddir=autoconf/bld dir', 'makecmd=make', 'sourcedir=autoconf' ],
     "dh_auto_options w/space, autoconf autoselection and sourcedir/builddir" );
@@ -375,7 +376,7 @@ sub dh_auto_do_autoconf {
 	if ($builddir) {
 		push @dh_auto_args, "-b", $builddir;
 		$dh_auto_str .= " -b $builddir";
-		$buildpath .= "/$builddir";
+		$buildpath = $builddir;
 	}
 
 	my $do_dh_auto = sub {

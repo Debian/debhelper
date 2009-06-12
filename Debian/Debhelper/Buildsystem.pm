@@ -46,11 +46,8 @@ sub DEFAULT_BUILD_DIRECTORY {
 #                  directory) where the sources to be built live. If not
 #                  specified or empty, defaults to the current directory.
 # - builddir -     specifies build directory to use. Path is relative to the
-#                  source directory unless it starts with ./, then it is
-#                  assumed to be relative to the top directory. If undef or
-#                  empty, DEFAULT_BUILD_DIRECTORY relative to the source
-#                  directory will be used. If not specified, in source build
-#                  will be attempted.
+#                  current (top) directory. If undef or empty,
+#                  DEFAULT_BUILD_DIRECTORY directory will be used. 
 # Derived class can override the constructor to initialize common object
 # parameters. Do NOT use constructor to execute commands or otherwise
 # configure/setup build environment. There is absolutely no guarantee the
@@ -83,20 +80,7 @@ sub new {
 sub _set_builddir {
 	my $this=shift;
 	my $builddir=shift;
-	if ($builddir) {
-		if ($builddir =~ m!^\./(.*)!) {
-			# Specified as relative to the current directory
-			$this->{builddir} = $1;
-		}
-		else {
-			# Specified as relative to the source directory
-			$this->{builddir} = $this->get_sourcepath($builddir);
-		}
-	}
-	else {
-		# Relative to the source directory by default
-		$this->{builddir} = $this->get_sourcepath($this->DEFAULT_BUILD_DIRECTORY());
-	}
+	$this->{builddir} = ($builddir) ? $builddir : $this->DEFAULT_BUILD_DIRECTORY;
 
 	# Canonicalize. If build directory ends up the same as source directory, drop it
 	if (defined $this->{builddir}) {
@@ -134,15 +118,18 @@ sub enforce_in_source_building {
 }
 
 # Derived class can call this method in its constructor to enforce
-# out of source building even if the user didn't request it.
+# out of source building even if the user didn't request it. However,
+# if $builddir is specified, accept it even if it matches the source
+# directory (soft mode).
 sub enforce_out_of_source_building {
 	my ($this, $builddir) = @_;
 	if (!defined $this->get_builddir()) {
 		$this->_set_builddir($builddir);
-		# The build directory might have been dropped if it matched the
-		# source directory. Just set to default in this case.
-		if (!defined $this->get_builddir()) {
-			$this->_set_builddir();
+		if (!defined $this->get_builddir() && !$builddir) {
+			# If we are here, DEFAULT_BUILD_DIRECTORY matches
+			# the source directory, building might fail.
+			error("default build directory is the same as the source directory." .
+			      " Please specify a custom build directory");
 		}
 	}
 }
@@ -195,7 +182,8 @@ sub get_sourcepath {
 }
 
 # Get path to the build directory if it was specified
-# (relative to the current (top) directory). undef otherwise.
+# (relative to the current (top) directory). undef if the same
+# as the source directory.
 sub get_builddir {
 	my $this=shift;
 	return $this->{builddir};
