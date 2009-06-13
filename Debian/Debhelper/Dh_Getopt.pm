@@ -71,9 +71,9 @@ sub NonOption {
 
 sub getoptions {
 	my $array=shift;
-	my $extraoptions=shift;
+	my %options=%{shift()} if ref $_[0];
 
-	my %options=(
+	Getopt::Long::GetOptionsFromArray($array,
 		"v" => \$dh{VERBOSE},
 		"verbose" => \$dh{VERBOSE},
 
@@ -137,35 +137,21 @@ sub getoptions {
 		
 		"ignore=s" => \&AddIgnore,
 
-		"<>" => \&NonOption,
-	);
-	
-	# Merge extra options and cancel default ones as needed (undef)
-	if (defined $extraoptions) {
-		for my $opt (keys %$extraoptions) {
-			if (defined $extraoptions->{$opt}) {
-				$options{$opt}=$extraoptions->{$opt};
-			}
-			else {
-				delete $options{$opt};
-			}
-		}
-	}
+		%options,
 
-	Getopt::Long::GetOptionsFromArray($array, %options);
+		"<>" => \&NonOption,
+	)
 }
 
 sub split_options_string {
 	my $str=shift;
-
 	$str=~s/^\s+//;
-	return map { $_=~s/\\(\s)/$1/g; $_=~s/\s+$//g; $_ } split(/(?<!\\)\s+/,$str);
+	return split(/\s+/,$str);
 }
 
 # Parse options and set %dh values.
 sub parseopts {
 	my $options=shift;
-	my $extra_args=shift;
 	
 	my @ARGV_extra;
 
@@ -206,15 +192,6 @@ sub parseopts {
 		if (!$ret) {
 			warning("warning: ignored unknown options in DH_OPTIONS");
 		}
-	}
-
-	if (defined $extra_args) {
-		my @extra_opts=split_options_string($extra_args);
-		my $ret=getoptions(\@extra_opts, $options);
-		if (!$ret) {
-			warning("warning: ignored unknown options");
-		}
-		push @ARGV_extra, @extra_opts;
 	}
 
 	my $ret=getoptions(\@ARGV, $options);
