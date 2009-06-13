@@ -353,16 +353,16 @@ if (defined \$bs) {
 EOF
 }
 
-is_deeply( process_stdout("DH_AUTO_OPTIONS='--builddirectory=autoconf/bld\\ dir --sourcedirectory autoconf' $^X -- -",
+is_deeply( process_stdout("$^X -- - --builddirectory='autoconf/bld dir' --sourcedirectory autoconf",
                           get_load_bs_source(undef, "configure")),
     [ 'NAME=autoconf', 'builddir=autoconf/bld dir', 'makecmd=make', 'sourcedir=autoconf' ],
-    "dh_auto_options w/space, autoconf autoselection and sourcedir/builddir" );
+    "autoconf autoselection and sourcedir/builddir" );
 
-is_deeply( process_stdout("$^X -- - -cautoconf -d autoconf", get_load_bs_source("autoconf", "build")),
+is_deeply( process_stdout("$^X -- - -Sautoconf -D autoconf", get_load_bs_source("autoconf", "build")),
     [ 'NAME=autoconf', 'builddir=undef', 'makecmd=make', 'sourcedir=autoconf' ],
     "forced autoconf and sourcedir" );
 
-is_deeply( process_stdout("$^X -- - -b -cautoconf", get_load_bs_source("autoconf", "build")),
+is_deeply( process_stdout("$^X -- - -B -Sautoconf", get_load_bs_source("autoconf", "build")),
     [ 'NAME=autoconf', "builddir=$default_builddir", 'makecmd=make', 'sourcedir=.' ],
     "forced autoconf and default build directory" );
 
@@ -374,11 +374,11 @@ sub dh_auto_do_autoconf {
 
 	my (@lines, @extra_args);
 	my $buildpath = $sourcedir;
-	my @dh_auto_args = ("-d", $sourcedir);
-	my $dh_auto_str = "-d $sourcedir";
+	my @dh_auto_args = ("-D", $sourcedir);
+	my $dh_auto_str = "-D $sourcedir";
 	if ($builddir) {
-		push @dh_auto_args, "-b", $builddir;
-		$dh_auto_str .= " -b $builddir";
+		push @dh_auto_args, "-B", $builddir;
+		$dh_auto_str .= " -B $builddir";
 		$buildpath = $builddir;
 	}
 

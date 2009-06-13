@@ -108,24 +108,15 @@ sub load_all_buildsystems {
 sub buildsystems_init {
 	my %args=@_;
 
-	# TODO: Not documented in the manual pages yet.
-	# Initialize options from environment variables
-	if (exists $ENV{DH_AUTO_BUILDDIRECTORY}) {
-		$opt_builddir = $ENV{DH_AUTO_BUILDDIRECTORY};
-	}
-	if (exists $ENV{DH_AUTO_BUILDSYSTEM}) {
-		$opt_buildsys = $ENV{DH_AUTO_BUILDSYSTEM};
-	}
-
 	# Available command line options
 	my %options = (
-	    "d=s" => \$opt_sourcedir,
+	    "D=s" => \$opt_sourcedir,
 	    "sourcedirectory=s" => \$opt_sourcedir,
 	
-	    "b:s" => \$opt_builddir,
+	    "B:s" => \$opt_builddir,
 	    "builddirectory:s" => \$opt_builddir,
 
-	    "m=s" => \$opt_buildsys,
+	    "S=s" => \$opt_buildsys,
 	    "buildsystem=s" => \$opt_buildsys,
 
 	    "l" => \$opt_list,
