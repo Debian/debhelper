@@ -64,7 +64,7 @@ sub new {
 		my $curdir = Cwd::getcwd();
 		my $abspath = Cwd::abs_path($opts{sourcedir});
 		if (! -d $abspath || $abspath !~ /^\Q$curdir\E/) {
-			error("Invalid or non-existing path to the source directory: ".$opts{sourcedir});
+			error("invalid or non-existing path to the source directory: ".$opts{sourcedir});
 		}
 		$this->{sourcedir} = File::Spec->abs2rel($abspath, $curdir);
 	}

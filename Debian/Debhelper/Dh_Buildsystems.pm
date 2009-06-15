@@ -89,7 +89,7 @@ sub load_all_buildsystems {
 
 	# Push debhelper built-in buildsystems first
 	for my $name (@BUILDSYSTEMS) {
-		error("Debhelper built-in buildsystem '$name' could not be found/loaded")
+		error("debhelper built-in buildsystem '$name' could not be found/loaded")
 		    if not exists $buildsystems{$name};
 		push @buildsystems, $buildsystems{$name};
 		delete $buildsystems{$name};
