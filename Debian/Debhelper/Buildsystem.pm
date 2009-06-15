@@ -297,15 +297,18 @@ sub doit_in_builddir {
 # If build directory does not exist, nothing is done and 0 is returned.
 sub rmdir_builddir {
 	my $this=shift;
+	my $only_empty=shift;
 	if ($this->get_builddir()) {
 		my $buildpath = $this->get_buildpath();
 		if (-d $buildpath && ! $dh{NO_ACT}) {
-			doit("rm", "-rf", $buildpath);
-			# If build directory had 2 or more levels, delete empty
-			# parent directories until the source directory level.
 			my @spdir = File::Spec->splitdir($this->get_build_rel2sourcedir());
 			my $peek;
-			pop @spdir;
+			if (!$only_empty) {
+				doit("rm", "-rf", $buildpath);
+				pop @spdir;
+			}
+			# If build directory had 2 or more levels, delete empty
+			# parent directories until the source directory level.
 			while (($peek=pop(@spdir)) && $peek ne '.' && $peek ne '..') {
 				last if ! rmdir($this->get_sourcepath(File::Spec->catdir(@spdir, $peek)));
 			}
