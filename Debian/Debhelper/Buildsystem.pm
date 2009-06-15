@@ -1,4 +1,4 @@
-# Defines debhelper buildsystem class interface and implementation
+# Defines debhelper build system class interface and implementation
 # of common functionality.
 #
 # Copyright: © 2008-2009 Modestas Vainius
@@ -13,7 +13,7 @@ use File::Spec;
 use Debian::Debhelper::Dh_Lib;
 
 # Cache DEB_BUILD_GNU_TYPE value. Performance hit of multiple
-# invocations is noticable when listing buildsystems.
+# invocations is noticable when listing build systems.
 our $DEB_BUILD_GNU_TYPE = dpkg_architecture_value("DEB_BUILD_GNU_TYPE");
 
 # Build system name. Defaults to the last component of the class
@@ -26,7 +26,7 @@ sub NAME {
 		return $1;
 	}
 	else {
-		error("ınvalid buildsystem class name: $class");
+		error("ınvalid build system class name: $class");
 	}
 }
 
@@ -120,7 +120,7 @@ sub enforce_in_source_building {
 # Derived class can call this method in its constructor to enforce
 # out of source building even if the user didn't request it. However,
 # if $builddir is specified, accept it even if it matches the source
-# directory (soft mode).
+# directory (i.e. out of source is prefered to in source).
 sub enforce_out_of_source_building {
 	my ($this, $builddir) = @_;
 	if (!defined $this->get_builddir()) {
@@ -347,7 +347,7 @@ sub post_building_step {
 # In case of failure, the method may just error() out.
 #
 # These methods should be overriden by derived classes to
-# implement buildsystem specific steps needed to build the
+# implement build system specific steps needed to build the
 # source. Arbitary number of custom step arguments might be
 # passed. Default implementations do nothing.
 sub configure {

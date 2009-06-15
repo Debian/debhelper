@@ -1,5 +1,5 @@
-# A buildsystem plugin for handling CMake based projects.
-# It enforces out of source tree building.
+# A debhelper build system class for handling CMake based projects.
+# It prefers out of source tree building.
 #
 # Copyright: © 2008-2009 Modestas Vainius
 # License: GPL-2+
@@ -25,7 +25,7 @@ sub new {
 	my $class=shift;
 	my $this=$class->SUPER::new(@_);
 	my %args=@_;
-	# Enforce out of source tree building (soft mode).
+	# Prefer out of source tree building.
 	$this->enforce_out_of_source_building($args{builddir});
 	return $this;
 }

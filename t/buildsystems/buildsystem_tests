@@ -139,7 +139,7 @@ $bs = $BS_CLASS->new(builddir => undef, sourcedir => "autoconf");
 );
 test_buildsystem_paths_api($bs, "default builddir, sourcedir=autoconf", \%tmp);
 
-# Enforce "hard" out of source tree building
+# Enforce out of source tree building
 # sourcedir=builddir=autoconf hence default builddir is implied
 $bs = $BS_CLASS->new(builddir => "autoconf", sourcedir => "autoconf/");
 $bs->enforce_out_of_source_building();
@@ -160,7 +160,7 @@ $bs = $BS_CLASS->new(builddir => "autoconf", sourcedir => "autoconf");
 );
 test_buildsystem_paths_api($bs, "no builddir, sourcedir=autoconf", \%tmp);
 
-# Enforce "soft" out of source tree building when
+# Prefer out of source tree building when
 # sourcedir=builddir=autoconf hence builddir should be dropped.
 $bs->enforce_out_of_source_building("autoconf");
 test_buildsystem_paths_api($bs, "soft out of source enforced, sourcedir=builddir", \%tmp);

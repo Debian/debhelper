@@ -1,4 +1,4 @@
-# A buildsystem plugin for handling Perl Build based projects.
+# A build system class for handling Perl Build based projects.
 #
 # Copyright: © 2008-2009 Joey Hess
 #            © 2008-2009 Modestas Vainius

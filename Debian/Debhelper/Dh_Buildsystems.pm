@@ -1,4 +1,4 @@
-# A module for loading and managing debhelper buildsystem plugins.
+# A module for loading and managing debhelper build system plugins.
 # This module is intended to be used by all dh_auto_* helper commands.
 #
 # Copyright: © 2009 Modestas Vainius
@@ -15,7 +15,7 @@ use base 'Exporter';
 our @EXPORT=qw(&buildsystems_init &buildsystems_do &load_buildsystem &load_all_buildsystems);
 
 # Historical order must be kept for backwards compatibility. New
-# buildsystems MUST be added to the END of the list.
+# build systems MUST be added to the END of the list.
 our @BUILDSYSTEMS = (
     "autoconf",
     "perl_makemaker",
@@ -38,7 +38,7 @@ sub create_buildsystem_instance {
 
 	eval "use $module";
 	if ($@) {
-		error("unable to load buildsystem class '$system': $@");
+		error("unable to load build system class '$system': $@");
 	}
 
 	if (!exists $bsopts{builddir} && defined $opt_builddir) {
@@ -50,8 +50,8 @@ sub create_buildsystem_instance {
 	return $module->new(%bsopts);
 }
 
-# Similar to create_buildsystem_instance(), but it attempts to autoselect
-# a buildsystem if none was specified. In case autoselection fails, undef
+# Similar to create_build system_instance(), but it attempts to autoselect
+# a build system if none was specified. In case autoselection fails, undef
 # is returned.
 sub load_buildsystem {
 	my $system=shift;
@@ -88,15 +88,15 @@ sub load_all_buildsystems {
 		}
 	}
 
-	# Push debhelper built-in buildsystems first
+	# Push debhelper built-in build systems first
 	for my $name (@BUILDSYSTEMS) {
-		error("debhelper built-in buildsystem '$name' could not be found/loaded")
+		error("debhelper built-in build system '$name' could not be found/loaded")
 		    if not exists $buildsystems{$name};
 		push @buildsystems, $buildsystems{$name};
 		delete $buildsystems{$name};
 	}
 
-	# The rest are 3rd party buildsystems
+	# The rest are 3rd party build systems
 	for my $name (keys %buildsystems) {
 		my $inst = $buildsystems{$name};
 		$inst->{thirdparty} = 1;
@@ -132,7 +132,7 @@ sub buildsystems_init {
 sub buildsystems_list {
 	my $step=shift;
 
-	# List buildsystems (including auto and specified status)
+	# List build systems (including auto and specified status)
 	my ($auto, $specified);
 	my @buildsystems = load_all_buildsystems();
 	for my $inst (@buildsystems) {

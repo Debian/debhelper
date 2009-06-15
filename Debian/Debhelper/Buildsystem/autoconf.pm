@@ -1,4 +1,4 @@
-# A buildsystem plugin for handling autoconf based projects
+# A debhelper build system class for handling Autoconf based projects
 #
 # Copyright: © 2008 Joey Hess
 #            © 2008-2009 Modestas Vainius

@@ -1,5 +1,5 @@
-# A buildsystem plugin for building Python Distutils based
-# projects.
+# A debhelper build system class for building Python Distutils based
+# projects. It prefers out of source tree building.
 #
 # Copyright: © 2008 Joey Hess
 #            © 2008-2009 Modestas Vainius
@@ -13,7 +13,7 @@ use Debian::Debhelper::Dh_Lib qw(error);
 use base 'Debian::Debhelper::Buildsystem';
 
 sub DESCRIPTION {
-	"Python distutils"
+	"Python Distutils (setup.py)"
 }
 
 sub DEFAULT_BUILD_DIRECTORY {
