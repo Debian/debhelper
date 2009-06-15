@@ -8,10 +8,26 @@
 package Debian::Debhelper::Buildsystem::python_distutils;
 
 use strict;
+use Cwd ();
+use Debian::Debhelper::Dh_Lib qw(error);
 use base 'Debian::Debhelper::Buildsystem';
 
 sub DESCRIPTION {
 	"Python distutils"
+}
+
+sub DEFAULT_BUILD_DIRECTORY {
+	my $this=shift;
+	return $this->_canonpath($this->get_sourcepath("build"));
+}
+
+sub new {
+	my $class=shift;
+	my $this=$class->SUPER::new(@_);
+	my %args=@_;
+	# Out of source tree building is prefered.
+	$this->enforce_out_of_source_building($args{builddir});
+	return $this;
 }
 
 sub check_auto_buildable {
@@ -19,13 +35,50 @@ sub check_auto_buildable {
 	return -e $this->get_sourcepath("setup.py");
 }
 
+sub not_our_cfg {
+	my $this=shift;
+	my $ret;
+	if (open(my $cfg, $this->get_buildpath(".pydistutils.cfg"))) {
+		$ret = not "# Created by dh_auto\n" eq <$cfg>;
+		close DISTUTILSCFG;
+	}
+	return $ret;
+}
+
+sub create_cfg {
+	my $this=shift;
+	if (open(my $cfg, ">", $this->get_buildpath(".pydistutils.cfg"))) {
+		print $cfg "# Created by dh_auto", "\n";
+		print $cfg "[build]\nbuild-base=", $this->get_build_rel2sourcedir(), "\n";
+		close $cfg;
+		return 1;
+	}
+	return 0;
+}
+
+sub pre_building_step {
+	my $this=shift;
+	my $step=shift;
+
+	return unless grep /$step/, qw(build install clean);
+
+	# --build-base can only be passed to the build command. However,
+	# it is always read from the config file (really weird design).
+	# Therefore create such a cfg config file.
+	if ($this->get_buildpath() ne $this->DEFAULT_BUILD_DIRECTORY()) {
+		not $this->not_our_cfg() or
+		    error("cannot set custom build directory: .pydistutils.cfg is in use");
+		$this->mkdir_builddir();
+		$this->create_cfg() or
+		    error("cannot set custom build directory: unwritable .pydistutils.cfg");
+		# Distutils reads $HOME/.pydistutils.cfg
+		$ENV{HOME} = Cwd::abs_path($this->get_buildpath());
+	}
+}
+
 sub setup_py {
 	my $this=shift;
 	my $act=shift;
-
-	if ($this->get_builddir()) {
-		unshift @_, "--build-base=" . $this->get_build_rel2sourcedir();
-	}
 	$this->doit_in_sourcedir("python", "setup.py", $act, @_);
 }
 
@@ -43,6 +96,12 @@ sub install {
 sub clean {
 	my $this=shift;
 	$this->setup_py("clean", "-a", @_);
+
+	# Config file will remain if it was created by us
+	if (!$this->not_our_cfg()) {
+		unlink($this->get_buildpath(".pydistutils.cfg"));
+		$this->rmdir_builddir(1); # only if empty
+	}
 	# The setup.py might import files, leading to python creating pyc
 	# files.
 	$this->doit_in_sourcedir('find', '.', '-name', '*.pyc', '-exec', 'rm', '{}', ';');
