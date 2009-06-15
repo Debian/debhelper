@@ -261,7 +261,7 @@ sub _cd {
 sub doit_in_sourcedir {
 	my $this=shift;
 	if ($this->get_sourcedir() ne '.') {
-		my $sourcedir = get_sourcedir();
+		my $sourcedir = $this->get_sourcedir();
 		my $curdir = Cwd::getcwd();
 		$this->_cd($sourcedir);
 		doit(@_);
