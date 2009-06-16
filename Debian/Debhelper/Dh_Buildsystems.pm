@@ -120,7 +120,7 @@ sub buildsystems_init {
 	    "buildsystem=s" => \$opt_buildsys,
 
 	    "l" => \$opt_list,
-	    "--list" => \$opt_list,
+	    "list" => \$opt_list,
 	);
 	$args{options}{$_} = $options{$_} foreach keys(%options);
 	Debian::Debhelper::Dh_Lib::init(%args);
