@@ -29,6 +29,7 @@ my $opt_buildsys;
 my $opt_sourcedir;
 my $opt_builddir;
 my $opt_list;
+my $opt_help_buildsys;
 
 sub create_buildsystem_instance {
 	my $system=shift;
@@ -121,6 +122,8 @@ sub buildsystems_init {
 
 	    "l" => \$opt_list,
 	    "list" => \$opt_list,
+
+	    "help-buildsystem" => \$opt_help_buildsys,
 	);
 	$args{options}{$_} = $options{$_} foreach keys(%options);
 	Debian::Debhelper::Dh_Lib::init(%args);
@@ -151,6 +154,50 @@ sub buildsystems_list {
 		if ! defined $auto && ! defined $specified;
 }
 
+sub help_buildsystem {
+	my $step=shift;
+
+	# Print build system help page to standard output
+
+	my $inst = load_buildsystem($opt_buildsys, $step);
+	if ($inst) {
+		my $pmfile = ref $inst;
+		$pmfile =~ s#::#/#g;
+		$pmfile = $INC{"$pmfile.pm"};
+
+		# Display help with perldoc if it is installed and output is
+		# a tty
+		my $perldoc;
+		if (-t STDOUT) {
+			eval "use Pod::Perldoc";
+			$perldoc = "Pod::Perldoc" if (!$@);
+		}
+		if ($perldoc) {
+			$perldoc = new Pod::Perldoc();
+			$perldoc->{args} = [ '-oman',
+			                     '-w', 'section=7" "--name=dh_auto_'.lc($inst->NAME()),
+			                     '-w', 'center=Dh_auto build system documentation',
+			                     '-w', 'release=',
+			                     '-F', $pmfile ];
+			$perldoc->process();
+		}
+		else {
+			# No perldoc on the system. Use Pod::Usage to emit simple text
+			eval "use Pod::Usage";
+			pod2usage( -message => "Help page for the ".$inst->NAME()." build system\n" .
+			                       '<' . '-'x74 . '>',
+			           -input => $pmfile, -exitval => 'NOEXIT',
+			           -verbose => 2, -noperldoc => 1 );
+			print '<', '-'x74, '>', "\n";
+		}
+		return 0;
+	}
+	else {
+		print STDERR "No system auto-selected or specified. Try using --buildsystem option\n";
+		return 1;
+	}
+}
+
 sub buildsystems_do {
 	my $step=shift;
 
@@ -166,6 +213,10 @@ sub buildsystems_do {
 	if ($opt_list) {
 		buildsystems_list($step);
 		exit 0;
+	}
+
+	if ($opt_help_buildsys) {
+		exit help_buildsystem($step);
 	}
 
 	my $buildsystem = load_buildsystem($opt_buildsys, $step);
