@@ -35,9 +35,6 @@ sub configure {
 
 	# Standard set of cmake flags
 	push @flags, "-DCMAKE_INSTALL_PREFIX=/usr";
-	push @flags, "-DCMAKE_C_FLAGS=$ENV{CFLAGS}" if (exists $ENV{CFLAGS});
-	push @flags, "-DCMAKE_CXX_FLAGS=$ENV{CXXFLAGS}" if (exists $ENV{CXXFLAGS});
-	push @flags, "-DCMAKE_LD_FLAGS=$ENV{LDFLAGS}" if (exists $ENV{LDFLAGS});
 	push @flags, "-DCMAKE_SKIP_RPATH=ON";
 	push @flags, "-DCMAKE_VERBOSE_MAKEFILE=ON";
 
