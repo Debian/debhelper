@@ -119,13 +119,15 @@ sub enforce_in_source_building {
 
 # Derived class can call this method in its constructor to enforce
 # out of source building even if the user didn't request it. However,
-# if $builddir is specified, accept it even if it matches the source
-# directory (i.e. out of source is prefered to in source).
+# if 'builddir' named parameter is passed, accept its value as the
+# build directory even if it matches the source directory (meaning out
+# of source is only prefered to in source, not enforced).
 sub enforce_out_of_source_building {
-	my ($this, $builddir) = @_;
+	my $this=shift;
+	my %args=@_;
 	if (!defined $this->get_builddir()) {
-		$this->_set_builddir($builddir);
-		if (!defined $this->get_builddir() && !$builddir) {
+		$this->_set_builddir($args{builddir});
+		if (!defined $this->get_builddir() && !$args{builddir}) {
 			# If we are here, DEFAULT_BUILD_DIRECTORY matches
 			# the source directory, building might fail.
 			error("default build directory is the same as the source directory." .
