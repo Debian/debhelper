@@ -27,15 +27,28 @@ PERLLIBDIR=$(shell perl -MConfig -e 'print $$Config{vendorlib}')/Debian/Debhelpe
 
 POD2MAN=pod2man -c Debhelper -r "$(VERSION)"
 
+DH_AUTO_POD=man/dh_auto_pod
+
 # l10n to be built is determined from .po files
 LANGS=$(notdir $(basename $(wildcard man/po4a/po/*.po)))
 
 build: version
-	find . -maxdepth 1 -type f -perm +100 -name "dh*" \
+	find . -maxdepth 1 -type f -perm +100 -name "dh*" -a ! -name "dh_auto*" \
 		-exec $(POD2MAN) {} {}.1 \;
 	cat debhelper.pod | \
 		$(MAKEMANLIST) `find . -maxdepth 1 -type f -perm +100 -name "dh_*" | sort` | \
 		$(POD2MAN) --name="debhelper" --section=7  > debhelper.7
+	# Generate dh_auto program PODs and manual pages
+	./run find . -maxdepth 1 -type f -perm +100 -name "dh_auto_*" \
+		-exec $(DH_AUTO_POD) {} -oman/{}.pod \;
+	cd man; for pod in dh_auto_*.pod; do $(POD2MAN) --section=1 $$pod "../$${pod%.pod}.1"; done
+	# Generate dh_auto POD and manual page
+	./run $(DH_AUTO_POD) -oman/dh_auto.pod
+	$(POD2MAN) --section=7 man/dh_auto.pod dh_auto.7
+	# Generate dh_auto build system manual pages
+	find Debian/Debhelper/Buildsystem -maxdepth 1 -type f -name "*.pm" \
+		-exec sh -c 'n=`basename {}`;n=$${n%.pm}; $(POD2MAN) --section=7 --name dh_auto_$$n {} dh_auto_$$n.7' \;
+	# Translations
 	po4a -L UTF-8 man/po4a/po4a.cfg 
 	set -e; \
 	for lang in $(LANGS); do \
@@ -54,7 +67,7 @@ version:
 		Debian/Debhelper/Dh_Version.pm
 
 clean:
-	rm -f *.1 *.7 Debian/Debhelper/Dh_Version.pm
+	rm -f *.1 *.7 man/dh_auto*.pod Debian/Debhelper/Dh_Version.pm
 	po4a --rm-translations --rm-backups man/po4a/po4a.cfg
 	for lang in $(LANGS); do \
 		if [ -e man/$$lang ]; then rmdir man/$$lang; fi; \
@@ -65,7 +78,7 @@ install:
 		$(DESTDIR)/usr/share/debhelper/autoscripts \
 		$(DESTDIR)$(PERLLIBDIR)/Sequence \
 		$(DESTDIR)$(PERLLIBDIR)/Buildsystem
-	install $(shell find -maxdepth 1 -mindepth 1 -name dh\* |grep -v \.1\$$) $(DESTDIR)/usr/bin
+	install $(shell find -maxdepth 1 -mindepth 1 -name dh\* -executable |grep -v \.1\$$) $(DESTDIR)/usr/bin
 	install -m 0644 autoscripts/* $(DESTDIR)/usr/share/debhelper/autoscripts
 	install -m 0644 Debian/Debhelper/*.pm $(DESTDIR)$(PERLLIBDIR)
 	install -m 0644 Debian/Debhelper/Sequence/*.pm $(DESTDIR)$(PERLLIBDIR)/Sequence
