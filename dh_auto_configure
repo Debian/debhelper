@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-dh_auto_configure - automatically configure a package prior to building
+dh_auto_configure - configure and prepare package sources for building
 
 =cut
 
@@ -11,19 +11,25 @@ use Debian::Debhelper::Dh_Buildsystems;
 
 =head1 SYNOPSIS
 
-B<dh_auto_configure> [S<I<debhelper options>>] [S<B<--> I<params>>]
+B<dh_auto_configure> [S<I<debhelper options>>] [S<I<dh_auto options>>] [S<B<--> I<params>>]
 
 =head1 DESCRIPTION
 
-dh_auto_configure is a debhelper program that tries to automatically
-configure a package prior to building. It looks for and runs a ./configure
-script, Makefile.PL, Build.PL, or cmake. A standard set of parameters is
-determined and passed to the program that is run. If no program to run is
-found, dh_auto_configure will exit without doing anything.
+dh_auto_configure is a debhelper program that is responsible for the
+I<configure> step of the L<dh_auto(7)> building process. Since I<configure> is
+the first step, typically it is the point when build configuration options
+are set, system settings are detected and various build system specific
+temporary files are pre-generated in the build directory. Some simpler build
+systems do not need this step. In such a case, dh_auto_configure silently
+succeeds without doing anything.
 
-This is intended to work for about 90% of packages. If it doesn't work,
-you're encouraged to skip using dh_auto_configure at all, and just run
-./configure or its equivalent manually.
+dh_auto_configure usually pre-configures the source build system with a set of
+standard options which most Debian packages need to set anyway. Custom options
+can be passed as I<params>. If dh_auto_configure does not meet your needs or
+does not work, it is safe to skip/override it entirely and just run a configure
+script or its equivalent manually.
+
+#DH_AUTO SHARED OPTIONS#
 
 =head1 OPTIONS
 
@@ -31,13 +37,18 @@ you're encouraged to skip using dh_auto_configure at all, and just run
 
 =item B<--> I<params>
 
-Pass "params" to the program that is run, after the standard
+Pass I<params> to the command that is run, after the standard
 parameters that dh_auto_configure passes. This can be used to supplement
 or override those parameters. For example:
 
   dh_auto_configure -- --with-foo --enable-bar
 
 =back
+
+=head1 SUPPORTED BUILD SYSTEMS
+
+#SUPPORTED BUILD SYSTEMS INTRO#
+#SUPPORTED BUILD SYSTEMS LIST#
 
 =cut
 
@@ -46,12 +57,16 @@ buildsystems_do();
 
 =head1 SEE ALSO
 
+L<dh_auto(7)>
+
 L<debhelper(7)>
 
-This program is a part of debhelper.
+This program is a part of debhelper and its dh_auto package source building
+suite.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Joey Hess <joeyh@debian.org>
+ Joey Hess <joeyh@debian.org>
+ Modestas Vainius <modestas@vainius.eu>
 
 =cut

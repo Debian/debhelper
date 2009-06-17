@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-dh_auto_test - automatically runs a package's test suites
+dh_auto_test - run package test suites after building
 
 =cut
 
@@ -11,20 +11,26 @@ use Debian::Debhelper::Dh_Buildsystems;
 
 =head1 SYNOPSIS
 
-B<dh_auto_test> [S<I<debhelper options>>] [S<B<--> I<params>>]
+B<dh_auto_test> [S<I<debhelper options>>] [S<I<dh_auto options>>] [S<B<--> I<params>>]
 
 =head1 DESCRIPTION
 
-dh_auto_test is a debhelper program that tries to automatically run a
-package's test suite. If there's a Makefile and it contains a "test"
-or "check" target, then this is  done by running make (or MAKE, if the
-environment variable is set). If the test suite fails, the command will
-exit nonzero. If there's no test suite, it will exit zero without doing
-anything.
+dh_auto_test is a debhelper program that is responsible for the I<test> step of
+the L<dh_auto(7)> building process. Typically, this is the point when package
+test suite is run to check if the sources were built successfully and/or
+binaries provide expected functionality. dh_auto_test will fail if test suite
+fails.  However, if there's no test suite, it will exit with zero status
+without doing anything.
 
-This is intended to work for about 90% of packages with a test suite. If it
-doesn't work, you're encouraged to skip using dh_auto_test at all, and
-just run the test suite manually.
+If dh_auto_test does not meet your needs or does not work, it is safe to
+skip/override it entirely and just run the test suite manually.
+
+=head1 NOTES
+
+If the DEB_BUILD_OPTIONS environment variable contains "nocheck", no tests will
+be performed.
+
+#DH_AUTO SHARED OPTIONS#
 
 =head1 OPTIONS
 
@@ -37,10 +43,10 @@ or override the any standard parameters that dh_auto_test passes.
 
 =back
 
-=head1 NOTES
+=head1 SUPPORTED BUILD SYSTEMS
 
-If the DEB_BUILD_OPTIONS environment variable contains "nocheck", no
-tests will be performed.
+#SUPPORTED BUILD SYSTEMS INTRO#
+#SUPPORTED BUILD SYSTEMS LIST#
 
 =cut
 
@@ -53,12 +59,16 @@ buildsystems_do();
 
 =head1 SEE ALSO
 
+L<dh_auto(7)>
+
 L<debhelper(7)>
 
-This program is a part of debhelper.
+This program is a part of debhelper and its dh_auto package source building
+suite.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Joey Hess <joeyh@debian.org>
+ Joey Hess <joeyh@debian.org>
+ Modestas Vainius <modestas@vainius.eu>
 
 =cut

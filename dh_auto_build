@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-dh_auto_build - automatically builds a package
+dh_auto_build - build package sources
 
 =cut
 
@@ -11,18 +11,21 @@ use Debian::Debhelper::Dh_Buildsystems;
 
 =head1 SYNOPSIS
 
-B<dh_auto_build> [S<I<debhelper options>>] [S<B<--> I<params>>]
+B<dh_auto_build> [S<I<debhelper options>>] [S<I<dh_auto options>>] [S<B<--> I<params>>]
 
 =head1 DESCRIPTION
 
-dh_auto_build is a debhelper program that tries to automatically
-build a package. If a Makefile is found, this is done by running make (or
-MAKE, if the environment variable is set).
-If there's a setup.py, or Build.PL, it is run to build the package.
+dh_auto_build is a debhelper program that is responsible for the I<build> step
+of the L<dh_auto(7)> building process. Typically, this is the point when
+package sources are compiled into binaries or otherwise transformed into ready
+to use format. Files produced throughout this step are put to the build
+directory.
 
-This is intended to work for about 90% of packages. If it doesn't work,
-you're encouraged to skip using dh_auto_build at all, and just run the
-build process manually.
+You can pass additional parameters via I<params>. However, if dh_auto_build
+does not meet your needs or does not work, it is safe to skip/override it
+entirely and build the package with custom commands.
+
+#DH_AUTO SHARED OPTIONS#
 
 =head1 OPTIONS
 
@@ -35,6 +38,11 @@ or override any standard parameters that dh_auto_build passes.
 
 =back
 
+=head1 SUPPORTED BUILD SYSTEMS
+
+#SUPPORTED BUILD SYSTEMS INTRO#
+#SUPPORTED BUILD SYSTEMS LIST#
+
 =cut
 
 buildsystems_init();
@@ -42,12 +50,16 @@ buildsystems_do();
 
 =head1 SEE ALSO
 
+L<dh_auto(7)>
+
 L<debhelper(7)>
 
-This program is a part of debhelper.
+This program is a part of debhelper and its dh_auto package source building
+suite.
 
 =head1 AUTHOR
 
-Joey Hess <joeyh@debian.org>
+ Joey Hess <joeyh@debian.org>
+ Modestas Vainius <modestas@vainius.eu>
 
 =cut

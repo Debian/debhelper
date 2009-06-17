@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-dh_auto_clean - automatically cleans up after a build
+dh_auto_clean - clean temporary files after building package sources
 
 =cut
 
@@ -11,19 +11,21 @@ use Debian::Debhelper::Dh_Buildsystems;
 
 =head1 SYNOPSIS
 
-B<dh_auto_clean> [S<I<debhelper options>>] [S<B<--> I<params>>]
+B<dh_auto_clean> [S<I<debhelper options>>] [S<I<dh_auto options>>] [S<B<--> I<params>>]
 
 =head1 DESCRIPTION
 
-dh_auto_clean is a debhelper program that tries to automatically clean up
-after a package build. If there's a Makefile and it contains a "distclean",
-"realclean", or "clean" target, then this is  done by running make (or MAKE,
-if the environment variable is set). If there is a setup.py or Build.PL, it
-is run to clean the package.
+dh_auto_clean is a debhelper program that is responsible for the I<clean> step
+of the L<dh_auto(7)> building process. It tries to automatically clean up after
+a package build by removing all temporary files from the build directory or
+even the build directory itself as appropriate. dh_auto_clean will fail only if
+the source build system clean routine fails. However, if the latter does not
+exist or there is nothing to clean it will exit with zero status doing nothing.
 
-This is intended to work for about 90% of packages. If it doesn't work, or
-tries to use the wrong clean target, you're encouraged to skip using
-dh_auto_clean at all, and just run make clean manually.
+If dh_auto_clean does not meet your needs or does not work, it is safe to
+skip/override it entirely and just run clean up manually.
+
+#DH_AUTO SHARED OPTIONS#
 
 =head1 OPTIONS
 
@@ -36,6 +38,11 @@ or override the any standard parameters that dh_auto_clean passes.
 
 =back
 
+=head1 SUPPORTED BUILD SYSTEMS
+
+#SUPPORTED BUILD SYSTEMS INTRO#
+#SUPPORTED BUILD SYSTEMS LIST#
+
 =cut
 
 buildsystems_init();
@@ -43,12 +50,15 @@ buildsystems_do();
 
 =head1 SEE ALSO
 
+L<dh_auto(7)>
+
 L<debhelper(7)>
 
-This program is a part of debhelper.
+This program is a part of debhelper and its dh_auto package source building suite.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Joey Hess <joeyh@debian.org>
+ Joey Hess <joeyh@debian.org>
+ Modestas Vainius <modestas@vainius.eu>
 
 =cut

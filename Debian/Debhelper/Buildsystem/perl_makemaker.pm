@@ -6,6 +6,29 @@
 
 package Debian::Debhelper::Buildsystem::perl_makemaker;
 
+=head1 NAME
+
+B<perl_makemaker> - Perl ExtUtils::MakeMaker (Makefile.PL)
+
+=head1 SYNOPSIS
+
+B<dh_auto_*> [B<--buildsystem>=I<perl_makemaker>] ...
+
+=head1 DESCRIPTION
+
+Perl ExtUtils::MakeMaker utility is designed to write a Makefile for an
+extension module from a Makefile.PL (at configure step). The rest of build
+process is handled by C<make>. Typically, ExtUtils::MakeMaker build system can
+be identified by presence of the F<Makefile.PL> script in the source directory.
+
+=head1 DH_AUTO NOTES
+
+Out of source tree building is not supported.
+
+=head1 BUILD PROCESS
+
+=cut
+
 use strict;
 use base 'Debian::Debhelper::Buildsystem::makefile';
 
@@ -42,6 +65,24 @@ sub new {
 	return $this;
 }
 
+=head2 Configure step
+
+=over
+
+=item I<Behaviour>
+
+Execute C<Makefile.PL> script passing C<INSTALLDIRS=vendor> and
+C<create_packlist=0> parameters. Environment variables C<PERL_MM_USE_DEFAULT=1>
+and C<PERL_AUTOINSTALL=--skipdeps> are exported before running the script.
+
+=item I<Auto-selection>
+
+If F<Makefile.PL> file exists but F<configure> does not exist in the source
+directory.
+
+=back
+
+=cut
 sub configure {
 	my $this=shift;
 	# If set to a true value then MakeMaker's prompt function will
@@ -55,10 +96,87 @@ sub configure {
 	    @_);
 }
 
+=head2 Build step
+
+=over 4
+
+=item I<Behaviour>
+
+Execute C<make> in the build directory. See I<makefile> build system
+documentation for more information.
+
+=item I<Auto-selection>
+
+Both F<Makefile.PL> and F<Makefile> exist in the source directory.
+
+=back
+
+=head2 Test step
+
+=over 4
+
+=item I<Behaviour>
+
+Execute C<make test> in the source directory. See I<makefile> build system
+documentation for more information.
+
+=item I<Auto-selection>
+
+Both F<Makefile.PL> and F<Makefile> exist in the source directory.
+
+=back
+
+=cut
+
+=head2 Install step
+
+=over 4
+
+=item I<Behaviour>
+
+Execute C<make install DESTDIR=$destdir PREFIX=/usr> in the source directory
+with $destdir set to the appropriate temporary installation directory. See
+I<makefile> build system documentation for more information.
+
+=item I<Auto-selection>
+
+Both F<Makefile.PL> and F<Makefile> exist in the source directory.
+
+=back
+
+=cut
 sub install {
 	my $this=shift;
 	my $destdir=shift;
 	$this->SUPER::install($destdir, "PREFIX=/usr", @_);
 }
+
+=head2 Clean step
+
+=over 4
+
+=item I<Behaviour>
+
+Execute C<make distclean> in the source directory. See I<makefile> build system
+documentation for more information.
+
+=item I<Auto-selection>
+
+Both F<Makefile.PL> and F<Makefile> exist in the source directory.
+
+=back
+
+=head1 SEE ALSO
+
+L<dh_auto_makefile(7)>
+
+L<dh_auto(7)>
+
+=head1 AUTHORS
+
+ Joey Hess <joeyh@debian.org>
+ Modestas Vainius <modestas@vainius.eu>
+
+=cut
 
 1;
