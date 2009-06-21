@@ -70,7 +70,7 @@ sub not_our_cfg {
 	my $ret;
 	if (open(my $cfg, $this->get_buildpath(".pydistutils.cfg"))) {
 		$ret = not "# Created by dh_auto\n" eq <$cfg>;
-		close DISTUTILSCFG;
+		close $cfg;
 	}
 	return $ret;
 }
