@@ -18,13 +18,21 @@ debhelper (7.3.0) UNRELEASED; urgency=low
 
  -- Joey Hess <joeyh@debian.org>  Mon, 20 Apr 2009 16:26:08 -0400
 
-debhelper (7.2.17) UNRELEASED; urgency=low
+debhelper (7.2.17) unstable; urgency=low
 
   * Allow command-specific options to be passed to commands
     via dh without causing other commands to emit a getopt
     warning or deprecation message.
+  * dh_installinfo: No longer inserts install-info calls into
+    maintainer scripts, as that is now triggerized. Adds a dependency
+    via misc:Depends to handle partial upgrades. Note that while
+    dh_installinfo already required that info files had a INFO-DIR-SECTION,
+    the new system also requires they have START-INFO-DIR-ENTRY and
+    END-INFO-DIR-ENTRY for proper registration. I assume there will be
+    some mass bug filing for any packages that do not have that.
+    Closes: #528864, #357434
 
- -- Joey Hess <joeyh@debian.org>  Fri, 12 Jun 2009 00:26:11 -0400
+ -- Joey Hess <joeyh@debian.org>  Fri, 26 Jun 2009 09:02:51 -0400
 
 debhelper (7.2.16) unstable; urgency=low
 

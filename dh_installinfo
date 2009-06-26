@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-dh_installinfo - install and register info files
+dh_installinfo - install info files
 
 =cut
 
@@ -11,16 +11,12 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_installinfo> [S<I<debhelper options>>] [B<-A>] [B<-n>] [S<I<file ...>>]
+B<dh_installinfo> [S<I<debhelper options>>] [B<-A>] [S<I<file ...>>]
 
 =head1 DESCRIPTION
 
 dh_installinfo is a debhelper program that is responsible for installing
-info files and registering the files it installs with install-info.
-
-Note that install-info determines some information about the info files by
-parsing them, in particular, it looks at the INFO-DIR-SECTION line to
-determine what section the info file belongs in.
+info files into usr/share/info in the package build directory.
 
 Any filenames specified as parameters will be installed into the first
 package dh_installinfo is told to act on. By default, this is the first
@@ -28,11 +24,6 @@ binary package in debian/control, but if you use -p, -i, or -a flags, it
 will be the first package specified by those flags.
 
 Files named debian/package.info can list other files to be installed.
-
-dh_installinfo will automatically generate the postinst and prerm commands
-needed to interface with install-info, updating the info dir. These
-commands are inserted into the maintainer scripts by dh_installdeb.
-See L<dh_installdeb(1)> for an explanation of how this works.
 
 =head1 OPTIONS
 
@@ -43,22 +34,12 @@ See L<dh_installdeb(1)> for an explanation of how this works.
 Install all files specified by command line parameters in ALL packages
 acted on.
 
-=item B<-n>, B<--noscripts>
-
-Do not modify postinst/prerm scripts.
-
 =item I<file ...>
 
 Install these info files into the first package acted on. (Or in
 all packages if -A is specified).
 
 =back
-
-=head1 NOTES
-
-Note that this command is not idempotent. L<dh_prep(1)> should be called
-between invocations of this command. Otherwise, it may cause multiple
-instances of the same text to be added to maintainer scripts.
 
 =cut
 
@@ -85,18 +66,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("cp",@info,"$tmp/usr/share/info");
 		doit("chmod","-R", "go=rX","$tmp/usr/share/info/");
 		doit("chmod","-R", "u+rw","$tmp/usr/share/info/");
-	}
-
-	foreach $file (@info) {
-		# Only register with install-info if this is a head file in
-		# a tree of info files.
-		if ($file !~ /-\d+$/ && ! $dh{NOSCRIPTS}) {
-			my $fn="/usr/share/info/".basename($file);
-			
-			autoscript($package,"postinst","postinst-info",
-				"s:#FILE#:$fn:");
-			autoscript($package,"prerm","prerm-info", "s:#FILE#:$fn:");
-		}
+		# For transition, could be removed later.
+		addsubstvar($package, "misc:Depends", "dpkg (>= 1.15.4) | install-info");
 	}
 }
 
