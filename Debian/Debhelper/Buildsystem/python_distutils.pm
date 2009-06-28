@@ -89,7 +89,12 @@ sub build {
 sub install {
 	my $this=shift;
 	my $destdir=shift;
-	$this->setup_py("install", "--root=$destdir", "--no-compile", "-O0", @_);
+	$this->setup_py("install",
+		"--root=$destdir",
+		"--no-compile",
+		"-O0",
+		"--install-layout=deb",
+		@_);
 }
 
 sub clean {
