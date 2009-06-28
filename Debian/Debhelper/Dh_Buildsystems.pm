@@ -1,4 +1,4 @@
-# A module for loading and managing debhelper build system class.
+# A module for loading and managing debhelper build system classes.
 # This module is intended to be used by all dh_auto_* programs.
 #
 # Copyright: © 2009 Modestas Vainius
