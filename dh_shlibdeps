@@ -112,6 +112,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $ext=pkgext($package);
 
+	# dpkg-shlibdeps expects this directory to exist
+	if (! -d "$tmp/DEBIAN") {
+		doit("install","-o",0,"-g",0,"-d","$tmp/DEBIAN");
+	}
+
 	my @filelist;
 	my $ff;
 
