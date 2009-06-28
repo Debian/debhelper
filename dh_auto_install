@@ -87,6 +87,7 @@ elsif (-e "setup.py") {
 	doit("python", "setup.py", "install", 
 		"--root=$destdir",
 		"--no-compile", "-O0",
+		"--install-layout=deb",
 		@{$dh{U_PARAMS}});
 }
 elsif (-e "Build.PL" && -e "Build") {
