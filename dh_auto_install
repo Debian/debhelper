@@ -13,14 +13,16 @@ use Cwd;
 
 =head1 SYNOPSIS
 
-B<dh_auto_install> [S<I<debhelper options>>] [S<B<--> I<params>>]
+B<dh_auto_install> [S<I<build system options>>] [S<I<debhelper options>>] [S<B<--> I<params>>]
 
 =head1 DESCRIPTION
 
 dh_auto_install is a debhelper program that tries to automatically install
-built files. If there's a Makefile and it contains a "install" target,
-then this is done by running make (or MAKE, if the environment variable is
-set). If there is a setup.py or Build.PL, it is used.
+built files. It does so by running the appropriate command for the build
+system it detects the package uses. For example, if there's a Makefile and
+it contains a "install" target, then this is done by running make (or MAKE,
+if the environment variable is set). If there is a setup.py or Build.PL,
+it is used.
 
 The files are installed into debian/<package>/ if there is only one binary
 package. In the multiple binary package case, the files are instead
@@ -39,6 +41,9 @@ dh_auto_install at all, and just run make install manually.
 =head1 OPTIONS
 
 =over 4
+
+See L<debhelper(7)/BUILD SYSTEM OPTIONS> for a list of common build
+system selection and control options.
 
 =item B<--> I<params>
 

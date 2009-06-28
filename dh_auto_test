@@ -11,22 +11,26 @@ use Debian::Debhelper::Dh_Buildsystems;
 
 =head1 SYNOPSIS
 
-B<dh_auto_test> [S<I<debhelper options>>] [S<B<--> I<params>>]
+B<dh_auto_test> [S<I<build system options>>] [S<I<debhelper options>>] [S<B<--> I<params>>]
 
 =head1 DESCRIPTION
 
 dh_auto_test is a debhelper program that tries to automatically run a
-package's test suite. If there's a Makefile and it contains a "test"
-or "check" target, then this is  done by running make (or MAKE, if the
-environment variable is set). If the test suite fails, the command will
-exit nonzero. If there's no test suite, it will exit zero without doing
-anything.
+package's test suite. It does so by running the appropriate command for the
+build system it detects the package uses. For example, if there's a
+Makefile and it contains a "test" or "check" target, then this is  done by
+running make (or MAKE, if the environment variable is set). If the test
+suite fails, the command will exit nonzero. If there's no test suite, it
+will exit zero without doing anything.
 
 This is intended to work for about 90% of packages with a test suite. If it
 doesn't work, you're encouraged to skip using dh_auto_test at all, and
 just run the test suite manually.
 
 =head1 OPTIONS
+
+See L<debhelper(7)/BUILD SYSTEM OPTIONS> for a list of common build
+system selection and control options.
 
 =over 4
 

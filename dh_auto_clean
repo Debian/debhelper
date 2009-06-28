@@ -11,21 +11,25 @@ use Debian::Debhelper::Dh_Buildsystems;
 
 =head1 SYNOPSIS
 
-B<dh_auto_clean> [S<I<debhelper options>>] [S<B<--> I<params>>]
+B<dh_auto_clean> [S<I<build system options>>] [S<I<debhelper options>>] [S<B<--> I<params>>]
 
 =head1 DESCRIPTION
 
 dh_auto_clean is a debhelper program that tries to automatically clean up
-after a package build. If there's a Makefile and it contains a "distclean",
-"realclean", or "clean" target, then this is  done by running make (or MAKE,
-if the environment variable is set). If there is a setup.py or Build.PL, it
-is run to clean the package.
+after a package build. It does so by running the appropriate command for
+the build system it detects the package uses. For example, if there's a
+Makefile and it contains a "distclean", "realclean", or "clean" target,
+then this is  done by running make (or MAKE, if the environment variable is
+set). If there is a setup.py or Build.PL, it is run to clean the package.
 
 This is intended to work for about 90% of packages. If it doesn't work, or
 tries to use the wrong clean target, you're encouraged to skip using
 dh_auto_clean at all, and just run make clean manually.
 
 =head1 OPTIONS
+
+See L<debhelper(7)/BUILD SYSTEM OPTIONS> for a list of common build
+system selection and control options.
 
 =over 4
 
