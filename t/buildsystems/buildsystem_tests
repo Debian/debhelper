@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 227;
+use Test::More tests => 228;
 
 use strict;
 use warnings;
@@ -64,6 +64,8 @@ is( $BS_CLASS->canonpath("path/to/../forward/../../somewhere"),
 is( $BS_CLASS->canonpath("path/to/../../../somewhere"),
     "../somewhere","canonpath no3" );
 is( $BS_CLASS->canonpath("./"), ".", "canonpath no4" );
+is( $BS_CLASS->canonpath("/absolute/path/./somewhere/../to/nowhere"),
+    "/absolute/path/to/nowhere", "canonpath no5" );
 is( $BS_CLASS->_rel2rel("path/my/file", "path/my"),
     "file", "_rel2rel no1" );
 is( $BS_CLASS->_rel2rel("path/dir/file", "path/my"),
