@@ -18,6 +18,11 @@ debhelper (7.3.0) UNRELEASED; urgency=low
       Closes: #534332
     - Historical dh_auto_* behavior should be preserved despite these
       large changes..
+  * Move two move command-specific options to only be accepted by the commands
+    that use them. The options are:
+    --sourcedir, --destdir
+  * If any third-party debhelper commands use either of the above options,
+    they will be broken, and need to be changed to pass options to init().
 
  -- Joey Hess <joeyh@debian.org>  Mon, 20 Apr 2009 16:26:08 -0400
 

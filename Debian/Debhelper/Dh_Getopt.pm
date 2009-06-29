@@ -121,10 +121,6 @@ sub getoptions {
 		"A" => \$dh{PARAMS_ALL},
 		"all" => \$dh{PARAMS_ALL},
 	
-		"sourcedir=s" => \$dh{SOURCEDIR},
-		
-		"destdir=s" => \$dh{DESTDIR},
-		
 		"priority=s" => \$dh{PRIORITY},
 		
 		"h|help" => \&showhelp,
