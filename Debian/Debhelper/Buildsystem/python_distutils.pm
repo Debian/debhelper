@@ -73,6 +73,8 @@ sub pre_building_step {
 		# Distutils reads $HOME/.pydistutils.cfg
 		$ENV{HOME} = Cwd::abs_path($this->get_buildpath());
 	}
+
+	$this->SUPER::pre_building_step($step);
 }
 
 sub setup_py {
