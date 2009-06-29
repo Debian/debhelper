@@ -38,7 +38,7 @@ sub configure {
 	push @flags, "-DCMAKE_VERBOSE_MAKEFILE=ON";
 
 	$this->mkdir_builddir();
-	$this->doit_in_builddir("cmake", $this->get_source_rel2builddir(), @flags);
+	$this->doit_in_builddir("cmake", $this->get_source_rel2builddir(), @flags, @_);
 }
 
 1
