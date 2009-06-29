@@ -338,7 +338,9 @@ sub rmdir_builddir {
 			# empty parent directories until the source directory level.
 			if (not File::Spec->file_name_is_absolute($buildpath)) {
 				while (($peek=pop(@spdir)) && $peek ne '.' && $peek ne '..') {
-					last if ! rmdir($this->get_sourcepath(File::Spec->catdir(@spdir, $peek)));
+					my $dir = $this->get_sourcepath(File::Spec->catdir(@spdir, $peek));
+					verbose_print("rmdir $dir");
+					last if ! rmdir($dir);
 				}
 			}
 		}
