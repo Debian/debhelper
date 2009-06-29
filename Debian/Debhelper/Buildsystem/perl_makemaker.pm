@@ -61,4 +61,4 @@ sub install {
 	$this->SUPER::install($destdir, "PREFIX=/usr", @_);
 }
 
-1;
+1

@@ -91,16 +91,16 @@ sub _set_builddir {
 	}
 }
 
-# This instance method is called to check if the build system is capable
+# This instance method is called to check if the build system is able
 # to auto build a source package. Additional argument $step describes
 # which operation the caller is going to perform (either configure,
 # build, test, install or clean). You must override this method for the
 # build system module to be ever picked up automatically. This method is
 # used in conjuction with @Dh_Buildsystems::BUILDSYSTEMS.
 #
-# This method is supposed to be called with source root directory being
-# working directory. Use $this->get_buildpath($path) method to get full
-# path to the files in the build directory.
+# This method is supposed to be called inside the source root directory.
+# Use $this->get_buildpath($path) method to get full path to the files
+# in the build directory.
 sub check_auto_buildable {
 	my $this=shift;
 	my ($step) = @_;
@@ -257,7 +257,7 @@ sub _cd {
 	}
 }
 
-# Changes working directory to the source directory (if needed)
+# Changes working directory to the source directory (if needed),
 # calls doit(@_) and changes working directory back to the top
 # directory.
 sub doit_in_sourcedir {
@@ -374,4 +374,4 @@ sub clean {
 	my $this=shift;
 }
 
-1;
+1

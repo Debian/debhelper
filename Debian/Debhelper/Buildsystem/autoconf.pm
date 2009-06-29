@@ -52,4 +52,4 @@ sub configure {
 	$this->doit_in_builddir($this->get_source_rel2builddir("configure"), @opts, @_);
 }
 
-1;
+1

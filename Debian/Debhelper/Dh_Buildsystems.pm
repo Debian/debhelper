@@ -87,7 +87,7 @@ sub load_all_buildsystems {
 		}
 	}
 
-	# Push standard debhelper build systems first
+	# Standard debhelper build systems first
 	for my $name (@BUILDSYSTEMS) {
 		error("standard debhelper build system '$name' could not be found/loaded")
 		    if not exists $buildsystems{$name};
@@ -131,8 +131,7 @@ sub buildsystems_list {
 
 	# List build systems (including auto and specified status)
 	my ($auto, $specified);
-	my @buildsystems = load_all_buildsystems();
-	for my $inst (@buildsystems) {
+	for my $inst (load_all_buildsystems()) {
 		my $is_specified = defined $opt_buildsys && $opt_buildsys eq $inst->NAME();
 		if (! defined $specified && defined $opt_buildsys && $opt_buildsys eq $inst->NAME()) {
 			$specified = $inst->NAME();
@@ -177,4 +176,4 @@ sub buildsystems_do {
 	return 0;
 }
 
-1;
+1

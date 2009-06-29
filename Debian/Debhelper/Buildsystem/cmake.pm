@@ -42,4 +42,4 @@ sub configure {
 	$this->doit_in_builddir("cmake", $this->get_source_rel2builddir(), @flags);
 }
 
-1;
+1

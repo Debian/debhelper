@@ -64,4 +64,4 @@ sub clean {
 	$this->do_perl("Build", "--allow_mb_mismatch", 1, "distclean", @_);
 }
 
-1;
+1

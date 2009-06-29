@@ -111,4 +111,4 @@ sub clean {
 	$this->doit_in_sourcedir('find', '.', '-name', '*.pyc', '-exec', 'rm', '{}', ';');
 }
 
-1;
+1
