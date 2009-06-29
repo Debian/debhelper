@@ -57,13 +57,13 @@ sub process_stdout {
 }
 
 ### Test Buildsystem class API methods
-is( $BS_CLASS->_canonpath("path/to/the/./nowhere/../../somewhere"),
-    "path/to/somewhere", "_canonpath no1" );
-is( $BS_CLASS->_canonpath("path/to/../forward/../../somewhere"),
-    "somewhere","_canonpath no2" );
-is( $BS_CLASS->_canonpath("path/to/../../../somewhere"),
-    "../somewhere","_canonpath no3" );
-is( $BS_CLASS->_canonpath("./"), ".", "_canonpath no4" );
+is( $BS_CLASS->canonpath("path/to/the/./nowhere/../../somewhere"),
+    "path/to/somewhere", "canonpath no1" );
+is( $BS_CLASS->canonpath("path/to/../forward/../../somewhere"),
+    "somewhere","canonpath no2" );
+is( $BS_CLASS->canonpath("path/to/../../../somewhere"),
+    "../somewhere","canonpath no3" );
+is( $BS_CLASS->canonpath("./"), ".", "canonpath no4" );
 is( $BS_CLASS->_rel2rel("path/my/file", "path/my"),
     "file", "_rel2rel no1" );
 is( $BS_CLASS->_rel2rel("path/dir/file", "path/my"),

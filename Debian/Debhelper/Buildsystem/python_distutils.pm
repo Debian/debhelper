@@ -18,7 +18,7 @@ sub DESCRIPTION {
 
 sub DEFAULT_BUILD_DIRECTORY {
 	my $this=shift;
-	return $this->_canonpath($this->get_sourcepath("build"));
+	return $this->canonpath($this->get_sourcepath("build"));
 }
 
 sub new {

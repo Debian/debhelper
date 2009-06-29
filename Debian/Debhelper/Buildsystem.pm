@@ -84,7 +84,7 @@ sub _set_builddir {
 
 	# Canonicalize. If build directory ends up the same as source directory, drop it
 	if (defined $this->{builddir}) {
-		$this->{builddir} = $this->_canonpath($this->{builddir});
+		$this->{builddir} = $this->canonpath($this->{builddir});
 		if ($this->{builddir} eq $this->get_sourcedir()) {
 			$this->{builddir} = undef;
 		}
@@ -149,7 +149,7 @@ sub enforce_out_of_source_building {
 # Enhanced version of File::Spec::canonpath. It collapses ..
 # too so it may return invalid path if symlinks are involved.
 # On the other hand, it does not need for the path to exist.
-sub _canonpath {
+sub canonpath {
 	my ($this, $path)=@_;
 	my @canon;
 	my $back=0;
