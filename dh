@@ -179,6 +179,16 @@ sequence addons like this:
 	%:
 		dh --with quilt $@
 
+Here is an example of overriding where the dh_auto_* commands find
+the package's source, for a package where the source is located in a
+subdirectory. It also forces use of perl's Module::Build build system,
+which can be necessary if debhelper wrongly detects that the package
+uses MakeMaker.
+
+	#!/usr/bin/make -f
+	%:
+		dh --sourcedirectory=src --buildsystem=perl_build $@
+
 =cut
 
 # Stash this away before init modifies it.
