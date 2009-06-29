@@ -89,6 +89,7 @@ sub _set_builddir {
 			$this->{builddir} = undef;
 		}
 	}
+	return $this->{builddir};
 }
 
 # This instance method is called to check if the build system is able
@@ -117,23 +118,32 @@ sub enforce_in_source_building {
 	}
 }
 
-# Derived class can call this method in its constructor to enforce
-# out of source building even if the user didn't request it. However,
-# if 'builddir' named parameter is passed, accept its value as the
-# build directory even if it matches the source directory (meaning out
-# of source is only prefered to in source, not enforced).
-sub enforce_out_of_source_building {
+# Derived class can call this method in its constructor to *prefer*
+# out of source building. Unless build directory has already been
+# specified building will proceed in the DEFAULT_BUILD_DIRECTORY or
+# the one specified in the 'builddir' named parameter (which may
+# match the source directory). Typically you should pass @_ from
+# the constructor to this call.
+sub prefer_out_of_source_building {
 	my $this=shift;
 	my %args=@_;
 	if (!defined $this->get_builddir()) {
-		$this->_set_builddir($args{builddir});
-		if (!defined $this->get_builddir() && !$args{builddir}) {
+		if (!$this->_set_builddir($args{builddir}) && !$args{builddir}) {
 			# If we are here, DEFAULT_BUILD_DIRECTORY matches
 			# the source directory, building might fail.
 			error("default build directory is the same as the source directory." .
 			      " Please specify a custom build directory");
 		}
 	}
+}
+
+# Derived class can call this method in its constructor to *enforce*
+# out of source building even if the user didn't request it.
+# Build directory is set to DEFAULT_BUILD_DIRECTORY or building
+# fails if it is not possible to set it
+sub enforce_out_of_source_building {
+	my $this=shift;
+	$this->prefer_out_of_source_building();
 }
 
 # Enhanced version of File::Spec::canonpath. It collapses ..

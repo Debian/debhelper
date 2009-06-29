@@ -25,7 +25,7 @@ sub new {
 	my $class=shift;
 	my $this=$class->SUPER::new(@_);
 	# Out of source tree building is prefered.
-	$this->enforce_out_of_source_building(@_);
+	$this->prefer_out_of_source_building(@_);
 	return $this;
 }
 
