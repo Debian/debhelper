@@ -57,16 +57,16 @@ sub new {
 	my ($class, %opts)=@_;
 
 	my $this = bless({ sourcedir => '.',
-	                   builddir => undef, }, $class);
+	                   builddir => undef,
+	                   cwd => Cwd::getcwd() }, $class);
 
 	if (exists $opts{sourcedir}) {
 		# Get relative sourcedir abs_path (without symlinks)
-		my $curdir = Cwd::getcwd();
 		my $abspath = Cwd::abs_path($opts{sourcedir});
-		if (! -d $abspath || $abspath !~ /^\Q$curdir\E/) {
+		if (! -d $abspath || $abspath !~ /^\Q$this->{cwd}\E/) {
 			error("invalid or non-existing path to the source directory: ".$opts{sourcedir});
 		}
-		$this->{sourcedir} = File::Spec->abs2rel($abspath, $curdir);
+		$this->{sourcedir} = File::Spec->abs2rel($abspath, $this->{cwd});
 	}
 	if (exists $opts{builddir}) {
 		$this->_set_builddir($opts{builddir});
@@ -79,17 +79,27 @@ sub new {
 # unset the build directory.
 sub _set_builddir {
 	my $this=shift;
-	my $builddir=shift;
-	$this->{builddir} = ($builddir) ? $builddir : $this->DEFAULT_BUILD_DIRECTORY;
+	my $builddir=shift || $this->DEFAULT_BUILD_DIRECTORY;
 
-	# Canonicalize. If build directory ends up the same as source directory, drop it
-	if (defined $this->{builddir}) {
-		$this->{builddir} = $this->canonpath($this->{builddir});
-		if ($this->{builddir} eq $this->get_sourcedir()) {
-			$this->{builddir} = undef;
+	if (defined $builddir) {
+		$builddir = $this->canonpath($builddir); # Canonicalize
+
+		# Sanitize $builddir
+		if ($builddir =~ m#^\.\./#) {
+			# We can't handle those as relative. Make them absolute
+			$builddir = File::Spec->catdir($this->{cwd}, $builddir);
+		}
+		elsif ($builddir =~ /\Q$this->{cwd}\E/) {
+			$builddir = File::Spec::abs2rel($builddir, $this->{cwd});
+		}
+
+		# If build directory ends up the same as source directory, drop it
+		if ($builddir eq $this->get_sourcedir()) {
+			$builddir = undef;
 		}
 	}
-	return $this->{builddir};
+	$this->{builddir} = $builddir;
+	return $builddir;
 }
 
 # This instance method is called to check if the build system is able
@@ -167,16 +177,23 @@ sub canonpath {
 	return (@canon + $back > 0) ? join('/', ('..')x$back, @canon) : '.';
 }
 
-# Given both $path and $base are relative to the same directory,
-# converts and returns path of $path being relative the $base.
+# Given both $path and $base are relative to the $root, converts and
+# returns path of $path being relative to the $base. If either $path or
+# $base is absolute, returns another $path (converted to) absolute.
 sub _rel2rel {
 	my ($this, $path, $base, $root)=@_;
-	$root = "/tmp" if !defined $root;
-	
-	return File::Spec->abs2rel(
-	    File::Spec->rel2abs($path, $root),
-	    File::Spec->rel2abs($base, $root)
-	);
+	$root = $this->{cwd} unless defined $root;
+
+	if (File::Spec->file_name_is_absolute($path)) {
+		return $path;
+	} elsif (File::Spec->file_name_is_absolute($base)) {
+		return File::Spec->rel2abs($path, $root);
+	} else {
+		return File::Spec->abs2rel(
+			File::Spec->rel2abs($path, $root),
+			File::Spec->rel2abs($base, $root)
+		);
+	}
 }
 
 # Get path to the source directory
@@ -274,10 +291,9 @@ sub doit_in_sourcedir {
 	my $this=shift;
 	if ($this->get_sourcedir() ne '.') {
 		my $sourcedir = $this->get_sourcedir();
-		my $curdir = Cwd::getcwd();
 		$this->_cd($sourcedir);
 		doit(@_);
-		$this->_cd($this->_rel2rel($curdir, $sourcedir, $curdir));
+		$this->_cd($this->_rel2rel($this->{cwd}, $sourcedir));
 	}
 	else {
 		doit(@_);
@@ -292,10 +308,9 @@ sub doit_in_builddir {
 	my $this=shift;
 	if ($this->get_buildpath() ne '.') {
 		my $buildpath = $this->get_buildpath();
-		my $curdir = Cwd::getcwd();
 		$this->_cd($buildpath);
 		doit(@_);
-		$this->_cd($this->_rel2rel($curdir, $buildpath, $curdir));
+		$this->_cd($this->_rel2rel($this->{cwd}, $buildpath));
 	}
 	else {
 		doit(@_);
@@ -319,10 +334,12 @@ sub rmdir_builddir {
 				doit("rm", "-rf", $buildpath);
 				pop @spdir;
 			}
-			# If build directory had 2 or more levels, delete empty
-			# parent directories until the source directory level.
-			while (($peek=pop(@spdir)) && $peek ne '.' && $peek ne '..') {
-				last if ! rmdir($this->get_sourcepath(File::Spec->catdir(@spdir, $peek)));
+			# If build directory is relative and had 2 or more levels, delete
+			# empty parent directories until the source directory level.
+			if (not File::Spec->file_name_is_absolute($buildpath)) {
+				while (($peek=pop(@spdir)) && $peek ne '.' && $peek ne '..') {
+					last if ! rmdir($this->get_sourcepath(File::Spec->catdir(@spdir, $peek)));
+				}
 			}
 		}
 		return 1;
