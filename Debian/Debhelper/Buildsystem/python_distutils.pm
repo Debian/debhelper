@@ -64,6 +64,8 @@ sub pre_building_step {
 	# --build-base can only be passed to the build command. However,
 	# it is always read from the config file (really weird design).
 	# Therefore create such a cfg config file.
+	# See http://bugs.python.org/issue818201
+	#     http://bugs.python.org/issue1011113
 	if ($this->get_buildpath() ne $this->DEFAULT_BUILD_DIRECTORY()) {
 		not $this->not_our_cfg() or
 		    error("cannot set custom build directory: .pydistutils.cfg is in use");
