@@ -462,7 +462,7 @@ sub run {
 		$override_command=$command;
 		# This passes the options through to commands called
 		# inside the target.
-		$ENV{DH_INTERNAL_OPTIONS}=join(" ", @options);
+		$ENV{DH_INTERNAL_OPTIONS}=join("\x1e", @options);
 		$command="debian/rules";
 		@options="override_".$override_command;
 	}

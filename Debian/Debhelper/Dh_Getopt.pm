@@ -168,7 +168,7 @@ sub parseopts {
 	# DH_INTERNAL_OPTIONS is used to pass additional options from
 	# dh through an override target to a command.
 	if (defined $ENV{DH_INTERNAL_OPTIONS}) {
-		@ARGV_extra=split_options_string($ENV{DH_INTERNAL_OPTIONS});
+		@ARGV_extra=split(/\x1e/, $ENV{DH_INTERNAL_OPTIONS});
 		getoptions(\@ARGV_extra, $options);
 
 		# Avoid forcing acting on packages specified in
