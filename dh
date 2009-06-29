@@ -197,6 +197,11 @@ my @ARGV_orig=@ARGV;
 # python-support is enabled by default, at least for now
 # (and comes first so python-central loads later and can disable it).
 unshift @ARGV, "--with=python-support";
+		
+# Disable complaints about unknown options for both dh and the commands
+# it runs. This is done because dh accepts and passes on options that may
+# be specific to only some debhelper commands.
+$ENV{DH_IGNORE_UNKNOWN_OPTIONS}=1;
 
 init(options => {
 	"until=s" => \$dh{UNTIL},

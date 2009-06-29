@@ -72,8 +72,14 @@ sub NonOption {
 sub getoptions {
 	my $array=shift;
 	my %options=%{shift()} if ref $_[0];
+	
+	my $oldwarn;
+	if ($ENV{DH_IGNORE_UNKNOWN_OPTIONS}) {
+		$oldwarn=$SIG{__WARN__};
+		$SIG{__WARN__}=sub {};
+	}
 
-	Getopt::Long::GetOptionsFromArray($array,
+	my $ret=Getopt::Long::GetOptionsFromArray($array,
 		"v" => \$dh{VERBOSE},
 		"verbose" => \$dh{VERBOSE},
 
@@ -136,7 +142,15 @@ sub getoptions {
 		%options,
 
 		"<>" => \&NonOption,
-	)
+	);
+
+	if ($ENV{DH_IGNORE_UNKNOWN_OPTIONS}) {
+		$SIG{__WARN__}=$oldwarn;
+		return 1;
+	}
+	else {
+		return $ret;
+	}
 }
 
 sub split_options_string {
@@ -155,11 +169,7 @@ sub parseopts {
 	# dh through an override target to a command.
 	if (defined $ENV{DH_INTERNAL_OPTIONS}) {
 		@ARGV_extra=split_options_string($ENV{DH_INTERNAL_OPTIONS});
-		# Unknown options will be silently ignored.
-		my $oldwarn=$SIG{__WARN__};
-		$SIG{__WARN__}=sub {};
 		getoptions(\@ARGV_extra, $options);
-		$SIG{__WARN__}=$oldwarn;
 
 		# Avoid forcing acting on packages specified in
 		# DH_INTERNAL_OPTIONS. This way, -p can be specified
