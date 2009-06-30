@@ -147,15 +147,6 @@ sub prefer_out_of_source_building {
 	}
 }
 
-# Derived class can call this method in its constructor to *enforce*
-# out of source building even if the user didn't request it.
-# Build directory is set to DEFAULT_BUILD_DIRECTORY or building
-# fails if it is not possible to set it
-sub enforce_out_of_source_building {
-	my $this=shift;
-	$this->prefer_out_of_source_building();
-}
-
 # Enhanced version of File::Spec::canonpath. It collapses ..
 # too so it may return invalid path if symlinks are involved.
 # On the other hand, it does not need for the path to exist.
