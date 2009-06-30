@@ -186,9 +186,11 @@ sub _rel2rel {
 
 	if (File::Spec->file_name_is_absolute($path)) {
 		return $path;
-	} elsif (File::Spec->file_name_is_absolute($base)) {
+	}
+	elsif (File::Spec->file_name_is_absolute($base)) {
 		return File::Spec->rel2abs($path, $root);
-	} else {
+	}
+	else {
 		return File::Spec->abs2rel(
 			File::Spec->rel2abs($path, $root),
 			File::Spec->rel2abs($base, $root)
