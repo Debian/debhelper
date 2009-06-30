@@ -320,20 +320,20 @@ sub rmdir_builddir {
 	my $only_empty=shift;
 	if ($this->get_builddir()) {
 		my $buildpath = $this->get_buildpath();
-		if (-d $buildpath && ! $dh{NO_ACT}) {
-			my @spdir = File::Spec->splitdir($this->get_build_rel2sourcedir());
+		if (-d $buildpath) {
+			my @dir = File::Spec->splitdir($this->get_build_rel2sourcedir());
 			my $peek;
-			if (!$only_empty) {
+			if (not $only_empty) {
 				doit("rm", "-rf", $buildpath);
-				pop @spdir;
+				pop @dir;
 			}
 			# If build directory is relative and had 2 or more levels, delete
-			# empty parent directories until the source directory level.
+			# empty parent directories until the source or top directory level.
 			if (not File::Spec->file_name_is_absolute($buildpath)) {
-				while (($peek=pop(@spdir)) && $peek ne '.' && $peek ne '..') {
-					my $dir = $this->get_sourcepath(File::Spec->catdir(@spdir, $peek));
-					verbose_print("rmdir $dir");
-					last if ! rmdir($dir);
+				while (($peek=pop @dir) && $peek ne '.' && $peek ne '..') {
+					my $dir = $this->get_sourcepath(File::Spec->catdir(@dir, $peek));
+					doit("rmdir", "--ignore-fail-on-non-empty", $dir);
+					last if -d $dir;
 				}
 			}
 		}
