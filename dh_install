@@ -147,7 +147,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			my @found = glob "$srcdir/$glob";
 			if (! compat(6)) {
 				# Fall back to looking in debian/tmp.
-				if (! @found || ! -e $found[0]) {
+				if (! @found || ! (-e $found[0] || -l $found[0])) {
 					@found = glob "debian/tmp/$glob";
 				}
 			}
