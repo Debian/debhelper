@@ -29,6 +29,17 @@ debhelper (7.3.0) UNRELEASED; urgency=low
 
  -- Joey Hess <joeyh@debian.org>  Mon, 20 Apr 2009 16:26:08 -0400
 
+debhelper (7.2.19) unstable; urgency=low
+
+  * dh_install: Handle correctly the case where a glob expands to
+    a dangling symlink, installing the dangling link as requested.
+    Closes: #534565
+  * dh_install: Fix fallback use of debian/tmp in v7 mode; a bug caused
+    it to put files inside a debian/tmp directory in the package build
+    directory, now that prefix is stripped. (See #534565)
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 30 Jun 2009 12:56:52 -0400
+
 debhelper (7.2.18) unstable; urgency=low
 
   * dh_shlibdeps: Ensure DEBIAN directory exists, as dpkg-shlibdeps
@@ -50,7 +61,7 @@ debhelper (7.2.17) unstable; urgency=low
     the new system also requires they have START-INFO-DIR-ENTRY and
     END-INFO-DIR-ENTRY for proper registration. I assume there will be
     some mass bug filing for any packages that do not have that.
-    Closes: #528864, #357434
+    Closes: #534639, #357434
 
  -- Joey Hess <joeyh@debian.org>  Fri, 26 Jun 2009 09:02:51 -0400
 
