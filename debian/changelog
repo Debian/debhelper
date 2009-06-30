@@ -3,6 +3,9 @@ debhelper (7.2.19) UNRELEASED; urgency=low
   * dh_install: Handle correctly the case where a glob expands to
     a dangling symlink, installing the dangling link as requested.
     Closes: #534565
+  * dh_install: Fix use of debian/tmp in v7 mode; a bug caused it to
+    put files inside a debian/tmp directory in the package build directory,
+    now that prefix is stripped. (See #534565)
 
  -- Joey Hess <joeyh@debian.org>  Tue, 30 Jun 2009 12:46:22 -0400
 
