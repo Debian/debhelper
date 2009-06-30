@@ -113,7 +113,7 @@ init(options => {
 my @installed;
 
 my $srcdir = '.';
-$srcdir = $dh{SOURCEDIR}."/" if defined $dh{SOURCEDIR};
+$srcdir = $dh{SOURCEDIR} if defined $dh{SOURCEDIR};
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
@@ -147,7 +147,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			my @found = glob "$srcdir/$glob";
 			if (! compat(6)) {
 				# Fall back to looking in debian/tmp.
-				if (! @found || ! -e $found[0]) {
+				if (! @found || ! (-e $found[0] || -l $found[0])) {
 					@found = glob "debian/tmp/$glob";
 				}
 			}
@@ -166,11 +166,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			if (! defined $dest) {
 				# Guess at destination directory.
 				$dest=$src;
-				my $strip=$srcdir;
-				if ($strip eq '.') {
-					$strip = "debian/tmp";
-				}
-				$dest=~s/^(.*\/)?\Q$strip\E//;
+				$dest=~s/^(.*\/)?(\Q$srcdir\E|debian\/tmp)\///;
 				$dest=dirname($dest);
 				$tmpdest=1;
 			}
