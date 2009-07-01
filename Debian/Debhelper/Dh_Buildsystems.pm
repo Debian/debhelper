@@ -139,7 +139,7 @@ sub buildsystems_list {
 		elsif (! defined $auto && ! $inst->{thirdparty} && $inst->check_auto_buildable($step)) {
 			$auto = $inst->NAME();
 		}
-		printf("%s - %s", $inst->NAME(), $inst->DESCRIPTION());
+		printf("%-20s %s", $inst->NAME(), $inst->DESCRIPTION());
 		print " [3rd party]" if $inst->{thirdparty};
 		print "\n";
 	}
