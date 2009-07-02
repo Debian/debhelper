@@ -171,7 +171,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				# Guess at destination directory.
 				$dest=$src;
 				$dest=~s/^(.*\/)?(\Q$srcdir\E|debian\/tmp)\///;
-				$dest=dirname($dest);
+				$dest=dirname("/".$dest);
 				$tmpdest=1;
 			}
 			
