@@ -44,9 +44,11 @@ build: version
 			prog=`basename $$file | sed 's/.pod//'`; \
 			$(POD2MAN) $$file $$prog.$$lang.1; \
 		done; \
-		cat $$dir/debhelper.pod | \
-			$(MAKEMANLIST) `find $$dir -type f -maxdepth 1 -name "dh_*.pod" | sort` | \
-			$(POD2MAN) --name="debhelper" --section=7 > debhelper.$$lang.7; \
+		if [ -e $$dir/debhelper.pod ]; then \
+			cat $$dir/debhelper.pod | \
+				$(MAKEMANLIST) `find $$dir -type f -maxdepth 1 -name "dh_*.pod" | sort` | \
+				$(POD2MAN) --name="debhelper" --section=7 > debhelper.$$lang.7; \
+		fi; \
 	done
 
 version:
