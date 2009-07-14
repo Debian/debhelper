@@ -17,13 +17,13 @@ our @EXPORT=qw(&buildsystems_init &buildsystems_do &load_buildsystem &load_all_b
 # Historical order must be kept for backwards compatibility. New
 # build systems MUST be added to the END of the list.
 our @BUILDSYSTEMS = (
-    "autoconf",
-    "perl_makemaker",
-    "makefile",
-    "python_distutils",
-    "perl_build",
-    "cmake",
-    "ant",
+	"autoconf",
+	"perl_makemaker",
+	"makefile",
+	"python_distutils",
+	"perl_build",
+	"cmake",
+	"ant",
 );
 
 my $opt_buildsys;
