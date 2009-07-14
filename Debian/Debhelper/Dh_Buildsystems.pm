@@ -23,6 +23,7 @@ our @BUILDSYSTEMS = (
     "python_distutils",
     "perl_build",
     "cmake",
+    "ant",
 );
 
 my $opt_buildsys;
