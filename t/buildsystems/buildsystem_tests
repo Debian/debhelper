@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 227;
+use Test::More tests => 228;
 
 use strict;
 use warnings;
@@ -19,7 +19,6 @@ use_ok( 'Debian::Debhelper::Dh_Buildsystems' );
 
 my $TOPDIR = "../..";
 my @STEPS = qw(configure build test install clean);
-my @BUILDSYSTEMS = qw(autoconf perl_makemaker makefile python_distutils perl_build cmake);
 my $BS_CLASS = 'Debian::Debhelper::Buildsystem';
 
 my ($bs, @bs, %bs);
@@ -188,7 +187,8 @@ test_buildsystem_paths_api($bs, "builddir=../bld/dir, sourcedir=autoconf", \%tmp
 ### Test if all buildsystems can be loaded
 @bs = load_all_buildsystems([ $INC[0] ]);
 @tmp = map { $_->NAME() } @bs;
-is_deeply( \@tmp, \@BUILDSYSTEMS, "load_all_buildsystems() loads all built-in buildsystems" );
+ok(@Debian::Debhelper::Dh_Buildsystems::BUILDSYSTEMS >= 1, "some build systems are built in" );
+is_deeply( \@tmp, \@Debian::Debhelper::Dh_Buildsystems::BUILDSYSTEMS, "load_all_buildsystems() loads all built-in buildsystems" );
 
 ### Test check_auto_buildable() of each buildsystem
 sub test_check_auto_buildable {
