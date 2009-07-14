@@ -47,6 +47,14 @@ debhelper (7.3.0) experimental; urgency=low
 
  -- Joey Hess <joeyh@debian.org>  Wed, 01 Jul 2009 15:31:20 -0400
 
+debhelper (7.2.22) unstable; urgency=low
+
+  * dh_install: Fix support for the case where --sourcedir=debian/tmp/foo
+    is used. Perl was not being greedy enough and the 'foo' was not stripped
+    from the destination directory in this unusual case. Closes: #537017
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 14 Jul 2009 17:08:25 -0400
+
 debhelper (7.2.21) unstable; urgency=low
 
   * Add a versioned dep on perl-base, to get a version that supports
