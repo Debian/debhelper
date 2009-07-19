@@ -83,6 +83,12 @@ sub dbg_build_needed {
 	my $this=shift;
 	my $act=shift;
 
+	# Return a list of python-dbg package which are listed
+	# in the build-dependencies. This is kinda ugly, but building
+	# dbg extensions without checking if they're supposed to be
+	# built may result in various FTBFS if the package is not
+	# built in a clean chroot.
+
 	my @dbg;
 	open (CONTROL,  $this->get_sourcepath('debian/control')) ||
 		error("cannot read debian/control: $!\n");
@@ -116,7 +122,7 @@ sub setup_py {
         my @python_requested = split ' ', `pyversions -r 2>/dev/null`;
 	if (grep /^$python_default/, @python_requested) {
 		@python_requested = ("python", grep(!/^$python_default/,
-					@python_requested);
+					@python_requested));
 	}
         my @dbg_build_needed = $this->dbg_build_needed();
 
@@ -125,10 +131,11 @@ sub setup_py {
 			$this->doit_in_sourcedir($python, "setup.py", $act, @_);
 		}
 		$python = $python . "-dbg";
-		if (grep /^(python-all-dbg|$python)/, @dbg_build_needed) {
+		if ((grep /^(python-all-dbg|$python)/, @dbg_build_needed)
+			or (($python eq "python-dbg")
+				and (grep /^$python_default/, @dbg_build_needed))){
 			$this->doit_in_sourcedir($python, "setup.py", $act, @_);
 		}
-
 	}
 }
 
