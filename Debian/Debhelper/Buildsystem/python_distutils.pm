@@ -79,6 +79,31 @@ sub pre_building_step {
 	$this->SUPER::pre_building_step($step);
 }
 
+sub dbg_build_needed {
+	my $this=shift;
+	my $act=shift;
+
+	# Return a list of python-dbg package which are listed
+	# in the build-dependencies. This is kinda ugly, but building
+	# dbg extensions without checking if they're supposed to be
+	# built may result in various FTBFS if the package is not
+	# built in a clean chroot.
+
+	my @dbg;
+	open (CONTROL,  $this->get_sourcepath('debian/control')) ||
+		error("cannot read debian/control: $!\n");
+	foreach my $builddeps (join('', <CONTROL>) =~ 
+			/^Build-Depends[^:]*:.*\n(?:^[^\w\n].*\n)*/gmi) {
+		foreach ($builddeps =~ /(python[^, ]*-dbg)/g) {
+			push @dbg, $1;
+		}
+	}
+
+	close CONTROL;
+	return @dbg;
+
+}
+
 sub setup_py {
 	my $this=shift;
 	my $act=shift;
@@ -86,14 +111,29 @@ sub setup_py {
 	# We need to to run setup.py with the default python first
 	# as distutils/setuptools modifies the shebang lines of scripts.
 	# This ensures that #!/usr/bin/python is used and not pythonX.Y
+	# Take into account that the default Python must not be in
+	# the requested Python versions.
 	# Then, run setup.py with each available python, to build
-	# extensions for each.
-	my $python_default = `pyversions -d`;
-	$python_default =~ s/^\s+//;
-	$python_default =~ s/\s+$//;
-	foreach my $python ("python", grep(!/^$python_default/,
-				(split ' ', `pyversions -r 2>/dev/null`))) {
+        # extensions for each.
+
+        my $python_default = `pyversions -d`;
+        $python_default =~ s/^\s+//;
+        $python_default =~ s/\s+$//;
+        my @python_requested = split ' ', `pyversions -r 2>/dev/null`;
+	if (grep /^$python_default/, @python_requested) {
+		@python_requested = ("python", grep(!/^$python_default/,
+					@python_requested));
+	}
+        my @dbg_build_needed = $this->dbg_build_needed();
+
+	foreach my $python (@python_requested) {
 		if (-x "/usr/bin/".$python) {
+			$this->doit_in_sourcedir($python, "setup.py", $act, @_);
+		}
+		$python = $python . "-dbg";
+		if ((grep /^(python-all-dbg|$python)/, @dbg_build_needed)
+			or (($python eq "python-dbg")
+				and (grep /^$python_default/, @dbg_build_needed))){
 			$this->doit_in_sourcedir($python, "setup.py", $act, @_);
 		}
 	}
