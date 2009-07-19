@@ -124,19 +124,22 @@ sub setup_py {
 		@python_requested = ("python", grep(!/^\Q$python_default\E/,
 					@python_requested));
 	}
-        my @dbg_build_needed = $this->dbg_build_needed();
 
-	foreach my $python (@python_requested) {
+	my @python_dbg;
+        my @dbg_build_needed = $this->dbg_build_needed();
+	foreach my $python (map { $_."-dbg" } @python_requested) {
+		if (grep /^(python-all-dbg|\Q$python\E)/, @dbg_build_needed) {
+			push @python_dbg, $python;
+		}
+		elsif (($python eq "python-dbg")
+		       and (grep /^\Q$python_default\E/, @dbg_build_needed)) {
+			push @python_dbg, $python_default."-dbg";
+		}
+	}
+
+	foreach my $python (@python_requested, @python_dbg) {
 		if (-x "/usr/bin/".$python) {
 			$this->doit_in_sourcedir($python, "setup.py", $act, @_);
-		}
-		$python = $python . "-dbg";
-		if (grep /^(python-all-dbg|\Q$python\E)/, @dbg_build_needed) {
-			$this->doit_in_sourcedir($python, "setup.py", $act, @_);
-		} elsif (($python eq "python-dbg")
-			and (grep /^$python_default/, @dbg_build_needed)) {
-			$this->doit_in_sourcedir($python_default."-dbg",
-				"setup.py", $act, @_);
 		}
 	}
 }
