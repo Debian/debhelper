@@ -131,10 +131,12 @@ sub setup_py {
 			$this->doit_in_sourcedir($python, "setup.py", $act, @_);
 		}
 		$python = $python . "-dbg";
-		if ((grep /^(python-all-dbg|$python)/, @dbg_build_needed)
-			or (($python eq "python-dbg")
-				and (grep /^$python_default/, @dbg_build_needed))){
+		if (grep /^(python-all-dbg|$python)/, @dbg_build_needed) {
 			$this->doit_in_sourcedir($python, "setup.py", $act, @_);
+		} elsif (($python eq "python-dbg")
+			and (grep /^$python_default/, @dbg_build_needed)) {
+			$this->doit_in_sourcedir($python_default."-dbg",
+				"setup.py", $act, @_);
 		}
 	}
 }
