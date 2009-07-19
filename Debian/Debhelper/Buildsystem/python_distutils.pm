@@ -79,21 +79,52 @@ sub pre_building_step {
 	$this->SUPER::pre_building_step($step);
 }
 
+sub dbg_build_needed {
+	my $this=shift;
+	my $act=shift;
+
+	my @dbg;
+	open (CONTROL,  $this->get_sourcepath('debian/control')) ||
+		error("cannot read debian/control: $!\n");
+	foreach my $builddeps (join('', <CONTROL>) =~ /^Build-Depends[^:]*:.*\n(?:^[^\w\n].*\n)*/gmi) {
+		foreach ($builddeps =~ /(python[^, ]*-dbg)/g) {
+			push @dbg, $1;
+		}
+	}
+
+	close CONTROL;
+	return @dbg;
+
+}
+
 sub setup_py {
 	my $this=shift;
 	my $act=shift;
+
 	my $python_default = `pyversions -d`;
 	$python_default =~ s/^\s+//;
 	$python_default =~ s/\s+$//;
+	my $python_requested = split ' ', `pyversions -r 2>/dev/null`;
+	my @dbg_build_needed = $this->dbg_build_needed();
 
 	# We need to to run setup.py with the default python first
 	# as distutils/setuptools modifies the shebang lines of scripts.
 	# This ensures that #!/usr/bin/python is used and not pythonX.Y
-	$this->doit_in_sourcedir("python", "setup.py", $act, @_);
-	for my $python (grep(!/^$python_default/, (split ' ', `pyversions -r 2>/dev/null`))) {
+	if (grep /^$python_default/, $python_requested) {
+		$this->doit_in_sourcedir("python", "setup.py", $act, @_);
+	}
+	if (grep /^(python-all-dbg|python-dbg)/, $dbg_build_needed) {
+		$this->doit_in_sourcedir("python-dbg", "setup.py", $act, @_);
+	}
+	for my $python (grep !/^$python_default/, $python_requested) {
 		if (-x "/usr/bin/" . $python) {
 			$this->doit_in_sourcedir($python, "setup.py", $act, @_);
 		}
+		$python = $python . "-dbg";
+		if (grep /^(python-all-dbg|$python)/, @dbg_build_needed) {
+			$this->doit_in_sourcedir($python, "setup.py", $act, @_);
+		}
+
 	}
 }
 
