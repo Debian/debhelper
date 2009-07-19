@@ -90,11 +90,11 @@ sub dbg_build_needed {
 	# built in a clean chroot.
 
 	my @dbg;
-	open (CONTROL,  $this->get_sourcepath('debian/control')) ||
+	open (CONTROL, 'debian/control') ||
 		error("cannot read debian/control: $!\n");
 	foreach my $builddeps (join('', <CONTROL>) =~ 
 			/^Build-Depends[^:]*:.*\n(?:^[^\w\n].*\n)*/gmi) {
-		foreach ($builddeps =~ /(python[^, ]*-dbg)/g) {
+		while ($builddeps =~ /(python[^, ]*-dbg)/g) {
 			push @dbg, $1;
 		}
 	}
@@ -120,8 +120,8 @@ sub setup_py {
         $python_default =~ s/^\s+//;
         $python_default =~ s/\s+$//;
         my @python_requested = split ' ', `pyversions -r 2>/dev/null`;
-	if (grep /^$python_default/, @python_requested) {
-		@python_requested = ("python", grep(!/^$python_default/,
+	if (grep /^\Q$python_default\E/, @python_requested) {
+		@python_requested = ("python", grep(!/^\Q$python_default\E/,
 					@python_requested));
 	}
         my @dbg_build_needed = $this->dbg_build_needed();
@@ -131,9 +131,9 @@ sub setup_py {
 			$this->doit_in_sourcedir($python, "setup.py", $act, @_);
 		}
 		$python = $python . "-dbg";
-		if ((grep /^(python-all-dbg|$python)/, @dbg_build_needed)
-			or (($python eq "python-dbg")
-				and (grep /^$python_default/, @dbg_build_needed))){
+		if ((grep /^(python-all-dbg|\Q$python\E)/, @dbg_build_needed)
+		    or (($python eq "python-dbg") and
+		        (grep /^$python_default/, @dbg_build_needed))) {
 			$this->doit_in_sourcedir($python, "setup.py", $act, @_);
 		}
 	}
