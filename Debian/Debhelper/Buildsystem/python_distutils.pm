@@ -82,13 +82,15 @@ sub pre_building_step {
 sub setup_py {
 	my $this=shift;
 	my $act=shift;
-	my $python_default = `pyversions -d`;
-	$python_default =~ s/^\s+//;
-	$python_default =~ s/\s+$//;
 
 	# We need to to run setup.py with the default python first
 	# as distutils/setuptools modifies the shebang lines of scripts.
 	# This ensures that #!/usr/bin/python is used and not pythonX.Y
+	# Then, run setup.py with each available python, to build
+	# extensions for each.
+	my $python_default = `pyversions -d`;
+	$python_default =~ s/^\s+//;
+	$python_default =~ s/\s+$//;
 	foreach my $python ("python", grep(!/^$python_default/,
 				(split ' ', `pyversions -r 2>/dev/null`))) {
 		if (-x "/usr/bin/".$python) {
