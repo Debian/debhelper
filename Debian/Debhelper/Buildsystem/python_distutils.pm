@@ -82,7 +82,19 @@ sub pre_building_step {
 sub setup_py {
 	my $this=shift;
 	my $act=shift;
+	my $python_default = `pyversions -d`;
+	$python_default =~ s/^\s+//;
+	$python_default =~ s/\s+$//;
+
+	# We need to to run setup.py with the default python first
+	# as distutils/setuptools modifies the shebang lines of scripts.
+	# This ensures that #!/usr/bin/python is used and not pythonX.Y
 	$this->doit_in_sourcedir("python", "setup.py", $act, @_);
+	for my $python (grep(!/^$python_default/, (split ' ', `pyversions -r 2>/dev/null`))) {
+		if (-x "/usr/bin/" . $python) {
+			$this->doit_in_sourcedir($python, "setup.py", $act, @_);
+		}
+	}
 }
 
 sub build {
