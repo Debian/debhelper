@@ -58,7 +58,17 @@ sub configure {
 sub install {
 	my $this=shift;
 	my $destdir=shift;
-	$this->SUPER::install($destdir, "PREFIX=/usr", @_);
+
+	# Special case for Makefile.PL that uses
+	# Module::Build::Compat. PREFIX should not be passed
+	# for those; it already installs into /usr by default.
+	my $makefile=$this->get_sourcepath("Makefile");
+	if (system(qq{grep -q "generated automatically by MakeMaker" $makefile}) != 0) {
+		$this->SUPER::install($destdir, @_);
+	}
+	else {
+		$this->SUPER::install($destdir, "PREFIX=/usr", @_);
+	}
 }
 
 1
