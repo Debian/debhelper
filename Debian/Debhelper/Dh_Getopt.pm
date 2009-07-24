@@ -72,8 +72,14 @@ sub NonOption {
 sub getoptions {
 	my $array=shift;
 	my %options=%{shift()} if ref $_[0];
+	
+	my $oldwarn;
+	if ($ENV{DH_IGNORE_UNKNOWN_OPTIONS}) {
+		$oldwarn=$SIG{__WARN__};
+		$SIG{__WARN__}=sub {};
+	}
 
-	Getopt::Long::GetOptionsFromArray($array,
+	my $ret=Getopt::Long::GetOptionsFromArray($array,
 		"v" => \$dh{VERBOSE},
 		"verbose" => \$dh{VERBOSE},
 
@@ -121,10 +127,6 @@ sub getoptions {
 		"A" => \$dh{PARAMS_ALL},
 		"all" => \$dh{PARAMS_ALL},
 	
-		"sourcedir=s" => \$dh{SOURCEDIR},
-		
-		"destdir=s" => \$dh{DESTDIR},
-		
 		"priority=s" => \$dh{PRIORITY},
 		
 		"h|help" => \&showhelp,
@@ -140,7 +142,21 @@ sub getoptions {
 		%options,
 
 		"<>" => \&NonOption,
-	)
+	);
+
+	if ($ENV{DH_IGNORE_UNKNOWN_OPTIONS}) {
+		$SIG{__WARN__}=$oldwarn;
+		return 1;
+	}
+	else {
+		return $ret;
+	}
+}
+
+sub split_options_string {
+	my $str=shift;
+	$str=~s/^\s+//;
+	return split(/\s+/,$str);
 }
 
 # Parse options and set %dh values.
@@ -152,15 +168,8 @@ sub parseopts {
 	# DH_INTERNAL_OPTIONS is used to pass additional options from
 	# dh through an override target to a command.
 	if (defined $ENV{DH_INTERNAL_OPTIONS}) {
-		$ENV{DH_INTERNAL_OPTIONS}=~s/^\s+//;
-		$ENV{DH_INTERNAL_OPTIONS}=~s/\s+$//;
-		@ARGV_extra=split(/\s+/,$ENV{DH_INTERNAL_OPTIONS});
-
-		# Unknown options will be silently ignored.
-		my $oldwarn=$SIG{__WARN__};
-		$SIG{__WARN__}=sub {};
+		@ARGV_extra=split(/\x1e/, $ENV{DH_INTERNAL_OPTIONS});
 		getoptions(\@ARGV_extra, $options);
-		$SIG{__WARN__}=$oldwarn;
 
 		# Avoid forcing acting on packages specified in
 		# DH_INTERNAL_OPTIONS. This way, -p can be specified
@@ -184,9 +193,7 @@ sub parseopts {
 	# to be parsed like @ARGV, but with unknown options
 	# skipped.
 	if (defined $ENV{DH_OPTIONS}) {
-		$ENV{DH_OPTIONS}=~s/^\s+//;
-		$ENV{DH_OPTIONS}=~s/\s+$//;
-		@ARGV_extra=split(/\s+/,$ENV{DH_OPTIONS});
+		@ARGV_extra=split_options_string($ENV{DH_OPTIONS});
 		my $ret=getoptions(\@ARGV_extra, $options);
 		if (!$ret) {
 			warning("warning: ignored unknown options in DH_OPTIONS");

@@ -7,26 +7,30 @@ dh_auto_test - automatically runs a package's test suites
 =cut
 
 use strict;
-use Debian::Debhelper::Dh_Lib;
+use Debian::Debhelper::Dh_Buildsystems;
 
 =head1 SYNOPSIS
 
-B<dh_auto_test> [S<I<debhelper options>>] [S<B<--> I<params>>]
+B<dh_auto_test> [S<I<build system options>>] [S<I<debhelper options>>] [S<B<--> I<params>>]
 
 =head1 DESCRIPTION
 
 dh_auto_test is a debhelper program that tries to automatically run a
-package's test suite. If there's a Makefile and it contains a "test"
-or "check" target, then this is  done by running make (or MAKE, if the
-environment variable is set). If the test suite fails, the command will
-exit nonzero. If there's no test suite, it will exit zero without doing
-anything.
+package's test suite. It does so by running the appropriate command for the
+build system it detects the package uses. For example, if there's a
+Makefile and it contains a "test" or "check" target, then this is  done by
+running make (or MAKE, if the environment variable is set). If the test
+suite fails, the command will exit nonzero. If there's no test suite, it
+will exit zero without doing anything.
 
 This is intended to work for about 90% of packages with a test suite. If it
 doesn't work, you're encouraged to skip using dh_auto_test at all, and
 just run the test suite manually.
 
 =head1 OPTIONS
+
+See L<debhelper(7)/BUILD SYSTEM OPTIONS> for a list of common build
+system selection and control options.
 
 =over 4
 
@@ -44,29 +48,12 @@ tests will be performed.
 
 =cut
 
-init();
-
 if (defined $ENV{DEB_BUILD_OPTIONS} && $ENV{DEB_BUILD_OPTIONS} =~ /nocheck/) {
 	exit 0;
 }
 
-if (-e "Makefile" || -e "makefile" || -e "GNUmakefile") {
-	$ENV{MAKE}="make" unless exists $ENV{MAKE};
-	foreach my $target (qw{test check}) {
-		# Use make -n to check to see if the target would do
-		# anything. There's no good way to test if a target exists.
-		my $ret=`$ENV{MAKE} -s -n $target 2>/dev/null`;
-		chomp $ret;
-		if (length $ret) {
-			doit($ENV{MAKE}, $target, @{$dh{U_PARAMS}});
-			last;
-		}
-	}
-}
-elsif (-e "Build.PL" && -e "Build") {
-	$ENV{MODULEBUILDRC} = "/dev/null";
-	doit(qw/perl Build test/, @{$dh{U_PARAMS}});
-}
+buildsystems_init();
+buildsystems_do();
 
 =head1 SEE ALSO
 

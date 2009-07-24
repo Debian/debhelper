@@ -8,18 +8,22 @@ dh_auto_install - automatically runs make install or similar
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+use Debian::Debhelper::Dh_Buildsystems;
 use Cwd;
 
 =head1 SYNOPSIS
 
-B<dh_auto_install> [S<I<debhelper options>>] [S<B<--> I<params>>]
+B<dh_auto_install> [S<I<build system options>>] [S<I<debhelper options>>] [S<B<--> I<params>>]
 
 =head1 DESCRIPTION
 
 dh_auto_install is a debhelper program that tries to automatically install
-built files. If there's a Makefile and it contains a "install" target,
-then this is done by running make (or MAKE, if the environment variable is
-set). If there is a setup.py or Build.PL, it is used.
+built files. It does so by running the appropriate command for the build
+system it detects the package uses. For example, if there's a Makefile and
+it contains a "install" target, then this is done by running make (or MAKE,
+if the environment variable is set). If there is a setup.py or Build.PL,
+it is used. Note that the Ant build system does not support installation,
+so dh_auto_install will not install files built using Ant.
 
 The files are installed into debian/<package>/ if there is only one binary
 package. In the multiple binary package case, the files are instead
@@ -36,6 +40,9 @@ dh_auto_install at all, and just run make install manually.
 
 =head1 OPTIONS
 
+See L<debhelper(7)/BUILD SYSTEM OPTIONS> for a list of common build
+system selection and control options.
+
 =over 4
 
 =item B<--> I<params>
@@ -47,7 +54,7 @@ or override the any standard parameters that dh_auto_install passes.
 
 =cut
 
-init();
+buildsystems_init();
 
 my $destdir;
 my @allpackages=getpackages();
@@ -59,41 +66,7 @@ else {
 }
 $destdir=cwd()."/".$destdir;
 
-if (-e "Makefile" || -e "makefile" || -e "GNUmakefile") {
-	$ENV{MAKE}="make" unless exists $ENV{MAKE};
-	my @params="DESTDIR=$destdir";
-
-	# Special case for MakeMaker generated Makefiles.
-	if (-e "Makefile" &&
-	    system('grep -q "generated automatically by MakeMaker" Makefile') == 0) {
-		push @params, "PREFIX=/usr";
-	}
-
-	foreach my $target (qw{install}) {
-		# Use make -n to check to see if the target would do
-		# anything. There's no good way to test if a target exists.
-		my $ret=`$ENV{MAKE} -s -n $target 2>/dev/null`;
-		chomp $ret;
-		if (length $ret) {
-			doit($ENV{MAKE}, $target,
-				@params,
-				@{$dh{U_PARAMS}});
-			last;
-		}
-	}
-}
-elsif (-e "setup.py") {
-	doit("python", "setup.py", "install", 
-		"--root=$destdir",
-		"--no-compile", "-O0",
-		"--install-layout=deb",
-		@{$dh{U_PARAMS}});
-}
-elsif (-e "Build.PL" && -e "Build") {
-	$ENV{MODULEBUILDRC} = "/dev/null";
-	doit("perl", "Build", "install", "destdir=$destdir",
-		"create_packlist=0", @{$dh{U_PARAMS}});
-}
+buildsystems_do("install", $destdir);
 
 =head1 SEE ALSO
 

@@ -174,6 +174,50 @@ in ALL packages acted on, not just the first.
 
 =back
 
+=head1 BUILD SYSTEM OPTIONS
+
+The following command line options are supported by all of the dh_auto_*
+debhelper programs. These programs support a variety of build systems,
+and normally heuristically determine which to use, and how to use them.
+You can use these command line options to override the default behavior.
+
+=over 4
+
+=item B<-S>I<buildsystem>, B<--buildsystem=>I<buildsystem>
+
+Force use of the specified I<buildsystem>, instead of trying to auto-select
+one which might be applicable for the package.
+
+=item B<-D>I<directory>, B<--sourcedirectory=>I<directory>
+
+Assume that the original package source tree is at the specified
+I<directory> rather than the top level directory of the Debian
+source package tree.
+
+=item B<-B>[I<directory>], B<--builddirectory>=[I<directory>]
+
+Enable out of source building and use the specified I<directory> as the build
+directory. If I<directory> parameter is omitted, a default build directory
+will chosen.
+
+If this option is not specified, building will be done in source by default
+unless the build system requires or prefers out of source tree building.
+In such a case, the default build directory will be used even if
+L<--builddirectory> is not specified.
+
+If the build system prefers out of source tree building but still
+allows in source building, the latter can be re-enabled by passing a build
+directory path that is the same as the source directory path.
+
+=item B<--list>, B<-l>
+
+List all build systems supported by debhelper on this system. The list
+includes both default and third party build systems (marked as such). Also
+shows which build system would be automatically selected, or which one
+is manually specified with the I<--buildsystem> option.
+
+=back
+
 =head1 NOTES
 
 =head2 Multiple binary package support

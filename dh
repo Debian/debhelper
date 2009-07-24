@@ -179,6 +179,16 @@ sequence addons like this:
 	%:
 		dh --with quilt $@
 
+Here is an example of overriding where the dh_auto_* commands find
+the package's source, for a package where the source is located in a
+subdirectory. It also forces use of perl's Module::Build build system,
+which can be necessary if debhelper wrongly detects that the package
+uses MakeMaker.
+
+	#!/usr/bin/make -f
+	%:
+		dh --sourcedirectory=src --buildsystem=perl_build $@
+
 =cut
 
 # Stash this away before init modifies it.
@@ -187,6 +197,11 @@ my @ARGV_orig=@ARGV;
 # python-support is enabled by default, at least for now
 # (and comes first so python-central loads later and can disable it).
 unshift @ARGV, "--with=python-support";
+		
+# Disable complaints about unknown options for both dh and the commands
+# it runs. This is done because dh accepts and passes on options that may
+# be specific to only some debhelper commands.
+$ENV{DH_IGNORE_UNKNOWN_OPTIONS}=1;
 
 init(options => {
 	"until=s" => \$dh{UNTIL},
@@ -447,7 +462,7 @@ sub run {
 		$override_command=$command;
 		# This passes the options through to commands called
 		# inside the target.
-		$ENV{DH_INTERNAL_OPTIONS}=join(" ", @options);
+		$ENV{DH_INTERNAL_OPTIONS}=join("\x1e", @options);
 		$command="debian/rules";
 		@options="override_".$override_command;
 	}
