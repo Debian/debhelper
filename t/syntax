@@ -2,7 +2,7 @@
 use Test;
 
 my @progs=grep { -x $_ } glob("dh_*"), "dh";
-my @libs=glob("Debian/Debhelper/*.pm");
+my @libs=(glob("Debian/Debhelper/*.pm"), glob("Debian/Debhelper/*/*.pm"));
 
 plan(tests => (@progs + @libs));
 

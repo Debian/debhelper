@@ -7,24 +7,28 @@ dh_auto_build - automatically builds a package
 =cut
 
 use strict;
-use Debian::Debhelper::Dh_Lib;
+use Debian::Debhelper::Dh_Buildsystems;
 
 =head1 SYNOPSIS
 
-B<dh_auto_build> [S<I<debhelper options>>] [S<B<--> I<params>>]
+B<dh_auto_build> [S<I<build system options>>] [S<I<debhelper options>>] [S<B<--> I<params>>]
 
 =head1 DESCRIPTION
 
-dh_auto_build is a debhelper program that tries to automatically
-build a package. If a Makefile is found, this is done by running make (or
-MAKE, if the environment variable is set).
-If there's a setup.py, or Build.PL, it is run to build the package.
+dh_auto_build is a debhelper program that tries to automatically build a
+package. It does so by running the appropriate command for the build system
+it detects the package uses. For example, if a Makefile is found, this is
+done by running make (or MAKE, if the environment variable is set). If
+there's a setup.py, or Build.PL, it is run to build the package.
 
 This is intended to work for about 90% of packages. If it doesn't work,
 you're encouraged to skip using dh_auto_build at all, and just run the
 build process manually.
 
 =head1 OPTIONS
+
+See L<debhelper(7)/BUILD SYSTEM OPTIONS> for a list of common build
+system selection and control options.
 
 =over 4
 
@@ -37,18 +41,8 @@ or override any standard parameters that dh_auto_build passes.
 
 =cut
 
-init();
-
-if (-e "Makefile" || -e "makefile" || -e "GNUmakefile") {
-	doit(exists $ENV{MAKE} ? $ENV{MAKE} : "make", @{$dh{U_PARAMS}});
-}
-elsif (-e "setup.py") {
-	doit("python", "setup.py", "build", @{$dh{U_PARAMS}});
-}
-elsif (-e "Build.PL" && -e "Build") {
-	$ENV{MODULEBUILDRC} = "/dev/null";
-	doit("perl", "Build", @{$dh{U_PARAMS}});
-}
+buildsystems_init();
+buildsystems_do();
 
 =head1 SEE ALSO
 

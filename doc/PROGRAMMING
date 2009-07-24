@@ -120,8 +120,6 @@ switch		variable	description
 				those processed here), will apply to all 
 				binary packages the program acts on, not just
 				the first
---sourcedir	SOURCEDIR	will be set to a string
---destdir	DESTDIR		will be set to a string
 --priority	PRIORITY	will be set to a number
 --mainpackage	MAINPACKAGE	controls which package is treated as the
 				main package to act on
@@ -250,13 +248,13 @@ write_log($cmd, $package ...)
 	Writes the log files for the specified package(s), adding
 	the cmd to the end.
 
-Sequence Addons
+Sequence Addons:
 ---------------
 
 The dh(1) command has a --with <addon> parameter that ca be used to load
-a sequence addon named Debian::Debhelper::Sequence::<addon>. 
-These addons can add/remove commands to the dh command sequences, by calling
-some functions from Dh_Lib:
+a sequence addon module named Debian::Debhelper::Sequence::<addon>. 
+These modules can add/remove commands to the dh command sequences, by
+calling some functions from Dh_Lib:
 
 insert_before($existing_command, $new_command)
 	Insert $new_command in sequences before $existing_command
@@ -266,5 +264,21 @@ insert_after($existing_command, $new_command)
 
 remove_command($existing_command)
 	Remove $existing_command from the list of commands to run.
+
+Buildsystem Classes:
+-------------------
+
+The dh_auto_* commands are frontends that use debhelper buildsystem
+classes. These classes have names like Debian::Debhelper::Buildsystem::foo,
+and are derived from Debian::Debhelper::Buildsystem, or other, related
+classes.
+
+A buildsystem class needs to inherit or define these methods: DESCRIPTION,
+check_auto_buildable, configure, build, test, install, clean. See the comments
+inside Debian::Debhelper::Buildsystem for details. Note that this interface
+is still subject to change.
+
+Note that third-party buildsystems will not automatically be used by default,
+but can be forced to be used via the --buildsystem parameter.
 
 -- Joey Hess <joeyh@debian.org>

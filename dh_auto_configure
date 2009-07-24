@@ -7,25 +7,31 @@ dh_auto_configure - automatically configure a package prior to building
 =cut
 
 use strict;
-use Debian::Debhelper::Dh_Lib;
+use Debian::Debhelper::Dh_Buildsystems;
 
 =head1 SYNOPSIS
 
-B<dh_auto_configure> [S<I<debhelper options>>] [S<B<--> I<params>>]
+B<dh_auto_configure> [S<I<build system options>>] [S<I<debhelper options>>] [S<B<--> I<params>>]
 
 =head1 DESCRIPTION
 
 dh_auto_configure is a debhelper program that tries to automatically
-configure a package prior to building. It looks for and runs a ./configure
-script, Makefile.PL, or Build.PL. A standard set of parameters is
-determined and passed to the program that is run. If no program to run is
-found, dh_auto_configure will exit without doing anything.
+configure a package prior to building. It does so by running the
+appropriate command for the build system it detects the package uses.
+For example, it looks for and runs a ./configure script, Makefile.PL,
+Build.PL, or cmake. A standard set of parameters is determined and passed
+to the program that is run. Some build systems, such as make, do not
+need a configure step; for these dh_auto_configure will exit without
+doing anything.
 
 This is intended to work for about 90% of packages. If it doesn't work,
 you're encouraged to skip using dh_auto_configure at all, and just run
 ./configure or its equivalent manually.
 
 =head1 OPTIONS
+
+See L<debhelper(7)/BUILD SYSTEM OPTIONS> for a list of common build
+system selection and control options.
 
 =over 4
 
@@ -41,67 +47,8 @@ or override those parameters. For example:
 
 =cut
 
-init();
-
-sub dpkg_architecture_value {
-	my $var=shift;
-	my $value=`dpkg-architecture -q$var 2>/dev/null` || error("dpkg-architecture failed");
-	chomp $value;
-	return $value;
-}
-
-sub sourcepackage {
-	open (CONTROL, 'debian/control') ||
-		error("cannot read debian/control: $!\n");
-	while (<CONTROL>) {
-		chomp;
-		s/\s+$//;
-		if (/^Source:\s*(.*)/) {
-			close CONTROL;
-			return $1;
-		}
-	}
-
-	close CONTROL;
-	error("could not find Source: line in control file.");
-}
-
-if (-x "configure") {
-	# Standard set of options for configure.
-	my @opts;
-	push @opts, "--build=".dpkg_architecture_value("DEB_BUILD_GNU_TYPE");
-	push @opts, "--prefix=/usr";
-	push @opts, "--includedir=\${prefix}/include";
-	push @opts, "--mandir=\${prefix}/share/man";
-	push @opts, "--infodir=\${prefix}/share/info";
-	push @opts, "--sysconfdir=/etc";
-	push @opts, "--localstatedir=/var";
-	push @opts, "--libexecdir=\${prefix}/lib/".sourcepackage();
-	push @opts, "--disable-maintainer-mode";
-	push @opts, "--disable-dependency-tracking";
-	# Provide --host only if different from --build, as recommended in
-	# autotools-dev README.Debian: When provided (even if equal) autotools
-	# 2.52+ switches to cross-compiling mode.
-	if (dpkg_architecture_value("DEB_BUILD_GNU_TYPE") ne dpkg_architecture_value("DEB_HOST_GNU_TYPE")) {
-		push @opts, "--host=".dpkg_architecture_value("DEB_HOST_GNU_TYPE");
-	}
-	doit("./configure", @opts, @{$dh{U_PARAMS}});
-}
-elsif (-e "Makefile.PL") {
-	# If set to a true value then MakeMaker's prompt function will
-	# always return the default without waiting for user input.
-	$ENV{PERL_MM_USE_DEFAULT}=1;
-	# This prevents  Module::Install from interactive behavior.
-	$ENV{PERL_AUTOINSTALL}="--skipdeps";
-
-	doit("perl", "Makefile.PL", "INSTALLDIRS=vendor",
-		"create_packlist=0", @{$dh{U_PARAMS}});
-}
-elsif (-e "Build.PL") {
-	$ENV{PERL_MM_USE_DEFAULT}=1; # Module::Build can also use this.
-	$ENV{MODULEBUILDRC} = "/dev/null";
-	doit("perl", "Build.PL", "installdirs=vendor", @{$dh{U_PARAMS}});
-}
+buildsystems_init();
+buildsystems_do();
 
 =head1 SEE ALSO
 

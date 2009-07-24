@@ -1,3 +1,86 @@
+debhelper (7.3.7) unstable; urgency=low
+
+  * First upload of buildsystems support to unstable.
+    Summary: Adds --buildsystem (modular, OO buildsystem classes),
+    --sourcedirectory, --builddirectory, and support for cmake
+    and ant.
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 24 Jul 2009 12:07:47 +0200
+
+debhelper (7.3.6) experimental; urgency=low
+
+  * perl_makemaker: Re-add fix for #496157, lost in rewrite.
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 23 Jul 2009 18:17:45 +0200
+
+debhelper (7.3.5) experimental; urgency=low
+
+  [ Bernd Zeimetz ]
+  * python_distutils buildsystem: Build for all supported Python
+    versions that are installed. Ensure that correct shebangs are
+    created by using `python' first during build and install.
+    Closes: #520834
+    Also build with python*-dbg if the package build-depends
+    on them.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 20 Jul 2009 20:30:22 +0200
+
+debhelper (7.3.4) experimental; urgency=low
+
+  * Merged debhelper 7.2.24.
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 15 Jul 2009 09:50:37 -0400
+
+debhelper (7.3.3) experimental; urgency=low
+
+  * Add ant buildsystem support. Closes: #537021
+  * Merged debhelper 7.2.22.
+
+ -- Joey Hess <joeyh@debian.org>  Tue, 14 Jul 2009 17:16:28 -0400
+
+debhelper (7.3.2) experimental; urgency=low
+
+  * Merged debhelper 7.2.21.
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 08 Jul 2009 21:23:48 -0400
+
+debhelper (7.3.1) experimental; urgency=low
+
+  * Merged debhelper 7.2.20.
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 02 Jul 2009 12:28:55 -0400
+
+debhelper (7.3.0) experimental; urgency=low
+
+  * Modular object oriented dh_auto_* buildsystem support,
+    contributed by Modestas Vainius
+    - dh_auto_* --sourcedirectory can now be used to specify a source
+      directory if sources and/or the whole buildsystem lives elsewhere
+      than the top level directory. Closes: #530597
+    - dh_auto_* --builddirectory can now be used to specify a build
+      directory to use for out of source building, for build systems
+      that support it. Closes: #480577
+    - dh_auto_* --buildsystem can now be used to override the autodetected
+      build system, or force use of a third-party class.
+    - dh_auto_* --list can be used to list available and selected build
+      systems.
+    - Adds support for cmake.
+    - For the perl_build build system, Build is used consistently
+      instead of falling back to using the generated Makefile.
+      Closes: #534332
+    - Historical dh_auto_* behavior should be preserved despite these
+      large changes..
+  * Move two more command-specific options to only be accepted by the commands
+    that use them. The options are:
+    --sourcedir, --destdir
+    If any third-party debhelper commands use either of the above options,
+    they will be broken, and need to be changed to pass options to init().
+  * Make dh not complain about unknown, command-specific options passed to it,
+    and further suppress warnings about such options it passes on to debhelper
+    commands. This was attempted incompletely before in version 7.2.17.
+
+ -- Joey Hess <joeyh@debian.org>  Wed, 01 Jul 2009 15:31:20 -0400
+
 debhelper (7.2.24) unstable; urgency=low
 
   * dh_install: Add test suite covering the last 5 bugs.

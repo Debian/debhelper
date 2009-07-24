@@ -48,6 +48,38 @@ directory (or whereever you've told it to look using --sourcedir).
 
 =over 4
 
+=item B<--list-missing>
+
+This option makes dh_install keep track of the files it installs, and then at
+the end, compare that list with the files in the source directory. If any of
+the files (and symlinks) in the source directory were not installed to
+somewhere, it will warn on stderr about that.
+
+This may be useful if you have a large package and want to make sure that
+you don't miss installing newly added files in new upstream releases.
+
+Note that files that are excluded from being moved via the -X option are not
+warned about.
+
+=item B<--fail-missing>
+
+This option is like --list-missing, except if a file was missed, it will
+not only list the missing files, but also fail with a nonzero exit code. 
+
+=item B<-Xitem>, B<--exclude=item>
+
+Exclude files that contain "item" anywhere in their filename from
+being installed.
+
+=item B<--sourcedir=dir>
+
+Look in the specified directory for files to be installed.
+
+Note that this is not the same as the --sourcedirectory option used
+by the dh_auto_* commands. You rarely need to use this option, since
+dh_install automatically looks for files in debian/tmp in debhelper
+compatibility level 7 and above.
+
 =item B<--autodest>
 
 Guess as the destination directory to install things to. If this is
@@ -66,35 +98,6 @@ itself in a
 debian/package.install file, with no explicit destination, then dh_install
 will automatically guess the destination even if this flag is not set.
 
-=item B<--fail-missing>
-
-This option is like --list-missing, except if a file was missed, it will
-not only list the missing files, but also fail with a nonzero exit code. 
-
-=item B<--list-missing>
-
-This option makes dh_install keep track of the files it installs, and then at
-the end, compare that list with the files in the source directory. If any of
-the files (and symlinks) in the source directory were not installed to
-somewhere, it will warn on stderr about that.
-
-This may be useful if you have a large package and want to make sure that
-you don't miss installing newly added files in new upstream releases.
-
-Note that files that are excluded from being moved via the -X option are not
-warned about.
-
-=item B<--sourcedir=dir>
-
-Makes all files to be installed be found under dir. If this is
-specified, it is akin to all the filenames having "dir/" prepended
-to them.
-
-=item B<-Xitem>, B<--exclude=item>
-
-Exclude files that contain "item" anywhere in their filename from
-being installed.
-
 =item I<file [...] dest>
 
 Lists files (or directories) to install and where to install them to.
@@ -108,6 +111,7 @@ init(options => {
 	"autodest" => \$dh{AUTODEST},
 	"list-missing" => \$dh{LIST_MISSING},
 	"fail-missing" => \$dh{FAIL_MISSING},
+	"sourcedir=s" => \$dh{SOURCEDIR},	
 });
 
 my @installed;
