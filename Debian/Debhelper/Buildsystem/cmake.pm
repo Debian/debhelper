@@ -34,7 +34,6 @@ sub configure {
 
 	# Standard set of cmake flags
 	push @flags, "-DCMAKE_INSTALL_PREFIX=/usr";
-	push @flags, "-DCMAKE_SKIP_RPATH=ON";
 	push @flags, "-DCMAKE_VERBOSE_MAKEFILE=ON";
 
 	$this->mkdir_builddir();
