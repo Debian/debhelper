@@ -61,7 +61,9 @@ sub install {
 
 sub clean {
 	my $this=shift;
-	$this->do_perl("Build", "--allow_mb_mismatch", 1, "distclean", @_);
+	if (-f "Build") {
+		$this->do_perl("Build", "--allow_mb_mismatch", 1, "distclean", @_);
+	}
 }
 
 1
