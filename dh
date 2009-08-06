@@ -322,6 +322,11 @@ sub remove_command {
 	}
 	
 }
+sub add_command {
+	my $command=shift;
+	my $sequence=shift;
+	unshift @{$sequences{$sequence}}, $command;
+}
 foreach my $addon (@{$dh{WITH}}) {
 	my $mod="Debian::Debhelper::Sequence::$addon";
 	$mod=~s/-/_/g;
