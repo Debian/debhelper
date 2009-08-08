@@ -115,9 +115,6 @@ sub setup_py {
 	# the requested Python versions.
 	# Then, run setup.py with each available python, to build
 	# extensions for each.
-	# To allow backports of debhelper we don't pass
-	# --install-layout=deb to 'setup.py install` for those Python
-	# versions where the option is ignored by distutils/setuptools.
 
         my $python_default = `pyversions -d`;
         $python_default =~ s/^\s+//;
@@ -142,6 +139,10 @@ sub setup_py {
 
 	foreach my $python (@python_requested, @python_dbg) {
 		if (-x "/usr/bin/".$python) {
+			# To allow backports of debhelper we don't pass
+			# --install-layout=deb to 'setup.py install` for
+			# those Python versions where the option is
+			# ignored by distutils/setuptools.
 			if ( $act eq "install" and not
 			     ( ($python =~ /^python(?:-dbg)?$/
 			         and $python_default =~ /^python2.[2345]$/)
