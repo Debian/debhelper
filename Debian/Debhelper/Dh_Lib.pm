@@ -681,12 +681,6 @@ sub getpackages {
 	%package_arches=();
 	
 	$type="" if ! defined $type;
-	
-	# Look up the build arch if we need to.
-	my $buildarch='';
-	if ($type eq 'same') {
-		$buildarch=buildarch();
-	}
 
 	my $package="";
 	my $arch="";
@@ -724,7 +718,8 @@ sub getpackages {
 			if ($package &&
 			    (($type eq 'indep' && $arch eq 'all') ||
 			     ($type eq 'arch' && $arch ne 'all') ||
-			     ($type eq 'same' && ($arch eq 'any' || samearch($buildarch, $arch))) ||
+			     ($type eq 'same' && ($arch eq 'any' ||
+			                     samearch(buildarch(), $arch))) ||
 			     ! $type)) {
 				push @list, $package;
 				$package="";
