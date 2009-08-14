@@ -145,8 +145,8 @@ sub setup_py {
 			# ignored by distutils/setuptools.
 			if ( $act eq "install" and not
 			     ( ($python =~ /^python(?:-dbg)?$/
-			         and $python_default =~ /^python2.[2345]$/)
-			      or $python =~ /^python2.[2345](?:-dbg)?$/ )) {
+			         and $python_default =~ /^python2\.[2345]$/)
+			      or $python =~ /^python2\.[2345](?:-dbg)?$/ )) {
 				$this->doit_in_sourcedir($python, "setup.py",
 						$act, @_, "--install-layout=deb");
 			}
