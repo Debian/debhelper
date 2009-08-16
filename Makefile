@@ -25,7 +25,7 @@ VERSION=$(shell expr "`dpkg-parsechangelog |grep Version:`" : '.*Version: \(.*\)
 
 PERLLIBDIR=$(shell perl -MConfig -e 'print $$Config{vendorlib}')/Debian/Debhelper
 
-POD2MAN=pod2man -c Debhelper -r "$(VERSION)"
+POD2MAN=pod2man --utf8 -c Debhelper -r "$(VERSION)"
 
 # l10n to be built is determined from .po files
 LANGS=$(notdir $(basename $(wildcard man/po4a/po/*.po)))
