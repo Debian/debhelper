@@ -362,7 +362,7 @@ foreach my $addon (@{$dh{WITH}}) {
 	$mod=~s/-/_/g;
 	eval "use $mod";
 	if ($@) {
-		error("--with $addon not supported or failed to load module $mod");
+		error("unable to load addon $addon: $@");
 	}
 }
 
