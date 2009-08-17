@@ -60,9 +60,9 @@ directories by default.
 
 =head1 CONFORMS TO
 
-Debian policy, version 3.0.1
+Debian policy, version 3.8.3
 
-Perl policy, version 1.18
+Perl policy, version 1.20
 
 =cut
 
@@ -70,10 +70,6 @@ init();
 
 my $vendorlib = substr $Config{vendorlib}, 1;
 my $vendorarch = substr $Config{vendorarch}, 1;
-
-# the installation dir for arch-indep modules changed to
-# /usr/share/perl5 in this version:
-my $min_version = '5.6.0-16';
 
 # Cleaning the paths given on the command line
 foreach (@ARGV) {
@@ -124,9 +120,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			($version) = `dpkg -s $perl` =~ /^Version:\s*(\S+)/m
 				unless $version;
 			$version = ">= $version";
-		}
-		elsif ($deps & PM_MODULE) {
-			$version = ">= $min_version";
 		}
 		
 		# no need to depend on an un-versioned perl-base -- it's
