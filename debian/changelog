@@ -1,3 +1,21 @@
+debhelper (7.3.15) unstable; urgency=low
+
+  * dh_installudev: Install rules files into new location
+    /lib/udev/rules.d/
+  * dh_installudev: Add code to delete old conffiles unless
+    they're modified, and in that case, rename them to override
+    the corresponding file in /lib/udev. (Based on patch by
+    Martin Pitt.) (Note that this file will not be deleted on purge -- 
+    I can't see a good way to determine when it's appropriate to do
+    that.)
+  * dh_installudev: Set default priority to 60; dropping the "z".
+    If --priority=zNN is passed, treat that as priority NN.
+  * Above Closes: #491117
+  * dh_installudev: Drop code handling move of /etc/udev/foo into
+    /etc/udev/rules.d/.
+
+ -- Joey Hess <joeyh@debian.org>  Fri, 21 Aug 2009 17:22:08 -0400
+
 debhelper (7.3.14) unstable; urgency=low
 
   [ Colin Watson ]

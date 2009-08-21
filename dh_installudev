@@ -20,7 +20,7 @@ dh_installudev is a debhelper program that is responsible for
 installing udev rules files.
 
 Files named debian/package.udev will be installed in
-etc/udev/rules.d/ in the package build directory.
+lib/udev/rules.d/ in the package build directory.
 
 Code is added to the preinst and postinst to handle the upgrade from the
 old udev rules file location.
@@ -37,7 +37,7 @@ debian/package.udev.
 
 =item B<--priority=>I<priority>
 
-Sets the priority string of the rules.d symlink. Default is z60.
+Sets the priority string of the rules.d symlink. Default is 60.
 
 =item B<-n>, B<--noscripts>
 
@@ -55,11 +55,23 @@ instances of the same text to be added to maintainer scripts.
 
 init();
 
+# The priority used to look like z60_;
+# we need to calculate that old value to handle
+# conffile moves correctly.
+my $old_priority=$dh{PRIORITY};
+
+# In case a caller still uses the `z` prefix, remove it.
+if (defined $dh{PRIORITY}) {
+	$dh{PRIORITY}=~s/^z//;
+}
+
 if (! defined $dh{PRIORITY}) {
-	$dh{PRIORITY}="z60";
+	$dh{PRIORITY}="60";
+	$old_priority="z60";
 }
 if ($dh{PRIORITY}) {
-	$dh{PRIORITY}.="_";
+	$dh{PRIORITY}.="-";
+	$old_priority.="_";
 }
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -72,16 +84,19 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	$filename=~s/\.udev$/.rules/;
 
 	if ($rules_file) {
-		if (! -e "$tmp/etc/udev/rules.d") {
-			doit("install","-d","$tmp/etc/udev/rules.d");
+		if (! -e "$tmp/lib/udev/rules.d") {
+			doit("install","-d","$tmp/lib/udev/rules.d");
 		}
-		doit("install","-m","0644",$rules_file,"$tmp/etc/udev/rules.d/$dh{PRIORITY}$filename");
+		my $rule="/lib/udev/rules.d/$dh{PRIORITY}$filename";
+		doit("install","-m","0644",$rules_file,$tmp.$rule);
 		if (! $dh{NOSCRIPTS}) {
-			my $old="/etc/udev/$filename";
-			my $rule="/etc/udev/rules.d/$dh{PRIORITY}$filename";
-			autoscript($package,"preinst","preinst-moveconffile","s!#OLD#!$old!g;s!#PACKAGE#!$package!g");
+			# Remove old rule from /etc, unless it's modified,
+			# in which case we rename it to match the new
+			# file in /lib, so it will override.
+			my $old="/etc/udev/rules.d/$old_priority$filename";
+			$rule=~s/^\/lib/\/etc/;
+			autoscript($package,"preinst","preinst-moveconffile","s!#OLD#!$old!g;s!#NEW#!$rule!g;s!#PACKAGE#!$package!g");
 			autoscript($package,"postinst","postinst-moveconffile","s!#OLD#!$old!g;s!#NEW#!$rule!g");
-			autoscript($package,"preinst","preinst-udev","s!#RULE#!$rule!g");
 		}
 	}
 }
