@@ -200,7 +200,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# Parse the file to get the doc id.
 		open (IN, "debian/$fn") || die "Cannot read debian/$fn.";
 		while (<IN>) {
-			if (/^Document:\s+([-+.a-z0-9]+)/) {
+			s/\s*$//;
+			if (/^Document\s*:\s*(.*)/) {
 				$doc_ids{$fn}=$1;
 				last;
 			}
