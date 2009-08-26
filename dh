@@ -346,12 +346,7 @@ sub remove_command_options {
 		# Remove only specified options
 		if (my $opts = $command_opts{$command}) {
 			foreach my $opt (@_) {
-				if (ref($opt) eq "Regexp") {
-					$opts = [ grep ! /$opt/, @$opts ];
-				}
-				else {
-					$opts = [ grep { $_ ne $opt } @$opts ];
-				}
+				$opts = [ grep { $_ ne $opt } @$opts ];
 			}
 			$command_opts{$command} = $opts;
 		}
