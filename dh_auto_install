@@ -78,7 +78,7 @@ if (!$destdir) {
 		$destdir=tmpdir($dh{MAINPACKAGE});
 	}
 }
-$destdir = File::Spec->rel2abs($destdir, Cwd::cwd());
+$destdir = File::Spec->rel2abs($destdir, cwd());
 
 buildsystems_do("install", $destdir);
 
