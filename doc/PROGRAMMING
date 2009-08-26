@@ -270,6 +270,19 @@ add_command($new_command, $sequence)
 	Add $new_command to the beginning of the specified sequence.
 	If the sequence does not exist, it will be created.
 
+add_command_options($command, $opt1, $opt2, ...)
+	Append $opt1, $opt2 etc. to the list of additional options which
+	dh passes when running the specified $command. These options are
+	not relayed to debhelper commands called via $command override.
+
+remove_command_options($command)
+	Clear all additional $command options previously added with
+	add_command_options().
+
+remove_command_options($command, $opt1, $opt2, ...)
+	Remove $opt1, $opt2 etc. from the list of additional options which
+	dh passes when running the specified $command.
+
 Buildsystem Classes:
 -------------------
 

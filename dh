@@ -293,6 +293,9 @@ $sequences{binary} = [@{$sequences{install}}, qw{
 }, @b];
 $sequences{'binary-arch'} = [@{$sequences{binary}}];
 
+# Additional command options
+my %command_opts;
+
 # sequence addon interface
 sub _insert {
 	my $offset=shift;
@@ -332,6 +335,26 @@ sub add_command {
 	my $command=shift;
 	my $sequence=shift;
 	unshift @{$sequences{$sequence}}, $command;
+}
+sub add_command_options {
+	my $command=shift;
+	push @{$command_opts{$command}}, @_;
+}
+sub remove_command_options {
+	my $command=shift;
+	if (@_) {
+		# Remove only specified options
+		if (my $opts = $command_opts{$command}) {
+			foreach my $opt (@_) {
+				$opts = [ grep { $_ ne $opt } @$opts ];
+			}
+			$command_opts{$command} = $opts;
+		}
+	}
+	else {
+		# Clear all additional options
+		delete $command_opts{$command};
+	}
 }
 
 if ($dh{LIST}) {
@@ -500,6 +523,10 @@ sub run {
 		$ENV{DH_INTERNAL_OPTIONS}=join("\x1e", @options);
 		$command="debian/rules";
 		@options="override_".$override_command;
+	}
+	else {
+		# Pass additional command options if any
+		unshift @options, @{$command_opts{$command}} if exists $command_opts{$command};
 	}
 
 	# 3 space indent lines the command being run up under the 
