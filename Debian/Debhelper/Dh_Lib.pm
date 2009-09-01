@@ -630,10 +630,9 @@ sub dpkg_architecture_value {
 	my $os;
 
 	sub buildos {
-		return $os if defined $os;
-
-		$os=`dpkg-architecture -qDEB_HOST_ARCH_OS 2>/dev/null` || error("dpkg-architecture failed");
-		chomp $os;
+		if (!defined $os) {
+			$os=dpkg_architecture_value("DEB_HOST_ARCH_OS");
+		}
 		return $os;
 	}
 }
