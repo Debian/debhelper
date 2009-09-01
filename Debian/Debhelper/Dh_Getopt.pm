@@ -28,16 +28,13 @@ sub AddPackage { my($option,$value)=@_;
 		push @{$dh{DOPACKAGES}}, getpackages('indep');
 		$dh{DOINDEP}=1;
 	}
-	elsif ($option eq 'a' or $option eq 'arch') {
+	elsif ($option eq 'a' or $option eq 'arch' or
+	       $option eq 's' or $option eq 'same-arch') {
 		push @{$dh{DOPACKAGES}}, getpackages('arch');
 		$dh{DOARCH}=1;
 	}
 	elsif ($option eq 'p' or $option eq 'package') {
 		push @{$dh{DOPACKAGES}}, $value;
-	}
-	elsif ($option eq 's' or $option eq 'same-arch') {
-		push @{$dh{DOPACKAGES}}, getpackages('same');
-		$dh{DOSAME}=1;
 	}
 	else {
 		error("bad option $option - should never happen!\n");
@@ -186,7 +183,6 @@ sub parseopts {
 		delete $dh{DOPACKAGES};
 		delete $dh{DOINDEP};
 		delete $dh{DOARCH};
-		delete $dh{DOSAME};
 	}
 	
 	# DH_OPTIONS can contain additional options
@@ -216,7 +212,7 @@ sub parseopts {
 	# want us to act on them all. Note we have to do this before excluding
 	# packages out, below.
 	if (! defined $dh{DOPACKAGES} || ! @{$dh{DOPACKAGES}}) {
-		if ($dh{DOINDEP} || $dh{DOARCH} || $dh{DOSAME}) {
+		if ($dh{DOINDEP} || $dh{DOARCH}) {
 			# User specified that all arch (in)dep package be
 			# built, and there are none of that type.
 			warning("You asked that all arch in(dep) packages be built, but there are none of that type.");

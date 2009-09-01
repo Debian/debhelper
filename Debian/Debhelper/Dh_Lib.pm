@@ -667,9 +667,8 @@ sub sourcepackage {
 }
 
 # Returns a list of packages in the control file.
-# Must pass "arch" or "indep" or "same" to specify arch-dependant or
-# -independant or same arch packages. If nothing is specified, returns all
-# packages.
+# Pass "arch" or "indep" to specify arch-dependant or
+# independant. If nothing is specified, returns all packages.
 # As a side effect, populates %package_arches and %package_types with the
 # types of all packages (not only those returned).
 my (%package_types, %package_arches);
@@ -717,8 +716,7 @@ sub getpackages {
 
 			if ($package &&
 			    (($type eq 'indep' && $arch eq 'all') ||
-			     ($type eq 'arch' && $arch ne 'all') ||
-			     ($type eq 'same' && ($arch eq 'any' ||
+			     ($type eq 'arch' && ($arch eq 'any' ||
 					     ($arch ne 'all' &&
 			                      samearch(buildarch(), $arch)))) ||
 			     ! $type)) {

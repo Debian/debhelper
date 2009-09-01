@@ -1,9 +1,14 @@
-debhelper (7.3.17) UNRELEASED; urgency=low
+debhelper (7.3.17) unstable; urgency=low
 
-  * Optimise -s handling to avoid running dpkg-architecture if the package
-    is arch all.
+  * Optimise -s handling to avoid running dpkg-architecture if a package
+    is arch all. This was, suprisingly, the only overhead of using the -s
+    flag with arch all/any packages.
+  * The -a flag now does the same thing as the -s flag, so debhelper users
+    do not need to worry about using the -s flag when building a package
+    that only builds for some architectures, and dh will also work in that
+    situation. Closes: #540794
 
- -- Joey Hess <joeyh@debian.org>  Tue, 01 Sep 2009 13:19:55 -0400
+ -- Joey Hess <joeyh@debian.org>  Tue, 01 Sep 2009 13:41:16 -0400
 
 debhelper (7.3.16) unstable; urgency=low
 

@@ -93,7 +93,8 @@ will output what it would have done.
 
 =item B<-a>, B<--arch>
 
-Act on all architecture dependent packages.
+Act on architecture dependent packages that should be built for the
+build architecture.
 
 =item B<-i>, B<--indep>
 
@@ -106,13 +107,8 @@ times to make debhelper operate on a given set of packages.
 
 =item B<-s>, B<--same-arch>
 
-This is a smarter version of the -a flag, that is used in some rare
-circumstances. It understands that if the control file lists "Architecture: i386"
-for the package, the package should not be acted on on other architectures. So
-this flag makes the command act on all "Architecture: any" packages, as well
-as on any packages that have the current architecture explicitly specified.
-Contrast to the -a flag, which makes the command work on all packages that
-are not architecture independent.
+This used to be a smarter version of the -a flag, but the -a flag is now
+equally smart.
 
 =item B<-N>I<package>, B<--no-package=>I<package>
 
