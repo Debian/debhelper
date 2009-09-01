@@ -630,10 +630,9 @@ sub dpkg_architecture_value {
 	my $os;
 
 	sub buildos {
-		return $os if defined $os;
-
-		$os=`dpkg-architecture -qDEB_HOST_ARCH_OS 2>/dev/null` || error("dpkg-architecture failed");
-		chomp $os;
+		if (!defined $os) {
+			$os=dpkg_architecture_value("DEB_HOST_ARCH_OS");
+		}
 		return $os;
 	}
 }
@@ -668,9 +667,8 @@ sub sourcepackage {
 }
 
 # Returns a list of packages in the control file.
-# Must pass "arch" or "indep" or "same" to specify arch-dependant or
-# -independant or same arch packages. If nothing is specified, returns all
-# packages.
+# Pass "arch" or "indep" to specify arch-dependant or
+# independant. If nothing is specified, returns all packages.
 # As a side effect, populates %package_arches and %package_types with the
 # types of all packages (not only those returned).
 my (%package_types, %package_arches);
@@ -715,11 +713,12 @@ sub getpackages {
 				$package_types{$package}=$package_type;
 				$package_arches{$package}=$arch;
 			}
+
 			if ($package &&
 			    (($type eq 'indep' && $arch eq 'all') ||
-			     ($type eq 'arch' && $arch ne 'all') ||
-			     ($type eq 'same' && ($arch eq 'any' ||
-			                     samearch(buildarch(), $arch))) ||
+			     ($type eq 'arch' && ($arch eq 'any' ||
+					     ($arch ne 'all' &&
+			                      samearch(buildarch(), $arch)))) ||
 			     ! $type)) {
 				push @list, $package;
 				$package="";
