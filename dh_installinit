@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-dh_installinit - install init scripts into package build directories
+dh_installinit - install upstart jobs or init scripts into package build directories
 
 =cut
 
@@ -11,20 +11,26 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_installinit> [S<I<debhelper options>>] [B<--name=>I<name>] [B<-n>] [B<-R>] [B<-r>] [B<-d>] [S<B<--> I<params>>]
+B<dh_installinit> [S<I<debhelper options>>] [B<--name=>I<name>] [B<-n>] [B<-R>] [B<-r>] [B<-d>] [B<-O>] [S<B<--> I<params>>]
 
 =head1 DESCRIPTION
 
 dh_installinit is a debhelper program that is responsible for installing
-init scripts and associated defaults files into package build directories.
+upstart job files or init scripts with associated defaults files into package
+build directories, and in the former case providing compatibility handling
+for non-upstart systems.
 
 It also automatically generates the postinst and postrm and prerm commands
 needed to set up the symlinks in /etc/rc*.d/ and to start and stop the init
 scripts.
 
-If a file named debian/package.init exists, then it is installed into
-etc/init.d/package in the package build directory, with "package" replaced
+If a file named debian/package.upstart exists, then it is installed into
+etc/init/package.conf in the package build directory, with "package" replaced
 by the package name.
+
+Otherwise, if a file named debian/package.init exists, then it is installed
+into etc/init.d/package in the package build directory, with "package"
+replaced by the package name.
 
 If a file named debian/package.default exists, then it is installed into
 etc/default/package in the package build directory, with "package" replaced
@@ -41,9 +47,14 @@ Do not modify postinst/postrm/prerm scripts.
 =item B<-o>, B<--onlyscripts>
 
 Only modify postinst/postrm/prerm scripts, do not actually install any init
-script or default files. May be useful if the init script is shipped and/or
-installed by upstream in a way that doesn't make it easy to let
-dh_installinit find it.
+script, default files, or upstart job.  May be useful if the init script or
+upstart job is shipped and/or installed by upstream in a way that doesn't
+make it easy to let dh_installinit find it.
+
+If no upstart job file is installed in the target directory when
+dh_installinit --onlyscripts is called, this program will assume that an
+init script is being installed and not provide the compatibility symlinks
+or upstart dependencies.
 
 =item B<-R>, B<--restart-after-upgrade>
 
@@ -68,7 +79,8 @@ Only call update-rc.d. Useful for rcS scripts.
 =item B<-d>, B<--remove-d>
 
 Remove trailing "d" from the name of the package, and use the result for the
-filename the init script is installed as in etc/init.d/ , and the default file
+filename the upstart job file is installed as in etc/init/ , or for the
+filename the init script is installed as in etc/init.d and the default file
 is installed as in etc/default/ . This may be useful for daemons with names
 ending in "d". (Note: this takes precedence over the --init-script parameter
 described below.)
@@ -82,11 +94,12 @@ passed to L<update-rc.d(8)>.
 
 =item B<--name=>I<name>
 
-Install the init script (and default file) using the filename I<name>
-instead of the default filename, which is the package name. When this
-parameter is used, dh_installinit looks for and installs files named
-debian/package.name.init and debian/package.name.default, instead of the
-usual debian/package.init and debian/package.default.
+Install the upstart job file or the init script (and default file) using the
+filename I<name> instead of the default filename, which is the package name.
+When this parameter is used, dh_installinit looks for and installs files
+named debian/package.name.upstart, debian/package.name.init and
+debian/package.name.default, instead of the usual debian/package.upstart,
+debian/package.init and debian/package.default.
 
 =item B<--init-script=>I<scriptname>
 
@@ -97,7 +110,8 @@ if a file in the debian/ directory exists that looks like
 "package.scriptname" and if so will install it as the init script in
 preference to the files it normally installs.
 
-This parameter is deprecated, use the --name parameter instead.
+This parameter is deprecated, use the --name parameter instead.  This
+parameter will be ignored completely for upstart jobs.
 
 =item B<--error-handler=>I<function>
 
@@ -130,8 +144,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	# Figure out what filename to install it as.
 	my $script;
+	my $jobfile=$package;
 	if (defined $dh{NAME}) {
-		$script=$dh{NAME};
+		$jobfile=$script=$dh{NAME};
 	}
 	elsif ($dh{D_FLAG}) {
 		# -d on the command line sets D_FLAG. We will 
@@ -139,7 +154,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# use that as the name.
 		$script=$package;
 		if ($script=~m/(.*)d$/) {
-			$script=$1;
+			$jobfile=$script=$1;
 		}
 		else {
 			warning("\"$package\" has no final d' in its name, but -d was specified.");
@@ -152,9 +167,32 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		$script=$package;
 	}       
 	
-	my $init=pkgfile($package,$script) || pkgfile($package,"init") ||
-	      pkgfile($package,"init.d");
-	my $default=pkgfile($package,'default');
+	my $job=pkgfile($package,"upstart");
+	my ($init,$default) = ('','');
+
+	if ($job ne '' || ($dh{ONLYSCRIPTS} && -e "$tmp/etc/init/$jobfile.conf")) {
+		if (! $dh{ONLYSCRIPTS}) {
+			if (! -d "$tmp/etc/init") {
+				doit("install","-d","$tmp/etc/init");
+			}
+		
+			doit("install","-p","-m644",$job,"$tmp/etc/init/$jobfile.conf");
+		}
+		
+		# ensures that our /etc/init.d/ symlink points to a valid
+		# implementation
+		addsubstvar($package, "misc:Depends", "upstart-job");
+
+		if (! -d "$tmp/etc/init.d") {
+			doit("install","-d","$tmp/etc/init.d");
+		}
+		doit("ln","-sf","/lib/init/upstart-job","$tmp/etc/init.d/$jobfile");
+	}
+	else {
+		$init=pkgfile($package,$script) || pkgfile($package,"init") ||
+			pkgfile($package,"init.d");
+		$default=pkgfile($package,'default');
+	}
 
 	if ($default ne '' && ! $dh{ONLYSCRIPTS}) {
 		if (! -d "$tmp/etc/default") {
@@ -163,15 +201,20 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("install","-p","-m644",$default,"$tmp/etc/default/$script");
 	}
 
-	if ($init ne '' || $dh{ONLYSCRIPTS}) {
-		if (! $dh{ONLYSCRIPTS}) {
-			if (! -d "$tmp/etc/init.d") {
-				doit("install","-d","$tmp/etc/init.d");
-			}
-		
-			doit("install","-p","-m755",$init,"$tmp/etc/init.d/$script");
+	if ($init ne '' && ! $dh{ONLYSCRIPTS}) {
+		if (! -d "$tmp/etc/init.d") {
+			doit("install","-d","$tmp/etc/init.d");
 		}
 		
+		doit("install","-p","-m755",$init,"$tmp/etc/init.d/$script");
+	}
+
+	if ($job ne '' || $init ne '' || $dh{ONLYSCRIPTS})
+	{
+		if (-e "$tmp/etc/init/$jobfile.conf") {
+			$script=$jobfile;
+		}
+
 		# This is set by the -u "foo" command line switch, it's
 		# the parameters to pass to update-rc.d. If not set,
 		# we have to say "defaults".
@@ -182,7 +225,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if ($params eq '') {
 			$params="defaults";
 		}
-                
+		
 		if (! $dh{NOSCRIPTS}) {
 			if (! $dh{NO_START}) {
 				if ($dh{RESTART_AFTER_UPGRADE}) {
@@ -227,8 +270,10 @@ L<debhelper(7)>
 
 This program is a part of debhelper.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Joey Hess <joeyh@debian.org>
+
+Steve Langasek <steve.langasek@canonical.com>
 
 =cut
