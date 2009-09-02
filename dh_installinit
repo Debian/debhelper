@@ -187,7 +187,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			doit("install","-d","$tmp/etc/init.d");
 		}
 		doit("ln","-sf","/lib/init/upstart-job","$tmp/etc/init.d/$jobfile");
-	} else {
+	}
+	else {
 		$init=pkgfile($package,$script) || pkgfile($package,"init") ||
 			pkgfile($package,"init.d");
 		$default=pkgfile($package,'default');
@@ -224,7 +225,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if ($params eq '') {
 			$params="defaults";
 		}
-                
+		
 		if (! $dh{NOSCRIPTS}) {
 			if (! $dh{NO_START}) {
 				if ($dh{RESTART_AFTER_UPGRADE}) {
