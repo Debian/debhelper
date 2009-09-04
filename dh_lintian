@@ -18,14 +18,22 @@ B<dh_lintian> [S<I<debhelper options>>]
 dh_lintian is a debhelper program that is responsible for installing
 override files used by lintian into package build directories.
 
-If a file named debian/package.lintian-overrides exists, then it is
-installed into usr/share/lintian/overrides/package in the package
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.lintian-overrides
+
+Installed into usr/share/lintian/overrides/I<package> in the package
 build directory. This file is used to suppress erroneous lintian
 diagnostics.
 
-Note that a file named debian/source.lintian-overrides will not be
-installed, but will be scanned by lintian to provide overrides for the
-source package.
+=item debian/I<source>.lintian-overrides
+
+These files are not installed, but will be scanned by lintian to provide
+overrides for the source package.
+
+=back
 
 =cut
 

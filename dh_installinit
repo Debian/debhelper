@@ -24,17 +24,26 @@ It also automatically generates the postinst and postrm and prerm commands
 needed to set up the symlinks in /etc/rc*.d/ and to start and stop the init
 scripts.
 
-If a file named debian/package.upstart exists, then it is installed into
-etc/init/package.conf in the package build directory, with "package" replaced
-by the package name.
+=head1 FILES
 
-Otherwise, if a file named debian/package.init exists, then it is installed
-into etc/init.d/package in the package build directory, with "package"
-replaced by the package name.
+=over 4
 
-If a file named debian/package.default exists, then it is installed into
-etc/default/package in the package build directory, with "package" replaced
-by the package name.
+=item debian/I<package>.upstart
+
+If this exists, it is installed into etc/init/I<package>.conf in the package
+build directory.
+
+=item debian/I<package>.init
+
+Otherwise, if this exists, it is installed
+into etc/init.d/I<package> in the package build directory.
+
+=item debian/I<package>.default
+
+If this exists, it is installed into etc/default/I<package> in the package
+build directory.
+
+=back
 
 =head1 OPTIONS
 

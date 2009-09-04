@@ -38,14 +38,6 @@ like /usr/share/man/pl/man1/, that is because your program has a
 name like "foo.pl", and dh_installman assumes that means it is translated
 into Polish. Use --language=C to avoid this.
 
-Any man page filenames specified as parameters will be installed into the
-first package dh_installman is told to act on. By default, this is the
-first binary package in debian/control, but if you use -p, -i, or -a flags,
-it will be the first package specified by those flags.
-
-Files named debian/package.manpages can list other man pages to be
-installed.
-
 After the man page installation step, dh_installman will check to see if
 any of the man pages in the temporary directories of any of the packages it
 is acting on contain ".so" links. If so, it changes them to symlinks.
@@ -54,6 +46,14 @@ Also, dh_installman will use man to guess the character encoding of each
 manual page and convert it to UTF-8. If the guesswork fails for some
 reason, you can override it using an encoding declaration. See
 L<manconv(1)> for details.
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.manpages
+
+Lists man pages to be installed.
 
 =head1 OPTIONS
 

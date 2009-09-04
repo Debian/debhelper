@@ -18,33 +18,44 @@ B<dh_installdocs> [S<I<debhelper options>>] [B<-A>] [B<-X>I<item>] [S<I<file ...
 dh_installdocs is a debhelper program that is responsible for installing
 documentation into usr/share/doc/package in package build directories.
 
-dh_installdocs automatically installs debian/copyright if it exists. If
-dh_installdocs is acting on multiple packages, debian/copyright files will be
-installed into all packages. However, if you need to have separate copyright
-files for different binary packages, you can use files named
-debian/package.copyright.
+=head1 FILES
 
-Any filenames specified as parameters will be installed into the first
-package dh_installdocs is told to act on. By default, this is the first
-binary package in debian/control, but if you use B<-p>, B<-i>, or B<-a> flags, it
-will be the first package specified by those flags.
+=over 4
 
-Also, debian/README.Debian (or debian/README.debian) and debian/TODO, if
-they exist, will be installed into the first binary package listed in
-debian/control, if dh_installdocs is acting on that package. Note that
-debian/TODO will be installed named TODO.Debian, if the package is not a
-debian native package. Also note that README.debian is installed as
-README.Debian, for consistency. Note that debian/package.README.Debian and
-debian/package.TODO can be used to specify files for subpackages.
+=item debian/I<package>.docs
 
-Files named debian/package.docs can list other files to be installed.
+List documentaton files to be installed into I<package>.
 
-Files named debian/package.doc-base, will be installed as doc-base control
-files. Note that the doc-id will be determined from the "Document:" entry
-in the doc-base control file in question.
+=item debian/copyright
+
+=item debian/README.Debian
+
+=item debian/TODO
+
+=item debian/I<package>.copyright
+
+=item debian/I<package>.README.Debian
+
+=item debian/I<package>.TODO
+
+Each of these files is automatically installed if present. Use the package
+specific name if I<package> needs a different version of the file.
+
+Note that debian/README.debian is also installed as README.Debian,
+and debian/TODO will be installed as TODO.Debian in non-native packages.
+
+=item debian/I<package>.doc-base
+
+Installed as doc-base control files. Note that the doc-id will be
+determined from the "Document:" entry in the doc-base control file in
+question.
+
+=item debian/I<package>.doc-base.*
 
 If your package needs to register more than one document, you need multiple
-files. To accomplish this, you can use files named debian/package.doc-base.*
+doc-base files, and can name them like this.
+
+=back
 
 =head1 OPTIONS
 

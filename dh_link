@@ -24,15 +24,6 @@ files are the already existing files that will be symlinked from. The
 destination files are the symlinks that will be created. There B<must> be
 an equal number of source and destination files specified.
 
-The list can be specified in two ways. A file named debian/package.links
-can list pairs of files. If you use this file, you should put each pair
-of files on its own line, and separate the files within the pair with
-whitespace. Also, pairs of files can be specified as parameters - these
-pairs will only be created in the package build directory of the first
-package dh_link is told to act on. By default, this is the first binary
-package in debian/control, but if you use -p, -i, or -a flags, it will be
-the first package specified by those flags.
-
 Be sure you B<do> specify the full filename to both the source and
 destination files (unlike you would do if you were using something like
 L<ln(1)>).
@@ -44,6 +35,16 @@ the symlinks in.
 
 dh_link also scans the package build tree for existing symlinks which do not
 conform to debian policy, and corrects them (v4 or later).
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.links
+
+Lists pairs of source and destination files to be symlinked. Each pair
+should be put on its own line, with the source and destination separated by
+whitespace.
 
 =head1 OPTIONS
 

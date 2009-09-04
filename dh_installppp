@@ -16,12 +16,21 @@ B<dh_installppp> [S<I<debhelper options>>] [B<--name=>I<name>]
 =head1 DESCRIPTION
 
 dh_installppp is a debhelper program that is responsible for installing
-ppp ip-up and ip-down scripts. into package build directories.
+ppp ip-up and ip-down scripts into package build directories.
 
-If a file named debian/package.ppp.ip-up exists, then it is installed into
-etc/ppp/ip-up.d/package in the package build directory. 
-Files named debian/package.ppp.ip-down are installed to
-etc/ppp/ip-down.d/package
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.ppp.ip-up
+
+Installed into etc/ppp/ip-up.d/I<package> in the package build directory. 
+
+=item debian/I<package>.ppp.ip-down
+
+Installed into etc/ppp/ip-down.d/I<package> in the package build directory.
+
+=back
 
 =head1 OPTIONS
 

@@ -21,13 +21,15 @@ with L<update-alternatives(8)>. The window manager's man page is also
 registered as a slave symlink (in v6 mode and up), if it is found in 
 usr/share/man/man1/ in the package build directory.
 
-Any window manager programs specified as parameters will be registered in
-the first package dh_installwm is told to act on. By default, this is the
-first binary package in debian/control, but if you use -p, -i, or -a flags,
-it will be the first package specified by those flags.
+=head1 FILES
 
-Files named debian/package.wm can list other window manager programs to
-register.
+=over 4
+
+=item debian/I<package>.wm
+
+List window manager programs to register.
+
+=back
 
 =head1 OPTIONS
 
@@ -45,8 +47,7 @@ Do not modify postinst/postrm scripts. Turns this command into a no-op.
 
 =item I<wm ...>
 
-The commands used to run the window manager or window managers you want to
-register.
+Window manager programs to register.
 
 =back
 

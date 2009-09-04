@@ -20,13 +20,23 @@ mime files into package build directories.
 
 It also automatically generates the postinst and postrm commands needed to
 interface with the debian mime-support and shared-mime-info packages. These
-commands are inserted into the maintainer scripts by dh_installdeb. See
-L<dh_installdeb(1)> for an explanation of how this works.
+commands are inserted into the maintainer scripts by L<dh_installdeb(1)>.
 
-If files named debian/package.mime or debian/package.sharedmimeinfo exist, then
-they are installed into usr/lib/mime/packages/package and
-/usr/share/mime/packages/package.xml (respectively) in the package build
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.mime
+
+Installed into usr/lib/mime/packages/I<package> in the package build
 directory.
+
+=item debian/I<package>.sharedmimeinfo
+
+Installed into /usr/share/mime/packages/I<package>.xml in the package build
+directory.
+
+=back
 
 =head1 OPTIONS
 

@@ -18,18 +18,6 @@ B<dh_installchangelogs> [S<I<debhelper options>>] [B<-k>] [B<-X>I<item>] [I<upst
 dh_installchangelogs is a debhelper program that is responsible for
 installing changelogs into package build directories.
 
-dh_installchangelogs determines if the package is a debian native package,
-and if so, it installs debian/changelog into usr/share/doc/package/changelog
-in the package build directory. Otherwise, it installs debian/changelog
-into usr/share/doc/package/changelog.Debian in the package build directory. (If
-files named debian/package.changelog exist, they will be used in preference
-to debian/changelog.)
-
-Parallelling the debian changelog handling, this program also takes care of
-NEWS.Debian files. If there is a debian/NEWS file, it is installed as
-usr/share/doc/package/NEWS.Debian. debian/package.NEWS files can also be
-used.
-
 An upstream changelog file may be specified as an option. If none is
 specified, a few common filenames are tried. (In compatibility level 7 and
 above.)
@@ -40,6 +28,30 @@ changelog is a html file (determined by file extension), it will be
 installed as usr/share/doc/package/changelog.html instead, and will be
 converted to plain text with html2text to generate
 usr/share/doc/package/changelog.
+
+=head1 FILES
+
+=over 4
+
+=item debian/changelog
+
+=item debian/NEWS
+
+=item debian/I<package>.changelog
+
+=item debian/I<package>.NEWS
+
+Automatically installed into usr/share/doc/I<package>/
+in the package build directory.
+
+Use the package specific name if I<package> needs a different
+NEWS or changelog file.
+
+The changelog file is installed with a name of changelog
+for native packages, and changelog.Debian for non-native packages.
+The NEWS file is always installed with a name of NEWS.Debian.
+
+=back
 
 =head1 OPTIONS
 
