@@ -19,11 +19,18 @@ B<dh_installudev> [S<I<debhelper options>>] [B<-n>] [B<--name=>I<name>] [B<--pri
 dh_installudev is a debhelper program that is responsible for
 installing udev rules files.
 
-Files named debian/package.udev will be installed in
-lib/udev/rules.d/ in the package build directory.
-
 Code is added to the preinst and postinst to handle the upgrade from the
 old udev rules file location.
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.udev
+
+Installed into lib/udev/rules.d/ in the package build directory.
+
+=back
 
 =head1 OPTIONS
 
@@ -32,8 +39,8 @@ old udev rules file location.
 =item B<--name=>I<name>
 
 When this parameter is used, dh_installudev looks for and
-installs files named debian/package.name.udev instead of the usual
-debian/package.udev.
+installs files named debian/I<package>.I<name>.udev instead of the usual
+debian/I<package>.udev.
 
 =item B<--priority=>I<priority>
 

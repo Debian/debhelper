@@ -21,9 +21,19 @@ libraries, and generates a shlibs file for the libraries it finds.
 It also adds a call to ldconfig in the postinst and postrm scripts (in
 V3 mode and above only) to any packages in which it finds shared libraries.
 
-If a L<dpkg-gensymbols(1)> symbol file is found in debian/package.symbols
-(or debian/package.symbols.arch), dpkg-gensymbols will be called
-to process and install the symbols file.
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.symbols
+
+=item debian/I<package>.symbols.I<arch>
+
+These symbols files, if present, are passed to L<dpkg-gensymbols(1)> to
+be processed and installed. Use the I<arch> specific names if you need
+to provide different symbols files for different architectures.
+
+=back
 
 =head1 OPTIONS
 

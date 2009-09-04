@@ -20,16 +20,23 @@ files used by the debian menu package into package build directories.
 
 It also automatically generates the postinst and postrm commands needed to
 interface with the debian menu package. These commands are inserted into
-the maintainer scripts by dh_installdeb. See L<dh_installdeb(1)> for an
-explanation of how this works.
+the maintainer scripts by L<dh_installdeb(1)>.
 
-If a file named debian/package.menu exists, then it is installed into
-usr/share/menu/package in the package build directory. This is a debian menu
-file. See L<menufile(5)> for its format.
+=head1 FILES
 
-If a file named debian/package.menu-method exits, then it is installed into
-etc/menu-methods/package in the package build directory. This is a debian
-menu method file.
+=over 4
+
+=item debian/I<package>.menu
+
+Debian menu files, installed into usr/share/menu/I<package> in the package
+build directory. See L<menufile(5)> for its format.
+
+=item debian/I<package>.menu-method
+
+Debian menu method files, installed into etc/menu-methods/I<package>
+in the package build directory.
+
+=back
 
 =head1 OPTIONS
 

@@ -22,19 +22,25 @@ It automatically generates the postinst and prerm fragments needed
 to register and unregister the schemas in usr/share/gconf/schemas, using
 gconf-schemas.
 
-If a file named debian/package.gconf-defaults exists, then it is
-installed into usr/share/gconf/defaults/10_package in the package build
-directory, with "package" replaced by the package name. Some postinst and
-postrm fragments will be generated to launch update-gconf-defaults.
+An appropriate dependency on gconf2 will be generated in ${misc:Depends}.
 
-If a file named debian/package.gconf-mandatory exists, then it is
-installed into usr/share/gconf/mandatory/10_package in the package build
-directory, with "package" replaced by the package name, and similar
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.gconf-defaults
+
+Installed into usr/share/gconf/defaults/10_package in the package build
+directory, with "I<package>" replaced by the package name. Some postinst
+and postrm fragments will be generated to run update-gconf-defaults.
+
+=item debian/I<package>.gconf-mandatory
+
+Installed into usr/share/gconf/mandatory/10_package in the package build
+directory, with "I<package>" replaced by the package name, and similar
 postinst and postrm fragments will be generated.
 
-The gconf-schemas and update-gconf-defaults scripts are provided by the
-gconf2 package. An appropriate dependency will be generated in
-${misc:Depends}.
+=back
 
 =head1 OPTIONS
 

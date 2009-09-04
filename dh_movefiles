@@ -20,14 +20,20 @@ out of debian/tmp or some other directory and into other package build
 directories. This may be useful if your package has a Makefile that installs
 everything into debian/tmp, and you need to break that up into subpackages.
 
-Files named debian/package.files list the files to be moved, separated by
-whitespace. The filenames listed should be relative to debian/tmp/. You can
-also list directory names, and the whole directory will be moved. If you
-prefer, you can list the files to move on the command line and this will
-apply to the first package dh_movefiles is told to act on.
-
 Note: dh_install is a much better program, and you are recommended to use
 it instead of dh_movefiles.
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.files
+
+Lists the files to be moved into a package, separated by whitespace. The
+filenames listed should be relative to debian/tmp/. You can also list
+directory names, and the whole directory will be moved.
+
+=back
 
 =head1 OPTIONS
 

@@ -20,25 +20,26 @@ B<dh_installmodules> [S<I<debhelper options>>] [B<-n>] [B<--name=>I<name>]
 dh_installmodules is a debhelper program that is responsible for
 registering kernel modules.
 
-Files named debian/package.modprobe will be installed in
-etc/modprobe.d/package.conf in the package build directory, to be used by
-module-init-tools's version of modprobe.
-
 Kernel modules are searched for in the package build directory and if
 found, postinst and postrm commands are automatically generated to 
 run depmod and register the modules when the package is installed. 
-These commands are inserted into the maintainer scripts by dh_installdeb.
-See L<dh_installdeb(1)> for an explanation of how this works.
+These commands are inserted into the maintainer scripts by
+L<dh_installdeb(1)>.
 
-Previous versions of dh_installmodules installed files named
-etc/modprobe.d/package, code is added to the preinst and postinst to
-handle the upgrade from the old location.
+=head1 FILES
 
-Previous versions of dh_installmodules also supported 
-files named debian/package.modules, which were installed into 
-etc/modutils/package in the package build directory. This was for use by
-modutils, which is no longer in Debian. dh_installmodules will warn about
-such files now.
+=over 4
+
+=item debian/I<package>.modprobe
+
+Installed to etc/modprobe.d/I<package>.conf in the package build directory.
+
+=item debian/I<package>.modules
+
+These files were installed for use by modutils, but are now not used
+and dh_installmodules will warn if these files are present.
+
+=back
 
 =head1 OPTIONS
 
@@ -51,9 +52,8 @@ Do not modify postinst/postrm scripts.
 =item B<--name=>I<name>
 
 When this parameter is used, dh_installmodules looks for and
-installs files named debian/package.name.modules and
-debian/package.name.modprobe instead of the usual
-debian/package.modules and debian/package.modprobe
+installs files named debian/I<package>.I<name>.modprobe instead
+of the usual debian/I<package>.modprobe
 
 =back
 

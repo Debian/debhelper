@@ -19,12 +19,15 @@ dh_installexamples is a debhelper program that is responsible for
 installing examples into usr/share/doc/package/examples in package
 build directories.
 
-Any file names specified as parameters will be installed into the first
-package dh_installexamples is told to act on. By default, this is the first
-binary package in debian/control, but if you use -p, -i, or -a flags, it
-will be the first package specified by those flags.
+=head1 OPTIONS
 
-Files named debian/package.examples can list other files to be installed.
+=over 4
+
+=item debian/I<package>.examples
+
+Lists example files or directories to be installed.
+
+=back
 
 =head1 OPTIONS
 
@@ -35,15 +38,15 @@ Files named debian/package.examples can list other files to be installed.
 Install any files specified by command line parameters in ALL packages
 acted on.
 
-=item I<file ...>
-
-Install these files as examples into the first package acted on. (Or into
-all packages if -A is specified.)
-
 =item B<-Xitem>, B<--exclude=item>
 
 Exclude files that contain "item" anywhere in their filename from
 being installed.
+
+=item I<file ...>
+
+Install these files (or directories) as examples into the first package
+acted on. (Or into all packages if -A is specified.)
 
 =back
 

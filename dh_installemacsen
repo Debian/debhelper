@@ -24,13 +24,26 @@ register a package as an emacs add on package. The commands are added to
 the maintainer scripts by dh_installdeb. See L<dh_installdeb(1)>
 for an explanation of how this works.
 
-If a file named debian/package.emacsen-install exists, then it is installed
-into
-usr/lib/emacsen-common/packages/install/package in the package build
-directory. Similarly, debian/package.emacsen-remove is installed into
-usr/lib/emacsen-common/packages/remove/package . And similarly,
-debian/package.emacsen-startup is installed into
-etc/emacs/site-start.d/50<package>.el (by default).
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.emacsen-install
+
+Installed into usr/lib/emacsen-common/packages/install/package in the
+package build directory.
+
+=item debian/I<package>.emacsen-remove
+
+Installed into usr/lib/emacsen-common/packages/remove/package in the
+package build directory.
+
+=item debian/I<package>.emacsen-startup
+
+Installed into etc/emacs/site-start.d/50I<package>.el in the package
+build directory. Use --priority to use a different priority than 50.
+
+=back
 
 =head1 OPTIONS
 

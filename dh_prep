@@ -16,10 +16,12 @@ B<dh_prep> [S<I<debhelper options>>] [B<-X>I<item>]
 =head1 DESCRIPTION
 
 dh_prep is a debhelper program that performs some file cleanups in
-preparation for building a package. (This is what dh_clean -k used to do.)
-It removes the package build directories, debian/tmp, and some temp files
-that are generated during the build. Putting this at the start of the build
-process makes the build process idempotent.
+preparation for building a binary package. (This is what dh_clean -k
+used to do.) It removes the package build directories, debian/tmp,
+and some temp files that are generated when building a binary package.
+
+It is typically run at the top of the binary-arch and binary-indep targets,
+or at the top of a target such as install that they depend on.
 
 =head1 OPTIONS
 
