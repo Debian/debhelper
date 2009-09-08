@@ -71,6 +71,24 @@ acted on.
 Exclude files that contain "item" anywhere in their filename from
 being installed. Note that this includes doc-base files.
 
+=item B<--link-doc=>I<package>
+
+Make the documentation directory of all packages acted on be a symlink to
+the documentation directory of I<package>. This has no effect when acting on
+I<package> itself, or if the documentation directory to be created already
+exists when B<dh_installdocs> is run. To comply with policy, I<package> must
+be a binary package that comes from the same source package.
+
+debhelper will try to avoid installing files into linked documentation
+directories that would cause conflicts with the linked package. The B<-A>
+option will have no effect on packages with linked documentation
+directories, and copyright, changelog, README.Debian, and TODO files will
+not be installed.
+
+(An older method to accomplish the same thing, which is still supported,
+is to make the documentation directory of a package be a dangling symlink,
+before calling dh_installdocs.)
+
 =item I<file ...>
 
 Install these files as documentation into the first package acted on. (Or
@@ -101,18 +119,59 @@ instances of the same text to be added to maintainer scripts.
 
 =cut
 
-init();
+my %docdir_created;
+# Create documentation directories on demand. This allows us to use dangling
+# symlinks for linked documentation directories unless additional files need
+# to be installed.
+sub ensure_docdir {
+	my $package=shift;
+	return if $docdir_created{$package};
+	my $tmp=tmpdir($package);
+
+	my $target;
+	if ($dh{LINK_DOC} && $dh{LINK_DOC} ne $package) {
+		$target="$tmp/usr/share/doc/$dh{LINK_DOC}";
+	}
+	else {
+		$target="$tmp/usr/share/doc/$package";
+	}
+
+	# If this is a symlink, leave it alone.
+	if (! -d $target && ! -l $target) {
+		doit("install","-g",0,"-o",0,"-d",$target);
+	}
+	$docdir_created{$package}=1;
+}
+
+init(options => {
+	"link-doc=s" => \$dh{LINK_DOC},
+});
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if is_udeb($package);
 	
 	my $tmp=tmpdir($package);
 	my $file=pkgfile($package,"docs");
+	my $link_doc=($dh{LINK_DOC} && $dh{LINK_DOC} ne $package);
 
-	# If this is a symlink, leave it alone.
-	if ( ! -d "$tmp/usr/share/doc/$package" &&
-	     ! -l "$tmp/usr/share/doc/$package") {
-		doit("install","-g",0,"-o",0,"-d","$tmp/usr/share/doc/$package");
+	if ($link_doc) {
+		# Make sure that the parent directory exists.
+		if (! -d "$tmp/usr/share/doc" && ! -l "$tmp/usr/share/doc") {
+			doit("install","-g",0,"-o",0,"-d","$tmp/usr/share/doc");
+		}
+		# Create symlink to another documentation directory if
+		# necessary.
+		if (! -d "$tmp/usr/share/doc/$package" &&
+		    ! -l "$tmp/usr/share/doc/$package") {
+			doit("ln", "-sf", $dh{LINK_DOC}, "$tmp/usr/share/doc/$package");
+			# Policy says that if you make your documentation
+			# directory a symlink, then you have to depend on
+			# the target.
+			addsubstvar($package, "misc:Depends", $dh{LINK_DOC});
+		}
+	}
+	else {
+		ensure_docdir($package);
 	}
 
 	my @docs;
@@ -121,7 +180,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		@docs=filearray($file, ".");
 	}
 
-	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+	if (($package eq $dh{FIRSTPACKAGE} || ($dh{PARAMS_ALL} && ! $link_doc)) && @ARGV) {
 		push @docs, @ARGV;
 	}
 
@@ -137,6 +196,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		foreach my $doc (@docs) {
 			next if excludefile($doc);
 			next if -e $doc && ! -s $doc && ! compat(4); # ignore empty files
+			ensure_docdir($package);
 			if (-d $doc && length $exclude) {
 				my $basename = basename($doc);
 				my $dir = ($basename eq '.') ? $doc : "$doc/..";
@@ -158,13 +218,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (! $readme_debian) {
 		$readme_debian=pkgfile($package,'README.debian');
 	}
-	if ($readme_debian && ! excludefile($readme_debian)) {
+	if (! $link_doc && $readme_debian && ! excludefile($readme_debian)) {
+		ensure_docdir($package);
 		doit("install","-g",0,"-o",0,"-m","644","-p","$readme_debian",
 			"$tmp/usr/share/doc/$package/README.Debian");
 	}
 
 	my $todo=pkgfile($package,'TODO');
-	if ($todo && ! excludefile($todo)) {
+	if (! $link_doc && $todo && ! excludefile($todo)) {
+		ensure_docdir($package);
 		if (isnative($package)) {
 			doit("install","-g",0,"-o",0,"-m","644","-p",$todo,
 				"$tmp/usr/share/doc/$package/TODO");
@@ -178,7 +240,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# If the "directory" is a dangling symlink, then don't install
 	# the copyright file. This is useful for multibinary packages 
 	# that share a doc directory.
-	if (-d "$tmp/usr/share/doc/$package") {
+	if (! $link_doc && (! -l "$tmp/usr/share/doc/$package" || -d "$tmp/usr/share/doc/$package")) {
 		# Support debian/package.copyright, but if not present, fall
 		# back on debian/copyright for all packages, not just the 
 		# main binary package.
@@ -187,8 +249,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$copyright="debian/copyright";
 		}
 		if ($copyright && ! excludefile($copyright)) {
-				doit("install","-g",0,"-o",0,"-m","644","-p",$copyright,
-					"$tmp/usr/share/doc/$package/copyright");
+			ensure_docdir($package);
+			doit("install","-g",0,"-o",0,"-m","644","-p",$copyright,
+				"$tmp/usr/share/doc/$package/copyright");
 		}
 	}
 
