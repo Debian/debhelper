@@ -471,17 +471,6 @@ none is specified.
 
 =back
 
-=head2 Doc directory symlinks
-
-Sometimes it is useful to make a package not contain a /usr/share/doc/package
-directory at all, instead placing just a dangling symlink in the binary
-package, that points to some other doc directory. Policy says this is ok if
-your package depends on the package whose doc directory it uses. To
-accomplish this, just don't tell debhelper to install any documentation
-files into the package, and use dh_link to set up the symlink (or do it by
-hand), and debhelper should do the right thing: notice it is a dangling
-symlink and not try to install a copyright file or changelog.
-
 =head2 udebs
 
 Debhelper includes support for udebs. To create a udeb with debhelper,
