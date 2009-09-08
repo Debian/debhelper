@@ -119,12 +119,22 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		error("could not find changelog $changelog");
 	}
 
-	if (! -d "$tmp/usr/share/doc/$package") {
-		# If it is a dangling symlink, then don't do anything.
-		# Think multi-binary packages that depend on each other and
-		# want to link doc dirs.
-		next if -l "$tmp/usr/share/doc/$package";
+	# If it is a symlink to a documentation directory from the same
+	# source package, then don't do anything. Think multi-binary
+	# packages that depend on each other and want to link doc dirs.
+	if (-l "$tmp/usr/share/doc/$package") {
+		my $linkval=readlink("$tmp/usr/share/doc/$package");
+		my %allpackages=map { $_ => 1 } getpackages();
+		if ($allpackages{basename($linkval)}) {
+			next;
+		}
+		# Even if the target doesn't seem to be a doc dir from the
+		# same source package, don't do anything if it's a dangling
+		# symlink.
+		next unless -d "$tmp/usr/share/doc/$package";
+	}
 
+	if (! -d "$tmp/usr/share/doc/$package") {
 		doit("install","-d","$tmp/usr/share/doc/$package");
 	}
 	doit("install","-o",0,"-g",0,"-p","-m644",$changelog,
