@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2009-09-06 18:44-0300\n"
+"POT-Creation-Date: 2009-09-14 15:47-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -333,7 +333,7 @@ msgid "Do not modify postinst/postrm/etc scripts."
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:161 dh_compress:49 dh_makeshlibs:76 dh_md5sums:37 dh_shlibdeps:36 dh_strip:39
+#: debhelper.pod:161 dh_compress:51 dh_makeshlibs:76 dh_md5sums:37 dh_shlibdeps:36 dh_strip:39
 msgid "B<-X>I<item>, B<--exclude=>I<item>"
 msgstr ""
 
@@ -345,7 +345,7 @@ msgid ""
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:166 dh_compress:57 dh_installdirs:35 dh_installdocs:64 dh_installexamples:36 dh_installinfo:35 dh_installman:62 dh_link:53
+#: debhelper.pod:166 dh_compress:59 dh_installdirs:35 dh_installdocs:64 dh_installexamples:36 dh_installinfo:35 dh_installman:64 dh_link:55
 msgid "B<-A>, B<--all>"
 msgstr ""
 
@@ -440,7 +440,7 @@ msgid ""
 msgstr ""
 
 #. type: =head1
-#: debhelper.pod:217 dh_installcatalogs:59 dh_installdocs:92 dh_installemacsen:67 dh_installexamples:53 dh_installinit:133 dh_installman:79 dh_installmime:51 dh_installmodules:60 dh_installwm:54 dh_installxfonts:37 dh_movefiles:64 dh_strip:68 dh_usrlocal:49
+#: debhelper.pod:217 dh_installcatalogs:59 dh_installdocs:110 dh_installemacsen:67 dh_installexamples:53 dh_installinit:133 dh_installman:81 dh_installmime:51 dh_installmodules:60 dh_installwm:54 dh_installxfonts:37 dh_movefiles:64 dh_strip:68 dh_usrlocal:49
 msgid "NOTES"
 msgstr ""
 
@@ -841,30 +841,11 @@ msgstr ""
 
 #. type: =head2
 #: debhelper.pod:474
-msgid "Doc directory symlinks"
-msgstr ""
-
-#. type: textblock
-#: debhelper.pod:476
-msgid ""
-"Sometimes it is useful to make a package not contain a "
-"/usr/share/doc/package directory at all, instead placing just a dangling "
-"symlink in the binary package, that points to some other doc "
-"directory. Policy says this is ok if your package depends on the package "
-"whose doc directory it uses. To accomplish this, just don't tell debhelper "
-"to install any documentation files into the package, and use dh_link to set "
-"up the symlink (or do it by hand), and debhelper should do the right thing: "
-"notice it is a dangling symlink and not try to install a copyright file or "
-"changelog."
-msgstr ""
-
-#. type: =head2
-#: debhelper.pod:485
 msgid "udebs"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:487
+#: debhelper.pod:476
 msgid ""
 "Debhelper includes support for udebs. To create a udeb with debhelper, add "
 "\"XC-Package-Type: udeb\" to the package's stanza in debian/control, and "
@@ -875,12 +856,12 @@ msgid ""
 msgstr ""
 
 #. type: =head2
-#: debhelper.pod:494
+#: debhelper.pod:483
 msgid "Other notes"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:496
+#: debhelper.pod:485
 msgid ""
 "In general, if any debhelper program needs a directory to exist under "
 "debian/, it will create it. I haven't bothered to document this in all the "
@@ -891,7 +872,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:502
+#: debhelper.pod:491
 msgid ""
 "Once your package uses debhelper to build, be sure to add debhelper to your "
 "Build-Depends line in debian/control. You should build-depend on a version "
@@ -900,7 +881,7 @@ msgid ""
 msgstr ""
 
 #. type: verbatim
-#: debhelper.pod:508
+#: debhelper.pod:497
 #, no-wrap
 msgid ""
 "  Build-Depends: debhelper (>= 7)\n"
@@ -908,51 +889,51 @@ msgid ""
 msgstr ""
 
 #. type: =head1
-#: debhelper.pod:510
+#: debhelper.pod:499
 msgid "ENVIRONMENT"
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:514
+#: debhelper.pod:503
 msgid "DH_VERBOSE"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:516
+#: debhelper.pod:505
 msgid ""
 "Set to 1 to enable verbose mode. Debhelper will output every command it runs "
 "that modifies files on the build system."
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:519
+#: debhelper.pod:508
 msgid "DH_COMPAT"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:521
+#: debhelper.pod:510
 msgid ""
 "Temporarily specifies what compatibility level debhelper should run at, "
 "overriding any value in debian/compat."
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:524
+#: debhelper.pod:513
 msgid "DH_NO_ACT"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:526
+#: debhelper.pod:515
 msgid "Set to 1 to enable no-act mode."
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:528
+#: debhelper.pod:517
 msgid "DH_OPTIONS"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:530
+#: debhelper.pod:519
 msgid ""
 "Anything in this variable will be prepended to the command line arguments of "
 "all debhelper commands. Command-specific options will be ignored by commands "
@@ -960,7 +941,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:534
+#: debhelper.pod:523
 msgid ""
 "This is useful in some situations, for example, if you need to pass -p to "
 "all debhelper commands that will be run. One good way to set DH_OPTIONS is "
@@ -969,12 +950,12 @@ msgid ""
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:539
+#: debhelper.pod:528
 msgid "DH_ALWAYS_EXCLUDE"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:541
+#: debhelper.pod:530
 msgid ""
 "If set, this adds the value the variable is set to to the -X options of all "
 "commands that support the -X option. Moreover, dh_builddeb will rm -rf "
@@ -982,7 +963,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:545
+#: debhelper.pod:534
 msgid ""
 "This can be useful if you are doing a build from a CVS source tree, in which "
 "case setting DH_ALWAYS_EXCLUDE=CVS will prevent any CVS directories from "
@@ -993,44 +974,44 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:552
+#: debhelper.pod:541
 msgid ""
 "Multiple things to exclude can be separated with colons, as in "
 "DH_ALWAYS_EXCLUDE=CVS:.svn"
 msgstr ""
 
 #. type: =head1
-#: debhelper.pod:557 dh_builddeb:88 dh_clean:138 dh_compress:198 dh_desktop:31 dh_fixperms:122 dh_gconf:110 dh_gencontrol:79 dh_installcatalogs:116 dh_installchangelogs:159 dh_installcron:77 dh_installdebconf:129 dh_installdeb:108 dh_installdirs:86 dh_installdocs:235 dh_installemacsen:124 dh_installexamples:106 dh_installinfo:77 dh_installinit:276 dh_installlogcheck:64 dh_installlogrotate:50 dh_installmanpages:197 dh_installman:251 dh_installmenu:87 dh_installmime:95 dh_installmodules:124 dh_installpam:59 dh_install:274 dh_installppp:65 dh_installwm:108 dh_installxfonts:86 dh_link:224 dh_listpackages:29 dh_makeshlibs:237 dh_md5sums:89 dh_movefiles:170 dh_perl:145 dh_python:282 dh_scrollkeeper:28 dh_shlibdeps:168 dh_strip:227 dh_suidregister:117 dh_testdir:44 dh_testroot:27 dh_testversion:75 dh_undocumented:28 dh_usrlocal:114
+#: debhelper.pod:546 dh_builddeb:88 dh_clean:138 dh_compress:200 dh_desktop:31 dh_fixperms:122 dh_gconf:110 dh_gencontrol:79 dh_installcatalogs:116 dh_installchangelogs:169 dh_installcron:77 dh_installdebconf:129 dh_installdeb:108 dh_installdirs:86 dh_installdocs:298 dh_installemacsen:124 dh_installexamples:106 dh_installinfo:77 dh_installinit:276 dh_installlogcheck:66 dh_installlogrotate:50 dh_installmanpages:197 dh_installman:253 dh_installmenu:87 dh_installmime:95 dh_installmodules:124 dh_installpam:59 dh_install:274 dh_installppp:65 dh_installwm:108 dh_installxfonts:86 dh_link:226 dh_listpackages:29 dh_makeshlibs:237 dh_md5sums:89 dh_movefiles:170 dh_perl:145 dh_python:282 dh_scrollkeeper:28 dh_shlibdeps:168 dh_strip:227 dh_suidregister:117 dh_testdir:44 dh_testroot:27 dh_testversion:75 dh_undocumented:28 dh_usrlocal:114
 msgid "SEE ALSO"
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:561
+#: debhelper.pod:550
 msgid "F</usr/share/doc/debhelper/examples/>"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:563
+#: debhelper.pod:552
 msgid "A set of example debian/rules files that use debhelper."
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:565
+#: debhelper.pod:554
 msgid "L<http://kitenet.net/~joey/code/debhelper/>"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:567
+#: debhelper.pod:556
 msgid "Debhelper web site."
 msgstr ""
 
 #. type: =head1
-#: debhelper.pod:571 dh_builddeb:94 dh_clean:144 dh_compress:204 dh_desktop:37 dh_fixperms:128 dh_gconf:116 dh_gencontrol:85 dh_installcatalogs:122 dh_installchangelogs:165 dh_installcron:83 dh_installdebconf:135 dh_installdeb:114 dh_installdirs:92 dh_installdocs:241 dh_installemacsen:130 dh_installexamples:112 dh_installinfo:83 dh_installlogcheck:70 dh_installlogrotate:56 dh_installmanpages:203 dh_installman:257 dh_installmenu:95 dh_installmime:101 dh_installmodules:130 dh_installpam:65 dh_install:280 dh_installppp:71 dh_installwm:114 dh_installxfonts:92 dh_link:230 dh_listpackages:35 dh_makeshlibs:243 dh_md5sums:95 dh_movefiles:176 dh_perl:151 dh_python:288 dh_scrollkeeper:34 dh_shlibdeps:174 dh_strip:233 dh_suidregister:123 dh_testdir:50 dh_testroot:33 dh_testversion:81 dh_undocumented:34 dh_usrlocal:120
+#: debhelper.pod:560 dh_builddeb:94 dh_clean:144 dh_compress:206 dh_desktop:37 dh_fixperms:128 dh_gconf:116 dh_gencontrol:85 dh_installcatalogs:122 dh_installchangelogs:175 dh_installcron:83 dh_installdebconf:135 dh_installdeb:114 dh_installdirs:92 dh_installdocs:304 dh_installemacsen:130 dh_installexamples:112 dh_installinfo:83 dh_installlogcheck:72 dh_installlogrotate:56 dh_installmanpages:203 dh_installman:259 dh_installmenu:95 dh_installmime:101 dh_installmodules:130 dh_installpam:65 dh_install:280 dh_installppp:71 dh_installwm:114 dh_installxfonts:92 dh_link:232 dh_listpackages:35 dh_makeshlibs:243 dh_md5sums:95 dh_movefiles:176 dh_perl:151 dh_python:288 dh_scrollkeeper:34 dh_shlibdeps:174 dh_strip:233 dh_suidregister:123 dh_testdir:50 dh_testroot:33 dh_testversion:81 dh_undocumented:34 dh_usrlocal:120
 msgid "AUTHOR"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:573 dh_builddeb:96 dh_clean:146 dh_compress:206 dh_fixperms:130 dh_gencontrol:87 dh_installchangelogs:167 dh_installcron:85 dh_installdebconf:137 dh_installdeb:116 dh_installdirs:94 dh_installdocs:243 dh_installemacsen:132 dh_installexamples:114 dh_installinfo:85 dh_installinit:284 dh_installlogrotate:58 dh_installmanpages:205 dh_installman:259 dh_installmenu:97 dh_installmime:103 dh_installmodules:132 dh_installpam:67 dh_install:282 dh_installppp:73 dh_installwm:116 dh_installxfonts:94 dh_link:232 dh_listpackages:37 dh_makeshlibs:245 dh_md5sums:97 dh_movefiles:178 dh_shlibdeps:176 dh_strip:235 dh_suidregister:125 dh_testdir:52 dh_testroot:35 dh_testversion:83 dh_undocumented:36
+#: debhelper.pod:562 dh_builddeb:96 dh_clean:146 dh_compress:208 dh_fixperms:130 dh_gencontrol:87 dh_installchangelogs:177 dh_installcron:85 dh_installdebconf:137 dh_installdeb:116 dh_installdirs:94 dh_installdocs:306 dh_installemacsen:132 dh_installexamples:114 dh_installinfo:85 dh_installinit:284 dh_installlogrotate:58 dh_installmanpages:205 dh_installman:261 dh_installmenu:97 dh_installmime:103 dh_installmodules:132 dh_installpam:67 dh_install:282 dh_installppp:73 dh_installwm:116 dh_installxfonts:94 dh_link:234 dh_listpackages:37 dh_makeshlibs:245 dh_md5sums:97 dh_movefiles:178 dh_shlibdeps:176 dh_strip:235 dh_suidregister:125 dh_testdir:52 dh_testroot:35 dh_testversion:83 dh_undocumented:36
 msgid "Joey Hess <joeyh@debian.org>"
 msgstr ""
 
@@ -1054,7 +1035,7 @@ msgid ""
 msgstr ""
 
 #. type: =head1
-#: dh_builddeb:21 dh_clean:41 dh_compress:45 dh_fixperms:31 dh_gconf:45 dh_gencontrol:26 dh_installcatalogs:49 dh_installchangelogs:56 dh_installcron:40 dh_installdebconf:61 dh_installdirs:31 dh_installdocs:60 dh_installemacsen:48 dh_installexamples:22 dh_installexamples:32 dh_installinfo:31 dh_installinit:48 dh_installlogrotate:22 dh_installmanpages:40 dh_installman:58 dh_installmenu:41 dh_installmime:41 dh_installmodules:44 dh_installpam:31 dh_install:54 dh_installppp:35 dh_installwm:34 dh_link:49 dh_makeshlibs:38 dh_md5sums:28 dh_movefiles:38 dh_perl:31 dh_python:39 dh_shlibdeps:26 dh_strip:35 dh_testdir:23 dh_testversion:34 dh_usrlocal:39
+#: dh_builddeb:21 dh_clean:41 dh_compress:47 dh_fixperms:31 dh_gconf:45 dh_gencontrol:26 dh_installcatalogs:49 dh_installchangelogs:56 dh_installcron:40 dh_installdebconf:61 dh_installdirs:31 dh_installdocs:60 dh_installemacsen:48 dh_installexamples:32 dh_installinfo:31 dh_installinit:48 dh_installlogrotate:22 dh_installmanpages:40 dh_installman:60 dh_installmenu:41 dh_installmime:41 dh_installmodules:44 dh_installpam:31 dh_install:54 dh_installppp:35 dh_installwm:34 dh_link:51 dh_makeshlibs:38 dh_md5sums:28 dh_movefiles:38 dh_perl:31 dh_python:39 dh_shlibdeps:26 dh_strip:35 dh_testdir:23 dh_testversion:34 dh_usrlocal:39
 msgid "OPTIONS"
 msgstr ""
 
@@ -1098,12 +1079,12 @@ msgid "Pass I<params> to L<dpkg-deb(1)> when it is used to build the package."
 msgstr ""
 
 #. type: textblock
-#: dh_builddeb:90 dh_clean:140 dh_compress:200 dh_fixperms:124 dh_gconf:112 dh_gencontrol:81 dh_installcatalogs:118 dh_installchangelogs:161 dh_installcron:79 dh_installdebconf:131 dh_installdeb:110 dh_installdirs:88 dh_installdocs:237 dh_installemacsen:126 dh_installexamples:108 dh_installinfo:79 dh_installinit:278 dh_installlogcheck:66 dh_installlogrotate:52 dh_installmanpages:199 dh_installman:253 dh_installmime:97 dh_installmodules:126 dh_installpam:61 dh_install:276 dh_installppp:67 dh_installwm:110 dh_installxfonts:88 dh_link:226 dh_listpackages:31 dh_makeshlibs:239 dh_md5sums:91 dh_movefiles:172 dh_perl:147 dh_python:284 dh_strip:229 dh_suidregister:119 dh_testdir:46 dh_testroot:29 dh_testversion:77 dh_undocumented:30 dh_usrlocal:116
+#: dh_builddeb:90 dh_clean:140 dh_compress:202 dh_fixperms:124 dh_gconf:112 dh_gencontrol:81 dh_installcatalogs:118 dh_installchangelogs:171 dh_installcron:79 dh_installdebconf:131 dh_installdeb:110 dh_installdirs:88 dh_installdocs:300 dh_installemacsen:126 dh_installexamples:108 dh_installinfo:79 dh_installinit:278 dh_installlogcheck:68 dh_installlogrotate:52 dh_installmanpages:199 dh_installman:255 dh_installmime:97 dh_installmodules:126 dh_installpam:61 dh_install:276 dh_installppp:67 dh_installwm:110 dh_installxfonts:88 dh_link:228 dh_listpackages:31 dh_makeshlibs:239 dh_md5sums:91 dh_movefiles:172 dh_perl:147 dh_python:284 dh_strip:229 dh_suidregister:119 dh_testdir:46 dh_testroot:29 dh_testversion:77 dh_undocumented:30 dh_usrlocal:116
 msgid "L<debhelper(7)>"
 msgstr ""
 
 #. type: textblock
-#: dh_builddeb:92 dh_clean:142 dh_compress:202 dh_desktop:35 dh_fixperms:126 dh_gconf:114 dh_gencontrol:83 dh_installchangelogs:163 dh_installcron:81 dh_installdebconf:133 dh_installdeb:112 dh_installdirs:90 dh_installdocs:239 dh_installemacsen:128 dh_installexamples:110 dh_installinfo:81 dh_installinit:280 dh_installlogrotate:54 dh_installmanpages:201 dh_installman:255 dh_installmenu:93 dh_installmime:99 dh_installmodules:128 dh_installpam:63 dh_install:278 dh_installppp:69 dh_installwm:112 dh_installxfonts:90 dh_link:228 dh_listpackages:33 dh_makeshlibs:241 dh_md5sums:93 dh_movefiles:174 dh_perl:149 dh_python:286 dh_scrollkeeper:32 dh_shlibdeps:172 dh_strip:231 dh_suidregister:121 dh_testdir:48 dh_testroot:31 dh_testversion:79 dh_undocumented:32 dh_usrlocal:118
+#: dh_builddeb:92 dh_clean:142 dh_compress:204 dh_desktop:35 dh_fixperms:126 dh_gconf:114 dh_gencontrol:83 dh_installchangelogs:173 dh_installcron:81 dh_installdebconf:133 dh_installdeb:112 dh_installdirs:90 dh_installdocs:302 dh_installemacsen:128 dh_installexamples:110 dh_installinfo:81 dh_installinit:280 dh_installlogrotate:54 dh_installmanpages:201 dh_installman:257 dh_installmenu:93 dh_installmime:99 dh_installmodules:128 dh_installpam:63 dh_install:278 dh_installppp:69 dh_installwm:112 dh_installxfonts:90 dh_link:230 dh_listpackages:33 dh_makeshlibs:241 dh_md5sums:93 dh_movefiles:174 dh_perl:149 dh_python:286 dh_scrollkeeper:32 dh_shlibdeps:172 dh_strip:231 dh_suidregister:121 dh_testdir:48 dh_testroot:31 dh_testversion:79 dh_undocumented:32 dh_usrlocal:118
 msgid "This program is a part of debhelper."
 msgstr ""
 
@@ -1150,7 +1131,7 @@ msgid ""
 msgstr ""
 
 #. type: =head1
-#: dh_clean:31 dh_compress:32 dh_gconf:27 dh_installcatalogs:35 dh_installchangelogs:32 dh_installcron:21 dh_installdebconf:34 dh_installdeb:22 dh_installdirs:21 dh_installdocs:21 dh_installemacsen:27 dh_installinfo:21 dh_installinit:27 dh_installlogcheck:21 dh_installman:50 dh_installmenu:25 dh_installmime:25 dh_installmodules:29 dh_installpam:21 dh_install:38 dh_installppp:21 dh_installwm:24 dh_link:39 dh_makeshlibs:24 dh_movefiles:26
+#: dh_clean:31 dh_compress:32 dh_gconf:27 dh_installcatalogs:35 dh_installchangelogs:32 dh_installcron:21 dh_installdebconf:34 dh_installdeb:22 dh_installdirs:21 dh_installdocs:21 dh_installemacsen:27 dh_installexamples:22 dh_installinfo:21 dh_installinit:27 dh_installlogcheck:21 dh_installman:50 dh_installmenu:25 dh_installmime:25 dh_installmodules:29 dh_installpam:21 dh_install:38 dh_installppp:21 dh_installwm:24 dh_link:39 dh_makeshlibs:24 dh_movefiles:26
 msgid "FILES"
 msgstr ""
 
@@ -1200,7 +1181,7 @@ msgid ""
 msgstr ""
 
 #. type: =item
-#: dh_clean:60 dh_compress:62 dh_installdocs:74 dh_installexamples:46 dh_installinfo:40 dh_installmanpages:44 dh_movefiles:55 dh_testdir:27
+#: dh_clean:60 dh_compress:64 dh_installdocs:92 dh_installexamples:46 dh_installinfo:40 dh_installmanpages:44 dh_movefiles:55 dh_testdir:27
 msgid "I<file ...>"
 msgstr ""
 
@@ -1258,7 +1239,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh_compress:51
+#: dh_compress:53
 msgid ""
 "Exclude files that contain \"item\" anywhere in their filename from being "
 "compressed. For example, -X.tiff will exclude tiff files from compression.  "
@@ -1268,24 +1249,24 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh_compress:59
+#: dh_compress:61
 msgid ""
 "Compress all files specified by command line parameters in ALL packages "
 "acted on."
 msgstr ""
 
 #. type: textblock
-#: dh_compress:64
+#: dh_compress:66
 msgid "Add these files to the list of files to compress."
 msgstr ""
 
 #. type: =head1
-#: dh_compress:68 dh_perl:61 dh_python:66 dh_strip:74 dh_usrlocal:55
+#: dh_compress:70 dh_perl:61 dh_python:66 dh_strip:74 dh_usrlocal:55
 msgid "CONFORMS TO"
 msgstr ""
 
 #. type: textblock
-#: dh_compress:70
+#: dh_compress:72
 msgid "Debian policy, version 3.0"
 msgstr ""
 
@@ -1545,7 +1526,7 @@ msgid "Do not modify F<postinst>/F<postrm>/F<prerm> scripts."
 msgstr ""
 
 #. type: textblock
-#: dh_installcatalogs:61 dh_installdocs:98 dh_installemacsen:69 dh_installinit:135 dh_installmime:53 dh_installmodules:62 dh_installwm:56 dh_usrlocal:51
+#: dh_installcatalogs:61 dh_installdocs:116 dh_installemacsen:69 dh_installinit:135 dh_installmime:53 dh_installmodules:62 dh_installwm:56 dh_usrlocal:51
 msgid ""
 "Note that this command is not idempotent. L<dh_prep(1)> should be called "
 "between invocations of this command. Otherwise, it may cause multiple "
@@ -1653,7 +1634,7 @@ msgid ""
 msgstr ""
 
 #. type: =item
-#: dh_installchangelogs:68 dh_installdocs:69 dh_installexamples:41 dh_install:76 dh_link:58 dh_movefiles:50
+#: dh_installchangelogs:68 dh_installdocs:69 dh_installexamples:41 dh_install:76 dh_link:60 dh_movefiles:50
 msgid "B<-Xitem>, B<--exclude=item>"
 msgstr ""
 
@@ -2064,7 +2045,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh_installdocs:66 dh_installinfo:37 dh_installman:64
+#: dh_installdocs:66 dh_installinfo:37 dh_installman:66
 msgid ""
 "Install all files specified by command line parameters in ALL packages acted "
 "on."
@@ -2077,25 +2058,58 @@ msgid ""
 "installed. Note that this includes doc-base files."
 msgstr ""
 
+#. type: =item
+#: dh_installdocs:74
+msgid "B<--link-doc=>I<package>"
+msgstr ""
+
 #. type: textblock
 #: dh_installdocs:76
+msgid ""
+"Make the documentation directory of all packages acted on be a symlink to "
+"the documentation directory of I<package>. This has no effect when acting on "
+"I<package> itself, or if the documentation directory to be created already "
+"exists when B<dh_installdocs> is run. To comply with policy, I<package> must "
+"be a binary package that comes from the same source package."
+msgstr ""
+
+#. type: textblock
+#: dh_installdocs:82
+msgid ""
+"debhelper will try to avoid installing files into linked documentation "
+"directories that would cause conflicts with the linked package. The B<-A> "
+"option will have no effect on packages with linked documentation "
+"directories, and copyright, changelog, README.Debian, and TODO files will "
+"not be installed."
+msgstr ""
+
+#. type: textblock
+#: dh_installdocs:88
+msgid ""
+"(An older method to accomplish the same thing, which is still supported, is "
+"to make the documentation directory of a package be a dangling symlink, "
+"before calling dh_installdocs.)"
+msgstr ""
+
+#. type: textblock
+#: dh_installdocs:94
 msgid ""
 "Install these files as documentation into the first package acted on. (Or in "
 "all packages if B<-A> is specified)."
 msgstr ""
 
 #. type: =head1
-#: dh_installdocs:81 dh_link:71 dh_makeshlibs:92 dh_shlibdeps:66
+#: dh_installdocs:99 dh_link:73 dh_makeshlibs:92 dh_shlibdeps:66
 msgid "EXAMPLES"
 msgstr ""
 
 #. type: textblock
-#: dh_installdocs:83
+#: dh_installdocs:101
 msgid "This is an example of a debian/package.docs file:"
 msgstr ""
 
 #. type: verbatim
-#: dh_installdocs:85
+#: dh_installdocs:103
 #, no-wrap
 msgid ""
 "  README\n"
@@ -2108,7 +2122,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh_installdocs:94
+#: dh_installdocs:112
 msgid ""
 "Note that dh_installdocs will happily copy entire directory hierarchies if "
 "you ask it to (similar to cp -a). If it is asked to install a directory, it "
@@ -2578,7 +2592,7 @@ msgid ""
 msgstr ""
 
 #. type: verbatim
-#: dh_installlogcheck:68
+#: dh_installlogcheck:70
 #, no-wrap
 msgid ""
 "This program is a part of debhelper.\n"
@@ -2586,7 +2600,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh_installlogcheck:72
+#: dh_installlogcheck:74
 msgid "Jon Middleton <jjm@debian.org>"
 msgstr ""
 
@@ -2773,31 +2787,31 @@ msgid "Lists man pages to be installed."
 msgstr ""
 
 #. type: =item
-#: dh_installman:67
+#: dh_installman:69
 msgid "B<--language>=ll"
 msgstr ""
 
 #. type: textblock
-#: dh_installman:69
+#: dh_installman:71
 msgid ""
 "Use this to specify that the man pages being acted on are written in the "
 "specified language."
 msgstr ""
 
 #. type: =item
-#: dh_installman:72
+#: dh_installman:74
 msgid "I<manpage ...>"
 msgstr ""
 
 #. type: textblock
-#: dh_installman:74
+#: dh_installman:76
 msgid ""
 "Install these man pages into the first package acted on. (Or in all packages "
 "if -A is specified)."
 msgstr ""
 
 #. type: textblock
-#: dh_installman:81
+#: dh_installman:83
 msgid ""
 "An older version of this program, L<dh_installmanpages(1)>, is still used by "
 "some packages, and so is still included in debhelper.  It is, however, "
@@ -3462,26 +3476,26 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh_link:55
+#: dh_link:57
 msgid ""
 "Create any links specified by command line parameters in ALL packages acted "
 "on, not just the first."
 msgstr ""
 
 #. type: textblock
-#: dh_link:60
+#: dh_link:62
 msgid ""
 "Do not correct symlinks that contain \"item\" anywhere in their filename "
 "from being corrected to comply with debian policy."
 msgstr ""
 
 #. type: =item
-#: dh_link:63
+#: dh_link:65
 msgid "I<source destination ...>"
 msgstr ""
 
 #. type: textblock
-#: dh_link:65
+#: dh_link:67
 msgid ""
 "Create a file named \"destination\" as a link to a file named \"source\". Do "
 "this in the package build directory of the first package acted on.  (Or in "
@@ -3489,7 +3503,7 @@ msgid ""
 msgstr ""
 
 #. type: verbatim
-#: dh_link:73
+#: dh_link:75
 #, no-wrap
 msgid ""
 " dh_link usr/share/man/man1/foo.1 usr/share/man/man1/bar.1\n"
@@ -3497,12 +3511,12 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh_link:75
+#: dh_link:77
 msgid "Make bar.1 be a symlink to foo.1"
 msgstr ""
 
 #. type: verbatim
-#: dh_link:77
+#: dh_link:79
 #, no-wrap
 msgid ""
 " dh_link var/lib/foo usr/lib/foo \\\n"
@@ -3511,7 +3525,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh_link:80
+#: dh_link:82
 msgid ""
 "Make /usr/lib/foo/ be a link to /var/lib/foo/, and bar.1 be a symlink to the "
 "foo.1"
