@@ -9,7 +9,7 @@ use Debian::Debhelper::Dh_Lib;
 # (This would not be needed if this file was contained in the python-support
 # package.)
 if (-x "/usr/bin/dh_pysupport") {
-	insert_after("dh_perl", "dh_pysupport");
+	insert_before("dh_installinit", "dh_pysupport");
 }
 
 1
