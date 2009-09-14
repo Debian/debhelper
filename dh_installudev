@@ -89,6 +89,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		$filename = "$package.udev";
 	}
 	$filename=~s/\.udev$/.rules/;
+	my $oldfilename=$filename;
+	if (defined $dh{NAME}) {
+		$filename="$dh{NAME}.rules";
+	}
 
 	if ($rules_file) {
 		if (! -e "$tmp/lib/udev/rules.d") {
@@ -100,7 +104,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			# Remove old rule from /etc, unless it's modified,
 			# in which case we rename it to match the new
 			# file in /lib, so it will override.
-			my $old="/etc/udev/rules.d/$old_priority$filename";
+			my $old="/etc/udev/rules.d/$old_priority$oldfilename";
 			$rule=~s/^\/lib/\/etc/;
 			autoscript($package,"preinst","preinst-moveconffile","s!#OLD#!$old!g;s!#NEW#!$rule!g;s!#PACKAGE#!$package!g");
 			autoscript($package,"postinst","postinst-moveconffile","s!#OLD#!$old!g;s!#NEW#!$rule!g");
