@@ -10,6 +10,9 @@ debhelper (7.4.2) UNRELEASED; urgency=low
   * Reorder dh_pysupport call in dh sequence to come before
     dh_installinit, so the generated postinst script registers
     python modules before trying to use them. Closes: #546293
+  * dh_installudev: With --name, install debian/<package>.<name>.udev
+    to rules.d/<priority>-<name>, the same as debian/<name>.udev
+    is installed for the first package. Closes: #546337
 
  -- Joey Hess <joeyh@debian.org>  Mon, 07 Sep 2009 12:48:39 -0400
 
