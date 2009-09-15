@@ -36,7 +36,7 @@ build: version
 	cat debhelper.pod | \
 		$(MAKEMANLIST) `find . -maxdepth 1 -type f -perm +100 -name "dh_*" | sort` | \
 		$(POD2MAN) --name="debhelper" --section=7  > debhelper.7
-	po4a -L UTF-8 man/po4a/po4a.cfg 
+	po4a --previous -L UTF-8 man/po4a/po4a.cfg 
 	set -e; \
 	for lang in $(LANGS); do \
 		dir=man/$$lang; \
@@ -57,7 +57,7 @@ version:
 
 clean:
 	rm -f *.1 *.7 Debian/Debhelper/Dh_Version.pm
-	po4a --rm-translations --rm-backups man/po4a/po4a.cfg
+	po4a --previous --rm-translations --rm-backups man/po4a/po4a.cfg
 	for lang in $(LANGS); do \
 		if [ -e man/$$lang ]; then rmdir man/$$lang; fi; \
 	done;
