@@ -608,7 +608,7 @@ sub excludefile {
 
 sub dpkg_architecture_value {
 	my $var = shift;
-	my $value=`dpkg-architecture -q$var 2>/dev/null` || error("dpkg-architecture failed");
+	my $value=`dpkg-architecture -q$var` || error("dpkg-architecture failed");
 	chomp $value;
 	return $value;
 }
