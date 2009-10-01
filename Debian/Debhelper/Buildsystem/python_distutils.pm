@@ -167,7 +167,7 @@ sub install {
 	my $this=shift;
 	my $destdir=shift;
 	$this->setup_py("install",
-                "--force",
+		"--force",
 		"--root=$destdir",
 		"--no-compile",
 		"-O0",
