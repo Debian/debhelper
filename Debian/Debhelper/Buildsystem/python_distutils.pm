@@ -108,9 +108,10 @@ sub setup_py {
 	my $this=shift;
 	my $act=shift;
 
-	# We need to to run setup.py with the default python first
+	# We need to to run setup.py with the default python last
 	# as distutils/setuptools modifies the shebang lines of scripts.
-	# This ensures that #!/usr/bin/python is used and not pythonX.Y
+	# This ensures that #!/usr/bin/python is installed last and
+	# not pythonX.Y
 	# Take into account that the default Python must not be in
 	# the requested Python versions.
 	# Then, run setup.py with each available python, to build
@@ -121,8 +122,10 @@ sub setup_py {
         $python_default =~ s/\s+$//;
         my @python_requested = split ' ', `pyversions -r 2>/dev/null`;
 	if (grep /^\Q$python_default\E/, @python_requested) {
-		@python_requested = ("python", grep(!/^\Q$python_default\E/,
-					@python_requested));
+		@python_requested = (
+			grep(!/^\Q$python_default\E/, @python_requested),
+			"python",
+		);
 	}
 
 	my @python_dbg;
@@ -137,7 +140,7 @@ sub setup_py {
 		}
 	}
 
-	foreach my $python (@python_requested, @python_dbg) {
+	foreach my $python (@python_dbg, @python_requested) {
 		if (-x "/usr/bin/".$python) {
 			# To allow backports of debhelper we don't pass
 			# --install-layout=deb to 'setup.py install` for

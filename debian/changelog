@@ -11,6 +11,10 @@ debhelper (7.4.3) UNRELEASED; urgency=low
   * dh_perl: Do not look at perl scripts under /usr/share/doc.
     Closes: #546683
   * Allow dpkg-architecture to print errors to stderr. Closes: #548636
+  * python_distutils: Run default python last, not first, and pass --force
+    to setup.py install to ensure that timestamps do not prevent installation
+    of the scripts built for the default python, without versioned shebang
+    lines. Closes: #547510 (Thanks, Andrew Straw)
 
  -- Joey Hess <joeyh@debian.org>  Tue, 15 Sep 2009 13:18:35 -0400
 
