@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 use Test;
-plan(tests => 21);
+plan(tests => 23);
 
 system("rm -rf debian/debhelper debian/tmp");
 
@@ -74,3 +74,15 @@ system("rm -rf debian/debhelper debian/tmp");
 system("./dh_install", "dh_install", "usr/bin");
 ok(-e "debian/debhelper/usr/bin/dh_install");
 system("rm -rf debian/debhelper debian/tmp");
+
+# specification of file in source directory not in debian/tmp
+system("mkdir -p bar/usr/bin; touch bar/usr/bin/foo");
+system("./dh_install", "--sourcedir=bar", "usr/bin/foo");
+ok(-e "debian/debhelper/usr/bin/foo");
+system("rm -rf debian/debhelper bar");
+
+# specification of file in subdir, not in debian/tmp
+system("mkdir -p bar/usr/bin; touch bar/usr/bin/foo");
+system("./dh_install", "bar/usr/bin/foo");
+ok(-e "debian/debhelper/bar/usr/bin/foo");
+system("rm -rf debian/debhelper bar");
