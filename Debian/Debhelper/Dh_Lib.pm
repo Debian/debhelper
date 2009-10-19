@@ -175,7 +175,7 @@ sub doit {
 	verbose_print(escape_shell(@_));
 
 	if (! $dh{NO_ACT}) {
-		system(@_) == 0 || _error_exitcode($_[0]);
+		system(@_) == 0 || _error_exitcode(join(" ", @_));
 	}
 }
 
