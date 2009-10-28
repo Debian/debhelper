@@ -33,10 +33,10 @@ sub exists_make_target {
 sub do_make {
 	my $this=shift;
 
+	# Remove unavailable jobserver options from MAKEFLAGS.
 	# Always clean MAKEFLAGS from unavailable jobserver options. If parallel
 	# is enabled, do more extensive clean up from all job control specific
-	# options and start our own jobserver if parallel building (> 1) was
-	# requested.
+	# options
 	my ($status, $makeflags) = get_make_jobserver_status();
 	if ($status eq "jobserver-unavailable" || defined $this->get_parallel()) {
 		if (defined $makeflags) {
