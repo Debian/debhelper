@@ -16,7 +16,8 @@ use vars qw(@ISA @EXPORT %dh);
 	    &compat &addsubstvar &delsubstvar &excludefile &package_arch
 	    &is_udeb &udeb_filename &debhelper_script_subst &escape_shell
 	    &inhibit_log &load_log &write_log &dpkg_architecture_value
-	    &sourcepackage &is_make_jobserver_unavailable &clean_makeflags);
+	    &sourcepackage
+	    &is_make_jobserver_unavailable &clean_jobserver_makeflags);
 
 my $max_compat=7;
 
@@ -811,15 +812,12 @@ sub is_make_jobserver_unavailable {
 	return; # no jobserver specified
 }
 
-# Cleans out job control options from MAKEFLAGS.
-sub clean_makeflags {
+# Cleans out jobserver options from MAKEFLAGS.
+sub clean_jobserver_makeflags {
 	if (exists $ENV{MAKEFLAGS}) {
 		if ($ENV{MAKEFLAGS} =~ /(?:^|\s)--jobserver-fds=(\d+)/) {
 			$ENV{MAKEFLAGS} =~ s/(?:^|\s)--jobserver-fds=\S+//g;
 			$ENV{MAKEFLAGS} =~ s/(?:^|\s)-j\b//g;
-		}
-		else {
-			$ENV{MAKEFLAGS} =~ s/(?:^|\s)(?:(?:-j\s*|--jobs(?:=|\s+))(\d+)?|--jobs)\b//g;
 		}
 		delete $ENV{MAKEFLAGS} if $ENV{MAKEFLAGS} =~ /^\s*$/;
 	}

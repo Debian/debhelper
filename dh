@@ -234,18 +234,13 @@ init(options => {
 });
 inhibit_log();
 
-# Parallel defaults to "unset" unless unavailable --jobserver-fds is detected
-# in MAKEFLAGS. This typically means dpkg-buildpackage was called with a -jX
-# option. Then -jX in MAKEFLAGS gets "consumed" by make invocation of
-# debian/rules and "converted" to --jobserver-fds.  If jobserver is
-# unavailable, dh was probably called via debian/rules without "+" prefix (so
-# make has closed jobserver FDs). In such a case, MAKEFLAGS is cleaned from the
-# offending --jobserver-fds option in order to prevent further make invocations
-# from spitting warnings and disabling job support.
+# If make was using a jobserver, but it is not available, clean out
+# MAKEFLAGS so that further make invocations can start a new job
+# server. 
 if (is_make_jobserver_unavailable()) {
-	clean_makeflags();
-	# Enable parallel (no maximum) if the package doesn't since it appears this
-	# dh is called via dpkg-buildpackage -jX.
+	clean_jobserver_makeflags();
+	# Enable parallel (no maximum) if a value was not previously
+	# specified.
 	$dh{PARALLEL} = 0 if !defined $dh{PARALLEL};
 }
 
