@@ -242,15 +242,8 @@ inhibit_log();
 # make has closed jobserver FDs). In such a case, MAKEFLAGS is cleaned from the
 # offending --jobserver-fds option in order to prevent further make invocations
 # from spitting warnings and disabling job support.
-my ($status, $makeflags) = get_make_jobserver_status();
-if ($status eq "jobserver-unavailable") {
-	# Stop make from spitting pointless job control warnings
-	if (defined $makeflags) {
-		$ENV{MAKEFLAGS} = $makeflags;
-	}
-	else {
-		delete $ENV{MAKEFLAGS};
-	}
+if (is_make_jobserver_unavailable()) {
+	clean_makeflags();
 	# Enable parallel (no maximum) if the package doesn't since it appears this
 	# dh is called via dpkg-buildpackage -jX.
 	$dh{PARALLEL} = 0 if !defined $dh{PARALLEL};

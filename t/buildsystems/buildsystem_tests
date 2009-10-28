@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 273;
+use Test::More tests => 281;
 
 use strict;
 use warnings;
@@ -484,39 +484,47 @@ ok ( ! -e 'bld', "bld got deleted too" );
 #### Test parallel building and related options / routines
 @tmp = ( $ENV{MAKEFLAGS}, $ENV{DEB_BUILD_OPTIONS} );
 
-# Test get_make_jobserver_status() sub
+# Test is_make_jobserver_unavailable and clean_makeflags.
 
 $ENV{MAKEFLAGS} = "--jobserver-fds=103,104 -j";
-is_deeply( [ get_make_jobserver_status() ], [ "jobserver-unavailable", undef ],
-	"get_make_jobserver_status(): unavailable jobserver, unset makeflags" );
+ok(is_make_jobserver_unavailable(), "unavailable jobserver" );
+clean_makeflags();
+ok(! exists $ENV{MAKEFLAGS}, "unset makeflags");
 
 $ENV{MAKEFLAGS} = "-a --jobserver-fds=103,104 -j -b";
-is_deeply( [ get_make_jobserver_status() ], [ "jobserver-unavailable", "-a -b" ],
-	"get_make_jobserver_status(): unavailable jobserver, clean makeflags" );
+ok(is_make_jobserver_unavailable(), "unavailable jobserver" );
+clean_makeflags();
+is($ENV{MAKEFLAGS}, "-a -b", "clean makeflags");
 
 $ENV{MAKEFLAGS} = " --jobserver-fds=1,2 -j  ";
-is_deeply( [ get_make_jobserver_status() ], [ "jobserver", undef ],
-	"get_make_jobserver_status(): jobserver (available), clean makeflags" );
+ok(! is_make_jobserver_unavailable(), "available jobserver" );
+clean_makeflags();
+ok(! exists $ENV{MAKEFLAGS}, "unset makeflags");
 
 $ENV{MAKEFLAGS} = "-a -j -b";
-is_deeply( [ get_make_jobserver_status() ], [ "jobs-0", "-a -b" ],
-	"get_make_jobserver_status(): -j" );
+ok(! is_make_jobserver_unavailable(), "no specified jobserver");
+clean_makeflags();
+is($ENV{MAKEFLAGS}, "-a -b", "clean makeflags");
 
 $ENV{MAKEFLAGS} = "-a --jobs -b";
-is_deeply( [ get_make_jobserver_status() ], [ "jobs-0", "-a -b" ],
-	"get_make_jobserver_status(): --jobs" );
+ok(! is_make_jobserver_unavailable(), "no specified jobserver");
+clean_makeflags();
+is($ENV{MAKEFLAGS}, "-a -b", "clean makeflags");
 
 $ENV{MAKEFLAGS} = "-j6";
-is_deeply( [ get_make_jobserver_status() ], [ "jobs-6", undef ],
-	"get_make_jobserver_status(): -j6" );
+ok(! is_make_jobserver_unavailable(), "no specified jobserver");
+clean_makeflags();
+ok(! exists $ENV{MAKEFLAGS}, "unset makeflags");
 
 $ENV{MAKEFLAGS} = "-a -j6 --jobs=7";
-is_deeply( [ get_make_jobserver_status() ], [ "jobs-7", "-a" ],
-	"get_make_jobserver_status(): -j6 --jobs=7" );
+ok(! is_make_jobserver_unavailable(), "no specified jobserver");
+clean_makeflags();
+is($ENV{MAKEFLAGS}, "-a", "clean makeflags");
 
 $ENV{MAKEFLAGS} = "-j6 --jobserver-fds=5,6 --jobs=8";
-is_deeply( [ get_make_jobserver_status() ], [ "jobserver-unavailable", "-j6 --jobs=8" ],
-	"get_make_jobserver_status(): mixed jobserver and -j/--jobs" );
+ok(is_make_jobserver_unavailable(), "unavailable jobserver");
+clean_makeflags();
+is($ENV{MAKEFLAGS}, "-j6 --jobs=8", "jobserver options removed");
 
 # Test parallel building with makefile build system.
 $ENV{MAKEFLAGS} = "";
