@@ -239,9 +239,9 @@ inhibit_log();
 # server. 
 if (is_make_jobserver_unavailable()) {
 	clean_jobserver_makeflags();
-	# Enable parallel (no maximum) if a value was not previously
+	# Implicitly enable parallel (no maximum) if a value was not previously
 	# specified.
-	$dh{PARALLEL} = 0 if !defined $dh{PARALLEL};
+	$dh{PARALLEL} = 0 unless defined $dh{PARALLEL};
 }
 
 # Definitions of sequences.
@@ -536,8 +536,8 @@ sub run {
 	# to prevent them from being acted on.
 	push @options, map { "-N$_" } @exclude;
 
-	# Pass --parallel to dh_auto_* commands if requested
-	if (defined $dh{PARALLEL} && ($dh{PARALLEL} == 0 || $dh{PARALLEL} > 1)
+	# Pass --parallel to dh_auto_* commands.
+	if (defined $dh{PARALLEL} && $dh{PARALLEL} != 1
 	    && $command =~ /^dh_auto_/) {
 		push @options, "--parallel" . ($dh{PARALLEL} > 1 ? "=$dh{PARALLEL}" : "");
 	}
