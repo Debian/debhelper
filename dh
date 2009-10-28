@@ -41,13 +41,6 @@ override target can then run the command with additional options, or run
 entirely different commands instead. (Note that to use this feature,
 you should Build-Depend on debhelper 7.0.50 or above.)
 
-dh passes --parallel to dh_auto_* commands if it detects being run by the
-C<dpkg-buildpackage -jX> command, but a job server of the parent I<make>
-(presumably debian/rules) is not reachable. Nonetheless, it is highly
-recommended to pass --parallel/-j option to dh explicitly to indicate that a
-source package supports parallel building. See L<debhelper(7)/"BUILD SYSTEM
-OPTIONS"> for more information.
-
 =head1 OPTIONS
 
 =over 4
@@ -229,8 +222,6 @@ init(options => {
 	},
 	"l" => \$dh{LIST},
 	"list" => \$dh{LIST},
-	"j:i" => \$dh{PARALLEL},
-	"parallel:i" => \$dh{PARALLEL},
 });
 inhibit_log();
 
@@ -239,9 +230,6 @@ inhibit_log();
 # server. 
 if (is_make_jobserver_unavailable()) {
 	clean_jobserver_makeflags();
-	# Implicitly enable parallel (no maximum) if a value was not previously
-	# specified.
-	$dh{PARALLEL} = 0 unless defined $dh{PARALLEL};
 }
 
 # Definitions of sequences.
@@ -450,12 +438,7 @@ while (@ARGV_orig) {
 		shift @ARGV_orig;
 		next;
 	}
-	elsif ($opt =~ /^--?(no-act|remaining|(after|until|before|with|without|parallel)=)/) {
-		next;
-	}
-	elsif ($opt =~ /^(-j|--parallel)$/) {
-		# Argument to -j/--parallel is optional.
-		shift @ARGV_orig if @ARGV_orig > 0 && $ARGV_orig[0] =~ /^\d+$/;
+	elsif ($opt =~ /^--?(no-act|remaining|(after|until|before|with|without)=)/) {
 		next;
 	}
 	push @options, $opt;
@@ -535,12 +518,6 @@ sub run {
 	# If some packages are excluded, add flags
 	# to prevent them from being acted on.
 	push @options, map { "-N$_" } @exclude;
-
-	# Pass --parallel to dh_auto_* commands.
-	if (defined $dh{PARALLEL} && $dh{PARALLEL} != 1
-	    && $command =~ /^dh_auto_/) {
-		push @options, "--parallel" . ($dh{PARALLEL} > 1 ? "=$dh{PARALLEL}" : "");
-	}
 
 	# Check for override targets in debian/rules and
 	# run them instead of running the command directly.
