@@ -16,7 +16,7 @@ use vars qw(@ISA @EXPORT %dh);
 	    &compat &addsubstvar &delsubstvar &excludefile &package_arch
 	    &is_udeb &udeb_filename &debhelper_script_subst &escape_shell
 	    &inhibit_log &load_log &write_log &dpkg_architecture_value
-	    &sourcepackage);
+	    &sourcepackage &get_make_jobserver_status);
 
 my $max_compat=7;
 
@@ -203,6 +203,46 @@ sub _error_exitcode {
 	else {
 		error("$command returned exit code ".($? >> 8));
 	}
+}
+
+# A helper subroutine for detecting (based on MAKEFLAGS) if make jobserver 
+# is enabled, if it is available or MAKEFLAGS contains "jobs" option.
+# It returns current status (jobserver, jobserver-unavailable or jobs-N where
+# N is number of jobs, 0 if infinite) and MAKEFLAGS cleaned up from 
+# job control options.
+sub get_make_jobserver_status {
+	my $jobsre = qr/(?:^|\s)(?:(?:-j\s*|--jobs(?:=|\s+))(\d+)?|--jobs)\b/;
+	my $status = "";
+	my $makeflags;
+
+	if (exists $ENV{MAKEFLAGS}) {
+		$makeflags = $ENV{MAKEFLAGS};
+		if ($makeflags =~ /(?:^|\s)--jobserver-fds=(\d+)/) {
+			$status = "jobserver";
+			if (!open(my $in, "<&", "$1")) {
+				# Job server is unavailable
+				$status .= "-unavailable";
+			}
+			else {
+				close $in;
+			}
+			# Clean makeflags up
+			$makeflags =~ s/(?:^|\s)--jobserver-fds=\S+//g;
+			$makeflags =~ s/(?:^|\s)-j\b//g;
+		}
+		elsif (my @m = ($makeflags =~ /$jobsre/g)) {
+			# Job count is specified in MAKEFLAGS. Whenever make reads it, a new
+			# jobserver will be started. Job count returned is 0 if infinite.
+			$status = "jobs-" . (defined $m[$#m] ? $m[$#m] : "0");
+			# Clean makeflags up from "jobs" option(s)
+			$makeflags =~ s/$jobsre//g;
+		}
+	}
+	if ($status) {
+		# MAKEFLAGS could be unset if it is empty
+		$makeflags = undef if $makeflags =~ /^\s*$/;
+	}
+	return wantarray ? ($status, $makeflags) : $status;
 }
 
 # Run a command that may have a huge number of arguments, like xargs does.

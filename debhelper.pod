@@ -205,6 +205,24 @@ If the build system prefers out of source tree building but still
 allows in source building, the latter can be re-enabled by passing a build
 directory path that is the same as the source directory path.
 
+=item B<-j>[I<maximum>], B<--parallel>[I<=maximum>]
+
+Indicate that a source package supports building using multiple parallel
+processes. However, the package will be built in this mode only if the build
+system supports this feature and tag I<parallel=n> is present in the
+DEB_BUILD_OPTIONS environment variable (as per Debian Policy section 4.9.1).
+The number of spawned parallel processes will be the smallest value of I<n>,
+I<maximum> (if specified) or a build system specific limit.
+
+If value of I<maximum> is 1, parallel building will be forcefully disabled.
+Such construct can be used to negate effects of the previously specified
+I<--parallel> option.
+
+If I<--parallel> is not specified, a debhelper build system will neither
+attempt to enforce nor prevent parallel building. This typically means a source
+package does not to support parallel building or enforces it in other ways
+(e.g. by modifying MAKEFLAGS manually).
+
 =item B<--list>, B<-l>
 
 List all build systems supported by debhelper on this system. The list

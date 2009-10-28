@@ -41,6 +41,13 @@ override target can then run the command with additional options, or run
 entirely different commands instead. (Note that to use this feature,
 you should Build-Depend on debhelper 7.0.50 or above.)
 
+dh passes --parallel to dh_auto_* commands if it detects being run by the
+C<dpkg-buildpackage -jX> command, but a job server of the parent I<make>
+(presumably debian/rules) is not reachable. Nonetheless, it is highly
+recommended to pass --parallel/-j option to dh explicitly to indicate that a
+source package supports parallel building. See L<debhelper(7)/"BUILD SYSTEM
+OPTIONS"> for more information.
+
 =head1 OPTIONS
 
 =over 4
@@ -222,8 +229,32 @@ init(options => {
 	},
 	"l" => \$dh{LIST},
 	"list" => \$dh{LIST},
+	"j:i" => \$dh{PARALLEL},
+	"parallel:i" => \$dh{PARALLEL},
 });
 inhibit_log();
+
+# Parallel defaults to "unset" unless unavailable --jobserver-fds is detected
+# in MAKEFLAGS. This typically means dpkg-buildpackage was called with a -jX
+# option. Then -jX in MAKEFLAGS gets "consumed" by make invocation of
+# debian/rules and "converted" to --jobserver-fds.  If jobserver is
+# unavailable, dh was probably called via debian/rules without "+" prefix (so
+# make has closed jobserver FDs). In such a case, MAKEFLAGS is cleaned from the
+# offending --jobserver-fds option in order to prevent further make invocations
+# from spitting warnings and disabling job support.
+my ($status, $makeflags) = get_make_jobserver_status();
+if ($status eq "jobserver-unavailable") {
+	# Stop make from spitting pointless job control warnings
+	if (defined $makeflags) {
+		$ENV{MAKEFLAGS} = $makeflags;
+	}
+	else {
+		delete $ENV{MAKEFLAGS};
+	}
+	# Enable parallel (no maximum) if the package doesn't since it appears this
+	# dh is called via dpkg-buildpackage -jX.
+	$dh{PARALLEL} = 0 if !defined $dh{PARALLEL};
+}
 
 # Definitions of sequences.
 my %sequences;
@@ -431,7 +462,12 @@ while (@ARGV_orig) {
 		shift @ARGV_orig;
 		next;
 	}
-	elsif ($opt =~ /^--?(no-act|remaining|(after|until|before|with|without)=)/) {
+	elsif ($opt =~ /^--?(no-act|remaining|(after|until|before|with|without|parallel)=)/) {
+		next;
+	}
+	elsif ($opt =~ /^(-j|--parallel)$/) {
+		# Argument to -j/--parallel is optional.
+		shift @ARGV_orig if @ARGV_orig > 0 && $ARGV_orig[0] =~ /^\d+$/;
 		next;
 	}
 	push @options, $opt;
@@ -511,6 +547,12 @@ sub run {
 	# If some packages are excluded, add flags
 	# to prevent them from being acted on.
 	push @options, map { "-N$_" } @exclude;
+
+	# Pass --parallel to dh_auto_* commands if requested
+	if (defined $dh{PARALLEL} && ($dh{PARALLEL} == 0 || $dh{PARALLEL} > 1)
+	    && $command =~ /^dh_auto_/) {
+		push @options, "--parallel" . ($dh{PARALLEL} > 1 ? "=$dh{PARALLEL}" : "");
+	}
 
 	# Check for override targets in debian/rules and
 	# run them instead of running the command directly.

@@ -47,7 +47,12 @@ sub DEFAULT_BUILD_DIRECTORY {
 #                  specified or empty, defaults to the current directory.
 # - builddir -     specifies build directory to use. Path is relative to the
 #                  current (top) directory. If undef or empty,
-#                  DEFAULT_BUILD_DIRECTORY directory will be used. 
+#                  DEFAULT_BUILD_DIRECTORY directory will be used.
+# - parallel -     number of parallel process to be spawned for building
+#                  sources. Parallel building needs to be supported by the
+#                  underlying build system for this option to be effective.
+#                  Defaults to undef (i.e. parallel disabled, but do not try to
+#                  enforce this limit by messing with environment).
 # Derived class can override the constructor to initialize common object
 # parameters. Do NOT use constructor to execute commands or otherwise
 # configure/setup build environment. There is absolutely no guarantee the
@@ -58,6 +63,7 @@ sub new {
 
 	my $this = bless({ sourcedir => '.',
 	                   builddir => undef,
+	                   parallel => undef,
 	                   cwd => Cwd::getcwd() }, $class);
 
 	if (exists $opts{sourcedir}) {
@@ -70,6 +76,9 @@ sub new {
 	}
 	if (exists $opts{builddir}) {
 		$this->_set_builddir($opts{builddir});
+	}
+	if (defined $opts{parallel} && $opts{parallel} >= 1) {
+		$this->{parallel} = $opts{parallel};
 	}
 	return $this;
 }
@@ -241,6 +250,11 @@ sub get_source_rel2builddir {
 		return File::Spec->catfile($dir, $path);
 	}
 	return $dir;
+}
+
+sub get_parallel {
+	my $this=shift;
+	return $this->{parallel};
 }
 
 # When given a relative path to the build directory, converts it

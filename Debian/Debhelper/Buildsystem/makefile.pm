@@ -7,7 +7,7 @@
 package Debian::Debhelper::Buildsystem::makefile;
 
 use strict;
-use Debian::Debhelper::Dh_Lib qw(escape_shell);
+use Debian::Debhelper::Dh_Lib qw(escape_shell get_make_jobserver_status);
 use base 'Debian::Debhelper::Buildsystem';
 
 sub get_makecmd_C {
@@ -30,13 +30,38 @@ sub exists_make_target {
 	return length($ret);
 }
 
+sub do_make {
+	my $this=shift;
+
+	# Always clean MAKEFLAGS from unavailable jobserver options. If parallel
+	# is enabled, do more extensive clean up from all job control specific
+	# options and start our own jobserver if parallel building (> 1) was
+	# requested.
+	my ($status, $makeflags) = get_make_jobserver_status();
+	if ($status eq "jobserver-unavailable" || defined $this->get_parallel()) {
+		if (defined $makeflags) {
+			$ENV{MAKEFLAGS} = $makeflags;
+		}
+		else {
+			delete $ENV{MAKEFLAGS} if exists $ENV{MAKEFLAGS};
+		}
+	}
+
+	# Start a new jobserver if parallel building was requested
+	if (defined $this->get_parallel()) {
+		unshift @_, "-j" . ($this->get_parallel() > 1 ? $this->get_parallel() : 1);
+	}
+
+	$this->doit_in_builddir($this->{makecmd}, @_);
+}
+
 sub make_first_existing_target {
 	my $this=shift;
 	my $targets=shift;
 
 	foreach my $target (@$targets) {
 		if ($this->exists_make_target($target)) {
-			$this->doit_in_builddir($this->{makecmd}, $target, @_);
+			$this->do_make($target, @_);
 			return $target;
 		}
 	}
@@ -71,7 +96,7 @@ sub check_auto_buildable {
 
 sub build {
 	my $this=shift;
-	$this->doit_in_builddir($this->{makecmd}, @_);
+	$this->do_make(@_);
 }
 
 sub test {

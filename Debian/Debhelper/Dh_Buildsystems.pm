@@ -30,6 +30,7 @@ my $opt_buildsys;
 my $opt_sourcedir;
 my $opt_builddir;
 my $opt_list;
+my $opt_parallel;
 
 sub create_buildsystem_instance {
 	my $system=shift;
@@ -46,6 +47,9 @@ sub create_buildsystem_instance {
 	}
 	if (!exists $bsopts{sourcedir} && defined $opt_sourcedir) {
 		$bsopts{sourcedir} = ($opt_sourcedir eq "") ? undef : $opt_sourcedir;
+	}
+	if (!exists $bsopts{parallel}) {
+		$bsopts{parallel} = $opt_parallel;
 	}
 	return $module->new(%bsopts);
 }
@@ -122,9 +126,47 @@ sub buildsystems_init {
 
 	    "l" => \$opt_list,
 	    "list" => \$opt_list,
+
+	    "j:i" => \$opt_parallel,
+	    "parallel:i" => \$opt_parallel,
 	);
 	$args{options}{$_} = $options{$_} foreach keys(%options);
 	Debian::Debhelper::Dh_Lib::init(%args);
+
+	# Post-process parallel building option. Initially $opt_parallel may have
+	# such values:
+	# * undef - no --parallel option was specified. This tells buildsystem class
+	#   not to mess with MAKEFLAGS (with the exception of cleaning MAKEFLAGS
+	#   from pointless unavailable jobserver options to avoid warnings) nor
+	#   enable parallel.
+	# * 1 - --parallel=1 option was specified, hence the package should never be
+	#   built in parallel mode. Cleans MAKEFLAGS if needed.
+	# * 0 - --parallel was specified without interger argument meaning package
+	#   does not want to enforce limit on maximum number of parallel processes.
+	# * N > 1 - --parallel=N was specified where N is the maximum number parallel
+	#   processes the package wants to enforce.
+	# Taken DEB_BUILD_OPTIONS and all this into account, set $opt_parallel to the
+	# number of parallel processes to be used for *this* build.
+	if (defined $opt_parallel) {
+		if ($opt_parallel >= 0 && exists $ENV{DEB_BUILD_OPTIONS}) {
+			# Parse parallel=n tag
+			my $n;
+			foreach my $opt (split(/\s+/, $ENV{DEB_BUILD_OPTIONS})) {
+				$n = $1 if $opt =~ /^parallel=(\d+)$/;
+			}
+			if (defined $n && $n > 0) {
+				$opt_parallel = $n if $opt_parallel == 0 || $n < $opt_parallel;
+			}
+			else {
+				# Invalid value in the parallel tag. Disable.
+				$opt_parallel = 1;
+			}
+		}
+		else {
+			# In case invalid number was passed
+			$opt_parallel = 1;
+		}
+	}
 }
 
 sub buildsystems_list {
