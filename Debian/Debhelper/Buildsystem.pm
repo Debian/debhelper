@@ -48,11 +48,8 @@ sub DEFAULT_BUILD_DIRECTORY {
 # - builddir -     specifies build directory to use. Path is relative to the
 #                  current (top) directory. If undef or empty,
 #                  DEFAULT_BUILD_DIRECTORY directory will be used.
-# - parallel -     number of parallel process to be spawned for building
-#                  sources. Parallel building needs to be supported by the
-#                  underlying build system for this option to be effective.
-#                  Defaults to undef (i.e. parallel disabled, but do not try to
-#                  enforce this limit by messing with environment).
+# - parallel -     max number of parallel processes to be spawned for building
+#                  sources (-1 = unlimited; 1 = no parallel)
 # Derived class can override the constructor to initialize common object
 # parameters. Do NOT use constructor to execute commands or otherwise
 # configure/setup build environment. There is absolutely no guarantee the
@@ -77,7 +74,7 @@ sub new {
 	if (exists $opts{builddir}) {
 		$this->_set_builddir($opts{builddir});
 	}
-	if (defined $opts{parallel} && $opts{parallel} >= 1) {
+	if (defined $opts{parallel}) {
 		$this->{parallel} = $opts{parallel};
 	}
 	return $this;

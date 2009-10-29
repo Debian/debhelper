@@ -7,8 +7,7 @@
 package Debian::Debhelper::Buildsystem::makefile;
 
 use strict;
-use Debian::Debhelper::Dh_Lib qw(escape_shell is_make_jobserver_unavailable
-	clean_jobserver_makeflags);
+use Debian::Debhelper::Dh_Lib qw(escape_shell clean_jobserver_makeflags);
 use base 'Debian::Debhelper::Buildsystem';
 
 sub get_makecmd_C {
@@ -34,17 +33,12 @@ sub exists_make_target {
 sub do_make {
 	my $this=shift;
 
-	# Avoid warnings about unavailable jobserver.
-	if (is_make_jobserver_unavailable()) {
-		clean_jobserver_makeflags();
-	}
+	# Avoid possible warnings about unavailable jobserver,
+	# and force make to start a new jobserver.
+	clean_jobserver_makeflags();
 
-	if (defined $this->get_parallel()) {
-		# Note that this will override any -j settings in MAKEFLAGS.
-		unshift @_, "-j" . ($this->get_parallel() > 1 ? $this->get_parallel() : 1);
-		# Force make to start a new jobserver.
-		clean_jobserver_makeflags();
-	}
+	# Note that this will override any -j settings in MAKEFLAGS.
+	unshift @_, "-j" . ($this->get_parallel() > 0 ? $this->get_parallel() : "");
 
 	$this->doit_in_builddir($this->{makecmd}, @_);
 }

@@ -113,7 +113,7 @@ sub load_all_buildsystems {
 sub buildsystems_init {
 	my %args=@_;
 	
-	my $max_parallel=0;
+	my $max_parallel=-1; # unlimited
 
 	# Available command line options
 	my %options = (
@@ -139,27 +139,21 @@ sub buildsystems_init {
 sub set_parallel {
 	my $max=shift;
 
+	$opt_parallel=1;
+
 	if (exists $ENV{DEB_BUILD_OPTIONS}) {
 		# Parse parallel=n tag
-		my $n;
 		foreach my $opt (split(/\s+/, $ENV{DEB_BUILD_OPTIONS})) {
-			$n = $1 if $opt =~ /^parallel=(\d+)$/;
-		}
-		if (defined $n && $n > 0) {
-			if (!$max || $n < $max) {
-				$opt_parallel = $n;
+			if ($opt =~ /^parallel=([-\d]+)$/) {
+				my $n=$1;
+				if ($n > 0 && ($max == -1 || $n < $max)) {
+					$opt_parallel = $n;
+				}
+				else {
+					$opt_parallel = $max;
+				}
 			}
-			else {
-				$opt_parallel = $max;
-			}
 		}
-		else {
-			# Invalid value in the parallel tag. Disable.
-			$opt_parallel = 1;
-		}
-	}
-	else {
-		$opt_parallel = 1;
 	}
 }
 
