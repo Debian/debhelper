@@ -112,6 +112,8 @@ sub load_all_buildsystems {
 
 sub buildsystems_init {
 	my %args=@_;
+	
+	my $max_parallel=0;
 
 	# Available command line options
 	my %options = (
@@ -127,28 +129,28 @@ sub buildsystems_init {
 	    "l" => \$opt_list,
 	    "list" => \$opt_list,
 
-	    "j:i" => \&set_parallel,
-	    "parallel:i" => \&set_parallel,
+	    "max-parallel:i" => \$max_parallel,
 	);
 	$args{options}{$_} = $options{$_} foreach keys(%options);
 	Debian::Debhelper::Dh_Lib::init(%args);
+	set_parallel($max_parallel);
 }
 
 sub set_parallel {
-	my ($option, $value)=@_;
+	my $max=shift;
 
-	if ($value >= 0 && exists $ENV{DEB_BUILD_OPTIONS}) {
+	if (exists $ENV{DEB_BUILD_OPTIONS}) {
 		# Parse parallel=n tag
 		my $n;
 		foreach my $opt (split(/\s+/, $ENV{DEB_BUILD_OPTIONS})) {
 			$n = $1 if $opt =~ /^parallel=(\d+)$/;
 		}
 		if (defined $n && $n > 0) {
-			if ($value == 0 || $n < $value) {
+			if ($max && $n < $max) {
 				$opt_parallel = $n;
 			}
 			else {
-				$opt_parallel = $value;
+				$opt_parallel = $max;
 			}
 		}
 		else {

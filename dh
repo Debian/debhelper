@@ -225,9 +225,9 @@ init(options => {
 });
 inhibit_log();
 
-# If make was using a jobserver, but it is not available, clean out
-# MAKEFLAGS so that further make invocations can start a new job
-# server. 
+# If make is using a jobserver, but it is not available
+# to this process, clean out MAKEFLAGS. This avoids
+# ugly warnings when calling make.
 if (is_make_jobserver_unavailable()) {
 	clean_jobserver_makeflags();
 }

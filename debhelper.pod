@@ -205,15 +205,16 @@ If the build system prefers out of source tree building but still
 allows in source building, the latter can be re-enabled by passing a build
 directory path that is the same as the source directory path.
 
-=item B<-j>[I<maximum>], B<--parallel>[I<=maximum>]
+=item B<--max-parallel>[I<=maximum>]
 
-Indicate that a source package supports building using multiple parallel
-processes. This only enables parallel building if the build system supports
-it, and I<parallel=n> is present in the DEB_BUILD_OPTIONS environment
-variable (as per Debian Policy section 4.9.1).
+By default, the DEB_BUILD_OPTIONS environment variable can be used to
+enable parallel building, when supported by the build system.
 
-The number of parallel processes will be the smaller value specified by
-I<--parallel>, DEB_BUILD_OPTIONS, or a build system specific limit.
+This option allows controlling how many parallel jobs can be used in a
+build. If set to 1, concurrent builds are disabled -- do this if
+the package build is known not to work in parallel. If the package build
+is known to only work with certian levels of concurrency, you can set this
+to the maximum level that is known to work, or that you wish to support.
 
 =item B<--list>, B<-l>
 

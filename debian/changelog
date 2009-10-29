@@ -1,13 +1,15 @@
 debhelper (7.4.4) UNRELEASED; urgency=low
 
-  * dh_auto_*: Add --parallel option that indicates the package supports
-    parallel building. Then if DH_BUILD_OPTIONS contains 'parallel=N',
-    and the build system supports it, parallel building is done.
   * The makefile buildsystem (and derived buildsystems) now supports
-    parallel building.
-  * Typically, to enable parallel building, the --parallel option will
-    be passed to dh. Closes: #532805
-  * Thanks, Modestas Vainius for most of the work on parallel build support.
+    parallel building by default, as specified via DEB_BUILD_OPTIONS.
+    Closes: #532805
+  * dh_auto_*: Add --max-parallel option that can be used to control
+    or disable parallel building. --max-parallel=1 will disable parallel
+    building, while --max-parallel=N will limit the maximum number of
+    parallel processes that can be specified via DEB_BUILD_OPTIONS.
+  * Added some hacks to avoid warnings about unavailable jobservers when
+    debhelper runs make.
+  * Thanks, Modestas Vainius for much of the work on parallel build support.
 
  -- Joey Hess <joeyh@debian.org>  Wed, 28 Oct 2009 18:10:45 -0400
 
