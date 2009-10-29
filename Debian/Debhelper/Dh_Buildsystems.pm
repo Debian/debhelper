@@ -146,7 +146,7 @@ sub set_parallel {
 			$n = $1 if $opt =~ /^parallel=(\d+)$/;
 		}
 		if (defined $n && $n > 0) {
-			if ($max && $n < $max) {
+			if (!$max || $n < $max) {
 				$opt_parallel = $n;
 			}
 			else {
