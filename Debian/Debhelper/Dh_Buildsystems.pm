@@ -129,7 +129,7 @@ sub buildsystems_init {
 	    "l" => \$opt_list,
 	    "list" => \$opt_list,
 
-	    "max-parallel:i" => \$max_parallel,
+	    "max-parallel=i" => \$max_parallel,
 	);
 	$args{options}{$_} = $options{$_} foreach keys(%options);
 	Debian::Debhelper::Dh_Lib::init(%args);
