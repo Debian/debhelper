@@ -27,18 +27,21 @@ a list of ELF executables and shared libraries it has found.
 
 =over 4
 
-=item B<-u>I<params>, B<--dpkg-shlibdeps-params=>I<params>
-
-=item B<--> I<params>
-
-Pass "params" to L<dpkg-shlibdeps(1)>.
-
 =item B<-X>I<item>, B<--exclude=>I<item>
 
 Exclude files that contain "item" anywhere in their filename from being
 passed to dpkg-shlibdeps. This will make their dependencies be ignored.
 This may be useful in some situations, but use it with caution. This option
 may be used more than once to exclude more than one thing.
+
+=item B<--> I<params>
+
+Pass "params" to L<dpkg-shlibdeps(1)>.
+
+=item B<-u>I<params>, B<--dpkg-shlibdeps-params=>I<params>
+
+This is another way to pass I<params> to L<dpkg-deb(1)>.
+It is deprecated; use B<--> instead.
 
 =item B<-l>I<directory>[:directory:directory:..]
 
