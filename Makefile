@@ -10,12 +10,19 @@ MAKEMANLIST=perl -e ' \
 		        $$file=<IN>; \
 		        close IN; \
 		        if ($$file=~m/=head1 .*?\n\n(.*?) - (.*?)\n\n/s) { \
-		                $$collect.="=item $$1(1)\n\n$$2\n\n"; \
+				my $$item="=item $$1(1)\n\n$$2\n\n"; \
+				if ($$2!~/deprecated/) { \
+			                $$list.=$$item; \
+				} \
+				else { \
+			                $$list_deprecated.=$$item; \
+				} \
 		        } \
 		} \
 		END { \
 			while (<STDIN>) { \
-		        	s/\#LIST\#/$$collect/; \
+		        	s/\#LIST\#/$$list/; \
+		        	s/\#LIST_DEPRECATED\#/$$list_deprecated/; \
 				print; \
 			}; \
 		}'
@@ -30,12 +37,9 @@ POD2MAN=pod2man --utf8 -c Debhelper -r "$(VERSION)"
 # l10n to be built is determined from .po files
 LANGS=$(notdir $(basename $(wildcard man/po4a/po/*.po)))
 
-build: version
+build: version debhelper.7
 	find . -maxdepth 1 -type f -perm +100 -name "dh*" \
 		-exec $(POD2MAN) {} {}.1 \;
-	cat debhelper.pod | \
-		$(MAKEMANLIST) `find . -maxdepth 1 -type f -perm +100 -name "dh_*" | sort` | \
-		$(POD2MAN) --name="debhelper" --section=7  > debhelper.7
 	po4a --previous -L UTF-8 man/po4a/po4a.cfg 
 	set -e; \
 	for lang in $(LANGS); do \
@@ -54,6 +58,11 @@ build: version
 version:
 	printf "package Debian::Debhelper::Dh_Version;\n\$$version='$(VERSION)';\n1" > \
 		Debian/Debhelper/Dh_Version.pm
+
+debhelper.7: debhelper.pod
+	cat debhelper.pod | \
+		$(MAKEMANLIST) `find . -maxdepth 1 -type f -perm +100 -name "dh_*" | sort` | \
+		$(POD2MAN) --name="debhelper" --section=7  > debhelper.7
 
 clean:
 	rm -f *.1 *.7 Debian/Debhelper/Dh_Version.pm
