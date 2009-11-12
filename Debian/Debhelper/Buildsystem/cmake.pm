@@ -40,4 +40,11 @@ sub configure {
 	$this->doit_in_builddir("cmake", $this->get_source_rel2builddir(), @flags, @_);
 }
 
+sub test {
+	my $this=shift;
+
+	$ENV{CTEST_OUTPUT_ON_FAILURE} = 1;
+	return $this->test(@_);
+}
+
 1
