@@ -280,6 +280,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				last;
 			}
 		}
+		if (! exists $doc_ids{$fn}) {
+			warning("Could not parse $fn for doc-base Document id; skipping");
+		}
 		close IN;
 	}
 	closedir(DEB);
