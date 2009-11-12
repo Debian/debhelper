@@ -313,7 +313,7 @@ sub dirname {
 			}
 		}
 
-		if ($c < 4 && ! $warned_compat) {
+		if ($c <= 4 && ! $warned_compat) {
 			warning("Compatibility levels before 5 are deprecated.");
 			$warned_compat=1;
 		}
