@@ -251,12 +251,11 @@ sub verbose_print {
 	}
 }
 
-# Output an error message and exit.
+# Output an error message and die (can be caught).
 sub error {
 	my $message=shift;
 
-	warning($message);
-	exit 1;
+	die basename($0).": $message\n";
 }
 
 # Output a warning.
