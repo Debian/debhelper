@@ -49,7 +49,15 @@ sub configure {
 	}
 
 	$this->mkdir_builddir();
-	$this->doit_in_builddir($this->get_source_rel2builddir("configure"), @opts, @_);
+	eval {
+		$this->doit_in_builddir($this->get_source_rel2builddir("configure"), @opts, @_);
+	};
+	if ($@) {
+		if (-e $this->get_buildpath("config.log")) {
+			$this->doit_in_builddir("cat config.log");
+		}
+		die $@;
+	}
 }
 
 1
