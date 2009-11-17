@@ -17,7 +17,10 @@ sub check_auto_buildable {
 	my $this=shift;
 	my ($step)=@_;
 	my $ret = -e $this->get_sourcepath("CMakeLists.txt");
-	$ret &&= $this->SUPER::check_auto_buildable(@_) if $step ne "configure";
+	if ($step ne "configure") {
+		$ret &&= -e $this->get_buildpath("CMakeCache.txt") &&
+		         $this->SUPER::check_auto_buildable(@_);
+	}
 	return $ret;
 }
 
