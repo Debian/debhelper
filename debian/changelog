@@ -1,4 +1,4 @@
-debhelper (7.4.4) UNRELEASED; urgency=low
+debhelper (7.4.4) unstable; urgency=low
 
   * The makefile buildsystem (and derived buildsystems cmake, autoconf, etc)
     now supports parallel building by default, as specified via
@@ -16,7 +16,7 @@ debhelper (7.4.4) UNRELEASED; urgency=low
     time soon.) Closes: #554509
   * Separate deprecated programs in the list of commands in debhelper(7).
     Closes: #548382
-  * Adjust code to add deprecation warning for compatability level 4.
+  * Adjust code to add deprecation warning for compatibility level 4.
     (Man page already said it was deprecated.) Closes: #555899
   * dh_installdocs: Warn if a doc-base file cannot be parsed to find a
     document id. Closes: #555677
@@ -31,7 +31,7 @@ debhelper (7.4.4) UNRELEASED; urgency=low
     makefile once cmake generated a makefile. Closes: #555805
     (Modestas Vainius)
 
- -- Joey Hess <joeyh@debian.org>  Wed, 28 Oct 2009 18:10:45 -0400
+ -- Joey Hess <joeyh@debian.org>  Wed, 18 Nov 2009 14:44:21 -0500
 
 debhelper (7.4.3) unstable; urgency=low
 
@@ -693,7 +693,7 @@ debhelper (7.0.8) unstable; urgency=low
     cli-common.
   * Moved python-support special case out of dh and into a python-support
     sequence addon. --with=python-support is enabled by default to avoid
-    breaking backwards compatability.
+    breaking backwards compatibility.
 
  -- Joey Hess <joeyh@debian.org>  Sun, 04 May 2008 16:10:54 -0400
 
@@ -1628,7 +1628,7 @@ debhelper (5.0.1) unstable; urgency=low
 
 debhelper (5.0.0) unstable; urgency=low
 
-  * debhelper v5 mode is finalised and the new recommended compatability
+  * debhelper v5 mode is finalised and the new recommended compatibility
     level. Unless your package uses dh_strip --dbg-package, switching to v5
     is 99.999% unlikely to change anything in a package, and it allows
     adding comments to all your debhelper config files, so I recommend making
@@ -1766,7 +1766,7 @@ debhelper (4.9.1) unstable; urgency=low
 
 debhelper (4.9.0) unstable; urgency=low
 
-  * Begin work on compatability level 5. The set of changes in this mode is
+  * Begin work on compatibility level 5. The set of changes in this mode is
     still being determined, and will be until debhelper version 5.0 is 
     released, so use at your own risk.
   * dh_strip: In v5, make --dbg-package specify a single debugging package
@@ -2986,7 +2986,7 @@ debhelper (4.0.0) unstable; urgency=low
   * v4 mode is done, you may now use it without fear of it changing.
     (This idea of this upload is to get v4 into woody so people won't run into
     many issues backporting from sarge to woody later on. Packages targeted
-    for woody should continue to use whatever compatability level they are
+    for woody should continue to use whatever compatibility level they are
     using.)
 
  -- Joey Hess <joeyh@debian.org>  Tue, 11 Apr 2002 17:28:57 -0400
@@ -3064,7 +3064,7 @@ debhelper (3.4.5) unstable; urgency=low
 debhelper (3.4.4) unstable; urgency=low
 
   * Introduced the debian/compat file. This is the new, preferred way to say
-    what debhelper compatability level your package uses. It has the big
+    what debhelper compatibility level your package uses. It has the big
     advantage of being available to debhelper when you run it at the command
     line, as well as in debian/rules.
   * A new v4 feature: dh_installinit, in v4 mode, will use invoke-rc.d.
@@ -3117,11 +3117,11 @@ debhelper (3.4.0) unstable; urgency=low
 
   * Began work on v4 support (and thus the large version number jump), and it
     is only for the very brave right now since I will unhesitatingly break
-    compatability in v4 mode as I'm developing it. Currently, updating to v4
+    compatibility in v4 mode as I'm developing it. Currently, updating to v4
     mode will only make dh_makeshlibs -V generate shared library deps that
     omit the debian part of the version number. The reasoning behind this
     change is that the debian revision should not typically break binary
-    compatability, that existing use of -V is causing too tight versioned
+    compatibility, that existing use of -V is causing too tight versioned
     deps, and that if you do need to include the debian revision for some
     reason, you can always write it out by hand. Closes: #101497
   * dh_testversion is deprecated -- use build deps instead. A warning message
@@ -3549,7 +3549,7 @@ debhelper (3.0.0) unstable; urgency=low
     begin using it, since this is much better then dh_installmanpages's
     evilness. I've been meaning to do this for a very long time..
     Closes: #38673, #53964, #64297, #16933, #17061, #54059, #54373, #61816
-  * dh_installmanpages remains in the package for backwards compatability,
+  * dh_installmanpages remains in the package for backwards compatibility,
     but is mildly deprecated.
   * dh_testversion is deprecated; use build dependancies instead.
   * dh_suidregister: re-enabled. Aj thinks that requiring people to stop
@@ -3739,14 +3739,14 @@ debhelper (2.2.1) unstable; urgency=low
     after I learned people use it for eg, documenting the source package
     itself. Closes: #34628, since it seems this is not such an "incredibly
     minor" change after all. Never underetimate the annoyance of
-    backwards-compatability.
+    backwards-compatibility.
 
  -- Joey Hess <joeyh@debian.org>  Mon, 27 Nov 2000 12:01:52 -0800
 
 debhelper (2.2.0) unstable; urgency=low
 
   * DH_COMPAT=3 now enables the following new features which I can't just
-    turn on by default for fear of breaking backwards compatability:
+    turn on by default for fear of breaking backwards compatibility:
     - dh_makeshlibs makes the postinst/postrm call ldconfig. Closes: #77154
       Patch from Masato Taruishi <taru@debian.org> (modified). If you 
       use this, be sure dh_makeshlibs runs before dh_installdeb; many
@@ -3824,7 +3824,7 @@ debhelper (2.1.21) unstable; urgency=low
     dpkg-dev >= 1.7.0 to make sure this doesn't break anything.
   * While I'm updating for dpkg 1.7.0, I removed the -ldirectory hack
     from dh_shlibdeps; dpkg-shlibdeps has its own much more brutal hack to
-    make this work. The switch is ignored now for backwards compatability.
+    make this work. The switch is ignored now for backwards compatibility.
   * dh_suidregister will be deprecated soon -- dpkg-statoverride is a
     much better way.
 
@@ -3884,7 +3884,7 @@ debhelper (2.1.16) unstable; urgency=low
 
 debhelper (2.1.15) unstable; urgency=low
 
-  * dh_installwm: patched a path in some backwards compatability code.
+  * dh_installwm: patched a path in some backwards compatibility code.
     Closes: #75283
 
  -- Joey Hess <joeyh@debian.org>  Mon, 23 Oct 2000 10:13:44 -0700
@@ -3999,7 +3999,7 @@ debhelper (2.1.1) unstable; urgency=low
 debhelper (2.1.0) unstable; urgency=low
 
   * I started work on debhelper v2 over a year ago, with a long list of
-    changes I hoped to get in that broke backwards compatability. That
+    changes I hoped to get in that broke backwards compatibility. That
     development stalled after only the most important change was made,
     although I did get out over 100 releases in the debhelper 2.0.x tree.
     In the meantime, lots of packages have switched to using v2, despite my
@@ -4464,7 +4464,7 @@ debhelper (2.0.52) unstable; urgency=low
 
 debhelper (2.0.51) unstable; urgency=low
 
-  * dh_installdocs: create the compatability symlink before calling
+  * dh_installdocs: create the compatibility symlink before calling
     install-docs. I'm told this is better in some cases. (Closes: #45608)
   * examples/rules.multi2: clarified what you have to comment/uncomment.
 
@@ -4551,7 +4551,7 @@ debhelper (2.0.40) unstable; urgency=low
   * Closes: #42489, #42587, #41732.
   * dh_installdocs: Adds code to postinst and prerm as specified in
     http://www.debian.org/Lists-Archives/debian-ctte-9908/msg00038.html,
-    to make /usr/doc/<package> a compatability symlink to
+    to make /usr/doc/<package> a compatibility symlink to
     /usr/share/doc/<package>. Note that currently if something exists in
     /usr/doc/<package> when the postinst is run, it will silently not make
     the symlink. I'm considering more intellingent handing of this case.
@@ -4785,7 +4785,7 @@ debhelper (2.0.02) unstable; urgency=low
   * If you're going to use v2, it's reccommended you call 
     "dh_testversion 2". Added a note about that to doc/v2.
   * Dh_Lib.pm compat: if a version that is greater than the highest
-    supported compatability level is specified, abort with an error. Perhaps
+    supported compatibility level is specified, abort with an error. Perhaps
     there will be a debhelper v3 some day...
 
  -- Joey Hess <joeyh@debian.org>  Thu,  1 Jul 1999 14:08:14 -0700
@@ -4805,7 +4805,7 @@ debhelper (2.0.00) unstable; urgency=low
     dh_movefiles still uses it.)
   * debhelper.1: documented this. 
   * Dh_lib.pm: added compat(), pass in a number, it returns true if the
-    current compatability level is equal to that number.
+    current compatibility level is equal to that number.
   * doc/PROGRAMMING: documented that.
   * debhelper itself now builds using DH_COMPAT=2.
   * dh_debstd forces DH_COMPAT=1, because it needs to stay compatable with
@@ -5534,7 +5534,7 @@ debhelper (1.1.20) unstable; urgency=low
 debhelper (1.1.19) unstable; urgency=low
 
   * dh_installmanpages: look at basename of man pacges specified on command
-    line to skip, for backwards compatability. 
+    line to skip, for backwards compatibility. 
 
  -- Joey Hess <joeyh@debian.org>  Thu, 10 Sep 1998 11:31:42 -0700
 
@@ -5897,7 +5897,7 @@ debhelper (0.90) unstable; urgency=low
   * dh_testroot: test for uid == 0, instead of username == root, becuase
     some people enjoy changing root's name.
   * dh_installinit: handle debian/init.d as well as debian/init files, 
-    for backwards compatability with debstd. Unlike with debstd, the two
+    for backwards compatibility with debstd. Unlike with debstd, the two
     files are treated identically.
   * dh_lib, PROGRAMMING: added "warning" function.
   * Minor man page fixes.
@@ -6403,7 +6403,7 @@ debhelper (0.18) unstable; urgency=low
 debhelper (0.17) unstable; urgency=low
 
   * Added dh_installdirs, automatically creates subdirectories (for
-    compatability with debstd's debian/dirs file.
+    compatibility with debstd's debian/dirs file.
   * dh_lib: fixed problem with -P flag.
 
  -- Joey Hess <joeyh@debian.org>  Fri,  7 Nov 1997 16:07:11 -0500
