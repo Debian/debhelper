@@ -14,6 +14,8 @@ use File::Spec;
 use base 'Exporter';
 our @EXPORT=qw(&buildsystems_init &buildsystems_do &load_buildsystem &load_all_buildsystems);
 
+use constant BUILD_STEPS => qw(configure build test install clean);
+
 # Historical order must be kept for backwards compatibility. New
 # build systems MUST be added to the END of the list.
 our @BUILDSYSTEMS = (
@@ -66,14 +68,26 @@ sub load_buildsystem {
 	}
 	else {
 		# Try to determine build system automatically
+		my $selected;
+		my $selected_level = 0;
 		for $system (@BUILDSYSTEMS) {
 			my $inst = create_buildsystem_instance($system, @_);
-			if ($inst->check_auto_buildable($step)) {
-				return $inst;
+
+			# Only derived (i.e. more specific) build system can be
+			# considered beyond the currently selected one.
+			next if defined $selected && !$inst->isa(ref $selected);
+
+			# If the build system says it is auto-buildable at the current
+			# step and it can provide more specific information about its
+			# status than its parent (if any), auto-select it.
+			my $level = $inst->check_auto_buildable($step);
+			if ($level > $selected_level) {
+				$selected = $inst;
+				$selected_level = $level;
 			}
 		}
+		return $selected;
 	}
-	return;
 }
 
 sub load_all_buildsystems {
@@ -189,7 +203,7 @@ sub buildsystems_do {
 		$step =~ s/^dh_auto_//;
 	}
 
-	if (grep(/^\Q$step\E$/, qw{configure build test install clean}) == 0) {
+	if (grep(/^\Q$step\E$/, BUILD_STEPS) == 0) {
 		error("unrecognized build step: " . $step);
 	}
 

@@ -109,18 +109,27 @@ sub _set_builddir {
 }
 
 # This instance method is called to check if the build system is able
-# to auto build a source package. Additional argument $step describes
-# which operation the caller is going to perform (either configure,
-# build, test, install or clean). You must override this method for the
-# build system module to be ever picked up automatically. This method is
-# used in conjuction with @Dh_Buildsystems::BUILDSYSTEMS.
+# to build a source package. It will be called during build
+# system auto-selection process inside the root directory of the debian
+# source package. Current build step will be passed as an additional
+# argument. The value returned must be 0 if the source is not buildable
+# or a positive integer otherwise.
 #
-# This method is supposed to be called inside the source root directory.
-# Use $this->get_buildpath($path) method to get full path to the files
-# in the build directory.
+# Generally, it is enough to look for invariant unique build system
+# files shipped with clean source to determine if the source might
+# be buildable or not. However, if the build system enhances (i.e.
+# derives) from the other auto-buildable build system, this method
+# may also check if the source has already been built with this build
+# system partitially by looking for temporary files or other common
+# results the build system produces during the build process. The
+# latter checks must be unique to the current build system and must
+# be very unlikely to be true for either its parent or other build
+# systems. If it is determined that the source has already built
+# partitially with this build system, the value returned must be
+# greater than the one of the SUPER call.
 sub check_auto_buildable {
 	my $this=shift;
-	my ($step) = @_;
+	my ($step)=@_;
 	return 0;
 }
 

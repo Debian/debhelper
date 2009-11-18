@@ -31,7 +31,7 @@ sub new {
 
 sub check_auto_buildable {
 	my $this=shift;
-	return -e $this->get_sourcepath("setup.py");
+	return -e $this->get_sourcepath("setup.py") ? 1 : 0;
 }
 
 sub not_our_cfg {
@@ -117,10 +117,10 @@ sub setup_py {
 	# Then, run setup.py with each available python, to build
 	# extensions for each.
 
-        my $python_default = `pyversions -d`;
-        $python_default =~ s/^\s+//;
-        $python_default =~ s/\s+$//;
-        my @python_requested = split ' ', `pyversions -r 2>/dev/null`;
+	my $python_default = `pyversions -d`;
+	$python_default =~ s/^\s+//;
+	$python_default =~ s/\s+$//;
+	my @python_requested = split ' ', `pyversions -r 2>/dev/null`;
 	if (grep /^\Q$python_default\E/, @python_requested) {
 		@python_requested = (
 			grep(!/^\Q$python_default\E/, @python_requested),
@@ -129,7 +129,7 @@ sub setup_py {
 	}
 
 	my @python_dbg;
-        my @dbg_build_needed = $this->dbg_build_needed();
+	my @dbg_build_needed = $this->dbg_build_needed();
 	foreach my $python (map { $_."-dbg" } @python_requested) {
 		if (grep /^(python-all-dbg|\Q$python\E)/, @dbg_build_needed) {
 			push @python_dbg, $python;

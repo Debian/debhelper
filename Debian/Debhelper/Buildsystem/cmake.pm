@@ -16,12 +16,12 @@ sub DESCRIPTION {
 sub check_auto_buildable {
 	my $this=shift;
 	my ($step)=@_;
-	my $ret = -e $this->get_sourcepath("CMakeLists.txt");
-	if ($step ne "configure") {
-		$ret &&= -e $this->get_buildpath("CMakeCache.txt") &&
-		         $this->SUPER::check_auto_buildable(@_);
+	if (-e $this->get_sourcepath("CMakeLists.txt")) {
+		my $ret = $this->SUPER::check_auto_buildable(@_);
+		$ret++ if ($ret && -e $this->get_buildpath("CMakeCache.txt"));
+		return $ret > 0 ? $ret : 1;
 	}
-	return $ret;
+	return 0;
 }
 
 sub new {

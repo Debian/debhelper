@@ -71,15 +71,11 @@ sub check_auto_buildable {
 	my $this=shift;
 	my ($step) = @_;
 
-	# Handles build, test, install, clean; configure - next class
-	if (grep /^\Q$step\E$/, qw{build test install clean}) {
-		# This is always called in the source directory, but generally
-		# Makefiles are created (or live) in the the build directory.
-		return -e $this->get_buildpath("Makefile") ||
-		       -e $this->get_buildpath("makefile") ||
-		       -e $this->get_buildpath("GNUmakefile");
-	}
-	return 0;
+	# This is always called in the source directory, but generally
+	# Makefiles are created (or live) in the the build directory.
+	return (-e $this->get_buildpath("Makefile") ||
+	        -e $this->get_buildpath("makefile") ||
+	        -e $this->get_buildpath("GNUmakefile")) ? 1 : 0;
 }
 
 sub build {

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 277;
+use Test::More tests => 292;
 
 use strict;
 use warnings;
@@ -229,14 +229,8 @@ sub test_check_auto_buildable {
 		} elsif (exists $expected->{default}) {
 			$e = $expected->{default};
 		}
-		if ($e) {
-			ok( $bs->check_auto_buildable($step),
-			    $bs->NAME() . "($config): check_auto_buildable($step)" );
-		}
-		else {
-			ok( ! $bs->check_auto_buildable($step),
-			    $bs->NAME() . "($config): ! check_auto_buildable($step)" );
-		}
+		is( $bs->check_auto_buildable($step), $e,
+			$bs->NAME() . "($config): check_auto_buildable($step) == $e" );
 	}
 }
 
@@ -262,17 +256,18 @@ touch "$tmpdir/configure", 0755;
 test_check_auto_buildable($bs{autoconf}, "configure", { configure => 1 });
 
 touch "$tmpdir/CMakeLists.txt";
-test_check_auto_buildable($bs{cmake}, "CMakeLists.txt", { configure => 1 });
+test_check_auto_buildable($bs{cmake}, "CMakeLists.txt", 1);
 
 touch "$tmpdir/Makefile.PL";
-test_check_auto_buildable($bs{perl_mm}, "Makefile.PL",
-    { configure => 1, install => 1 });
+test_check_auto_buildable($bs{perl_mm}, "Makefile.PL", { configure => 1 });
 
 # With Makefile
 touch "$builddir/Makefile";
-test_check_auto_buildable($bs, "Makefile", { configure => 0, default => 1 });
+test_check_auto_buildable($bs, "Makefile", 1);
 test_check_auto_buildable($bs{autoconf}, "configure+Makefile", { configure => 1 });
 test_check_auto_buildable($bs{cmake}, "CMakeLists.txt+Makefile", 1);
+touch "$builddir/CMakeCache.txt"; # strong evidence that cmake was run
+test_check_auto_buildable($bs{cmake}, "CMakeCache.txt+Makefile", 2);
 
 # Makefile.PL forces in-source
 #(see note in check_auto_buildable() why always 1 here)
@@ -298,18 +293,20 @@ cleandir($tmpdir);
 
 ### Now test if it can autoselect a proper buildsystem for a typical package
 sub test_autoselection {
-	my $system=shift;
+	my $testname=shift;
 	my $expected=shift;
+	my %args=@_;
 	for my $step (@STEPS) {
 		my $bs = load_buildsystem(undef, $step, @_);
 		my $e = $expected;
 		$e = $expected->{$step} if ref $expected;
 		if (defined $bs) {
-			is( $bs->NAME(), $e, "autoselection($system): $step=".((defined $e)?$e:'undef') );
+			is( $bs->NAME(), $e, "autoselection($testname): $step=".((defined $e)?$e:'undef') );
 		}
 		else {
-			is ( undef, $e, "autoselection($system): $step=".((defined $e)?$e:'undef') );
+			is ( undef, $e, "autoselection($testname): $step=".((defined $e)?$e:'undef') );
 		}
+		&{$args{"code_$step"}}() if exists $args{"code_$step"};
 	}
 }
 
@@ -329,8 +326,7 @@ cleandir $tmpdir;
 
 # Makefile
 touch "$builddir/Makefile";
-test_autoselection("makefile", { build => "makefile", test => "makefile",
-		install => "makefile", clean => "makefile" }, %tmp);
+test_autoselection("makefile", "makefile", %tmp);
 cleandir $tmpdir;
 
 # Python Distutils
@@ -346,10 +342,27 @@ cleandir $tmpdir;
 
 # CMake
 touch "$tmpdir/CMakeLists.txt";
+$tmp = sub {
+	touch "$builddir/Makefile";
+};
+test_autoselection("cmake without CMakeCache.txt",
+	{ configure => "cmake", build => "makefile",
+	  test => "makefile", install => "makefile", clean => "makefile" }, %tmp,
+	code_configure => $tmp);
+cleandir $tmpdir;
+
+touch "$tmpdir/CMakeLists.txt";
+$tmp = sub {
+	touch "$builddir/Makefile";
+	touch "$builddir/CMakeCache.txt";
+};
+test_autoselection("cmake with CMakeCache.txt",
+	"cmake", %tmp, code_configure => $tmp);
+cleandir $tmpdir;
+
+touch "$tmpdir/CMakeLists.txt";
 touch "$builddir/Makefile";
-test_autoselection("cmake",
-    { configure => "cmake", build => "makefile",
-      test => "makefile", install => "makefile", clean => "makefile" }, %tmp);
+test_autoselection("cmake and existing Makefile", "makefile", %tmp);
 cleandir $tmpdir;
 
 ### Test Buildsystem::rmdir_builddir()

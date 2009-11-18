@@ -21,7 +21,7 @@ sub check_auto_buildable {
 	if ($step ne "configure") {
 		$ret &&= -e $this->get_sourcepath("Build");
 	}
-	return $ret;
+	return $ret ? 1 : 0;
 }
 
 sub do_perl {

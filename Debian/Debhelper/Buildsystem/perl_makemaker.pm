@@ -19,7 +19,7 @@ sub check_auto_buildable {
 
 	# Handles everything if Makefile.PL exists. Otherwise - next class.
 	if (-e $this->get_sourcepath("Makefile.PL")) {
-		if ($step eq "install" || $step eq "configure") {
+		if ($step eq "configure") {
 			return 1;
 		}
 		else {
