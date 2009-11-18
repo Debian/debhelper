@@ -18,6 +18,9 @@ sub check_auto_buildable {
 	my ($step)=@_;
 	if (-e $this->get_sourcepath("CMakeLists.txt")) {
 		my $ret = $this->SUPER::check_auto_buildable(@_);
+		# Existence of CMakeCache.txt indicates cmake has already
+		# been used by a prior build step, so should be used
+		# instead of the parent makefile class.
 		$ret++ if ($ret && -e $this->get_buildpath("CMakeCache.txt"));
 		return $ret > 0 ? $ret : 1;
 	}

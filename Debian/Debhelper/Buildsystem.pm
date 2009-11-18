@@ -109,16 +109,16 @@ sub _set_builddir {
 }
 
 # This instance method is called to check if the build system is able
-# to build a source package. It will be called during build
-# system auto-selection process inside the root directory of the debian
-# source package. Current build step will be passed as an additional
-# argument. The value returned must be 0 if the source is not buildable
-# or a positive integer otherwise.
+# to build a source package. It will be called during the build
+# system auto-selection process, inside the root directory of the debian
+# source package. The current build step is passed as an argument.
+# Return 0 if the source is not buildable, or a positive integer
+# otherwise.
 #
 # Generally, it is enough to look for invariant unique build system
 # files shipped with clean source to determine if the source might
-# be buildable or not. However, if the build system enhances (i.e.
-# derives) from the other auto-buildable build system, this method
+# be buildable or not. However, if the build system is derived from
+# another other auto-buildable build system, this method
 # may also check if the source has already been built with this build
 # system partitially by looking for temporary files or other common
 # results the build system produces during the build process. The
