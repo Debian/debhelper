@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 292;
+use Test::More tests => 312;
 
 use strict;
 use warnings;
@@ -204,12 +204,6 @@ $bs = $BS_CLASS->new(builddir => "bld/dir/", sourcedir => "autoconf");
 );
 test_buildsystem_paths_api($bs, "builddir=../bld/dir, sourcedir=autoconf", \%tmp);
 
-### Test if all buildsystems can be loaded
-@bs = load_all_buildsystems([ $INC[0] ]);
-@tmp = map { $_->NAME() } @bs;
-ok(@Debian::Debhelper::Dh_Buildsystems::BUILDSYSTEMS >= 1, "some build systems are built in" );
-is_deeply( \@tmp, \@Debian::Debhelper::Dh_Buildsystems::BUILDSYSTEMS, "load_all_buildsystems() loads all built-in buildsystems" );
-
 ### Test check_auto_buildable() of each buildsystem
 sub test_check_auto_buildable {
 	my $bs=shift;
@@ -242,15 +236,21 @@ mkdir $builddir;
 	sourcedir => $tmpdir
 );
 
-$bs{autoconf} = load_buildsystem("autoconf", undef, %tmp);
-$bs{cmake} = load_buildsystem("cmake", undef, %tmp);
-$bs{perl_mm} = load_buildsystem("perl_makemaker", undef, %tmp);
-$bs = load_buildsystem("makefile", undef, %tmp);
+# Test if all buildsystems can be loaded
+@bs = load_all_buildsystems([ $INC[0] ], %tmp);
+@tmp = map { $_->NAME() } @bs;
+ok(@Debian::Debhelper::Dh_Buildsystems::BUILDSYSTEMS >= 1, "some build systems are built in" );
+is_deeply( \@tmp, \@Debian::Debhelper::Dh_Buildsystems::BUILDSYSTEMS, "load_all_buildsystems() loads all built-in buildsystems" );
 
-test_check_auto_buildable($bs{autoconf}, "no configure", 0);
-test_check_auto_buildable($bs{cmake}, "no CMakeLists.txt", 0);
-test_check_auto_buildable($bs{perl_mm}, "no Makefile.PL", 0);
-test_check_auto_buildable($bs, "no Makefile", 0);
+# check_auto_buildable() fails with numeric 0
+for $bs (@bs) {
+    test_check_auto_buildable($bs, "fails with numeric 0", 0);
+}
+
+%bs = ();
+for $bs (@bs) {
+    $bs{$bs->NAME()} = $bs;
+}
 
 touch "$tmpdir/configure", 0755;
 test_check_auto_buildable($bs{autoconf}, "configure", { configure => 1 });
@@ -259,11 +259,11 @@ touch "$tmpdir/CMakeLists.txt";
 test_check_auto_buildable($bs{cmake}, "CMakeLists.txt", 1);
 
 touch "$tmpdir/Makefile.PL";
-test_check_auto_buildable($bs{perl_mm}, "Makefile.PL", { configure => 1 });
+test_check_auto_buildable($bs{perl_makemaker}, "Makefile.PL", { configure => 1 });
 
 # With Makefile
 touch "$builddir/Makefile";
-test_check_auto_buildable($bs, "Makefile", 1);
+test_check_auto_buildable($bs{makefile}, "Makefile", 1);
 test_check_auto_buildable($bs{autoconf}, "configure+Makefile", { configure => 1 });
 test_check_auto_buildable($bs{cmake}, "CMakeLists.txt+Makefile", 1);
 touch "$builddir/CMakeCache.txt"; # strong evidence that cmake was run
@@ -273,21 +273,19 @@ test_check_auto_buildable($bs{cmake}, "CMakeCache.txt+Makefile", 2);
 #(see note in check_auto_buildable() why always 1 here)
 unlink "$builddir/Makefile";
 touch "$tmpdir/Makefile";
-test_check_auto_buildable($bs{perl_mm}, "Makefile.PL+Makefile", 1);
+test_check_auto_buildable($bs{perl_makemaker}, "Makefile.PL+Makefile", 1);
 
 # Perl Build.PL - handles always
-$bs = load_buildsystem("perl_build", undef, %tmp);
-test_check_auto_buildable($bs, "no Build.PL", 0);
+test_check_auto_buildable($bs{perl_build}, "no Build.PL", 0);
 touch "$tmpdir/Build.PL";
-test_check_auto_buildable($bs, "Build.PL", { configure => 1 });
+test_check_auto_buildable($bs{perl_build}, "Build.PL", { configure => 1 });
 touch "$tmpdir/Build"; # forced in source
-test_check_auto_buildable($bs, "Build.PL+Build", 1);
+test_check_auto_buildable($bs{perl_build}, "Build.PL+Build", 1);
 
 # Python Distutils
-$bs = load_buildsystem("python_distutils", undef, %tmp);
-test_check_auto_buildable($bs, "no setup.py", 0);
+test_check_auto_buildable($bs{python_distutils}, "no setup.py", 0);
 touch "$tmpdir/setup.py";
-test_check_auto_buildable($bs, "setup.py", 1);
+test_check_auto_buildable($bs{python_distutils}, "setup.py", 1);
 
 cleandir($tmpdir);
 
@@ -309,6 +307,10 @@ sub test_autoselection {
 		&{$args{"code_$step"}}() if exists $args{"code_$step"};
 	}
 }
+
+# Auto-select nothing when no supported build system can be found
+# (see #557006).
+test_autoselection("auto-selects nothing", undef, %tmp);
 
 # Autoconf
 touch "$tmpdir/configure", 0755;
