@@ -14,7 +14,7 @@ sub DESCRIPTION {
 
 sub check_auto_buildable {
 	my $this=shift;
-	return $this->get_sourcepath("build.xml") ? 1 : 0;
+	return (-e $this->get_sourcepath("build.xml")) ? 1 : 0;
 }
 
 sub new {
