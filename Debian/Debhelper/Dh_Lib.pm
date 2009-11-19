@@ -576,7 +576,7 @@ sub filedoublearray {
 		# as if we were in the specified directory, so the
 		# filenames that come out are relative to it.
 		if (defined $globdir && ! compat(2)) {
-			for (map { glob "$globdir/$_" } split) {
+			foreach (map { glob "$globdir/$_" } split) {
 				s#^$globdir/##;
 				push @line, $_;
 			}

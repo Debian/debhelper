@@ -62,7 +62,7 @@ sub autoselect_buildsystem {
 	my $selected;
 	my $selected_level = 0;
 
-	for my $inst (@_) {
+	foreach my $inst (@_) {
 		# Only derived (i.e. more specific) build system can be
 		# considered beyond the currently selected one.
 		next if defined $selected && !$inst->isa(ref $selected);
@@ -92,7 +92,7 @@ sub load_buildsystem {
 	else {
 		# Try to determine build system automatically
 		my @buildsystems;
-		for $system (@BUILDSYSTEMS) {
+		foreach $system (@BUILDSYSTEMS) {
 			push @buildsystems, create_buildsystem_instance($system, @_);
 		}
 		return autoselect_buildsystem($step, @buildsystems);
@@ -103,10 +103,10 @@ sub load_all_buildsystems {
 	my $incs=shift || \@INC;
 	my (%buildsystems, @buildsystems);
 
-	for my $inc (@$incs) {
+	foreach my $inc (@$incs) {
 		my $path = File::Spec->catdir($inc, "Debian/Debhelper/Buildsystem");
 		if (-d $path) {
-			for my $module_path (glob "$path/*.pm") {
+			foreach my $module_path (glob "$path/*.pm") {
 				my $name = basename($module_path);
 				$name =~ s/\.pm$//;
 				next if exists $buildsystems{$name};
@@ -116,7 +116,7 @@ sub load_all_buildsystems {
 	}
 
 	# Standard debhelper build systems first
-	for my $name (@BUILDSYSTEMS) {
+	foreach my $name (@BUILDSYSTEMS) {
 		error("standard debhelper build system '$name' could not be found/loaded")
 		    if not exists $buildsystems{$name};
 		push @buildsystems, $buildsystems{$name};
@@ -124,7 +124,7 @@ sub load_all_buildsystems {
 	}
 
 	# The rest are 3rd party build systems
-	for my $name (keys %buildsystems) {
+	foreach my $name (keys %buildsystems) {
 		my $inst = $buildsystems{$name};
 		$inst->{thirdparty} = 1;
 		push @buildsystems, $inst;
@@ -188,7 +188,7 @@ sub buildsystems_list {
 	my $specified;
 
 	# List build systems (including auto and specified status)
-	for my $inst (@buildsystems) {
+	foreach my $inst (@buildsystems) {
 		if (! defined $specified && defined $opt_buildsys && $opt_buildsys eq $inst->NAME()) {
 			$specified = $inst;
 		}

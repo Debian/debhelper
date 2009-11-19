@@ -169,7 +169,7 @@ sub canonpath {
 	my ($this, $path)=@_;
 	my @canon;
 	my $back=0;
-	for my $comp (split(m%/+%, $path)) {
+	foreach my $comp (split(m%/+%, $path)) {
 		if ($comp eq '.') {
 			next;
 		}
