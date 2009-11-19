@@ -56,6 +56,29 @@ sub create_buildsystem_instance {
 	return $module->new(%bsopts);
 }
 
+# Autoselect a build system from the list of instances
+sub autoselect_buildsystem {
+	my $step=shift;
+	my $selected;
+	my $selected_level = 0;
+
+	for my $inst (@_) {
+		# Only derived (i.e. more specific) build system can be
+		# considered beyond the currently selected one.
+		next if defined $selected && !$inst->isa(ref $selected);
+
+		# If the build system says it is auto-buildable at the current
+		# step and it can provide more specific information about its
+		# status than its parent (if any), auto-select it.
+		my $level = $inst->check_auto_buildable($step);
+		if ($level > $selected_level) {
+			$selected = $inst;
+			$selected_level = $level;
+		}
+	}
+	return $selected;
+}
+
 # Similar to create_build system_instance(), but it attempts to autoselect
 # a build system if none was specified. In case autoselection fails, undef
 # is returned.
@@ -68,25 +91,11 @@ sub load_buildsystem {
 	}
 	else {
 		# Try to determine build system automatically
-		my $selected;
-		my $selected_level = 0;
+		my @buildsystems;
 		for $system (@BUILDSYSTEMS) {
-			my $inst = create_buildsystem_instance($system, @_);
-
-			# Only derived (i.e. more specific) build system can be
-			# considered beyond the currently selected one.
-			next if defined $selected && !$inst->isa(ref $selected);
-
-			# If the build system says it is auto-buildable at the current
-			# step and it can provide more specific information about its
-			# status than its parent (if any), auto-select it.
-			my $level = $inst->check_auto_buildable($step);
-			if ($level > $selected_level) {
-				$selected = $inst;
-				$selected_level = $level;
-			}
+			push @buildsystems, create_buildsystem_instance($system, @_);
 		}
-		return $selected;
+		return autoselect_buildsystem($step, @buildsystems);
 	}
 }
 
@@ -174,23 +183,22 @@ sub set_parallel {
 sub buildsystems_list {
 	my $step=shift;
 
+	my @buildsystems = load_all_buildsystems();
+	my $auto = autoselect_buildsystem($step, grep { ! $_->{thirdparty} } @buildsystems);
+	my $specified;
+
 	# List build systems (including auto and specified status)
-	my ($auto, $specified);
-	for my $inst (load_all_buildsystems()) {
-		my $is_specified = defined $opt_buildsys && $opt_buildsys eq $inst->NAME();
+	for my $inst (@buildsystems) {
 		if (! defined $specified && defined $opt_buildsys && $opt_buildsys eq $inst->NAME()) {
-			$specified = $inst->NAME();
-		}
-		elsif (! defined $auto && ! $inst->{thirdparty} && $inst->check_auto_buildable($step)) {
-			$auto = $inst->NAME();
+			$specified = $inst;
 		}
 		printf("%-20s %s", $inst->NAME(), $inst->DESCRIPTION());
 		print " [3rd party]" if $inst->{thirdparty};
 		print "\n";
 	}
 	print "\n";
-	print "Auto-selected: $auto\n" if defined $auto;
-	print "Specified: $specified\n" if defined $specified;
+	print "Auto-selected: ", $auto->NAME(), "\n" if defined $auto;
+	print "Specified: ", $specified->NAME(), "\n" if defined $specified;
 	print "No system auto-selected or specified\n"
 		if ! defined $auto && ! defined $specified;
 }
