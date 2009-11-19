@@ -256,7 +256,7 @@ touch "$tmpdir/configure", 0755;
 test_check_auto_buildable($bs{autoconf}, "configure", { configure => 1 });
 
 touch "$tmpdir/CMakeLists.txt";
-test_check_auto_buildable($bs{cmake}, "CMakeLists.txt", 1);
+test_check_auto_buildable($bs{cmake}, "CMakeLists.txt", { configure => 1 });
 
 touch "$tmpdir/Makefile.PL";
 test_check_auto_buildable($bs{perl_makemaker}, "Makefile.PL", { configure => 1 });
