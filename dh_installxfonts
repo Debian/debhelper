@@ -51,7 +51,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	# Find all font directories in the package build directory.
 	my @fontdirs;
-	foreach my $parentdir ("$tmp/usr/X11R6/lib/X11/fonts/", "$tmp/usr/share/fonts/X11/") {
+	foreach my $parentdir ("$tmp/usr/share/fonts/X11/") {
 		opendir(DIR, $parentdir) || next;
 		@fontdirs = grep { -d "$parentdir/$_" && !/^\./ } (readdir DIR);
 		closedir DIR;

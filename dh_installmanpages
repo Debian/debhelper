@@ -17,7 +17,7 @@ B<dh_installmanpages> [S<I<debhelper options>>] [S<I<file ...>>]
 =head1 DESCRIPTION
 
 dh_installmanpages is a debhelper program that is responsible for
-automatically installing man pages into usr/share/man/ and usr/X11R6/man/
+automatically installing man pages into usr/share/man/
 in package build directories.
 
 This is a DWIM-style program, with an interface unlike the rest of
@@ -182,7 +182,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	
 	# Now the .so conversion.
 	@sofiles=@sodests=();
-	foreach my $dir (qw{usr/share/man usr/X11R6/man}) {
+	foreach my $dir (qw{usr/share/man}) {
 		if (-e "$tmp/$dir") {
 			find(\&find_so_man, "$tmp/$dir");
 		}

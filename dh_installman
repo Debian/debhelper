@@ -185,7 +185,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	# Now the .so conversion.
 	@sofiles=@sodests=();
-	foreach my $dir (qw{usr/share/man usr/X11R6/man}) {
+	foreach my $dir (qw{usr/share/man}) {
 		if (-e "$tmp/$dir") {
 			find(\&find_so_man, "$tmp/$dir");
 		}
@@ -197,7 +197,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	# Now utf-8 conversion.
-	foreach my $dir (qw{usr/share/man usr/X11R6/man}) {
+	foreach my $dir (qw{usr/share/man}) {
 		if (-e "$tmp/$dir") {
 			find(sub {
 				return if ! -f $_ || -l $_;
