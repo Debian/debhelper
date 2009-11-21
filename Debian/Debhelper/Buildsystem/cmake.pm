@@ -51,7 +51,7 @@ sub test {
 	my $this=shift;
 
 	$ENV{CTEST_OUTPUT_ON_FAILURE} = 1;
-	return $this->test(@_);
+	return $this->SUPER::test(@_);
 }
 
 1
