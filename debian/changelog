@@ -1,3 +1,12 @@
+debhelper (7.4.7) UNRELEASED; urgency=low
+
+  * make: Avoid infinite loop that occurrs when testing existence of a target
+    in a certian horribly broken makefile, by making the test stop after
+    it sees one line of output from make. (This may be better replaced with
+    dh's makefile parser in the future.) Closes: #557307
+
+ -- Joey Hess <joeyh@debian.org>  Sat, 21 Nov 2009 13:29:01 -0500
+
 debhelper (7.4.6) unstable; urgency=low
 
   * Update --list to reflect buildsystem autoselection changes.

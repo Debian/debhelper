@@ -25,7 +25,7 @@ sub exists_make_target {
 
 	# Use make -n to check to see if the target would do
 	# anything. There's no good way to test if a target exists.
-	my $ret=`$makecmd -s -n --no-print-directory $target 2>/dev/null`;
+	my $ret=`$makecmd -s -n --no-print-directory $target 2>/dev/null | head -n 1`;
 	chomp $ret;
 	return length($ret);
 }
