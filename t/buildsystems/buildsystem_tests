@@ -574,7 +574,7 @@ test_isnt_parallel( do_parallel_mk(),
 	"No parallel by default" );
 
 $ENV{DEB_BUILD_OPTIONS}="parallel=5";
-test_is_parallel( do_parallel_mk(),
+test_isnt_parallel( do_parallel_mk(),
 	"DEB_BUILD_OPTIONS=parallel=5 without --max-parallel" );
 test_is_parallel( do_parallel_mk("--max-parallel=2"),
 	"DEB_BUILD_OPTIONS=parallel=5 with --max-parallel=2" );
@@ -583,10 +583,10 @@ test_isnt_parallel( do_parallel_mk("--max-parallel=1"),
 
 $ENV{MAKEFLAGS} = "--jobserver-fds=105,106 -j";
 $ENV{DEB_BUILD_OPTIONS}="";
-test_isnt_parallel( do_parallel_mk(),
+test_isnt_parallel( do_parallel_mk("--max-parallel=5"),
 	"makefile.pm (no parallel): no make warnings about unavailable jobserver" );
 $ENV{DEB_BUILD_OPTIONS}="parallel=5";
-test_is_parallel( do_parallel_mk(),
+test_is_parallel( do_parallel_mk("--max-paralle=5"),
 	"DEB_BUILD_OPTIONS=parallel=5: no make warnings about unavail parent jobserver" );
 
 $ENV{MAKEFLAGS} = "-j2";
@@ -622,7 +622,7 @@ sub test_dh_parallel {
 	$rules = <<'EOF';
 %:
 	@dh_clean > /dev/null 2>&1
-	@dh --buildsystem=makefile --after=dh_auto_configure --until=dh_auto_build $@
+	@dh --buildsystem=makefile --max-parallel=5 --after=dh_auto_configure --until=dh_auto_build $@
 	@dh_clean > /dev/null 2>&1
 EOF
 
@@ -643,7 +643,7 @@ EOF
 	$rules = <<'EOF';
 %:
 	@dh_clean > /dev/null 2>&1
-	@dh -j --buildsystem=makefile --after=dh_auto_configure --until=dh_auto_build $@
+	@dh -j --buildsystem=makefile --max-parallel=5 --after=dh_auto_configure --until=dh_auto_build $@
 	@dh_clean > /dev/null 2>&1
 EOF
 	test_is_parallel( do_rules_for_parallel("build", $rules),
@@ -675,7 +675,7 @@ $tmp = write_debian_rules(<<'EOF');
 #!/usr/bin/make -f
 %:
 	@dh_clean > /dev/null 2>&1
-	@+dh --buildsystem=makefile --after=dh_auto_configure --until=dh_auto_build $@
+	@+dh --buildsystem=makefile --max-parallel=5 --after=dh_auto_configure --until=dh_auto_build $@
 	@dh_clean > /dev/null 2>&1
 EOF
 test_is_parallel( do_rules_for_parallel("build", "include debian/rules"),
@@ -688,7 +688,7 @@ override_dh_auto_build:
 	dh_auto_build
 %:
 	@dh_clean > /dev/null 2>&1
-	@+dh --buildsystem=makefile --after=dh_auto_configure --until=dh_auto_build $@
+	@+dh --buildsystem=makefile --max-parallel=5 --after=dh_auto_configure --until=dh_auto_build $@
 	@dh_clean > /dev/null 2>&1
 EOF
 test_is_parallel( do_rules_for_parallel("build", "include debian/rules"),
@@ -701,7 +701,7 @@ override_dh_auto_build:
 	+dh_auto_build
 %:
 	@dh_clean > /dev/null 2>&1
-	@+dh --buildsystem=makefile --after=dh_auto_configure --until=dh_auto_build $@
+	@+dh --buildsystem=makefile --max-parallel=5 --after=dh_auto_configure --until=dh_auto_build $@
 	@dh_clean > /dev/null 2>&1
 EOF
 test_is_parallel( do_rules_for_parallel("build", "include debian/rules"),
@@ -714,7 +714,7 @@ override_dh_auto_build:
 	$(MAKE)
 %:
 	@dh_clean > /dev/null 2>&1
-	@+dh --buildsystem=makefile --after=dh_auto_configure --until=dh_auto_build $@
+	@+dh --buildsystem=makefile --max-parallel=5 --after=dh_auto_configure --until=dh_auto_build $@
 	@dh_clean > /dev/null 2>&1
 EOF
 test_is_parallel( do_rules_for_parallel("build", "include debian/rules"),
