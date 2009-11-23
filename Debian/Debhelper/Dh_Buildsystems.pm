@@ -136,7 +136,7 @@ sub load_all_buildsystems {
 sub buildsystems_init {
 	my %args=@_;
 	
-	my $max_parallel=-1; # unlimited
+	my $max_parallel=1;
 
 	# Available command line options
 	my %options = (

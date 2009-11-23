@@ -219,14 +219,17 @@ directory path that is the same as the source directory path.
 
 =item B<--max-parallel>I<=maximum>
 
-By default, the DEB_BUILD_OPTIONS environment variable can be used to
-enable parallel building, when supported by the build system.
-
 This option allows controlling how many parallel jobs can be used in a
-build. If set to 1, concurrent builds are disabled -- do this if
-the package build is known not to work in parallel. If the package build
-is known to only work with certian levels of concurrency, you can set this
-to the maximum level that is known to work, or that you wish to support.
+build, if parallel builds are enabled by the DEB_BUILD_OPTIONS environment
+variable.
+
+If set to 1, parallel builds are disabled -- do this if the package build
+is known not to work in parallel. If the package build is known to only
+work with certian levels of concurrency, you can set this to the maximum
+level that is known to work, or that you wish to support.
+
+If this option is not specified, debhelper currently defaults to not
+supporting parallel package builds.
 
 =item B<--list>, B<-l>
 
