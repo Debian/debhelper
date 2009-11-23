@@ -139,13 +139,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# because only if we can get a library name and a major number from
 	# objdump is anything actually added.
 	my $exclude='';
-	my @udeb_lines;
+	my (@udeb_lines, @lib_files);
 	if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
 		$exclude="! \\( $dh{EXCLUDE_FIND} \\) ";
 	}
 	open (FIND, "find $tmp -type f \\( -name '*.so' -or -name '*.so.*' \\) $exclude |");
 	while (<FIND>) {
 		my ($library, $major);
+		push @lib_files, $_;
 		my $objdump=`objdump -p $_`;
 		if ($objdump=~m/\s+SONAME\s+(.+)\.so\.(.+)/) {
 			# proper soname format
@@ -227,7 +228,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# is not 100% compatible with debhelper. (For example,
 		# this supports --ignore being used.)
 		doit("dpkg-gensymbols", "-p$package", "-I$symbols",
-			"-P$tmp", @{$dh{U_PARAMS}});
+			"-P$tmp", (map { "-e$_" } @lib_files),
+			@{$dh{U_PARAMS}});
 		if (-s "$tmp/DEBIAN/symbols" == 0) {
 			doit("rm", "-f", "$tmp/DEBIAN/symbols");
 		}
