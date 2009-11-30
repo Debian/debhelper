@@ -177,7 +177,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}       
 	
 	my $job=pkgfile($package,"upstart");
-	my ($init,$default) = ('','');
+	my $init='';
 
 	if ($job ne '' || ($dh{ONLYSCRIPTS} && -e "$tmp/etc/init/$jobfile.conf")) {
 		if (! $dh{ONLYSCRIPTS}) {
@@ -200,9 +200,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	else {
 		$init=pkgfile($package,$script) || pkgfile($package,"init") ||
 			pkgfile($package,"init.d");
-		$default=pkgfile($package,'default');
 	}
 
+	my $default=pkgfile($package,'default');
 	if ($default ne '' && ! $dh{ONLYSCRIPTS}) {
 		if (! -d "$tmp/etc/default") {
 			doit("install","-d","$tmp/etc/default");
@@ -218,8 +218,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("install","-p","-m755",$init,"$tmp/etc/init.d/$script");
 	}
 
-	if ($job ne '' || $init ne '' || $dh{ONLYSCRIPTS})
-	{
+	if ($job ne '' || $init ne '' || $dh{ONLYSCRIPTS}) {
 		if (-e "$tmp/etc/init/$jobfile.conf") {
 			$script=$jobfile;
 		}
