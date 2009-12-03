@@ -604,7 +604,7 @@ sub do_rules_for_parallel {
 		"make -f - $cmdline 2>&1 >/dev/null", $stdin);
 }
 
-doit("ln", "-s", "parallel.mk", "Makefile");
+doit("ln", "-sf", "parallel.mk", "Makefile");
 
 # Test if dh+override+$(MAKE) legacy punctuation hack work as before
 $ENV{MAKEFLAGS} = "-j5";
