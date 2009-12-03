@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 311;
+use Test::More tests => 297;
 
 use strict;
 use warnings;
@@ -604,69 +604,7 @@ sub do_rules_for_parallel {
 		"make -f - $cmdline 2>&1 >/dev/null", $stdin);
 }
 
-# Simulate dpkg-buildpackage -j5
 doit("ln", "-s", "parallel.mk", "Makefile");
-
-sub test_dh_parallel {
-	my $extra_dsc=shift || "";
-	my $debian_rules=shift || "";
-	my $rules;
-	my $tmpfile;
-
-	$ENV{MAKEFLAGS} = "-j5";
-	$ENV{DEB_BUILD_OPTIONS} = "parallel=5";
-
-	# Write debian/rules if requested
-	$tmpfile = write_debian_rules($debian_rules);
-
-	$rules = <<'EOF';
-%:
-	@dh_clean > /dev/null 2>&1
-	@dh --buildsystem=makefile --max-parallel=5 --after=dh_auto_configure --until=dh_auto_build $@
-	@dh_clean > /dev/null 2>&1
-EOF
-
-	$ENV{MAKEFLAGS} = "";
-	test_is_parallel( do_rules_for_parallel("build", $rules),
-		"DEB_BUILD_OPTIONS=parallel=5 without MAKEFLAGS=-jX via dh $extra_dsc" );
-
-	$ENV{MAKEFLAGS} = "-j5";
-	$rules = <<'EOF';
-%:
-	@dh_clean > /dev/null 2>&1
-	@dh --max-parallel=1 --buildsystem=makefile --after=dh_auto_configure --until=dh_auto_build $@
-	@dh_clean > /dev/null 2>&1
-EOF
-	test_isnt_parallel( do_rules_for_parallel("build", $rules),
-		"dh --max-parallel=1 disables implicit parallel under dpkg-buildpackage -j5 $extra_dsc");
-
-	$rules = <<'EOF';
-%:
-	@dh_clean > /dev/null 2>&1
-	@dh -j --buildsystem=makefile --max-parallel=5 --after=dh_auto_configure --until=dh_auto_build $@
-	@dh_clean > /dev/null 2>&1
-EOF
-	test_is_parallel( do_rules_for_parallel("build", $rules),
-		"dh -j under dpkg-buildpackage -j5 is parallel $extra_dsc");
-	$ENV{MAKEFLAGS} = "";
-	test_is_parallel( do_rules_for_parallel("build", $rules),
-		"dh -j is parallel only with DEB_BUILD_OPTIONS=parallel=5 $extra_dsc");
-
-	if (defined $tmpfile) {
-		rename($tmpfile, "debian/rules");
-	}
-	elsif ($debian_rules) {
-		unlink("debian/rules");
-	}
-}
-
-# dh should pass the same tests with and without overrides
-test_dh_parallel();
-test_dh_parallel("(with overrides)", <<'EOF');
-#!/usr/bin/make -f
-override_dh_auto_build:
-	@dh_auto_build -- -f parallel.mk
-EOF
 
 # Test if legacy punctuation hacks (+) work as before
 $ENV{MAKEFLAGS} = "-j5";
