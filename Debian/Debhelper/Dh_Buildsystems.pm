@@ -165,14 +165,12 @@ sub set_parallel {
 	$opt_parallel=1;
 
 	if (exists $ENV{DEB_BUILD_OPTIONS}) {
-		# Parse parallel=n tag
+		# Get number of processes from parallel=n tag limiting it
+		# with $max if needed
 		foreach my $opt (split(/\s+/, $ENV{DEB_BUILD_OPTIONS})) {
-			if ($opt =~ /^parallel=([-\d]+)$/) {
-				my $n=$1;
-				if ($n > 0 && ($max == -1 || $n < $max)) {
-					$opt_parallel = $n;
-				}
-				else {
+			if ($opt =~ /^parallel=(-?\d+)$/) {
+				$opt_parallel = $1;
+				if ($max > 0 && $opt_parallel > $max) {
 					$opt_parallel = $max;
 				}
 			}
