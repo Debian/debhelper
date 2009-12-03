@@ -135,14 +135,14 @@ sub load_all_buildsystems {
 
 sub buildsystems_init {
 	my %args=@_;
-	
+
 	my $max_parallel=1;
 
 	# Available command line options
 	my %options = (
 	    "D=s" => \$opt_sourcedir,
 	    "sourcedirectory=s" => \$opt_sourcedir,
-	
+
 	    "B:s" => \$opt_builddir,
 	    "builddirectory:s" => \$opt_builddir,
 
