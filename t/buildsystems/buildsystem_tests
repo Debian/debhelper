@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 291;
+use Test::More tests => 295;
 
 use strict;
 use warnings;
@@ -572,21 +572,27 @@ sub test_is_parallel {
 
 test_isnt_parallel( do_parallel_mk(),
 	"No parallel by default" );
+test_isnt_parallel( do_parallel_mk("parallel"),
+	"No parallel by default with --parallel" );
+test_isnt_parallel( do_parallel_mk("--max-parallel=5"),
+	"No parallel by default with --max-parallel=5" );
 
 $ENV{DEB_BUILD_OPTIONS}="parallel=5";
 test_isnt_parallel( do_parallel_mk(),
-	"DEB_BUILD_OPTIONS=parallel=5 without --max-parallel" );
+	"DEB_BUILD_OPTIONS=parallel=5 without parallel options" );
++test_is_parallel( do_parallel_mk("--parallel"),
++	"DEB_BUILD_OPTIONS=parallel=5 with --parallel" );
 test_is_parallel( do_parallel_mk("--max-parallel=2"),
 	"DEB_BUILD_OPTIONS=parallel=5 with --max-parallel=2" );
 test_isnt_parallel( do_parallel_mk("--max-parallel=1"),
-	"DEB_BUILD_OPTIONS=parallel=5 with --max-parallel=1 (off)" );
+	"DEB_BUILD_OPTIONS=parallel=5 with --max-parallel=1" );
 
 $ENV{MAKEFLAGS} = "--jobserver-fds=105,106 -j";
 $ENV{DEB_BUILD_OPTIONS}="";
-test_isnt_parallel( do_parallel_mk("--max-parallel=5"),
+test_isnt_parallel( do_parallel_mk(),
 	"makefile.pm (no parallel): no make warnings about unavailable jobserver" );
 $ENV{DEB_BUILD_OPTIONS}="parallel=5";
-test_is_parallel( do_parallel_mk("--max-paralle=5"),
+test_is_parallel( do_parallel_mk("--parallel"),
 	"DEB_BUILD_OPTIONS=parallel=5: no make warnings about unavail parent jobserver" );
 
 $ENV{MAKEFLAGS} = "-j2";

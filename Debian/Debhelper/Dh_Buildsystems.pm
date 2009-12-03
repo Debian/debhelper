@@ -152,6 +152,7 @@ sub buildsystems_init {
 	    "l" => \$opt_list,
 	    "list" => \$opt_list,
 
+	    "parallel" => sub { $max_parallel = -1 },
 	    "max-parallel=i" => \$max_parallel,
 	);
 	$args{options}{$_} = $options{$_} foreach keys(%options);

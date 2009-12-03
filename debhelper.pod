@@ -217,19 +217,23 @@ If the build system prefers out of source tree building but still
 allows in source building, the latter can be re-enabled by passing a build
 directory path that is the same as the source directory path.
 
-=item B<--max-parallel>I<=maximum>
+=item B<--parallel>
 
-This option allows controlling how many parallel jobs can be used in a
-build, if parallel builds are enabled by the DEB_BUILD_OPTIONS environment
-variable.
-
-If set to 1, parallel builds are disabled -- do this if the package build
-is known not to work in parallel. If the package build is known to only
-work with certian levels of concurrency, you can set this to the maximum
-level that is known to work, or that you wish to support.
+Enable support for parallel builds if underlying build system provides this
+feature. The number of parallel processes is controlled by the
+DEB_BUILD_OPTIONS environment variable (L<Debian Policy, section 4.9.1>) at
+build time. It might also be subject to the build system specific limit.
 
 If this option is not specified, debhelper currently defaults to not
 supporting parallel package builds.
+
+=item B<--max-parallel>I<=maximum>
+
+This option implies L<--parallel> and allows to further limit the number of
+jobs that can be used in a parallel build. If the package build is known to
+only work with certain levels of concurrency, you can set this to the maximum
+level that is known to work, or that you wish to support. If set to 1, parallel
+builds will be effectively forbidden.
 
 =item B<--list>, B<-l>
 
