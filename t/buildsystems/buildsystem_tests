@@ -580,8 +580,8 @@ test_isnt_parallel( do_parallel_mk("--max-parallel=5"),
 $ENV{DEB_BUILD_OPTIONS}="parallel=5";
 test_isnt_parallel( do_parallel_mk(),
 	"DEB_BUILD_OPTIONS=parallel=5 without parallel options" );
-+test_is_parallel( do_parallel_mk("--parallel"),
-+	"DEB_BUILD_OPTIONS=parallel=5 with --parallel" );
+test_is_parallel( do_parallel_mk("--parallel"),
+	"DEB_BUILD_OPTIONS=parallel=5 with --parallel" );
 test_is_parallel( do_parallel_mk("--max-parallel=2"),
 	"DEB_BUILD_OPTIONS=parallel=5 with --max-parallel=2" );
 test_isnt_parallel( do_parallel_mk("--max-parallel=1"),
