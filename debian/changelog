@@ -1,9 +1,12 @@
-debhelper (7.4.10) UNRELEASED; urgency=low
+debhelper (7.4.10) unstable; urgency=low
 
   * Add --parallel option that can be used to enable parallel building
     without limiting the max number of parallel jobs. (Modestas Vainius)
+  * dh_makeshlibs: Temporarily revert fix for #557603, as it caused
+    dpkg-gensymbols to see libraries not in the regular search path and
+    broke builds. This will be re-enabled in v8. Closes: #560217
 
- -- Joey Hess <joeyh@debian.org>  Mon, 07 Dec 2009 14:34:18 -0500
+ -- Joey Hess <joeyh@debian.org>  Wed, 09 Dec 2009 15:17:19 -0500
 
 debhelper (7.4.9) unstable; urgency=low
 
@@ -19,6 +22,8 @@ debhelper (7.4.8) unstable; urgency=low
     be enabled by using the --max-parallel option. This was necessary because
     some buildds build with -j2 by default. (See #532805)
   * dh: Document --no-act. Closes: #557505
+  * dh_makeshlibs: Make -X also exclude libraries from the symbols file.
+    Closes: #557603 (Peter Samuelson)
 
  -- Joey Hess <joeyh@debian.org>  Mon, 23 Nov 2009 13:57:10 -0500
 
