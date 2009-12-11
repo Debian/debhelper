@@ -540,30 +540,44 @@ sub run {
 	# Check for override targets in debian/rules and
 	# run them instead of running the command directly.
 	my $override_command;
-	if (rules_explicit_target("override_".$command)) {
+	my $has_explicit_target = rules_explicit_target("override_".$command);
+	if (defined $has_explicit_target) {
 		$override_command=$command;
-		# This passes the options through to commands called
-		# inside the target.
-		$ENV{DH_INTERNAL_OPTIONS}=join("\x1e", @options);
-		$command="debian/rules";
-		@options="override_".$override_command;
+		# Check if target isn't noop
+		if ($has_explicit_target) {
+			# This passes the options through to commands called
+			# inside the target.
+			$ENV{DH_INTERNAL_OPTIONS}=join("\x1e", @options);
+			$command="debian/rules";
+			@options="override_".$override_command;
+		}
+		else {
+			$command = undef;
+		}
 	}
 	else {
 		# Pass additional command options if any
 		unshift @options, @{$command_opts{$command}} if exists $command_opts{$command};
 	}
 
-	# 3 space indent lines the command being run up under the 
-	# sequence name after "dh ".
-	print "   ".escape_shell($command, @options)."\n";
+	if (defined $command) {
+		# 3 space indent lines the command being run up under the 
+		# sequence name after "dh ".
+		print "   ".escape_shell($command, @options)."\n";
+	}
+	else {
+		print "   ", "# Skipping ", $override_command, " - empty override", "\n";
+	}
 
 	if (! $dh{NO_ACT}) {
-		my $ret=system($command, @options);
-		if ($ret >> 8 != 0) {
-			exit $ret >> 8;
-		}
-		elsif ($ret) {
-			exit 1;
+		if (defined $command) {
+			my $ret=system($command, @options);
+			if ($ret >> 8 != 0) {
+				exit $ret >> 8;
+			}
+			elsif ($ret) {
+				exit 1;
+			}
 		}
 
 		if (defined $override_command) {
@@ -589,11 +603,14 @@ my $rules_parsed;
 sub rules_explicit_target {
 	# Checks if a specified target exists as an explicit target
 	# in debian/rules. 
+	# undef is returned if target does not exist, 0 if target is noop
+	# and 1 if target has dependencies or executes commands.
 	my $target=shift;
-	
-	if (! $rules_parsed) {	
+
+	if (! $rules_parsed) {
 		my $processing_targets = 0;
 		my $not_a_target = 0;
+		my $current_target;
 		open(MAKE, "LC_ALL=C make -Rrnpsf debian/rules debhelper-fail-me 2>/dev/null |");
 		while (<MAKE>) {
 			if ($processing_targets) {
@@ -601,12 +618,26 @@ sub rules_explicit_target {
 					$not_a_target = 1;
 				}
 				else {
-					if (!$not_a_target && /^([^#:]+)::?/) {
-						# Target is defined.
-						# NOTE: if it is a depenency
-						# of .PHONY it will be
-						# defined too but that's ok.
-						$targets{$1} = 1;
+					if (!$not_a_target && /^([^#:]+)::?\s*(.*)$/) {
+						# Target is defined. NOTE: if it is a depenency of
+						# .PHONY it will be defined too but that's ok.
+						# $2 contains target dependencies if any.
+						$current_target = $1;
+						$targets{$current_target} = ($2) ? 1 : 0;
+					}
+					else {
+						if (defined $current_target) {
+							if (/^#/) {
+								# Check if target has commands to execute
+								if (/^#\s*commands to execute/) {
+									$targets{$current_target} = 1;
+								}
+							}
+							else {
+								# Target parsed.
+								$current_target = undef;
+							}
+						}
 					}
 					# "Not a target:" is always followed by
 					# a target name, so resetting this one
@@ -621,7 +652,7 @@ sub rules_explicit_target {
 		$rules_parsed = 1;
 	}
 
-	return exists $targets{$target};
+	return (exists $targets{$target}) ? $targets{$target} : undef;
 }
 
 }
