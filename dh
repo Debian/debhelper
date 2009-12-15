@@ -35,11 +35,10 @@ in the sequence. The B<--until>, B<--before>, B<--after>, and B<--remaining>
 options can override this behavior.
 
 If debian/rules contains a target with a name like "override_I<dh_command>",
-then when it gets to that command in the sequence, dh will run that
-target from the rules file, rather than running the actual command. The
-override target can then run the command with additional options, or run
-entirely different commands instead. (Note that to use this feature,
-you should Build-Depend on debhelper 7.0.50 or above.)
+then when it would notmally run I<dh_command>, dh will instead call that
+target. The override target can then run the command with additional options,
+or run entirely different commands instead. See examples below. (Note that to
+use this feature, you should Build-Depend on debhelper 7.0.50 or above.)
 
 =head1 OPTIONS
 
