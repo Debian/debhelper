@@ -167,7 +167,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$destdir="$tmp/usr/share/man/$langcode/man$realsection/";
 		}
 		$destdir=~tr:/:/:s; # just for looks
-		my $instpage="$destdir/$instname.$section";
+		my $instpage="$destdir$instname.$section";
 
 		next if -l $instpage;
 		next if compat(5) && -e $instpage;
