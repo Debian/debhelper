@@ -87,12 +87,10 @@ All other options passed to dh are passed on to each command it runs. This
 can be used to set an option like "-v" or "-X" or "-N", as well as for more
 specialised options.
 
-=head1 COMMAND SPECIFICATION
-
-I<cmd> can be a full name of a debhelper command, or a substring. It'll first
-search for a command in the sequence exactly matching the name, to avoid any
-ambiguity. If there are multiple substring matches, the last one in the
-sequence will be used.
+In the above options, I<cmd> can be a full name of a debhelper command, or
+a substring. It'll first search for a command in the sequence exactly
+matching the name, to avoid any ambiguity. If there are multiple substring
+matches, the last one in the sequence will be used.
 
 =cut
 
@@ -179,6 +177,14 @@ default. This is how to use dh_pycentral instead.
 	%:
 		dh --with python-central $@
 
+Here is how to force use of perl's Module::Build build system,
+which can be necessary if debhelper wrongly detects that the package
+uses MakeMaker.
+
+	#!/usr/bin/make -f
+	%:
+		dh --buildsystem=perl_build $@
+
 To patch your package using quilt, you can tell dh to use quilt's dh
 sequence addons like this:
 	
@@ -188,13 +194,22 @@ sequence addons like this:
 
 Here is an example of overriding where the dh_auto_* commands find
 the package's source, for a package where the source is located in a
-subdirectory. It also forces use of perl's Module::Build build system,
-which can be necessary if debhelper wrongly detects that the package
-uses MakeMaker.
+subdirectory.
 
 	#!/usr/bin/make -f
 	%:
-		dh --sourcedirectory=src --buildsystem=perl_build $@
+		dh --sourcedirectory=src $@
+
+Finally, here is a way to prevent dh from running several commands
+that you don't want it to run, by defining empty override targets for each
+command.
+
+	#!/usr/bin/make -f
+	%:
+		dh $@
+	
+	# Commands not to run:
+	override_dh_auto_test override_dh_compress override_dh_fixperms:
 
 =cut
 
