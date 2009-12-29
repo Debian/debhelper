@@ -135,8 +135,6 @@ use constant SO_MODULE_NONSTANDARD => 16;
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp = tmpdir($package);
 
-	delsubstvar($package, "python:Depends");
-
 	my @dirs = ("usr/lib/site-python", "usr/lib/$package", "usr/share/$package", "usr/lib/games/$package", "usr/share/games/$package", @ARGV );
 	my @dirs_so = ("usr/lib/site-python", @ARGV );
 

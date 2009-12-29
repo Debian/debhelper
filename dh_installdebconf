@@ -117,9 +117,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if ($config ne '' || $templates ne '') {
 		addsubstvar($package, "misc:Depends", $debconfdep);
 	}
-	else {
-		addsubstvar($package, "misc:Depends", $debconfdep, undef, 1); # remove
-	}
 	
 	if (($config ne '' || $templates ne '') && ! $dh{NOSCRIPTS}) {
 		autoscript($package,"postrm","postrm-debconf");

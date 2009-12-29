@@ -216,9 +216,10 @@ addsubstvar($package, $substvar, $deppackage, $verinfo, $remove)
 	- version info for the package (optional) (ie: ">= 1.1")
 	- if this last parameter is passed, the thing that would be added
 	  is removed instead. This can be useful to ensure that a debhelper
-	  command is idempotent. Note that without this parameter, if you
-	  call the function twice with the same values it will only add one
-	  item to the substvars file.
+	  command is idempotent. (However, we generally don't bother,
+	  and rely on the user calling dh_prep.) Note that without this
+	  parameter, if you call the function twice with the same values it
+	  will only add one item to the substvars file.
 delsubstvar($package, $substvar)
 	This function removes the entire line for the substvar from the
 	package's shlibs file.

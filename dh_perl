@@ -90,8 +90,6 @@ use constant XS_MODULE => 4;
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 
-	delsubstvar($package, "perl:Depends"); # for idempotency
-	
 	# Check also for alternate locations given on the command line
 	my @dirs = grep -d, map "$tmp/$_", $vendorlib, $vendorarch, @ARGV;
 
