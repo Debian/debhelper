@@ -71,6 +71,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			if (-f "$tmp/etc/X11/fonts/$f/$package.alias") {
 				push @cmds_postinst, "update-fonts-alias --include /etc/X11/fonts/$f/$package.alias $f";
 				push @cmds_postrm, "update-fonts-alias --exclude /etc/X11/fonts/$f/$package.alias $f";
+				addsubstvar($package, "misc:Depends", "xfonts-utils (>= 1:7.5+2)");
 			}
 		}
 
