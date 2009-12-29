@@ -61,19 +61,23 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# Figure out what commands the postinst and postrm will need 
 		# to call.
 		my @cmds;
+		my @cmds_postinst;
+		my @cmds_postrm;
 		foreach my $f (@fontdirs) {
 			# This must come before update-fonts-dir.
 			push @cmds, "update-fonts-scale $f"
 				if -f "$tmp/etc/X11/fonts/$f/$package.scale";
 			push @cmds, "update-fonts-dir --x11r7-layout $f";
-			push @cmds, "update-fonts-alias $f"
-				if -f "$tmp/etc/X11/fonts/$f/$package.alias";
+			if (-f "$tmp/etc/X11/fonts/$f/$package.alias") {
+				push @cmds_postinst, "update-fonts-alias --include /etc/X11/fonts/$f/$package.alias $f";
+				push @cmds_postrm, "update-fonts-alias --exclude /etc/X11/fonts/$f/$package.alias $f";
+			}
 		}
 
 		autoscript($package, "postinst", "postinst-xfonts",
-			"s:#CMDS#:".join(";", @cmds).":;");
+			"s:#CMDS#:".join(";", @cmds).";".join(";", @cmds_postinst).":;");
 		autoscript($package, "postrm", "postrm-xfonts",
-			"s:#CMDS#:".join(";", @cmds).":;");
+			"s:#CMDS#:".join(";", @cmds).";".join(";", @cmds_postrm).":;");
 
 		addsubstvar($package, "misc:Depends", "xfonts-utils");
 	}
