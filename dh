@@ -561,7 +561,7 @@ sub run {
 	}
 
 	if (defined $command) {
-		# 3 space indent lines the command being run up under the 
+		# 3 space indent lines the command being run up under the
 		# sequence name after "dh ".
 		print "   ".escape_shell($command, @options)."\n";
 	}
@@ -602,7 +602,7 @@ my $rules_parsed;
 
 sub rules_explicit_target {
 	# Checks if a specified target exists as an explicit target
-	# in debian/rules. 
+	# in debian/rules.
 	# undef is returned if target does not exist, 0 if target is noop
 	# and 1 if target has dependencies or executes commands.
 	my $target=shift;
@@ -644,7 +644,8 @@ sub rules_explicit_target {
 					# here is safe.
 					$not_a_target = 0;
 				}
-			} elsif (/^# Files$/) {
+			}
+			elsif (/^# Files$/) {
 				$processing_targets = 1;
 			}
 		}
