@@ -10,24 +10,21 @@ use strict;
 use Debian::Debhelper::Dh_Lib qw(escape_shell clean_jobserver_makeflags);
 use base 'Debian::Debhelper::Buildsystem';
 
-sub get_makecmd_C {
-	my $this=shift;
-	my $buildpath = $this->get_buildpath();
-	if ($buildpath ne '.') {
-		return $this->{makecmd} . " -C " . escape_shell($buildpath);
-	}
-	return $this->{makecmd};
-}
-
 sub exists_make_target {
 	my ($this, $target) = @_;
-	my $makecmd=$this->get_makecmd_C();
 
 	# Use make -n to check to see if the target would do
 	# anything. There's no good way to test if a target exists.
-	my $ret=`$makecmd -s -n --no-print-directory $target 2>/dev/null | head -n 1`;
-	chomp $ret;
-	return length($ret);
+	my @opts=("-s", "-n", "--no-print-directory");
+	my $buildpath = $this->get_buildpath();
+	unshift @opts, "-C", $buildpath if $buildpath ne ".";
+	open(SAVEDERR, ">&STDERR");
+	close STDERR;
+	open(MAKE, "-|", $this->{makecmd}, @opts, $target);
+	my $output=<MAKE>;
+	close MAKE;
+	open(STDERR, ">&SAVEDERR");
+	return defined $output && length $output;
 }
 
 sub do_make {
