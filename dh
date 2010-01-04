@@ -220,28 +220,28 @@ my @ARGV_orig=@ARGV;
 # (and comes first so python-central loads later and can disable it).
 unshift @ARGV, "--with=python-support";
 		
-# Disable complaints about unknown options for both dh and the commands
-# it runs. This is done because dh accepts and passes on options that may
-# be specific to only some debhelper commands.
-$ENV{DH_IGNORE_UNKNOWN_OPTIONS}=1;
-
 init(options => {
-	"until=s" => \$dh{UNTIL},
-	"after=s" => \$dh{AFTER},
-	"before=s" => \$dh{BEFORE},
-	"remaining" => \$dh{REMAINING},
-	"with=s" => sub {
-		my ($option,$value)=@_;
-		push @{$dh{WITH}},split(",", $value);
+		"until=s" => \$dh{UNTIL},
+		"after=s" => \$dh{AFTER},
+		"before=s" => \$dh{BEFORE},
+		"remaining" => \$dh{REMAINING},
+		"with=s" => sub {
+			my ($option,$value)=@_;
+			push @{$dh{WITH}},split(",", $value);
+		},
+		"without=s" => sub {
+			my ($option,$value)=@_;
+			@{$dh{WITH}} = grep { $_ ne $value } @{$dh{WITH}};
+		},
+		"l" => \$dh{LIST},
+		"list" => \$dh{LIST},
 	},
-	"without=s" => sub {
-		my ($option,$value)=@_;
-		@{$dh{WITH}} = grep { $_ ne $value } @{$dh{WITH}};
-	},
-	"l" => \$dh{LIST},
-	"list" => \$dh{LIST},
-});
+	# Disable complaints about unknown options; they are passed on the
+	# debhelper commands.
+	ignore_unknown_options => 1,
+);
 inhibit_log();
+
 
 # If make is using a jobserver, but it is not available
 # to this process, clean out MAKEFLAGS. This avoids

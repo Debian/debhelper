@@ -33,7 +33,7 @@ sub init {
 	    grep /^-/, @ARGV) {
 		eval "use Debian::Debhelper::Dh_Getopt";
 		error($@) if $@;
-		Debian::Debhelper::Dh_Getopt::parseopts($params{options});
+		Debian::Debhelper::Dh_Getopt::parseopts(%params);
 	}
 
 	# Another way to set excludes.

@@ -68,10 +68,11 @@ sub NonOption {
 
 sub getoptions {
 	my $array=shift;
-	my %options=%{shift()} if ref $_[0];
+	my %params=@_;
+	my %options=%{$params{options}} if ref $params{options};
 	
 	my $oldwarn;
-	if ($ENV{DH_IGNORE_UNKNOWN_OPTIONS}) {
+	if ($params{ignore_unknown_options}) {
 		$oldwarn=$SIG{__WARN__};
 		$SIG{__WARN__}=sub {};
 	}
@@ -141,7 +142,7 @@ sub getoptions {
 		"<>" => \&NonOption,
 	);
 
-	if ($ENV{DH_IGNORE_UNKNOWN_OPTIONS}) {
+	if ($params{ignore_unknown_options}) {
 		$SIG{__WARN__}=$oldwarn;
 		return 1;
 	}
@@ -158,7 +159,7 @@ sub split_options_string {
 
 # Parse options and set %dh values.
 sub parseopts {
-	my $options=shift;
+	my %params=@_;
 	
 	my @ARGV_extra;
 
@@ -166,7 +167,7 @@ sub parseopts {
 	# dh through an override target to a command.
 	if (defined $ENV{DH_INTERNAL_OPTIONS}) {
 		@ARGV_extra=split(/\x1e/, $ENV{DH_INTERNAL_OPTIONS});
-		getoptions(\@ARGV_extra, $options);
+		getoptions(\@ARGV_extra, %params, ignore_unknown_options => 1);
 
 		# Avoid forcing acting on packages specified in
 		# DH_INTERNAL_OPTIONS. This way, -p can be specified
@@ -185,18 +186,16 @@ sub parseopts {
 		delete $dh{DOARCH};
 	}
 	
-	# DH_OPTIONS can contain additional options
-	# to be parsed like @ARGV, but with unknown options
-	# skipped.
+	# DH_OPTIONS can contain additional options to be parsed like @ARGV
 	if (defined $ENV{DH_OPTIONS}) {
 		@ARGV_extra=split_options_string($ENV{DH_OPTIONS});
-		my $ret=getoptions(\@ARGV_extra, $options);
+		my $ret=getoptions(\@ARGV_extra, %params);
 		if (!$ret) {
 			warning("warning: ignored unknown options in DH_OPTIONS");
 		}
 	}
 
-	my $ret=getoptions(\@ARGV, $options);
+	my $ret=getoptions(\@ARGV, %params);
 	if (!$ret) {
 		warning("warning: unknown options will be a fatal error in a future debhelper release");
 		#error("unknown option; aborting");
