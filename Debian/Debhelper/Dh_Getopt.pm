@@ -69,15 +69,8 @@ sub NonOption {
 sub getoptions {
 	my $array=shift;
 	my %params=@_;
-	my %options=%{$params{options}} if ref $params{options};
-	
-	my $oldwarn;
-	if ($params{ignore_unknown_options}) {
-		$oldwarn=$SIG{__WARN__};
-		$SIG{__WARN__}=sub {};
-	}
 
-	my $ret=Getopt::Long::GetOptionsFromArray($array,
+	my %options=(	
 		"v" => \$dh{VERBOSE},
 		"verbose" => \$dh{VERBOSE},
 
@@ -137,18 +130,37 @@ sub getoptions {
 		
 		"ignore=s" => \&AddIgnore,
 
-		%options,
+		"O=s" => sub { my($option,$value)=@_;
+			# Try to parse an option, but ignore it
+			# if it is not known.
+			if (getoptions([$value], %params, test => 1)) {
+				getoptions([$value], %params);
+			}
+		},
+
+		(ref $params{options} ? %{$params{options}} : ()) ,
 
 		"<>" => \&NonOption,
 	);
 
-	if ($params{ignore_unknown_options}) {
+	if ($params{test}) {
+		foreach my $key (keys %options) {
+			$options{$key}=sub {};
+		}
+	}
+
+	my $oldwarn;
+	if ($params{test} || $params{ignore_unknown_options}) {
+		$oldwarn=$SIG{__WARN__};
+		$SIG{__WARN__}=sub {};
+	}
+	my $ret=Getopt::Long::GetOptionsFromArray($array, %options);
+	if ($oldwarn) {
 		$SIG{__WARN__}=$oldwarn;
-		return 1;
 	}
-	else {
-		return $ret;
-	}
+
+	return 1 if $params{ignore_unknown_options};
+	return $ret;
 }
 
 sub split_options_string {
@@ -171,7 +183,7 @@ sub parseopts {
 
 		# Avoid forcing acting on packages specified in
 		# DH_INTERNAL_OPTIONS. This way, -p can be specified
-		# at the command line to act on a specific package, and if
+		# at the command line to act on a specific package, but when
 		# nothing is specified, the excludes will cause the set of
 		# packages DH_INTERNAL_OPTIONS specifies to be acted on.
 		if (defined $dh{DOPACKAGES}) {

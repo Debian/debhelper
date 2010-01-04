@@ -4,6 +4,12 @@ debhelper (7.4.12) UNRELEASED; urgency=low
   * makefile: Support the (asking for trouble) case of MAKE being set to
     something with a space in it. Closes: #563557
   * Fix warning about unknown options passed to commands in override targets.
+  * Add -O option, which can be used to pass options to commands, ignoring
+    options that they do not support.
+  * dh: Use -O to pass user-specified options to the commands it runs.
+    This solves the problem with passing "-Bbuild" to dh, where commands
+    that do not support -B would see a bogus -u option. Closes: #541773
+    (It also ensures that the commands dh prints out can really be run.)
 
  -- Joey Hess <joeyh@debian.org>  Fri, 01 Jan 2010 13:00:22 -0500
 

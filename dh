@@ -175,7 +175,7 @@ default. This is how to use dh_pycentral instead.
 
 	#!/usr/bin/make -f
 	%:
-		dh --with python-central $@
+		dh $@ --with python-central
 
 Here is how to force use of perl's Module::Build build system,
 which can be necessary if debhelper wrongly detects that the package
@@ -183,14 +183,14 @@ uses MakeMaker.
 
 	#!/usr/bin/make -f
 	%:
-		dh --buildsystem=perl_build $@
+		dh $@ --buildsystem=perl_build
 
 To patch your package using quilt, you can tell dh to use quilt's dh
 sequence addons like this:
 	
 	#!/usr/bin/make -f
 	%:
-		dh --with quilt $@
+		dh $@ --with quilt
 
 Here is an example of overriding where the dh_auto_* commands find
 the package's source, for a package where the source is located in a
@@ -198,7 +198,7 @@ subdirectory.
 
 	#!/usr/bin/make -f
 	%:
-		dh --sourcedirectory=src $@
+		dh $@ --sourcedirectory=src
 
 Finally, here is a way to prevent dh from running several commands
 that you don't want it to run, by defining empty override targets for each
@@ -459,7 +459,17 @@ while (@ARGV_orig) {
 	elsif ($opt =~ /^--?(no-act|remaining|(after|until|before|with|without)=)/) {
 		next;
 	}
-	push @options, $opt;
+	elsif ($opt=~/^-/) {
+		push @options, "-O".$opt;
+	}
+	elsif (@options) {
+		if ($options[$#options]=~/^-O--/) {
+			$options[$#options].="=".$opt;
+		}
+		else {
+			$options[$#options].=$opt;
+		}
+	}
 }
 
 # Figure out at what point in the sequence to start for each package.
