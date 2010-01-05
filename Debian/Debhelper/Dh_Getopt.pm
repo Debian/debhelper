@@ -70,6 +70,7 @@ sub getoptions {
 	my $array=shift;
 	my %params=@_;
 
+	my @test;
 	my %options=(	
 		"v" => \$dh{VERBOSE},
 		"verbose" => \$dh{VERBOSE},
@@ -130,14 +131,8 @@ sub getoptions {
 		
 		"ignore=s" => \&AddIgnore,
 
-		"O=s" => sub { my($option,$value)=@_;
-			# Try to parse an option, but ignore it
-			# if it is not known.
-			if (getoptions([$value], %params, test => 1)) {
-				getoptions([$value], %params);
-			}
-		},
-
+		"O=s" => sub { push @test, $_[1] },
+	      
 		(ref $params{options} ? %{$params{options}} : ()) ,
 
 		"<>" => \&NonOption,
@@ -157,6 +152,14 @@ sub getoptions {
 	my $ret=Getopt::Long::GetOptionsFromArray($array, %options);
 	if ($oldwarn) {
 		$SIG{__WARN__}=$oldwarn;
+	}
+
+	foreach my $opt (@test) {
+		# Try to parse an option, but ignore it
+		# if it is not known.
+		if (getoptions([$opt], %params, test => 1)) {
+			getoptions([$opt], %params);
+		}
 	}
 
 	return 1 if $params{ignore_unknown_options};
