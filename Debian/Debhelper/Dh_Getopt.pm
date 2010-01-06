@@ -145,7 +145,7 @@ sub getoptions {
 	}
 
 	my $oldwarn;
-	if ($params{test} || $params{ignore_unknown_options}) {
+	if ($params{test}) {
 		$oldwarn=$SIG{__WARN__};
 		$SIG{__WARN__}=sub {};
 	}
@@ -162,7 +162,6 @@ sub getoptions {
 		}
 	}
 
-	return 1 if $params{ignore_unknown_options};
 	return $ret;
 }
 
@@ -182,7 +181,7 @@ sub parseopts {
 	# dh through an override target to a command.
 	if (defined $ENV{DH_INTERNAL_OPTIONS}) {
 		@ARGV_extra=split(/\x1e/, $ENV{DH_INTERNAL_OPTIONS});
-		getoptions(\@ARGV_extra, %params, ignore_unknown_options => 1);
+		getoptions(\@ARGV_extra, %params);
 
 		# Avoid forcing acting on packages specified in
 		# DH_INTERNAL_OPTIONS. This way, -p can be specified
