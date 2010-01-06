@@ -145,7 +145,7 @@ sub getoptions {
 	}
 
 	my $oldwarn;
-	if ($params{test}) {
+	if ($params{test} || $params{ignore_unknown_options}) {
 		$oldwarn=$SIG{__WARN__};
 		$SIG{__WARN__}=sub {};
 	}
@@ -155,13 +155,14 @@ sub getoptions {
 	}
 
 	foreach my $opt (@test) {
-		# Try to parse an option, but ignore it
+		# Try to parse an option, and skip it
 		# if it is not known.
-		if (getoptions([$opt], %params, test => 1)) {
+		if (getoptions([$opt], test => 1)) {
 			getoptions([$opt], %params);
 		}
 	}
 
+	return 1 if $params{ignore_unknown_options};
 	return $ret;
 }
 
