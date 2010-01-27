@@ -26,6 +26,7 @@ our @BUILDSYSTEMS = (
 	"perl_build",
 	"cmake",
 	"ant",
+	"qmake",
 );
 
 my $opt_buildsys;
