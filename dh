@@ -200,6 +200,13 @@ subdirectory.
 	%:
 		dh $@ --sourcedirectory=src
 
+And here is an example of how to tell the dh_auto_* commands to build
+in a subdirectory, which will be removed on clean.
+
+	#!/usr/bin/make -f
+	%:
+		dh $@ --builddirectory=build
+
 Finally, here is a way to prevent dh from running several commands
 that you don't want it to run, by defining empty override targets for each
 command.
