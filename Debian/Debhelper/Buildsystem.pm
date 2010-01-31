@@ -96,7 +96,7 @@ sub _set_builddir {
 			$builddir = File::Spec->catdir($this->{cwd}, $builddir);
 		}
 		elsif ($builddir =~ /\Q$this->{cwd}\E/) {
-			$builddir = File::Spec::abs2rel($builddir, $this->{cwd});
+			$builddir = File::Spec->abs2rel($builddir, $this->{cwd});
 		}
 
 		# If build directory ends up the same as source directory, drop it
