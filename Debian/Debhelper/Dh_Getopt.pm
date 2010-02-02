@@ -157,7 +157,9 @@ sub getoptions {
 	foreach my $opt (@test) {
 		# Try to parse an option, and skip it
 		# if it is not known.
-		if (getoptions([$opt], test => 1)) {
+		if (getoptions([$opt], %params,
+				ignore_unknown_options => 0,
+				test => 1)) {
 			getoptions([$opt], %params);
 		}
 	}
