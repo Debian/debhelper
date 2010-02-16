@@ -70,6 +70,10 @@ sub getoptions {
 	my $array=shift;
 	my %params=@_;
 
+	if (! exists $params{bundling} || $params{bundling}) {
+		Getopt::Long::config("bundling");
+	}
+
 	my @test;
 	my %options=(	
 		"v" => \$dh{VERBOSE},
@@ -275,10 +279,5 @@ sub parseopts {
 	push @{$dh{U_PARAMS}}, @ARGV, @ARGV_extra;
 	@ARGV=@{$dh{ARGV}} if exists $dh{ARGV};
 }
-
-sub import {
-	# Enable bundling of short command line options.
-	Getopt::Long::config("bundling");
-}		
 
 1
