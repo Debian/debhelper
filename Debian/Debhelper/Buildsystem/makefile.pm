@@ -19,7 +19,7 @@ sub exists_make_target {
 	my $buildpath = $this->get_buildpath();
 	unshift @opts, "-C", $buildpath if $buildpath ne ".";
 	open(SAVEDERR, ">&STDERR");
-	close STDERR;
+	open(STDERR, ">/dev/null");
 	open(MAKE, "-|", $this->{makecmd}, @opts, $target);
 	my $output=<MAKE>;
 	close MAKE;
