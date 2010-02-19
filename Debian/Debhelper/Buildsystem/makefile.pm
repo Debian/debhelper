@@ -22,6 +22,7 @@ sub exists_make_target {
 	open(STDERR, ">/dev/null");
 	open(MAKE, "-|", $this->{makecmd}, @opts, $target);
 	my $output=<MAKE>;
+	chomp $output;
 	close MAKE;
 	open(STDERR, ">&SAVEDERR");
 	return defined $output && length $output;
