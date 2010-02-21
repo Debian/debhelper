@@ -126,7 +126,12 @@ my @installed;
 my $srcdir = '.';
 $srcdir = $dh{SOURCEDIR} if defined $dh{SOURCEDIR};
 
-foreach my $package (@{$dh{DOPACKAGES}}) {
+foreach my $package (getpackages()) {
+	# Look at the install files for all packages to handle
+	# list-missing/fail-missing, but skip really installing for
+	# packages that are not being acted on.
+	my $skip_install=! grep { $_ eq $package } @{$dh{DOPACKAGES}};
+
 	my $tmp=tmpdir($package);
 	my $file=pkgfile($package,"install");
 
@@ -166,12 +171,16 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 
 		if (! compat(4)) { # check added in v5
-			if (! @filelist) {
+			if (! @filelist && ! $skip_install) {
 				error("$package missing files (@$set), aborting");
 			}
 		}
+
 		foreach my $src (@filelist) { 
 			next if excludefile($src);
+			
+			push @installed, $src;
+			next if $skip_install;
 		
 			if (! defined $dest) {
 				# Guess at destination directory.
@@ -185,16 +194,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			# Make sure the destination directory exists.
 			if (! -e "$tmp/$dest") {
 				doit("install","-d","$tmp/$dest");
-			}
-
-			# Keep track of what's installed.
-			if ($dh{LIST_MISSING} || $dh{FAIL_MISSING}) {
-				# Kill any extra slashes. Makes the
-				# @installed stuff more robust.
-				$src=~y:/:/:s;
-				$src=~s:/+$::;
-				$src=~s:^(\./)*::;
-				push @installed, "\Q$src\E\/.*|\Q$src\E";
 			}
 			
 			if (-d $src && $exclude) {
@@ -225,7 +224,13 @@ if ($dh{LIST_MISSING} || $dh{FAIL_MISSING}) {
 	}
 	
 	my @missing;
-	my $installed=join("|", @installed);
+	my $installed=join("|", map {
+		# Kill any extra slashes, for robustness.
+		y:/:/:s;
+		s:/+$::;
+		s:^(\./)*::;
+		"\Q$_\E\/.*|\Q$_\E";
+	} @installed);
 	$installed=qr{^($installed)$};
 	find(sub {
 		-f || -l || return;
