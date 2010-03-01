@@ -76,7 +76,7 @@ sub init {
 	# Check if packages to build have been specified, if not, fall back to
 	# the default, doing them all.
 	if (! defined $dh{DOPACKAGES} || ! @{$dh{DOPACKAGES}}) {
-		push @{$dh{DOPACKAGES}},@allpackages;
+		push @{$dh{DOPACKAGES}}, getpackages('both');
 	}
 
 	# Check to see if -P was specified. If so, we can only act on a single
@@ -667,8 +667,10 @@ sub sourcepackage {
 }
 
 # Returns a list of packages in the control file.
-# Pass "arch" or "indep" to specify arch-dependant or
-# independant. If nothing is specified, returns all packages.
+# Pass "arch" or "indep" to specify arch-dependant (that will be built
+# for the system's arch) or independant. If nothing is specified,
+# returns all packages. Also, "both" returns the union of "arch" and "indep"
+# packages.
 # As a side effect, populates %package_arches and %package_types with the
 # types of all packages (not only those returned).
 my (%package_types, %package_arches);
@@ -715,8 +717,8 @@ sub getpackages {
 			}
 
 			if ($package &&
-			    (($type eq 'indep' && $arch eq 'all') ||
-			     ($type eq 'arch' && ($arch eq 'any' ||
+			    ((($type eq 'indep' || $type eq 'both') && $arch eq 'all') ||
+			     (($type eq 'arch'  || $type eq 'both') && ($arch eq 'any' ||
 					     ($arch ne 'all' &&
 			                      samearch(buildarch(), $arch)))) ||
 			     ! $type)) {

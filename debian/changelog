@@ -7,6 +7,13 @@ debhelper (7.4.16) UNRELEASED; urgency=low
     not all packages are acted on (due to architecture limits or flags).
     Closes: #570373
   * Typo. Closes: #571968
+  * If neither -a or -i are specified, debhelper commands used to default
+    to acting on all packages in the control file, which was a guaranteed
+    failure if the control file listed packages that did not build for the
+    target architecture. After recent optimisations, this default behavior
+    can efficiently be changed to the more sane default of acting on only
+    packages that can be built for the current architecture. This change
+    is mostly useful when using minimal rules files with dh. Closes: #572077
 
  -- Joey Hess <joeyh@debian.org>  Thu, 18 Feb 2010 17:53:27 -0500
 
