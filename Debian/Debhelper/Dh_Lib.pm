@@ -65,11 +65,11 @@ sub init {
 		$dh{NO_ACT}=1;
 	}
 
-	my @allpackages=getpackages();
 	# Get the name of the main binary package (first one listed in
 	# debian/control). Only if the main package was not set on the
 	# command line.
 	if (! exists $dh{MAINPACKAGE} || ! defined $dh{MAINPACKAGE}) {
+		my @allpackages=getpackages();
 		$dh{MAINPACKAGE}=$allpackages[0];
 	}
 
