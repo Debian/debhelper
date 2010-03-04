@@ -207,6 +207,13 @@ in a subdirectory, which will be removed on clean.
 	%:
 		dh $@ --builddirectory=build
 
+If your package can be built in parallel, you can support parallel building
+as follows. Then I<dpkg-buildpackage -j> will work.
+
+	#!/usr/bin/make -f
+	%:
+		dh $@ --parallel
+
 Finally, here is a way to prevent dh from running several commands
 that you don't want it to run, by defining empty override targets for each
 command.
