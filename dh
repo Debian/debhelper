@@ -247,8 +247,8 @@ init(options => {
 			my ($option,$value)=@_;
 			@{$dh{WITH}} = grep { $_ ne $value } @{$dh{WITH}};
 		},
-		"l" => \$dh{LIST},
-		"list" => \$dh{LIST},
+		"l" => \&list_addons,
+		"list" => \&list_addons,
 	},
 	# Disable complaints about unknown options; they are passed on the
 	# debhelper commands.
@@ -397,7 +397,7 @@ sub remove_command_options {
 	}
 }
 
-if ($dh{LIST}) {
+sub list_addons {
 	my %addons;
 
 	for my $inc (@INC) {
