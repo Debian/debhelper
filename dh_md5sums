@@ -75,7 +75,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		$exclude.="! \\( $dh{EXCLUDE_FIND} \\) ";
 	}
 	
-	complex_doit("(cd $tmp >/dev/null ; find . -type f $exclude ! -regex '.*/DEBIAN/.*' -printf '%P\\0' | xargs -r0 md5sum > DEBIAN/md5sums) >/dev/null");
+	complex_doit("(cd $tmp >/dev/null ; find . -type f $exclude ! -regex '.*/DEBIAN/.*' -printf '%P\\0' | LC_ALL=C sort -z | xargs -r0 md5sum > DEBIAN/md5sums) >/dev/null");
 	# If the file's empty, no reason to waste inodes on it.
 	if (-z "$tmp/DEBIAN/md5sums") {
 		doit("rm","-f","$tmp/DEBIAN/md5sums");
