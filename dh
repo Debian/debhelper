@@ -24,16 +24,6 @@ they only work on binary independent packages, and commands in the
 binary-arch sequences are passed the "-a" option to ensure they only work
 on architecture dependent packages.
 
-Each debhelper command will record when it's successfully run in
-debian/package.debhelper.log. (Which dh_clean deletes.) So dh can tell
-which commands have already been run, for which packages, and skip running
-those commands again.
-
-Each time dh is run, it examines the log, and finds the last logged command
-that is in the specified sequence. It then continues with the next command
-in the sequence. The B<--until>, B<--before>, B<--after>, and B<--remaining>
-options can override this behavior.
-
 If debian/rules contains a target with a name like "override_I<dh_command>",
 then when it would normally run I<dh_command>, dh will instead call that
 target. The override target can then run the command with additional options,
@@ -145,9 +135,9 @@ easy way to do with is by adding an override target for that command.
 	override_dh_installdocs:
 		dh_installdocs README TODO
 
-Sometimes the automated dh_auto_configure and dh_auto_build can't guess
-what to do for a strange package. Here's how to avoid running either
-and instead run your own commands.
+Sometimes the automated L<dh_auto_configure(1)> and L<dh_auto_build(1)>
+can't guess what to do for a strange package. Here's how to avoid running
+either and instead run your own commands.
 
 	#!/usr/bin/make -f
 	%:
@@ -214,9 +204,8 @@ as follows. Then I<dpkg-buildpackage -j> will work.
 	%:
 		dh $@ --parallel
 
-Finally, here is a way to prevent dh from running several commands
-that you don't want it to run, by defining empty override targets for each
-command.
+Here is a way to prevent dh from running several commands that you don't
+want it to run, by defining empty override targets for each command.
 
 	#!/usr/bin/make -f
 	%:
@@ -224,6 +213,56 @@ command.
 	
 	# Commands not to run:
 	override_dh_auto_test override_dh_compress override_dh_fixperms:
+
+Sometimes, you may need to make an override target only run commands when a
+particular package is being built. This can be accomplished using
+L<dh_listpackages(1)> to test what is being built. For example:
+
+	#!/usr/bin/make -f
+	%:
+		dh $@
+	
+	override_dh_fixperms:
+		dh_fixperms
+	ifneq (,$(findstring foo, $(shell dh_listpackages)))
+		chmod 4755 debian/foo/usr/bin/foo
+	endif
+
+Finally, remember that you are not limited to using override targets in the
+rules file when using dh. You can also explicitly define any of the regular
+rules file targets when it makes sense to do so. A common reason to do this
+is if your package needs different build-arch and build-indep targets. For
+example, a package with a long document build process can put it in
+build-indep to avoid build daemons redundantly building the documentation.
+
+	#!/usr/bin/make -f
+	%:
+		dh $@
+	
+	build: build-arch build-indep
+	build-indep:
+		$(MAKE) docs
+	build-arch:
+		$(MAKE) bins
+
+=head1 INTERNALS
+
+If you're curious about dh's internals, here's how it works under the hood.
+
+Each debhelper command will record when it's successfully run in
+debian/package.debhelper.log. (Which dh_clean deletes.) So dh can tell
+which commands have already been run, for which packages, and skip running
+those commands again.
+
+Each time dh is run, it examines the log, and finds the last logged command
+that is in the specified sequence. It then continues with the next command
+in the sequence. The B<--until>, B<--before>, B<--after>, and B<--remaining>
+options can override this behavior.
+
+dh uses the DH_INTERNAL_OPTIONS environment variable to pass information
+through to debhelper commands that are run inside override targets. The
+contents (and indeed, existence) of this environment variable, as the name
+might suggest, is subject to change at any time.
 
 =cut
 
