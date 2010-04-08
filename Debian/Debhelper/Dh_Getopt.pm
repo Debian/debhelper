@@ -238,7 +238,7 @@ sub parseopts {
 			warning("You asked that all arch in(dep) packages be built, but there are none of that type.");
 			exit(0);
 		}
-		push @{$dh{DOPACKAGES}},getpackages();
+		push @{$dh{DOPACKAGES}},getpackages("both");
 	}
 
 	# Remove excluded packages from the list of packages to act on.
