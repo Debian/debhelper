@@ -74,7 +74,7 @@ sub init {
 	}
 
 	# Check if packages to build have been specified, if not, fall back to
-	# the default, doing them all.
+	# the default, building all relevant packages.
 	if (! defined $dh{DOPACKAGES} || ! @{$dh{DOPACKAGES}}) {
 		push @{$dh{DOPACKAGES}}, getpackages('both');
 	}
