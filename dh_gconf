@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-dh_gconf - generate GConf schema registration scripts
+dh_gconf - install GConf defaults files and register schemas
 
 =cut
 
@@ -15,12 +15,8 @@ B<dh_gconf> [S<I<debhelper options>>] [B<--priority=<number>>]
 
 =head1 DESCRIPTION
 
-dh_gconf is a debhelper program that is responsible for registering
-GConf schemas.
-
-It automatically generates the postinst and prerm fragments needed
-to register and unregister the schemas in usr/share/gconf/schemas, using
-gconf-schemas.
+dh_gconf is a debhelper program that is responsible for installing GConf
+defaults files and registering GConf schemas.
 
 An appropriate dependency on gconf2 will be generated in ${misc:Depends}.
 
@@ -31,14 +27,12 @@ An appropriate dependency on gconf2 will be generated in ${misc:Depends}.
 =item debian/I<package>.gconf-defaults
 
 Installed into usr/share/gconf/defaults/10_package in the package build
-directory, with "I<package>" replaced by the package name. Some postinst
-and postrm fragments will be generated to run update-gconf-defaults.
+directory, with "I<package>" replaced by the package name.
 
 =item debian/I<package>.gconf-mandatory
 
 Installed into usr/share/gconf/mandatory/10_package in the package build
-directory, with "I<package>" replaced by the package name, and similar
-postinst and postrm fragments will be generated.
+directory, with "I<package>" replaced by the package name.
 
 =back
 
