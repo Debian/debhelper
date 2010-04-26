@@ -638,15 +638,34 @@ sub dpkg_architecture_value {
 }
 
 # Passed an arch and a list of arches to match against, returns true if matched
-sub samearch {
-	my $arch=shift;
-	my @archlist=split(/\s+/,shift);
+{
+	my %knownsame;
 
-	foreach my $a (@archlist) {
-		system("dpkg-architecture", "-a$arch", "-i$a") == 0 && return 1;
+	sub samearch {
+		my $arch=shift;
+		my @archlist=split(/\s+/,shift);
+	
+		foreach my $a (@archlist) {
+			# Avoid expensive dpkg-architecture call to compare
+			# with a simple architecture name. "linux-any" and
+			# other architecture wildcards are (currently)
+			# always hypenated.
+			if ($a !~ /-/) {
+				return 1 if $arch eq $a;
+			}
+			elsif (exists $knownsame{$arch}{$a}) {
+				return 1 if $knownsame{$arch}{$a};
+			}
+			elsif (system("dpkg-architecture", "-a$arch", "-i$a") == 0) {
+				return $knownsame{$arch}{$a}=1;
+			}
+			else {
+				$knownsame{$arch}{$a}=0;
+			}
+		}
+	
+		return 0;
 	}
-
-	return 0;
 }
 
 # Returns source package name
