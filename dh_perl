@@ -128,7 +128,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			unless $perl eq 'perl-base' && ! length($version);
 
 		# add perlapi-<ver> for XS modules
-		addsubstvar($package, "perl:Depends", "perlapi-$Config{version}")
+		addsubstvar($package, "perl:Depends",
+			"perlapi-" . ($Config{debian_abi} || $Config{version}))
 			if $deps & XS_MODULE;
 	}
 
