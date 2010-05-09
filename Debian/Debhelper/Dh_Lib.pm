@@ -610,13 +610,13 @@ sub excludefile {
 	my %dpkg_arch_output;
 	sub dpkg_architecture_value {
 		my $var = shift;
-		local $_;
-		if (!exists($dpkg_arch_output{$var})) {
+		if (! exists($dpkg_arch_output{$var})) {
+			local $_;
 			open(PIPE, '-|', 'dpkg-architecture')
 				or error("dpkg-architecture failed");
 			while (<PIPE>) {
-				my ($k, $v) = split(/=/);
-				chomp $v;
+				chomp;
+				my ($k, $v) = split(/=/, 2);
 				$dpkg_arch_output{$k} = $v;
 			}
 			close(PIPE);
@@ -625,28 +625,14 @@ sub excludefile {
 	}
 }
 
-# Returns the build architecture. (Memoized)
-{
-	my $arch;
-	
-	sub buildarch {
-		if (!defined $arch) {
-		    $arch=dpkg_architecture_value('DEB_HOST_ARCH');
-		}
-		return $arch;
-	}
+# Returns the build architecture.
+sub buildarch {
+	dpkg_architecture_value('DEB_HOST_ARCH');
 }
 
-# Returns the build OS. (Memoized)
-{
-	my $os;
-
-	sub buildos {
-		if (!defined $os) {
-			$os=dpkg_architecture_value("DEB_HOST_ARCH_OS");
-		}
-		return $os;
-	}
+# Returns the build OS.
+sub buildos {
+	dpkg_architecture_value("DEB_HOST_ARCH_OS");
 }
 
 # Passed an arch and a list of arches to match against, returns true if matched
