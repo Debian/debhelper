@@ -616,7 +616,7 @@ sub excludefile {
 				or error("dpkg-architecture failed");
 			while (<PIPE>) {
 				chomp;
-				my ($k, $v) = split(/=/, 2);
+				my ($k, $v) = split(/=/, $_, 2);
 				$dpkg_arch_output{$k} = $v;
 			}
 			close(PIPE);
