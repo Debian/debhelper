@@ -364,9 +364,23 @@ sub pkgfile {
 		$filename="$dh{NAME}.$filename";
 	}
 	
-	my @try=("debian/$package.$filename.".buildarch(),
-		 "debian/$package.$filename.".buildos(),
-		 "debian/$package.$filename");
+	# First, check for files ending in buildarch and buildos.
+	my $match;
+	foreach my $file (glob("debian/$package.$filename.*")) {
+		next if ! -f $file;
+		next if $dh{IGNORE} && exists $dh{IGNORE}->{$file};
+		if ($file eq "debian/$package.$filename.".buildarch()) {
+			$match=$file;
+			# buildarch files are used in preference to buildos files.
+			last;
+		}
+		elsif ($file eq "debian/$package.$filename.".buildos()) {
+			$match=$file;
+		}
+	}
+	return $match if defined $match;
+
+	my @try=("debian/$package.$filename");
 	if ($package eq $dh{MAINPACKAGE}) {
 		push @try, "debian/$filename";
 	}
