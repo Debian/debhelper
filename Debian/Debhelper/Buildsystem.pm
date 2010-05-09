@@ -12,10 +12,6 @@ use Cwd ();
 use File::Spec;
 use Debian::Debhelper::Dh_Lib;
 
-# Cache DEB_BUILD_GNU_TYPE value. Performance hit of multiple
-# invocations is noticable when listing build systems.
-our $DEB_BUILD_GNU_TYPE = dpkg_architecture_value("DEB_BUILD_GNU_TYPE");
-
 # Build system name. Defaults to the last component of the class
 # name. Do not override this method unless you know what you are
 # doing.
@@ -38,7 +34,7 @@ sub DESCRIPTION {
 # Default build directory. Can be overriden in the derived
 # class if really needed.
 sub DEFAULT_BUILD_DIRECTORY {
-	"obj-" . $DEB_BUILD_GNU_TYPE;
+	"obj-" . dpkg_architecture_value("DEB_BUILD_GNU_TYPE");
 }
 
 # Constructs a new build system object. Named parameters:
