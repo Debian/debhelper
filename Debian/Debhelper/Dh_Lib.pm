@@ -606,11 +606,23 @@ sub excludefile {
         return 0;
 }
 
-sub dpkg_architecture_value {
-	my $var = shift;
-	my $value=`dpkg-architecture -q$var` || error("dpkg-architecture failed");
-	chomp $value;
-	return $value;
+{
+	my %dpkg_arch_output;
+	sub dpkg_architecture_value {
+		my $var = shift;
+		local $_;
+		if (!exists($dpkg_arch_output{$var})) {
+			open(PIPE, '-|', 'dpkg-architecture')
+				or error("dpkg-architecture failed");
+			while (<PIPE>) {
+				my ($k, $v) = split(/=/);
+				chomp $v;
+				$dpkg_arch_output{$k} = $v;
+			}
+			close(PIPE);
+		}
+		return $dpkg_arch_output{$var};
+	}
 }
 
 # Returns the build architecture. (Memoized)
