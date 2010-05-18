@@ -241,7 +241,10 @@ sub find_so_man {
 		    dirname($solink)) {
 			$solink=basename($solink);
 		}
-		else {
+		# A so link with a path is relative to the base of the man
+		# page hierarchy, but without a path, is relative to the
+		# current section.
+		elsif ($solink =~ m!/!) {
 			$solink="../$solink";
 		}
 	
