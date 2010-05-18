@@ -248,8 +248,10 @@ sub find_so_man {
 			$solink="../$solink";
 		}
 	
-		push @sofiles,"$File::Find::dir/$_";
-		push @sodests,$solink;
+		if (-e $solink || -e "$solink.gz") {
+			push @sofiles,"$File::Find::dir/$_";
+			push @sodests,$solink;
+		}
 	}
 }
 
