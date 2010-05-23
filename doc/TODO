@@ -23,10 +23,6 @@ Deprecated:
 * DH_COMPAT 1, 2, 3, 4. Can be removed once all packages are seen to be using
   a newer version. I won't hold my breath. Now with evil warning messages
   though.
-* Also, grep the entire archive for all dh_* command lines,
-  and check to see what other switches are not being used, and maybe remove
-  some of them. I'd also like to deprecate/remove debian/compress files, -X is
-  a better idea.
 * dh_suidregister. Once nothing in the archive uses it.
 * dh_installmanpages.
 * dh_testversion. Remove as soon as nothing uses it.
@@ -35,10 +31,15 @@ Deprecated:
 * dh_undocumented
 * dh_installinit --init-script (make it warn)
 * dh_python
-* dh_clean -k (make it warn (need to make alien not use it 1st!))
+* dh_clean -k
 * dh_desktop, dh_scrollkeeper. Remove eventually..
 * -s flag, not formally deprecated yet; remove eventually
 * -u flag; add a warning on use and remove eventually
 * delsubstvar() and the last parameter to addsubstvar that makes it remove
   a string are not used in debhelper itself, but have been left in the
   library in case other things use them. Deprecate and remove.
+
+Also, grep the entire archive for all dh_* command lines,
+and check to see what other switches are not being used, and maybe remove
+some of them. I'd also like to deprecate/remove debian/compress files, -X is
+a better idea.
