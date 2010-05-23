@@ -7,11 +7,12 @@ v8:
 * make dh_install use hard links for efficiency (maybe?)
 * dh_installinit --restart-after-upgrade as default?
 * #487006: dh_installman with 3-letter codes
-* apply patch in #557603 (breaks compatibility slightly; see #560120)
 * clean up dh's handling of options passed onto commands it calls,
   by implementing one of the changes discussed in #570039
   (either change #3, change #4, or change #5; change #0 was done, but 
   was an incomplete workaround)
+  My preference ATM is #3, require dh options come before --,
+  and after, options to be passed on to commands.
 * better package arch filtering for -N , -p (#576990)
 * Support DEB_BUILD_OPTIONS=debug ; maybe also support passing
   -g -O2 by default. See patch (and discussion of why this breaks

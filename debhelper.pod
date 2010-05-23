@@ -518,6 +518,14 @@ Changes from V7 are:
 
 Commands will fail rather than warning when they are passed unknown options.
 
+=item -
+
+dh_makeshlibs will run dpkg-gensymbols on all shared libraries that it
+generates shlibs files for. So -X can be used to exclude libraries.
+Also, libraries in unusual locations that dpkg-gensymbols would not
+have processed before will be passed to it, a behavior change that 
+can cause some packages to fail to build.
+
 =back
 
 =back

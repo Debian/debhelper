@@ -7,6 +7,12 @@ debhelper (7.4.21) UNRELEASED; urgency=low
   * Add deprecation warning for dh_clean -k.
   * In v8 mode, do not allow directly passing unknown options to debhelper
     commands. (Unknown options in DH_OPTIONS still only result in warnings.)
+  * In v8 mode, dh_makeshlibs will run dpkg-gensymbols on all shared
+    libraries it generates shlibs files for. This means that -X can be
+    used to exclude libraries from processing by dpkg-gensymbols. It also
+    means that libraries in unusual locations, where dpkg-gensymbols does
+    not itself normally look will be passed to it, a behavior change which
+    may break some packages. Closes: #557603
 
  -- Joey Hess <joeyh@debian.org>  Mon, 17 May 2010 20:01:19 -0400
 
