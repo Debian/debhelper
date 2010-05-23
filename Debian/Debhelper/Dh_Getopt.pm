@@ -218,8 +218,9 @@ sub parseopts {
 
 	my $ret=getoptions(\@ARGV, %params);
 	if (!$ret) {
-		warning("warning: unknown options will be a fatal error in a future debhelper release");
-		#error("unknown option; aborting");
+		if (! compat(7)) {
+			error("unknown option; aborting");
+		}
 	}
 
 	# Check to see if -V was specified. If so, but no parameters were
