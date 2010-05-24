@@ -34,6 +34,8 @@ changelog files. Plus PCF fonts underneath usr/share/fonts/X11/
 
 =item debian/I<package>.compress
 
+These files are deprecated.
+
 If this file exists, the default files are not compressed. Instead, the
 file is ran as a shell script, and all filenames that the shell script
 outputs will be compressed. The shell script will be run from inside the
@@ -52,8 +54,7 @@ need to.
 Exclude files that contain "item" anywhere in their filename from being
 compressed. For example, -X.tiff will exclude tiff files from compression.
 You may use this option multiple times to build up a list of things to
-exclude. You can accomplish the same thing by using a debian/compress file,
-but this is easier.
+exclude.
 
 =item B<-A>, B<--all>
 
@@ -91,8 +92,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		push @files, @ARGV;
 	}
 	if ($compress) {
-		# The config file is a sh script that outputs the files to be compressed
+		# The compress file is a sh script that outputs the files to be compressed
 		# (typically using find).
+		warning("$compress is deprecated; use -X or avoid calling dh_compress instead");
 		push @files, split(/\n/,`sh $olddir/$compress 2>/dev/null`);
 	}
 	else {
