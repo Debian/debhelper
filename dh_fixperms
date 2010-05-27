@@ -72,7 +72,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# ..and so are executable shared and static libraries 
 	# (and .la files from libtool) ..
 	complex_doit("find $tmp -perm -5 -type f",
-		"\\( -name '*.so*' -or -name '*.la' -or -name '*.a' \\) $find_options -print0",
+		"\\( -name '*.so.*' -or -name '*.so' -or -name '*.la' -or -name '*.a' \\) $find_options -print0",
 		"2>/dev/null | xargs -0r chmod 644");
 	
 	# ..and header files ..
