@@ -132,8 +132,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	doit("rm", "-f", "$tmp/DEBIAN/shlibs");
 
 	# So, we look for files or links to existing files with names that
-	# match "*.so*". Matching *.so.* is not good enough because of
-	# broken crap like db3. And we only look at real files not
+	# match "*.so.*". And we only look at real files not
 	# symlinks, so we don't accidentually add shlibs data to -dev
 	# packages. This may have a few false positives, which is ok,
 	# because only if we can get a library name and a major number from
