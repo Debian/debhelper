@@ -19,6 +19,7 @@ debhelper (7.9.1) UNRELEASED; urgency=low
   * dh_fixperms: Tighten globs used to find library .so files,
     avoiding incorrectly matching things like "foo.sources". Closes: #583328
   * In v8 mode, dh expects the sequence to run is always its first parameter.
+    (Ie, use "dh $@ --foo", not "dh --foo $@")
     This avoids ambiguities when parsing options to be passed on to debhelper
     commands. (See #570039)
 
