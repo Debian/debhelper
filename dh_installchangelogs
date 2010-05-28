@@ -19,8 +19,8 @@ dh_installchangelogs is a debhelper program that is responsible for
 installing changelogs into package build directories.
 
 An upstream changelog file may be specified as an option. If none is
-specified, a few common filenames are tried. (In compatibility level 7 and
-above.)
+specified, it looks for files with names that seem likely to be changelogs.
+(In compatibility level 7 and above.)
 
 If there is an upstream changelog file, it will be be installed as
 usr/share/doc/package/changelog in the package build directory. If the
@@ -84,14 +84,16 @@ my $upstream=shift;
 my $changelog_name="changelog.Debian";
 if (! defined $upstream) {
 	if (! isnative($dh{MAINPACKAGE}) && !compat(6)) {
-		my @files=sort glob("*");
-		foreach my $name (qw{changelog changes changelog.txt changes.txt history history.txt}) {
-			my @matches=grep {
-				lc $_ eq $name && -s $_ && ! excludefile($_)
-			} @files;
-			if (@matches) {
-				$upstream=shift @matches;
-				last;
+		foreach my $dir (qw{. doc docs}) {
+			my @files=sort glob("$dir/*");
+			foreach my $name (qw{changelog changes changelog.txt changes.txt history history.txt}) {
+				my @matches=grep {
+					lc basename($_) eq $name && -s $_ && ! excludefile($_)
+				} @files;
+				if (@matches) {
+					$upstream=shift @matches;
+					last;
+				}
 			}
 		}
 	}
