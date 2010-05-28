@@ -5,6 +5,15 @@ debhelper (7.9.1) UNRELEASED; urgency=low
     target is not present in the same binary package, on advice of 
     Colin Watson. (To support eventual so search paths.)
   * Add deprecation warning for dh_clean -k.
+  * dh_testversion: Removed this deprecated and unused command.
+  * debian/compress files are now deprecated. Seems only one package
+    (genesis) still uses them.
+  * dh_fixperms: Tighten globs used to find library .so files,
+    avoiding incorrectly matching things like "foo.sources". Closes: #583328
+  * dh_installchangelogs: Support packages placing their changelog in a
+    file with a name like HISTORY. Closes: #582749
+  * dh_installchangelogs: Also look for changelog files in doc(s)
+    subdirectories. Closes: #521258
   * In v8 mode, do not allow directly passing unknown options to debhelper
     commands. (Unknown options in DH_OPTIONS still only result in warnings.)
   * In v8 mode, dh_makeshlibs will run dpkg-gensymbols on all shared
@@ -13,19 +22,10 @@ debhelper (7.9.1) UNRELEASED; urgency=low
     means that libraries in unusual locations, where dpkg-gensymbols does
     not itself normally look, will be passed to it, a behavior change which
     may break some packages. Closes: #557603
-  * dh_testversion: Removed this deprecated and unused command.
-  * debian/compress files are now deprecated. Seems only one package
-    (genesis) still uses them.
-  * dh_fixperms: Tighten globs used to find library .so files,
-    avoiding incorrectly matching things like "foo.sources". Closes: #583328
   * In v8 mode, dh expects the sequence to run is always its first parameter.
     (Ie, use "dh $@ --foo", not "dh --foo $@")
     This avoids ambiguities when parsing options to be passed on to debhelper
     commands. (See #570039)
-  * dh_installchangelogs: Support packages placing their changelog in a
-    file with a name like HISTORY. Closes: #582749
-  * dh_installchangelogs: Also look for changelog files in doc(s)
-    subdirectories. Closes: #521258
   * In v8 mode, prefer the perl_build buildsystem over perl_makemaker.
     Closes: #578805
 
