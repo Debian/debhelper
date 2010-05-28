@@ -20,10 +20,11 @@ use constant BUILD_STEPS => qw(configure build test install clean);
 # build systems MUST be added to the END of the list.
 our @BUILDSYSTEMS = (
 	"autoconf",
+	(! compat(7) ? "perl_build" : ()),
 	"perl_makemaker",
 	"makefile",
 	"python_distutils",
-	"perl_build",
+	(compat(7) ? "perl_build" : ()),
 	"cmake",
 	"ant",
 	"qmake",
