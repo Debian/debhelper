@@ -1,4 +1,4 @@
-debhelper (7.4.21) UNRELEASED; urgency=low
+debhelper (7.9.1) UNRELEASED; urgency=low
 
   * dh_installman: Support .so links relative to the current section.
   * dh_installman: Avoid converting .so links to symlinks if the link
@@ -18,6 +18,9 @@ debhelper (7.4.21) UNRELEASED; urgency=low
     (genesis) still uses them.
   * dh_fixperms: Tighten globs used to find library .so files,
     avoiding incorrectly matching things like "foo.sources". Closes: #583328
+  * In v8 mode, dh expects the sequence to run is always its first parameter.
+    This avoids ambiguities when parsing options to be passed on to debhelper
+    commands. (See #570039)
 
  -- Joey Hess <joeyh@debian.org>  Mon, 17 May 2010 20:01:19 -0400
 

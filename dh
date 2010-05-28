@@ -468,17 +468,31 @@ foreach my $addon (@{$dh{WITH}}) {
 	}
 }
 
-# Get the sequence of commands to run.
-if (! @ARGV) {
+my $sequence;
+if (! compat(7)) {
+	# From v8, the sequence is the very first parameter.
+	$sequence=shift @ARGV_orig;
+	if ($sequence=~/^-/) {
+		error "Unknown sequence $sequence (options should not come before the sequence)";
+	}
+}
+else {
+	# Before v8, the sequence could be at any position in the parameters,
+	# so was what was left after parsing.
+	$sequence=shift;
+	if (defined $sequence) {
+		@ARGV_orig=grep { $_ ne $sequence } @ARGV_orig;
+	}
+}
+if (! defined $sequence) {
 	error "specify a sequence to run";
 }
-my $sequence=shift;
 if ($sequence eq 'debian/rules' ||
     $sequence =~ /^override_dh_/) {
-	# make -B causes the rules file to be run as a target
-	# and support completly empty override targets
-	exit 0
-}	
+	# make -B causes the rules file to be run as a target.
+	# Also support completly empty override targets.
+	exit 0;
+}
 elsif (! exists $sequences{$sequence}) {
 	error "Unknown sequence $sequence (choose from: ".
 		join(" ", sort keys %sequences).")";
@@ -506,7 +520,6 @@ elsif ($sequence eq 'binary-indep') {
 }
 while (@ARGV_orig) {
 	my $opt=shift @ARGV_orig;
-	next if $opt eq $sequence;
 	if ($opt =~ /^--?(after|until|before|with|without)$/) {
 		shift @ARGV_orig;
 		next;
