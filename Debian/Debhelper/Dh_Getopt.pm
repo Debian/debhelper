@@ -230,8 +230,9 @@ sub parseopts {
 	}
 	
 	# If we have not been given any packages to act on, assume they
-	# want us to act on them all. Note we have to do this before excluding
-	# packages out, below.
+	# want us to act on all relevant packages. Note we have to do
+	# this before excluding packages out, below.
+	my @packages_relevant=getpackages("both");
 	if (! defined $dh{DOPACKAGES} || ! @{$dh{DOPACKAGES}}) {
 		if ($dh{DOINDEP} || $dh{DOARCH}) {
 			# User specified that all arch (in)dep package be
@@ -239,25 +240,27 @@ sub parseopts {
 			warning("You asked that all arch in(dep) packages be built, but there are none of that type.");
 			exit(0);
 		}
-		push @{$dh{DOPACKAGES}},getpackages("both");
+		push @{$dh{DOPACKAGES}}, @packages_relevant;
 	}
 
 	# Remove excluded packages from the list of packages to act on.
 	# Also unique the list, in case some options were specified that
 	# added a package to it twice.
+	# And avoid acting on packages that are not relevant.
 	my @package_list;
 	my $package;
 	my %packages_seen;
+	my %packages_relevant=map { $_ => 1 } @packages_relevant;
 	foreach $package (@{$dh{DOPACKAGES}}) {
 		if (defined($dh{EXCLUDE_LOGGED}) &&
 		    grep { $_ eq basename($0) } load_log($package)) {
 			$exclude_package{$package}=1;
 		}
-		if (! $exclude_package{$package}) {
-			if (! exists $packages_seen{$package}) {
-				$packages_seen{$package}=1;
-				push @package_list, $package;	
-			}
+		if (! $exclude_package{$package} &&
+		    ! exists $packages_seen{$package} &&
+		    $packages_relevant{$package}) {
+			$packages_seen{$package}=1;
+			push @package_list, $package;	
 		}
 	}
 	@{$dh{DOPACKAGES}}=@package_list;

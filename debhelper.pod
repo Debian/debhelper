@@ -530,6 +530,12 @@ can cause some packages to fail to build.
 
 dh requires the sequence to run be specified as the first parameter, and
 any switches come after it. Ie, use "dh $@ --foo", not "dh --foo $@"
+  
+=item -
+
+Debhelper only ever acts on packages that can be built for the given
+architecture, even if -N or -p are used to specify packages specific
+to other architectures.
 
 =back
 
