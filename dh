@@ -167,6 +167,15 @@ default. This is how to use dh_pycentral instead.
 	%:
 		dh $@ --with python-central
 
+If your package uses autotools and you want to freshen config.sub and
+config.guess with newer versions from the autotools-dev package
+at build time, you can use some commands provided in autotools-dev
+that automate it, like this.
+
+	#!/usr/bin/make -f
+	%:
+		dh $@ --with autotools_dev
+
 Here is how to force use of perl's Module::Build build system,
 which can be necessary if debhelper wrongly detects that the package
 uses MakeMaker.
