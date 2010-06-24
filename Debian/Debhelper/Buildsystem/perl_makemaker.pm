@@ -45,8 +45,10 @@ sub configure {
 	$ENV{PERL_AUTOINSTALL}="--skipdeps";
 
 	$this->doit_in_sourcedir("perl", "Makefile.PL", "INSTALLDIRS=vendor",
-	    "create_packlist=0",
-	    @_);
+		# if perl_build is not tested first, need to pass packlist
+		# option to handle fallthrough case
+		(compat(7) ? "create_packlist=0" : ()),
+		@_);
 }
 
 sub install {
