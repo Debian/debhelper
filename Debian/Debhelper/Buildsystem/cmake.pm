@@ -58,8 +58,12 @@ sub configure {
 sub test {
 	my $this=shift;
 
+	# Unlike make, CTest does not have "unlimited parallel" setting (-j implies
+	# -j1). So in order to simulate unlimited parallel, allow to fork a huge
+	# number of threads instead.
+	my $parallel = ($this->get_parallel() > 0) ? $this->get_parallel() : 999;
 	$ENV{CTEST_OUTPUT_ON_FAILURE} = 1;
-	return $this->SUPER::test(@_);
+	return $this->SUPER::test(@_, "ARGS+=-j$parallel");
 }
 
 1
