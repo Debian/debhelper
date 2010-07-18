@@ -117,6 +117,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			"-type f $find_options -print0",
 			"2>/dev/null | xargs -0r chmod 644");
 	}
+
+	# Files in $tmp/etc/sudoers.d/ must be mode 440.
+	if (-d "$tmp/etc/sudoers.d") {
+		complex_doit("find $tmp/etc/sudoers.d",
+			"-type f ! -perm 440 $find_options -print0",
+			"2>/dev/null | xargs -0r chmod 440");
+	}
 }
 
 =head1 SEE ALSO
