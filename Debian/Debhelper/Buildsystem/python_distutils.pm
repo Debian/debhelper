@@ -163,9 +163,7 @@ sub setup_py {
 
 sub build {
 	my $this=shift;
-	$this->setup_py("build",
-		"--force",
-		@_);
+	$this->setup_py("build", @_);
 }
 
 sub install {
