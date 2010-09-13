@@ -499,19 +499,27 @@ ok ( ! -e 'bld', "bld got deleted too" );
 #### Test parallel building and related options / routines
 @tmp = ( $ENV{MAKEFLAGS}, $ENV{DEB_BUILD_OPTIONS} );
 
+use POSIX;
+sub closefd {
+	POSIX::close(shift);
+}
+
 # Test is_make_jobserver_unavailable and clean_jobserver_makeflags.
 
 $ENV{MAKEFLAGS} = "--jobserver-fds=103,104 -j";
+closefd(103); closefd(104);
 ok(is_make_jobserver_unavailable(), "unavailable jobserver" );
 clean_jobserver_makeflags();
 ok(! exists $ENV{MAKEFLAGS}, "unset makeflags");
 
 $ENV{MAKEFLAGS} = "-a --jobserver-fds=103,104 -j -b";
+closefd(103); closefd(104);
 ok(is_make_jobserver_unavailable(), "unavailable jobserver" );
 clean_jobserver_makeflags();
 is($ENV{MAKEFLAGS}, "-a -b", "clean makeflags");
 
 $ENV{MAKEFLAGS} = " --jobserver-fds=1,2 -j  ";
+# fds left open
 ok(! is_make_jobserver_unavailable(), "available jobserver" );
 clean_jobserver_makeflags();
 ok(! exists $ENV{MAKEFLAGS}, "unset makeflags");
@@ -537,6 +545,7 @@ clean_jobserver_makeflags();
 is($ENV{MAKEFLAGS}, "-a -j6 --jobs=7", "clean makeflags does not remove -j or --jobs");
 
 $ENV{MAKEFLAGS} = "-j6 --jobserver-fds=5,6 --jobs=8";
+closefd(5); closefd(6);
 ok(is_make_jobserver_unavailable(), "unavailable jobserver");
 clean_jobserver_makeflags();
 is($ENV{MAKEFLAGS}, "-j6 --jobs=8", "jobserver options removed");
