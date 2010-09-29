@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 300;
+use Test::More tests => 292;
 
 use strict;
 use warnings;
@@ -499,54 +499,37 @@ ok ( ! -e 'bld', "bld got deleted too" );
 #### Test parallel building and related options / routines
 @tmp = ( $ENV{MAKEFLAGS}, $ENV{DEB_BUILD_OPTIONS} );
 
-use POSIX;
-sub closefd {
-	POSIX::close(shift);
-}
-
-# Test is_make_jobserver_unavailable and clean_jobserver_makeflags.
+# Test clean_jobserver_makeflags.
 
 $ENV{MAKEFLAGS} = "--jobserver-fds=103,104 -j";
-closefd(103); closefd(104);
-ok(is_make_jobserver_unavailable(), "unavailable jobserver" );
 clean_jobserver_makeflags();
 ok(! exists $ENV{MAKEFLAGS}, "unset makeflags");
 
 $ENV{MAKEFLAGS} = "-a --jobserver-fds=103,104 -j -b";
-closefd(103); closefd(104);
-ok(is_make_jobserver_unavailable(), "unavailable jobserver" );
 clean_jobserver_makeflags();
 is($ENV{MAKEFLAGS}, "-a -b", "clean makeflags");
 
 $ENV{MAKEFLAGS} = " --jobserver-fds=1,2 -j  ";
-# fds left open
-ok(! is_make_jobserver_unavailable(), "available jobserver" );
 clean_jobserver_makeflags();
 ok(! exists $ENV{MAKEFLAGS}, "unset makeflags");
 
 $ENV{MAKEFLAGS} = "-a -j -b";
-ok(! is_make_jobserver_unavailable(), "no specified jobserver");
 clean_jobserver_makeflags();
 is($ENV{MAKEFLAGS}, "-a -j -b", "clean makeflags does not remove -j");
 
 $ENV{MAKEFLAGS} = "-a --jobs -b";
-ok(! is_make_jobserver_unavailable(), "no specified jobserver");
 clean_jobserver_makeflags();
 is($ENV{MAKEFLAGS}, "-a --jobs -b", "clean makeflags does not remove --jobs");
 
 $ENV{MAKEFLAGS} = "-j6";
-ok(! is_make_jobserver_unavailable(), "no specified jobserver");
 clean_jobserver_makeflags();
 is($ENV{MAKEFLAGS}, "-j6", "clean makeflags does not remove -j6");
 
 $ENV{MAKEFLAGS} = "-a -j6 --jobs=7";
-ok(! is_make_jobserver_unavailable(), "no specified jobserver");
 clean_jobserver_makeflags();
 is($ENV{MAKEFLAGS}, "-a -j6 --jobs=7", "clean makeflags does not remove -j or --jobs");
 
-$ENV{MAKEFLAGS} = "-j6 --jobserver-fds=5,6 --jobs=8";
-closefd(5); closefd(6);
-ok(is_make_jobserver_unavailable(), "unavailable jobserver");
+$ENV{MAKEFLAGS} = "-j6 --jobserver-fds=103,104 --jobs=8";
 clean_jobserver_makeflags();
 is($ENV{MAKEFLAGS}, "-j6 --jobs=8", "jobserver options removed");
 
