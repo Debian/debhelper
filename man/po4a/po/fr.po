@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: debhelper manpages\n"
 "POT-Creation-Date: 2010-08-07 11:36-0300\n"
-"PO-Revision-Date: 2010-09-26 18:12+0200\n"
+"PO-Revision-Date: 2010-10-15 17:07+0200\n"
 "Last-Translator: Valery Perrin <valery.perrin.debian@free.fr>\n"
 "Language-Team: French <debian-l10n-french@lists.debian.org>\n"
 "Language: fr\n"
@@ -221,8 +221,8 @@ msgstr ""
 "changelog> et F<debian/control>, qui se trouvent dans tous les paquets, et "
 "pas seulement dans ceux qui emploient debhelper, d'autres fichiers peuvent "
 "servir à configurer le comportement des commandes spécifiques de debhelper. "
-"Ces fichiers sont, en principe, nommés debian/paquet.toto (où « paquet » "
-"est, bien sûr, à remplacer par le nom du paquet concerné)."
+"Ces fichiers sont, en principe, nommés debian/paquet.toto (où « paquet » est, "
+"bien sûr, à remplacer par le nom du paquet concerné)."
 
 # type: textblock
 #. type: textblock
@@ -287,8 +287,8 @@ msgstr ""
 "indiquer divers types de fichiers. Documentation, fichiers d'exemples à "
 "installer, fichiers à déplacer et ainsi de suite. Lorsque cela se justifie, "
 "dans des cas comme ceux-ci, il est possible d'employer, dans ces fichiers, "
-"les jokers (wildcard) standard de l'interpréteur de commandes (shell) "
-"(« ? », « * » et « [..] »)."
+"les jokers (wildcard) standard de l'interpréteur de commandes (shell) (« ? », "
+"« * » et « [..] »)."
 
 # type: textblock
 #. type: textblock
@@ -518,7 +518,12 @@ msgid ""
 "commands it runs. If the command supports the specified option or option "
 "bundle, it will take effect. If the command does not support the option (or "
 "any part of an option bundle), it will be ignored."
-msgstr "Cette option est utilisée par L <dh(1)> pour passer des options spécifiées par l'utilisateur à toutes les commandes exécutées. Si la commande prend en charge cette option ou l'ensemble d'options, elle prendra effet. Si la commande ne supporte pas cette option (ou une partie de l'ensemble d'options), elle sera ignorée."
+msgstr ""
+"Cette option est utilisée par L <dh(1)> pour passer une ou plusieurs "
+"options, spécifiées par l'utilisateur, à toutes les commandes exécutées. Si "
+"la commande prend en charge l'option ou l'ensemble d'options, elle prendra "
+"effet. Si la commande n'accepte pas l'option (ou une partie de l'ensemble "
+"d'options), elle sera ignorée."
 
 # type: =head1
 #. type: =head1
@@ -696,15 +701,20 @@ msgid ""
 "(L<Debian Policy, section 4.9.1>) at build time. It might also be subject to "
 "a build system specific limit."
 msgstr ""
-"Cette option active la construction parallèle si le système sous-jacent le permet. Le nombre "
-"de tâches parallèles est contrôlé, lors de la construction, par la variable d'environnement DEB_BUILD_OPTIONS (L <Charte Debian, section 4.9.1>). Ce nombre peut également être soumis aux limites spécifiques du système."
+"Cette option active la construction parallèle si le système sous-jacent le "
+"permet. Le nombre de tâches parallèles est contrôlé, lors de la "
+"construction, par la variable d'environnement DEB_BUILD_OPTIONS (L <Charte "
+"Debian, section 4.9.1>). Ce nombre peut également être soumis aux limites "
+"spécifiques du système."
 
 #. type: textblock
 #: debhelper.pod:234
 msgid ""
 "If this option is not specified, debhelper currently defaults to not "
 "allowing parallel package builds."
-msgstr "Si cette option n'est pas spécifiée, debhelper n'activera pas, par défaut, le parallélisme lors de la construction."
+msgstr ""
+"Si cette option n'est pas spécifiée, debhelper n'activera pas, par défaut, "
+"le parallélisme lors de la construction."
 
 #. type: =item
 #: debhelper.pod:237
@@ -718,7 +728,12 @@ msgid ""
 "jobs that can be used in a parallel build. If the package build is known to "
 "only work with certain levels of concurrency, you can set this to the "
 "maximum level that is known to work, or that you wish to support."
-msgstr "Cette option implique L<--parallel> et permet de limiter le nombre de tâches qui pourront être lancées lors d'une compilation parallèle. Si la construction du paquet est connu pour ne fonctionner qu'avec un certain niveau de parallélisme, il est possible de le régler à la valeur maximum censée fonctionner, ou que vous souhaitez mettre en oeuvre."
+msgstr ""
+"Cette option implique L<--parallel> et permet de limiter le nombre de tâches "
+"qui pourront être lancées lors d'une compilation parallèle. Si la "
+"construction du paquet est connu pour ne fonctionner qu'avec un certain "
+"niveau de parallélisme, il est possible de le régler à la valeur maximum "
+"censée fonctionner, ou que vous souhaitez mettre en oeuvre."
 
 # type: =item
 #. type: =item
@@ -956,12 +971,12 @@ msgid ""
 "act on."
 msgstr ""
 "Parfois, il peut être souhaitable d'utiliser un autre répertoire temporaire. "
-"Ceci est obtenu grâce au paramètre -P. Par exemple, « dh_installdocs -"
-"Pdebian/tmp » utilisera debian/tmp comme répertoire temporaire. Nota : "
-"L'usage de -P implique que les programmes de debhelper ne construisent qu'un "
-"seul paquet à la fois. De ce fait, si le paquet source génère plusieurs "
-"paquets binaires, il faudra employer également le paramètre -p pour préciser "
-"l'unique paquet binaire à construire."
+"Ceci est obtenu grâce au paramètre -P. Par exemple, « dh_installdocs -Pdebian/"
+"tmp » utilisera debian/tmp comme répertoire temporaire. Nota : L'usage de -P "
+"implique que les programmes de debhelper ne construisent qu'un seul paquet à "
+"la fois. De ce fait, si le paquet source génère plusieurs paquets binaires, "
+"il faudra employer également le paramètre -p pour préciser l'unique paquet "
+"binaire à construire."
 
 # type: =head2
 #. type: =head2
@@ -998,7 +1013,10 @@ msgstr ""
 msgid ""
 "Tell debhelper what compatibility level to use by writing a number to debian/"
 "compat. For example, to turn on v8 mode:"
-msgstr "Pour indiquer à debhelper le niveau de compatibilité à utiliser il faut placer un nombre dans debian/compat. Par exemple, pour exploiter la version 8 :"
+msgstr ""
+"Pour indiquer à debhelper le niveau de compatibilité à utiliser il faut "
+"placer un nombre dans debian/compat. Par exemple, pour exploiter la version "
+"8 :"
 
 # type: verbatim
 #. type: verbatim
@@ -1108,7 +1126,7 @@ msgid ""
 "Debhelper config files support globbing via * and ?, when appropriate. To "
 "turn this off and use those characters raw, just prefix with a backslash."
 msgstr ""
-"Les fichiers de configuration de debhelper acceptent les jokers * et ? "
+"Les fichiers de configuration de debhelper acceptent les jokers * et ? "
 "lorsque cela a un sens. Pour désactiver cette substitution et utiliser ces "
 "caractères tels quels, il suffit de les préfixer avec une barre contre-"
 "oblique (backslash)."
@@ -1352,7 +1370,9 @@ msgstr "Les changements par rapport à la version 7 sont :"
 #. type: textblock
 #: debhelper.pod:516
 msgid "Commands will fail rather than warning when they are passed unknown options."
-msgstr "Les commandes échoueront plutôt que de produire une alerte lorsquelle recevront des options inconnues."
+msgstr ""
+"Les commandes échoueront plutôt que de produire une alerte lorsqu'elles "
+"recevront des options inconnues."
 
 #. type: textblock
 #: debhelper.pod:520
@@ -1362,7 +1382,14 @@ msgid ""
 "libraries in unusual locations that dpkg-gensymbols would not have processed "
 "before will be passed to it, a behavior change that can cause some packages "
 "to fail to build."
-msgstr "dh_makeshlibs va exécuter le programme dpkg-gensymbols sur toutes les bibliothèques partagées qu'il génère pour les fichiers shlibs. -X peut alors être utilisé pour exclure certaines bibliothèques. En outre, les bibliothèques rangées à des emplacements inhabituels que pkg-gensymbols n'aurait pas traiter avant qu'elles ne lui soient transmises, induisent un changement de comportement qui peut causer l'échec de la construction de certains paquets."
+msgstr ""
+"dh_makeshlibs va exécuter le programme dpkg-gensymbols sur toutes les "
+"bibliothèques partagées qu'il génère pour les fichiers shlibs. -X peut alors "
+"être utilisé pour exclure certaines bibliothèques. En outre, les "
+"bibliothèques rangées à des emplacements inhabituels que pkg-gensymbols "
+"n'aurait pas traitées avant qu'elles ne lui soient transmises, induisent un "
+"changement de comportement qui peut causer l'échec de la construction de "
+"certains paquets."
 
 #. type: textblock
 #: debhelper.pod:528
@@ -1370,13 +1397,16 @@ msgid ""
 "dh requires the sequence to run be specified as the first parameter, and any "
 "switches come after it. Ie, use \"dh $@ --foo\", not \"dh --foo $@\""
 msgstr ""
-"dh exige que la séquence à exécuter soit spécifiée en tant que premier paramètre. Tous les"
-"commutateurs doivent venir après. C'est à dire qu'il faut écrire « dh $@ --toto », et non « dh --toto $@ »"
+"dh exige que la séquence à exécuter soit spécifiée en tant que premier "
+"paramètre. Tous les commutateurs doivent venir après. C'est à dire qu'il "
+"faut écrire « dh $@ --toto », et non « dh --toto $@ »"
 
 #. type: textblock
 #: debhelper.pod:533
 msgid "dh_auto_* prefer to use perl's Module::Build in preference to Makefile.PL."
-msgstr "Dh_auto_* utilise préférentiellement Module::Build de perl au lieu de Makefile.PL."
+msgstr ""
+"Dh_auto_* utilise préférentiellement Module::Build de perl au lieu de "
+"Makefile.PL."
 
 # type: =head2
 #. type: =head2
@@ -1402,9 +1432,14 @@ msgid ""
 "\".udeb\", not installing any documentation into a udeb, skipping over "
 "preinst, postrm, prerm, and config scripts, etc."
 msgstr ""
-"Debhelper prend en charge la construction des udebs. Pour créer un udeb avec debhelper, il faut ajouter « Package-Type: udeb » aux lignes de paquet "
-"dans debian/control, ainsi qu'une dépendance vers debhelper (>= 4.2) dans la ligne build-depend. Debhelper essayera de construire des udebs, conformément aux règles de l'installateur Debian, en suffixant les fichiers de paquets générés avec « .udeb », en n'installant aucune documentation dans un udeb, en omettant les scripts preinst, postrm et prerm ainsi que les scripts de configuration, "
-"etc."
+"Debhelper prend en charge la construction des udebs. Pour créer un udeb avec "
+"debhelper, il faut ajouter « Package-Type: udeb » aux lignes de paquet dans "
+"debian/control, ainsi qu'une dépendance vers debhelper (>= 4.2) dans la "
+"ligne build-depend. Debhelper essayera de construire des udebs, conformément "
+"aux règles de l'installateur Debian, en suffixant les fichiers de paquets "
+"générés avec « .udeb », en n'installant aucune documentation dans un udeb, en "
+"omettant les scripts preinst, postrm et prerm ainsi que les scripts de "
+"configuration, etc."
 
 # type: =head2
 #. type: =head2
@@ -1727,8 +1762,12 @@ msgid ""
 "(Note that to use this feature, you should Build-Depend on debhelper 7.0.50 "
 "or above.)"
 msgstr ""
-"Si le fichier debian/rules comporte un bloc avec une indication telle que « override_I<dh_command> », dh exécutera la commande indiquée dans le fichier debian/rules au lieu d'exécuter la commande par défaut. La commande exécutée peut être la même commande avec des options additionnelles ou une "
-"commande entièrement différente. Nota : pour utiliser cette possibilité, il est nécessaire d'être dépendant (Build-Depend) de la version 7.0.50 ou "
+"Si le fichier debian/rules comporte un bloc avec une indication telle que "
+"« override_I<dh_command> », dh exécutera la commande indiquée dans le fichier "
+"debian/rules au lieu d'exécuter la commande par défaut. La commande exécutée "
+"peut être la même commande avec des options additionnelles ou une commande "
+"entièrement différente. Nota : pour utiliser cette possibilité, il est "
+"nécessaire d'être dépendant (Build-Depend) de la version 7.0.50 ou "
 "supérieure de debhelper."
 
 # type: =head1
@@ -1981,8 +2020,10 @@ msgid ""
 "can't guess what to do for a strange package. Here's how to avoid running "
 "either and instead run your own commands."
 msgstr ""
-"Parfois les automatismes de L<dh_auto_configure(1)> et de L<dh_auto_build(1)> n'arrivent "
-"pas à deviner ce qu'il faut faire pour certains paquets tordus. Voici comment indiquer vos propres commandes plutôt que de laisser faire l'automatisme."
+"Parfois les automatismes de L<dh_auto_configure(1)> et de L<dh_auto_build(1)"
+"> n'arrivent pas à deviner ce qu'il faut faire pour certains paquets tordus. "
+"Voici comment indiquer vos propres commandes plutôt que de laisser faire "
+"l'automatisme."
 
 # type: verbatim
 #. type: verbatim
@@ -2066,7 +2107,11 @@ msgid ""
 "If your package uses autotools and you want to freshen config.sub and config."
 "guess with newer versions from the autotools-dev package at build time, you "
 "can use some commands provided in autotools-dev that automate it, like this."
-msgstr "Si le paquet utilise les autotools et que vous voulez rafraîchir les config.sub et les config. avec les nouvelles versions du paquet autotools-dev lors de la compilation, il est possible d'utiliser certaines commandes fournies dans autotools-dev afin d'automatiser cette tâche, comme ci-dessous :"
+msgstr ""
+"Si le paquet utilise les autotools et que vous voulez rafraîchir les config."
+"sub et les config. avec les nouvelles versions du paquet autotools-dev lors "
+"de la compilation, il est possible d'utiliser certaines commandes fournies "
+"dans autotools-dev afin d'automatiser cette tâche, comme ci-dessous :"
 
 # type: verbatim
 #. type: verbatim
@@ -2174,8 +2219,9 @@ msgid ""
 "And here is an example of how to tell the dh_auto_* commands to build in a "
 "subdirectory, which will be removed on clean."
 msgstr ""
-"Voici un exemple d'utilisation des commandes dh_auto_* pour réaliser la construction dans un"
-" sous-répertoire, qui sera ensuite supprimé lors du nettoyage."
+"Voici un exemple d'utilisation des commandes dh_auto_* pour réaliser la "
+"construction dans un sous-répertoire, qui sera ensuite supprimé lors du "
+"nettoyage."
 
 # type: verbatim
 #. type: verbatim
@@ -2197,7 +2243,9 @@ msgstr ""
 msgid ""
 "If your package can be built in parallel, you can support parallel building "
 "as follows. Then I<dpkg-buildpackage -j> will work."
-msgstr "Si le paquet peut être construit en parallèle, vous pouvez activer le parallélisme comme ci-dessous. Alors <dpkg-buildpackage -j> fonctionerra."
+msgstr ""
+"Si le paquet peut être construit en parallèle, vous pouvez activer le "
+"parallélisme comme ci-dessous. Alors <dpkg-buildpackage -j> fonctionnera."
 
 # type: verbatim
 #. type: verbatim
@@ -2224,7 +2272,10 @@ msgstr ""
 msgid ""
 "Here is a way to prevent dh from running several commands that you don't "
 "want it to run, by defining empty override targets for each command."
-msgstr "Voici un moyen d'empêcher dh d'exécuter plusieurs commandes, en définissant des blocs de substitution vides pour chaque commande que vous ne voulez pas lancer."
+msgstr ""
+"Voici un moyen d'empêcher dh d'exécuter plusieurs commandes, en définissant "
+"des blocs de substitution vides pour chaque commande que vous ne voulez pas "
+"lancer."
 
 # type: verbatim
 #. type: verbatim
@@ -2249,7 +2300,7 @@ msgid ""
 "\toverride_dh_auto_test override_dh_compress override_dh_fixperms:\n"
 "\n"
 msgstr ""
-"\t# Commandes que l'on ne veut pas exécuter :\n"
+"\t# Commandes que l'on ne veut pas exécuter :\n"
 "\toverride_dh_auto_test override_dh_compress override_dh_fixperms:\n"
 "\n"
 
@@ -2259,7 +2310,11 @@ msgid ""
 "Sometimes, you may need to make an override target only run commands when a "
 "particular package is being built. This can be accomplished using "
 "L<dh_listpackages(1)> to test what is being built. For example:"
-msgstr "Parfois, il peut-être utile de substituer une commande seulement lors de la construction d'un paquet particulier. Ceci peut être réalisé à l'aide de L<dh_listpackages(1)> pour connaître le paquet en cours de construction. Par exemple :"
+msgstr ""
+"Parfois, il peut être utile de substituer une commande seulement lors de la "
+"construction d'un paquet particulier. Ceci est réalisable à l'aide de "
+"L<dh_listpackages(1)> pour connaître le paquet en cours de construction. Par "
+"exemple :"
 
 # type: verbatim
 #. type: verbatim
@@ -2294,7 +2349,15 @@ msgid ""
 "is if your package needs different build-arch and build-indep targets. For "
 "example, a package with a long document build process can put it in build-"
 "indep to avoid build daemons redundantly building the documentation."
-msgstr "Enfin, n'oubliez pas que vous n'êtes pas limité à la seule substitution de blocs dans le fichier rules lors de l'utilisation de dh. Vous pouvez également redéfinir explicitement les blocs standard du fichier rules lorsqu'il est logique de le faire. Une raison courante de cette démarche se présente lorsque le paquet requiert des traitements différents en build-arch et en build-indep. Par exemple, la génération de la documentation volumineuse d'un paquet peut être placé en arch-indep pour éviter que cette génération soit refaite pour chacune des architectures."
+msgstr ""
+"Enfin, n'oubliez pas que vous n'êtes pas limité à la seule substitution de "
+"blocs dans le fichier rules lors de l'utilisation de dh. Vous pouvez "
+"également redéfinir explicitement les blocs standard du fichier rules "
+"lorsqu'il est logique de le faire. Une raison courante de cette démarche se "
+"présente lorsque le paquet requiert des traitements différents en build-arch "
+"et en build-indep. Par exemple, la génération de la documentation "
+"volumineuse d'un paquet peut être placé en arch-indep pour éviter que cette "
+"génération soit refaite pour chacune des architectures."
 
 #. type: verbatim
 #: dh:251
@@ -2307,7 +2370,7 @@ msgid ""
 "\t\t$(MAKE) bins\n"
 "\n"
 msgstr ""
-"\tbuild: build-arch build-indep ;\n"
+"\tbuild: build-arch build-indep ;\n"
 "\tbuild-indep:\n"
 "\t\t$(MAKE) docs\n"
 "\tbuild-arch:\n"
@@ -2322,7 +2385,9 @@ msgstr "FONCTIONNEMENT INTERNE"
 #. type: textblock
 #: dh:259
 msgid "If you're curious about dh's internals, here's how it works under the hood."
-msgstr "Si vous êtes curieux de connaître le fonctionnement interne de dh, voici ce qu'il y a sous le capot."
+msgstr ""
+"Si vous êtes curieux de connaître le fonctionnement interne de dh, voici ce "
+"qu'il y a sous le capot."
 
 # type: textblock
 #. type: textblock
@@ -2360,7 +2425,12 @@ msgid ""
 "through to debhelper commands that are run inside override targets. The "
 "contents (and indeed, existence) of this environment variable, as the name "
 "might suggest, is subject to change at any time."
-msgstr "dh utilise la variable d'environnement DH_INTERNAL_OPTIONS pour transmettre des informations aux commandes debhelper exécutées au sein des blocs surchargés. Le contenu (et l'existence même) de cette variable d'environnement, comme son nom l'indique, est sujet à des modifications permanentes."
+msgstr ""
+"dh utilise la variable d'environnement DH_INTERNAL_OPTIONS pour transmettre "
+"des informations aux commandes debhelper exécutées au sein des blocs "
+"surchargés. Le contenu (et l'existence même) de cette variable "
+"d'environnement, comme son nom l'indique, est sujet à des modifications "
+"permanentes."
 
 # type: textblock
 #. type: textblock
@@ -2751,10 +2821,10 @@ msgstr ""
 "automatiquement le jeu d'essai d'un paquet. Il le fait en lançant les "
 "commandes appropriées du processus de construction d'après le type du "
 "paquet. Par exemple, s'il y a un Makefile et qu'il contient un bloc « test » "
-"ou « check » il exécutera make (ou MAKE si cette variable d'environnement "
-"est définie). Si les tests produisent une erreur, la commande retourne une "
-"valeur non nulle. S'il n'y a pas de jeu de d'essai, la commande retourne "
-"zéro sans rien faire."
+"ou « check » il exécutera make (ou MAKE si cette variable d'environnement est "
+"définie). Si les tests produisent une erreur, la commande retourne une "
+"valeur non nulle. S'il n'y a pas de jeu d'essai, la commande retourne zéro "
+"sans rien faire."
 
 # type: textblock
 #. type: textblock
@@ -3042,8 +3112,8 @@ msgid ""
 "It does not run \"make clean\" to clean up after the build process. Use "
 "L<dh_auto_clean(1)> to do things like that."
 msgstr ""
-"Il n'exécute pas un « make clean » pour faire le ménage après la "
-"construction du paquet. Il faut utiliser L<dh_auto_clean(1)> pour le faire."
+"Il n'exécute pas un « make clean » pour faire le ménage après la construction "
+"du paquet. Il faut utiliser L<dh_auto_clean(1)> pour le faire."
 
 # type: textblock
 #. type: textblock
@@ -3109,9 +3179,9 @@ msgid ""
 "deleted, even if they would normally be deleted. You may use this option "
 "multiple times to build up a list of things to exclude."
 msgstr ""
-"Conserve les fichiers qui contiennent « élément » n'importe où dans leur "
-"nom, même s'ils auraient dû être normalement supprimés. Cette option peut "
-"être employée plusieurs fois afin d'exclure de la suppression une liste "
+"Conserve les fichiers qui contiennent « élément » n'importe où dans leur nom, "
+"même s'ils auraient dû être normalement supprimés. Cette option peut être "
+"employée plusieurs fois afin d'exclure de la suppression une liste "
 "d'éléments."
 
 # type: =item
@@ -3224,7 +3294,11 @@ msgid ""
 "compressed. For example, -X.tiff will exclude tiff files from compression.  "
 "You may use this option multiple times to build up a list of things to "
 "exclude."
-msgstr "Permet d'exclure de la compression les fichiers qui comportent « élément » n'importe où dans leur nom. Par exemple, -X.tiff exclura de la compression les fichiers d'extension .tiff. Cette option peut être employée plusieurs fois afin d'exclure une liste d'éléments."
+msgstr ""
+"Permet d'exclure de la compression les fichiers qui comportent « élément » "
+"n'importe où dans leur nom. Par exemple, -X.tiff exclura de la compression "
+"les fichiers d'extension .tiff. Cette option peut être employée plusieurs "
+"fois afin d'exclure une liste d'éléments."
 
 # type: textblock
 #. type: textblock
@@ -3390,7 +3464,9 @@ msgstr "B<dh_gconf> [I<options de debhelper>] [B<--priority=<number>>]"
 msgid ""
 "dh_gconf is a debhelper program that is responsible for installing GConf "
 "defaults files and registering GConf schemas."
-msgstr "dh_gconf est un programme de la suite debhelper chargé de l'installation des fichiers par défaut de GConf et de l'inscription des schémas GConf."
+msgstr ""
+"dh_gconf est un programme de la suite debhelper chargé de l'installation des "
+"fichiers par défaut de GConf et de l'inscription des schémas GConf."
 
 # type: textblock
 #. type: textblock
@@ -3415,9 +3491,9 @@ msgid ""
 "Installed into usr/share/gconf/defaults/10_package in the package build "
 "directory, with \"I<package>\" replaced by the package name."
 msgstr ""
-"Les fichiers seront installés dans le répertoire de construction du paquet sous "
-"usr/share/gconf/defaults/10_paquet où le mot « l<paquet> » sera remplacé par le "
-"nom du paquet."
+"Les fichiers seront installés dans le répertoire de construction du paquet "
+"sous usr/share/gconf/defaults/10_paquet où le mot « l<paquet> » sera remplacé "
+"par le nom du paquet."
 
 # type: =item
 #. type: =item
@@ -3436,9 +3512,9 @@ msgid ""
 "Installed into usr/share/gconf/mandatory/10_package in the package build "
 "directory, with \"I<package>\" replaced by the package name."
 msgstr ""
-"Les fichiers seront installés dans le répertoire de construction du paquet sous "
-"usr/share/gconf/mandatory/defaults/10_paquet où le mot « l<paquet> » sera remplacé par le "
-"nom du paquet."
+"Les fichiers seront installés dans le répertoire de construction du paquet "
+"sous usr/share/gconf/mandatory/defaults/10_paquet où le mot « l<paquet> » "
+"sera remplacé par le nom du paquet."
 
 # type: =item
 #. type: =item
@@ -4095,8 +4171,9 @@ msgid ""
 "specified, it looks for files with names that seem likely to be changelogs.  "
 "(In compatibility level 7 and above.)"
 msgstr ""
-"Un journal amont des modifications (upstream changelog) peut être indiqué en option. "
-"Si rien n'est indiqué, le processus cherche des fichiers portant des noms susceptibles d'être des changelogs. (à partir de la version 7)."
+"Un journal amont des modifications (upstream changelog) peut être indiqué en "
+"option. Si rien n'est indiqué, le processus cherche des fichiers portant des "
+"noms susceptibles d'être des changelogs. (à partir de la version 7)."
 
 # type: textblock
 #. type: textblock
@@ -4182,10 +4259,9 @@ msgid ""
 msgstr ""
 "Conserve le nom original du journal amont. Ce résultat est obtenu en "
 "installant le journal amont sous le nom « changelog » et en créant un lien "
-"symbolique portant le nom d'origine et pointant sur le fichier "
-"« changelog ». Cela peut être utile si le journal amont porte un nom "
-"inhabituel ou si d'autres éléments de documentation du paquet se réfèrent à "
-"ce fichier."
+"symbolique portant le nom d'origine et pointant sur le fichier « changelog ». "
+"Cela peut être utile si le journal amont porte un nom inhabituel ou si "
+"d'autres éléments de documentation du paquet se réfèrent à ce fichier."
 
 # type: textblock
 #. type: textblock
@@ -4194,8 +4270,8 @@ msgid ""
 "Exclude upstream changelog files that contain \"item\" anywhere in their "
 "filename from being installed."
 msgstr ""
-"Exclut du traitement les journaux amonts qui comportent « élément » "
-"n'importe où dans leur nom."
+"Exclut du traitement les journaux amonts qui comportent « élément » n'importe "
+"où dans leur nom."
 
 # type: =item
 #. type: =item
@@ -4398,7 +4474,8 @@ msgid ""
 "package will automatically be flagged as conffiles by this program, so there "
 "is no need to list them manually here."
 msgstr ""
-"À partir du niveau de compatibilité v3, tous les fichiers du répertoire etc/ du paquet construit sont automatiquement marqués en tant que fichiers de "
+"À partir du niveau de compatibilité v3, tous les fichiers du répertoire etc/ "
+"du paquet construit sont automatiquement marqués en tant que fichiers de "
 "configuration. De ce fait, il est inutile de les énumérer ici."
 
 # type: textblock
@@ -4806,8 +4883,8 @@ msgid ""
 "before calling dh_installdocs.)"
 msgstr ""
 "(Une autre méthode, pour réaliser la même chose, qui reste toujours "
-"possible, est de faire du répertoire de documentation un lien symbolique "
-"« en l'air » avant l'appel à dh_installdocs.)"
+"possible, est de faire du répertoire de documentation un lien symbolique « en "
+"l'air » avant l'appel à dh_installdocs.)"
 
 # type: textblock
 #. type: textblock
@@ -4984,8 +5061,8 @@ msgid ""
 "\", alternatives include \"xemacs\" and \"emacs20\"."
 msgstr ""
 "Fixe la « saveur » dans laquelle le fichier site-start.d sera installé. La "
-"valeur par défaut est « emacs ». Les autres valeurs possibles sont "
-"« xemacs » et « emacs20 »."
+"valeur par défaut est « emacs ». Les autres valeurs possibles sont « xemacs » "
+"et « emacs20 »."
 
 # type: textblock
 #. type: textblock
@@ -5445,8 +5522,8 @@ msgid ""
 "and if so will install it as the init script in preference to the files it "
 "normally installs."
 msgstr ""
-"Utilise « nom-du-script » en tant que nom du script init dans etc/init.d/ "
-"et, si besoin est, comme nom du fichier « defaults ». Avec ce paramètre "
+"Utilise « nom-du-script » en tant que nom du script init dans etc/init.d/ et, "
+"si besoin est, comme nom du fichier « defaults ». Avec ce paramètre "
 "dh_installinit cherche dans le répertoire debian/ un fichier du genre "
 "« paquet.nom-du-script » et, s'il le trouve, l'installe en tant que script "
 "init à la place des fichiers qu'il installe habituellement."
@@ -5652,10 +5729,9 @@ msgstr ""
 "de la page et en déduit la destination. Si la ligne .TH est correctement "
 "renseignée, les pages de manuel seront installées dans la bonne section avec "
 "le nom adéquat. Ce mécanisme fonctionne également pour les pages comportant "
-"des sous-sections, telle que « 3perl », qui sera placé en « man3 » et "
-"portera l'extension « .3perl ». Si la ligne .TH est erronée ou absente, le "
-"programme peut faire une mauvaise déduction, basée sur l'extension du "
-"fichier."
+"des sous-sections, telle que « 3perl », qui sera placé en « man3 » et portera "
+"l'extension « .3perl ». Si la ligne .TH est erronée ou absente, le programme "
+"peut faire une mauvaise déduction, basée sur l'extension du fichier."
 
 # type: textblock
 #. type: textblock
@@ -5691,8 +5767,7 @@ msgstr ""
 "dh_installman installe une page de manuel dans un répertoire tel que /usr/"
 "share/man/pl/man1/ c'est parce que le programme possède un nom comme « toto."
 "pl » et que dh_installman pense que la page de manuel est traduite en "
-"polonais (pl). Il suffit d'utiliser « language=C » pour lever cette "
-"ambiguïté."
+"polonais (pl). Il suffit d'utiliser « language=C » pour lever cette ambiguïté."
 
 # type: textblock
 #. type: textblock
@@ -6608,9 +6683,9 @@ msgid ""
 "Do not correct symlinks that contain \"item\" anywhere in their filename "
 "from being corrected to comply with debian policy."
 msgstr ""
-"Ne corrige pas les liens symboliques qui comportent « élément », n'importe "
-"où dans leur nom, alors qu'ils auraient dû l'être pour se conformer à la "
-"charte Debian."
+"Ne corrige pas les liens symboliques qui comportent « élément », n'importe où "
+"dans leur nom, alors qu'ils auraient dû l'être pour se conformer à la charte "
+"Debian."
 
 # type: =item
 #. type: =item
@@ -6675,8 +6750,8 @@ msgstr ""
 #: dh_lintian:5
 msgid "dh_lintian - install lintian override files into package build directories"
 msgstr ""
-"dh_lintian - installe les fichiers « override » de lintian dans le "
-"répertoire de construction du paquet"
+"dh_lintian - installe les fichiers « override » de lintian dans le répertoire "
+"de construction du paquet"
 
 # type: textblock
 #. type: textblock
@@ -6692,7 +6767,7 @@ msgid ""
 "override files used by lintian into package build directories."
 msgstr ""
 "dh_lintian est le programme de la suite debhelper chargé de l'installation, "
-"dans le répertoire de construction du paquet, des fichiers « override » "
+"dans le répertoire de construction du paquet, des fichiers « override » "
 "utilisés par lintian."
 
 # type: =item
@@ -6888,7 +6963,7 @@ msgstr ""
 "bibliothèque partagée. Il peut être utile d'ajouter une indication de "
 "dépendance de version au fichier shlibs. Si -V est indiqué sans préciser de "
 "valeur, elle sera fixée comme étant égale à la version du paquet amont "
-"actuel, de la manière suivante : « nom_du_paquet (>= version_du_paquet) ». "
+"actuel, de la manière suivante : « nom_du_paquet (>= version_du_paquet) ». "
 "Nota : Dans les niveaux de compatibilité inférieur à v4, la partie Debian du "
 "numéro de version du paquet est incluse également. Si -V est employé avec un "
 "paramètre, celui-ci peut être utilisé pour indiquer la dépendance requise "
@@ -7233,8 +7308,8 @@ msgid ""
 msgstr ""
 "Le programme examine les scripts et les modules Perl du paquet, et exploite "
 "cette information pour produire une dépendance vers perl ou perlapi. La "
-"substitution a lieu dans le fichier « control » du paquet, à l'emplacement "
-"où est indiqué « ${perl:Depends} »."
+"substitution a lieu dans le fichier « control » du paquet, à l'emplacement où "
+"est indiqué « ${perl:Depends} »."
 
 # type: textblock
 #. type: textblock
@@ -7400,8 +7475,8 @@ msgid ""
 "Python-Version control file field exists."
 msgstr ""
 "Notez bien que ce programme est obsolète. Il faut utiliser « dh_pysupport » "
-"ou « dh_pycentral » à la place. Ce programme ne fera rien si le champ "
-"« debian/pycompat » ou « Python-Version » existe dans le fichier « control »."
+"ou « dh_pycentral » à la place. Ce programme ne fera rien si le champ « debian/"
+"pycompat » ou « Python-Version » existe dans le fichier « control »."
 
 # type: textblock
 #. type: textblock
@@ -8053,8 +8128,8 @@ msgid ""
 msgstr ""
 "Ce programme est utilisé pour créer des liens symboliques vers la page de "
 "manuel « undocumented.7 » lorsque la page de manuel du paquet n'existe pas. "
-"La Charte Debian désapprouve l'utilisation de « undocumented.7 ». De ce "
-"fait, ce programme ne fait rien et de doit pas être utilisé."
+"La Charte Debian désapprouve l'utilisation de « undocumented.7 ». De ce fait, "
+"ce programme ne fait rien et de doit pas être utilisé."
 
 # type: textblock
 #. type: textblock
@@ -8271,10 +8346,9 @@ msgstr "Andrew Stribblehill <ads@debian.org>"
 #~ "defaults."
 #~ msgstr ""
 #~ "Ce fichier sera installé dans le répertoire de construction du paquet "
-#~ "sous usr/share/gconf/defaults/10_paquet où le mot « paquet » sera "
-#~ "remplacé par le nom du paquet. Certaines parties des scripts de "
-#~ "maintenance postinst et postrm seront produites pour exécuter update-"
-#~ "gconf-defaults."
+#~ "sous usr/share/gconf/defaults/10_paquet où le mot « paquet » sera remplacé "
+#~ "par le nom du paquet. Certaines parties des scripts de maintenance "
+#~ "postinst et postrm seront produites pour exécuter update-gconf-defaults."
 
 # type: =head1
 #~ msgid "COMMAND SPECIFICATION"
