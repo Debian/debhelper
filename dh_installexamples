@@ -11,12 +11,12 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_installexamples> [S<I<debhelper options>>] [B<-A>] [B<-X>I<item>] [S<I<file ...>>]
+B<dh_installexamples> [S<I<debhelper options>>] [B<-A>] [B<-X>I<item>] [S<I<file> ...>]
 
 =head1 DESCRIPTION
 
-dh_installexamples is a debhelper program that is responsible for
-installing examples into usr/share/doc/package/examples in package
+B<dh_installexamples> is a debhelper program that is responsible for
+installing examples into F<usr/share/doc/package/examples> in package
 build directories.
 
 =head1 FILES
@@ -38,22 +38,22 @@ Lists example files or directories to be installed.
 Install any files specified by command line parameters in ALL packages
 acted on.
 
-=item B<-Xitem>, B<--exclude=item>
+=item B<-X>I<item>, B<--exclude=>I<item>
 
-Exclude files that contain "item" anywhere in their filename from
+Exclude files that contain I<item> anywhere in their filename from
 being installed.
 
-=item I<file ...>
+=item I<file> ...
 
 Install these files (or directories) as examples into the first package
-acted on. (Or into all packages if -A is specified.)
+acted on. (Or into all packages if B<-A> is specified.)
 
 =back
 
 =head1 NOTES
 
-Note that dh_installexamples will happily copy entire directory hierarchies
-if you ask it to (similar to cp -a). If it is asked to install a
+Note that B<dh_installexamples> will happily copy entire directory hierarchies
+if you ask it to (similar to B<cp -a>). If it is asked to install a
 directory, it will install the complete contents of the directory.
 
 =cut

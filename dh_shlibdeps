@@ -16,11 +16,11 @@ B<dh_shlibdeps> [S<I<debhelper options>>] [B<-L>I<package>] [B<-l>I<directory>] 
 
 =head1 DESCRIPTION
 
-dh_shlibdeps is a debhelper program that is responsible for calculating
+B<dh_shlibdeps> is a debhelper program that is responsible for calculating
 shared library dependencies for packages.
 
 This program is merely a wrapper around L<dpkg-shlibdeps(1)> that calls it
-once for each package listed in the control file, passing it
+once for each package listed in the F<control> file, passing it
 a list of ELF executables and shared libraries it has found.
 
 =head1 OPTIONS
@@ -29,38 +29,38 @@ a list of ELF executables and shared libraries it has found.
 
 =item B<-X>I<item>, B<--exclude=>I<item>
 
-Exclude files that contain "item" anywhere in their filename from being
-passed to dpkg-shlibdeps. This will make their dependencies be ignored.
+Exclude files that contain F<item> anywhere in their filename from being
+passed to B<dpkg-shlibdeps>. This will make their dependencies be ignored.
 This may be useful in some situations, but use it with caution. This option
 may be used more than once to exclude more than one thing.
 
 =item B<--> I<params>
 
-Pass "params" to L<dpkg-shlibdeps(1)>.
+Pass I<params> to L<dpkg-shlibdeps(1)>.
 
 =item B<-u>I<params>, B<--dpkg-shlibdeps-params=>I<params>
 
 This is another way to pass I<params> to L<dpkg-shlibdeps(1)>.
 It is deprecated; use B<--> instead.
 
-=item B<-l>I<directory>[:directory:directory:..]
+=item B<-l>I<directory>[B<:>I<directory> ...]
 
-With recent versions of dpkg-shlibdeps, this option is generally not
+With recent versions of B<dpkg-shlibdeps>, this option is generally not
 needed.
 
-Before dpkg-shlibdeps is run, LD_LIBRARY_PATH will have added to it the 
+Before B<dpkg-shlibdeps> is run, B<LD_LIBRARY_PATH> will have added to it the 
 specified directory (or directories -- separate with colons). With recent
-versions of dpkg-shlibdeps, this is mostly only useful for packages that
+versions of B<dpkg-shlibdeps>, this is mostly only useful for packages that
 build multiple flavors of the same library, or other situations where
 the library is installed into a directory not on the regular library search
 path.
 
 =item B<-L>I<package>, B<--libpackage=>I<package>
 
-With recent versions of dpkg-shlibdeps, this option is generally not
+With recent versions of B<dpkg-shlibdeps>, this option is generally not
 needed, unless your package builds multiple flavors of the same library.
 
-It tells dpkg-shlibdeps (via its -S parameter) to look first in the package
+It tells B<dpkg-shlibdeps> (via its B<-S> parameter) to look first in the package
 build directory for the specified package, when searching for libraries,
 symbol files, and shlibs files.
 
@@ -70,18 +70,18 @@ symbol files, and shlibs files.
 
 Suppose that your source package produces libfoo1, libfoo-dev, and
 libfoo-bin binary packages. libfoo-bin links against libfoo1, and should
-depend on it. In your rules file, first run dh_makeshlibs, then dh_shlibdeps:
+depend on it. In your rules file, first run B<dh_makeshlibs>, then B<dh_shlibdeps>:
 
 	dh_makeshlibs
 	dh_shlibdeps
 
 This will have the effect of generating automatically a shlibs file for
 libfoo1, and using that file and the libfoo1 library in the
-debian/libfoo1/usr/lib directory to calculate shared library dependency
+F<debian/libfoo1/usr/lib> directory to calculate shared library dependency
 information.
 
 If a libbar1 package is also produced, that is an alternate build of
-libfoo, and is installed into /usr/lib/bar/, you can make libfoo-bin depend
+libfoo, and is installed into F</usr/lib/bar/>, you can make libfoo-bin depend
 on libbar1 as follows:
 
 	dh_shlibdeps -Llibbar1 -l/usr/lib/bar

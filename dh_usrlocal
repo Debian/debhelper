@@ -18,23 +18,23 @@ B<dh_usrlocal> [S<I<debhelper options>>] [B<-n>]
 
 =head1 DESCRIPTION
 
-dh_usrlocal is a debhelper program that can be used for building packages
-that will provide a subdirectory in /usr/local when installed.
+B<dh_usrlocal> is a debhelper program that can be used for building packages
+that will provide a subdirectory in F</usr/local> when installed.
 
-It finds subdirectories of usr/local in the package build directory, and
+It finds subdirectories of F<usr/local> in the package build directory, and
 removes them, replacing them with maintainer script snippets (unless B<-n>
 is used) to create the directories at install time, and remove them when
 the package is removed, in a manner compliant with Debian policy. These
-snippets are inserted into the maintainer scripts by dh_installdeb. See
-L<dh_installdeb(1)> for an explanation of Debhelper maintainer script
+snippets are inserted into the maintainer scripts by B<dh_installdeb>. See
+L<dh_installdeb(1)> for an explanation of debhelper maintainer script
 snippets.
 
 If the directories found in the build tree have unusual owners, groups, or
 permissions, then those values will be preserved in the directories made by
-the postinst script. However, as a special exception, if a directory is owned
+the F<postinst> script. However, as a special exception, if a directory is owned
 by root.root, it will be treated as if it is owned by root.staff and is mode
 2775. This is useful, since that is the group and mode policy recommends for
-directories in /usr/local.
+directories in F</usr/local>.
 
 =head1 OPTIONS
 

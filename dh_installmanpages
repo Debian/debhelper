@@ -12,36 +12,36 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_installmanpages> [S<I<debhelper options>>] [S<I<file ...>>]
+B<dh_installmanpages> [S<I<debhelper options>>] [S<I<file> ...>]
 
 =head1 DESCRIPTION
 
-dh_installmanpages is a debhelper program that is responsible for
-automatically installing man pages into usr/share/man/
+B<dh_installmanpages> is a debhelper program that is responsible for
+automatically installing man pages into F<usr/share/man/>
 in package build directories.
 
 This is a DWIM-style program, with an interface unlike the rest of
 debhelper. It is deprecated, and you are encouraged to use
 L<dh_installman(1)> instead.
 
-dh_installmanpages scans the current directory and all subdirectories for
+B<dh_installmanpages> scans the current directory and all subdirectories for
 filenames that look like man pages. (Note that only real files are looked
 at; symlinks are ignored.) It uses L<file(1)> to verify that the files are
 in the correct format. Then, based on the files' extensions, it installs 
 them into the correct man directory.
 
-All filenames specified as parameters will be skipped by dh_installmanpages.
+All filenames specified as parameters will be skipped by B<dh_installmanpages>.
 This is useful if by default it installs some man pages that you do not
 want to be installed.
 
-After the man page installation step, dh_installmanpages will check to see
-if any of the man pages are ".so" links. If so, it changes them to symlinks.
+After the man page installation step, B<dh_installmanpages> will check to see
+if any of the man pages are F<.so> links. If so, it changes them to symlinks.
 
 =head1 OPTIONS
 
 =over 4
 
-=item I<file ...>
+=item I<file> ...
 
 Do not install these files as man pages, even if they look like valid man
 pages.
@@ -50,12 +50,12 @@ pages.
 
 =head1 BUGS
 
-dh_installmanpages will install the man pages it finds into B<all> packages
+B<dh_installmanpages> will install the man pages it finds into B<all> packages
 you tell it to act on, since it can't tell what package the man
-pages belong in. This is almost never what you really want (use -p to work
+pages belong in. This is almost never what you really want (use B<-p> to work
 around this, or use the much better L<dh_installman(1)> program instead).
 
-Files ending in I<.man> will be ignored.
+Files ending in F<.man> will be ignored.
 
 Files specified as parameters that contain spaces in their filenames will
 not be processed properly.

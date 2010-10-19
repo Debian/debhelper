@@ -15,17 +15,17 @@ B<dh_fixperms> [S<I<debhelper options>>] [B<-X>I<item>]
 
 =head1 DESCRIPTION
 
-dh_fixperms is a debhelper program that is responsible for setting the
+B<dh_fixperms> is a debhelper program that is responsible for setting the
 permissions of files and directories in package build directories to a
 sane state -- a state that complies with Debian policy.
 
-dh_fixperms makes all files in usr/share/doc in the package build directory
-(excluding files in the examples/ directory) be mode 644. It also changes
+B<dh_fixperms> makes all files in F<usr/share/doc> in the package build directory
+(excluding files in the F<examples/> directory) be mode 644. It also changes
 the permissions of all man pages to mode 644. It makes all files be owned
 by root, and it removes group and other write permission from all files. It
-removes execute permissions from any libraries, headers, perl modules, or
-desktop files that have it set. It makes all files in the standard bin and
-sbin directories, usr/games/ and etc/init.d executable (since v4). Finally,
+removes execute permissions from any libraries, headers, Perl modules, or
+desktop files that have it set. It makes all files in the standard F<bin> and
+F<sbin> directories, F<usr/games/> and F<etc/init.d> executable (since v4). Finally,
 it removes the setuid and setgid bits from all files in the package.
 
 =head1 OPTIONS
@@ -34,7 +34,7 @@ it removes the setuid and setgid bits from all files in the package.
 
 =item B<-X>I<item>, B<--exclude> I<item>
 
-Exclude files that contain "item" anywhere in their filename from having
+Exclude files that contain I<item> anywhere in their filename from having
 their permissions changed. You may use this option multiple times to build
 up a list of things to exclude.
 

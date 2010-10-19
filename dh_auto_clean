@@ -15,28 +15,28 @@ B<dh_auto_clean> [S<I<build system options>>] [S<I<debhelper options>>] [S<B<-->
 
 =head1 DESCRIPTION
 
-dh_auto_clean is a debhelper program that tries to automatically clean up
+B<dh_auto_clean> is a debhelper program that tries to automatically clean up
 after a package build. It does so by running the appropriate command for
 the build system it detects the package uses. For example, if there's a
-Makefile and it contains a "distclean", "realclean", or "clean" target,
-then this is  done by running make (or MAKE, if the environment variable is
-set). If there is a setup.py or Build.PL, it is run to clean the package.
+F<Makefile> and it contains a B<distclean>, B<realclean>, or B<clean> target,
+then this is done by running B<make> (or B<MAKE>, if the environment variable is
+set). If there is a F<setup.py> or F<Build.PL>, it is run to clean the package.
 
 This is intended to work for about 90% of packages. If it doesn't work, or
 tries to use the wrong clean target, you're encouraged to skip using
-dh_auto_clean at all, and just run make clean manually.
+B<dh_auto_clean> at all, and just run B<make clean> manually.
 
 =head1 OPTIONS
 
-See L<debhelper(7)/BUILD SYSTEM OPTIONS> for a list of common build
+See L<debhelper(7)/B<BUILD SYSTEM OPTIONS>> for a list of common build
 system selection and control options.
 
 =over 4
 
 =item B<--> I<params>
 
-Pass "params" to the program that is run. These can be used to supplement
-or override the any standard parameters that dh_auto_clean passes.
+Pass I<params> to the program that is run. These can be used to supplement
+or override the any standard parameters that B<dh_auto_clean> passes.
 
 =back
 

@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-dh_python - calculates python dependencies and adds postinst and prerm python scripts (deprecated)
+dh_python - calculates Python dependencies and adds postinst and prerm Python scripts (deprecated)
 
 =cut
 
@@ -12,29 +12,29 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_python> [S<I<debhelper options>>] [B<-n>] [B<-V> I<version>] [S<I<module dirs ...>>]
+B<dh_python> [S<I<debhelper options>>] [B<-n>] [B<-V> I<version>] [S<I<module dirs> ...>]
 
 =head1 DESCRIPTION
 
-Note: This program is deprecated. You should use dh_pysupport or
-dh_pycentral instead. This program will do nothing if debian/pycompat
-or a Python-Version control file field exists.
+Note: This program is deprecated. You should use B<dh_pysupport> or
+B<dh_pycentral> instead. This program will do nothing if F<debian/pycompat>
+or a B<Python-Version> F<control> file field exists.
 
-dh_python is a debhelper program that is responsible for generating the
-${python:Depends} substitutions and adding them to substvars files. It
-will also add a postinst and a prerm script if required.
+B<dh_python> is a debhelper program that is responsible for generating the
+B<${python:Depends}> substitutions and adding them to substvars files. It
+will also add a F<postinst> and a F<prerm> script if required.
 
-The program will look at python scripts and modules in your package, and
-will use this information to generate a dependency on python, with the
-current major version, or on pythonX.Y if your scripts or modules need a
-specific python version. The dependency will be substituted into your
-package's control file wherever you place the token "${python:Depends}".
+The program will look at Python scripts and modules in your package, and
+will use this information to generate a dependency on B<python>, with the
+current major version, or on B<python>I<X>B<.>I<Y> if your scripts or modules need a
+specific B<python> version. The dependency will be substituted into your
+package's F<control> file wherever you place the token B<${python:Depends}>.
 
 If some modules need to be byte-compiled at install time, appropriate
-postinst and prerm scripts will be generated. If already byte-compiled
+F<postinst> and F<prerm> scripts will be generated. If already byte-compiled
 modules are found, they are removed.
 
-If you use this program, your package should build-depend on python.
+If you use this program, your package should build-depend on B<python>.
 
 =head1 OPTIONS
 
@@ -42,24 +42,24 @@ If you use this program, your package should build-depend on python.
 
 =item I<module dirs>
 
-If your package installs python modules in non-standard directories, you
-can make dh_python check those directories by passing their names on the
-command line. By default, it will check /usr/lib/site-python,
-/usr/lib/$PACKAGE, /usr/share/$PACKAGE, /usr/lib/games/$PACKAGE,
-/usr/share/games/$PACKAGE and /usr/lib/python?.?/site-packages.
+If your package installs Python modules in non-standard directories, you
+can make F<dh_python> check those directories by passing their names on the
+command line. By default, it will check F</usr/lib/site-python,
+/usr/lib/$PACKAGE>, F</usr/share/$PACKAGE>, F</usr/lib/games/$PACKAGE>,
+F</usr/share/games/$PACKAGE> and F</usr/lib/python?.?/site-packages>.
 
-Note: only /usr/lib/site-python, /usr/lib/python?.?/site-packages and the
-extra names on the command line are searched for binary (.so) modules.
+Note: only F</usr/lib/site-python>, F</usr/lib/python?.?/site-packages> and the
+extra names on the command line are searched for binary (F<.so>) modules.
 
 =item B<-V> I<version>
 
-If the .py files your package ships are meant to be used by a specific
-pythonX.Y version, you can use this option to specify the desired version,
-such as 2.3. Do not use if you ship modules in /usr/lib/site-python.
+If the F<.py> files your package ships are meant to be used by a specific
+B<python>I<X>B<.>I<Y> version, you can use this option to specify the desired version,
+such as B<2.3>. Do not use if you ship modules in F</usr/lib/site-python>.
 
 =item B<-n>, B<--noscripts>
 
-Do not modify postinst/postrm scripts.
+Do not modify F<postinst>/F<postrm> scripts.
 
 =back
 

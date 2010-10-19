@@ -12,25 +12,25 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_strip> [S<I<debhelper options>>] [B<-X>I<item>] [--dbg-package=package] [--keep-debug]
+B<dh_strip> [S<I<debhelper options>>] [B<-X>I<item>] [B<--dbg-package=>I<package>] [B<--keep-debug>]
 
 =head1 DESCRIPTION
 
-dh_strip is a debhelper program that is responsible for stripping
+B<dh_strip> is a debhelper program that is responsible for stripping
 executables, shared libraries, and static libraries that are not used for
 debugging.
 
 This program examines your package build directories and works out what
 to strip on its own. It uses L<file(1)> and file permissions and filenames
-to figure out what files are shared libraries (*.so), executable binaries,
-and static (lib*.a) and debugging libraries (lib*_g.a, debug/*.so), and
+to figure out what files are shared libraries (F<*.so>), executable binaries,
+and static (F<lib*.a>) and debugging libraries (F<lib*_g.a>, F<debug/*.so>), and
 strips each as much as is possible. (Which is not at all for debugging
 libraries.) In general it seems to make very good guesses, and will do the
 right thing in almost all cases.
 
 Since it is very hard to automatically guess if a file is a
-module, and hard to determine how to strip a module, dh_strip does not
-currently deal with stripping binary modules such as .o files.
+module, and hard to determine how to strip a module, B<dh_strip> does not
+currently deal with stripping binary modules such as F<.o> files.
 
 =head1 OPTIONS
 
@@ -38,36 +38,36 @@ currently deal with stripping binary modules such as .o files.
 
 =item B<-X>I<item>, B<--exclude=>I<item>
 
-Exclude files that contain "item" anywhere in their filename from being
+Exclude files that contain I<item> anywhere in their filename from being
 stripped. You may use this option multiple times to build up a list of
 things to exclude.
 
 =item B<--dbg-package=>I<package>
 
-Causes dh_strip to save debug symbols stripped from the packages it acts on
+Causes B<dh_strip> to save debug symbols stripped from the packages it acts on
 as independent files in the package build directory of the specified debugging
 package.
 
 For example, if your packages are libfoo and foo and you want to include a
-foo-dbg package with debugging symbols, use dh_strip --dbg-package=foo-dbg.
+I<foo-dbg> package with debugging symbols, use B<dh_strip --dbg-package=>I<foo-dbg>.
 
 Note that this option behaves significantly different in debhelper
 compatibility levels 4 and below. Instead of specifying the name of a debug
 package to put symbols in, it specifies a package (or packages) which
 should have separated debug symbols, and the separated symbols are placed
-in packages with "-dbg" added to their name.
+in packages with B<-dbg> added to their name.
 
 =item B<-k>, B<--keep-debug>
 
 Debug symbols will be retained, but split into an independent
-file in usr/lib/debug/ in the package build directory. --dbg-package
+file in F<usr/lib/debug/> in the package build directory. B<--dbg-package>
 is easier to use than this option, but this option is more flexible.
 
 =back
 
 =head1 NOTES
 
-If the DEB_BUILD_OPTIONS environment variable contains "nostrip", nothing
+If the B<DEB_BUILD_OPTIONS> environment variable contains B<nostrip>, nothing
 will be stripped, in accordance with Debian policy (section 10.1
 "Binaries").
 

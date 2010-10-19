@@ -12,21 +12,21 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_compress> [S<I<debhelper options>>] [B<-X>I<item>] [B<-A>] [S<I<file ...>>]
+B<dh_compress> [S<I<debhelper options>>] [B<-X>I<item>] [B<-A>] [S<I<file> ...>]
 
 =head1 DESCRIPTION
 
-dh_compress is a debhelper program that is responsible for compressing
+B<dh_compress> is a debhelper program that is responsible for compressing
 the files in package build directories, and makes sure that any symlinks
 that pointed to the files before they were compressed are updated to point
 to the new files.
 
-By default, dh_compress compresses files that debian policy mandates should
-be compressed, namely all files in usr/share/info, usr/share/man,
-files in usr/share/doc that are larger than 4k in size,
-(except the copyright file, .html and .css files, image files, and files
+By default, B<dh_compress> compresses files that Debian policy mandates should
+be compressed, namely all files in F<usr/share/info>, F<usr/share/man>,
+files in F<usr/share/doc> that are larger than 4k in size,
+(except the F<copyright> file, F<.html> and F<.css> files, image files, and files
 that appear to be already compressed based on their extensions), and all
-changelog files. Plus PCF fonts underneath usr/share/fonts/X11/
+F<changelog> files. Plus PCF fonts underneath F<usr/share/fonts/X11/>
 
 =head1 FILES
 
@@ -39,8 +39,8 @@ These files are deprecated.
 If this file exists, the default files are not compressed. Instead, the
 file is ran as a shell script, and all filenames that the shell script
 outputs will be compressed. The shell script will be run from inside the
-package build directory. Note though that using -X is a much better idea in
-general; you should only use a debian/package.compress file if you really
+package build directory. Note though that using B<-X> is a much better idea in
+general; you should only use a F<debian/package.compress> file if you really
 need to.
 
 =back
@@ -51,8 +51,8 @@ need to.
 
 =item B<-X>I<item>, B<--exclude=>I<item>
 
-Exclude files that contain "item" anywhere in their filename from being
-compressed. For example, -X.tiff will exclude tiff files from compression.
+Exclude files that contain F<item> anywhere in their filename from being
+compressed. For example, B<-X.tiff> will exclude TIFF files from compression.
 You may use this option multiple times to build up a list of things to
 exclude.
 
@@ -61,7 +61,7 @@ exclude.
 Compress all files specified by command line parameters in ALL packages
 acted on.
 
-=item I<file ...>
+=item I<file> ...
 
 Add these files to the list of files to compress.
 

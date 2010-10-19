@@ -12,37 +12,37 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_installman> [S<I<debhelper options>>] [S<I<manpage ...>>]
+B<dh_installman> [S<I<debhelper options>>] [S<I<manpage> ...>]
 
 =head1 DESCRIPTION
 
-dh_installman is a debhelper program that handles installing
+B<dh_installman> is a debhelper program that handles installing
 man pages into the correct locations in package build directories. You tell
 it what man pages go in your packages, and it figures out where to
-install them based on the section field in their .TH line. If you have a
-properly formatted .TH line, your man page will be installed into the right
+install them based on the section field in their B<.TH> line. If you have a
+properly formatted B<.TH> line, your man page will be installed into the right
 directory, with the right name (this includes proper handling of pages
-with a subsection, like "3perl", which are placed in man3, and given an
-extension of ".3perl"). If your .TH line is incorrect or missing, the program
+with a subsection, like B<3perl>, which are placed in F<man3>, and given an
+extension of F<.3perl>). If your B<.TH> line is incorrect or missing, the program
 may guess wrong based on the file extension.
 
 It also supports translated man pages, by looking for extensions
-like .ll.8 and .ll_LL.8, or by use of the --language switch.
+like F<.ll.8> and F<.ll_LL.8>, or by use of the B<--language> switch.
 
-If dh_installman seems to install a man page into the wrong section or with
+If B<dh_installman> seems to install a man page into the wrong section or with
 the wrong extension, this is because the man page has the wrong section
-listed in its .TH line. Edit the man page and correct the section, and
-dh_installman will follow suit.  See L<man(7)> for details about the .TH
-section. If dh_installman seems to install a man page into a directory
-like /usr/share/man/pl/man1/, that is because your program has a
-name like "foo.pl", and dh_installman assumes that means it is translated
-into Polish. Use --language=C to avoid this.
+listed in its B<.TH> line. Edit the man page and correct the section, and
+B<dh_installman> will follow suit. See L<man(7)> for details about the B<.TH>
+section. If B<dh_installman> seems to install a man page into a directory
+like F</usr/share/man/pl/man1/>, that is because your program has a
+name like F<foo.pl>, and B<dh_installman> assumes that means it is translated
+into Polish. Use B<--language=C> to avoid this.
 
-After the man page installation step, dh_installman will check to see if
+After the man page installation step, B<dh_installman> will check to see if
 any of the man pages in the temporary directories of any of the packages it
-is acting on contain ".so" links. If so, it changes them to symlinks.
+is acting on contain F<.so> links. If so, it changes them to symlinks.
 
-Also, dh_installman will use man to guess the character encoding of each
+Also, B<dh_installman> will use man to guess the character encoding of each
 manual page and convert it to UTF-8. If the guesswork fails for some
 reason, you can override it using an encoding declaration. See
 L<manconv(1)> for details.
@@ -66,15 +66,15 @@ Lists man pages to be installed.
 Install all files specified by command line parameters in ALL packages
 acted on.
 
-=item B<--language>=ll
+=item B<--language=>I<ll>
 
 Use this to specify that the man pages being acted on are written in the
 specified language.
 
-=item I<manpage ...>
+=item I<manpage> ...
 
 Install these man pages into the first package acted on. (Or in all
-packages if -A is specified).
+packages if B<-A> is specified).
 
 =back
 

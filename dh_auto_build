@@ -15,27 +15,27 @@ B<dh_auto_build> [S<I<build system options>>] [S<I<debhelper options>>] [S<B<-->
 
 =head1 DESCRIPTION
 
-dh_auto_build is a debhelper program that tries to automatically build a
+B<dh_auto_build> is a debhelper program that tries to automatically build a
 package. It does so by running the appropriate command for the build system
-it detects the package uses. For example, if a Makefile is found, this is
-done by running make (or MAKE, if the environment variable is set). If
-there's a setup.py, or Build.PL, it is run to build the package.
+it detects the package uses. For example, if a F<Makefile> is found, this is
+done by running B<make> (or B<MAKE>, if the environment variable is set). If
+there's a F<setup.py>, or F<Build.PL>, it is run to build the package.
 
 This is intended to work for about 90% of packages. If it doesn't work,
-you're encouraged to skip using dh_auto_build at all, and just run the
+you're encouraged to skip using B<dh_auto_build> at all, and just run the
 build process manually.
 
 =head1 OPTIONS
 
-See L<debhelper(7)/BUILD SYSTEM OPTIONS> for a list of common build
+See L<debhelper(7)/B<BUILD SYSTEM OPTIONS>> for a list of common build
 system selection and control options.
 
 =over 4
 
 =item B<--> I<params>
 
-Pass "params" to the program that is run. These can be used to supplement
-or override any standard parameters that dh_auto_build passes.
+Pass I<params> to the program that is run. These can be used to supplement
+or override any standard parameters that B<dh_auto_build> passes.
 
 =back
 

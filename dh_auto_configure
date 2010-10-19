@@ -15,30 +15,30 @@ B<dh_auto_configure> [S<I<build system options>>] [S<I<debhelper options>>] [S<B
 
 =head1 DESCRIPTION
 
-dh_auto_configure is a debhelper program that tries to automatically
+B<dh_auto_configure> is a debhelper program that tries to automatically
 configure a package prior to building. It does so by running the
 appropriate command for the build system it detects the package uses.
-For example, it looks for and runs a ./configure script, Makefile.PL,
-Build.PL, or cmake. A standard set of parameters is determined and passed
+For example, it looks for and runs a F<./configure> script, F<Makefile.PL>,
+F<Build.PL>, or F<cmake>. A standard set of parameters is determined and passed
 to the program that is run. Some build systems, such as make, do not
-need a configure step; for these dh_auto_configure will exit without
+need a configure step; for these B<dh_auto_configure> will exit without
 doing anything.
 
 This is intended to work for about 90% of packages. If it doesn't work,
-you're encouraged to skip using dh_auto_configure at all, and just run
-./configure or its equivalent manually.
+you're encouraged to skip using B<dh_auto_configure> at all, and just run
+F<./configure> or its equivalent manually.
 
 =head1 OPTIONS
 
-See L<debhelper(7)/BUILD SYSTEM OPTIONS> for a list of common build
+See L<debhelper(7)/B<BUILD SYSTEM OPTIONS>> for a list of common build
 system selection and control options.
 
 =over 4
 
 =item B<--> I<params>
 
-Pass "params" to the program that is run, after the standard
-parameters that dh_auto_configure passes. This can be used to supplement
+Pass I<params> to the program that is run, after the standard
+parameters that B<dh_auto_configure> passes. This can be used to supplement
 or override those parameters. For example:
 
   dh_auto_configure -- --with-foo --enable-bar

@@ -11,15 +11,15 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_installwm> [S<I<debhelper options>>] [B<-n>] [B<--priority=>I<n>] [S<I<wm ...>>]
+B<dh_installwm> [S<I<debhelper options>>] [B<-n>] [B<--priority=>I<n>] [S<I<wm> ...>]
 
 =head1 DESCRIPTION
 
-dh_installwm is a debhelper program that is responsible for
-generating the postinst and postrm commands that register a window manager
+B<dh_installwm> is a debhelper program that is responsible for
+generating the F<postinst> and F<postrm> commands that register a window manager
 with L<update-alternatives(8)>. The window manager's man page is also 
 registered as a slave symlink (in v6 mode and up), if it is found in 
-usr/share/man/man1/ in the package build directory.
+F<usr/share/man/man1/> in the package build directory.
 
 =head1 FILES
 
@@ -43,9 +43,9 @@ calculating the correct value.
 
 =item B<-n>, B<--noscripts>
 
-Do not modify postinst/postrm scripts. Turns this command into a no-op.
+Do not modify F<postinst>/F<postrm> scripts. Turns this command into a no-op.
 
-=item I<wm ...>
+=item I<wm> ...
 
 Window manager programs to register.
 

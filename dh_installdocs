@@ -11,12 +11,12 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_installdocs> [S<I<debhelper options>>] [B<-A>] [B<-X>I<item>] [S<I<file ...>>]
+B<dh_installdocs> [S<I<debhelper options>>] [B<-A>] [B<-X>I<item>] [S<I<file> ...>]
 
 =head1 DESCRIPTION
 
-dh_installdocs is a debhelper program that is responsible for installing
-documentation into usr/share/doc/package in package build directories.
+B<dh_installdocs> is a debhelper program that is responsible for installing
+documentation into F<usr/share/doc/package> in package build directories.
 
 =head1 FILES
 
@@ -26,11 +26,11 @@ documentation into usr/share/doc/package in package build directories.
 
 List documentation files to be installed into I<package>.
 
-=item debian/copyright
+=item F<debian/copyright>
 
-=item debian/README.Debian
+=item F<debian/README.Debian>
 
-=item debian/TODO
+=item F<debian/TODO>
 
 =item debian/I<package>.copyright
 
@@ -41,13 +41,13 @@ List documentation files to be installed into I<package>.
 Each of these files is automatically installed if present. Use the package
 specific name if I<package> needs a different version of the file.
 
-Note that debian/README.debian is also installed as README.Debian,
-and debian/TODO will be installed as TODO.Debian in non-native packages.
+Note that F<debian/README.debian> is also installed as F<README.Debian>,
+and F<debian/TODO> will be installed as F<TODO.Debian> in non-native packages.
 
 =item debian/I<package>.doc-base
 
 Installed as doc-base control files. Note that the doc-id will be
-determined from the "Document:" entry in the doc-base control file in
+determined from the B<Document:> entry in the doc-base control file in
 question.
 
 =item debian/I<package>.doc-base.*
@@ -66,9 +66,9 @@ doc-base files, and can name them like this.
 Install all files specified by command line parameters in ALL packages
 acted on.
 
-=item B<-Xitem>, B<--exclude=item>
+=item B<-X>I<item>, B<--exclude=>I<item>
 
-Exclude files that contain "item" anywhere in their filename from
+Exclude files that contain I<item> anywhere in their filename from
 being installed. Note that this includes doc-base files.
 
 =item B<--link-doc=>I<package>
@@ -82,14 +82,14 @@ be a binary package that comes from the same source package.
 debhelper will try to avoid installing files into linked documentation
 directories that would cause conflicts with the linked package. The B<-A>
 option will have no effect on packages with linked documentation
-directories, and copyright, changelog, README.Debian, and TODO files will
+directories, and F<copyright>, F<changelog>, F<README.Debian>, and F<TODO> files will
 not be installed.
 
 (An older method to accomplish the same thing, which is still supported,
 is to make the documentation directory of a package be a dangling symlink,
-before calling dh_installdocs.)
+before calling B<dh_installdocs>.)
 
-=item I<file ...>
+=item I<file> ...
 
 Install these files as documentation into the first package acted on. (Or
 in all packages if B<-A> is specified).
@@ -98,7 +98,7 @@ in all packages if B<-A> is specified).
 
 =head1 EXAMPLES
 
-This is an example of a debian/package.docs file:
+This is an example of a F<debian/package.docs> file:
 
   README
   TODO
@@ -109,8 +109,8 @@ This is an example of a debian/package.docs file:
 
 =head1 NOTES
 
-Note that dh_installdocs will happily copy entire directory hierarchies if
-you ask it to (similar to cp -a). If it is asked to install a
+Note that B<dh_installdocs> will happily copy entire directory hierarchies if
+you ask it to (similar to B<cp -a>). If it is asked to install a
 directory, it will install the complete contents of the directory.
 
 Note that this command is not idempotent. L<dh_prep(1)> should be called

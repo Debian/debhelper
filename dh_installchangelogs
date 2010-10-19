@@ -15,27 +15,27 @@ B<dh_installchangelogs> [S<I<debhelper options>>] [B<-k>] [B<-X>I<item>] [I<upst
 
 =head1 DESCRIPTION
 
-dh_installchangelogs is a debhelper program that is responsible for
+B<dh_installchangelogs> is a debhelper program that is responsible for
 installing changelogs into package build directories.
 
-An upstream changelog file may be specified as an option. If none is
+An upstream F<changelog> file may be specified as an option. If none is
 specified, it looks for files with names that seem likely to be changelogs.
 (In compatibility level 7 and above.)
 
-If there is an upstream changelog file, it will be be installed as
-usr/share/doc/package/changelog in the package build directory. If the
-changelog is a html file (determined by file extension), it will be
-installed as usr/share/doc/package/changelog.html instead, and will be
-converted to plain text with html2text to generate
-usr/share/doc/package/changelog.
+If there is an upstream F<changelog> file, it will be be installed as
+F<usr/share/doc/package/changelog> in the package build directory. If the
+changelog is a F<html> file (determined by file extension), it will be
+installed as F<usr/share/doc/package/changelog.html> instead, and will be
+converted to plain text with B<html2text> to generate
+F<usr/share/doc/package/changelog>.
 
 =head1 FILES
 
 =over 4
 
-=item debian/changelog
+=item F<debian/changelog>
 
-=item debian/NEWS
+=item F<debian/NEWS>
 
 =item debian/I<package>.changelog
 
@@ -45,11 +45,11 @@ Automatically installed into usr/share/doc/I<package>/
 in the package build directory.
 
 Use the package specific name if I<package> needs a different
-NEWS or changelog file.
+F<NEWS> or F<changelog> file.
 
-The changelog file is installed with a name of changelog
-for native packages, and changelog.Debian for non-native packages.
-The NEWS file is always installed with a name of NEWS.Debian.
+The F<changelog> file is installed with a name of changelog
+for native packages, and F<changelog.Debian> for non-native packages.
+The F<NEWS> file is always installed with a name of F<NEWS.Debian>.
 
 =back
 
@@ -60,14 +60,14 @@ The NEWS file is always installed with a name of NEWS.Debian.
 =item B<-k>, B<--keep>
 
 Keep the original name of the upstream changelog. This will be accomplished
-by installing the upstream changelog as "changelog", and making a symlink from
-that to the original name of the changelog file. This can be useful if the
+by installing the upstream changelog as F<changelog>, and making a symlink from
+that to the original name of the F<changelog> file. This can be useful if the
 upstream changelog has an unusual name, or if other documentation in the
-package refers to the changelog file.
+package refers to the F<changelog> file.
 
-=item B<-Xitem>, B<--exclude=item>
+=item B<-X>I<item>, B<--exclude=>I<item>
 
-Exclude upstream changelog files that contain "item" anywhere in their
+Exclude upstream F<changelog> files that contain I<item> anywhere in their
 filename from being installed.
 
 =item I<upstream>

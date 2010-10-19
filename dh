@@ -11,21 +11,21 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh> sequence [B<--with> I<addon>[,I<addon>,...]] [B<--list>] [B<--until> I<cmd>] [B<--before> I<cmd>] [B<--after> I<cmd>] [B<--remaining>] [S<I<debhelper options>>]
+B<dh> I<sequence> [B<--with> I<addon>[B<,>I<addon> ...]] [B<--list>] [B<--until> I<cmd>] [B<--before> I<cmd>] [B<--after> I<cmd>] [B<--remaining>] [S<I<debhelper options>>]
 
 =head1 DESCRIPTION
 
-dh runs a sequence of debhelper commands. The supported sequences
-correspond to the targets of a debian/rules file: "build", "clean",
-"install", "binary-arch", "binary-indep", and "binary".
+B<dh> runs a sequence of debhelper commands. The supported I<sequence>s
+correspond to the targets of a F<debian/rules> file: B<build>, B<clean>,
+B<install>, B<binary-arch>, B<binary-indep>, and B<binary>.
 
-Commands in the binary-indep sequence are passed the "-i" option to ensure
+Commands in the B<binary-indep> sequence are passed the B<-i> option to ensure
 they only work on binary independent packages, and commands in the
-binary-arch sequences are passed the "-a" option to ensure they only work
+B<binary-arch> sequences are passed the B<-a> option to ensure they only work
 on architecture dependent packages.
 
-If debian/rules contains a target with a name like "override_I<dh_command>",
-then when it would normally run I<dh_command>, dh will instead call that
+If F<debian/rules> contains a target with a name like B<override_>I<dh_command>,
+then when it would normally run I<dh_command>, B<dh> will instead call that
 target. The override target can then run the command with additional options,
 or run entirely different commands instead. See examples below. (Note that to
 use this feature, you should Build-Depend on debhelper 7.0.50 or above.)
@@ -34,18 +34,18 @@ use this feature, you should Build-Depend on debhelper 7.0.50 or above.)
 
 =over 4
 
-=item B<--with> I<addon>[,I<addon>,...]
+=item B<--with> I<addon>[B<,>I<addon> ...]
 
 Add the debhelper commands specified by the given addon to appropriate places
 in the sequence of commands that is run. This option can be repeated more
 than once, or multiple addons can be listed, separated by commas.
 This is used when there is a third-party package that provides
-debhelper commands. See the PROGRAMMING file for documentation about
+debhelper commands. See the F<PROGRAMMING> file for documentation about
 the sequence addon interface.
 
 =item B<--without> I<addon>
 
-The inverse of --with, disables using the given addon.
+The inverse of B<--with>, disables using the given addon.
 
 =item B<--list>, B<-l>
 
@@ -73,8 +73,8 @@ Prints commands that would run for a given sequence, but does not run them.
 
 =back
 
-All other options passed to dh are passed on to each command it runs. This
-can be used to set an option like "-v" or "-X" or "-N", as well as for more
+All other options passed to B<dh> are passed on to each command it runs. This
+can be used to set an option like B<-v> or B<-X> or B<-N>, as well as for more
 specialised options.
 
 In the above options, I<cmd> can be a full name of a debhelper command, or
@@ -160,23 +160,23 @@ after a particular debhelper command is run.
 		dh_fixperms
 		chmod 4755 debian/foo/usr/bin/foo
 
-If your package is a python package, dh will use dh_pysupport by
-default. This is how to use dh_pycentral instead.
+If your package is a Python package, B<dh> will use B<dh_pysupport> by
+default. This is how to use B<dh_pycentral> instead.
 
 	#!/usr/bin/make -f
 	%:
 		dh $@ --with python-central
 
-If your package uses autotools and you want to freshen config.sub and
-config.guess with newer versions from the autotools-dev package
-at build time, you can use some commands provided in autotools-dev
+If your package uses autotools and you want to freshen F<config.sub> and
+F<config.guess> with newer versions from the B<autotools-dev> package
+at build time, you can use some commands provided in B<autotools-dev>
 that automate it, like this.
 
 	#!/usr/bin/make -f
 	%:
 		dh $@ --with autotools_dev
 
-Here is how to force use of perl's Module::Build build system,
+Here is how to force use of Perl's B<Module::Build> build system,
 which can be necessary if debhelper wrongly detects that the package
 uses MakeMaker.
 
@@ -184,14 +184,14 @@ uses MakeMaker.
 	%:
 		dh $@ --buildsystem=perl_build
 
-To patch your package using quilt, you can tell dh to use quilt's dh
+To patch your package using quilt, you can tell B<dh> to use quilt's B<dh>
 sequence addons like this:
 	
 	#!/usr/bin/make -f
 	%:
 		dh $@ --with quilt
 
-Here is an example of overriding where the dh_auto_* commands find
+Here is an example of overriding where the B<dh_auto_>I<*> commands find
 the package's source, for a package where the source is located in a
 subdirectory.
 
@@ -199,21 +199,21 @@ subdirectory.
 	%:
 		dh $@ --sourcedirectory=src
 
-And here is an example of how to tell the dh_auto_* commands to build
-in a subdirectory, which will be removed on clean.
+And here is an example of how to tell the B<dh_auto_>I<*> commands to build
+in a subdirectory, which will be removed on B<clean>.
 
 	#!/usr/bin/make -f
 	%:
 		dh $@ --builddirectory=build
 
 If your package can be built in parallel, you can support parallel building
-as follows. Then I<dpkg-buildpackage -j> will work.
+as follows. Then B<dpkg-buildpackage -j> will work.
 
 	#!/usr/bin/make -f
 	%:
 		dh $@ --parallel
 
-Here is a way to prevent dh from running several commands that you don't
+Here is a way to prevent B<dh> from running several commands that you don't
 want it to run, by defining empty override targets for each command.
 
 	#!/usr/bin/make -f
@@ -238,11 +238,11 @@ L<dh_listpackages(1)> to test what is being built. For example:
 	endif
 
 Finally, remember that you are not limited to using override targets in the
-rules file when using dh. You can also explicitly define any of the regular
+rules file when using B<dh>. You can also explicitly define any of the regular
 rules file targets when it makes sense to do so. A common reason to do this
-is if your package needs different build-arch and build-indep targets. For
+is if your package needs different B<build-arch> and B<build-indep> targets. For
 example, a package with a long document build process can put it in
-build-indep to avoid build daemons redundantly building the documentation.
+B<build-indep> to avoid build daemons redundantly building the documentation.
 
 	#!/usr/bin/make -f
 	%:
@@ -256,19 +256,19 @@ build-indep to avoid build daemons redundantly building the documentation.
 
 =head1 INTERNALS
 
-If you're curious about dh's internals, here's how it works under the hood.
+If you're curious about B<dh>'s internals, here's how it works under the hood.
 
 Each debhelper command will record when it's successfully run in
-debian/package.debhelper.log. (Which dh_clean deletes.) So dh can tell
+F<debian/package.debhelper.log>. (Which B<dh_clean> deletes.) So B<dh> can tell
 which commands have already been run, for which packages, and skip running
 those commands again.
 
-Each time dh is run, it examines the log, and finds the last logged command
+Each time B<dh> is run, it examines the log, and finds the last logged command
 that is in the specified sequence. It then continues with the next command
 in the sequence. The B<--until>, B<--before>, B<--after>, and B<--remaining>
 options can override this behavior.
 
-dh uses the DH_INTERNAL_OPTIONS environment variable to pass information
+B<dh> uses the B<DH_INTERNAL_OPTIONS> environment variable to pass information
 through to debhelper commands that are run inside override targets. The
 contents (and indeed, existence) of this environment variable, as the name
 might suggest, is subject to change at any time.

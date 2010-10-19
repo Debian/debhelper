@@ -16,11 +16,11 @@ B<dh_installudev> [S<I<debhelper options>>] [B<-n>] [B<--name=>I<name>] [B<--pri
 
 =head1 DESCRIPTION
 
-dh_installudev is a debhelper program that is responsible for
-installing udev rules files.
+B<dh_installudev> is a debhelper program that is responsible for
+installing B<udev> rules files.
 
-Code is added to the preinst and postinst to handle the upgrade from the
-old udev rules file location.
+Code is added to the F<preinst> and F<postinst> to handle the upgrade from the
+old B<udev> rules file location.
 
 =head1 FILES
 
@@ -28,7 +28,7 @@ old udev rules file location.
 
 =item debian/I<package>.udev
 
-Installed into lib/udev/rules.d/ in the package build directory.
+Installed into F<lib/udev/rules.d/> in the package build directory.
 
 =back
 
@@ -38,17 +38,17 @@ Installed into lib/udev/rules.d/ in the package build directory.
 
 =item B<--name=>I<name>
 
-When this parameter is used, dh_installudev looks for and
+When this parameter is used, B<dh_installudev> looks for and
 installs files named debian/I<package>.I<name>.udev instead of the usual
 debian/I<package>.udev.
 
 =item B<--priority=>I<priority>
 
-Sets the priority string of the rules.d symlink. Default is 60.
+Sets the priority string of the F<rules.d> symlink. Default is 60.
 
 =item B<-n>, B<--noscripts>
 
-Do not modify postinst/postrm scripts.
+Do not modify F<postinst>/F<postrm> scripts.
 
 =back
 

@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-dh_installemacsen - register an emacs add on package
+dh_installemacsen - register an Emacs add on package
 
 =cut
 
@@ -15,13 +15,13 @@ B<dh_installemacsen> [S<I<debhelper options>>] [B<-n>] [B<--priority=>I<n>] [B<-
 
 =head1 DESCRIPTION
 
-dh_installemacsen is a debhelper program that is responsible for installing
-files used by the debian emacsen-common package into package build
+B<dh_installemacsen> is a debhelper program that is responsible for installing
+files used by the Debian B<emacsen-common> package into package build
 directories.
 
-It also automatically generates the postinst and prerm commands needed to
-register a package as an emacs add on package. The commands are added to
-the maintainer scripts by dh_installdeb. See L<dh_installdeb(1)>
+It also automatically generates the F<postinst> and F<prerm> commands needed to
+register a package as an Emacs add on package. The commands are added to
+the maintainer scripts by B<dh_installdeb>. See L<dh_installdeb(1)>
 for an explanation of how this works.
 
 =head1 FILES
@@ -30,18 +30,18 @@ for an explanation of how this works.
 
 =item debian/I<package>.emacsen-install
 
-Installed into usr/lib/emacsen-common/packages/install/package in the
+Installed into F<usr/lib/emacsen-common/packages/install/package> in the
 package build directory.
 
 =item debian/I<package>.emacsen-remove
 
-Installed into usr/lib/emacsen-common/packages/remove/package in the
+Installed into F<usr/lib/emacsen-common/packages/remove/package> in the
 package build directory.
 
 =item debian/I<package>.emacsen-startup
 
 Installed into etc/emacs/site-start.d/50I<package>.el in the package
-build directory. Use --priority to use a different priority than 50.
+build directory. Use B<--priority> to use a different priority than 50.
 
 =back
 
@@ -51,16 +51,16 @@ build directory. Use --priority to use a different priority than 50.
 
 =item B<-n>, B<--noscripts>
 
-Do not modify postinst/prerm scripts.
+Do not modify F<postinst>/F<prerm> scripts.
 
 =item B<--priority=>I<n>
 
-Sets the priority number of a site-start.d file. Default is 50.
+Sets the priority number of a F<site-start.d> file. Default is 50.
 
 =item B<--flavor=>I<foo>
 
-Sets the flavor a site-start.d file will be installed in. Default is
-"emacs", alternatives include "xemacs" and "emacs20".
+Sets the flavor a F<site-start.d> file will be installed in. Default is
+B<emacs>, alternatives include B<xemacs> and B<emacs20>.
 
 =back
 

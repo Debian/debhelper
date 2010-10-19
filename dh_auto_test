@@ -15,35 +15,35 @@ B<dh_auto_test> [S<I<build system options>>] [S<I<debhelper options>>] [S<B<--> 
 
 =head1 DESCRIPTION
 
-dh_auto_test is a debhelper program that tries to automatically run a
+B<dh_auto_test> is a debhelper program that tries to automatically run a
 package's test suite. It does so by running the appropriate command for the
 build system it detects the package uses. For example, if there's a
-Makefile and it contains a "test" or "check" target, then this is  done by
-running make (or MAKE, if the environment variable is set). If the test
+Makefile and it contains a B<test> or B<check> target, then this is done by
+running B<make> (or B<MAKE>, if the environment variable is set). If the test
 suite fails, the command will exit nonzero. If there's no test suite, it
 will exit zero without doing anything.
 
 This is intended to work for about 90% of packages with a test suite. If it
-doesn't work, you're encouraged to skip using dh_auto_test at all, and
+doesn't work, you're encouraged to skip using B<dh_auto_test> at all, and
 just run the test suite manually.
 
 =head1 OPTIONS
 
-See L<debhelper(7)/BUILD SYSTEM OPTIONS> for a list of common build
+See L<debhelper(7)/B<BUILD SYSTEM OPTIONS>> for a list of common build
 system selection and control options.
 
 =over 4
 
 =item B<--> I<params>
 
-Pass "params" to the program that is run. These can be used to supplement
-or override the any standard parameters that dh_auto_test passes.
+Pass I<params> to the program that is run. These can be used to supplement
+or override the any standard parameters that B<dh_auto_test> passes.
 
 =back
 
 =head1 NOTES
 
-If the DEB_BUILD_OPTIONS environment variable contains "nocheck", no
+If the B<DEB_BUILD_OPTIONS> environment variable contains B<nocheck>, no
 tests will be performed.
 
 =cut

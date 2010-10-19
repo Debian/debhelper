@@ -15,23 +15,23 @@ B<dh_installxfonts> [S<I<debhelper options>>]
 
 =head1 DESCRIPTION
 
-dh_installxfonts is a debhelper program that is responsible for
-registering X fonts, so their corresponding fonts.dir, fonts.alias,
-and fonts.scale be rebuilt properly at install time.
+B<dh_installxfonts> is a debhelper program that is responsible for
+registering X fonts, so their corresponding F<fonts.dir>, F<fonts.alias>,
+and F<fonts.scale> be rebuilt properly at install time.
 
 Before calling this program, you should have installed any X fonts provided
 by your package into the appropriate location in the package build
-directory, and if you have fonts.alias or fonts.scale files, you should
-install them into the correct location under etc/X11/fonts in your
+directory, and if you have F<fonts.alias> or F<fonts.scale> files, you should
+install them into the correct location under F<etc/X11/fonts> in your
 package build directory.
 
-Your package should depend on xfonts-utils so that the
-update-fonts-* commands are available. (This program adds that dependency to
-${misc:Depends}.)
+Your package should depend on B<xfonts-utils> so that the
+B<update-fonts->I<*> commands are available. (This program adds that dependency to
+B<${misc:Depends}>.)
 
-This program automatically generates the postinst and postrm commands needed
+This program automatically generates the F<postinst> and F<postrm> commands needed
 to register X fonts. These commands are inserted into the maintainer
-scripts by dh_installdeb. See L<dh_installdeb(1)> for an explanation of how
+scripts by B<dh_installdeb>. See L<dh_installdeb(1)> for an explanation of how
 this works.
 
 =head1 NOTES

@@ -15,13 +15,13 @@ B<dh_installinit> [S<I<debhelper options>>] [B<--name=>I<name>] [B<-n>] [B<-R>] 
 
 =head1 DESCRIPTION
 
-dh_installinit is a debhelper program that is responsible for installing
+B<dh_installinit> is a debhelper program that is responsible for installing
 upstart job files or init scripts with associated defaults files into package
 build directories, and in the former case providing compatibility handling
 for non-upstart systems.
 
-It also automatically generates the postinst and postrm and prerm commands
-needed to set up the symlinks in /etc/rc*.d/ and to start and stop the init
+It also automatically generates the F<postinst> and F<postrm> and F<prerm> commands
+needed to set up the symlinks in F</etc/rc*.d/> and to start and stop the init
 scripts.
 
 =head1 FILES
@@ -51,17 +51,17 @@ build directory.
 
 =item B<-n>, B<--noscripts>
 
-Do not modify postinst/postrm/prerm scripts.
+Do not modify F<postinst>/F<postrm>/F<prerm> scripts.
 
 =item B<-o>, B<--onlyscripts>
 
-Only modify postinst/postrm/prerm scripts, do not actually install any init
-script, default files, or upstart job.  May be useful if the init script or
+Only modify F<postinst>/F<postrm>/F<prerm> scripts, do not actually install any init
+script, default files, or upstart job. May be useful if the init script or
 upstart job is shipped and/or installed by upstream in a way that doesn't
-make it easy to let dh_installinit find it.
+make it easy to let B<dh_installinit> find it.
 
 If no upstart job file is installed in the target directory when
-dh_installinit --onlyscripts is called, this program will assume that an
+B<dh_installinit --onlyscripts> is called, this program will assume that an
 init script is being installed and not provide the compatibility symlinks
 or upstart dependencies.
 
@@ -69,7 +69,7 @@ or upstart dependencies.
 
 Do not stop the init script until after the package upgrade has been
 completed. This is different than the default behavior, which stops the
-script in the prerm, and starts it again in the postinst.
+script in the F<prerm>, and starts it again in the F<postinst>.
 
 This can be useful for daemons that should not have a possibly long
 downtime during upgrade. But you should make sure that the daemon will not
@@ -83,50 +83,50 @@ Do not stop init script on upgrade.
 =item B<--no-start>
 
 Do not start the init script on install or upgrade, or stop it on removal.
-Only call update-rc.d. Useful for rcS scripts.
+Only call B<update-rc.d>. Useful for rcS scripts.
 
 =item B<-d>, B<--remove-d>
 
-Remove trailing "d" from the name of the package, and use the result for the
-filename the upstart job file is installed as in etc/init/ , or for the
+Remove trailing B<d> from the name of the package, and use the result for the
+filename the upstart job file is installed as in F<etc/init/> , or for the
 filename the init script is installed as in etc/init.d and the default file
-is installed as in etc/default/ . This may be useful for daemons with names
-ending in "d". (Note: this takes precedence over the --init-script parameter
+is installed as in F<etc/default/> . This may be useful for daemons with names
+ending in B<d>. (Note: this takes precedence over the B<--init-script> parameter
 described below.)
 
 =item B<-u>I<params> B<--update-rcd-params=>I<params>
 
 =item B<--> I<params>
 
-Pass "params" to L<update-rc.d(8)>. If not specified, "defaults" will be
+Pass I<params> to L<update-rc.d(8)>. If not specified, B<defaults> will be
 passed to L<update-rc.d(8)>.
 
 =item B<--name=>I<name>
 
 Install the upstart job file or the init script (and default file) using the
 filename I<name> instead of the default filename, which is the package name.
-When this parameter is used, dh_installinit looks for and installs files
-named debian/package.name.upstart, debian/package.name.init and
-debian/package.name.default, instead of the usual debian/package.upstart,
-debian/package.init and debian/package.default.
+When this parameter is used, B<dh_installinit> looks for and installs files
+named F<debian/package.name.upstart>, F<debian/package.name.init> and
+F<debian/package.name.default>, instead of the usual F<debian/package.upstart>,
+F<debian/package.init> and F<debian/package.default>.
 
 =item B<--init-script=>I<scriptname>
 
-Use "scriptname" as the filename the init script is installed as in
-etc/init.d/ (and also use it as the filename for the defaults file, if it
-is installed). If you use this parameter, dh_installinit will look to see
-if a file in the debian/ directory exists that looks like
-"package.scriptname" and if so will install it as the init script in
+Use I<scriptname> as the filename the init script is installed as in
+F<etc/init.d/> (and also use it as the filename for the defaults file, if it
+is installed). If you use this parameter, B<dh_installinit> will look to see
+if a file in the F<debian/> directory exists that looks like
+F<package.scriptname> and if so will install it as the init script in
 preference to the files it normally installs.
 
-This parameter is deprecated, use the --name parameter instead.  This
+This parameter is deprecated, use the B<--name> parameter instead. This
 parameter will be ignored completely for upstart jobs.
 
 =item B<--error-handler=>I<function>
 
-Call the named shell function if running the init script fails. The
-function should be provided in the prerm and postinst scripts, before the
-#DEBHELPER# token.
+Call the named shell I<function> if running the init script fails. The
+function should be provided in the F<prerm> and F<postinst> scripts, before the
+B<#DEBHELPER#> token.
 
 =back
 

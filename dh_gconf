@@ -11,14 +11,14 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_gconf> [S<I<debhelper options>>] [B<--priority=<number>>]
+B<dh_gconf> [S<I<debhelper options>>] [B<--priority=>I<priority>]
 
 =head1 DESCRIPTION
 
-dh_gconf is a debhelper program that is responsible for installing GConf
+B<dh_gconf> is a debhelper program that is responsible for installing GConf
 defaults files and registering GConf schemas.
 
-An appropriate dependency on gconf2 will be generated in ${misc:Depends}.
+An appropriate dependency on gconf2 will be generated in B<${misc:Depends}>.
 
 =head1 FILES
 
@@ -26,13 +26,13 @@ An appropriate dependency on gconf2 will be generated in ${misc:Depends}.
 
 =item debian/I<package>.gconf-defaults
 
-Installed into usr/share/gconf/defaults/10_package in the package build
-directory, with "I<package>" replaced by the package name.
+Installed into F<usr/share/gconf/defaults/10_package> in the package build
+directory, with I<package> replaced by the package name.
 
 =item debian/I<package>.gconf-mandatory
 
-Installed into usr/share/gconf/mandatory/10_package in the package build
-directory, with "I<package>" replaced by the package name.
+Installed into F<usr/share/gconf/mandatory/10_package> in the package build
+directory, with I<package> replaced by the package name.
 
 =back
 
@@ -43,9 +43,9 @@ directory, with "I<package>" replaced by the package name.
 =item B<--priority> I<priority>
 
 Use I<priority> (which should be a 2-digit number) as the defaults
-priority instead of 10. Higher values than ten can be used by 
-derived distributions (20), CDD distributions (50), or site-specific
-packages (90).
+priority instead of B<10>. Higher values than ten can be used by 
+derived distributions (B<20>), CDD distributions (B<50>), or site-specific
+packages (B<90>).
 
 =back
 

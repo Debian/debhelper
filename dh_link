@@ -12,14 +12,14 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_link> [S<I<debhelper options>>] [B<-A>] [B<-X>I<item>] [S<I<source destination ...>>]
+B<dh_link> [S<I<debhelper options>>] [B<-A>] [B<-X>I<item>] [S<I<source destination> ...>]
 
 =head1 DESCRIPTION
 
-dh_link is a debhelper program that creates symlinks in package build
+B<dh_link> is a debhelper program that creates symlinks in package build
 directories.
 
-dh_link accepts a list of pairs of source and destination files. The source
+B<dh_link> accepts a list of pairs of source and destination files. The source
 files are the already existing files that will be symlinked from. The
 destination files are the symlinks that will be created. There B<must> be
 an equal number of source and destination files specified.
@@ -28,13 +28,13 @@ Be sure you B<do> specify the full filename to both the source and
 destination files (unlike you would do if you were using something like
 L<ln(1)>).
 
-dh_link will generate symlinks that comply with debian policy - absolute
+B<dh_link> will generate symlinks that comply with Debian policy - absolute
 when policy says they should be absolute, and relative links with as short
 a path as possible. It will also create any subdirectories it needs to to put
 the symlinks in.
 
-dh_link also scans the package build tree for existing symlinks which do not
-conform to debian policy, and corrects them (v4 or later).
+B<dh_link> also scans the package build tree for existing symlinks which do not
+conform to Debian policy, and corrects them (v4 or later).
 
 =head1 FILES
 
@@ -57,16 +57,16 @@ whitespace.
 Create any links specified by command line parameters in ALL packages
 acted on, not just the first.
 
-=item B<-Xitem>, B<--exclude=item>
+=item B<-X>I<item>, B<--exclude=>I<item>
 
-Do not correct symlinks that contain "item" anywhere in their filename from
-being corrected to comply with debian policy.
+Do not correct symlinks that contain I<item> anywhere in their filename from
+being corrected to comply with Debian policy.
 
-=item I<source destination ...>
+=item I<source destination> ...
 
-Create a file named "destination" as a link to a file named "source". Do
+Create a file named I<destination> as a link to a file named I<source>. Do
 this in the package build directory of the first package acted on.
-(Or in all packages if -A is specified.)
+(Or in all packages if B<-A> is specified.)
 
 =back
 
@@ -74,13 +74,13 @@ this in the package build directory of the first package acted on.
 
  dh_link usr/share/man/man1/foo.1 usr/share/man/man1/bar.1
 
-Make bar.1 be a symlink to foo.1
+Make F<bar.1> be a symlink to F<foo.1>
 
  dh_link var/lib/foo usr/lib/foo \
    usr/share/man/man1/foo.1 usr/share/man/man1/bar.1
 
-Make /usr/lib/foo/ be a link to /var/lib/foo/, and bar.1 be a symlink to
-the foo.1
+Make F</usr/lib/foo/> be a link to F</var/lib/foo/>, and F<bar.1> be a symlink to
+the F<foo.1>
 
 =cut
 

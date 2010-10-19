@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-dh_perl - calculates perl dependencies and cleans up after MakeMaker
+dh_perl - calculates Perl dependencies and cleans up after MakeMaker
 
 =cut
 
@@ -13,20 +13,20 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_perl> [S<I<debhelper options>>] [B<-d>] [S<I<library dirs ...>>]
+B<dh_perl> [S<I<debhelper options>>] [B<-d>] [S<I<library dirs> ...>]
 
 =head1 DESCRIPTION
 
-dh_perl is a debhelper program that is responsible for generating
-the ${perl:Depends} substitutions and adding them to substvars files.
+B<dh_perl> is a debhelper program that is responsible for generating
+the B<${perl:Depends}> substitutions and adding them to substvars files.
 
-The program will look at perl scripts and modules in your package,
-and will use this information to generate a dependency on perl or
-perlapi. The dependency will be substituted into your package's control
-file wherever you place the token "${perl:Depends}".
+The program will look at Perl scripts and modules in your package,
+and will use this information to generate a dependency on B<perl> or
+B<perlapi>. The dependency will be substituted into your package's F<control>
+file wherever you place the token B<${perl:Depends}>.
 
-dh_perl also cleans up empty directories that MakeMaker can generate when
-installing perl modules.
+B<dh_perl> also cleans up empty directories that MakeMaker can generate when
+installing Perl modules.
 
 =head1 OPTIONS
 
@@ -34,26 +34,26 @@ installing perl modules.
 
 =item B<-d>
 
-In some specific cases you may want to depend on perl-base rather than the
-full perl package. If so, you can pass the -d option to make dh_perl generate
+In some specific cases you may want to depend on B<perl-base> rather than the
+full B<perl> package. If so, you can pass the -d option to make B<dh_perl> generate
 a dependency on the correct base package. This is only necessary for some
 packages that are included in the base system.
 
-Note that this flag may cause no dependency on perl-base to be generated at
-all. perl-base is Essential, so its dependency can be left out, unless a
+Note that this flag may cause no dependency on B<perl-base> to be generated at
+all. B<perl-base> is Essential, so its dependency can be left out, unless a
 versioned dependency is needed.
 
 =item B<-V>
 
 By default, scripts and architecture independent modules don't depend
-on any specific version of perl.  The -V option causes the current
-version of the perl (or perl-base with -d) package to be specified.
+on any specific version of B<perl>. The B<-V> option causes the current
+version of the B<perl> (or B<perl-base> with B<-d>) package to be specified.
 
 =item I<library dirs>
 
-If your package installs perl modules in non-standard
-directories, you can make dh_perl check those directories by passing their
-names on the command line. It will only check the vendorlib and vendorarch
+If your package installs Perl modules in non-standard
+directories, you can make B<dh_perl> check those directories by passing their
+names on the command line. It will only check the F<vendorlib> and F<vendorarch>
 directories by default.
 
 =back

@@ -17,12 +17,12 @@ B<dh_installmodules> [S<I<debhelper options>>] [B<-n>] [B<--name=>I<name>]
 
 =head1 DESCRIPTION
 
-dh_installmodules is a debhelper program that is responsible for
+B<dh_installmodules> is a debhelper program that is responsible for
 registering kernel modules.
 
 Kernel modules are searched for in the package build directory and if
-found, postinst and postrm commands are automatically generated to 
-run depmod and register the modules when the package is installed. 
+found, F<postinst> and F<postrm> commands are automatically generated to 
+run B<depmod> and register the modules when the package is installed. 
 These commands are inserted into the maintainer scripts by
 L<dh_installdeb(1)>.
 
@@ -37,7 +37,7 @@ Installed to etc/modprobe.d/I<package>.conf in the package build directory.
 =item debian/I<package>.modules
 
 These files were installed for use by modutils, but are now not used
-and dh_installmodules will warn if these files are present.
+and B<dh_installmodules> will warn if these files are present.
 
 =back
 
@@ -47,11 +47,11 @@ and dh_installmodules will warn if these files are present.
 
 =item B<-n>, B<--noscripts>
 
-Do not modify postinst/postrm scripts.
+Do not modify F<postinst>/F<postrm> scripts.
 
 =item B<--name=>I<name>
 
-When this parameter is used, dh_installmodules looks for and
+When this parameter is used, B<dh_installmodules> looks for and
 installs files named debian/I<package>.I<name>.modprobe instead
 of the usual debian/I<package>.modprobe
 
