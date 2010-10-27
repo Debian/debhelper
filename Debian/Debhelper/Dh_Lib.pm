@@ -215,6 +215,7 @@ sub xargs {
 
         # The kernel can accept command lines up to 20k worth of characters.
 	my $command_max=20000; # LINUX SPECIFIC!!
+			# (And obsolete; it's bigger now.)
 			# I could use POSIX::ARG_MAX, but that would be slow.
 
 	# Figure out length of static portion of command.
