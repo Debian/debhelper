@@ -125,6 +125,8 @@ sub write_log {
 	my $cmd=shift;
 	my @packages=@_;
 
+	return if defined $ENV{DH_INHIBIT_LOG} && $cmd eq $ENV{DH_INHIBIT_LOG};
+
 	foreach my $package (@packages) {
 		my $ext=pkgext($package);
 		my $log="debian/${ext}debhelper.log";

@@ -635,6 +635,9 @@ sub run {
 			# This passes the options through to commands called
 			# inside the target.
 			$ENV{DH_INTERNAL_OPTIONS}=join("\x1e", @options);
+			# Prevent commands called inside the target from
+			# logging.
+			$ENV{DH_INHIBIT_LOG}=$command;
 			$command="debian/rules";
 			@options="override_".$override_command;
 		}
@@ -669,9 +672,9 @@ sub run {
 
 		if (defined $override_command) {
 			delete $ENV{DH_INTERNAL_OPTIONS};
-			# Need to handle logging for overriden commands here,
-			# because the actual debhelper command may not have
-			# been run by the rules file target.
+			delete $ENV{DH_INHIBIT_LOG};
+			# Update log for overridden command now that it has
+			# finished successfully.
 			# (But avoid logging for dh_clean since it removes
 			# the log earlier.)
 			if ($override_command ne 'dh_clean') {
