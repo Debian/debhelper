@@ -1,3 +1,9 @@
+# List of files of dh_* commands. Sorted for debhelper man page.
+COMMANDS=$(shell find . -maxdepth 1 -type f -perm +100 -name "dh_*" -printf "%f\n" | sort)
+
+# Find deprecated commands by looking at their synopsis.
+DEPRECATED=$(shell egrep -l '^dh_.* - .*deprecated' $(COMMANDS))
+
 # This generates a list of synopses of debhelper commands, and substitutes
 # it in to the #LIST# line on the man page fed to it on stdin. Must be passed
 # parameters of all the executables or pod files to get the synopses from.
@@ -11,7 +17,7 @@ MAKEMANLIST=perl -e ' \
 		        close IN; \
 		        if ($$file=~m/=head1 .*?\n\n(.*?) - (.*?)\n\n/s) { \
 				my $$item="=item $$1(1)\n\n$$2\n\n"; \
-				if ($$2!~/deprecated/) { \
+				if (" $(DEPRECATED) " !~ / $$1 /) { \
 			                $$list.=$$item; \
 				} \
 				else { \
@@ -61,7 +67,7 @@ version:
 
 debhelper.7: debhelper.pod
 	cat debhelper.pod | \
-		$(MAKEMANLIST) `find . -maxdepth 1 -type f -perm +100 -name "dh_*" | sort` | \
+		$(MAKEMANLIST) $(COMMANDS) | \
 		$(POD2MAN) --name="debhelper" --section=7  > debhelper.7
 
 clean:
@@ -76,7 +82,7 @@ install:
 		$(DESTDIR)/usr/share/debhelper/autoscripts \
 		$(DESTDIR)$(PERLLIBDIR)/Sequence \
 		$(DESTDIR)$(PERLLIBDIR)/Buildsystem
-	install $(shell find -maxdepth 1 -mindepth 1 -name dh\* |grep -v \.1\$$) $(DESTDIR)/usr/bin
+	install dh $(COMMANDS) $(DESTDIR)/usr/bin
 	install -m 0644 autoscripts/* $(DESTDIR)/usr/share/debhelper/autoscripts
 	install -m 0644 Debian/Debhelper/*.pm $(DESTDIR)$(PERLLIBDIR)
 	install -m 0644 Debian/Debhelper/Sequence/*.pm $(DESTDIR)$(PERLLIBDIR)/Sequence
