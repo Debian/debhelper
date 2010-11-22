@@ -16,13 +16,15 @@ B<dh> I<sequence> [B<--with> I<addon>[B<,>I<addon> ...]] [B<--list>] [B<--until>
 =head1 DESCRIPTION
 
 B<dh> runs a sequence of debhelper commands. The supported I<sequence>s
-correspond to the targets of a F<debian/rules> file: B<build>, B<clean>,
+correspond to the targets of a F<debian/rules> file: B<build-arch>,
+B<build-indep>, B<build>, B<clean>, B<install-indep>, B<install-arch>,
 B<install>, B<binary-arch>, B<binary-indep>, and B<binary>.
 
-Commands in the B<binary-indep> sequence are passed the B<-i> option to ensure
-they only work on binary independent packages, and commands in the
-B<binary-arch> sequences are passed the B<-a> option to ensure they only work
-on architecture dependent packages.
+Commands in the B<build-indep>, B<install-indep> and B<binary-indep>
+sequences are passed the B<-i> option to ensure they only work on
+binary independent packages, and commands in the B<build-arch>,
+B<install-arch> and B<binary-arch> sequences are passed the B<-a>
+option to ensure they only work on architecture dependent packages.
 
 If F<debian/rules> contains a target with a name like B<override_>I<dh_command>,
 then when it would normally run I<dh_command>, B<dh> will instead call that
@@ -322,12 +324,14 @@ $sequences{build} = [qw{
 	dh_auto_build
 	dh_auto_test
 }],
+$sequences{'build-indep'} = [@{$sequences{build}}];
+$sequences{'build-arch'} = [@{$sequences{build}}];
 $sequences{clean} = [qw{
 	dh_testdir
 	dh_auto_clean
 	dh_clean
 }];
-$sequences{install} = [@{$sequences{build}}, qw{
+my @i = qw{
 	dh_testroot
 	dh_prep
 	dh_installdirs
@@ -366,20 +370,24 @@ $sequences{install} = [@{$sequences{build}}, qw{
 	dh_link
 	dh_compress
 	dh_fixperms
-}];
+};
+$sequences{'install'} = [@{$sequences{build}}, @i];
+$sequences{'install-indep'} = [@{$sequences{'build-indep'}}, @i];
+$sequences{'install-arch'} = [@{$sequences{'build-arch'}}, @i];
+my @ba=qw{
+	dh_strip
+	dh_makeshlibs
+	dh_shlibdeps
+};
 my @b=qw{
 	dh_installdeb
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
 };
-$sequences{'binary-indep'} = [@{$sequences{install}}, @b];
-$sequences{binary} = [@{$sequences{install}}, qw{
-	dh_strip
-	dh_makeshlibs
-	dh_shlibdeps
-}, @b];
-$sequences{'binary-arch'} = [@{$sequences{binary}}];
+$sequences{binary} = [@{$sequences{install}}, @ba, @b];
+$sequences{'binary-indep'} = [@{$sequences{'install-indep'}}, @b];
+$sequences{'binary-arch'} = [@{$sequences{'install-arch'}}, @ba, @b];
 
 # Additional command options
 my %command_opts;
@@ -514,14 +522,18 @@ my @packages=@{$dh{DOPACKAGES}};
 # Get the options to pass to commands in the sequence.
 # Filter out options intended only for this program.
 my @options;
-if ($sequence eq 'binary-arch') {
+if ($sequence eq 'build-arch' ||
+    $sequence eq 'install-arch' ||
+    $sequence eq 'binary-arch') {
 	push @options, "-a";
 	# as an optimisation, remove from the list any packages
 	# that are not arch dependent
 	my %arch_packages = map { $_ => 1 } getpackages("arch");
 	@packages = grep { $arch_packages{$_} } @packages;
 }
-elsif ($sequence eq 'binary-indep') {
+elsif ($sequence eq 'build-indep' ||
+       $sequence eq 'install-indep' ||
+       $sequence eq 'binary-indep') {
 	push @options, "-i";
 	# ditto optimisation for arch indep
 	my %indep_packages = map { $_ => 1 } getpackages("indep");
