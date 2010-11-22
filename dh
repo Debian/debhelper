@@ -233,7 +233,7 @@ L<dh_listpackages(1)> to test what is being built. For example:
 	
 	override_dh_fixperms:
 		dh_fixperms
-	ifneq (,$(findstring foo, $(shell dh_listpackages)))
+	ifneq (,$(filter foo, $(shell dh_listpackages)))
 		chmod 4755 debian/foo/usr/bin/foo
 	endif
 
