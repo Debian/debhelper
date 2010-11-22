@@ -236,7 +236,9 @@ sub parseopts {
 		if ($dh{DOINDEP} || $dh{DOARCH}) {
 			# User specified that all arch (in)dep package be
 			# built, and there are none of that type.
-			warning("You asked that all arch in(dep) packages be built, but there are none of that type.");
+			if (! $dh{BLOCK_NOOP_WARNINGS}) {
+				warning("You asked that all arch in(dep) packages be built, but there are none of that type.");
+			}
 			exit(0);
 		}
 		push @{$dh{DOPACKAGES}},getpackages("both");
@@ -263,7 +265,9 @@ sub parseopts {
 	@{$dh{DOPACKAGES}}=@package_list;
 
 	if (! defined $dh{DOPACKAGES} || ! @{$dh{DOPACKAGES}}) {
-		warning("No packages to build.");
+		if (! $dh{BLOCK_NOOP_WARNINGS}) {
+			warning("No packages to build.");
+		}
 		exit(0);
 	}
 
