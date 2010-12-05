@@ -28,9 +28,8 @@ List documentation files to be installed into I<package>.
 
 =item F<debian/copyright>
 
-=item F<debian/README.Debian>
-
-=item F<debian/TODO>
+The copyright file is installed into all packages, unless a more
+specific copyright file is available.
 
 =item debian/I<package>.copyright
 
@@ -38,11 +37,18 @@ List documentation files to be installed into I<package>.
 
 =item debian/I<package>.TODO
 
-Each of these files is automatically installed if present. Use the package
-specific name if I<package> needs a different version of the file.
+Each of these files is automatically installed if present for a
+I<package>.
 
-Note that F<debian/README.debian> is also installed as F<README.Debian>,
-and F<debian/TODO> will be installed as F<TODO.Debian> in non-native packages.
+=item F<debian/README.Debian>
+
+=item F<debian/TODO>
+
+These files are installed into the first binary package listed in
+debian/control.
+
+Note that F<README.debian> files are also installed as F<README.Debian>,
+and F<TODO> files will be installed as F<TODO.Debian> in non-native packages.
 
 =item debian/I<package>.doc-base
 
