@@ -270,16 +270,6 @@ that is in the specified sequence. It then continues with the next command
 in the sequence. The B<--until>, B<--before>, B<--after>, and B<--remaining>
 options can override this behavior.
 
-A sequence can also have dependencies.  For example, the "binary"
-sequence depends upon the "binary-arch" and "binary-indep" sequences,
-and the "binary-arch" sequence depends upon the "install-arch"
-sequence which in turn depends upon the "build-arch" sequence.  These
-will, by default, be run via "debian/rules <sequence>" and so may be
-overridden or extended there, or else will run dh again to execute the
-depending sequence.  For example, "dh binary-arch" will run
-"debian/rules install-arch" which will run "dh install-arch" unless a
-custom install-arch target replaces the default target.
-
 B<dh> uses the B<DH_INTERNAL_OPTIONS> environment variable to pass information
 through to debhelper commands that are run inside override targets. The
 contents (and indeed, existence) of this environment variable, as the name
@@ -328,15 +318,14 @@ if (is_make_jobserver_unavailable()) {
 
 # Definitions of sequences.
 my %sequences;
-my @bd = qw{
+$sequences{build} = [qw{
 	dh_testdir
 	dh_auto_configure
 	dh_auto_build
 	dh_auto_test
-};
-$sequences{build} = [@bd];
-$sequences{'build-indep'} = [@bd];
-$sequences{'build-arch'} = [@bd];
+}],
+$sequences{'build-indep'} = [@{$sequences{build}}];
+$sequences{'build-arch'} = [@{$sequences{build}}];
 $sequences{clean} = [qw{
 	dh_testdir
 	dh_auto_clean
@@ -382,9 +371,9 @@ my @i = qw{
 	dh_compress
 	dh_fixperms
 };
-$sequences{'install'} = [@i];
-$sequences{'install-indep'} = [@i];
-$sequences{'install-arch'} = [@i];
+$sequences{'install'} = [@{$sequences{build}}, @i];
+$sequences{'install-indep'} = [@{$sequences{'build-indep'}}, @i];
+$sequences{'install-arch'} = [@{$sequences{'build-arch'}}, @i];
 my @ba=qw{
 	dh_strip
 	dh_makeshlibs
@@ -396,19 +385,9 @@ my @b=qw{
 	dh_md5sums
 	dh_builddeb
 };
-$sequences{binary} = [@ba, @b];
-$sequences{'binary-indep'} = [@b];
-$sequences{'binary-arch'} = [@ba, @b];
-
-# Sequence dependencies
-my %sequence_deps;
-$sequence_deps{build} = ['build-arch', 'build-indep'];
-$sequence_deps{install} = ['install-arch', 'install-indep'];
-$sequence_deps{'install-arch'} = ['build-arch'];
-$sequence_deps{'install-indep'} = ['build-indep'];
-$sequence_deps{binary} = ['binary-arch', 'binary-indep'];
-$sequence_deps{'binary-arch'} = ['install-arch'];
-$sequence_deps{'binary-indep'} = ['install-indep'];
+$sequences{binary} = [@{$sequences{install}}, @ba, @b];
+$sequences{'binary-indep'} = [@{$sequences{'install-indep'}}, @b];
+$sequences{'binary-arch'} = [@{$sequences{'install-arch'}}, @ba, @b];
 
 # Additional command options
 my %command_opts;
@@ -536,29 +515,6 @@ elsif (! exists $sequences{$sequence}) {
 		join(" ", sort keys %sequences).")";
 }
 my @sequence=@{$sequences{$sequence}};
-
-# Recursively invoke sequence dependencies before any further processing.
-# The dh options are not passed in the environment, to ensure that the
-# behaviour is the same if invoked directly.
-my $deps = undef;
-$deps = $sequence_deps{$sequence}
-	if (exists($sequence_deps{$sequence}));
-if (defined($deps)) {
-	foreach my $dep (@$deps) {
-		my $command = 'debian/rules';
-		my @dep_options = ($dep);
-		print "   ".escape_shell($command, @dep_options)."\n";
-		if (! $dh{NO_ACT}) {
-			my $ret=system($command, @dep_options);
-			if ($ret >> 8 != 0) {
-				exit $ret >> 8;
-			}
-			elsif ($ret) {
-				exit 1;
-			}
-		}
-	}
-}
 
 # The list of all packages that can be acted on.
 my @packages=@{$dh{DOPACKAGES}};
