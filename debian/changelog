@@ -25,12 +25,16 @@ debhelper (8.1.0) UNRELEASED; urgency=low
   * dh: Add support for build-arch, build-indep, install-arch and
     install-indep sequences. Closes: #604563
     (Thanks, Roger Leigh)
+  * dh: When running eg, 'dh binary', explicitly call the build
+    target in debian/rules, rather than running a sequence of commands
+    which includes any build commands that need to be run.
+    (Thanks, Roger Leigh)
   * dh_listpackages: Do not display warnings if options cause no packages
     to be listed.
   * dh_installdocs: Clarify that debian/README.Debian and debian/TODO are
     only installed into the first package listed in debian/control.
     Closes: #606036
-  
+
   [ Valery Perrin ]
   * update french translation.
   * Fix french misspelling.
