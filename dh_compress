@@ -24,7 +24,7 @@ to the new files.
 By default, B<dh_compress> compresses files that Debian policy mandates should
 be compressed, namely all files in F<usr/share/info>, F<usr/share/man>,
 files in F<usr/share/doc> that are larger than 4k in size,
-(except the F<copyright> file, F<.html> and F<.css> files, image files, and files
+(except the F<copyright> file, F<.html> and other web files, image files, and files
 that appear to be already compressed based on their extensions), and all
 F<changelog> files. Plus PCF fonts underneath F<usr/share/fonts/X11/>
 
@@ -115,7 +115,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				! -iname "*.tgz" ! -iname "*.z" ! -iname "*.bz2" \\
 				! -iname "*-gz"  ! -iname "*-z" ! -iname "*_z" \\
 				! -iname "*.jar" ! -iname "*.zip" ! -iname "*.css" \\
-				! -iname "*.svg" ! -iname "*.svgz" \\
+				! -iname "*.svg" ! -iname "*.svgz" ! -iname "*.js" \\
 				! -name "index.sgml" \\
 				! -name "copyright" 2>/dev/null || true;
 			find usr/share/fonts/X11 -type f -name "*.pcf" 2>/dev/null || true;
