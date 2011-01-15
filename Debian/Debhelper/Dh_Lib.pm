@@ -17,7 +17,7 @@ use vars qw(@ISA @EXPORT %dh);
 	    &compat &addsubstvar &delsubstvar &excludefile &package_arch
 	    &is_udeb &udeb_filename &debhelper_script_subst &escape_shell
 	    &inhibit_log &load_log &write_log &commit_override_log
-	    &dpkg_architecture_value &sourcepackage
+	    &dpkg_architecture_value &sourcepackage &make_symlink
 	    &is_make_jobserver_unavailable &clean_jobserver_makeflags
 	    &cross_command &set_buildflags &get_buildoption);
 
@@ -934,6 +934,97 @@ sub debhelper_script_subst {
 		doit("chown","0:0","$tmp/DEBIAN/$script");
 		doit("chmod",755,"$tmp/DEBIAN/$script");
 	}
+}
+
+
+# symlink($dest, $src[, $tmp]) creates a symlink from  $dest -> $src.
+# if $tmp is given, $dest will be created in $base.
+# Usually $tmp should be the value of tmpdir($package);
+sub make_symlink{
+	my $dest = shift;
+	my $src = _expand_path(shift);
+	my $tmp = shift;
+        $tmp = '' if not defined($tmp);
+	$src=~s:^/::;
+	$dest=~s:^/::;
+
+	if ($src eq $dest) {
+		warning("skipping link from $src to self");
+		return;
+	}
+
+	# Make sure the directory the link will be in exists.
+	my $basedir=dirname("$tmp/$dest");
+	if (! -e $basedir) {
+		doit("install","-d",$basedir);
+	}
+
+	# Policy says that if the link is all within one toplevel
+	# directory, it should be relative. If it's between
+	# top level directories, leave it absolute.
+	my @src_dirs=split(m:/+:,$src);
+	my @dest_dirs=split(m:/+:,$dest);
+	if (@src_dirs > 0 && $src_dirs[0] eq $dest_dirs[0]) {
+		# Figure out how much of a path $src and $dest
+		# share in common.
+		my $x;
+		for ($x=0; $x < @src_dirs && $src_dirs[$x] eq $dest_dirs[$x]; $x++) {}
+		# Build up the new src.
+		$src="";
+		for (1..$#dest_dirs - $x) {
+			$src.="../";
+		}
+		for ($x .. $#src_dirs) {
+			$src.=$src_dirs[$_]."/";
+		}
+		if ($x > $#src_dirs && ! length $src) {
+			$src="."; # special case
+		}
+		$src=~s:/$::;
+	}
+	else {
+		# Make sure it's properly absolute.
+		$src="/$src";
+	}
+
+	if (-d "$tmp/$dest" && ! -l "$tmp/$dest") {
+		error("link destination $tmp/$dest is a directory");
+	}
+	doit("rm", "-f", "$tmp/$dest");
+	doit("ln","-sf", $src, "$tmp/$dest");
+}
+
+# _expand_path expands all path "." and ".." components, but doesn't
+# resolve symbolic links.
+sub _expand_path {
+	my $start = @_ ? shift : '.';
+	my @pathname = split(m:/+:,$start);
+	my @respath;
+	for my $entry (@pathname) {
+		if ($entry eq '.' || $entry eq '') {
+			# Do nothing
+		}
+		elsif ($entry eq '..') {
+			if ($#respath == -1) {
+				# Do nothing
+			}
+			else {
+				pop @respath;
+			}
+		}
+		else {
+			push @respath, $entry;
+		}
+	}
+
+	my $result;
+	for my $entry (@respath) {
+		$result .= '/' . $entry;
+	}
+	if (! defined $result) {
+		$result="/"; # special case
+	}
+	return $result;
 }
 
 # Checks if make's jobserver is enabled via MAKEFLAGS, but
