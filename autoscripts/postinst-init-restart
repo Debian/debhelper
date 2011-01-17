@@ -5,9 +5,5 @@ if [ -x "/etc/init.d/#SCRIPT#" ]; then
 	else
 		_dh_action=start
 	fi
-	if [ -x "`which invoke-rc.d 2>/dev/null`" ]; then
-		invoke-rc.d #SCRIPT# $_dh_action || #ERROR_HANDLER#
-	else
-		/etc/init.d/#SCRIPT# $_dh_action || #ERROR_HANDLER#
-	fi
+	invoke-rc.d #SCRIPT# $_dh_action || #ERROR_HANDLER#
 fi
