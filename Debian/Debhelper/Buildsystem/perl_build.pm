@@ -26,7 +26,6 @@ sub check_auto_buildable {
 
 sub do_perl {
 	my $this=shift;
-	$ENV{MODULEBUILDRC} = "/dev/null";
 	$this->doit_in_sourcedir("perl", @_);
 }
 
