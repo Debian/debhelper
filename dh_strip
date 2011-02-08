@@ -86,14 +86,8 @@ if (defined $ENV{DEB_BUILD_OPTIONS} && $ENV{DEB_BUILD_OPTIONS} =~ /nostrip/) {
 	exit;
 }
 
-my $objcopy = "objcopy";
-my $strip = "strip";
-# cross-compiling?
-if (dpkg_architecture_value("DEB_BUILD_GNU_TYPE")
-    ne dpkg_architecture_value("DEB_HOST_GNU_TYPE")) {
-	$objcopy=dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-objcopy";
-	$strip=dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-strip";
-}
+my $objcopy = cross_command("objcopy");
+my $strip = cross_command("strip");
 
 # I could just use `file $_[0]`, but this is safer
 sub get_file_type {

@@ -17,7 +17,8 @@ use vars qw(@ISA @EXPORT %dh);
 	    &is_udeb &udeb_filename &debhelper_script_subst &escape_shell
 	    &inhibit_log &load_log &write_log &dpkg_architecture_value
 	    &sourcepackage
-	    &is_make_jobserver_unavailable &clean_jobserver_makeflags);
+	    &is_make_jobserver_unavailable &clean_jobserver_makeflags
+	    &cross_command);
 
 my $max_compat=8;
 
@@ -855,6 +856,18 @@ sub clean_jobserver_makeflags {
 			$ENV{MAKEFLAGS} =~ s/(?:^|\s)-j\b//g;
 		}
 		delete $ENV{MAKEFLAGS} if $ENV{MAKEFLAGS} =~ /^\s*$/;
+	}
+}
+
+# If cross-compiling, returns appropriate cross version of command.
+sub cross_command {
+	my $command=shift;
+	if (dpkg_architecture_value("DEB_BUILD_GNU_TYPE")
+	    ne dpkg_architecture_value("DEB_HOST_GNU_TYPE")) {
+		return dpkg_architecture_value("DEB_HOST_GNU_TYPE")."-$command";
+	}
+	else {
+		return $command;
 	}
 }
 

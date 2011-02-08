@@ -121,12 +121,7 @@ init(options => {
 	"add-udeb=s" => \$dh{SHLIBS_UDEB},
 });
 
-my $od = "objdump";
-# cross-compiling?
-if (dpkg_architecture_value("DEB_BUILD_GNU_TYPE")
-    ne dpkg_architecture_value("DEB_HOST_GNU_TYPE")) {
-	$od=dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-objdump";
-}
+my $objdump=cross_command("objdump");
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if is_udeb($package);
@@ -153,13 +148,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	while (<FIND>) {
 		my ($library, $major);
 		push @lib_files, $_;
-		my $objdump=`$od -p $_`;
-		if ($objdump=~m/\s+SONAME\s+(.+)\.so\.(.+)/) {
+		my $ret=`$objdump -p $_`;
+		if ($ret=~m/\s+SONAME\s+(.+)\.so\.(.+)/) {
 			# proper soname format
 			$library=$1;
 			$major=$2;
 		}
-		elsif ($objdump=~m/\s+SONAME\s+(.+)-(.+)\.so/) {
+		elsif ($ret=~m/\s+SONAME\s+(.+)-(.+)\.so/) {
 			# idiotic crap soname format
 			$library=$1;
 			$major=$2;
