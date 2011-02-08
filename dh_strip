@@ -86,6 +86,15 @@ if (defined $ENV{DEB_BUILD_OPTIONS} && $ENV{DEB_BUILD_OPTIONS} =~ /nostrip/) {
 	exit;
 }
 
+my $objcopy = "objcopy";
+my $strip = "strip";
+# cross-compiling?
+if (dpkg_architecture_value("DEB_BUILD_GNU_TYPE")
+    ne dpkg_architecture_value("DEB_HOST_GNU_TYPE")) {
+	$objcopy=dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-objcopy";
+	$strip=dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-strip";
+}
+
 # I could just use `file $_[0]`, but this is safer
 sub get_file_type {
 	my $file=shift;
@@ -163,7 +172,7 @@ sub make_debug {
 	if (! -d $debug_dir) {
 		doit("install", "-d", $debug_dir);
 	}
-	doit("objcopy", "--only-keep-debug", $file, $debug_path);
+	doit($objcopy, "--only-keep-debug", $file, $debug_path);
 	# No reason for this to be executable.
 	doit("chmod", 644, $debug_path);
 	return $debug_path;
@@ -172,7 +181,7 @@ sub make_debug {
 sub attach_debug {
 	my $file=shift;
 	my $debug_path=shift;
-	doit("objcopy", "--add-gnu-debuglink", $debug_path, $file);
+	doit($objcopy, "--add-gnu-debuglink", $debug_path, $file);
 }
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -207,20 +216,20 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		my $debug_path = make_debug($_, $tmp, $debugtmp) if $keep_debug;
 		# Note that all calls to strip on shared libs
 		# *must* inclde the --strip-unneeded.
-		doit("strip","--remove-section=.comment",
+		doit($strip,"--remove-section=.comment",
 			"--remove-section=.note","--strip-unneeded",$_);
 		attach_debug($_, $debug_path) if defined $debug_path;
 	}
 	
 	foreach (@executables) {
 		my $debug_path = make_debug($_, $tmp, $debugtmp) if $keep_debug;
-		doit("strip","--remove-section=.comment",
+		doit($strip,"--remove-section=.comment",
 			"--remove-section=.note",$_);
  		attach_debug($_, $debug_path) if defined $debug_path;
 	}
 
 	foreach (@static_libs) {
-		doit("strip","--strip-debug",$_);
+		doit($strip,"--strip-debug",$_);
 	}
 }
 
