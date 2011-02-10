@@ -1,8 +1,13 @@
 debhelper (8.1.1) UNRELEASED; urgency=low
 
   * dh_strip, dh_makeshlibs: use triplet-objdump, triplet-objcopy and
-    triplet-strip from cross-binutils when cross-compiling; closes: #412118.
+    triplet-strip from cross-binutils when cross-compiling; Closes: #412118.
     (Thanks, Loïc Minier)
+  * Improve handling of logging in override targets, so that
+    --remaining-packages can be used again. Now all debhelper commands run
+    in the override target are marked as running as part of the override,
+    and when the whole target is run, the log is updated to indicate that
+    commands run during the override have finished. Closes: #612828
 
  -- Joey Hess <joeyh@debian.org>  Tue, 08 Feb 2011 15:32:35 -0400
 

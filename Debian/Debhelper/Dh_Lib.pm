@@ -15,8 +15,8 @@ use vars qw(@ISA @EXPORT %dh);
 	    &filedoublearray &getpackages &basename &dirname &xargs %dh
 	    &compat &addsubstvar &delsubstvar &excludefile &package_arch
 	    &is_udeb &udeb_filename &debhelper_script_subst &escape_shell
-	    &inhibit_log &load_log &write_log &dpkg_architecture_value
-	    &sourcepackage
+	    &inhibit_log &load_log &write_log &commit_override_log
+	    &dpkg_architecture_value &sourcepackage
 	    &is_make_jobserver_unavailable &clean_jobserver_makeflags
 	    &cross_command);
 
@@ -107,16 +107,36 @@ sub END {
 	}
 }
 
+sub logfile {
+	my $package=shift;
+	my $ext=pkgext($package);
+	return "debian/${ext}debhelper.log"
+}
+
+sub add_override {
+	my $line=shift;
+	$line="override_$ENV{DH_INTERNAL_OVERRIDE} $line"
+		if defined $ENV{DH_INTERNAL_OVERRIDE};
+	return $line;
+}
+
+sub remove_override {
+	my $line=shift;
+	$line=~s/^\Qoverride_$ENV{DH_INTERNAL_OVERRIDE}\E\s+//
+		if defined $ENV{DH_INTERNAL_OVERRIDE};
+	return $line;
+}
+
 sub load_log {
 	my ($package, $db)=@_;
-	my $ext=pkgext($package);
 
 	my @log;
-	open(LOG, "<", "debian/${ext}debhelper.log") || return;
+	open(LOG, "<", logfile($package)) || return;
 	while (<LOG>) {
 		chomp;
-		push @log, $_;
-		$db->{$package}{$_}=1 if defined $db;
+		my $command=remove_override($_);
+		push @log, $command;
+		$db->{$package}{$command}=1 if defined $db;
 	}
 	close LOG;
 	return @log;
@@ -126,13 +146,22 @@ sub write_log {
 	my $cmd=shift;
 	my @packages=@_;
 
-	return if defined $ENV{DH_INHIBIT_LOG} && $cmd eq $ENV{DH_INHIBIT_LOG};
+	foreach my $package (@packages) {
+		my $log=logfile($package);
+		open(LOG, ">>", $log) || error("failed to write to ${log}: $!");
+		print LOG add_override($cmd)."\n";
+		close LOG;
+	}
+}
+
+sub commit_override_log {
+	my @packages=@_;
 
 	foreach my $package (@packages) {
-		my $ext=pkgext($package);
-		my $log="debian/${ext}debhelper.log";
-		open(LOG, ">>", $log) || error("failed to write to ${log}: $!");
-		print LOG $cmd."\n";
+		my @log=map { remove_override($_) } load_log($package);
+		my $log=logfile($package);
+		open(LOG, ">", $log) || error("failed to write to ${log}: $!");
+		print LOG $_."\n" foreach @log;
 		close LOG;
 	}
 }

@@ -647,9 +647,7 @@ sub run {
 			# This passes the options through to commands called
 			# inside the target.
 			$ENV{DH_INTERNAL_OPTIONS}=join("\x1e", @options);
-			# Prevent commands called inside the target from
-			# logging.
-			$ENV{DH_INHIBIT_LOG}=$command;
+			$ENV{DH_INTERNAL_OVERRIDE}=$command;
 			$command="debian/rules";
 			@options="override_".$override_command;
 		}
@@ -670,10 +668,11 @@ sub run {
 	else {
 		print "   ", "# Skipping ", $override_command, " - empty override", "\n";
 	}
-
+				
 	if (! $dh{NO_ACT}) {
 		if (defined $command) {
 			my $ret=system($command, @options);
+			
 			if ($ret >> 8 != 0) {
 				exit $ret >> 8;
 			}
@@ -683,8 +682,6 @@ sub run {
 		}
 
 		if (defined $override_command) {
-			delete $ENV{DH_INTERNAL_OPTIONS};
-			delete $ENV{DH_INHIBIT_LOG};
 			# Update log for overridden command now that it has
 			# finished successfully.
 			# (But avoid logging for dh_clean since it removes
@@ -692,8 +689,12 @@ sub run {
 			if ($override_command ne 'dh_clean') {
 				my %packages=map { $_ => 1 } @packages;
 				map { delete $packages{$_} } @exclude;
+				commit_override_log(keys %packages);
 				write_log($override_command, keys %packages);
 			}
+
+			delete $ENV{DH_INTERNAL_OPTIONS};
+			delete $ENV{DH_INTERNAL_OVERRIDE};
 		}
 	}
 }
