@@ -689,8 +689,8 @@ sub run {
 			if ($override_command ne 'dh_clean') {
 				my %packages=map { $_ => 1 } @packages;
 				map { delete $packages{$_} } @exclude;
-				commit_override_log(keys %packages);
 				write_log($override_command, keys %packages);
+				commit_override_log(keys %packages);
 			}
 
 			delete $ENV{DH_INTERNAL_OPTIONS};
