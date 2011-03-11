@@ -20,7 +20,7 @@ use vars qw(@ISA @EXPORT %dh);
 	    &is_make_jobserver_unavailable &clean_jobserver_makeflags
 	    &cross_command);
 
-my $max_compat=8;
+my $max_compat=9;
 
 sub init {
 	my %params=@_;

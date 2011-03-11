@@ -122,6 +122,7 @@ init(options => {
 });
 
 my $objdump=cross_command("objdump");
+my $multiarch=dpkg_architecture_value("DEB_HOST_MULTIARCH");
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if is_udeb($package);
@@ -130,6 +131,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	my %seen;
 	my $need_ldconfig = 0;
+	my $is_multiarch = 0;
 
 	doit("rm", "-f", "$tmp/DEBIAN/shlibs");
 
@@ -148,6 +150,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	while (<FIND>) {
 		my ($library, $major);
 		push @lib_files, $_;
+		if ($multiarch ne '' && $_ =~ m,/$multiarch/,) {
+			$is_multiarch=1;
+		}
 		my $ret=`$objdump -p $_`;
 		if ($ret=~m/\s+SONAME\s+(.+)\.so\.(.+)/) {
 			# proper soname format
@@ -239,6 +244,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (-s "$tmp/DEBIAN/symbols" == 0) {
 			doit("rm", "-f", "$tmp/DEBIAN/symbols");
 		}
+	}
+	if ($is_multiarch) {
+		addsubstvar($package, "misc:Pre-Depends", "multiarch-support");
 	}
 }
 

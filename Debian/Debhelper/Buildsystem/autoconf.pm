@@ -7,7 +7,7 @@
 package Debian::Debhelper::Buildsystem::autoconf;
 
 use strict;
-use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value sourcepackage);
+use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value sourcepackage compat);
 use base 'Debian::Debhelper::Buildsystem::makefile';
 
 sub DESCRIPTION {
@@ -37,7 +37,12 @@ sub configure {
 	push @opts, "--infodir=\${prefix}/share/info";
 	push @opts, "--sysconfdir=/etc";
 	push @opts, "--localstatedir=/var";
-	push @opts, "--libexecdir=\${prefix}/lib/" . sourcepackage();
+	if (! compat(8)) {
+		push @opts, "--libdir=\${prefix}/lib/" . dpkg_architecture_value("DEB_HOST_MULTIARCH");
+		push @opts, "--libexecdir=\${prefix}/lib/" . dpkg_architecture_value("DEB_HOST_MULTIARCH") . "/" . sourcepackage();
+	} else {
+		push @opts, "--libexecdir=\${prefix}/lib/" . sourcepackage();
+	}
 	push @opts, "--disable-maintainer-mode";
 	push @opts, "--disable-dependency-tracking";
 	# Provide --host only if different from --build, as recommended in
