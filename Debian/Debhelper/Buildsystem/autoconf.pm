@@ -40,7 +40,8 @@ sub configure {
 	if (! compat(8)) {
 		push @opts, "--libdir=\${prefix}/lib/" . dpkg_architecture_value("DEB_HOST_MULTIARCH");
 		push @opts, "--libexecdir=\${prefix}/lib/" . dpkg_architecture_value("DEB_HOST_MULTIARCH") . "/" . sourcepackage();
-	} else {
+	}
+	else {
 		push @opts, "--libexecdir=\${prefix}/lib/" . sourcepackage();
 	}
 	push @opts, "--disable-maintainer-mode";
