@@ -150,7 +150,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	while (<FIND>) {
 		my ($library, $major);
 		push @lib_files, $_;
-		if ($multiarch ne '' && $_ =~ m,/$multiarch/,) {
+		if (defined $multiarch && $multiarch ne '' && m,/$multiarch/,) {
 			$is_multiarch=1;
 		}
 		my $ret=`$objdump -p $_`;
