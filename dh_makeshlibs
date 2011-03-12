@@ -21,6 +21,11 @@ libraries, and generates a shlibs file for the libraries it finds.
 It also adds a call to ldconfig in the F<postinst> and F<postrm> scripts (in
 v3 mode and above only) to any packages in which it finds shared libraries.
 
+In v9 mode and above, packages that support multiarch are detected, and
+a Pre-Dependency on multiarch-support is set in ${misc:Pre-Depends} ;
+you should make sure to put that token into an appropriate place in your
+debian/control file for packages supporting multiarch.
+
 =head1 FILES
 
 =over 4

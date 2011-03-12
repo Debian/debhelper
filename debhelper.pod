@@ -503,6 +503,23 @@ none is specified.
 
 =back
 
+=item v9
+
+This compatability level is still open for development; use with caution.
+
+Changes from v8 are:
+
+=over 8
+
+=item - 
+
+Multiarch support. In particular, B<dh_auto_configure> passes
+multiarch directories to autoconf in --libdir and --libexecdir,
+while B<dh_makeshlibs> detects packages containing multiarch
+directories and sets a Pre-Dependency on multiarch-support is
+${misc:Pre-Depends} . A version of dpkg-dev supporting multiarch
+is required for this to work.
+
 =item v8
 
 This is the recommended mode of operation.

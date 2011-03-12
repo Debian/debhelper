@@ -4,6 +4,15 @@ debhelper (8.1.3) UNRELEASED; urgency=low
     in some rule other than clean, perhaps to clean up an intermediate
     build before a second build is run, debian/rules clean still runs it.
     Closes: #615553
+  * Started work on Debhelper v9. It is still experimental, and more
+    changes may be added to that mode.
+  * Support multiarch in v9. Thanks, Steve Langasek. Closes: #617761
+  * dh_auto_configure: Support multiarch in v9 by passing multiarch
+    directories to --libdir and --libexecdir. dpkg-dev (>= 1.16.0)
+    is needed for this to be done, so packages should build-depend on it.
+  * dh_makeshlibs: Detect packages using multiarch directories and
+    make ${misc:Pre-Depends} expand to multiarch-support. Also needs
+    a new enough dpkg-dev.
 
  -- Joey Hess <joeyh@debian.org>  Sun, 27 Feb 2011 15:43:12 -0400
 
