@@ -1,12 +1,12 @@
 # Translation of debhelper manpages to French
-# Valery Perrin <valery.perrin.debian@free.fr>, 2005, 2006, 2010.
+# Valery Perrin <valery.perrin.debian@free.fr>, 2005, 2006, 2010, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: debhelper manpages\n"
 "POT-Creation-Date: 2011-02-14 14:22-0400\n"
-"PO-Revision-Date: 2010-11-07 00:09+0100\n"
+"PO-Revision-Date: 2011-04-03 17:37+0200\n"
 "Last-Translator: Valery Perrin <valery.perrin.debian@free.fr>\n"
-"Language-Team: French <French <debian-l10n-french@lists.debian.org>>\n"
+"Language-Team: Français <debian-l10n-french@lists.debian.org>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1730,7 +1730,6 @@ msgstr ""
 # type: textblock
 #. type: textblock
 #: dh:18
-#, fuzzy
 #| msgid ""
 #| "B<dh> runs a sequence of debhelper commands. The supported I<sequence>s "
 #| "correspond to the targets of a F<debian/rules> file: B<build>, B<clean>, "
@@ -1741,14 +1740,14 @@ msgid ""
 "indep>, B<build>, B<clean>, B<install-indep>, B<install-arch>, B<install>, "
 "B<binary-arch>, B<binary-indep>, and B<binary>."
 msgstr ""
-"B<dh> exécute séquentiellement une série de commande debhelper. Les "
-"séquences acceptées correspondent aux blocs d'un fichier F<debian/rules> : "
-"B<build>, B<clean>, B<install>, B<binary-arch>, B<binary-indep> et B<binary>."
+"B<dh> exécute une suite de commandes debhelper. Les I<suite>s acceptées "
+"correspondent aux blocs d'un fichier F<debian/rules> : B<build-arch>, "
+"B<build-indep>, B<build>, B<clean>, B<install-indep>, B<install-arch>, "
+"B<install>, B<binary-arch>, B<binary-indep> et B<binary>."
 
 # type: textblock
 #. type: textblock
 #: dh:23
-#, fuzzy
 #| msgid ""
 #| "Commands in the B<binary-indep> sequence are passed the B<-i> option to "
 #| "ensure they only work on binary independent packages, and commands in the "
@@ -1761,9 +1760,10 @@ msgid ""
 "B<install-arch> and B<binary-arch> sequences are passed the B<-a> option to "
 "ensure they only work on architecture dependent packages."
 msgstr ""
-"Les commandes de la séquence B<binary-indep> sont appelées avec l'option B<-"
-"i> pour être certain qu'elles ne s'accompliront que sur des paquets "
-"indépendants de l'architecture. Symétriquement les commandes de la séquence "
+"Les commandes des séquences B<build-indep>, B<install-indep> et B<binary-"
+"indep> sont appelées avec l'option B<-i> pour être certain qu'elles ne "
+"s'accompliront que sur des paquets indépendants de l'architecture. "
+"Symétriquement les commandes des séquences B<build-arch>, B<install-arch> et "
 "B<binary-arch> sont appelées avec l'option B<-a> pour être certain qu'elles "
 "ne s'accompliront que sur des paquets dépendants de l'architecture."
 
@@ -2123,8 +2123,8 @@ msgid ""
 "build time, you can use some commands provided in B<autotools-dev> that "
 "automate it, like this."
 msgstr ""
-"Si le paquet utilise « autotools » et que vous voulez rafraîchir les "
-"F<config.sub> et les F<config.guess> avec les nouvelles versions du paquet "
+"Si le paquet utilise « autotools » et que vous voulez rafraîchir les F<config."
+"sub> et les F<config.guess> avec les nouvelles versions du paquet "
 "B<autotools-dev> lors de la compilation, il est possible d'utiliser "
 "certaines commandes fournies dans B<autotools-dev> afin d'automatiser cette "
 "tâche, comme ci-dessous :"
@@ -2325,7 +2325,7 @@ msgstr ""
 # type: verbatim
 #. type: verbatim
 #: dh:236
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid ""
 #| "\toverride_dh_fixperms:\n"
 #| "\t\tdh_fixperms\n"
@@ -2343,8 +2343,8 @@ msgid ""
 msgstr ""
 "\toverride_dh_fixperms:\n"
 "\t\tdh_fixperms\n"
-"\tifneq (,$(findstring foo, $(shell dh_listpackages)))\n"
-"\t\tchmod 4755 debian/foo/usr/bin/foo\n"
+"\tifneq (,$(filter toto, $(shell dh_listpackages)))\n"
+"\t\tchmod 4755 debian/toto/usr/bin/toto\n"
 "\tendif\n"
 "\n"
 
@@ -2535,7 +2535,7 @@ msgid ""
 "See L<debhelper(7)/B<BUILD SYSTEM OPTIONS>> for a list of common build "
 "system selection and control options."
 msgstr ""
-"Consulter L<debhelper(7)/B<OPTIONS DU PROCESSUS DE CONSTRUCTION>> pour "
+"Consulter B<OPTIONS DU PROCESSUS DE CONSTRUCTION> dans L<debhelper(7)> pour "
 "obtenir la liste des processus de construction courants et celle des options "
 "de contrôle."
 
@@ -2727,7 +2727,7 @@ msgid ""
 "built using Ant."
 msgstr ""
 "B<dh_auto_install> est un programme de la suite debhelper qui tente "
-"d'installer automatiquement les fichier construits. Il le fait en lançant "
+"d'installer automatiquement les fichiers construits. Il le fait en lançant "
 "les commandes appropriées du processus de construction d'après le type du "
 "paquet. Par exemple, s'il y a un F<Makefile> et qu'il contient un bloc "
 "B<install> il exécutera B<make> (ou B<MAKE> si les variables d'environnement "
@@ -2746,7 +2746,7 @@ msgid ""
 "should be moved from there to the appropriate package build directory using "
 "L<dh_install(1)>."
 msgstr ""
-"A moins que l'option B<--destdir> soit spécifiée; les fichiers sont "
+"À moins que l'option B<--destdir> soit spécifiée; les fichiers sont "
 "installés dans debian/I<Paquet>/ s'il n'y a qu'un seul paquet binaire. Dans "
 "le cas de paquets binaires multiples, les fichiers seront installés dans "
 "F<debian/tmp> et pourront être déplacés vers le répertoire de construction "
@@ -3132,8 +3132,8 @@ msgid ""
 "It does not run \"make clean\" to clean up after the build process. Use "
 "L<dh_auto_clean(1)> to do things like that."
 msgstr ""
-"Il n'exécute pas un « make clean » pour faire le ménage après la "
-"construction du paquet. Il faut utiliser L<dh_auto_clean(1)> pour le faire."
+"Il n'exécute pas un « make clean » pour faire le ménage après la construction "
+"du paquet. Il faut utiliser L<dh_auto_clean(1)> pour le faire."
 
 # type: textblock
 #. type: textblock
@@ -3254,7 +3254,6 @@ msgstr ""
 # type: textblock
 #. type: textblock
 #: dh_compress:24
-#, fuzzy
 #| msgid ""
 #| "By default, B<dh_compress> compresses files that Debian policy mandates "
 #| "should be compressed, namely all files in F<usr/share/info>, F<usr/share/"
@@ -3276,8 +3275,8 @@ msgstr ""
 "que les polices PCF stockées dans F<usr/share/fonts/X11/>. Il comprimera "
 "également les fichiers de F<usr/share/doc> qui font plus de 4ko, à "
 "l'exception du fichier de F<copyright>, des fichiers suffixés par F<.html> "
-"et F<.css>, des fichiers image et des fichiers qui paraissent, de par leur "
-"extension, avoir déjà été comprimés."
+"et des autres fichiers Web, des fichiers d'images et des fichiers qui "
+"paraissent, de par leur extension, avoir déjà été comprimés."
 
 # type: =item
 #. type: =item
@@ -4805,6 +4804,8 @@ msgid ""
 "The copyright file is installed into all packages, unless a more specific "
 "copyright file is available."
 msgstr ""
+"Le fichier de copyright est installé dans tous les paquets sauf si un "
+"fichier de copyright plus spécifique est disponible."
 
 # type: =item
 #. type: =item
@@ -4827,15 +4828,14 @@ msgstr "debian/I<paquet>.TODO"
 # type: textblock
 #. type: textblock
 #: dh_installdocs:40
-#, fuzzy
 #| msgid ""
 #| "Each of these files is automatically installed if present. Use the "
 #| "package specific name if I<package> needs a different version of the file."
 msgid ""
 "Each of these files is automatically installed if present for a I<package>."
 msgstr ""
-"Chacun de ces fichiers est automatiquement installé, s'ils existent. Utilise "
-"le nom du paquet si I<paquet> nécessite une version différente du fichier."
+"Chacun de ces fichiers est automatiquement installé s'il existe pour un "
+"I<paquet>."
 
 # type: =item
 #. type: =item
@@ -4852,7 +4852,6 @@ msgstr "F<debian/TODO>"
 # type: textblock
 #. type: textblock
 #: dh_installdocs:47
-#, fuzzy
 #| msgid ""
 #| "These files are installed into etc/network/if-*.d/I<package> in the "
 #| "package build directory."
@@ -4860,13 +4859,12 @@ msgid ""
 "These files are installed into the first binary package listed in debian/"
 "control."
 msgstr ""
-"Ces fichiers sont installés dans le répertoire de construction du paquet "
-"sous etc/network/if-*.d/I<paquet>."
+"Ces fichiers sont installés dans le premier paquet binaire listé dans "
+"F<debian/control>."
 
 # type: textblock
 #. type: textblock
 #: dh_installdocs:50
-#, fuzzy
 #| msgid ""
 #| "Note that F<debian/README.debian> is also installed as F<README.Debian>, "
 #| "and F<debian/TODO> will be installed as F<TODO.Debian> in non-native "
@@ -4875,8 +4873,9 @@ msgid ""
 "Note that F<README.debian> files are also installed as F<README.Debian>, and "
 "F<TODO> files will be installed as F<TODO.Debian> in non-native packages."
 msgstr ""
-"Nota : F<debian/README.debian> est aussi installé sous F<README.Debian> et "
-"F<debian/TODO> sous F<TODO.Debian> dans les paquets non natifs."
+"Nota : les fichiers F<README.debian> sont également installés en tant que "
+"F<README.Debian> et les fichiers  F<TODO> seront installés en tant que "
+"F<TODO.Debian> dans les paquets non natifs."
 
 # type: =item
 #. type: =item
@@ -4979,8 +4978,8 @@ msgid ""
 "before calling B<dh_installdocs>.)"
 msgstr ""
 "(Une autre méthode, pour réaliser la même chose, qui reste toujours "
-"possible, est de faire du répertoire de documentation un lien symbolique "
-"« en l'air » avant l'appel à B<dh_installdocs>.)"
+"possible, est de faire du répertoire de documentation un lien symbolique « en "
+"l'air » avant l'appel à B<dh_installdocs>.)"
 
 # type: textblock
 #. type: textblock
@@ -5158,9 +5157,9 @@ msgid ""
 "Sets the flavor a F<site-start.d> file will be installed in. Default is "
 "B<emacs>, alternatives include B<xemacs> and B<emacs20>."
 msgstr ""
-"Fixe la « saveur » dans laquelle le fichier F<site-start.d> sera installé. "
-"La valeur par défaut est B<emacs>. Les autres valeurs possibles sont "
-"B<xemacs> et B<emacs20>."
+"Fixe la « saveur » dans laquelle le fichier F<site-start.d> sera installé. La "
+"valeur par défaut est B<emacs>. Les autres valeurs possibles sont B<xemacs> "
+"et B<emacs20>."
 
 # type: textblock
 #. type: textblock
@@ -5840,9 +5839,9 @@ msgid ""
 msgstr ""
 "B<dh_installman> gère également les traductions de pages de manuel soit en "
 "cherchant des extensions telles que f<.ll.8> et F<ll_LL.8>, soit en "
-"utilisant l'option B<--language>. (NdT : « ll » représente le code langue "
-"sur deux caractères et « LL » la variante locale sur deux caractères "
-"également. Par exemple : fr_BE pour le français de Belgique.)"
+"utilisant l'option B<--language>. (NdT : « ll » représente le code langue sur "
+"deux caractères et « LL » la variante locale sur deux caractères également. "
+"Par exemple : fr_BE pour le français de Belgique.)"
 
 # type: textblock
 #. type: textblock
@@ -6867,8 +6866,8 @@ msgstr ""
 msgid ""
 "dh_lintian - install lintian override files into package build directories"
 msgstr ""
-"dh_lintian - installe les fichiers « override » de lintian dans le "
-"répertoire de construction du paquet"
+"dh_lintian - installe les fichiers « override » de lintian dans le répertoire "
+"de construction du paquet"
 
 # type: textblock
 #. type: textblock
@@ -7036,7 +7035,6 @@ msgstr "B<-m>I<numéro-majeur>, B<--major=>I<numéro-majeur>"
 # type: textblock
 #. type: textblock
 #: dh_makeshlibs:44
-#, fuzzy
 #| msgid ""
 #| "Instead of trying to guess the major number of the library with /"
 #| "postobjdump, use the major number specified after the -m parameter. This "
@@ -7048,10 +7046,11 @@ msgid ""
 "than it used to be, back in the bad old days when this program looked at "
 "library filenames rather than using objdump."
 msgstr ""
-"Permet de préciser le numéro majeur de version de la bibliothèque, au lieu "
-"d'essayer de le déterminer avec / postobjdump. Ce paramètre est devenu "
-"beaucoup moins utile qu'autrefois où B<dh_makeshlibs> se basait sur le nom "
-"du fichier de bibliothèque et non sur l'utilisation d'objdump."
+"Utilise le nombre majeur indiqué après le paramètre -m afin de préciser le "
+"numéro majeur de version de la bibliothèque, au lieu d'essayer de le "
+"déterminer avec objdump. Ce paramètre est devenu beaucoup moins utile "
+"qu'autrefois où ce programme se basait sur les noms des fichiers de "
+"bibliothèque et non sur l'utilisation d'objdump."
 
 # type: =item
 #. type: =item
@@ -7849,7 +7848,7 @@ msgstr "Passe I<paramètres> à L<dpkg-shlibdeps(1)>."
 #. type: =item
 #: dh_shlibdeps:41
 msgid "B<-u>I<params>, B<--dpkg-shlibdeps-params=>I<params>"
-msgstr "B<-u>I<params>, B<--dpkg-shlibdeps-params=>I<params>"
+msgstr "B<-u>I<paramètres>, B<--dpkg-shlibdeps-params=>I<paramètres>"
 
 #. type: textblock
 #: dh_shlibdeps:43
@@ -8534,10 +8533,9 @@ msgstr "Andrew Stribblehill <ads@debian.org>"
 #~ "defaults."
 #~ msgstr ""
 #~ "Ce fichier sera installé dans le répertoire de construction du paquet "
-#~ "sous usr/share/gconf/defaults/10_paquet où le mot « paquet » sera "
-#~ "remplacé par le nom du paquet. Certaines parties des scripts de "
-#~ "maintenance postinst et postrm seront produites pour exécuter update-"
-#~ "gconf-defaults."
+#~ "sous usr/share/gconf/defaults/10_paquet où le mot « paquet » sera remplacé "
+#~ "par le nom du paquet. Certaines parties des scripts de maintenance "
+#~ "postinst et postrm seront produites pour exécuter update-gconf-defaults."
 
 # type: =head1
 #~ msgid "COMMAND SPECIFICATION"
