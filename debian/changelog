@@ -1,3 +1,15 @@
+debhelper (8.1.4) UNRELEASED; urgency=low
+
+  * dh_clean: Remove debhelper logs for all packages, including packages
+    not being acted on. dh can sometimes produce such logs by accident
+    when passed bundled options (like "-Nfoo" instead of "-N foo") that
+    it does not understand; and it was not possible to fix that
+    for any compat level before v8. But also, such logs can occur
+    for other reasons, like interrupted builds during development, 
+    and it should be safe to clean them all. Closes: #623446
+
+ -- Joey Hess <joeyh@debian.org>  Thu, 21 Apr 2011 14:05:52 -0400
+
 debhelper (8.1.3) unstable; urgency=low
 
   [ Joey Hess ]
