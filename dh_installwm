@@ -16,7 +16,7 @@ B<dh_installwm> [S<I<debhelper options>>] [B<-n>] [B<--priority=>I<n>] [S<I<wm> 
 =head1 DESCRIPTION
 
 B<dh_installwm> is a debhelper program that is responsible for
-generating the F<postinst> and F<postrm> commands that register a window manager
+generating the F<postinst> and F<prerm> commands that register a window manager
 with L<update-alternatives(8)>. The window manager's man page is also 
 registered as a slave symlink (in v6 mode and up), if it is found in 
 F<usr/share/man/man1/> in the package build directory.
@@ -43,7 +43,7 @@ calculating the correct value.
 
 =item B<-n>, B<--noscripts>
 
-Do not modify F<postinst>/F<postrm> scripts. Turns this command into a no-op.
+Do not modify F<postinst>/F<prerm> scripts. Turns this command into a no-op.
 
 =item I<wm> ...
 
