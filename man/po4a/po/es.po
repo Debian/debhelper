@@ -31,7 +31,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: debhelper 8.0.0\n"
-"POT-Creation-Date: 2011-04-05 13:17-0400\n"
+"POT-Creation-Date: 2011-04-22 16:15-0400\n"
 "PO-Revision-Date: 2010-11-11 22:28+0100\n"
 "Last-Translator: Omar Campagne <ocampagne@gmail.com>\n"
 "Language-Team: Debian l10n Spanish <debian-l10n-spanish@lists.debian.org>\n"
@@ -1656,7 +1656,7 @@ msgstr ""
 #. type: =head1
 #: debhelper.pod:629 dh:765 dh_auto_build:47 dh_auto_clean:50
 #: dh_auto_configure:53 dh_auto_install:85 dh_auto_test:58 dh_bugfiles:122
-#: dh_builddeb:91 dh_clean:138 dh_compress:204 dh_desktop:31 dh_fixperms:129
+#: dh_builddeb:91 dh_clean:139 dh_compress:204 dh_desktop:31 dh_fixperms:129
 #: dh_gconf:99 dh_gencontrol:82 dh_icons:65 dh_install:280
 #: dh_installcatalogs:116 dh_installchangelogs:171 dh_installcron:77
 #: dh_installdeb:144 dh_installdebconf:126 dh_installdirs:86
@@ -1701,7 +1701,7 @@ msgstr "Sitio web de Debhelper."
 #. type: =head1
 #: debhelper.pod:643 dh:771 dh_auto_build:53 dh_auto_clean:56
 #: dh_auto_configure:59 dh_auto_install:91 dh_auto_test:64 dh_bugfiles:130
-#: dh_builddeb:97 dh_clean:144 dh_compress:210 dh_desktop:37 dh_fixperms:135
+#: dh_builddeb:97 dh_clean:145 dh_compress:210 dh_desktop:37 dh_fixperms:135
 #: dh_gconf:105 dh_gencontrol:88 dh_icons:71 dh_install:286
 #: dh_installcatalogs:122 dh_installchangelogs:177 dh_installcron:83
 #: dh_installdeb:150 dh_installdebconf:132 dh_installdirs:92
@@ -1721,7 +1721,7 @@ msgstr "AUTOR"
 #. type: textblock
 #: debhelper.pod:645 dh:773 dh_auto_build:55 dh_auto_clean:58
 #: dh_auto_configure:61 dh_auto_install:93 dh_auto_test:66 dh_builddeb:99
-#: dh_clean:146 dh_compress:212 dh_fixperms:137 dh_gencontrol:90
+#: dh_clean:147 dh_compress:212 dh_fixperms:137 dh_gencontrol:90
 #: dh_install:288 dh_installchangelogs:179 dh_installcron:85 dh_installdeb:152
 #: dh_installdebconf:134 dh_installdirs:94 dh_installdocs:315
 #: dh_installemacsen:132 dh_installexamples:114 dh_installifupdown:77
@@ -2423,7 +2423,7 @@ msgstr ""
 # type: textblock
 #. type: textblock
 #: dh:767 dh_auto_build:49 dh_auto_clean:52 dh_auto_configure:55
-#: dh_auto_install:87 dh_auto_test:60 dh_builddeb:93 dh_clean:140
+#: dh_auto_install:87 dh_auto_test:60 dh_builddeb:93 dh_clean:141
 #: dh_compress:206 dh_fixperms:131 dh_gconf:101 dh_gencontrol:84
 #: dh_install:282 dh_installcatalogs:118 dh_installchangelogs:173
 #: dh_installcron:79 dh_installdeb:146 dh_installdebconf:128 dh_installdirs:88
@@ -2443,7 +2443,7 @@ msgstr "L<debhelper(7)>"
 #. type: textblock
 #: dh:769 dh_auto_build:51 dh_auto_clean:54 dh_auto_configure:57
 #: dh_auto_install:89 dh_auto_test:62 dh_bugfiles:128 dh_builddeb:95
-#: dh_clean:142 dh_compress:208 dh_desktop:35 dh_fixperms:133 dh_gconf:103
+#: dh_clean:143 dh_compress:208 dh_desktop:35 dh_fixperms:133 dh_gconf:103
 #: dh_gencontrol:86 dh_icons:69 dh_install:284 dh_installchangelogs:175
 #: dh_installcron:81 dh_installdeb:148 dh_installdebconf:130 dh_installdirs:90
 #: dh_installdocs:311 dh_installemacsen:128 dh_installexamples:110
@@ -4982,7 +4982,7 @@ msgstr ""
 
 # type: textblock
 #. type: textblock
-#: dh_installemacsen:54 dh_usrlocal:45
+#: dh_installemacsen:54 dh_python:62 dh_usrlocal:45
 msgid "Do not modify F<postinst>/F<prerm> scripts."
 msgstr "No modifica los scripts F<postinst>/F<prerm>."
 
@@ -5985,8 +5985,7 @@ msgstr ""
 
 # type: textblock
 #. type: textblock
-#: dh_installmenu:47 dh_installmime:47 dh_installmodules:50 dh_installudev:51
-#: dh_makeshlibs:79 dh_python:62
+#: dh_installmenu:47 dh_installmime:47 dh_makeshlibs:79
 msgid "Do not modify F<postinst>/F<postrm> scripts."
 msgstr "No modifica los scripts F<postinst>/F<postrm>."
 
@@ -6091,11 +6090,19 @@ msgstr ""
 # type: textblock
 #. type: textblock
 #: dh_installmodules:23
+#, fuzzy
+#| msgid ""
+#| "Kernel modules are searched for in the package build directory and if "
+#| "found, F<postinst> and F<postrm> commands are automatically generated to "
+#| "run B<depmod> and register the modules when the package is installed.  "
+#| "These commands are inserted into the maintainer scripts by L<dh_installdeb"
+#| "(1)>."
 msgid ""
 "Kernel modules are searched for in the package build directory and if found, "
-"F<postinst> and F<postrm> commands are automatically generated to run "
-"B<depmod> and register the modules when the package is installed.  These "
-"commands are inserted into the maintainer scripts by L<dh_installdeb(1)>."
+"F<preinst>, F<postinst> and F<postrm> commands are automatically generated "
+"to run B<depmod> and register the modules when the package is installed.  "
+"These commands are inserted into the maintainer scripts by L<dh_installdeb(1)"
+">."
 msgstr ""
 "Los módulos del núcleo se buscan en el directorio de construcción del "
 "paquete, y si se encuentran, se generan órdenes F<postinst> y F<postrm> "
@@ -6131,6 +6138,14 @@ msgstr ""
 "Estos ficheros se instalaron para su uso mediante modutils, pero ya están en "
 "desuso, y B<dh_installmodules> emitirá un aviso si estos ficheros están "
 "presentes."
+
+# type: textblock
+#. type: textblock
+#: dh_installmodules:50
+#, fuzzy
+#| msgid "Do not modify F<postinst>/F<postrm> scripts."
+msgid "Do not modify F<preinst>/F<postinst>/F<postrm> scripts."
+msgstr "No modifica los scripts F<postinst>/F<postrm>."
 
 # type: textblock
 #. type: textblock
@@ -6331,6 +6346,14 @@ msgstr ""
 
 # type: textblock
 #. type: textblock
+#: dh_installudev:51
+#, fuzzy
+#| msgid "Do not modify F<postinst>/F<postrm> scripts."
+msgid "Do not modify F<preinst>/F<postinst> scripts."
+msgstr "No modifica los scripts F<postinst>/F<postrm>."
+
+# type: textblock
+#. type: textblock
 #: dh_installwm:5
 msgid "dh_installwm - register a window manager"
 msgstr "dh_installwm - Registra un gestor de ventanas"
@@ -6348,9 +6371,16 @@ msgstr ""
 # type: textblock
 #. type: textblock
 #: dh_installwm:18
+#, fuzzy
+#| msgid ""
+#| "B<dh_installwm> is a debhelper program that is responsible for generating "
+#| "the F<postinst> and F<postrm> commands that register a window manager "
+#| "with L<update-alternatives(8)>. The window manager's man page is also "
+#| "registered as a slave symlink (in v6 mode and up), if it is found in "
+#| "F<usr/share/man/man1/> in the package build directory."
 msgid ""
 "B<dh_installwm> is a debhelper program that is responsible for generating "
-"the F<postinst> and F<postrm> commands that register a window manager with "
+"the F<postinst> and F<prerm> commands that register a window manager with "
 "L<update-alternatives(8)>. The window manager's man page is also registered "
 "as a slave symlink (in v6 mode and up), if it is found in F<usr/share/man/"
 "man1/> in the package build directory."
@@ -6389,8 +6419,12 @@ msgstr ""
 # type: textblock
 #. type: textblock
 #: dh_installwm:46
+#, fuzzy
+#| msgid ""
+#| "Do not modify F<postinst>/F<postrm> scripts. Turns this command into a no-"
+#| "op."
 msgid ""
-"Do not modify F<postinst>/F<postrm> scripts. Turns this command into a no-op."
+"Do not modify F<postinst>/F<prerm> scripts. Turns this command into a no-op."
 msgstr ""
 "No modifica los scripts F<postinst>/F<postrm>. Si se especifica esta orden, "
 "no hará nada."
