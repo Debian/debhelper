@@ -26,7 +26,9 @@ F<postinst> and F<postrm> commands that register files with ucf(1) and ucfr(1).
 
 List pairs of source and destination files to register with ucf. Each pair
 should be put on its own line, with the source and destination separated by
-whitespace. Both source and destination must be absolute paths.
+whitespace. Both source and destination must be absolute paths. The source
+should be a file that is provided by your package, typically in /usr/share/,
+while the destination is typically a file in /etc/.
 
 A dependency on ucf will be generated in B<${misc:Depends}>.
 
