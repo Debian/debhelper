@@ -240,16 +240,19 @@ L<dh_listpackages(1)> to test what is being built. For example:
 	endif
 
 Finally, remember that you are not limited to using override targets in the
-rules file when using B<dh>. You can also explicitly define any of the regular
+rules file when using B<dh>. You can also explicitly define the regular
 rules file targets when it makes sense to do so. A common reason to do this
-is if your package needs different B<build-arch> and B<build-indep> targets. For
-example, a package with a long document build process can put it in
-B<build-indep> to avoid build daemons redundantly building the documentation.
+is if your package needs different B<build-arch> and B<build-indep> targets.
+For example, a package with a long document build process can put it in
+B<build-indep>.
 
 	#!/usr/bin/make -f
 	%:
 		dh $@
 	
+	binary: binary-arch binary-indep ;
+	binary-arch:: build-arch
+	binary-indep:: build-indep
 	build: build-arch build-indep ;
 	build-indep:
 		$(MAKE) docs
