@@ -609,7 +609,7 @@ sub filedoublearray {
 	my $globdir=shift;
 
 	my @ret;
-	open (DH_FARRAY_IN, $file) || error("cannot read $file: $1");
+	open (DH_FARRAY_IN, $file) || error("cannot read $file: $!");
 	while (<DH_FARRAY_IN>) {
 		chomp;
 		# Only ignore comments and empty lines in v5 mode.
