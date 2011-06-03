@@ -151,6 +151,16 @@ either and instead run your own commands.
 	override_dh_auto_build:
 		make universe-explode-in-delight
 
+If running a configure script, it may be necessary to prevent it being
+run twice, once for architecture-independent packages, and again for
+architecture-dependent packages.  This may be accomplished by
+overriding L<dh_autoconfigure(1)>:
+
+	override_dh_auto_configure: config.status
+
+	config.status:
+		dh_auto_configure -- $configure_options
+
 Another common case is wanting to do something manually before or
 after a particular debhelper command is run.
 
@@ -273,6 +283,13 @@ that is in the specified sequence. It then continues with the next command
 in the sequence. The B<--until>, B<--before>, B<--after>, and B<--remaining>
 options can override this behavior.
 
+A sequence can also run dependent targets in debian/rules.  For
+example, the "binary" sequence runs the "install" target.  This will
+show up in the dh output as "debian/rules install", but internally
+will be called "rules:install" in the sequence.  The "install"
+sequence likewise runs "debian/rules build", internally named
+"rules:build".
+
 B<dh> uses the B<DH_INTERNAL_OPTIONS> environment variable to pass information
 through to debhelper commands that are run inside override targets. The
 contents (and indeed, existence) of this environment variable, as the name
@@ -321,14 +338,20 @@ if (is_make_jobserver_unavailable()) {
 
 # Definitions of sequences.
 my %sequences;
-$sequences{build} = [qw{
+my @bd = qw{
 	dh_testdir
 	dh_auto_configure
 	dh_auto_build
 	dh_auto_test
-}],
-$sequences{'build-indep'} = [@{$sequences{build}}];
-$sequences{'build-arch'} = [@{$sequences{build}}];
+};
+# The build sequences will call 'debian/rules build-arch' and
+# 'debian/rules build-indep' after running the standard sequence;
+# these will typically be no-ops but this permits the standard targets
+# to be customised by the user and still run as a side-effect of the
+# build target.
+$sequences{build} = [@bd, 'rules:build-arch', 'rules:build-indep'];
+$sequences{'build-indep'} = [@bd];
+$sequences{'build-arch'} = [@bd];
 $sequences{clean} = [qw{
 	dh_testdir
 	dh_auto_clean
@@ -376,9 +399,15 @@ my @i = qw{
 	dh_compress
 	dh_fixperms
 };
-$sequences{'install'} = [@{$sequences{build}}, @i];
-$sequences{'install-indep'} = [@{$sequences{'build-indep'}}, @i];
-$sequences{'install-arch'} = [@{$sequences{'build-arch'}}, @i];
+# The install sequences will call 'debian/rules build' before running
+# the standard sequence, and 'debian/rules install-arch' and
+# 'debian/rules install-indep' after running the standard sequence;
+# these will typically be no-ops but this permits the install-arch and
+# install-indep targets to be customised by the user and still run as
+# a side-effect of the install target.
+$sequences{'install'} = ['rules:build', @i, 'rules:install-arch', 'rules:install-indep'];
+$sequences{'install-indep'} = ['rules:build-indep', @i];
+$sequences{'install-arch'} = ['rules:build-arch', @i];
 my @ba=qw{
 	dh_strip
 	dh_makeshlibs
@@ -390,9 +419,11 @@ my @b=qw{
 	dh_md5sums
 	dh_builddeb
 };
-$sequences{binary} = [@{$sequences{install}}, @ba, @b];
-$sequences{'binary-indep'} = [@{$sequences{'install-indep'}}, @b];
-$sequences{'binary-arch'} = [@{$sequences{'install-arch'}}, @ba, @b];
+# The binary sequences will call 'debian/rules install' before running
+# the standard sequence.
+$sequences{binary} = ['rules:install', 'rules:binary-arch', 'rules:binary-indep'];
+$sequences{'binary-indep'} = ['rules:install-indep', @b];
+$sequences{'binary-arch'} = ['rules:install-arch', @ba, @b];
 
 # Additional command options
 my %command_opts;
@@ -641,11 +672,29 @@ sub run {
 	# to prevent them from being acted on.
 	push @options, map { "-N$_" } @exclude;
 
+	# If the command has a rules: prefix, run debian/rules with
+	# the remainder as the target.
+	my $rules_target = undef;
+	if ($command =~ /^rules:(.*)/) {
+		$rules_target = $1;
+	}
+
 	# Check for override targets in debian/rules and
 	# run them instead of running the command directly.
 	my $override_command;
 	my $has_explicit_target = rules_explicit_target("override_".$command);
-	if (defined $has_explicit_target) {
+
+	if (defined $rules_target) {
+		# Don't pass DH_ environment variables, since this is
+		# a fresh invocation of debian/rules and any sub-dh
+		# commands.
+		$override_command=$command;
+		delete $ENV{DH_INTERNAL_OPTIONS};
+		delete $ENV{DH_INTERNAL_OVERRIDE};
+		$command="debian/rules";
+		@options=$rules_target;
+	}
+	elsif (defined $has_explicit_target) {
 		$override_command=$command;
 		# Check if target isn't noop
 		if ($has_explicit_target) {
