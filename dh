@@ -151,16 +151,6 @@ either and instead run your own commands.
 	override_dh_auto_build:
 		make universe-explode-in-delight
 
-If running a configure script, it may be necessary to prevent it being
-run twice, once for architecture-independent packages, and again for
-architecture-dependent packages.  This may be accomplished by
-overriding L<dh_autoconfigure(1)>:
-
-	override_dh_auto_configure: config.status
-
-	config.status:
-		dh_auto_configure -- $configure_options
-
 Another common case is wanting to do something manually before or
 after a particular debhelper command is run.
 
@@ -250,9 +240,9 @@ L<dh_listpackages(1)> to test what is being built. For example:
 	endif
 
 Finally, remember that you are not limited to using override targets in the
-rules file when using B<dh>. You can also explicitly define the regular
+rules file when using B<dh>. You can also explicitly define any of the regular
 rules file targets when it makes sense to do so. A common reason to do this
-is if your package needs different B<build-arch> and B<build-indep> targets.
+is when your package needs different B<build-arch> and B<build-indep> targets.
 For example, a package with a long document build process can put it in
 B<build-indep>.
 
@@ -260,14 +250,14 @@ B<build-indep>.
 	%:
 		dh $@
 	
-	binary: binary-arch binary-indep ;
-	binary-arch:: build-arch
-	binary-indep:: build-indep
-	build: build-arch build-indep ;
 	build-indep:
 		$(MAKE) docs
 	build-arch:
 		$(MAKE) bins
+
+Note that in the example above, dh will arrange for "debian/rules build"
+to call your build-indep and build-arch targets. You do not need to
+explicitly define the dependencies in the rules file when using dh.
 
 =head1 INTERNALS
 
@@ -284,11 +274,7 @@ in the sequence. The B<--until>, B<--before>, B<--after>, and B<--remaining>
 options can override this behavior.
 
 A sequence can also run dependent targets in debian/rules.  For
-example, the "binary" sequence runs the "install" target.  This will
-show up in the dh output as "debian/rules install", but internally
-will be called "rules:install" in the sequence.  The "install"
-sequence likewise runs "debian/rules build", internally named
-"rules:build".
+example, the "binary" sequence runs the "install" target.
 
 B<dh> uses the B<DH_INTERNAL_OPTIONS> environment variable to pass information
 through to debhelper commands that are run inside override targets. The
