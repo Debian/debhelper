@@ -346,12 +346,9 @@ my @bd = (@bd_minimal, qw{
 	dh_auto_build
 	dh_auto_test
 });
-# The build sequences will call 'debian/rules build-arch' and
-# 'debian/rules build-indep' after running the standard sequence;
-# these will typically be no-ops but this permits the standard targets
-# to be customised by the user and still run as a side-effect of the
-# build target.
-$sequences{build} = [@bd, 'rules:build-arch', 'rules:build-indep'];
+# rules:build-arch and rules:build-indep are not called by build,
+# as an optimisation (code below will adjust this if explicit targets exist).
+$sequences{build} = [@bd];
 $sequences{'build-indep'} = [@bd];
 $sequences{'build-arch'} = [@bd];
 $sequences{clean} = [qw{
@@ -403,12 +400,10 @@ my @i = (@i_minimal, qw{
 	dh_compress
 	dh_fixperms
 });
-# The install sequences will call 'debian/rules build' before running
-# the standard sequence, and 'debian/rules install-arch' and
-# 'debian/rules install-indep' after running the standard sequence;
-# these will typically be no-ops but this permits the install-arch and
-# install-indep targets to be customised by the user and still run as
-# a side-effect of the install target.
+# The install sequences will call rules:build before running
+# the standard sequence. rules:install-arch and rules:install-indep
+# are not called by install, as an optimisation (code below will adjust
+# this if explicit targets exist).
 $sequences{'install'} = ['rules:build', @i, 'rules:install-arch', 'rules:install-indep'];
 $sequences{'install-indep'} = ['rules:build-indep', @i];
 $sequences{'install-arch'} = ['rules:build-arch', @i];
