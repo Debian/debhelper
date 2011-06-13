@@ -340,12 +340,13 @@ if (is_make_jobserver_unavailable()) {
 my %sequences;
 my @bd_minimal = qw{
 	dh_testdir
-	dh_auto_configure
 };
-my @bd = (@bd_minimal, qw{
+my @bd = qw{
+	dh_testdir
+	dh_auto_configure
 	dh_auto_build
 	dh_auto_test
-});
+	};
 # rules:build-arch and rules:build-indep are not called by build,
 # as an optimisation (code below will adjust this if explicit targets exist).
 $sequences{build} = [@bd];
@@ -359,7 +360,8 @@ $sequences{clean} = [qw{
 my @i_minimal = qw{
 	dh_testroot
 };
-my @i = (@i_minimal, qw{
+my @i = qw{
+	dh_testroot
 	dh_prep
 	dh_installdirs
 	dh_auto_install
@@ -399,7 +401,7 @@ my @i = (@i_minimal, qw{
 	dh_link
 	dh_compress
 	dh_fixperms
-});
+};
 # The install sequences will call rules:build before running
 # the standard sequence. rules:install-arch and rules:install-indep
 # are not called by install, as an optimisation (code below will adjust
