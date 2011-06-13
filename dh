@@ -342,12 +342,10 @@ my @bd_minimal = qw{
 	dh_testdir
 	dh_auto_configure
 };
-my @bd = qw{
-	dh_testdir
-	dh_auto_configure
+my @bd = (@bd_minimal, qw{
 	dh_auto_build
 	dh_auto_test
-};
+});
 # The build sequences will call 'debian/rules build-arch' and
 # 'debian/rules build-indep' after running the standard sequence;
 # these will typically be no-ops but this permits the standard targets
@@ -364,8 +362,7 @@ $sequences{clean} = [qw{
 my @i_minimal = qw{
 	dh_testroot
 };
-my @i = qw{
-	dh_testroot
+my @i = (@i_minimal, qw{
 	dh_prep
 	dh_installdirs
 	dh_auto_install
@@ -405,7 +402,7 @@ my @i = qw{
 	dh_link
 	dh_compress
 	dh_fixperms
-};
+});
 # The install sequences will call 'debian/rules build' before running
 # the standard sequence, and 'debian/rules install-arch' and
 # 'debian/rules install-indep' after running the standard sequence;
@@ -547,10 +544,11 @@ else {
 if (! defined $sequence) {
 	error "specify a sequence to run";
 }
+# make -B causes the rules file to be run as a target.
+# Also support completly empty override targets.
+# Note: it's not safe to use rules_explicit_target before this check.
 if ($sequence eq 'debian/rules' ||
     $sequence =~ /^override_dh_/) {
-	# make -B causes the rules file to be run as a target.
-	# Also support completly empty override targets.
 	exit 0;
 }
 elsif (! exists $sequences{$sequence}) {
@@ -558,14 +556,10 @@ elsif (! exists $sequences{$sequence}) {
 		join(" ", sort keys %sequences).")";
 }
 
-# Note: it's not safe to run rules_explicit_target before this point
-# due to dh being recursively invoked with debhelper-fail-me as the
-# sequence
-# If debian/rules defines build-arch or build-indep, run sequences
-# separately.
+# If debian/rules defines build-arch or build-indep, run sequences separately.
 if (rules_explicit_target('build-arch') ||
     rules_explicit_target('build-indep')) {
-    $sequences{build} = [@bd_minimal, 'rules:build-arch', 'rules:build-indep'];
+	$sequences{build} = [@bd_minimal, 'rules:build-arch', 'rules:build-indep'];
 }
 # If debian/rules defines install-arch or install-indep, run sequences
 # separately.
