@@ -257,7 +257,9 @@ B<build-indep>.
 
 Note that in the example above, dh will arrange for "debian/rules build"
 to call your build-indep and build-arch targets. You do not need to
-explicitly define the dependencies in the rules file when using dh.
+explicitly define the dependencies in the rules file when using dh with
+compatability level v9. This example would be more complicated with
+earlier compatability levels.
 
 =head1 INTERNALS
 
@@ -362,22 +364,6 @@ my @bd = qw{
 	dh_auto_build
 	dh_auto_test
 };
-$sequences{'build-indep'} = [@bd];
-$sequences{'build-arch'} = [@bd];
-if (rules_explicit_target('build-arch') ||
-    rules_explicit_target('build-indep')) {
-	# run sequences separately
-	$sequences{build} = [@bd_minimal, 'rules:build-arch', 'rules:build-indep'];
-}
-else {
-	# run standard sequence (this is faster)
-	$sequences{build} = [@bd];
-}
-$sequences{clean} = [qw{
-	dh_testdir
-	dh_auto_clean
-	dh_clean
-}];
 my @i_minimal = qw{
 	dh_testroot
 };
@@ -423,17 +409,6 @@ my @i = qw{
 	dh_compress
 	dh_fixperms
 };
-$sequences{'install-indep'} = ['rules:build-indep', @i];
-$sequences{'install-arch'} = ['rules:build-arch', @i];
-if (rules_explicit_target('install-arch') ||
-    rules_explicit_target('install-indep')) {
-    	# run sequences separately
-	$sequences{'install'} = ['rules:build', @i_minimal, 'rules:install-arch', 'rules:install-indep'];
-}
-else {
-	# run standard sequence (this is faster)
-	$sequences{'install'} = ['rules:build', @i, 'rules:install-arch', 'rules:install-indep'];
-}
 my @ba=qw{
 	dh_strip
 	dh_makeshlibs
@@ -445,9 +420,48 @@ my @b=qw{
 	dh_md5sums
 	dh_builddeb
 };
-$sequences{'binary-indep'} = ['rules:install-indep', @b];
-$sequences{'binary-arch'} = ['rules:install-arch', @ba, @b];
-$sequences{binary} = ['rules:install', 'rules:binary-arch', 'rules:binary-indep'];
+$sequences{clean} = [qw{
+	dh_testdir
+	dh_auto_clean
+	dh_clean
+}];
+$sequences{'build-indep'} = [@bd];
+$sequences{'build-arch'} = [@bd];
+if (! compat(8)) {
+	# From v9, sequences take standard rules targets into account.
+	if (rules_explicit_target('build-arch') ||
+	    rules_explicit_target('build-indep')) {
+		# run sequences separately
+		$sequences{build} = [@bd_minimal, 'rules:build-arch', 'rules:build-indep'];
+	}
+	else {
+		# run standard sequence (this is faster)
+		$sequences{build} = [@bd];
+	}
+	$sequences{'install-indep'} = ['rules:build-indep', @i];
+	$sequences{'install-arch'} = ['rules:build-arch', @i];
+	if (rules_explicit_target('install-arch') ||
+	    rules_explicit_target('install-indep')) {
+		# run sequences separately
+		$sequences{'install'} = ['rules:build', @i_minimal, 'rules:install-arch', 'rules:install-indep'];
+	}
+	else {
+		# run standard sequence (this is faster)
+		$sequences{'install'} = ['rules:build', @i, 'rules:install-arch', 'rules:install-indep'];
+	}
+	$sequences{'binary-indep'} = ['rules:install-indep', @b];
+	$sequences{'binary-arch'} = ['rules:install-arch', @ba, @b];
+	$sequences{binary} = ['rules:install', 'rules:binary-arch', 'rules:binary-indep'];
+}
+else {
+	$sequences{build} = [@bd];
+	$sequences{'install'} = [@{$sequences{build}}, @i];
+	$sequences{'install-indep'} = [@{$sequences{'build-indep'}}, @i];
+	$sequences{'install-arch'} = [@{$sequences{'build-arch'}}, @i];
+	$sequences{binary} = [@{$sequences{install}}, @ba, @b];
+	$sequences{'binary-indep'} = [@{$sequences{'install-indep'}}, @b];
+	$sequences{'binary-arch'} = [@{$sequences{'install-arch'}}, @ba, @b];
+}
 
 # Additional command options
 my %command_opts;
