@@ -322,6 +322,35 @@ if (is_make_jobserver_unavailable()) {
 	clean_jobserver_makeflags();
 }
 
+# Process the sequence parameter.
+my $sequence;
+if (! compat(7)) {
+	# From v8, the sequence is the very first parameter.
+	$sequence=shift @ARGV_orig;
+	if ($sequence=~/^-/) {
+		error "Unknown sequence $sequence (options should not come before the sequence)";
+	}
+}
+else {
+	# Before v8, the sequence could be at any position in the parameters,
+	# so was what was left after parsing.
+	$sequence=shift;
+	if (defined $sequence) {
+		@ARGV_orig=grep { $_ ne $sequence } @ARGV_orig;
+	}
+}
+if (! defined $sequence) {
+	error "specify a sequence to run";
+}
+# make -B causes the rules file to be run as a target.
+# Also support completly empty override targets.
+# Note: it's not safe to use rules_explicit_target before this check.
+if ($sequence eq 'debian/rules' ||
+    $sequence =~ /^override_dh_/) {
+	exit 0;
+}
+
+
 # Definitions of sequences.
 my %sequences;
 my @bd_minimal = qw{
@@ -332,12 +361,18 @@ my @bd = qw{
 	dh_auto_configure
 	dh_auto_build
 	dh_auto_test
-	};
-# rules:build-arch and rules:build-indep are not called by build,
-# as an optimisation (code below will adjust this if explicit targets exist).
-$sequences{build} = [@bd];
+};
 $sequences{'build-indep'} = [@bd];
 $sequences{'build-arch'} = [@bd];
+if (rules_explicit_target('build-arch') ||
+    rules_explicit_target('build-indep')) {
+	# run sequences separately
+	$sequences{build} = [@bd_minimal, 'rules:build-arch', 'rules:build-indep'];
+}
+else {
+	# run standard sequence (this is faster)
+	$sequences{build} = [@bd];
+}
 $sequences{clean} = [qw{
 	dh_testdir
 	dh_auto_clean
@@ -388,13 +423,17 @@ my @i = qw{
 	dh_compress
 	dh_fixperms
 };
-# The install sequences will call rules:build before running
-# the standard sequence. rules:install-arch and rules:install-indep
-# are not called by install, as an optimisation (code below will adjust
-# this if explicit targets exist).
-$sequences{'install'} = ['rules:build', @i, 'rules:install-arch', 'rules:install-indep'];
 $sequences{'install-indep'} = ['rules:build-indep', @i];
 $sequences{'install-arch'} = ['rules:build-arch', @i];
+if (rules_explicit_target('install-arch') ||
+    rules_explicit_target('install-indep')) {
+    	# run sequences separately
+	$sequences{'install'} = ['rules:build', @i_minimal, 'rules:install-arch', 'rules:install-indep'];
+}
+else {
+	# run standard sequence (this is faster)
+	$sequences{'install'} = ['rules:build', @i, 'rules:install-arch', 'rules:install-indep'];
+}
 my @ba=qw{
 	dh_strip
 	dh_makeshlibs
@@ -406,11 +445,9 @@ my @b=qw{
 	dh_md5sums
 	dh_builddeb
 };
-# The binary sequences will call 'debian/rules install' before running
-# the standard sequence.
-$sequences{binary} = ['rules:install', 'rules:binary-arch', 'rules:binary-indep'];
 $sequences{'binary-indep'} = ['rules:install-indep', @b];
 $sequences{'binary-arch'} = ['rules:install-arch', @ba, @b];
+$sequences{binary} = ['rules:install', 'rules:binary-arch', 'rules:binary-indep'];
 
 # Additional command options
 my %command_opts;
@@ -499,6 +536,7 @@ sub list_addons {
 	exit 0;
 }
 
+# Load addons, which can modify sequences.
 foreach my $addon (@{$dh{WITH}}) {
 	my $mod="Debian::Debhelper::Sequence::$addon";
 	$mod=~s/-/_/g;
@@ -508,49 +546,10 @@ foreach my $addon (@{$dh{WITH}}) {
 	}
 }
 
-my $sequence;
-if (! compat(7)) {
-	# From v8, the sequence is the very first parameter.
-	$sequence=shift @ARGV_orig;
-	if ($sequence=~/^-/) {
-		error "Unknown sequence $sequence (options should not come before the sequence)";
-	}
-}
-else {
-	# Before v8, the sequence could be at any position in the parameters,
-	# so was what was left after parsing.
-	$sequence=shift;
-	if (defined $sequence) {
-		@ARGV_orig=grep { $_ ne $sequence } @ARGV_orig;
-	}
-}
-if (! defined $sequence) {
-	error "specify a sequence to run";
-}
-# make -B causes the rules file to be run as a target.
-# Also support completly empty override targets.
-# Note: it's not safe to use rules_explicit_target before this check.
-if ($sequence eq 'debian/rules' ||
-    $sequence =~ /^override_dh_/) {
-	exit 0;
-}
-elsif (! exists $sequences{$sequence}) {
+if (! exists $sequences{$sequence}) {
 	error "Unknown sequence $sequence (choose from: ".
 		join(" ", sort keys %sequences).")";
 }
-
-# If debian/rules defines build-arch or build-indep, run sequences separately.
-if (rules_explicit_target('build-arch') ||
-    rules_explicit_target('build-indep')) {
-	$sequences{build} = [@bd_minimal, 'rules:build-arch', 'rules:build-indep'];
-}
-# If debian/rules defines install-arch or install-indep, run sequences
-# separately.
-if (rules_explicit_target('install-arch') ||
-    rules_explicit_target('install-indep')) {
-	$sequences{'install'} = ['rules:build', @i_minimal, 'rules:install-arch', 'rules:install-indep'];
-}
-
 my @sequence=@{$sequences{$sequence}};
 
 # The list of all packages that can be acted on.
