@@ -778,7 +778,7 @@ sub optimize_sequence {
 	foreach my $command (@_) {
 		my $rules_target=rules_target($command);
 		if (defined $rules_target &&
-		    ! rules_explicit_target($rules_target)) {
+		    ! defined rules_explicit_target($rules_target)) {
 			# inline the sequence for this implicit target
 			$add->($_) foreach optimize_sequence(@{$sequences{$rules_target}});
 		}
