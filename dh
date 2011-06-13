@@ -550,7 +550,7 @@ if (! exists $sequences{$sequence}) {
 	error "Unknown sequence $sequence (choose from: ".
 		join(" ", sort keys %sequences).")";
 }
-my @sequence=@{$sequences{$sequence}};
+my @sequence=optimize_sequence(@{$sequences{$sequence}});
 
 # The list of all packages that can be acted on.
 my @packages=@{$dh{DOPACKAGES}};
@@ -672,18 +672,14 @@ sub run {
 	# to prevent them from being acted on.
 	push @options, map { "-N$_" } @exclude;
 
-	# If the command has a rules: prefix, run debian/rules with
-	# the remainder as the target.
-	my $rules_target = undef;
-	if ($command =~ /^rules:(.*)/) {
-		$rules_target = $1;
-	}
-
 	# Check for override targets in debian/rules and
 	# run them instead of running the command directly.
 	my $override_command;
 	my $has_explicit_target = rules_explicit_target("override_".$command);
 
+	# If the command has a rules: prefix, run debian/rules with
+	# the remainder as the target.
+	my $rules_target = rules_target($command);
 	if (defined $rules_target) {
 		# Don't pass DH_ environment variables, since this is
 		# a fresh invocation of debian/rules and any sub-dh
@@ -750,6 +746,42 @@ sub run {
 			delete $ENV{DH_INTERNAL_OPTIONS};
 			delete $ENV{DH_INTERNAL_OVERRIDE};
 		}
+	}
+}
+
+sub optimize_sequence {
+	my @sequence;
+	my %seen;
+	my $add=sub {
+		# commands can appear multiple times when sequences are
+		# inlined together; only the first should be needed
+		my $command=shift;
+		if (! $seen{$command}) {
+			$seen{$command}=1;
+			push @sequence, $command;
+		}
+	};
+	foreach my $command (@_) {
+		my $rules_target=rules_target($command);
+		if (defined $rules_target &&
+		    ! rules_explicit_target($rules_target)) {
+			# inline the sequence for this implicit target
+			$add->($_) foreach optimize_sequence(@{$sequences{$rules_target}});
+		}
+		else {
+			$add->($command);
+		}
+	}
+	return @sequence;
+}
+
+sub rules_target {
+	my $command=shift;
+	if ($command =~ /^rules:(.*)/) {
+		return $1
+	}
+	else {
+		return undef;
 	}
 }
 
