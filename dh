@@ -435,26 +435,26 @@ if (! compat(8)) {
 	if (rules_explicit_target('build-arch') ||
 	    rules_explicit_target('build-indep')) {
 		# run sequences separately
-		$sequences{build} = [@bd_minimal, 'rules:build-arch', 'rules:build-indep'];
+		$sequences{build} = [@bd_minimal, rules("build-arch"), rules("build-indep")];
 	}
 	else {
 		# run standard sequence (this is faster)
 		$sequences{build} = [@bd];
 	}
-	$sequences{'install-indep'} = ['rules:build-indep', @i];
-	$sequences{'install-arch'} = ['rules:build-arch', @i];
+	$sequences{'install-indep'} = [rules("build-indep"), @i];
+	$sequences{'install-arch'} = [rules("build-arch"), @i];
 	if (rules_explicit_target('install-arch') ||
 	    rules_explicit_target('install-indep')) {
 		# run sequences separately
-		$sequences{'install'} = ['rules:build', @i_minimal, 'rules:install-arch', 'rules:install-indep'];
+		$sequences{'install'} = [rules("build"), @i_minimal, rules("install-arch"), rules("install-indep")];
 	}
 	else {
 		# run standard sequence (this is faster)
-		$sequences{'install'} = ['rules:build', @i, 'rules:install-arch', 'rules:install-indep'];
+		$sequences{'install'} = [rules("build"), @i, rules("install-arch"), rules("install-indep")];
 	}
-	$sequences{'binary-indep'} = ['rules:install-indep', @b];
-	$sequences{'binary-arch'} = ['rules:install-arch', @ba, @b];
-	$sequences{binary} = ['rules:install', 'rules:binary-arch', 'rules:binary-indep'];
+	$sequences{'binary-indep'} = [rules("install-indep"), @b];
+	$sequences{'binary-arch'} = [rules("install-arch"), @ba, @b];
+	$sequences{binary} = [rules("install"), rules("binary-arch"), rules("binary-indep")];
 }
 else {
 	$sequences{build} = [@bd];
@@ -694,8 +694,6 @@ sub run {
 	my $override_command;
 	my $has_explicit_target = rules_explicit_target("override_".$command);
 
-	# If the command has a rules: prefix, run debian/rules with
-	# the remainder as the target.
 	my $rules_target = rules_target($command);
 	if (defined $rules_target) {
 		# Don't pass DH_ environment variables, since this is
@@ -794,12 +792,16 @@ sub optimize_sequence {
 
 sub rules_target {
 	my $command=shift;
-	if ($command =~ /^rules:(.*)/) {
+	if ($command =~ /^debian\/rules\s+(.*)/) {
 		return $1
 	}
 	else {
 		return undef;
 	}
+}
+
+sub rules {
+	return "debian/rules ".@_;
 }
 
 {
