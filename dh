@@ -278,6 +278,9 @@ options can override this behavior.
 A sequence can also run dependent targets in debian/rules.  For
 example, the "binary" sequence runs the "install" target.
 
+B<dh> sets environment variables listed by B<dpkg-buildflags>, unless
+they are already set. It supports DEB_BUILD_OPTIONS=noopt too.
+
 B<dh> uses the B<DH_INTERNAL_OPTIONS> environment variable to pass information
 through to debhelper commands that are run inside override targets. The
 contents (and indeed, existence) of this environment variable, as the name
@@ -315,7 +318,7 @@ init(options => {
 	bundling => 0,
 );
 inhibit_log();
-
+set_buildflags();
 
 # If make is using a jobserver, but it is not available
 # to this process, clean out MAKEFLAGS. This avoids
