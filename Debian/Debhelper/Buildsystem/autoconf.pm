@@ -38,9 +38,14 @@ sub configure {
 	push @opts, "--sysconfdir=/etc";
 	push @opts, "--localstatedir=/var";
 	my $multiarch=dpkg_architecture_value("DEB_HOST_MULTIARCH");
-	if (! compat(8) && defined $multiarch) {
-		push @opts, "--libdir=\${prefix}/lib/$multiarch";
-		push @opts, "--libexecdir=\${prefix}/lib/$multiarch";
+	if (! compat(8)) {
+	       if (defined $multiarch) {
+			push @opts, "--libdir=\${prefix}/lib/$multiarch";
+			push @opts, "--libexecdir=\${prefix}/lib/$multiarch";
+		}
+		else {
+			push @opts, "--libexecdir=\${prefix}/lib";
+		}
 	}
 	else {
 		push @opts, "--libexecdir=\${prefix}/lib/" . sourcepackage();
