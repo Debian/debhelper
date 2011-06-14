@@ -18,7 +18,7 @@ use vars qw(@ISA @EXPORT %dh);
 	    &inhibit_log &load_log &write_log &commit_override_log
 	    &dpkg_architecture_value &sourcepackage
 	    &is_make_jobserver_unavailable &clean_jobserver_makeflags
-	    &cross_command);
+	    &cross_command &set_buildflags);
 
 my $max_compat=9;
 
@@ -897,6 +897,37 @@ sub cross_command {
 	}
 	else {
 		return $command;
+	}
+}
+
+# Sets environment variables from dpkg-buildflags. Avoids changing
+# any existing environment variables. Supports DEB_BUILD_OPTIONS=noopt.
+sub set_buildflags {
+	# optimisation
+	return if $ENV{DH_INTERNAL_BUILDFLAGS};
+	$ENV{DH_INTERNAL_BUILDFLAGS}=1;
+
+	my $noopt=$ENV{DEB_BUILD_OPTIONS}=~/noopt/;
+
+	my @shell=`dpkg-buildflags --export`;
+	foreach my $line (@shell) {
+		chomp $line;
+		if ($line=~/^export\s+([^=]+)=(["'])(.*)\2$/) {
+			my $var=$1;
+			my $val=$3;
+			if ($noopt) {
+				$val=$ENV{$var} if exists $ENV{$var};
+				$val=~s/-O\d+/-O0/;
+				$ENV{$var}=$val;
+				next;
+			}
+			elsif (! exists $ENV{$var}) {
+				$ENV{$var}=$val;
+			}
+		}
+		else {
+			warning "unparsable line from dpkg-buildflags: $line";
+		}
 	}
 }
 

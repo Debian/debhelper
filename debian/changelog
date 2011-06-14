@@ -5,6 +5,12 @@ debhelper (8.1.7) UNRELEASED; urgency=low
   * dh_movefiles: Optimise use of xargs. Closes: #627737
   * dh_auto_configure: In v9, does not include the source package name
     in --libexecdir when using autoconf. Closes: #541458
+  * dh_auto_build, dh_auto_configure, dh: Set environment variables
+    listed by dpkg-buildflags --export. Any environment variables that
+    are already set to other values will not be changed.
+    Closes: #544844
+  * Also, support DEB_BUILD_OPTIONS=noopt, by changing -O2 to -O0
+    in any variables listed by dpkg-buildflags.
 
  -- Joey Hess <joeyh@debian.org>  Sat, 21 May 2011 15:24:19 -0400
 
