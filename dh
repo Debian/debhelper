@@ -346,9 +346,12 @@ if (! defined $sequence) {
 }
 # make -B causes the rules file to be run as a target.
 # Also support completly empty override targets.
-# Note: it's not safe to use rules_explicit_target before this check.
+# Note: it's not safe to use rules_explicit_target before this check,
+# since it causes dh to be run.
+my $dummy_target="debhelper-fail-me";
 if ($sequence eq 'debian/rules' ||
-    $sequence =~ /^override_dh_/) {
+    $sequence =~ /^override_dh_/ ||
+    $sequence eq $dummy_target) {
 	exit 0;
 }
 
@@ -814,7 +817,7 @@ sub rules_explicit_target {
 		my $processing_targets = 0;
 		my $not_a_target = 0;
 		my $current_target;
-		open(MAKE, "LC_ALL=C make -Rrnpsf debian/rules debhelper-fail-me 2>/dev/null |");
+		open(MAKE, "LC_ALL=C make -Rrnpsf debian/rules $dummy_target 2>/dev/null |");
 		while (<MAKE>) {
 			if ($processing_targets) {
 				if (/^# Not a target:/) {
