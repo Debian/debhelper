@@ -901,32 +901,23 @@ sub cross_command {
 }
 
 # Sets environment variables from dpkg-buildflags. Avoids changing
-# any existing environment variables. Supports DEB_BUILD_OPTIONS=noopt.
+# any existing environment variables.
 sub set_buildflags {
 	# optimisation
 	return if $ENV{DH_INTERNAL_BUILDFLAGS};
 	$ENV{DH_INTERNAL_BUILDFLAGS}=1;
 
-	my $noopt=$ENV{DEB_BUILD_OPTIONS}=~/noopt/;
+	eval "use Dpkg::BuildFlags";
+	if ($@) {
+		warning "unable to load build flags: $@";
+	}
 
-	my @shell=`dpkg-buildflags --export`;
-	foreach my $line (@shell) {
-		chomp $line;
-		if ($line=~/^export\s+([^=]+)=(["'])(.*)\2$/) {
-			my $var=$1;
-			my $val=$3;
-			if ($noopt) {
-				$val=$ENV{$var} if exists $ENV{$var};
-				$val=~s/-O\d+/-O0/;
-				$ENV{$var}=$val;
-				next;
-			}
-			elsif (! exists $ENV{$var}) {
-				$ENV{$var}=$val;
-			}
-		}
-		else {
-			warning "unparsable line from dpkg-buildflags: $line";
+	my $buildflags = Dpkg::BuildFlags->new();
+	$buildflags->load_config();
+	foreach my $flag ($buildflags->list()) {
+		next unless $flag =~ /^[A-Z]/; # Skip flags starting with lowercase
+		if (! exists $ENV{$flag}) {
+			$ENV{$flag} = $buildflags->get($flag);
 		}
 	}
 }
