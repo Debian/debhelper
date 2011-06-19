@@ -910,6 +910,7 @@ sub set_buildflags {
 	eval "use Dpkg::BuildFlags";
 	if ($@) {
 		warning "unable to load build flags: $@";
+		return;
 	}
 
 	my $buildflags = Dpkg::BuildFlags->new();
