@@ -917,7 +917,7 @@ sub set_buildflags {
 	$buildflags->load_config();
 	foreach my $flag ($buildflags->list()) {
 		next unless $flag =~ /^[A-Z]/; # Skip flags starting with lowercase
-		if (! exists $ENV{$flag}) {
+		if (! exists $ENV{$flag} || $buildflags->get_origin($flag) eq "env") {
 			$ENV{$flag} = $buildflags->get($flag);
 		}
 	}
