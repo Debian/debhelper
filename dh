@@ -193,18 +193,6 @@ sequence addons like this:
 	%:
 		dh $@ --with quilt
 
-In order to override standard build flags, export appropriate environment
-variables as documented in the L<dpkg-buildflags(1)> manual page. They will be
-preferred over directly exported their counterparts (CFLAGS, CXXFLAGS, LDFLAGS
-etc.). For example, to append -Wall to the standard CFLAGS and CXXFLAGS, use:
-
-	#!/usr/bin/make -f
-	export DEB_CFLAGS_APPEND = -Wall
-	export DEB_CXXFLAGS_APPEND = -Wall
-	
-	%:
-		dh $@
-
 Here is an example of overriding where the B<dh_auto_>I<*> commands find
 the package's source, for a package where the source is located in a
 subdirectory.
