@@ -16,9 +16,9 @@ B<dh_python> [S<I<debhelper options>>] [B<-n>] [B<-V> I<version>] [S<I<module di
 
 =head1 DESCRIPTION
 
-Note: This program is deprecated. You should use B<dh_pysupport> or
-B<dh_pycentral> instead. This program will do nothing if F<debian/pycompat>
-or a B<Python-Version> F<control> file field exists.
+Note: This program is deprecated. You should use B<dh_python2> instead.
+This program will do nothing if F<debian/pycompat> or a
+B<Python-Version> F<control> file field exists.
 
 B<dh_python> is a debhelper program that is responsible for generating the
 B<${python:Depends}> substitutions and adding them to substvars files. It
@@ -78,11 +78,11 @@ if (-e "debian/pycompat") {
 	exit 0;
 }
 elsif (`grep Python-Version: debian/control`) {
-	warning("Doing nothing since Python-Version is set; dh_pysupport or dh_pycentral should do the work. You can remove dh_python from your rules file.");
+	warning("Doing nothing since Python-Version is set; dh_python2 should do the work. You can remove dh_python from your rules file.");
 	exit 0;
 }
 else {
-	warning("This program is deprecated, you should use dh_pysupport or dh_pycentral instead.");
+	warning("This program is deprecated, you should use dh_python2 instead.");
 }
 
 my $python = 'python';
