@@ -335,7 +335,7 @@ my $sequence;
 if (! compat(7)) {
 	# From v8, the sequence is the very first parameter.
 	$sequence=shift @ARGV_orig;
-	if ($sequence=~/^-/) {
+	if (defined $sequence && $sequence=~/^-/) {
 		error "Unknown sequence $sequence (options should not come before the sequence)";
 	}
 }
