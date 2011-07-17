@@ -10,7 +10,7 @@ sub DESCRIPTION {
 }
 
 sub configure {
-        my $this=shift;
+	my $this=shift;
 	$Debian::Debhelper::Buildsystem::qmake::qmake="qmake-qt4";
 	$this->SUPER::configure(@_);
 }
