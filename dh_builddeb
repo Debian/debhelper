@@ -85,8 +85,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (! defined $pid) {
 		error("fork failed! $!");
 	}
-	$processes++;
 	if ($pid) { # parent
+		$processes++;
 		reap while $processes > $max_procs;
 		next;
 	}
