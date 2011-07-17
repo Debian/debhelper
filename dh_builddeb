@@ -104,9 +104,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			doit("dpkg-deb", @{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$filename);
 		}
 		exit (0) if ($max_procs > 1);
-	} else {
+	}
+	else {
 		if (!defined $pid) {
-			error("fork failed!");
+			error("fork failed! $!");
 		}
 		$processes++;
 	}
