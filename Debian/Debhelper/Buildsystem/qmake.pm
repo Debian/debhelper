@@ -11,6 +11,8 @@ use warnings;
 use Debian::Debhelper::Dh_Lib qw(error);
 use base 'Debian::Debhelper::Buildsystem::makefile';
 
+our $qmake="qmake";
+
 sub DESCRIPTION {
 	"qmake (*.pro)";
 }
@@ -66,7 +68,7 @@ sub configure {
 	push @flags, "QMAKE_STRIP=:";
 	push @flags, "PREFIX=/usr";
 
-	$this->doit_in_builddir('qmake', @options, @flags, @_);
+	$this->doit_in_builddir($qmake, @options, @flags, @_);
 }
 
 sub install {

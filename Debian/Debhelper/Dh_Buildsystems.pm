@@ -28,6 +28,7 @@ our @BUILDSYSTEMS = (
 	"cmake",
 	"ant",
 	"qmake",
+	"qmake_qt4",
 );
 
 my $opt_buildsys;
