@@ -63,30 +63,55 @@ else {
 	$dh{FILENAME}="/$dh{FILENAME}";
 }
 
+my $processes=1;
+my $max_procs=1;
+if (defined $ENV{DEB_BUILD_OPTIONS} && $ENV{DEB_BUILD_OPTIONS}=~/parallel=(\d+)/) {
+	$max_procs=$1;
+}
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
-	my $tmp=tmpdir($package);
-	if (exists $ENV{DH_ALWAYS_EXCLUDE} && length $ENV{DH_ALWAYS_EXCLUDE}) {
-		if (! compat(5)) {
-			complex_doit("find $tmp $dh{EXCLUDE_FIND} | xargs rm -rf");
+	my $pid=0;
+
+	if ($max_procs > 1) {
+		while ($processes > $max_procs) {
+			wait;
+			$processes--;
+		}
+		$pid=fork();
+	}
+
+	if ($pid == 0) {
+		my $tmp=tmpdir($package);
+		if (exists $ENV{DH_ALWAYS_EXCLUDE} && length $ENV{DH_ALWAYS_EXCLUDE}) {
+			if (! compat(5)) {
+				complex_doit("find $tmp $dh{EXCLUDE_FIND} | xargs rm -rf");
+			}
+			else {
+				# Old broken code here for compatibility. Does not
+				# remove everything.
+				complex_doit("find $tmp -name $_ | xargs rm -rf")
+					foreach split(":", $ENV{DH_ALWAYS_EXCLUDE});
+			}
+		}
+		if (! is_udeb($package)) {
+			doit("dpkg-deb", @{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$dh{FILENAME});
 		}
 		else {
-			# Old broken code here for compatibility. Does not
-			# remove everything.
-			complex_doit("find $tmp -name $_ | xargs rm -rf")
-				foreach split(":", $ENV{DH_ALWAYS_EXCLUDE});
+			my $filename=$dh{FILENAME};
+			if (! $filename) {
+				$filename="/".udeb_filename($package);
+			}
+			doit("dpkg-deb", @{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$filename);
 		}
-	}
-	if (! is_udeb($package)) {
-		doit("dpkg-deb", @{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$dh{FILENAME});
-	}
-	else {
-		my $filename=$dh{FILENAME};
-		if (! $filename) {
-			$filename="/".udeb_filename($package);
+		exit (0) if ($max_procs > 1);
+	} else {
+		if (!defined $pid) {
+			error("fork failed!");
 		}
-		doit("dpkg-deb", @{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$filename);
+		$processes++;
 	}
 }
+while (($max_procs > 0) && (wait != -1)) {}
 
 =head1 SEE ALSO
 
