@@ -95,6 +95,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 # Remove all debhelper logs.
 if (! $dh{D_FLAG} && ! $dh{K_FLAG}) {
 	complex_doit("rm","-f","debian/*.debhelper.log");
+	if (compat(1)) {
+		doit("rm","-f","debian/debhelper.log");
+	}
 }
 
 if (! $dh{D_FLAG}) {
