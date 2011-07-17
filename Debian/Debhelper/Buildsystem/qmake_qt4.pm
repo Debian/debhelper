@@ -5,10 +5,14 @@ use warnings;
 use Debian::Debhelper::Dh_Lib qw(error);
 use base 'Debian::Debhelper::Buildsystem::qmake';
 
-$Debian::Debhelper::Buildsystem::qmake::qmake="qmake-qt4";
-
 sub DESCRIPTION {
 	"qmake for QT 4 (*.pro)";
+}
+
+sub configure {
+        my $this=shift;
+	$Debian::Debhelper::Buildsystem::qmake::qmake="qmake-qt4";
+	$this->SUPER::configure(@_);
 }
 
 1
