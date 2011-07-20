@@ -373,9 +373,6 @@ my @bd = qw{
 	dh_auto_build
 	dh_auto_test
 };
-my @i_minimal = qw{
-	dh_testroot
-};
 my @i = qw{
 	dh_testroot
 	dh_prep
@@ -438,26 +435,10 @@ $sequences{'build-indep'} = [@bd];
 $sequences{'build-arch'} = [@bd];
 if (! compat(8)) {
 	# From v9, sequences take standard rules targets into account.
-	if (rules_explicit_target('build-arch') ||
-	    rules_explicit_target('build-indep')) {
-		# run sequences separately
-		$sequences{build} = [@bd_minimal, rules("build-arch"), rules("build-indep")];
-	}
-	else {
-		# run standard sequence (this is faster)
-		$sequences{build} = [@bd];
-	}
+	$sequences{build} = [@bd_minimal, rules("build-arch"), rules("build-indep")];
 	$sequences{'install-indep'} = [rules("build-indep"), @i];
 	$sequences{'install-arch'} = [rules("build-arch"), @i];
-	if (rules_explicit_target('install-arch') ||
-	    rules_explicit_target('install-indep')) {
-		# run sequences separately
-		$sequences{'install'} = [rules("build"), @i_minimal, rules("install-arch"), rules("install-indep")];
-	}
-	else {
-		# run standard sequence (this is faster)
-		$sequences{'install'} = [rules("build"), @i, rules("install-arch"), rules("install-indep")];
-	}
+	$sequences{'install'} = [rules("build"), rules("install-arch"), rules("install-indep"), @i];
 	$sequences{'binary-indep'} = [rules("install-indep"), @b];
 	$sequences{'binary-arch'} = [rules("install-arch"), @ba, @b];
 	$sequences{binary} = [rules("install"), rules("binary-arch"), rules("binary-indep")];
