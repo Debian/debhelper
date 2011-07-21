@@ -69,11 +69,23 @@ sub check_auto_buildable {
 	my $this=shift;
 	my ($step) = @_;
 
-	# This is always called in the source directory, but generally
-	# Makefiles are created (or live) in the the build directory.
-	return (-e $this->get_buildpath("Makefile") ||
-	        -e $this->get_buildpath("makefile") ||
-	        -e $this->get_buildpath("GNUmakefile")) ? 1 : 0;
+	if (-e $this->get_buildpath("Makefile") ||
+	    -e $this->get_buildpath("makefile") ||
+	    -e $this->get_buildpath("GNUmakefile"))
+	{
+		# This is always called in the source directory, but generally
+		# Makefiles are created (or live) in the the build directory.
+		return 1;
+	} elsif ($step eq "clean" && defined $this->get_builddir() &&
+	         $this->check_auto_buildable("configure"))
+	{
+		# Assume that the package can be cleaned (i.e. the build directory can
+		# be removed) as long as it is built out-of-source tree and can be
+		# configured. This is useful for derivative buildsystems which
+		# generate Makefiles.
+		return 1;
+	}
+	return 0;
 }
 
 sub build {
