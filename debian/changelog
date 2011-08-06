@@ -1,4 +1,4 @@
-debhelper (8.9.4) UNRELEASED; urgency=low
+debhelper (8.9.4) unstable; urgency=low
 
   * dh: The --before --after --until and --remaining options are deprecated.
     Use override targets instead.
@@ -8,8 +8,13 @@ debhelper (8.9.4) UNRELEASED; urgency=low
     (Modestas Vainius) Closes: #601590
   * dh_auto_test: Run cmake tests in parallel when allowed by
     DEB_BUILD_OPTIONS. (Modestas Vainius) Closes: #587885
+  * dpkg-buildflags is only used to set environment in v9, to avoid
+    re-breaking packages that were already broken a first time by
+    dpkg-buildpackage unconditionally setting the environment, and
+    worked around that by unsetting variables in the rules file.
+    (Example: numpy)
 
- -- Joey Hess <joeyh@debian.org>  Fri, 05 Aug 2011 10:58:36 -0400
+ -- Joey Hess <joeyh@debian.org>  Sat, 06 Aug 2011 18:58:59 -0400
 
 debhelper (8.9.3) unstable; urgency=low
 

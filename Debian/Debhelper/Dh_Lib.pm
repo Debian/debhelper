@@ -903,8 +903,7 @@ sub cross_command {
 # Sets environment variables from dpkg-buildflags. Avoids changing
 # any existing environment variables.
 sub set_buildflags {
-	# optimisation
-	return if $ENV{DH_INTERNAL_BUILDFLAGS};
+	return if $ENV{DH_INTERNAL_BUILDFLAGS} || compat(8);
 	$ENV{DH_INTERNAL_BUILDFLAGS}=1;
 
 	eval "use Dpkg::BuildFlags";

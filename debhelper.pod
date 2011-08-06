@@ -191,10 +191,6 @@ in ALL packages acted on, not just the first.
 
 =head1 BUILD SYSTEM OPTIONS
 
-All of the B<dh_auto_>I<*> debhelper programs set environment variables
-listed by B<dpkg-buildflags>, unless they are already set. They
-support DEB_BUILD_OPTIONS=noopt too.
-
 The following command line options are supported by all of the B<dh_auto_>I<*>
 debhelper programs. These programs support a variety of build systems,
 and normally heuristically determine which to use, and how to use them.
@@ -488,6 +484,12 @@ in --libexecdir when using autoconf.
 =item -
 
 B<dh> does not default to enabling --with=python-support
+
+=item -
+
+All of the B<dh_auto_>I<*> debhelper programs and B<dh> set
+environment variables listed by B<dpkg-buildflags>, unless
+they are already set. They support DEB_BUILD_OPTIONS=noopt too.
 
 =back
 
