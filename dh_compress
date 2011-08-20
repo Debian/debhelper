@@ -108,7 +108,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				! -iname "*.gif" ! -iname "*.png" ! -iname "*.jpg" \\
 				! -iname "*.jpeg" \\
 				2>/dev/null || true;
-			find usr/share/doc -type f \\( -size +4k -or -name "changelog*" -or -name "NEWS*" \\) \\
+			find usr/share/doc \\
+				\\( -type d -name _sources -prune -false \\) -o \\
+				-type f \\( -size +4k -or -name "changelog*" -or -name "NEWS*" \\) \\
 				\\( -name changelog.html -or ! -iname "*.htm*" \\) \\
 				! -iname "*.gif" ! -iname "*.png" ! -iname "*.jpg" \\
 				! -iname "*.jpeg" ! -iname "*.gz" ! -iname "*.taz" \\
