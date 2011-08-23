@@ -39,6 +39,16 @@ subdirectories of F<etc/logcheck/> in package build directories.
 
 =back
 
+=head1 OPTIONS
+
+=over 4
+
+=item B<--name=>I<name>
+
+Look for files named F<debian/package.name.logcheck.*> and install
+them into the corresponding subdirectories of F<etc/logcheck/>, but
+use the specified name instead of that of the package.
+
 =cut
 
 init();
@@ -56,7 +66,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			if (! -d "$tmp/etc/logcheck/$type") {
 				doit("install","-o",0,"-g",0,"-d","$tmp/etc/logcheck/$type");
 			}
-			my $packagenodot=$package; # run-parts..
+			my $packagenodot=pkgfilename($package); # run-parts..
 			$packagenodot=~s/\./_/g;
 			doit("install","-m","0644",$logcheck,"$tmp/etc/logcheck/$type/$packagenodot");
 		}
