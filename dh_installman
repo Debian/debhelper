@@ -197,8 +197,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	# Now utf-8 conversion.
-	foreach my $dir (qw{usr/share/man}) {
-		if (-e "$tmp/$dir") {
+	if (defined `man --version`) {
+		foreach my $dir (qw{usr/share/man}) {
+			next unless -e "$tmp/$dir";
 			find(sub {
 				return if ! -f $_ || -l $_;
 				my ($tmp, $orig)=($_.".new", $_);
