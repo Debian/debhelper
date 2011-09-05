@@ -146,6 +146,8 @@ sub write_log {
 	my $cmd=shift;
 	my @packages=@_;
 
+	return if $dh{NO_ACT};
+
 	foreach my $package (@packages) {
 		my $log=logfile($package);
 		open(LOG, ">>", $log) || error("failed to write to ${log}: $!");
@@ -156,6 +158,8 @@ sub write_log {
 
 sub commit_override_log {
 	my @packages=@_;
+
+	return if $dh{NO_ACT};
 
 	foreach my $package (@packages) {
 		my @log=map { remove_override($_) } load_log($package);
