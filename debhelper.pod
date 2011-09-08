@@ -472,9 +472,10 @@ multiarch directories to autoconf in --libdir and --libexecdir.
 
 =item -
 
-dh allows defining custom build, build-arch, and build-indep targets
-in debian/rules, without needing to manually define the other targets
-that depend on them.
+dh is aware of the usual dependencies between targets in debian/rules.
+So, "dh binary" will run any build, build-arch, build-indep, install,
+etc targets that exist in the rules file. There's no need to define an
+explicit binary target with explicit dependencies on the other targets.
 
 =item -
 
