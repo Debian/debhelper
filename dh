@@ -11,7 +11,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh> I<sequence> [B<--with> I<addon>[B<,>I<addon> ...]] [B<--list>] [B<--until> I<cmd>] [B<--before> I<cmd>] [B<--after> I<cmd>] [B<--remaining>] [S<I<debhelper options>>]
+B<dh> I<sequence> [B<--with> I<addon>[B<,>I<addon> ...]] [B<--list>] [S<I<debhelper options>>]
 
 =head1 DESCRIPTION
 
@@ -53,66 +53,15 @@ The inverse of B<--with>, disables using the given addon.
 
 List all available addons.
 
-=item B<--until> I<cmd>
-
-Run commands in the sequence until and including I<cmd>, then stop.
-(Deprecated)
-
-=item B<--before> I<cmd>
-
-Run commands in the sequence before I<cmd>, then stop.
-(Deprecated)
-
-=item B<--after> I<cmd>
-
-Run commands in the sequence that come after I<cmd>.
-(Deprecated)
-
-=item B<--remaining>
-
-Run all commands in the sequence that have yet to be run.
-(Deprecated)
-
 =item B<--no-act>
 
 Prints commands that would run for a given sequence, but does not run them.
 
 =back
 
-All other options passed to B<dh> are passed on to each command it runs. This
+Other options passed to B<dh> are passed on to each command it runs. This
 can be used to set an option like B<-v> or B<-X> or B<-N>, as well as for more
 specialised options.
-
-In the above options, I<cmd> can be a full name of a debhelper command, or
-a substring. It'll first search for a command in the sequence exactly
-matching the name, to avoid any ambiguity. If there are multiple substring
-matches, the last one in the sequence will be used.
-
-=cut
-
-sub command_pos {
-	my $command=shift;
-	my @sequence=@_;
-
-	foreach my $i (0..$#sequence) {
-		if ($command eq $sequence[$i]) {
-			return $i;
-		}
-	}
-
-	my @matches;
-	foreach my $i (0..$#sequence) {
-		if ($sequence[$i] =~ /\Q$command\E/) {
-			push @matches, $i;
-		}
-	}
-	if (! @matches) {
-		error "command specification \"$command\" does not match any command in the sequence"
-	}
-	else {
-		return pop @matches;
-	}
-}
 
 =head1 EXAMPLES
 
@@ -287,6 +236,36 @@ B<dh> uses the B<DH_INTERNAL_OPTIONS> environment variable to pass information
 through to debhelper commands that are run inside override targets. The
 contents (and indeed, existence) of this environment variable, as the name
 might suggest, is subject to change at any time.
+
+=head1 DEPRECATED OPTIONS
+
+The following options are deprecated. It's much 
+better to use override targets instead.
+
+=over 4
+
+=item B<--until> I<cmd>
+
+Run commands in the sequence until and including I<cmd>, then stop.
+
+=item B<--before> I<cmd>
+
+Run commands in the sequence before I<cmd>, then stop.
+
+=item B<--after> I<cmd>
+
+Run commands in the sequence that come after I<cmd>.
+
+=item B<--remaining>
+
+Run all commands in the sequence that have yet to be run.
+
+=back
+
+In the above options, I<cmd> can be a full name of a debhelper command, or
+a substring. It'll first search for a command in the sequence exactly
+matching the name, to avoid any ambiguity. If there are multiple substring
+matches, the last one in the sequence will be used.
 
 =cut
 
@@ -863,6 +842,30 @@ sub warn_deprecated {
 		if (defined $dh{uc $deprecated}) {
 			warning("The --$deprecated option is deprecated. Use override targets instead.");
 		}
+	}
+}
+
+sub command_pos {
+	my $command=shift;
+	my @sequence=@_;
+
+	foreach my $i (0..$#sequence) {
+		if ($command eq $sequence[$i]) {
+			return $i;
+		}
+	}
+
+	my @matches;
+	foreach my $i (0..$#sequence) {
+		if ($sequence[$i] =~ /\Q$command\E/) {
+			push @matches, $i;
+		}
+	}
+	if (! @matches) {
+		error "command specification \"$command\" does not match any command in the sequence"
+	}
+	else {
+		return pop @matches;
 	}
 }
 
