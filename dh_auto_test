@@ -7,6 +7,7 @@ dh_auto_test - automatically runs a package's test suites
 =cut
 
 use strict;
+use Debian::Debhelper::Dh_Lib;
 use Debian::Debhelper::Dh_Buildsystems;
 
 =head1 SYNOPSIS
@@ -48,7 +49,7 @@ tests will be performed.
 
 =cut
 
-if (defined $ENV{DEB_BUILD_OPTIONS} && $ENV{DEB_BUILD_OPTIONS} =~ /nocheck/) {
+if (get_buildoption("nocheck")) {
 	exit 0;
 }
 

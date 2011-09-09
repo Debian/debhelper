@@ -167,19 +167,12 @@ sub buildsystems_init {
 sub set_parallel {
 	my $max=shift;
 
-	$opt_parallel=1;
+	# Get number of processes from parallel=n option, limiting it
+	# with $max if needed
+	$opt_parallel=get_buildoption("parallel") || 1;
 
-	if (exists $ENV{DEB_BUILD_OPTIONS}) {
-		# Get number of processes from parallel=n tag limiting it
-		# with $max if needed
-		foreach my $opt (split(/\s+/, $ENV{DEB_BUILD_OPTIONS})) {
-			if ($opt =~ /^parallel=(-?\d+)$/) {
-				$opt_parallel = $1;
-				if ($max > 0 && $opt_parallel > $max) {
-					$opt_parallel = $max;
-				}
-			}
-		}
+	if ($max > 0 && $opt_parallel > $max) {
+		$opt_parallel = $max;
 	}
 }
 

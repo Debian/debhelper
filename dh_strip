@@ -82,7 +82,7 @@ init(options => {
 });
 
 # This variable can be used to turn off stripping (see Policy).
-if (defined $ENV{DEB_BUILD_OPTIONS} && $ENV{DEB_BUILD_OPTIONS} =~ /nostrip/) {
+if (get_buildoption('nostrip')) {
 	exit;
 }
 

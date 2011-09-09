@@ -63,10 +63,7 @@ else {
 	$dh{FILENAME}="/$dh{FILENAME}";
 }
 
-my $max_procs=1;
-if (defined $ENV{DEB_BUILD_OPTIONS} && $ENV{DEB_BUILD_OPTIONS}=~/parallel=(\d+)/) {
-	$max_procs=$1;
-}
+my $max_procs=get_buildoption("parallel") || 1;
 
 my $processes=1;
 my $exit=0;

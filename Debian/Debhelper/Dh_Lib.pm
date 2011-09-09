@@ -18,7 +18,7 @@ use vars qw(@ISA @EXPORT %dh);
 	    &inhibit_log &load_log &write_log &commit_override_log
 	    &dpkg_architecture_value &sourcepackage
 	    &is_make_jobserver_unavailable &clean_jobserver_makeflags
-	    &cross_command &set_buildflags);
+	    &cross_command &set_buildflags &get_buildoption);
 
 my $max_compat=9;
 
@@ -922,6 +922,23 @@ sub set_buildflags {
 		next unless $flag =~ /^[A-Z]/; # Skip flags starting with lowercase
 		if (! exists $ENV{$flag}) {
 			$ENV{$flag} = $buildflags->get($flag);
+		}
+	}
+}
+
+# Gets a DEB_BUILD_OPTIONS option, if set.
+sub get_buildoption {
+	my $wanted=shift;
+
+	return undef unless exists $ENV{DEB_BUILD_OPTIONS};
+
+	foreach my $opt (split(/\s+/, $ENV{DEB_BUILD_OPTIONS})) {
+		# currently parallel= is the only one with a parameter
+		if ($opt =~ /^parallel=(-?\d+)$/ && $wanted eq 'parallel') {
+			return $1;
+		}
+		elsif ($opt eq $wanted) {
+			return 1;
 		}
 	}
 }
