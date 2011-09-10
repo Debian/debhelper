@@ -626,6 +626,8 @@ elsif ($dh{BEFORE}) {
 
 # Now run the commands in the sequence.
 foreach my $i (0..$stoppoint) {
+	my $command=$sequence[$i];
+
 	# Figure out which packages need to run this command.
 	my @exclude;
 	foreach my $package (@packages) {
@@ -640,92 +642,84 @@ foreach my $i (0..$stoppoint) {
 		next;
 	}
 
-	run($sequence[$i], \@packages, \@exclude, @options);
+	my $rules_target = rules_target($command);
+	if (defined $rules_target) {
+		# Don't pass DH_ environment variables, since this is
+		# a fresh invocation of debian/rules and any sub-dh commands.
+		delete $ENV{DH_INTERNAL_OPTIONS};
+		delete $ENV{DH_INTERNAL_OVERRIDE};
+		run("debian/rules", $rules_target);
+		next;
+	}
+	
+	my @opts=@options;
+	# If some packages are excluded, add flags
+	# to prevent them from being acted on.
+	push @opts, map { "-N$_" } @exclude;
+
+	# Check for override targets in debian/rules, and run instead of
+	# the usual command.
+	next if run_override("override_".$command, $command,
+		\@packages, \@exclude, @opts);
+		
+	run($command, @opts);
 }
 
 sub run {
+	my $command=shift;
+	my @options=@_;
+
+	# Include additional command options if any
+	unshift @options, @{$command_opts{$command}}
+		if exists $command_opts{$command};
+
+	# 3 space indent lines the command being run up under the
+	# sequence name after "dh ".
+	print "   ".escape_shell($command, @options)."\n";
+
+	return if $dh{NO_ACT};
+			
+	my $ret=system($command, @options);
+	if ($ret >> 8 != 0) {
+		exit $ret >> 8;
+	}
+	elsif ($ret) {
+		exit 1;
+	}
+}
+
+# Returns true if an override target exists for a command.
+sub run_override {
+	my $override=shift;
 	my $command=shift;
 	my @packages=@{shift()};
 	my @exclude=@{shift()};
 	my @options=@_;
 	
-	# If some packages are excluded, add flags
-	# to prevent them from being acted on.
-	push @options, map { "-N$_" } @exclude;
+	my $has_explicit_target = rules_explicit_target($override);
+	return 0 unless defined $has_explicit_target; # no such override
+	return 1 if ! $has_explicit_target; # has empty override
 
-	# Check for override targets in debian/rules and
-	# run them instead of running the command directly.
-	my $override_command;
-	my $has_explicit_target = rules_explicit_target("override_".$command);
+	# This passes the options through to commands called
+	# inside the target.
+	$ENV{DH_INTERNAL_OPTIONS}=join("\x1e", @options);
+	$ENV{DH_INTERNAL_OVERRIDE}=$command;
+	run("debian/rules", "override_".$command);
+	delete $ENV{DH_INTERNAL_OPTIONS};
+	delete $ENV{DH_INTERNAL_OVERRIDE};
 
-	my $rules_target = rules_target($command);
-	if (defined $rules_target) {
-		# Don't pass DH_ environment variables, since this is
-		# a fresh invocation of debian/rules and any sub-dh
-		# commands.
-		$override_command=$command;
-		delete $ENV{DH_INTERNAL_OPTIONS};
-		delete $ENV{DH_INTERNAL_OVERRIDE};
-		$command="debian/rules";
-		@options=$rules_target;
-	}
-	elsif (defined $has_explicit_target) {
-		$override_command=$command;
-		# Check if target isn't noop
-		if ($has_explicit_target) {
-			# This passes the options through to commands called
-			# inside the target.
-			$ENV{DH_INTERNAL_OPTIONS}=join("\x1e", @options);
-			$ENV{DH_INTERNAL_OVERRIDE}=$command;
-			$command="debian/rules";
-			@options="override_".$override_command;
-		}
-		else {
-			$command = undef;
-		}
-	}
-	else {
-		# Pass additional command options if any
-		unshift @options, @{$command_opts{$command}} if exists $command_opts{$command};
+	# Update log for overridden command now that it has
+	# finished successfully.
+	# (But avoid logging for dh_clean since it removes
+	# the log earlier.)
+	if (! $dh{NO_ACT} && $command ne 'dh_clean') {
+		my %packages=map { $_ => 1 } @packages;
+		map { delete $packages{$_} } @exclude;
+		write_log($command, keys %packages);
+		commit_override_log(keys %packages);
 	}
 
-	if (defined $command) {
-		# 3 space indent lines the command being run up under the
-		# sequence name after "dh ".
-		print "   ".escape_shell($command, @options)."\n";
-	}
-	else {
-		print "   ", "# Skipping ", $override_command, " - empty override", "\n";
-	}
-				
-	if (! $dh{NO_ACT}) {
-		if (defined $command) {
-			my $ret=system($command, @options);
-			
-			if ($ret >> 8 != 0) {
-				exit $ret >> 8;
-			}
-			elsif ($ret) {
-				exit 1;
-			}
-		}
-
-		if (defined $override_command) {
-			# Update log for overridden command now that it has
-			# finished successfully.
-			# (But avoid logging for dh_clean since it removes
-			# the log earlier.)
-			if ($override_command ne 'dh_clean') {
-				my %packages=map { $_ => 1 } @packages;
-				map { delete $packages{$_} } @exclude;
-				write_log($override_command, keys %packages);
-				commit_override_log(keys %packages);
-			}
-
-			delete $ENV{DH_INTERNAL_OPTIONS};
-			delete $ENV{DH_INTERNAL_OVERRIDE};
-		}
-	}
+	return 1;
 }
 
 sub optimize_sequence {
