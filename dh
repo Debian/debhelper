@@ -629,18 +629,18 @@ foreach my $i (0..$stoppoint) {
 	my $command=$sequence[$i];
 
 	# Figure out which packages need to run this command.
-	my @exclude;
+	my @todo;
+	my @opts=@options;
 	foreach my $package (@packages) {
 		if ($startpoint{$package} > $i ||
 		    $logged{$package}{$sequence[$i]}) {
-			push @exclude, $package;
+			push @opts, "-N$package";
+		}
+		else {
+			push @todo, $package;
 		}
 	}
-	
-	if (@exclude eq @packages) {
-		# Command already done for all packages.
-		next;
-	}
+	next unless @todo;
 
 	my $rules_target = rules_target($command);
 	if (defined $rules_target) {
@@ -652,15 +652,9 @@ foreach my $i (0..$stoppoint) {
 		next;
 	}
 	
-	my @opts=@options;
-	# If some packages are excluded, add flags
-	# to prevent them from being acted on.
-	push @opts, map { "-N$_" } @exclude;
-
 	# Check for override targets in debian/rules, and run instead of
 	# the usual command.
-	next if run_override("override_".$command, $command,
-		\@packages, \@exclude, @opts);
+	next if run_override("override_".$command, $command, \@todo, @opts);
 		
 	run($command, @opts);
 }
@@ -693,7 +687,6 @@ sub run_override {
 	my $override=shift;
 	my $command=shift;
 	my @packages=@{shift()};
-	my @exclude=@{shift()};
 	my @options=@_;
 	
 	my $has_explicit_target = rules_explicit_target($override);
@@ -713,10 +706,8 @@ sub run_override {
 	# (But avoid logging for dh_clean since it removes
 	# the log earlier.)
 	if (! $dh{NO_ACT} && $command ne 'dh_clean') {
-		my %packages=map { $_ => 1 } @packages;
-		map { delete $packages{$_} } @exclude;
-		write_log($command, keys %packages);
-		commit_override_log(keys %packages);
+		write_log($command, @packages);
+		commit_override_log(@packages);
 	}
 
 	return 1;
