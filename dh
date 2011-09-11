@@ -20,17 +20,25 @@ correspond to the targets of a F<debian/rules> file: B<build-arch>,
 B<build-indep>, B<build>, B<clean>, B<install-indep>, B<install-arch>,
 B<install>, B<binary-arch>, B<binary-indep>, and B<binary>.
 
-Commands in the B<build-indep>, B<install-indep> and B<binary-indep>
-sequences are passed the B<-i> option to ensure they only work on
-architecture independent packages, and commands in the B<build-arch>,
-B<install-arch> and B<binary-arch> sequences are passed the B<-a>
-option to ensure they only work on architecture dependent packages.
+=head1 OVERRIDE TARGETS
 
-If F<debian/rules> contains a target with a name like B<override_>I<dh_command>,
-then when it would normally run I<dh_command>, B<dh> will instead call that
-target. The override target can then run the command with additional options,
-or run entirely different commands instead. See examples below. (Note that to
-use this feature, you should Build-Depend on debhelper 7.0.50 or above.)
+A F<debian/rules> file using B<dh> can override the command that is run
+at any step in a sequence, by defining an override target.
+
+To override I<dh_command>, add a target named B<override_>I<dh_command> to
+the rules file. When it would normally run I<dh_command>, B<dh> will
+instead call that target. The override target can then run the command with
+additional options, or run entirely different commands instead. See
+examples below.
+(Note that to use this feature, you should Build-Depend on
+debhelper 7.0.50 or above.)
+
+Override targets can also be defined to run only when building
+architecture dependent or architecture independent packages.
+Use targets with names like B<override_>I<dh_command>B<-arch>
+and B<override_>I<dh_command>B<-indep>.
+(Note that to use this feature, you should Build-Depend on
+debhelper 8.9.7 or above.)
 
 =head1 OPTIONS
 
@@ -172,41 +180,30 @@ want it to run, by defining empty override targets for each command.
 	# Commands not to run:
 	override_dh_auto_test override_dh_compress override_dh_fixperms:
 
-Sometimes, you may need to make an override target only run commands when a
-particular package is being built. This can be accomplished using
-L<dh_listpackages(1)> to test what is being built. For example:
+A long build process for a separate documentation package can
+be separated out using architecture independent overrides.
+These will be skipped when running build-arch and binary-arch sequences.
 
 	#!/usr/bin/make -f
 	%:
 		dh $@
 	
-	override_dh_fixperms:
+	override_dh_auto_build-indep:
+		$(MAKE) -C docs
+
+	# No tests needed for docs
+	override_dh_auto_test-indep:
+
+	override_dh_auto_install-indep:
+		$(MAKE) -C docs install
+
+Adding to the example above, suppose you need to chmod a file, but only
+when building the architecture dependent package, as it's not present
+when building only documentation.
+
+	override_dh_fixperms-arch:
 		dh_fixperms
-	ifneq (,$(filter foo, $(shell dh_listpackages)))
 		chmod 4755 debian/foo/usr/bin/foo
-	endif
-
-Finally, remember that you are not limited to using override targets in the
-rules file when using B<dh>. You can also explicitly define any of the regular
-rules file targets when it makes sense to do so. A common reason to do this
-is when your package needs different B<build-arch> and B<build-indep> targets.
-For example, a package with a long document build process can put it in
-B<build-indep>.
-
-	#!/usr/bin/make -f
-	%:
-		dh $@
-	
-	build-indep:
-		$(MAKE) docs
-	build-arch:
-		$(MAKE) bins
-
-Note that in the example above, dh will arrange for "debian/rules build"
-to call your build-indep and build-arch targets. You do not need to
-explicitly define those dependencies in the rules file when using dh with
-compatibility level v9. This example would be more complicated with
-earlier compatibility levels.
 
 =head1 INTERNALS
 
@@ -229,6 +226,12 @@ B<dh> uses the B<DH_INTERNAL_OPTIONS> environment variable to pass information
 through to debhelper commands that are run inside override targets. The
 contents (and indeed, existence) of this environment variable, as the name
 might suggest, is subject to change at any time.
+
+Commands in the B<build-indep>, B<install-indep> and B<binary-indep>
+sequences are passed the B<-i> option to ensure they only work on
+architecture independent packages, and commands in the B<build-arch>,
+B<install-arch> and B<binary-arch> sequences are passed the B<-a>
+option to ensure they only work on architecture dependent packages.
 
 =head1 DEPRECATED OPTIONS
 
@@ -653,9 +656,14 @@ foreach my $i (0..$stoppoint) {
 	}
 	
 	# Check for override targets in debian/rules, and run instead of
-	# the usual command.
-	next if run_override("override_".$command, $command, \@todo, @opts);
-		
+	# the usual command. (The non-arch-specific override is tried first,
+	# for simplest semantics; mixing it with arch-specific overrides
+	# makes little sense.)
+	foreach my $override_type (undef, "arch", "indep") {
+		@todo = run_override($override_type, $command, \@todo, @opts);
+	}
+	next unless @todo;
+
 	run($command, @opts);
 }
 
@@ -682,22 +690,47 @@ sub run {
 	}
 }
 
-# Returns true if an override target exists for a command.
+# Tries to run an override target for a command. Returns the list of
+# packages that it was unable to run an override target for.
 sub run_override {
-	my $override=shift;
+	my $override_type=shift; # arch, indep, or undef
 	my $command=shift;
 	my @packages=@{shift()};
 	my @options=@_;
-	
+
+	my $override="override_$command".
+		(defined $override_type ? "-".$override_type : "");
+
+	# Check which packages are of the right architecture for the
+	# override_type.
+	my (@todo, @rest);
+	if (defined $override_type) {
+		foreach my $package (@packages) {
+			my $isall=package_arch($package) eq 'all';
+			if (($override_type eq 'indep' && $isall) ||
+			    ($override_type eq 'arch' && !$isall)) {
+				push @todo, $package;
+			}
+			else {
+				push @rest, $package;
+				push @options, "-N$package";
+			}
+		}
+	}
+	else {
+		@todo=@packages;
+	}
+
 	my $has_explicit_target = rules_explicit_target($override);
-	return 0 unless defined $has_explicit_target; # no such override
-	return 1 if ! $has_explicit_target; # has empty override
+	return @packages unless defined $has_explicit_target; # no such override
+	return @rest if ! $has_explicit_target; # has empty override
+	return @rest unless @todo; # has override, but no packages to act on
 
 	# This passes the options through to commands called
 	# inside the target.
 	$ENV{DH_INTERNAL_OPTIONS}=join("\x1e", @options);
 	$ENV{DH_INTERNAL_OVERRIDE}=$command;
-	run("debian/rules", "override_".$command);
+	run("debian/rules", $override);
 	delete $ENV{DH_INTERNAL_OPTIONS};
 	delete $ENV{DH_INTERNAL_OVERRIDE};
 
@@ -706,11 +739,11 @@ sub run_override {
 	# (But avoid logging for dh_clean since it removes
 	# the log earlier.)
 	if (! $dh{NO_ACT} && $command ne 'dh_clean') {
-		write_log($command, @packages);
-		commit_override_log(@packages);
+		write_log($command, @todo);
+		commit_override_log(@todo);
 	}
 
-	return 1;
+	return @rest;
 }
 
 sub optimize_sequence {
