@@ -418,7 +418,7 @@ if (! compat(8)) {
 	$sequences{build} = [@bd_minimal, rules("build-arch"), rules("build-indep")];
 	$sequences{'install-indep'} = [rules("build-indep"), @i];
 	$sequences{'install-arch'} = [rules("build-arch"), @i];
-	$sequences{'install'} = [rules("build"), rules("install-arch"), rules("install-indep"), @i];
+	$sequences{'install'} = [rules("build"), rules("install-arch"), rules("install-indep")];
 	$sequences{'binary-indep'} = [rules("install-indep"), @b];
 	$sequences{'binary-arch'} = [rules("install-arch"), @ba, @b];
 	$sequences{binary} = [rules("install"), rules("binary-arch"), rules("binary-indep")];
