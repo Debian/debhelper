@@ -328,6 +328,7 @@ sub dirname {
 
 	sub compat {
 		my $num=shift;
+		my $nowarn=shift;
 	
 		if (! defined $c) {
 			$c=1;
@@ -349,7 +350,7 @@ sub dirname {
 			}
 		}
 
-		if ($c <= 4 && ! $warned_compat) {
+		if ($c <= 4 && ! $warned_compat && ! $nowarn) {
 			warning("Compatibility levels before 5 are deprecated.");
 			$warned_compat=1;
 		}
