@@ -1,30 +1,32 @@
-debhelper (8.9.7) UNRELEASED; urgency=low
+debhelper (8.9.7) unstable; urgency=low
 
   * dh: Now you can use override_dh_command-arch and override_dh_command-indep
     to run different overrides when building arch and indep packages. This
     allows for a much simplified form of rules file in this situation, where
     build-arch/indep and binary-arch/indep targets do not need to be manually
     specified. See man page for examples. Closes: #640965
-  * dh: Note that if a rules file has say, override_dh_fixperms-arch,
+    .
+    Note that if a rules file has say, override_dh_fixperms-arch,
     but no corresponding override_dh_fixperms-indep, then the unoverridden
     dh_fixperms will be run on the indep packages.
-  * dh: Note that the old override_dh_command takes precidence over the new
+    .
+    Note that the old override_dh_command takes precidence over the new
     overrides, because mixing the two types of overrides would have been
     too complicated. In particular, it's difficult to ensure an
     old override target will work if it's sometimes constrained to only
     acting on half the packages it would normally run on. This would be 
     a source of subtle bugs, so is avoided.
   * dh: Don't bother running dh_shlibdebs, dh_makeshlibs, or dh_strip
-    for the binary target when all packages being acted on are indep.
+    in the binary target when all packages being acted on are indep.
+  * dh: Avoid running install sequence a third time in v9 when the
+    rules file has explicit binary-indep and binary-arch targets.
+    Closes: #639341 Thanks, Yann Dirson for test case.
   * debhelper no longer build-depends on man-db or file, to ease bootstrapping.
   * Remove obsolete versioned dependency on perl-base.
   * Avoid writing debhelper log files in no-act mode. Closes: #640586
   * Tighten parsing of DEB_BUILD_OPTIONS.
-  * dh: Avoid running install sequence a third time in v9 when the
-    rules file has explicit binary-indep and binary-arch targets.
-    Closes: #639341 Thanks, Yann Dirson for test case.
 
- -- Joey Hess <joeyh@debian.org>  Mon, 29 Aug 2011 20:18:01 -0400
+ -- Joey Hess <joeyh@debian.org>  Sun, 11 Sep 2011 20:29:22 -0400
 
 debhelper (8.9.6) unstable; urgency=low
 
