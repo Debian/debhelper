@@ -105,11 +105,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 	
 	# ADA ali files should be mode 444 to avoid recompilation
-	if (-d "$tmp/usr/lib/ada") {
-		complex_doit("find $tmp/usr/lib/ada -type f",
-			"-name '*.ali' $find_options -print0",
-			"2>/dev/null | xargs -0r chmod uga-w");
-	}
+	complex_doit("find $tmp/usr/lib -type f",
+		"-name '*.ali' $find_options -print0",
+		"2>/dev/null | xargs -0r chmod uga-w");
 
 	# Lintian overrides should never be executable, too.
 	if (-d "$tmp/usr/share/lintian") {
