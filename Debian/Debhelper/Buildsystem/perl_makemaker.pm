@@ -46,7 +46,7 @@ sub configure {
 	# This prevents  Module::Install from interactive behavior.
 	$ENV{PERL_AUTOINSTALL}="--skipdeps";
 
-	if ($ENV{CFLAGS}) {
+	if ($ENV{CFLAGS} && ! compat(8)) {
 		push @flags, "OPTIMIZE=$ENV{CFLAGS}";
 	}
 
