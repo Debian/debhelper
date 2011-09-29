@@ -46,9 +46,9 @@ sub configure {
 	# This prevents  Module::Install from interactive behavior.
 	$ENV{PERL_AUTOINSTALL}="--skipdeps";
 
-        if ($ENV{CFLAGS}) {
-                push @flags, "OPTIMIZE=$ENV{CFLAGS}";
-        }
+	if ($ENV{CFLAGS}) {
+		push @flags, "OPTIMIZE=$ENV{CFLAGS}";
+	}
 
 	$this->doit_in_sourcedir("perl", "Makefile.PL", "INSTALLDIRS=vendor",
 		# if perl_build is not tested first, need to pass packlist
