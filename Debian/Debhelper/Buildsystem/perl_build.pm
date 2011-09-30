@@ -7,6 +7,7 @@
 package Debian::Debhelper::Buildsystem::perl_build;
 
 use strict;
+use Debian::Debhelper::Dh_Lib qw(compat);
 use base 'Debian::Debhelper::Buildsystem';
 
 sub DESCRIPTION {
@@ -38,8 +39,12 @@ sub new {
 
 sub configure {
 	my $this=shift;
+	my @flags;
 	$ENV{PERL_MM_USE_DEFAULT}=1;
-	$this->do_perl("Build.PL", "installdirs=vendor", @_);
+	if ($ENV{CFLAGS} && ! compat(8)) {
+		push @flags, "config=optimize=$ENV{CFLAGS}";
+	}
+	$this->do_perl("Build.PL", "installdirs=vendor", @flags, @_);
 }
 
 sub build {
