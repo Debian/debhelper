@@ -34,7 +34,7 @@ sub DESCRIPTION {
 # Default build directory. Can be overriden in the derived
 # class if really needed.
 sub DEFAULT_BUILD_DIRECTORY {
-	"obj-" . dpkg_architecture_value("DEB_BUILD_GNU_TYPE");
+	"obj-" . dpkg_architecture_value("DEB_HOST_GNU_TYPE");
 }
 
 # Constructs a new build system object. Named parameters:
