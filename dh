@@ -87,16 +87,16 @@ commands work with no additional options.
 
 Often you'll want to pass an option to a specific debhelper command. The
 easy way to do with is by adding an override target for that command.
-	
+
 	#!/usr/bin/make -f
 	%:
 		dh $@
-
+	
 	override_dh_strip:
 		dh_strip -Xfoo
-		
-	override_dh_installdocs:
-		dh_installdocs README TODO
+	
+	override_dh_auto_configure:
+		dh_auto_configure -- --with-foo --disable-bar
 
 Sometimes the automated L<dh_auto_configure(1)> and L<dh_auto_build(1)>
 can't guess what to do for a strange package. Here's how to avoid running
