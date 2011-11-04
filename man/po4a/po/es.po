@@ -31,7 +31,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: debhelper 8.0.0\n"
-"POT-Creation-Date: 2011-09-29 15:41-0400\n"
+"POT-Creation-Date: 2011-11-04 17:02-0400\n"
 "PO-Revision-Date: 2010-11-11 22:28+0100\n"
 "Last-Translator: Omar Campagne <ocampagne@gmail.com>\n"
 "Language-Team: Debian l10n Spanish <debian-l10n-spanish@lists.debian.org>\n"
@@ -1265,8 +1265,7 @@ msgstr ""
 #. type: textblock
 #: debhelper.pod:499
 msgid ""
-"B<dh_auto_configure> passes CFLAGS to F<Makefile.PL> using the OPTIMIZE "
-"variable."
+"B<dh_auto_configure> passes CFLAGS to perl F<Makefile.PL> and F<Build.PL>"
 msgstr ""
 
 # type: =head1
@@ -1963,7 +1962,7 @@ msgstr ""
 "predeterminadas de órdenes funcionan sin opciones adicionales."
 
 #. type: verbatim
-#: dh:84 dh:91 dh:105 dh:118
+#: dh:84 dh:105 dh:118
 #, no-wrap
 msgid ""
 "\t#!/usr/bin/make -f\n"
@@ -1976,13 +1975,16 @@ msgstr ""
 "\t\tdh $@\n"
 "\n"
 
-#. type: verbatim
+#. type: textblock
 #: dh:88
-#, no-wrap
+#, fuzzy
+#| msgid ""
+#| "Often you'll want to pass an option to a specific debhelper command. The\n"
+#| "easy way to do with is by adding an override target for that command.\n"
+#| "\t\n"
 msgid ""
-"Often you'll want to pass an option to a specific debhelper command. The\n"
-"easy way to do with is by adding an override target for that command.\n"
-"\t\n"
+"Often you'll want to pass an option to a specific debhelper command. The "
+"easy way to do with is by adding an override target for that command."
 msgstr ""
 "A menudo, querrá introducir una opción a una orden de debhelper en\n"
 "particular. La forma sencilla de hacerlo es añadir un objetivo «overrride»\n"
@@ -1990,12 +1992,30 @@ msgstr ""
 "\t\n"
 
 #. type: verbatim
-#: dh:95
+#: dh:91 dh:176 dh:187
 #, no-wrap
+msgid ""
+"\t#!/usr/bin/make -f\n"
+"\t%:\n"
+"\t\tdh $@\n"
+"\t\n"
+msgstr ""
+"\t#!/usr/bin/make -f\n"
+"\t%:\n"
+"\t\tdh $@\n"
+"\t\n"
+
+#. type: verbatim
+#: dh:95
+#, fuzzy, no-wrap
+#| msgid ""
+#| "\toverride_dh_strip:\n"
+#| "\t\tdh_strip -Xfoo\n"
+#| "\t\t\n"
 msgid ""
 "\toverride_dh_strip:\n"
 "\t\tdh_strip -Xfoo\n"
-"\t\t\n"
+"\t\n"
 msgstr ""
 "\toverride_dh_strip:\n"
 "\t\tdh_strip -Xfoo\n"
@@ -2003,14 +2023,16 @@ msgstr ""
 
 #. type: verbatim
 #: dh:98
-#, no-wrap
+#, fuzzy, no-wrap
+#| msgid ""
+#| "  dh_auto_configure -- --with-foo --enable-bar\n"
+#| "\n"
 msgid ""
-"\toverride_dh_installdocs:\n"
-"\t\tdh_installdocs README TODO\n"
+"\toverride_dh_auto_configure:\n"
+"\t\tdh_auto_configure -- --with-foo --disable-bar\n"
 "\n"
 msgstr ""
-"\toverride_dh_installdocs:\n"
-"\t\tdh_installdocs README TODO\n"
+"  dh_auto_configure -- --with-foo --enable-bar\n"
 "\n"
 
 #. type: textblock
@@ -2232,20 +2254,6 @@ msgstr ""
 "A continuación puede ver cómo evitar que B<dh> ejecute varias órdenes que no "
 "desea que se ejecuten. Para ello, defina objetivos «override» vacíos para "
 "cada orden."
-
-#. type: verbatim
-#: dh:176 dh:187
-#, no-wrap
-msgid ""
-"\t#!/usr/bin/make -f\n"
-"\t%:\n"
-"\t\tdh $@\n"
-"\t\n"
-msgstr ""
-"\t#!/usr/bin/make -f\n"
-"\t%:\n"
-"\t\tdh $@\n"
-"\t\n"
 
 #. type: verbatim
 #: dh:180
@@ -5313,9 +5321,13 @@ msgstr ""
 # type: textblock
 #. type: textblock
 #: dh_installinit:14
+#, fuzzy
+#| msgid ""
+#| "B<dh_installinit> [S<I<debhelper options>>] [B<--name=>I<name>] [B<-n>] "
+#| "[B<-R>] [B<-r>] [B<-d>] [B<-O>] [S<B<--> I<params>>]"
 msgid ""
 "B<dh_installinit> [S<I<debhelper options>>] [B<--name=>I<name>] [B<-n>] [B<-"
-"R>] [B<-r>] [B<-d>] [B<-O>] [S<B<--> I<params>>]"
+"R>] [B<-r>] [B<-d>] [S<B<--> I<params>>]"
 msgstr ""
 "B<dh_installinit> [S<I<opciones-de-debhelper>>] [B<--name=>I<nombre>] [B<-"
 "n>] [B<-R>] [B<-r>] [B<-d>] [B<-O>] [S<B<--> I<parámetros>>]"
@@ -8351,6 +8363,15 @@ msgstr "Normas de Debian, versión 2.2"
 #: dh_usrlocal:122
 msgid "Andrew Stribblehill <ads@debian.org>"
 msgstr "Andrew Stribblehill <ads@debian.org>"
+
+#~ msgid ""
+#~ "\toverride_dh_installdocs:\n"
+#~ "\t\tdh_installdocs README TODO\n"
+#~ "\n"
+#~ msgstr ""
+#~ "\toverride_dh_installdocs:\n"
+#~ "\t\tdh_installdocs README TODO\n"
+#~ "\n"
 
 # type: textblock
 #~ msgid ""

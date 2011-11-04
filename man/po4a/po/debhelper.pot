@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2011-09-29 15:41-0400\n"
+"POT-Creation-Date: 2011-11-04 17:02-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -872,9 +872,7 @@ msgstr ""
 
 #. type: textblock
 #: debhelper.pod:499
-msgid ""
-"B<dh_auto_configure> passes CFLAGS to F<Makefile.PL> using the OPTIMIZE "
-"variable."
+msgid "B<dh_auto_configure> passes CFLAGS to perl F<Makefile.PL> and F<Build.PL>"
 msgstr ""
 
 #. type: =head1
@@ -1312,7 +1310,7 @@ msgid ""
 msgstr ""
 
 #. type: verbatim
-#: dh:84 dh:91 dh:105 dh:118
+#: dh:84 dh:105 dh:118
 #, no-wrap
 msgid ""
 "\t#!/usr/bin/make -f\n"
@@ -1321,12 +1319,20 @@ msgid ""
 "\n"
 msgstr ""
 
-#. type: verbatim
+#. type: textblock
 #: dh:88
+msgid ""
+"Often you'll want to pass an option to a specific debhelper command. The "
+"easy way to do with is by adding an override target for that command."
+msgstr ""
+
+#. type: verbatim
+#: dh:91 dh:176 dh:187
 #, no-wrap
 msgid ""
-"Often you'll want to pass an option to a specific debhelper command. The\n"
-"easy way to do with is by adding an override target for that command.\n"
+"\t#!/usr/bin/make -f\n"
+"\t%:\n"
+"\t\tdh $@\n"
 "\t\n"
 msgstr ""
 
@@ -1336,15 +1342,15 @@ msgstr ""
 msgid ""
 "\toverride_dh_strip:\n"
 "\t\tdh_strip -Xfoo\n"
-"\t\t\n"
+"\t\n"
 msgstr ""
 
 #. type: verbatim
 #: dh:98
 #, no-wrap
 msgid ""
-"\toverride_dh_installdocs:\n"
-"\t\tdh_installdocs README TODO\n"
+"\toverride_dh_auto_configure:\n"
+"\t\tdh_auto_configure -- --with-foo --disable-bar\n"
 "\n"
 msgstr ""
 
@@ -1502,16 +1508,6 @@ msgstr ""
 msgid ""
 "Here is a way to prevent B<dh> from running several commands that you don't "
 "want it to run, by defining empty override targets for each command."
-msgstr ""
-
-#. type: verbatim
-#: dh:176 dh:187
-#, no-wrap
-msgid ""
-"\t#!/usr/bin/make -f\n"
-"\t%:\n"
-"\t\tdh $@\n"
-"\t\n"
 msgstr ""
 
 #. type: verbatim
@@ -3686,7 +3682,7 @@ msgstr ""
 #: dh_installinit:14
 msgid ""
 "B<dh_installinit> [S<I<debhelper options>>] [B<--name=>I<name>] [B<-n>] "
-"[B<-R>] [B<-r>] [B<-d>] [B<-O>] [S<B<--> I<params>>]"
+"[B<-R>] [B<-r>] [B<-d>] [S<B<--> I<params>>]"
 msgstr ""
 
 #. type: textblock

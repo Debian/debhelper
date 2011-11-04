@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: debhelper manpages\n"
-"POT-Creation-Date: 2011-09-29 15:41-0400\n"
+"POT-Creation-Date: 2011-11-04 17:02-0400\n"
 "PO-Revision-Date: 2011-04-03 17:37+0200\n"
 "Last-Translator: Valery Perrin <valery.perrin.debian@free.fr>\n"
 "Language-Team: Français <debian-l10n-french@lists.debian.org>\n"
@@ -1260,8 +1260,7 @@ msgstr ""
 #. type: textblock
 #: debhelper.pod:499
 msgid ""
-"B<dh_auto_configure> passes CFLAGS to F<Makefile.PL> using the OPTIMIZE "
-"variable."
+"B<dh_auto_configure> passes CFLAGS to perl F<Makefile.PL> and F<Build.PL>"
 msgstr ""
 
 # type: =head1
@@ -1973,7 +1972,7 @@ msgstr ""
 
 # type: verbatim
 #. type: verbatim
-#: dh:84 dh:91 dh:105 dh:118
+#: dh:84 dh:105 dh:118
 #, no-wrap
 msgid ""
 "\t#!/usr/bin/make -f\n"
@@ -1987,13 +1986,16 @@ msgstr ""
 "\n"
 
 # type: verbatim
-#. type: verbatim
+#. type: textblock
 #: dh:88
-#, no-wrap
+#, fuzzy
+#| msgid ""
+#| "Often you'll want to pass an option to a specific debhelper command. The\n"
+#| "easy way to do with is by adding an override target for that command.\n"
+#| "\t\n"
 msgid ""
-"Often you'll want to pass an option to a specific debhelper command. The\n"
-"easy way to do with is by adding an override target for that command.\n"
-"\t\n"
+"Often you'll want to pass an option to a specific debhelper command. The "
+"easy way to do with is by adding an override target for that command."
 msgstr ""
 "Il est fréquent de vouloir passer une option à une commande debhelper.\n"
 "Le moyen le plus simple de le faire consiste à surcharger la commande\n"
@@ -2001,12 +2003,31 @@ msgstr ""
 
 # type: verbatim
 #. type: verbatim
-#: dh:95
+#: dh:91 dh:176 dh:187
 #, no-wrap
+msgid ""
+"\t#!/usr/bin/make -f\n"
+"\t%:\n"
+"\t\tdh $@\n"
+"\t\n"
+msgstr ""
+"\t#!/usr/bin/make -f\n"
+"\t%:\n"
+"\t\tdh $@\n"
+"\t\n"
+
+# type: verbatim
+#. type: verbatim
+#: dh:95
+#, fuzzy, no-wrap
+#| msgid ""
+#| "\toverride_dh_strip:\n"
+#| "\t\tdh_strip -Xfoo\n"
+#| "\t\t\n"
 msgid ""
 "\toverride_dh_strip:\n"
 "\t\tdh_strip -Xfoo\n"
-"\t\t\n"
+"\t\n"
 msgstr ""
 "\toverride_dh_strip:\n"
 "\t\tdh_strip -Xfoo\n"
@@ -2015,14 +2036,16 @@ msgstr ""
 # type: verbatim
 #. type: verbatim
 #: dh:98
-#, no-wrap
+#, fuzzy, no-wrap
+#| msgid ""
+#| "  dh_auto_configure -- --with-foo --enable-bar\n"
+#| "\n"
 msgid ""
-"\toverride_dh_installdocs:\n"
-"\t\tdh_installdocs README TODO\n"
+"\toverride_dh_auto_configure:\n"
+"\t\tdh_auto_configure -- --with-foo --disable-bar\n"
 "\n"
 msgstr ""
-"\toverride_dh_installdocs:\n"
-"\t\tdh_installdocs README TODO\n"
+" dh_auto_configure -- --with-toto --enable-titi\n"
 "\n"
 
 # type: textblock
@@ -2256,21 +2279,6 @@ msgstr ""
 "Voici un moyen d'empêcher B<dh> d'exécuter plusieurs commandes, en "
 "définissant des blocs de substitution vides pour chaque commande que vous ne "
 "voulez pas lancer."
-
-# type: verbatim
-#. type: verbatim
-#: dh:176 dh:187
-#, no-wrap
-msgid ""
-"\t#!/usr/bin/make -f\n"
-"\t%:\n"
-"\t\tdh $@\n"
-"\t\n"
-msgstr ""
-"\t#!/usr/bin/make -f\n"
-"\t%:\n"
-"\t\tdh $@\n"
-"\t\n"
 
 #. type: verbatim
 #: dh:180
@@ -5461,9 +5469,13 @@ msgstr ""
 # type: textblock
 #. type: textblock
 #: dh_installinit:14
+#, fuzzy
+#| msgid ""
+#| "B<dh_installinit> [S<I<debhelper options>>] [B<--name=>I<name>] [B<-n>] "
+#| "[B<-R>] [B<-r>] [B<-d>] [B<-O>] [S<B<--> I<params>>]"
 msgid ""
 "B<dh_installinit> [S<I<debhelper options>>] [B<--name=>I<name>] [B<-n>] [B<-"
-"R>] [B<-r>] [B<-d>] [B<-O>] [S<B<--> I<params>>]"
+"R>] [B<-r>] [B<-d>] [S<B<--> I<params>>]"
 msgstr ""
 "B<dh_installinit> [I<options de debhelper>] [B<--name=>I<nom>] [B<-n>] [B<-"
 "R>] [B<-r>] [B<-d>] [B<-O>] [B<--> I<paramètres>]"
@@ -8572,6 +8584,16 @@ msgstr "Charte Debian, version 2.2"
 #: dh_usrlocal:122
 msgid "Andrew Stribblehill <ads@debian.org>"
 msgstr "Andrew Stribblehill <ads@debian.org>"
+
+# type: verbatim
+#~ msgid ""
+#~ "\toverride_dh_installdocs:\n"
+#~ "\t\tdh_installdocs README TODO\n"
+#~ "\n"
+#~ msgstr ""
+#~ "\toverride_dh_installdocs:\n"
+#~ "\t\tdh_installdocs README TODO\n"
+#~ "\n"
 
 # type: textblock
 #~ msgid ""
