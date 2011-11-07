@@ -166,7 +166,7 @@ sub make_debug {
 	if (! -d $debug_dir) {
 		doit("install", "-d", $debug_dir);
 	}
-	if(compat(8)) {
+	if (compat(8)) {
 		doit($objcopy, "--only-keep-debug", $file, $debug_path);
 	}
 	else {
