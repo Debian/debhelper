@@ -166,7 +166,12 @@ sub make_debug {
 	if (! -d $debug_dir) {
 		doit("install", "-d", $debug_dir);
 	}
-	doit($objcopy, "--only-keep-debug", $file, $debug_path);
+	if(compat(8)) {
+		doit($objcopy, "--only-keep-debug", $file, $debug_path);
+	}
+	else {
+		doit($objcopy, "--only-keep-debug --compress-debug-sections", $file, $debug_path);
+	}
 	# No reason for this to be executable.
 	doit("chmod", 644, $debug_path);
 	return $debug_path;
