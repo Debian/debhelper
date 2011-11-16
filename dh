@@ -726,6 +726,13 @@ sub run_override {
 	return @rest if ! $has_explicit_target; # has empty override
 	return @rest unless @todo; # has override, but no packages to act on
 
+	if (defined $override_type) {
+		# Ensure appropriate -a or -i option is passed when running
+		# an arch-specific override target.
+		my $opt=$override_type eq "arch" ? "-a" : "-i";
+		push @options, $opt unless grep { $_ eq $opt } @options;
+	}
+
 	# This passes the options through to commands called
 	# inside the target.
 	$ENV{DH_INTERNAL_OPTIONS}=join("\x1e", @options);

@@ -4,6 +4,9 @@ debhelper (8.9.10) UNRELEASED; urgency=low
     Needs a new enough binutils and gdb; debhelper backport
     may need to disable this.
     Thanks, Aurelien Jarno and Bastien ROUCARIES. Closes: #631985
+  * dh: Ensure -a and -i are passed when running override_dh_command-arch
+    and override_dh_command-indep targets. This is needed when the binary
+    target is run, rather than binary-arch/binary-indep. Closes: #648901
 
  -- Joey Hess <joeyh@debian.org>  Mon, 07 Nov 2011 13:50:30 -0400
 
