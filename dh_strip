@@ -170,7 +170,7 @@ sub make_debug {
 		doit($objcopy, "--only-keep-debug", $file, $debug_path);
 	}
 	else {
-		doit($objcopy, "--only-keep-debug --compress-debug-sections", $file, $debug_path);
+		doit($objcopy, "--only-keep-debug", "--compress-debug-sections", $file, $debug_path);
 	}
 	# No reason for this to be executable.
 	doit("chmod", 644, $debug_path);
