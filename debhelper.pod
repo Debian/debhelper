@@ -69,9 +69,9 @@ Generally, these files will list files to act on, one file per line. Some
 programs in debhelper use pairs of files and destinations or slightly more
 complicated formats.
 
-Note that if a package is the first (or only) binary package listed in
-F<debian/control>, debhelper will use F<debian/foo> if no F<debian/package.foo>
-file can be found.
+Note for the first (or only) binary package listed in
+F<debian/control>, debhelper will use F<debian/foo> when there's no
+F<debian/package.foo> file.
 
 In some rare cases, you may want to have different versions of these files
 for different architectures or OSes. If files named debian/I<package>.foo.I<ARCH>
@@ -80,13 +80,18 @@ output of "B<dpkg-architecture -qDEB_HOST_ARCH>" /
 "B<dpkg-architecture -qDEB_HOST_ARCH_OS>",
 then they will be used in preference to other, more general files.
 
-In many cases, these config files are used to specify various types of
+Mostly, these config files are used to specify lists of various types of
 files. Documentation or example files to install, files to move, and so on.
 When appropriate, in cases like these, you can use standard shell wildcard
 characters (B<?> and B<*> and B<[>I<..>B<]> character classes) in the files.
-
 You can also put comments in these files; lines beginning with B<#> are
 ignored.
+
+The syntax of these files is intentionally kept very simple to make then
+easy to read, understand, and modify. If you prefer power and complexity,
+you can make the file executable, and write a program that outputs
+whatever content is appropriate for a given situation. When you do so,
+the output is not further processed to expand wildcards or strip comments.
 
 =head1 SHARED DEBHELPER OPTIONS
 

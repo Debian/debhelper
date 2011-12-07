@@ -613,12 +613,21 @@ sub filedoublearray {
 	my $file=shift;
 	my $globdir=shift;
 
+	my $x=-x $file;
+	if ($x) {
+		require Cwd;
+		my $cmd=Cwd::abs_path($file);
+		open (DH_FARRAY_IN, "$cmd |") || error("cannot run $file: $!");
+	}
+	else {
+		open (DH_FARRAY_IN, $file) || error("cannot read $file: $!");
+	}
+
 	my @ret;
-	open (DH_FARRAY_IN, $file) || error("cannot read $file: $!");
 	while (<DH_FARRAY_IN>) {
 		chomp;
 		# Only ignore comments and empty lines in v5 mode.
-		if (! compat(4)) {
+		if (! compat(4) && ! $x)  {
 			next if /^#/ || /^$/;
 		}
 		my @line;
@@ -627,7 +636,7 @@ sub filedoublearray {
 		# The tricky bit is that the glob expansion is done
 		# as if we were in the specified directory, so the
 		# filenames that come out are relative to it.
-		if (defined $globdir && ! compat(2)) {
+		if (defined $globdir && ! compat(2) && ! $x) {
 			foreach (map { glob "$globdir/$_" } split) {
 				s#^$globdir/##;
 				push @line, $_;
@@ -638,7 +647,8 @@ sub filedoublearray {
 		}
 		push @ret, [@line];
 	}
-	close DH_FARRAY_IN;
+
+	close DH_FARRAY_IN || error("problem reading $file: $!");
 	
 	return @ret;
 }
