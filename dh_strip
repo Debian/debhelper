@@ -162,8 +162,8 @@ sub make_debug {
 
 	my ($base_file)=$file=~/^\Q$tmp\E(.*)/;
 	my $debug_path;
-	my $elfnotes=`readelf -n $file`;
-	if ($elfnotes =~ /^\s+Build ID: ([0-9a-f]{2})([0-9a-f]+)$/m) {
+	if (! compat(8) && 
+	    `readelf -n $file`=~ /^\s+Build ID: ([0-9a-f]{2})([0-9a-f]+)$/m) {
 		$debug_path=$desttmp."/usr/lib/debug/.build-id/$1/$2.debug"
 	}
 	else {
