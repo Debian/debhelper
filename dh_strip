@@ -161,7 +161,14 @@ sub make_debug {
 	return unless get_file_type($file) =~ /not stripped/;
 
 	my ($base_file)=$file=~/^\Q$tmp\E(.*)/;
-	my $debug_path=$desttmp."/usr/lib/debug/".$base_file;
+	my $debug_path;
+	my $elfnotes=`readelf -n $file`;
+	if ($elfnotes =~ /^\s+Build ID: ([0-9a-f]{2})([0-9a-f]+)$/m) {
+		$debug_path=$desttmp."/usr/lib/debug/.build-id/$1/$2.debug"
+	}
+	else {
+		$debug_path=$desttmp."/usr/lib/debug/".$base_file;
+	}
 	my $debug_dir=dirname($debug_path);
 	if (! -d $debug_dir) {
 		doit("install", "-d", $debug_dir);
