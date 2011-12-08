@@ -54,12 +54,12 @@ sub configure {
 	push @options, '-nocache';
 
 	if ($ENV{CFLAGS}) {
-		push @flags, "QMAKE_CFLAGS_RELEASE=$ENV{CFLAGS}";
-		push @flags, "QMAKE_CFLAGS_DEBUG=$ENV{CFLAGS}";
+		push @flags, "QMAKE_CFLAGS_RELEASE=$ENV{CFLAGS} $ENV{CPPFLAGS}";
+		push @flags, "QMAKE_CFLAGS_DEBUG=$ENV{CFLAGS} $ENV{CPPFLAGS}";
 	}
 	if ($ENV{CXXFLAGS}) {
-		push @flags, "QMAKE_CXXFLAGS_RELEASE=$ENV{CXXFLAGS}";
-		push @flags, "QMAKE_CXXFLAGS_DEBUG=$ENV{CXXFLAGS}";
+		push @flags, "QMAKE_CXXFLAGS_RELEASE=$ENV{CXXFLAGS} $ENV{CPPFLAGS}";
+		push @flags, "QMAKE_CXXFLAGS_DEBUG=$ENV{CXXFLAGS} $ENV{CPPFLAGS}";
 	}
 	if ($ENV{LDFLAGS}) {
 		push @flags, "QMAKE_LFLAGS_RELEASE=$ENV{LDFLAGS}";
