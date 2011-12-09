@@ -613,7 +613,8 @@ sub filedoublearray {
 	my $file=shift;
 	my $globdir=shift;
 
-	my $x=-x $file;
+	# executable confi files are a v9 thing.
+	my $x=! compat(8) && -x $file;
 	if ($x) {
 		require Cwd;
 		my $cmd=Cwd::abs_path($file);
