@@ -249,27 +249,6 @@ if ($dh{LIST_MISSING} || $dh{FAIL_MISSING}) {
 	}
 }
 
-=head1 EXAMPLE
-
-Suppose your package's upstream F<Makefile> installs a binary, a man page, and
-a library into appropriate subdirectories of F<debian/tmp>. You want to put
-the library into package libfoo, and the rest into package foo. Your rules
-file will run "B<dh_install --sourcedir=debian/tmp>". Make F<debian/foo.install>
-contain:
-
-  usr/bin
-  usr/share/man/man1
-
-While F<debian/libfoo.install> contains:
-
-  usr/lib/libfoo*.so.*
-
-If you want a libfoo-dev package too, F<debian/libfoo-dev.install> might contain:
-
-  usr/include
-  usr/lib/libfoo*.so
-  usr/share/man/man3
-
 =head1 LIMITATIONS
 
 B<dh_install> cannot rename files or directories, it can only install them
