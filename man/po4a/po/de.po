@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: debhelper 8.9.8\n"
+"Project-Id-Version: debhelper 8.9.13\n"
 "Report-Msgid-Bugs-To: debhelper@packages.debian.org\n"
-"POT-Creation-Date: 2011-12-27 11:53-0400\n"
-"PO-Revision-Date: 2011-12-06 21:31+0100\n"
+"POT-Creation-Date: 2011-12-09 13:54-0400\n"
+"PO-Revision-Date: 2011-12-27 22:22+0100\n"
 "Last-Translator: Chris Leick <c.leick@vollbio.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
 "Language: de\n"
@@ -232,18 +232,13 @@ msgstr ""
 
 #. type: textblock
 #: debhelper.pod:72
-#, fuzzy
-#| msgid ""
-#| "Note that if a package is the first (or only) binary package listed in "
-#| "F<debian/control>, debhelper will use F<debian/foo> if no F<debian/"
-#| "package.foo> file can be found."
 msgid ""
 "Note for the first (or only) binary package listed in F<debian/control>, "
 "debhelper will use F<debian/foo> when there's no F<debian/package.foo> file."
 msgstr ""
-"Beachten Sie, dass wenn ein Paket das erste (oder einzige) in F<debian/"
-"control> aufgelistete Binärpaket ist, Debhelper F<debian/foo> benutzen wird, "
-"falls keine F<debian/package.foo>-Datei gefunden wird."
+"Beachten Sie, dass Debhelper für das erste (oder einzige) in "
+"F<debian/control> aufgelistete Binärpaket F<debian/foo> benutzen wird, wenn "
+"es dort keine F<debian/package.foo>-Datei gibt."
 
 #. type: textblock
 #: debhelper.pod:76
@@ -265,13 +260,6 @@ msgstr ""
 
 #. type: textblock
 #: debhelper.pod:83
-#, fuzzy
-#| msgid ""
-#| "In many cases, these config files are used to specify various types of "
-#| "files. Documentation or example files to install, files to move, and so "
-#| "on.  When appropriate, in cases like these, you can use standard shell "
-#| "wildcard characters (B<?> and B<*> and B<[>I<..>B<]> character classes) "
-#| "in the files."
 msgid ""
 "Mostly, these config files are used to specify lists of various types of "
 "files. Documentation or example files to install, files to move, and so on.  "
@@ -280,11 +268,13 @@ msgid ""
 "files.  You can also put comments in these files; lines beginning with B<#> "
 "are ignored."
 msgstr ""
-"In vielen Fällen werden diese Konfigurationsdateien benutzt, um verschiedene "
-"Dateitypen anzugeben – zu installierende Dokumentations- oder "
-"Beispieldateien, Dateien zum Verschieben und so weiter. Wenn es in Fällen "
+"Meist werden diese Konfigurationsdateien benutzt, um verschiedene Typen von "
+"Dateien anzugeben – zu installierende Dokumentations- oder Beispieldateien, "
+"Dateien zum Verschieben und so weiter. Wenn es in Fällen "
 "wie diesem zweckmäßig ist, können Sie die Standardplatzhalterzeichen der "
-"Shell in den Dateien verwenden (B<?>, B<*> und B<[>I<..>B<]>-Zeichenklassen)."
+"Shell in den Dateien verwenden (B<?>, B<*> und B<[>I<..>B<]>-Zeichenklassen). "
+"Sie können außerdem Kommentare in diese Dateien einfügen; Zeilen, die mit "
+"B<#> beginnen, werden ignoriert."
 
 #. type: textblock
 #: debhelper.pod:90
@@ -295,6 +285,12 @@ msgid ""
 "content is appropriate for a given situation. When you do so, the output is "
 "not further processed to expand wildcards or strip comments."
 msgstr ""
+"Die Syntax dieser Dateien ist absichtlich sehr einfach gehalten, damit sie "
+"leicht zu lesen, zu verstehen und zu ändern sind. Falls Sie Leistung und "
+"Komplexität vorziehen, können Sie die Datei ausführbar machen und ein "
+"Programm schreiben, das das ausgibt, was auch immer für eine gegebene "
+"Situation gegeignet ist. Wenn Sie dies tun, wird die Ausgabe nicht weiter "
+"verarbeitet, um Platzhalter zu expandieren oder Kommentare zu entfernen."
 
 #. type: =head1
 #: debhelper.pod:96
@@ -630,7 +626,6 @@ msgstr ""
 "I<Verzeichnis>] als Bauverzeichnis. Falls der Parameter I<Verzeichnis>] "
 "weggelassen wurde, wird ein Vorgabebauverzeichnis ausgewählt."
 
-# FIXME s/B<--builddirectory> is not/B<--builddirectory> is/
 #. type: textblock
 #: debhelper.pod:225
 msgid ""
@@ -1042,7 +1037,6 @@ msgstr ""
 "B<dh_clean> wird F<debian/clean> lesen und die dort aufgeführten Dateien "
 "löschen."
 
-# FIXME s/toplevel/top-level/
 #. type: textblock
 #: debhelper.pod:427
 msgid "B<dh_clean> will delete toplevel F<*-stamp> files."
@@ -1163,6 +1157,8 @@ msgid ""
 "B<dh_strip> compresses debugging symbol files to reduce the installed size "
 "of -dbg packages."
 msgstr ""
+"B<dh_strip> komprimiert Debug-Symboldateien, um die installierte Größe von "
+"»-dbg«-Paketen zu verringern."
 
 #. type: textblock
 #: debhelper.pod:494
@@ -1192,15 +1188,10 @@ msgstr ""
 
 #. type: textblock
 #: debhelper.pod:509
-#, fuzzy
-#| msgid ""
-#| "B<dh_auto_configure> passes CFLAGS to F<Makefile.PL> using the OPTIMIZE "
-#| "variable."
 msgid ""
 "B<dh_auto_configure> passes CFLAGS to perl F<Makefile.PL> and F<Build.PL>"
 msgstr ""
-"B<dh_auto_configure> übergibt CFLAGS unter Benutzung der Variable OPTIMIZE "
-"an F<Makefile.PL>."
+"B<dh_auto_configure> übergibt CFLAGS an Perls F<Makefile.PL> und F<Build.PL.>"
 
 #. type: textblock
 #: debhelper.pod:514
@@ -1208,13 +1199,17 @@ msgid ""
 "B<dh_strip> puts separated debug symbols in a location based on their build-"
 "id."
 msgstr ""
+"B<dh_strip> legt getrennte Debug-Symbole an einer Stelle ab, die auf ihrer "
+"Baukennzahl basiert."
 
 #. type: textblock
 #: debhelper.pod:519
 msgid ""
-"Executable debhelper config files are run and their output used as the "
+"Executable debconf config files are run and their output used as the "
 "configuration."
 msgstr ""
+"Ausführbare Debconf-Konfigurationsdateien werden ausgeführt und ihre Ausgabe "
+"wird als Konfiguration benutzt."
 
 #. type: =head1
 #: debhelper.pod:526 dh_auto_test:45 dh_installcatalogs:59 dh_installdocs:116
@@ -1593,7 +1588,7 @@ msgstr ""
 #: debhelper.pod:666 dh:890 dh_auto_build:47 dh_auto_clean:50
 #: dh_auto_configure:52 dh_auto_install:85 dh_auto_test:59 dh_bugfiles:122
 #: dh_builddeb:120 dh_clean:142 dh_compress:206 dh_desktop:31 dh_fixperms:127
-#: dh_gconf:99 dh_gencontrol:82 dh_icons:65 dh_install:258
+#: dh_gconf:99 dh_gencontrol:82 dh_icons:65 dh_install:279
 #: dh_installcatalogs:116 dh_installchangelogs:171 dh_installcron:77
 #: dh_installdeb:144 dh_installdebconf:126 dh_installdirs:86
 #: dh_installdocs:307 dh_installemacsen:124 dh_installexamples:106
@@ -1635,7 +1630,7 @@ msgstr "Debhelper-Website"
 #: debhelper.pod:680 dh:896 dh_auto_build:53 dh_auto_clean:56
 #: dh_auto_configure:58 dh_auto_install:91 dh_auto_test:65 dh_bugfiles:130
 #: dh_builddeb:126 dh_clean:148 dh_compress:212 dh_desktop:37 dh_fixperms:133
-#: dh_gconf:105 dh_gencontrol:88 dh_icons:71 dh_install:264
+#: dh_gconf:105 dh_gencontrol:88 dh_icons:71 dh_install:285
 #: dh_installcatalogs:122 dh_installchangelogs:177 dh_installcron:83
 #: dh_installdeb:150 dh_installdebconf:132 dh_installdirs:92
 #: dh_installdocs:313 dh_installemacsen:130 dh_installexamples:112
@@ -1654,7 +1649,7 @@ msgstr "AUTOR"
 #: debhelper.pod:682 dh:898 dh_auto_build:55 dh_auto_clean:58
 #: dh_auto_configure:60 dh_auto_install:93 dh_auto_test:67 dh_builddeb:128
 #: dh_clean:150 dh_compress:214 dh_fixperms:135 dh_gencontrol:90
-#: dh_install:266 dh_installchangelogs:179 dh_installcron:85 dh_installdeb:152
+#: dh_install:287 dh_installchangelogs:179 dh_installcron:85 dh_installdeb:152
 #: dh_installdebconf:134 dh_installdirs:94 dh_installdocs:315
 #: dh_installemacsen:132 dh_installexamples:114 dh_installifupdown:77
 #: dh_installinfo:85 dh_installinit:283 dh_installlogrotate:58
@@ -1672,7 +1667,6 @@ msgstr "Joey Hess <joeyh@debian.org>"
 msgid "dh - debhelper command sequencer"
 msgstr "dh - Debhelper-Befehls-Sequenzer"
 
-# FIXME s/addon/add-on/
 #. type: textblock
 #: dh:14
 msgid ""
@@ -1760,13 +1754,11 @@ msgstr ""
 msgid "OPTIONS"
 msgstr "OPTIONEN"
 
-# FIXME s/addon/add-on/
 #. type: =item
 #: dh:47
 msgid "B<--with> I<addon>[B<,>I<addon> ...]"
 msgstr "B<--with> I<Add-on>[B<,>I<Add-on> …]"
 
-# FIXME s/addon/add-on/
 #. type: textblock
 #: dh:49
 msgid ""
@@ -1784,13 +1776,11 @@ msgstr ""
 "Fremdpaket gibt, das Debhelper-Befehle bereitstellt. Dokumentation über die "
 "Sequenz-Add-on-Schnittstelle finden Sie in der Datei F<PROGRAMMING>."
 
-# FIXME s/addon/add-on/
 #. type: =item
 #: dh:56
 msgid "B<--without> I<addon>"
 msgstr "B<--without> I<Add-on>"
 
-# FIXME s/addon/add-on/
 #. type: textblock
 #: dh:58
 msgid "The inverse of B<--with>, disables using the given addon."
@@ -1798,7 +1788,6 @@ msgstr ""
 "das Gegenteil von B<--with>, deaktiviert die Benutzung des angegebenen Add-"
 "ons."
 
-# FIXME s/addon/add-on/
 #. type: textblock
 #: dh:62
 msgid "List all available addons."
@@ -1872,19 +1861,13 @@ msgstr ""
 
 #. type: textblock
 #: dh:88
-#, fuzzy
-#| msgid ""
-#| "Often you'll want to pass an option to a specific debhelper command. The\n"
-#| "easy way to do with is by adding an override target for that command.\n"
-#| "\t\n"
 msgid ""
 "Often you'll want to pass an option to a specific debhelper command. The "
 "easy way to do with is by adding an override target for that command."
 msgstr ""
-"Oft möchten Sie eine Option an einen speziellen Debhelper-Befehl übergeben.\n"
+"Oft möchten Sie eine Option an einen speziellen Debhelper-Befehl übergeben. "
 "Der einfachste Weg, dies zu tun, besteht darin, ein außer Kraft setzendes "
-"Ziel\n"
-"für diesen Befehl hinzuzufügen.\t\n"
+"Ziel für diesen Befehl hinzuzufügen."
 
 #. type: verbatim
 #: dh:91 dh:176 dh:187
@@ -1902,11 +1885,7 @@ msgstr ""
 
 #. type: verbatim
 #: dh:95
-#, fuzzy, no-wrap
-#| msgid ""
-#| "\toverride_dh_strip:\n"
-#| "\t\tdh_strip -Xfoo\n"
-#| "\t\t\n"
+#, no-wrap
 msgid ""
 "\toverride_dh_strip:\n"
 "\t\tdh_strip -Xfoo\n"
@@ -1914,20 +1893,18 @@ msgid ""
 msgstr ""
 "\toverride_dh_strip:\n"
 "\t\tdh_strip -Xfoo\n"
-"\t\t\n"
+"\t\n"
 
 #. type: verbatim
 #: dh:98
-#, fuzzy, no-wrap
-#| msgid ""
-#| "  dh_auto_configure -- --with-foo --enable-bar\n"
-#| "\n"
+#, no-wrap
 msgid ""
 "\toverride_dh_auto_configure:\n"
 "\t\tdh_auto_configure -- --with-foo --disable-bar\n"
 "\n"
 msgstr ""
-"  dh_auto_configure -- --with-foo --enable-bar\n"
+"\toverride_dh_auto_configure:\n"
+"\t\tdh_auto_configure -- --with-foo --disable-bar\n"
 "\n"
 
 #. type: textblock
@@ -2387,7 +2364,7 @@ msgstr ""
 #: dh:892 dh_auto_build:49 dh_auto_clean:52 dh_auto_configure:54
 #: dh_auto_install:87 dh_auto_test:61 dh_builddeb:122 dh_clean:144
 #: dh_compress:208 dh_fixperms:129 dh_gconf:101 dh_gencontrol:84
-#: dh_install:260 dh_installcatalogs:118 dh_installchangelogs:173
+#: dh_install:281 dh_installcatalogs:118 dh_installchangelogs:173
 #: dh_installcron:79 dh_installdeb:146 dh_installdebconf:128 dh_installdirs:88
 #: dh_installdocs:309 dh_installemacsen:126 dh_installexamples:108
 #: dh_installifupdown:71 dh_installinfo:79 dh_installinit:277
@@ -2405,7 +2382,7 @@ msgstr "L<debhelper(7)>"
 #: dh:894 dh_auto_build:51 dh_auto_clean:54 dh_auto_configure:56
 #: dh_auto_install:89 dh_auto_test:63 dh_bugfiles:128 dh_builddeb:124
 #: dh_clean:146 dh_compress:210 dh_desktop:35 dh_fixperms:131 dh_gconf:103
-#: dh_gencontrol:86 dh_icons:69 dh_install:262 dh_installchangelogs:175
+#: dh_gencontrol:86 dh_icons:69 dh_install:283 dh_installchangelogs:175
 #: dh_installcron:81 dh_installdeb:148 dh_installdebconf:130 dh_installdirs:90
 #: dh_installdocs:311 dh_installemacsen:128 dh_installexamples:110
 #: dh_installifupdown:73 dh_installinfo:81 dh_installinit:279
@@ -3712,11 +3689,82 @@ msgstr ""
 
 #. type: =head1
 #: dh_install:252
+msgid "EXAMPLE"
+msgstr "BEISPIEL"
+
+#. type: textblock
+#: dh_install:254
+msgid ""
+"Suppose your package's upstream F<Makefile> installs a binary, a man page, "
+"and a library into appropriate subdirectories of F<debian/tmp>. You want to "
+"put the library into package libfoo, and the rest into package foo. Your "
+"rules file will run \"B<dh_install --sourcedir=debian/tmp>\". Make F<debian/"
+"foo.install> contain:"
+msgstr ""
+"Angenommen, das F<Makefile> der Originalautoren Ihres Pakets installiert ein "
+"Binärpaket, eine Handbuchseite und eine Bibliothek in geeignete "
+"Unterverzeichnisse von F<debian/tmp>. Sie möchten die Bibliothek in das "
+"Paket »libfoo« und den Rest in das Paket »foo« ablegen. Ihre »rules«-Datei "
+"wird »B<dh_install --sourcedir=debian/tmp>« ausführen. Geben Sie F<debian/"
+"foo.install> den Inhalt:"
+
+#. type: verbatim
+#: dh_install:260
+#, no-wrap
+msgid ""
+"  usr/bin\n"
+"  usr/share/man/man1\n"
+"\n"
+msgstr ""
+"  usr/bin\n"
+"  usr/share/man/man1\n"
+"\n"
+
+#. type: textblock
+#: dh_install:263
+msgid "While F<debian/libfoo.install> contains:"
+msgstr "F<debian/libfoo.install> enthält indessen Folgendes:"
+
+#. type: verbatim
+#: dh_install:265
+#, no-wrap
+msgid ""
+"  usr/lib/libfoo*.so.*\n"
+"\n"
+msgstr ""
+"  usr/lib/libfoo*.so.*\n"
+"\n"
+
+#. type: textblock
+#: dh_install:267
+msgid ""
+"If you want a libfoo-dev package too, F<debian/libfoo-dev.install> might "
+"contain:"
+msgstr ""
+"Falls Sie auch ein »libfoo-dev«-Paket wollen, könnte F<debian/libfoo-dev."
+"install> Folgendes enthalten:"
+
+#. type: verbatim
+#: dh_install:269
+#, no-wrap
+msgid ""
+"  usr/include\n"
+"  usr/lib/libfoo*.so\n"
+"  usr/share/man/man3\n"
+"\n"
+msgstr ""
+"  usr/include\n"
+"  usr/lib/libfoo*.so\n"
+"  usr/share/man/man3\n"
+"\n"
+
+#. type: =head1
+#: dh_install:273
 msgid "LIMITATIONS"
 msgstr "EINSCHRÄNKUNGEN"
 
 #. type: verbatim
-#: dh_install:254
+#: dh_install:275
 #, no-wrap
 msgid ""
 "B<dh_install> cannot rename files or directories, it can only install them\n"
@@ -4219,16 +4267,10 @@ msgstr ""
 
 #. type: textblock
 #: dh_installdebconf:29
-#, fuzzy
-#| msgid ""
-#| "Note that for your config script to be called by B<dpkg>, your "
-#| "F<postinst> needs to source debconf's confmodule. B<dh_installdebconf> "
-#| "does not install this statement into the F<postinst> automatically as it "
-#| "it too hard to do it right."
 msgid ""
 "Note that for your config script to be called by B<dpkg>, your F<postinst> "
 "needs to source debconf's confmodule. B<dh_installdebconf> does not install "
-"this statement into the F<postinst> automatically as it is too hard to do it "
+"this statement into the F<postinst> automatically as it it too hard to do it "
 "right."
 msgstr ""
 "Beachten Sie für Ihr durch B<dpkg> aufgerufenes Konfigurationsskript, dass "
@@ -4890,16 +4932,12 @@ msgstr ""
 
 #. type: textblock
 #: dh_installinit:14
-#, fuzzy
-#| msgid ""
-#| "B<dh_installinit> [S<I<debhelper options>>] [B<--name=>I<name>] [B<-n>] "
-#| "[B<-R>] [B<-r>] [B<-d>] [B<-O>] [S<B<--> I<params>>]"
 msgid ""
 "B<dh_installinit> [S<I<debhelper options>>] [B<--name=>I<name>] [B<-n>] [B<-"
 "R>] [B<-r>] [B<-d>] [S<B<--> I<params>>]"
 msgstr ""
 "B<dh_installinit> [S<I<Debhelper-Optionen>>] [B<--name=>I<Name>] [B<-n>] [B<-"
-"R>] [B<-r>] [B<-d>] [B<-O>] [S<B<--> I<Parameter>>]"
+"R>] [B<-r>] [B<-d>] [S<B<--> I<Parameter>>]"
 
 #. type: textblock
 #: dh_installinit:18
@@ -4914,21 +4952,15 @@ msgstr ""
 "Paketbauverzeichnisse zuständig ist und im erstgenannten Fall die "
 "Kompatibilität für nicht Upstart-Systeme handhabt."
 
-# FIXME s/and to start/to start/
 #. type: textblock
 #: dh_installinit:23
-#, fuzzy
-#| msgid ""
-#| "It also automatically generates the F<postinst> and F<postrm> and "
-#| "F<prerm> commands needed to set up the symlinks in F</etc/rc*.d/> and to "
-#| "start and stop the init scripts."
 msgid ""
 "It also automatically generates the F<postinst> and F<postrm> and F<prerm> "
 "commands needed to set up the symlinks in F</etc/rc*.d/> to start and stop "
 "the init scripts."
 msgstr ""
 "Es erzeugt außerdem automatisch die F<postinst>-, F<postrm>- und F<prerm>-"
-"Skripte, die nötig sind, um die symbolischen Verweise um F</etc/rc*.d/> "
+"Skripte, die nötig sind, um die symbolischen Verweise in F</etc/rc*.d/> "
 "einzurichten und die Init-Skripte zu starten und zu stoppen."
 
 #. type: =item
@@ -5358,7 +5390,6 @@ msgstr ""
 "annimmt, dass dies bedeutet, sie sei ins Polnische übersetzt. Benutzen Sie "
 "B<--language=C>, um dies zu vermeiden."
 
-# FIXME s/contain/contains/
 #. type: textblock
 #: dh_installman:41
 msgid ""
@@ -5618,7 +5649,6 @@ msgstr ""
 msgid "Do not modify F<postinst>/F<postrm> scripts."
 msgstr "ändert keine F<postinst>-/F<postrm>-Skripte."
 
-# FIXME wrong order
 #. type: textblock
 #: dh_installmenu:89
 msgid "L<debhelper(7)> L<update-menus(1)> L<menufile(5)>"
@@ -6986,17 +7016,8 @@ msgstr ""
 msgid "I<module dirs>"
 msgstr "I<Modulverzeichnisse>"
 
-# FIXME s/F</usr/lib/site-python/F</usr/lib/site-python>/
-# FIXME s//usr/lib/$PACKAGE>/F</usr/lib/$PACKAGE>/
 #. type: textblock
 #: dh_python:45
-#, fuzzy
-#| msgid ""
-#| "If your package installs Python modules in non-standard directories, you "
-#| "can make F<dh_python> check those directories by passing their names on "
-#| "the command line. By default, it will check F</usr/lib/site-python, /usr/"
-#| "lib/$PACKAGE>, F</usr/share/$PACKAGE>, F</usr/lib/games/$PACKAGE>, F</usr/"
-#| "share/games/$PACKAGE> and F</usr/lib/python?.?/site-packages>."
 msgid ""
 "If your package installs Python modules in non-standard directories, you can "
 "make F<dh_python> check those directories by passing their names on the "
@@ -7007,8 +7028,8 @@ msgstr ""
 "Falls Ihr Paket Python-Module in nicht vorgegebene Verzeichnisse "
 "installiert, können Sie diese von F<dh_python> prüfen lassen, indem Sie ihre "
 "Namen auf der Befehlszeile übergeben. Standardmäßig wird es F</usr/lib/site-"
-"python, /usr/lib/$PACKAGE>, F</usr/share/$PACKAGE>, F</usr/lib/games/"
-"$PACKAGE>, F</usr/share/games/$PACKAGE> und F</usr/lib/python?.?/site-"
+"python,> F</usr/lib/$PACKAGE,> F</usr/share/$PACKAGE,> F</usr/lib/games/"
+"$PACKAGE,> F</usr/share/games/$PACKAGE> und F</usr/lib/python?.?/site-"
 "packages> prüfen."
 
 #. type: textblock
@@ -7615,60 +7636,6 @@ msgstr "Debian-Richtlinie, Version 2.2"
 #: dh_usrlocal:122
 msgid "Andrew Stribblehill <ads@debian.org>"
 msgstr "Andrew Stribblehill <ads@debian.org>"
-
-#~ msgid "EXAMPLE"
-#~ msgstr "BEISPIEL"
-
-#~ msgid ""
-#~ "Suppose your package's upstream F<Makefile> installs a binary, a man "
-#~ "page, and a library into appropriate subdirectories of F<debian/tmp>. You "
-#~ "want to put the library into package libfoo, and the rest into package "
-#~ "foo. Your rules file will run \"B<dh_install --sourcedir=debian/tmp>\". "
-#~ "Make F<debian/foo.install> contain:"
-#~ msgstr ""
-#~ "Angenommen, das F<Makefile> der Originalautoren Ihres Pakets installiert "
-#~ "ein Binärpaket, eine Handbuchseite und eine Bibliothek in geeignete "
-#~ "Unterverzeichnisse von F<debian/tmp>. Sie möchten die Bibliothek in das "
-#~ "Paket »libfoo« und den Rest in das Paket »foo« ablegen. Ihre »rules«-"
-#~ "Datei wird »B<dh_install --sourcedir=debian/tmp>« ausführen. Geben Sie "
-#~ "F<debian/foo.install> den Inhalt:"
-
-#~ msgid ""
-#~ "  usr/bin\n"
-#~ "  usr/share/man/man1\n"
-#~ "\n"
-#~ msgstr ""
-#~ "  usr/bin\n"
-#~ "  usr/share/man/man1\n"
-#~ "\n"
-
-#~ msgid "While F<debian/libfoo.install> contains:"
-#~ msgstr "F<debian/libfoo.install> enthält indessen Folgendes:"
-
-#~ msgid ""
-#~ "  usr/lib/libfoo*.so.*\n"
-#~ "\n"
-#~ msgstr ""
-#~ "  usr/lib/libfoo*.so.*\n"
-#~ "\n"
-
-#~ msgid ""
-#~ "If you want a libfoo-dev package too, F<debian/libfoo-dev.install> might "
-#~ "contain:"
-#~ msgstr ""
-#~ "Falls Sie auch ein »libfoo-dev«-Paket wollen, könnte F<debian/libfoo-dev."
-#~ "install> Folgendes enthalten:"
-
-#~ msgid ""
-#~ "  usr/include\n"
-#~ "  usr/lib/libfoo*.so\n"
-#~ "  usr/share/man/man3\n"
-#~ "\n"
-#~ msgstr ""
-#~ "  usr/include\n"
-#~ "  usr/lib/libfoo*.so\n"
-#~ "  usr/share/man/man3\n"
-#~ "\n"
 
 #~ msgid ""
 #~ "You can also put comments in these files; lines beginning with B<#> are "
