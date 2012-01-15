@@ -346,7 +346,7 @@ sub dirname {
 				}
 			}
 			else {
-				warning("No compatability level specified in debian/compat");
+				warning("No compatibility level specified in debian/compat");
 				warning("This package will soon FTBFS; time to fix it!");
 			}
 
