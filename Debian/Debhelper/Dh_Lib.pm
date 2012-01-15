@@ -20,7 +20,7 @@ use vars qw(@ISA @EXPORT %dh);
 	    &is_make_jobserver_unavailable &clean_jobserver_makeflags
 	    &cross_command &set_buildflags &get_buildoption);
 
-my $max_compat=9;
+my $max_compat=10;
 
 sub init {
 	my %params=@_;
@@ -332,26 +332,31 @@ sub dirname {
 	
 		if (! defined $c) {
 			$c=1;
-			if (defined $ENV{DH_COMPAT}) {
-				$c=$ENV{DH_COMPAT};
-			}
-			elsif (-e 'debian/compat') {
-				# Try the file..
+			if (-e 'debian/compat') {
 				open (COMPAT_IN, "debian/compat") || error "debian/compat: $!";
 				my $l=<COMPAT_IN>;
 				close COMPAT_IN;
 				if (! defined $l || ! length $l) {
-					warning("debian/compat is empty, assuming level $c");
+					warning("debian/compat is empty, assuming level $c")
+						unless defined $ENV{DH_COMPAT};
 				}
 				else {
 					chomp $l;
 					$c=$l;
 				}
 			}
+			else {
+				warning("No compatability level specified in debian/compat");
+				warning("This package will soon FTBFS; time to fix it!");
+			}
+
+			if (defined $ENV{DH_COMPAT}) {
+				$c=$ENV{DH_COMPAT};
+			}
 		}
 
 		if ($c <= 4 && ! $warned_compat && ! $nowarn) {
-			warning("Compatibility levels before 5 are deprecated.");
+			warning("Compatibility levels before 5 are deprecated (level $c in use)");
 			$warned_compat=1;
 		}
 	
