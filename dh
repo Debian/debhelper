@@ -55,7 +55,9 @@ the sequence addon interface.
 
 =item B<--without> I<addon>
 
-The inverse of B<--with>, disables using the given addon.
+The inverse of B<--with>, disables using the given addon. This option
+can be repeated more than once, or multiple addons to disable can be
+listed, separated by commas.
 
 =item B<--list>, B<-l>
 
@@ -285,7 +287,8 @@ init(options => {
 		},
 		"without=s" => sub {
 			my ($option,$value)=@_;
-			@{$dh{WITH}} = grep { $_ ne $value } @{$dh{WITH}};
+			my %without = map { $_ => 1 } split(",", $value);
+			@{$dh{WITH}} = grep { ! $without{$_} } @{$dh{WITH}};
 		},
 		"l" => \&list_addons,
 		"list" => \&list_addons,
