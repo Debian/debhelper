@@ -271,6 +271,12 @@ F<debian/compat>. For example, to turn on v9 mode:
 
   % echo 9 > debian/compat
 
+Your package will also need a versioned build dependency on a version of
+debhelper equal to (or greater than) the compatibility level your package
+uses. So for compatibility level 9, ensure debian/control has:
+
+  Build-Depends: debhelper (>= 9)
+
 Unless otherwise indicated, all debhelper documentation assumes that you
 are using the most recent compatibility level, and in most cases does not
 indicate if the behavior is different in an earlier compatibility level, so
@@ -615,21 +621,11 @@ act on.
 =head2 udebs
 
 Debhelper includes support for udebs. To create a udeb with debhelper,
-add "B<Package-Type: udeb>" to the package's stanza in F<debian/control>, and
-build-depend on debhelper (>= 4.2). Debhelper will try to create udebs that
-comply with debian-installer policy, by making the generated package files
-end in F<.udeb>, not installing any documentation into a udeb, skipping over
+add "B<Package-Type: udeb>" to the package's stanza in F<debian/control>.
+Debhelper will try to create udebs that comply with debian-installer
+policy, by making the generated package files end in F<.udeb>, not
+installing any documentation into a udeb, skipping over
 F<preinst>, F<postrm>, F<prerm>, and F<config> scripts, etc.
-
-=head2 Build depends
-
-Once your package uses debhelper to build, be sure to add
-debhelper to your Build-Depends line in F<debian/control>. You should
-build-depend on a version of debhelper equal to (or greater than) the
-debhelper compatibility level your package uses. So if your package used
-compatibility level 9:
-
-  Build-Depends: debhelper (>= 9)
 
 =head1 ENVIRONMENT
 
