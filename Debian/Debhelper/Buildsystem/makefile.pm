@@ -101,7 +101,9 @@ sub test {
 sub install {
 	my $this=shift;
 	my $destdir=shift;
-	$this->make_first_existing_target(['install'], "DESTDIR=$destdir", @_);
+	$this->make_first_existing_target(['install'],
+		"DESTDIR=$destdir",
+		"AM_UPDATE_INFO_DIR=no", @_);
 }
 
 sub clean {
