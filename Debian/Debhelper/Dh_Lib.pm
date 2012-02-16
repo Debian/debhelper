@@ -533,14 +533,14 @@ sub autoscript {
 	   && !compat(5)) {
 		# Add fragments to top so they run in reverse order when removing.
 		complex_doit("echo \"# Automatically added by ".basename($0)."\"> $outfile.new");
-		complex_doit("sed \"$sed\" $infile >> $outfile.new");
+		complex_doit("sed '$sed' $infile >> $outfile.new");
 		complex_doit("echo '# End automatically added section' >> $outfile.new");
 		complex_doit("cat $outfile >> $outfile.new");
 		complex_doit("mv $outfile.new $outfile");
 	}
 	else {
 		complex_doit("echo \"# Automatically added by ".basename($0)."\">> $outfile");
-		complex_doit("sed \"$sed\" $infile >> $outfile");
+		complex_doit("sed '$sed' $infile >> $outfile");
 		complex_doit("echo '# End automatically added section' >> $outfile");
 	}
 }
