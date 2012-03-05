@@ -9,6 +9,7 @@ package Debian::Debhelper::Buildsystem::perl_makemaker;
 use strict;
 use Debian::Debhelper::Dh_Lib qw(compat);
 use base 'Debian::Debhelper::Buildsystem::makefile';
+use Config;
 
 sub DESCRIPTION {
 	"Perl ExtUtils::MakeMaker (Makefile.PL)"
@@ -47,7 +48,10 @@ sub configure {
 	$ENV{PERL_AUTOINSTALL}="--skipdeps";
 
 	if ($ENV{CFLAGS} && ! compat(8)) {
-		push @flags, "OPTIMIZE=$ENV{CFLAGS}";
+		push @flags, "OPTIMIZE=$ENV{CFLAGS} $ENV{CPPFLAGS}";
+	}
+	if ($ENV{LDFLAGS} && ! compat(8)) {
+		push @flags, "LD=$Config{ld} $ENV{LDFLAGS}";
 	}
 
 	$this->doit_in_sourcedir("perl", "Makefile.PL", "INSTALLDIRS=vendor",
