@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: debhelper 8.9.13\n"
 "Report-Msgid-Bugs-To: debhelper@packages.debian.org\n"
-"POT-Creation-Date: 2012-01-15 14:43-0400\n"
+"POT-Creation-Date: 2012-03-11 18:29-0400\n"
 "PO-Revision-Date: 2011-12-27 22:22+0100\n"
 "Last-Translator: Chris Leick <c.leick@vollbio.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
@@ -1209,10 +1209,14 @@ msgstr "Standardmäßig aktiviert B<dh> nicht --with=python-support."
 
 #. type: textblock
 #: debhelper.pod:507
+#, fuzzy
+#| msgid ""
+#| "All of the B<dh_auto_>I<*> debhelper programs and B<dh> set environment "
+#| "variables listed by B<dpkg-buildflags>, unless they are already set. They "
+#| "support DEB_BUILD_OPTIONS=noopt too."
 msgid ""
 "All of the B<dh_auto_>I<*> debhelper programs and B<dh> set environment "
-"variables listed by B<dpkg-buildflags>, unless they are already set. They "
-"support DEB_BUILD_OPTIONS=noopt too."
+"variables listed by B<dpkg-buildflags>, unless they are already set."
 msgstr ""
 "Alle B<dh_auto_>I<*>-Debhelper-Programme und B<dh> setzen "
 "Umgebungsvariablen, die durch B<dpkg-buildflags> aufgelistet werden, wenn "
@@ -1221,8 +1225,12 @@ msgstr ""
 
 #. type: textblock
 #: debhelper.pod:513
+#, fuzzy
+#| msgid ""
+#| "B<dh_auto_configure> passes CFLAGS to perl F<Makefile.PL> and F<Build.PL>"
 msgid ""
-"B<dh_auto_configure> passes CFLAGS to perl F<Makefile.PL> and F<Build.PL>"
+"B<dh_auto_configure> passes B<dpkg-buildflags> CFLAGS, CPPFLAGS, and LDFLAGS "
+"to perl F<Makefile.PL> and F<Build.PL>"
 msgstr ""
 "B<dh_auto_configure> übergibt CFLAGS an Perls F<Makefile.PL> und F<Build.PL.>"
 
@@ -1629,7 +1637,7 @@ msgstr ""
 "getrennt werden, wie in B<DH_ALWAYS_EXCLUDE=CVS:.svn>."
 
 #. type: =head1
-#: debhelper.pod:674 dh:892 dh_auto_build:47 dh_auto_clean:50
+#: debhelper.pod:674 dh:893 dh_auto_build:47 dh_auto_clean:50
 #: dh_auto_configure:52 dh_auto_install:85 dh_auto_test:59 dh_bugfiles:122
 #: dh_builddeb:120 dh_clean:142 dh_compress:206 dh_desktop:31 dh_fixperms:127
 #: dh_gconf:99 dh_gencontrol:82 dh_icons:65 dh_install:258
@@ -1671,7 +1679,7 @@ msgid "Debhelper web site."
 msgstr "Debhelper-Website"
 
 #. type: =head1
-#: debhelper.pod:688 dh:898 dh_auto_build:53 dh_auto_clean:56
+#: debhelper.pod:688 dh:899 dh_auto_build:53 dh_auto_clean:56
 #: dh_auto_configure:58 dh_auto_install:91 dh_auto_test:65 dh_bugfiles:130
 #: dh_builddeb:126 dh_clean:148 dh_compress:212 dh_desktop:37 dh_fixperms:133
 #: dh_gconf:105 dh_gencontrol:88 dh_icons:71 dh_install:264
@@ -1690,7 +1698,7 @@ msgid "AUTHOR"
 msgstr "AUTOR"
 
 #. type: textblock
-#: debhelper.pod:690 dh:900 dh_auto_build:55 dh_auto_clean:58
+#: debhelper.pod:690 dh:901 dh_auto_build:55 dh_auto_clean:58
 #: dh_auto_configure:60 dh_auto_install:93 dh_auto_test:67 dh_builddeb:128
 #: dh_clean:150 dh_compress:214 dh_fixperms:135 dh_gencontrol:90
 #: dh_install:266 dh_installchangelogs:179 dh_installcron:85 dh_installdeb:152
@@ -2406,7 +2414,7 @@ msgstr ""
 "der letzte in der Sequenz benutzt."
 
 #. type: textblock
-#: dh:894 dh_auto_build:49 dh_auto_clean:52 dh_auto_configure:54
+#: dh:895 dh_auto_build:49 dh_auto_clean:52 dh_auto_configure:54
 #: dh_auto_install:87 dh_auto_test:61 dh_builddeb:122 dh_clean:144
 #: dh_compress:208 dh_fixperms:129 dh_gconf:101 dh_gencontrol:84
 #: dh_install:260 dh_installcatalogs:118 dh_installchangelogs:173
@@ -2424,7 +2432,7 @@ msgid "L<debhelper(7)>"
 msgstr "L<debhelper(7)>"
 
 #. type: textblock
-#: dh:896 dh_auto_build:51 dh_auto_clean:54 dh_auto_configure:56
+#: dh:897 dh_auto_build:51 dh_auto_clean:54 dh_auto_configure:56
 #: dh_auto_install:89 dh_auto_test:63 dh_bugfiles:128 dh_builddeb:124
 #: dh_clean:146 dh_compress:210 dh_desktop:35 dh_fixperms:131 dh_gconf:103
 #: dh_gencontrol:86 dh_icons:69 dh_install:262 dh_installchangelogs:175
@@ -3499,9 +3507,13 @@ msgstr "dh_install - installiert Dateien in Bauverzeichnisse von Paketen"
 
 #. type: textblock
 #: dh_install:15
+#, fuzzy
+#| msgid ""
+#| "B<dh_install> [B<-X>I<item>] [B<--autodest>] [B<--sourcedir=>I<dir>] "
+#| "[S<I<debhelper options>>] [S<I<file> ... I<dest>>]"
 msgid ""
 "B<dh_install> [B<-X>I<item>] [B<--autodest>] [B<--sourcedir=>I<dir>] "
-"[S<I<debhelper options>>] [S<I<file> ... I<dest>>]"
+"[S<I<debhelper options>>] [S<I<file|dir> ... I<destdir>>]"
 msgstr ""
 "B<dh_install> [B<-X>I<Element>] [B<--autodest>] [B<--sourcedir=>I<Verz>] "
 "[S<I<Debhelper-Optionen>>] [S<I<Datei> … I<Ziel>>]"
@@ -3719,7 +3731,9 @@ msgstr ""
 
 #. type: =item
 #: dh_install:108
-msgid "I<file> ... I<dest>"
+#, fuzzy
+#| msgid "I<file> ... I<dest>"
+msgid "I<file|dir> ... I<destdir>"
 msgstr "<I<Datei> … I<Ziel>"
 
 #. type: textblock

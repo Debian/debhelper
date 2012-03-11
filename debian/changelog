@@ -1,12 +1,18 @@
-debhelper (9.20120116) UNRELEASED; urgency=low
+debhelper (9.20120311) unstable; urgency=low
 
   * dh_auto_install: Set AM_UPDATE_INFO_DIR=no to avoid automake
     generating an info dir file. Closes: #634741
   * dh_install: Man page clarification. Closes: #659635
   * Avoid expanding shell metacharacters in sed call in autoscript().
     Closes: #660794
+  * dh_auto_configure: Pass CPPFLAGS and LDFLAGS to Makefile.PL and Build.PL,
+    in compat level v9. Closes: #662666
+    Thanks, Dominic Hargreaves for the patch.
+    Thanks, Alessandro Ghedini, Niko Tyni, and Dominic Hargreaves for
+    testing all relevant packages to verify the safety of this late
+    change to v9.
 
- -- Joey Hess <joeyh@debian.org>  Wed, 08 Feb 2012 13:46:13 -0400
+ -- Joey Hess <joeyh@debian.org>  Sun, 11 Mar 2012 18:28:33 -0400
 
 debhelper (9.20120115) unstable; urgency=low
 
