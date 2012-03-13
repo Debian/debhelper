@@ -51,7 +51,7 @@ sub configure {
 		push @flags, "OPTIMIZE=$ENV{CFLAGS} $ENV{CPPFLAGS}";
 	}
 	if ($ENV{LDFLAGS} && ! compat(8)) {
-		push @flags, "LD=$Config{ld} $ENV{LDFLAGS}";
+		push @flags, "LD=$Config{ld} $ENV{CFLAGS} $ENV{LDFLAGS}";
 	}
 
 	$this->doit_in_sourcedir("perl", "Makefile.PL", "INSTALLDIRS=vendor",

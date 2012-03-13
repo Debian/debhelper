@@ -46,7 +46,7 @@ sub configure {
 		push @flags, "config=optimize=$ENV{CFLAGS} $ENV{CPPFLAGS}";
 	}
 	if ($ENV{LDFLAGS} && ! compat(8)) {
-		push @flags, "config=ld=$Config{ld} $ENV{LDFLAGS}";
+		push @flags, "config=ld=$Config{ld} $ENV{CFLAGS} $ENV{LDFLAGS}";
 	}
 	$this->do_perl("Build.PL", "installdirs=vendor", @flags, @_);
 }
