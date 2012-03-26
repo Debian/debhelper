@@ -618,7 +618,7 @@ sub filedoublearray {
 	my $file=shift;
 	my $globdir=shift;
 
-	# executable confi files are a v9 thing.
+	# executable config files are a v9 thing.
 	my $x=! compat(8) && -x $file;
 	if ($x) {
 		require Cwd;
