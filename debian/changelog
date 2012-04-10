@@ -1,9 +1,16 @@
 debhelper (9.20120323) UNRELEASED; urgency=low
 
+  [ Joey Hess ]
   * Fix a typo. Closes: #665891
   * Conflict with too old automake for AM_UPDATE_INFO_DIR=no. Closes: #666901
   * dh_md5sums: Don't skip DEBIAN directories other than the control files
     one. Closes: #668276
+
+  [ Steve Langasek ]
+  * dh_installinit: rework upstart handling to comply with new policy
+    proposal; packages will ship both an init script and an upstart job,
+    instead of just an upstart job and a symlink to a compat wrapper.
+    Closes: #577040
 
  -- Joey Hess <joeyh@debian.org>  Mon, 26 Mar 2012 17:18:58 -0400
 
