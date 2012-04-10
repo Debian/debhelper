@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-dh_installinit - install upstart jobs and/or init scripts into package build directories
+dh_installinit - install init scripts and/or upstart jobs into package build directories
 
 =cut
 
@@ -16,21 +16,16 @@ B<dh_installinit> [S<I<debhelper options>>] [B<--name=>I<name>] [B<-n>] [B<-R>] 
 =head1 DESCRIPTION
 
 B<dh_installinit> is a debhelper program that is responsible for installing
-upstart job files and init scripts with associated defaults files into
-package build directories.
+init scripts with associated defaults files, as well as upstart job files
+into package build directories.
 
-It also automatically generates the F<postinst> and F<postrm> and F<prerm> commands
-needed to set up the symlinks in F</etc/rc*.d/> to start and stop the init
-scripts.
+It also automatically generates the F<postinst> and F<postrm> and F<prerm>
+commands needed to set up the symlinks in F</etc/rc*.d/> to start and stop
+the init scripts.
 
 =head1 FILES
 
 =over 4
-
-=item debian/I<package>.upstart
-
-If this exists, it is installed into etc/init/I<package>.conf in the package
-build directory.
 
 =item debian/I<package>.init
 
@@ -40,6 +35,11 @@ build directory.
 =item debian/I<package>.default
 
 If this exists, it is installed into etc/default/I<package> in the package
+build directory.
+
+=item debian/I<package>.upstart
+
+If this exists, it is installed into etc/init/I<package>.conf in the package
 build directory.
 
 =back
@@ -97,12 +97,13 @@ passed to L<update-rc.d(8)>.
 
 =item B<--name=>I<name>
 
-Install the upstart job file and init script (and default file) using the
-filename I<name> instead of the default filename, which is the package name.
-When this parameter is used, B<dh_installinit> looks for and installs files
-named F<debian/package.name.upstart>, F<debian/package.name.init> and
-F<debian/package.name.default>, instead of the usual F<debian/package.upstart>,
-F<debian/package.init> and F<debian/package.default>.
+Install the init script (and default file) as well as upstart job file
+using the filename I<name> instead of the default filename, which is
+the package name. When this parameter is used, B<dh_installinit> looks
+for and installs files named F<debian/package.name.init>,
+F<debian/package.name.default> and F<debian/package.name.upstart>
+instead of the usual F<debian/package.init>, F<debian/package.default> and
+F<debian/package.upstart>.
 
 =item B<--init-script=>I<scriptname>
 
