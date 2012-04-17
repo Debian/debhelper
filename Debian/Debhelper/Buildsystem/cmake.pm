@@ -44,7 +44,7 @@ sub configure {
 	push @flags, "-DCMAKE_VERBOSE_MAKEFILE=ON";
 
 	# CMake doesn't respect CPPFLAGS, see #653916.
-	if ($ENV{CPPFLAGS}) {
+	if ($ENV{CPPFLAGS} && ! compat(8)) {
 		$ENV{CFLAGS}   .= ' ' . $ENV{CPPFLAGS};
 		$ENV{CXXFLAGS} .= ' ' . $ENV{CPPFLAGS};
 	}
