@@ -43,6 +43,12 @@ sub configure {
 	push @flags, "-DCMAKE_INSTALL_PREFIX=/usr";
 	push @flags, "-DCMAKE_VERBOSE_MAKEFILE=ON";
 
+	# CMake doesn't respect CPPFLAGS, see #653916.
+	if ($ENV{CPPFLAGS}) {
+		$ENV{CFLAGS}   .= ' ' . $ENV{CPPFLAGS};
+		$ENV{CXXFLAGS} .= ' ' . $ENV{CPPFLAGS};
+	}
+
 	$this->mkdir_builddir();
 	eval { 
 		$this->doit_in_builddir("cmake", $this->get_source_rel2builddir(), @flags, @_);
