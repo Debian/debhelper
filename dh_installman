@@ -18,22 +18,23 @@ B<dh_installman> [S<I<debhelper options>>] [S<I<manpage> ...>]
 
 B<dh_installman> is a debhelper program that handles installing
 man pages into the correct locations in package build directories. You tell
-it what man pages go in your packages, and it figures out where to
-install them based on the section field in their B<.TH> line. If you have a
-properly formatted B<.TH> line, your man page will be installed into the right
-directory, with the right name (this includes proper handling of pages
-with a subsection, like B<3perl>, which are placed in F<man3>, and given an
-extension of F<.3perl>). If your B<.TH> line is incorrect or missing, the program
-may guess wrong based on the file extension.
+it what man pages go in your packages, and it figures out where to install
+them based on the section field in their B<.TH> or B<.Dt> line. If you have
+a properly formatted B<.TH> or B<.Dt> line, your man page will be installed
+into the right directory, with the right name (this includes proper handling
+of pages with a subsection, like B<3perl>, which are placed in F<man3>, and
+given an extension of F<.3perl>). If your B<.TH> or B<.Dt> line is incorrect
+or missing, the program may guess wrong based on the file extension.
 
 It also supports translated man pages, by looking for extensions
 like F<.ll.8> and F<.ll_LL.8>, or by use of the B<--language> switch.
 
 If B<dh_installman> seems to install a man page into the wrong section or with
 the wrong extension, this is because the man page has the wrong section
-listed in its B<.TH> line. Edit the man page and correct the section, and
-B<dh_installman> will follow suit. See L<man(7)> for details about the B<.TH>
-section. If B<dh_installman> seems to install a man page into a directory
+listed in its B<.TH> or B<.Dt> line. Edit the man page and correct the
+section, and B<dh_installman> will follow suit. See L<man(7)> for details
+about the B<.TH> section, and L<mdoc(7)> for the B<.Dt> section. If
+B<dh_installman> seems to install a man page into a directory
 like F</usr/share/man/pl/man1/>, that is because your program has a
 name like F<foo.pl>, and B<dh_installman> assumes that means it is translated
 into Polish. Use B<--language=C> to avoid this.
@@ -118,7 +119,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 
 		my $section;
-		# See if there is a .TH entry in the man page. If so,
+		# See if there is a .TH or .Dt entry in the man page. If so,
 		# we'll pull the section field from that.
 		if ($gz) {
 			open (IN, "zcat $page|") or die "$page: $!";
@@ -127,7 +128,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			open (IN, $page) or die "$page: $!";
 		}
 		while (<IN>) {
-			if (/^\.TH\s+\S+\s+"?(\d+[^"\s]*)"?/) {
+			if (/^\.TH\s+\S+\s+"?(\d+[^"\s]*)"?/ ||
+			    /^\.Dt\s+\S+\s+(\d+[^\s]*)/) {
 				$section=$1;
 				last;
 			}
