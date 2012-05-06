@@ -1,14 +1,14 @@
 # Translation of the debhelper documentation to German.
 # Copyright (C) 1997-2011 Joey Hess.
 # This file is distributed under the same license as the debhelper package.
-# Copyright (C) of this file 2011 Chris Leick.
+# Copyright (C) of this file 2011, 2012 Chris Leick.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: debhelper 8.9.13\n"
+"Project-Id-Version: debhelper 9.20120419\n"
 "Report-Msgid-Bugs-To: debhelper@packages.debian.org\n"
 "POT-Creation-Date: 2012-04-10 12:51-0400\n"
-"PO-Revision-Date: 2011-12-27 22:22+0100\n"
+"PO-Revision-Date: 2012-04-27 18:45+0100\n"
 "Last-Translator: Chris Leick <c.leick@vollbio.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
 "Language: de\n"
@@ -278,13 +278,6 @@ msgstr ""
 
 #. type: textblock
 #: debhelper.pod:90
-#, fuzzy
-#| msgid ""
-#| "The syntax of these files is intentionally kept very simple to make then "
-#| "easy to read, understand, and modify. If you prefer power and complexity, "
-#| "you can make the file executable, and write a program that outputs "
-#| "whatever content is appropriate for a given situation. When you do so, "
-#| "the output is not further processed to expand wildcards or strip comments."
 msgid ""
 "The syntax of these files is intentionally kept very simple to make them "
 "easy to read, understand, and modify. If you prefer power and complexity, "
@@ -751,62 +744,44 @@ msgstr ""
 
 #. type: textblock
 #: debhelper.pod:269
-#, fuzzy
-#| msgid ""
-#| "Tell debhelper what compatibility level to use by writing a number to "
-#| "F<debian/compat>. For example, to turn on v8 mode:"
 msgid ""
 "Tell debhelper what compatibility level to use by writing a number to "
 "F<debian/compat>. For example, to turn on v9 mode:"
 msgstr ""
 "Schreiben Sie eine Zahl nach F<debian/compat>, um Debhelper mitzuteilen, "
 "welche Kompatibilitätsstufe es nutzen soll. Um beispielsweise in den Modus "
-"V8 zu schalten geben Sie Folgendes ein:"
+"V9 zu schalten geben Sie Folgendes ein:"
 
 #. type: verbatim
 #: debhelper.pod:272
-#, fuzzy, no-wrap
-#| msgid ""
-#| "  % echo 8 > debian/compat\n"
-#| "\n"
+#, no-wrap
 msgid ""
 "  % echo 9 > debian/compat\n"
 "\n"
 msgstr ""
-"  % echo 8 > debian/compat\n"
+"  % echo 9 > debian/compat\n"
 "\n"
 
 #. type: textblock
 #: debhelper.pod:274
-#, fuzzy
-#| msgid ""
-#| "Once your package uses debhelper to build, be sure to add debhelper to "
-#| "your Build-Depends line in F<debian/control>. You should build-depend on "
-#| "a version of debhelper equal to (or greater than) the debhelper "
-#| "compatibility level your package uses. So if your package used "
-#| "compatibility level 7:"
 msgid ""
 "Your package will also need a versioned build dependency on a version of "
 "debhelper equal to (or greater than) the compatibility level your package "
 "uses. So for compatibility level 9, ensure debian/control has:"
 msgstr ""
-"Sobald Ihr Paket zum Bauen Debhelper benutzt, fügen Sie Debhelper unbedingt "
-"Ihrer »Build-Depends«-Zeile in F<debian/control> hinzu. Sie sollen die "
-"Bauabhängigkeit auf eine Version von Debhelper setzen, die gleich (oder "
-"größer als) der Debhelper-Kompatibilitätsstufe ist, die Ihr Pakets "
-"verwendet. Falls also Ihr Paket Kompatibilitätsstufe 7 anwendet:"
+"Ihr Paket wird außerdem eine Bauabhängigkeit mit Versionspflege auf eine "
+"Debhelper-Version benötigen, die gleich (oder größer) als die ist, die von "
+"der Kompatibilitätsstufe Ihres Pakets verwandt wird. Daher müssen Sie für "
+"Kompatibilitätsstufe 9 sicherstellen, dass debian/control Folgendes hat:"
 
 #. type: verbatim
 #: debhelper.pod:278
-#, fuzzy, no-wrap
-#| msgid ""
-#| "  Build-Depends: debhelper (>= 7)\n"
-#| "\n"
+#, no-wrap
 msgid ""
 "  Build-Depends: debhelper (>= 9)\n"
 "\n"
 msgstr ""
-"  Build-Depends: debhelper (>= 7)\n"
+"  Build-Depends: debhelper (>= 9)\n"
 "\n"
 
 #. type: textblock
@@ -1216,30 +1191,22 @@ msgstr "Standardmäßig aktiviert B<dh> nicht --with=python-support."
 
 #. type: textblock
 #: debhelper.pod:507
-#, fuzzy
-#| msgid ""
-#| "All of the B<dh_auto_>I<*> debhelper programs and B<dh> set environment "
-#| "variables listed by B<dpkg-buildflags>, unless they are already set. They "
-#| "support DEB_BUILD_OPTIONS=noopt too."
 msgid ""
 "All of the B<dh_auto_>I<*> debhelper programs and B<dh> set environment "
 "variables listed by B<dpkg-buildflags>, unless they are already set."
 msgstr ""
 "Alle B<dh_auto_>I<*>-Debhelper-Programme und B<dh> setzen "
 "Umgebungsvariablen, die durch B<dpkg-buildflags> aufgelistet werden, wenn "
-"sie nicht bereits gesetzt sind. Sie unterstützen auch "
-"DEB_BUILD_OPTIONS=noopt."
+"sie nicht bereits gesetzt sind."
 
 #. type: textblock
 #: debhelper.pod:513
-#, fuzzy
-#| msgid ""
-#| "B<dh_auto_configure> passes CFLAGS to perl F<Makefile.PL> and F<Build.PL>"
 msgid ""
 "B<dh_auto_configure> passes B<dpkg-buildflags> CFLAGS, CPPFLAGS, and LDFLAGS "
 "to perl F<Makefile.PL> and F<Build.PL>"
 msgstr ""
-"B<dh_auto_configure> übergibt CFLAGS an Perls F<Makefile.PL> und F<Build.PL.>"
+"B<dh_auto_configure> übergibt CFLAGS, CPPFLAGS und LDFLAGS von "
+"B<dpkg-buildflags> an Perls F<Makefile.PL> und F<Build.PL.>"
 
 #. type: textblock
 #: debhelper.pod:518
@@ -1252,23 +1219,17 @@ msgstr ""
 
 #. type: textblock
 #: debhelper.pod:523
-#, fuzzy
-#| msgid ""
-#| "Executable debconf config files are run and their output used as the "
-#| "configuration."
 msgid ""
 "Executable debhelper config files are run and their output used as the "
 "configuration."
 msgstr ""
-"Ausführbare Debconf-Konfigurationsdateien werden ausgeführt und ihre Ausgabe "
-"wird als Konfiguration benutzt."
+"Ausführbare Debhelper-Konfigurationsdateien werden ausgeführt und ihre "
+"Ausgabe wird als Konfiguration benutzt."
 
 #. type: =item
 #: debhelper.pod:528
-#, fuzzy
-#| msgid "v1"
 msgid "v10"
-msgstr "v1"
+msgstr "v10"
 
 #. type: textblock
 #: debhelper.pod:530
@@ -1280,15 +1241,13 @@ msgstr ""
 
 #. type: textblock
 #: debhelper.pod:532
-#, fuzzy
-#| msgid "Changes from v3 are:"
 msgid "Changes from v9 are:"
-msgstr "Änderungen gegenüber v3 sind:"
+msgstr "Änderungen gegenüber v9 sind:"
 
 #. type: textblock
 #: debhelper.pod:538
 msgid "None yet.."
-msgstr ""
+msgstr "Bisher keine …"
 
 #. type: =head1
 #: debhelper.pod:544 dh_auto_test:45 dh_installcatalogs:59 dh_installdocs:116
@@ -1506,15 +1465,7 @@ msgstr "Udebs"
 
 #. type: textblock
 #: debhelper.pod:623
-#, fuzzy
-#| msgid ""
-#| "Debhelper includes support for udebs. To create a udeb with debhelper, "
-#| "add \"B<Package-Type: udeb>\" to the package's stanza in F<debian/"
-#| "control>, and build-depend on debhelper (>= 4.2). Debhelper will try to "
-#| "create udebs that comply with debian-installer policy, by making the "
-#| "generated package files end in F<.udeb>, not installing any documentation "
-#| "into a udeb, skipping over F<preinst>, F<postrm>, F<prerm>, and F<config> "
-#| "scripts, etc."
+# FIXME : an udeb
 msgid ""
 "Debhelper includes support for udebs. To create a udeb with debhelper, add "
 "\"B<Package-Type: udeb>\" to the package's stanza in F<debian/control>.  "
@@ -1525,7 +1476,7 @@ msgid ""
 msgstr ""
 "Debhelper beinhaltet Unterstützung für Udebs. Um ein Udeb mit Debhelper zu "
 "erstellen, fügen Sie dem Absatz des Pakets in F<debian/control> »B<Package-"
-"Type: udeb>« hinzu und eine Bauabhängigkeit zu Debhelper (>= 4.2). Debhelper "
+"Type: udeb>« hinzu. Debhelper "
 "wird versuchen, Udebs zu erstellen, die der Debian-Installer-Richtlinie "
 "entsprechen, indem die erzeugten Paketdateien mit F<.udeb> enden, indem "
 "keine Dokumentation in ein Udeb installiert wird und indem F<preinst>-, "
@@ -1847,6 +1798,9 @@ msgid ""
 "repeated more than once, or multiple addons to disable can be listed, "
 "separated by commas."
 msgstr ""
+"das Gegenteil von B<--with>, deaktiviert die Benutzung des angegebenen "
+"Add-ons. Diese Option kann mehrfach wiederholt werden oder es können mehrere "
+"Add-ons zum Deaktivieren durch Kommas getrennt aufgelistet werden."
 
 #. type: textblock
 #: dh:64
@@ -3514,16 +3468,12 @@ msgstr "dh_install - installiert Dateien in Bauverzeichnisse von Paketen"
 
 #. type: textblock
 #: dh_install:15
-#, fuzzy
-#| msgid ""
-#| "B<dh_install> [B<-X>I<item>] [B<--autodest>] [B<--sourcedir=>I<dir>] "
-#| "[S<I<debhelper options>>] [S<I<file> ... I<dest>>]"
 msgid ""
 "B<dh_install> [B<-X>I<item>] [B<--autodest>] [B<--sourcedir=>I<dir>] "
 "[S<I<debhelper options>>] [S<I<file|dir> ... I<destdir>>]"
 msgstr ""
 "B<dh_install> [B<-X>I<Element>] [B<--autodest>] [B<--sourcedir=>I<Verz>] "
-"[S<I<Debhelper-Optionen>>] [S<I<Datei> … I<Ziel>>]"
+"[S<I<Debhelper-Optionen>>] [S<I<Datei|Verz> … I<Ziel>>]"
 
 #. type: textblock
 #: dh_install:19
@@ -3738,10 +3688,8 @@ msgstr ""
 
 #. type: =item
 #: dh_install:108
-#, fuzzy
-#| msgid "I<file> ... I<dest>"
 msgid "I<file|dir> ... I<destdir>"
-msgstr "<I<Datei> … I<Ziel>"
+msgstr "<I<Datei|Verz> … I<Zielverz>"
 
 #. type: textblock
 #: dh_install:110
@@ -4262,12 +4210,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_installdebconf:29
-#, fuzzy
-#| msgid ""
-#| "Note that for your config script to be called by B<dpkg>, your "
-#| "F<postinst> needs to source debconf's confmodule. B<dh_installdebconf> "
-#| "does not install this statement into the F<postinst> automatically as it "
-#| "it too hard to do it right."
 msgid ""
 "Note that for your config script to be called by B<dpkg>, your F<postinst> "
 "needs to source debconf's confmodule. B<dh_installdebconf> does not install "
@@ -4924,15 +4866,11 @@ msgstr ""
 
 #. type: textblock
 #: dh_installinit:5
-#, fuzzy
-#| msgid ""
-#| "dh_installinit - install upstart jobs or init scripts into package build "
-#| "directories"
 msgid ""
 "dh_installinit - install init scripts and/or upstart jobs into package build "
 "directories"
 msgstr ""
-"dh_installinit - installiert Upstart-Jobs oder Init-Skripte in "
+"dh_installinit - installiert Init-Skripte und/oder Upstart-Jobs in "
 "Paketbauverzeichnisse."
 
 #. type: textblock
@@ -4946,17 +4884,14 @@ msgstr ""
 
 #. type: textblock
 #: dh_installinit:18
-#, fuzzy
-#| msgid ""
-#| "B<dh_installmime> is a debhelper program that is responsible for "
-#| "installing mime files into package build directories."
 msgid ""
 "B<dh_installinit> is a debhelper program that is responsible for installing "
 "init scripts with associated defaults files, as well as upstart job files "
 "into package build directories."
 msgstr ""
-"B<dh_installmime> ist ein Debhelper-Programm, das für die Installation von "
-"MIME-Dateien in Paketbauverzeichnisse zuständig ist."
+"B<dh_installinit> ist ein Debhelper-Programm, das für die Installation von "
+"Init-Skripten mit zugehörigen Standarddateien sowie Upstart-Job-Dateien in "
+"Paketbauverzeichnisse zuständig ist."
 
 #. type: textblock
 #: dh_installinit:22
@@ -4976,15 +4911,11 @@ msgstr "debian/I<Paket>.init"
 
 #. type: textblock
 #: dh_installinit:32
-#, fuzzy
-#| msgid ""
-#| "If this exists, it is installed into etc/init/I<package>.conf in the "
-#| "package build directory."
 msgid ""
 "If this exists, it is installed into etc/init.d/I<package> in the package "
 "build directory."
 msgstr ""
-"Falls dies existiert, wird es in etc/init/I<Paket>.conf im "
+"Falls dies existiert, wird es in etc/init.d/I<Paket>.conf im "
 "Paketbauverzeichnis installiert."
 
 #. type: =item
@@ -5095,14 +5026,7 @@ msgstr "B<-d>, B<--remove-d>"
 
 #. type: textblock
 #: dh_installinit:84
-#, fuzzy
-#| msgid ""
-#| "Remove trailing B<d> from the name of the package, and use the result for "
-#| "the filename the upstart job file is installed as in F<etc/init/> , or "
-#| "for the filename the init script is installed as in etc/init.d and the "
-#| "default file is installed as in F<etc/default/> . This may be useful for "
-#| "daemons with names ending in B<d>. (Note: this takes precedence over the "
-#| "B<--init-script> parameter described below.)"
+# FIXME s#F<etc/default/> .#F<etc/default/>.#
 msgid ""
 "Remove trailing B<d> from the name of the package, and use the result for "
 "the filename the upstart job file is installed as in F<etc/init/> , and for "
@@ -5113,7 +5037,7 @@ msgid ""
 msgstr ""
 "entfernt abschließende B<d> vom Namen des Pakets und benutzt das Ergebnis "
 "als Dateiname, unter dem die Upstart-Job-Datei in F<etc/init/> installiert "
-"wird, oder als Dateiname, unter dem das Init-Skript in etc/init.d und die "
+"wird und als Dateiname, unter dem das Init-Skript in etc/init.d und die "
 "Standarddatei in F<etc/default/> installiert wird. Dies kann nützlich für "
 "Daemons sein, deren Namen mit B<d> enden. (Anmerkung: Dies hat Vorrang "
 "gegenüber dem im Folgenden beschriebenen Parameter B<--init-script>.)"
@@ -5134,15 +5058,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_installinit:100
-#, fuzzy
-#| msgid ""
-#| "Install the upstart job file or the init script (and default file) using "
-#| "the filename I<name> instead of the default filename, which is the "
-#| "package name.  When this parameter is used, B<dh_installinit> looks for "
-#| "and installs files named F<debian/package.name.upstart>, F<debian/package."
-#| "name.init> and F<debian/package.name.default>, instead of the usual "
-#| "F<debian/package.upstart>, F<debian/package.init> and F<debian/package."
-#| "default>."
 msgid ""
 "Install the init script (and default file) as well as upstart job file using "
 "the filename I<name> instead of the default filename, which is the package "
@@ -5151,13 +5066,13 @@ msgid ""
 "F<debian/package.name.upstart> instead of the usual F<debian/package.init>, "
 "F<debian/package.default> and F<debian/package.upstart>."
 msgstr ""
-"installiert den Upstart-Job oder das Init-Skript (und die Standarddatei) "
-"unter Benutzung des Dateinamens I<Name> an Stelle des Standarddateinamens, "
-"der dem Paketnamen entspricht. Wenn dieser Parameter verwandt wird, sucht "
-"und installiert B<dh_installinit> Dateien mit dem Namen F<debian/Paket.Name."
-"upstart>, F<debian/Paket.Name.init> und F<debian/Paket.Name.default> an "
-"Stelle der üblichen F<debian/Paket.upstart>, F<debian/Paket.init> und "
-"F<debian/Paket.default>."
+"installiert das Init-Skript (und die Standarddatei) ebenso wie den "
+"Upstart-Job unter Benutzung des Dateinamens I<Name> an Stelle des "
+"Standarddateinamens, der dem Paketnamen entspricht. Wenn dieser Parameter "
+"verwandt wird, sucht und installiert B<dh_installinit> Dateien mit dem Namen "
+"F<debian/package.name.init>, F<debian/package.name.default> und "
+"F<debian/package.name.upstart> an Stelle der üblichen F<debian/package.init>, "
+"F<debian/package.default> and F<debian/package.upstart>."
 
 #. type: =item
 #: dh_installinit:108
@@ -5184,16 +5099,12 @@ msgstr ""
 
 #. type: textblock
 #: dh_installinit:117
-#, fuzzy
-#| msgid ""
-#| "This parameter is deprecated, use the B<--name> parameter instead. This "
-#| "parameter will be ignored completely for upstart jobs."
 msgid ""
 "This parameter is deprecated, use the B<--name> parameter instead. This "
 "parameter is incompatible with the use of upstart jobs."
 msgstr ""
 "Dieser Parameter ist missbilligt. Benutzen Sie stattdessen den Parameter B<--"
-"name>. Dieser Parameter wird für Upstart-Jobs vollständig ignoriert."
+"name>. Dieser Parameter ist für die Benutzung mit Upstart-Jobs inkompatibel."
 
 #. type: =item
 #: dh_installinit:120
