@@ -49,6 +49,11 @@ relative to the current directory, while the installation directory is given
 relative to the package build directory. You may use wildcards in the names of
 the files to install (in v3 mode and above).
 
+Note that if you list exactly one filename or wildcard-pattern on a line by
+itself, with no explicit destination, then B<dh_install>
+will automatically guess the destination to use, the same as if the
+--autodest option were used.
+
 =back
 
 =head1 OPTIONS
@@ -99,11 +104,6 @@ the filename, if it is present, and install into the dirname of the
 filename. So if the filename is F<debian/tmp/usr/bin>, then that directory
 will be copied to F<debian/package/usr/>. If the filename is
 F<debian/tmp/etc/passwd>, it will be copied to F<debian/package/etc/>.
-
-Note that if you list exactly one filename or wildcard-pattern on a line by
-itself in a
-F<debian/package.install> file, with no explicit destination, then B<dh_install>
-will automatically guess the destination even if this flag is not set.
 
 =item I<file|dir> ... I<destdir>
 
