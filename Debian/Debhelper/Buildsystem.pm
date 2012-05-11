@@ -287,8 +287,8 @@ sub mkdir_builddir {
 
 sub _cd {
 	my ($this, $dir)=@_;
+	verbose_print("cd $dir");
 	if (! $dh{NO_ACT}) {
-		verbose_print("cd $dir");
 		chdir $dir or error("error: unable to chdir to $dir");
 	}
 }
