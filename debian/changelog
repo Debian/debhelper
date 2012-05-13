@@ -1,6 +1,11 @@
 debhelper (9.20120510) UNRELEASED; urgency=low
 
   * Improve -v logging. Closes: #672448
+  * dh_builddeb: Build udebs with xz compression, level 1, extreme strategy.
+    This has been chosen to not need any more memory or cpu when uncompressing,
+    while yeilding the best compressions for udebs. Thanks, Philipp Kern.
+  * Depend on a new enough dpkg for above features. Backporters will need
+    to revert these changes.
 
  -- Joey Hess <joeyh@debian.org>  Fri, 11 May 2012 11:58:53 -0400
 

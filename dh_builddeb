@@ -109,7 +109,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (! $filename) {
 			$filename="/".udeb_filename($package);
 		}
-		doit("dpkg-deb", @{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$filename);
+		doit("dpkg-deb", "-z1", "-Zxz", "-Sextreme",
+			@{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$filename);
 	}
 	exit 0;
 }
