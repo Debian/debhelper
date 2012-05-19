@@ -24,7 +24,7 @@ sub DEFAULT_BUILD_DIRECTORY {
 sub new {
 	my $class=shift;
 	my $this=$class->SUPER::new(@_);
-	# Out of source tree building is prefered.
+	# Out of source tree building is preferred.
 	$this->prefer_out_of_source_building(@_);
 	return $this;
 }

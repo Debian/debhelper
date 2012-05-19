@@ -74,7 +74,7 @@ sub check_auto_buildable {
 	    -e $this->get_buildpath("GNUmakefile"))
 	{
 		# This is always called in the source directory, but generally
-		# Makefiles are created (or live) in the the build directory.
+		# Makefiles are created (or live) in the build directory.
 		return 1;
 	} elsif ($step eq "clean" && defined $this->get_builddir() &&
 	         $this->check_auto_buildable("configure"))

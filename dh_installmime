@@ -68,7 +68,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 		doit("install","-p","-m644",$mime,"$tmp/usr/lib/mime/packages/$package");
 	}
-	# Check wether we have to call update-mime (either upstream already
+	# Check whether we have to call update-mime (either upstream already
 	# installs a MIME information file or Debian provides one)
 	if ((! $dh{NOSCRIPTS}) && (-d "$tmp/usr/lib/mime/packages")) {
 		autoscript($package,"postinst","postinst-mime");
@@ -83,7 +83,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 		doit("install", "-p", "-m644", $sharedmimeinfo, "$tmp/usr/share/mime/packages/$package.xml");
 	}
-	# check wether we have to call update-mime-database (either upstream
+	# check whether we have to call update-mime-database (either upstream
 	# already installs a shared MIME information file or Debian provides
 	# one)
 	if ((! $dh{NOSCRIPTS}) && (-d "$tmp/usr/share/mime/packages")) {

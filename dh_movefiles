@@ -112,7 +112,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	# Now we need to expand wildcards in @tomove.
 	# This is only necessary in pre-v3 land -- as of v3, the
-	# expension is automatically done by filearray().
+	# expansion is automatically done by filearray().
 	if (@tomove && compat(2)) {
 		my @filelist=();
 		foreach (@tomove) {
@@ -158,12 +158,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 }
 
-# If $ret is set, we wern't actually able to find some 
+# If $ret is set, we weren't actually able to find some
 # files that were specified to be moved, and we should
 # exit with the code in $ret. This program puts off 
 # exiting with an error until all files have been tried
 # to be moved, because this makes it easier for some 
-# packages that arn't always sure exactly which files need
+# packages that aren't always sure exactly which files need
 # to be moved.
 exit $ret;
 

@@ -221,7 +221,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	foreach (@shared_libs) {
 		my $debug_path = make_debug($_, $tmp, $debugtmp) if $keep_debug;
 		# Note that all calls to strip on shared libs
-		# *must* inclde the --strip-unneeded.
+		# *must* include the --strip-unneeded.
 		doit($strip,"--remove-section=.comment",
 			"--remove-section=.note","--strip-unneeded",$_);
 		attach_debug($_, $debug_path) if defined $debug_path;

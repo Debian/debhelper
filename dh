@@ -331,7 +331,7 @@ if (! defined $sequence) {
 	error "specify a sequence to run";
 }
 # make -B causes the rules file to be run as a target.
-# Also support completly empty override targets.
+# Also support completely empty override targets.
 # Note: it's not safe to use rules_explicit_target before this check,
 # since it causes dh to be run.
 my $dummy_target="debhelper-fail-me";
@@ -819,7 +819,7 @@ sub rules_explicit_target {
 				}
 				else {
 					if (!$not_a_target && /^([^#:]+)::?\s*(.*)$/) {
-						# Target is defined. NOTE: if it is a depenency of
+						# Target is defined. NOTE: if it is a dependency of
 						# .PHONY it will be defined too but that's ok.
 						# $2 contains target dependencies if any.
 						$current_target = $1;
