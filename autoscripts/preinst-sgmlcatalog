@@ -1,0 +1,7 @@
+if [ "$1" = "upgrade" ] && ! dpkg-query -S #CENTRALCAT# >/dev/null 2>&1; then
+	# If the dpkg-query command returns non-zero, the central catalog is
+	# not owned by any package. This is due to an old behaviour of
+	# debhelper. Now that file becomes a conffile. In order to avoid a
+	# question during installation, we remove the old non-conffile.
+	rm -f #CENTRALCAT#
+fi

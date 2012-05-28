@@ -9,7 +9,7 @@ dh_installcatalogs - install and register SGML Catalogs
 use strict;
 use Debian::Debhelper::Dh_Lib;
 
-my $sgmlbasever = "1.17";
+my $sgmlbasever = "1.26+nmu2";
 
 =head1 SYNOPSIS
 
@@ -96,12 +96,16 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			doit("install","-d","-m755","$tmpdir/etc/sgml");
 		}
 
+		my $centralcat = "/etc/sgml/$package.cat";
+
+		open(CENTRALCAT, ">", "$tmpdir$centralcat") || error("failed to write to $tmpdir$centralcat");
+		foreach my $sgmldest (@sgmlinstalled) {
+			print CENTRALCAT "CATALOG " . $sgmldest . "\n";
+		}
+		close CENTRALCAT;
+
 		if (! $dh{NOSCRIPTS}) {
-			my $ordcats = join(" ", @sgmlinstalled);
-			my $centralcat = "/etc/sgml/$package.cat";
-			autoscript($package, "postinst", "postinst-sgmlcatalog",
-				   "s%#CENTRALCAT#%$centralcat%g; s%#ORDCATS#%$ordcats%g;");
-			autoscript($package, "prerm", "prerm-sgmlcatalog",
+			autoscript($package, "preinst", "preinst-sgmlcatalog",
 				   "s%#CENTRALCAT#%$centralcat%g;");
 			autoscript($package, "postrm", "postrm-sgmlcatalog",
 				   "s%#CENTRALCAT#%$centralcat%g;");
