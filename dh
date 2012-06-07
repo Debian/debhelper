@@ -662,10 +662,20 @@ foreach my $i (0..$stoppoint) {
 	# the usual command. (The non-arch-specific override is tried first,
 	# for simplest semantics; mixing it with arch-specific overrides
 	# makes little sense.)
+	my @oldtodo=@todo;
 	foreach my $override_type (undef, "arch", "indep") {
 		@todo = run_override($override_type, $command, \@todo, @opts);
 	}
 	next unless @todo;
+
+	# No need to run the command for any packages handled by the
+	# override targets.
+	my %todo=map { $_ => 1 } @todo;
+	foreach my $package (@oldtodo) {
+		if (! $todo{$package}) {
+			push @opts, "-N$package";
+		}
+	}
 
 	run($command, @opts);
 }
