@@ -111,6 +111,10 @@ if ($dh{L_PARAMS}) {
 	$dh{L_PARAMS}=join(':', @paths);
 }
 
+if (defined $dh{V_FLAG}) {
+	warning("You probably wanted to pass -V to dh_makeshlibs, it has no effect on dh_shlibdeps");
+}
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $ext=pkgext($package);
