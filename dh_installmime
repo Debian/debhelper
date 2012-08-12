@@ -11,16 +11,12 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_installmime> [S<I<debhelper options>>] [B<-n>]
+B<dh_installmime> [S<I<debhelper options>>]
 
 =head1 DESCRIPTION
 
 B<dh_installmime> is a debhelper program that is responsible for installing
 mime files into package build directories.
-
-It also automatically generates the F<postinst> and F<postrm> commands needed to
-interface with the debian B<mime-support> and B<shared-mime-info> packages. These
-commands are inserted into the maintainer scripts by L<dh_installdeb(1)>.
 
 =head1 FILES
 
@@ -38,22 +34,6 @@ directory.
 
 =back
 
-=head1 OPTIONS
-
-=over 4
-
-=item B<-n>, B<--noscripts>
-
-Do not modify F<postinst>/F<postrm> scripts.
-
-=back
-
-=head1 NOTES
-
-Note that this command is not idempotent. L<dh_prep(1)> should be called
-between invocations of this command. Otherwise, it may cause multiple
-instances of the same text to be added to maintainer scripts.
-
 =cut
 
 init();
@@ -68,12 +48,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 		doit("install","-p","-m644",$mime,"$tmp/usr/lib/mime/packages/$package");
 	}
-	# Check whether we have to call update-mime (either upstream already
-	# installs a MIME information file or Debian provides one)
-	if ((! $dh{NOSCRIPTS}) && (-d "$tmp/usr/lib/mime/packages")) {
-		autoscript($package,"postinst","postinst-mime");
-		autoscript($package,"postrm","postrm-mime")
-	}
 	
 	my $sharedmimeinfo=pkgfile($package,"sharedmimeinfo");
 	
@@ -82,13 +56,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			doit("install", "-d", "$tmp/usr/share/mime/packages");
 		}
 		doit("install", "-p", "-m644", $sharedmimeinfo, "$tmp/usr/share/mime/packages/$package.xml");
-	}
-	# check whether we have to call update-mime-database (either upstream
-	# already installs a shared MIME information file or Debian provides
-	# one)
-	if ((! $dh{NOSCRIPTS}) && (-d "$tmp/usr/share/mime/packages")) {
-		autoscript($package, "postinst", "postinst-sharedmimeinfo");
-		autoscript($package, "postrm", "postrm-sharedmimeinfo")
 	}
 }
 
