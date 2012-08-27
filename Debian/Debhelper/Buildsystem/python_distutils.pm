@@ -118,9 +118,23 @@ sub setup_py {
 	# extensions for each.
 
 	my $python_default = `pyversions -d`;
+	if ($? == -1) {
+		error("failed to run pyversions")
+	}
+	my $ecode = $? >> 8;
+	if ($ecode != 0) {
+		error("pyversions -d failed [$ecode]")
+	}
 	$python_default =~ s/^\s+//;
 	$python_default =~ s/\s+$//;
-	my @python_requested = split ' ', `pyversions -r 2>/dev/null`;
+	my @python_requested = split ' ', `pyversions -r`;
+	if ($? == -1) {
+		error("failed to run pyversions")
+	}
+	$ecode = $? >> 8;
+	if ($ecode != 0) {
+		error("pyversions -r failed [$ecode]")
+	}
 	if (grep /^\Q$python_default\E/, @python_requested) {
 		@python_requested = (
 			grep(!/^\Q$python_default\E/, @python_requested),
