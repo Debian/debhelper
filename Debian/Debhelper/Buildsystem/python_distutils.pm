@@ -155,7 +155,7 @@ sub setup_py {
 	}
 
 	foreach my $python (@python_dbg, @python_requested) {
-		if (-x "/usr/bin/".$python) {
+		if (-f "/usr/lib/$python/distutils/__init__.py") {
 			# To allow backports of debhelper we don't pass
 			# --install-layout=deb to 'setup.py install` for
 			# those Python versions where the option is
