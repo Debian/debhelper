@@ -20,6 +20,17 @@ debhelper (9.20120609) UNRELEASED; urgency=low
 
  -- Joey Hess <joeyh@debian.org>  Thu, 05 Jul 2012 08:51:07 -0600
 
+debhelper (9.20120909) UNRELEASED; urgency=low
+
+  * autoscript() can now be passed a perl sub to run to s/// lines of
+    the script, which avoids problems with using sed, including potentially
+    building too long a sed command-line. This will become the recommended
+    interface in the future; for now it can be used by specific commands
+    such as dh_installxmlcatalogs that encounter the problem.
+    Closes: #665296 Thanks, Marcin Owsiany
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 09 Sep 2012 14:23:10 -0400
+
 debhelper (9.20120830) unstable; urgency=low
 
   * dh_installcatalogs: Adjust catalog conffile conversion to avoid
