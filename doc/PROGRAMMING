@@ -191,13 +191,16 @@ isnative($package)
 	is a native debian package.
 	As a side effect, $dh{VERSION} is set to the version number of the
 	package.
-autoscript($package, $scriptname, $snippetname, $sedcommands)
+autoscript($package, $scriptname, $snippetname, $sedcommands || $sub)
 	Pass parameters:
 	 - binary package to be affected
 	 - script to add to
 	 - filename of snippet
-	 - sed commands to run on the snippet. Ie, s/#PACKAGE#/$PACKAGE/
-	   (optional) Note: Passed to the shell inside double quotes.
+	 - (optional) EITHER sed commands to run on the snippet. Ie,
+	   s/#PACKAGE#/$PACKAGE/ Note: Passed to the shell inside double
+           quotes.
+	   OR a perl sub to invoke with $_ set to each line of the snippet in
+           turn.
 	This command automatically adds shell script snippets to a debian
 	maintainer script (like the postinst or prerm).
 	Note that in v6 mode and up, the snippets are added in reverse

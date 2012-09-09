@@ -504,7 +504,8 @@ sub pkgfilename {
 # 1: package
 # 2: script to add to
 # 3: filename of snippet
-# 4: sed to run on the snippet. Ie, s/#PACKAGE#/$PACKAGE/
+# 4: either text: shell-quoted sed to run on the snippet. Ie, 's/#PACKAGE#/$PACKAGE/'
+#    or a sub to run on each line of the snippet. Ie sub { s/#PACKAGE#/$PACKAGE/ }
 sub autoscript {
 	my $package=shift;
 	my $script=shift;
@@ -533,15 +534,31 @@ sub autoscript {
 	   && !compat(5)) {
 		# Add fragments to top so they run in reverse order when removing.
 		complex_doit("echo \"# Automatically added by ".basename($0)."\"> $outfile.new");
-		complex_doit("sed \"$sed\" $infile >> $outfile.new");
+		autoscript_sed($sed, $infile, "$outfile.new");
 		complex_doit("echo '# End automatically added section' >> $outfile.new");
 		complex_doit("cat $outfile >> $outfile.new");
 		complex_doit("mv $outfile.new $outfile");
 	}
 	else {
 		complex_doit("echo \"# Automatically added by ".basename($0)."\">> $outfile");
-		complex_doit("sed \"$sed\" $infile >> $outfile");
+		autoscript_sed($sed, $infile, $outfile);
 		complex_doit("echo '# End automatically added section' >> $outfile");
+	}
+}
+
+sub autoscript_sed {
+	my $sed = shift;
+	my $infile = shift;
+	my $outfile = shift;
+	if (ref($sed) eq 'CODE') {
+		open(IN, $infile) or die "$infile: $!";
+		open(OUT, ">>$outfile") or die "$outfile: $!";
+		while (<IN>) { $sed->(); print OUT }
+		close(OUT) or die "$outfile: $!";
+		close(IN) or die "$infile: $!";
+	}
+	else {
+		complex_doit("sed \"$sed\" $infile >> $outfile");
 	}
 }
 
