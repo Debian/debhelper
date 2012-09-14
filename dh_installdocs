@@ -54,12 +54,17 @@ and F<TODO> files will be installed as F<TODO.Debian> in non-native packages.
 
 Installed as doc-base control files. Note that the doc-id will be
 determined from the B<Document:> entry in the doc-base control file in
-question.
+question. In the event that multiple doc-base files in a single source
+package share the same doc-id, they will be installed to
+usr/share/doc-base/package instead of usr/share/doc-base/doc-id.
 
 =item debian/I<package>.doc-base.*
 
-If your package needs to register more than one document, you need multiple
-doc-base files, and can name them like this.
+If your package needs to register more than one document, you need
+multiple doc-base files, and can name them like this. In the event
+that multiple doc-base files of this style in a single source package
+share the same doc-id, they will be installed to
+usr/share/doc-base/package-* instead of usr/share/doc-base/doc-id.
 
 =back
 
@@ -298,9 +303,29 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			doit("install","-g",0,"-o",0,"-d","$tmp/usr/share/doc-base/");
 		}
 	}
+	# check for duplicate document ids
+	my %used_doc_ids;
+	for my $fn (keys %doc_ids) {
+		$used_doc_ids{$doc_ids{$fn}}++;
+	}
 	foreach my $fn (keys %doc_ids) {
-		doit("install","-g",0,"-o",0,"-m644","-p","debian/$fn",
-		     "$tmp/usr/share/doc-base/$doc_ids{$fn}");
+		# if this document ID is duplicated, we will install
+		# to usr/share/doc-base/packagename instead of
+		# usr/share/doc-base/doc_id. To allow for multiple
+		# conflicting doc-bases in a single package, we will
+		# install to usr/share/doc-base/packagename-extrabits
+		# if the doc-base file is
+		# packagename.doc-base.extrabits
+		if ($used_doc_ids{$doc_ids{$fn}}>1) {
+			my $fn_no_docbase = $fn;
+			$fn_no_docbase =~ s/\.doc-base(?:\.(.*))?/
+			    if (defined $1 and length $1) {"-$1"} else {''}/xe;
+			doit("install","-g",0,"-o",0,"-m644","-p","debian/$fn",
+			     "$tmp/usr/share/doc-base/$fn_no_docbase");
+		} else {
+			doit("install","-g",0,"-o",0,"-m644","-p","debian/$fn",
+			     "$tmp/usr/share/doc-base/$doc_ids{$fn}");
+		}
 	}
 }
 
