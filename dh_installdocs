@@ -316,13 +316,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# install to usr/share/doc-base/packagename-extrabits
 		# if the doc-base file is
 		# packagename.doc-base.extrabits
-		if ($used_doc_ids{$doc_ids{$fn}}>1) {
+		if ($used_doc_ids{$doc_ids{$fn}} > 1) {
 			my $fn_no_docbase = $fn;
 			$fn_no_docbase =~ s/\.doc-base(?:\.(.*))?/
 			    if (defined $1 and length $1) {"-$1"} else {''}/xe;
 			doit("install","-g",0,"-o",0,"-m644","-p","debian/$fn",
 			     "$tmp/usr/share/doc-base/$fn_no_docbase");
-		} else {
+		}
+		else {
 			doit("install","-g",0,"-o",0,"-m644","-p","debian/$fn",
 			     "$tmp/usr/share/doc-base/$doc_ids{$fn}");
 		}
