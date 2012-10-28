@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-dh_installinit - install service init files into package build directories
+dh_installinit - install init scripts and/or upstart jobs into package build directories
 
 =cut
 
@@ -16,8 +16,8 @@ B<dh_installinit> [S<I<debhelper options>>] [B<--name=>I<name>] [B<-n>] [B<-R>] 
 =head1 DESCRIPTION
 
 B<dh_installinit> is a debhelper program that is responsible for installing
-init scripts with associated defaults files, as well as upstart job files,
-and systemd service files into package build directories.
+init scripts with associated defaults files, as well as upstart job files
+into package build directories.
 
 It also automatically generates the F<postinst> and F<postrm> and F<prerm>
 commands needed to set up the symlinks in F</etc/rc*.d/> to start and stop
@@ -42,17 +42,6 @@ build directory.
 If this exists, it is installed into etc/init/I<package>.conf in the package
 build directory.
 
-=item debian/I<package>.service
-
-If this exists, it is installed into lib/systemd/system/I<package>.service in
-the package build directory.
-
-=item debian/I<package>.tmpfile
-
-If this exists, it is installed into usr/lib/tmpfiles.d/I<package>.conf in the
-package build directory. (The tmpfiles.d mechanism is currently only used
-by systemd.)
-
 =back
 
 =head1 OPTIONS
@@ -66,10 +55,9 @@ Do not modify F<postinst>/F<postrm>/F<prerm> scripts.
 =item B<-o>, B<--onlyscripts>
 
 Only modify F<postinst>/F<postrm>/F<prerm> scripts, do not actually install any init
-script, default files, upstart job or systemd service file. May be useful if
-the init script, upstart job or systemd service file is shipped and/or
-installed by upstream in a way that doesn't make it easy to let
-B<dh_installinit> find it.
+script, default files, or upstart job. May be useful if the init script or
+upstart job is shipped and/or installed by upstream in a way that doesn't
+make it easy to let B<dh_installinit> find it.
 
 =item B<-R>, B<--restart-after-upgrade>
 
@@ -183,26 +171,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		$script=$package;
 	}       
 
-	my $service=pkgfile($package,"service");
-	if ($service ne '' && ! $dh{ONLYSCRIPTS}) {
-		my $path="$tmp/lib/systemd/system";
-		if (! -d "$path") {
-			doit("install","-d","$path");
-		}
-
-		doit("install","-p","-m644",$service,"$path/$script.service");
-	}
-
-	my $tmpfile=pkgfile($package,"tmpfile");
-	if ($tmpfile ne '' && ! $dh{ONLYSCRIPTS}) {
-		my $path="$tmp/usr/lib/tmpfiles.d";
-		if (! -d "$path") {
-			doit("install","-d","$path");
-		}
-
-		doit("install","-p","-m644",$tmpfile,"$path/$script.conf");
-	}
-
 	my $job=pkgfile($package,"upstart");
 
 	if ($job ne '' && ! $dh{ONLYSCRIPTS}) {
@@ -235,11 +203,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		error("Can't use --init-script with an upstart job");
 	}
 
-	# NB: The case that only $tmpfile is set makes no sense. The
-	# tmpfiles.d(5) mechanism is only available when using systemd (at
-	# least currently), so there has to be an init script which does the
-	# same thing for sysvinit.
-	if ($service ne '' || $job ne '' || $init ne '' || $dh{ONLYSCRIPTS}) {
+	if ($job ne '' || $init ne '' || $dh{ONLYSCRIPTS}) {
 		# This is set by the -u "foo" command line switch, it's
 		# the parameters to pass to update-rc.d. If not set,
 		# we have to say "defaults".
@@ -300,7 +264,5 @@ This program is a part of debhelper.
 Joey Hess <joeyh@debian.org>
 
 Steve Langasek <steve.langasek@canonical.com>
-
-Michael Stapelberg <stapelberg@debian.org>
 
 =cut
