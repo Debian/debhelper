@@ -8,6 +8,7 @@ dh_installinit - install service init files into package build directories
 
 use strict;
 use Debian::Debhelper::Dh_Lib;
+use File::Find;
 
 =head1 SYNOPSIS
 
@@ -251,6 +252,25 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 		
 		if (! $dh{NOSCRIPTS}) {
+			# Include postinst-init-tmpfiles if the package ships any files
+			# in /usr/lib/tmpfiles.d or /etc/tmpfiles.d
+			my $got_tmpfile = undef;
+			my $tmpdir = tmpdir($package);
+			find({
+				wanted => sub {
+					return unless -f $File::Find::name;
+					if (!$got_tmpfile &&
+						$File::Find::name =~ m,^$tmpdir/usr/lib/tmpfiles\.d/, ||
+						$File::Find::name =~ m,^$tmpdir/etc/tmpfiles\.d/,) {
+						$got_tmpfile = 1;
+					}
+				},
+				no_chdir => 1,
+			}, $tmpdir);
+			if ($got_tmpfile) {
+				autoscript($package,"postinst", "postinst-init-tmpfiles", "");
+			}
+
 			if (! $dh{NO_START}) {
 				if ($dh{RESTART_AFTER_UPGRADE}) {
 					# update-rc.d, and restart (or
