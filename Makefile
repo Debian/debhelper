@@ -38,6 +38,8 @@ VERSION=$(shell expr "`dpkg-parsechangelog |grep Version:`" : '.*Version: \(.*\)
 
 PERLLIBDIR=$(shell perl -MConfig -e 'print $$Config{vendorlib}')/Debian/Debhelper
 
+PREFIX=/usr
+
 POD2MAN=pod2man --utf8 -c Debhelper -r "$(VERSION)"
 
 ifneq ($(USE_NLS),no)
@@ -84,13 +86,15 @@ clean:
 	done;
 
 install:
-	install -d $(DESTDIR)/usr/bin \
-		$(DESTDIR)/usr/share/debhelper/autoscripts \
+	install -d $(DESTDIR)$(PREFIX)/bin \
+		$(DESTDIR)$(PREFIX)/share/debhelper/autoscripts \
 		$(DESTDIR)$(PERLLIBDIR)/Sequence \
 		$(DESTDIR)$(PERLLIBDIR)/Buildsystem
-	install dh $(COMMANDS) $(DESTDIR)/usr/bin
-	install -m 0644 autoscripts/* $(DESTDIR)/usr/share/debhelper/autoscripts
+	install dh $(COMMANDS) $(DESTDIR)$(PREFIX)/bin
+	install -m 0644 autoscripts/* $(DESTDIR)$(PREFIX)/share/debhelper/autoscripts
 	install -m 0644 Debian/Debhelper/*.pm $(DESTDIR)$(PERLLIBDIR)
+	[ "$(PREFIX)" = /usr ] || \
+		sed -i '/$$prefix=/s@/usr@$(PREFIX)@g' $(DESTDIR)$(PERLLIBDIR)/Dh_Lib.pm
 	install -m 0644 Debian/Debhelper/Sequence/*.pm $(DESTDIR)$(PERLLIBDIR)/Sequence
 	install -m 0644 Debian/Debhelper/Buildsystem/*.pm $(DESTDIR)$(PERLLIBDIR)/Buildsystem
 

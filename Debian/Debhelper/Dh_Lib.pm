@@ -21,6 +21,7 @@ use vars qw(@ISA @EXPORT %dh);
 	    &cross_command &set_buildflags &get_buildoption);
 
 my $max_compat=10;
+my $prefix="/usr";
 
 sub init {
 	my %params=@_;
@@ -522,11 +523,11 @@ sub autoscript {
 		$infile="$ENV{DH_AUTOSCRIPTDIR}/$filename";
 	}
 	else {
-		if (-e "/usr/share/debhelper/autoscripts/$filename") {
-			$infile="/usr/share/debhelper/autoscripts/$filename";
+		if (-e "$prefix/share/debhelper/autoscripts/$filename") {
+			$infile="$prefix/share/debhelper/autoscripts/$filename";
 		}
 		else {
-			error("/usr/share/debhelper/autoscripts/$filename does not exist");
+			error("$prefix/share/debhelper/autoscripts/$filename does not exist");
 		}
 	}
 
