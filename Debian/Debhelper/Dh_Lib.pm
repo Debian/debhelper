@@ -21,6 +21,8 @@ use vars qw(@ISA @EXPORT %dh);
 	    &cross_command &set_buildflags &get_buildoption);
 
 my $max_compat=10;
+
+# The Makefile changes this if debhelper is installed in a PREFIX.
 my $prefix="/usr";
 
 sub init {
