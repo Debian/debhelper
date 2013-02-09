@@ -1,5 +1,5 @@
 # List of files of dh_* commands. Sorted for debhelper man page.
-COMMANDS=$(shell find . -maxdepth 1 -type f -perm +100 -name "dh_*" -printf "%f\n" | sort)
+COMMANDS=$(shell find . -maxdepth 1 -type f -perm /100 -name "dh_*" -printf "%f\n" | sort)
 
 # Find deprecated commands by looking at their synopsis.
 DEPRECATED=$(shell egrep -l '^dh_.* - .*deprecated' $(COMMANDS))
@@ -50,7 +50,7 @@ LANGS=
 endif
 
 build: version debhelper.7
-	find . -maxdepth 1 -type f -perm +100 -name "dh*" \
+	find . -maxdepth 1 -type f -perm /100 -name "dh*" \
 		-exec $(POD2MAN) {} {}.1 \;
 ifneq ($(USE_NLS),no)
 	po4a --previous -L UTF-8 man/po4a/po4a.cfg 

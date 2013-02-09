@@ -53,7 +53,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (! @files && ! $suid) {
 		# No files specified (and no empty debian/suid file), so
 		# guess what files to process.
-		@files=split(/\n/,`find $tmp -type f -perm +6000`);
+		@files=split(/\n/,`find $tmp -type f -perm /6000`);
 
 		# Strip the debian working directory off of the filenames.
 		$tostrip="$tmp/";
