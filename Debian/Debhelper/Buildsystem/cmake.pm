@@ -43,6 +43,7 @@ sub configure {
 	# Standard set of cmake flags
 	push @flags, "-DCMAKE_INSTALL_PREFIX=/usr";
 	push @flags, "-DCMAKE_VERBOSE_MAKEFILE=ON";
+	push @flags, "-DCMAKE_BUILD_TYPE=RelWithDebInfo";
 
 	# CMake doesn't respect CPPFLAGS, see #653916.
 	if ($ENV{CPPFLAGS} && ! compat(8)) {
