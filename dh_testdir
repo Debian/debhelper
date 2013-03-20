@@ -32,10 +32,19 @@ Test for the existence of these files too.
 
 =cut
 
+# Run before init because init will try to read debian/control and
+# we want a nicer error message.
+checkfile('debian/control');
+
 init();
 inhibit_log();
 
-foreach my $file ('debian/control', @ARGV) {
+foreach my $file (@ARGV) {
+	checkfile($file);
+}
+
+sub checkfile {
+	my $file=shift;
 	if (! -e $file) {
 		error("\"$file\" not found. Are you sure you are in the correct directory?");
 	}
