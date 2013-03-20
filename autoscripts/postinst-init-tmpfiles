@@ -1,5 +1,5 @@
 # In case this system is running systemd, we need to ensure that all
 # necessary tmpfiles (if any) are created before starting.
-if [ -d /sys/fs/cgroup/systemd ] ; then
+if [ -d /run/systemd/system ] ; then
 	systemd-tmpfiles --create >/dev/null || true
 fi

@@ -5,6 +5,6 @@ fi
 
 # In case this system is running systemd, we make systemd reload the unit files
 # to pick up changes.
-if [ -d /sys/fs/cgroup/systemd ] ; then
+if [ -d /run/systemd/system ] ; then
 	systemctl --system daemon-reload >/dev/null || true
 fi
