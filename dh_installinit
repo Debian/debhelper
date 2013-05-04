@@ -254,21 +254,21 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (! $dh{NOSCRIPTS}) {
 			# Include postinst-init-tmpfiles if the package ships any files
 			# in /usr/lib/tmpfiles.d or /etc/tmpfiles.d
-			my $got_tmpfile = undef;
 			my $tmpdir = tmpdir($package);
+			my @tmpfiles;
 			find({
 				wanted => sub {
 					return unless -f $File::Find::name;
-					if (!$got_tmpfile &&
-						$File::Find::name =~ m,^$tmpdir/usr/lib/tmpfiles\.d/, ||
+					if ($File::Find::name =~ m,^$tmpdir/usr/lib/tmpfiles\.d/, ||
 						$File::Find::name =~ m,^$tmpdir/etc/tmpfiles\.d/,) {
-						$got_tmpfile = 1;
+						push @tmpfiles, $File::Find::name;
 					}
 				},
 				no_chdir => 1,
 			}, $tmpdir);
-			if ($got_tmpfile) {
-				autoscript($package,"postinst", "postinst-init-tmpfiles", "");
+			if (@tmpfiles > 0) {
+				autoscript($package,"postinst", "postinst-init-tmpfiles",
+					"s/#TMPFILES#/" . join(" ", map { basename($_) } @tmpfiles)."/");
 			}
 
 			if (! $dh{NO_START}) {
