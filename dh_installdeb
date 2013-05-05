@@ -58,11 +58,6 @@ code cannot be inserted here.  For example, a line such as C<mv_conffile
 /etc/oldconffile /etc/newconffile> will insert maintainer script snippets
 into all maintainer scripts sufficient to move that conffile.
 
-A versioned Pre-Dependency on dpkg is needed to use
-L<dpkg-maintscript-helper(1)>. An appropriate Pre-Dependency is
-set in ${misc:Pre-Depends} ; you should make sure to put that token into
-an appropriate place in your debian/control file.
-
 =back
 
 =cut
@@ -72,8 +67,8 @@ init();
 # dpkg-maintscript-helper commands with their associated dpkg pre-dependency
 # versions.
 my %maintscript_predeps = (
-	"rm_conffile" => "1.15.7.2",
-	"mv_conffile" => "1.15.7.2",
+	"rm_conffile" => "",
+	"mv_conffile" => "",
 );
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -105,7 +100,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			error("unknown dpkg-maintscript-helper command: $cmd")
 				unless exists $maintscript_predeps{$cmd};
 			addsubstvar($package, "misc:Pre-Depends", "dpkg",
-				    ">= $maintscript_predeps{$cmd}");
+				    ">= $maintscript_predeps{$cmd}")
+			    	if length $maintscript_predeps{$cmd};
 			my $params=escape_shell(@$line);
 			foreach my $script (qw{postinst preinst prerm postrm}) {
 				autoscript($package, $script, "maintscript-helper",
