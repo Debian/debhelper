@@ -575,7 +575,8 @@ while (@ARGV_orig) {
 	}
 	elsif ($opt=~/^-/) {
 		push @options, "-O".$opt;
-		$user_specified_options=1;
+		$user_specified_options=1
+			unless $opt =~ /^--(parallel|buildsystem|sourcedirectory|builddirectory|)/;
 	}
 	elsif (@options) {
 		$user_specified_options=1;
