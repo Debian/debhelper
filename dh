@@ -911,7 +911,8 @@ sub can_skip {
 	my $command=shift;
 	my @packages=@_;
 
-	return 0 if $user_specified_options;
+	return 0 if $user_specified_options ||
+		(exists $ENV{DH_OPTIONS} && length $ENV{DH_OPTIONS});
 
 	if (! defined $skipinfo{$command}) {
 		$skipinfo{$command}=[extract_skipinfo($command)];
