@@ -923,7 +923,7 @@ sub can_skip {
 
 	foreach my $package (@packages) {
 		foreach my $skipinfo (@skipinfo) {
-			if ($skipinfo=~/^tmp(.*)$/) {
+			if ($skipinfo=~/^tmp\((.*)\)$/) {
 				my $need=$1;
 				my $tmp=tmpdir($package);
 				return 0 if -e "$tmp/$need";
