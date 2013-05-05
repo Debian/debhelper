@@ -2,8 +2,7 @@
 
 =head1 NAME
 
-dh_installmodules - register modules with modutils
-
+dh_installmodules - register kernel modules
 
 =cut
 
@@ -33,11 +32,6 @@ L<dh_installdeb(1)>.
 =item debian/I<package>.modprobe
 
 Installed to etc/modprobe.d/I<package>.conf in the package build directory.
-
-=item debian/I<package>.modules
-
-These files were installed for use by modutils, but are now not used
-and B<dh_installmodules> will warn if these files are present.
 
 =back
 
@@ -89,17 +83,14 @@ sub find_kernel_modules {
 	return keys %versions;
 }
 
+# PROMISE: DH NOOP WITHOUT modprobe tmp(lib/modules)
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
-	my $modutils_file=pkgfile($package,"modules");
 	my $modprobe_file=pkgfile($package,"modprobe");
 
 	if (! -e $tmp) {
 		doit("install","-d",$tmp);
-	}
-
-	if ($modutils_file) {
-		warning("ignoring $modutils_file, since modutils is no longer in Debian");
 	}
 
 	if ($modprobe_file) {

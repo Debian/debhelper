@@ -71,6 +71,7 @@ my %bugfile_types = (
 	"control" => "bug-control",
 	"presubj" => "bug-presubj",
 );
+# PROMISE: DH NOOP WITHOUT bug-script bug-control bug-presubj
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if is_udeb($package);
@@ -85,7 +86,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		my $file=pkgfile($package,$pkgfilename);
 		if ($file) {
 			$bugfiles{$type}=$file;
-		} elsif (-f "debian/$pkgfilename" && $dh{PARAMS_ALL}) {
+		}
+		elsif (-f "debian/$pkgfilename" && $dh{PARAMS_ALL}) {
 			$bugfiles{$type}="debian/$pkgfilename";
 		}
 	}

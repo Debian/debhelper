@@ -181,6 +181,16 @@ pkgfile($package, $basename)
 	package. The convention is that the files are named
 	debian/package.filename, and debian/filename is also allowable for
 	the $dh{MAINPACKAGE}. If the file does not exist, nothing is returned.
+
+	If the *entire* behavior of a command, when run without any special
+	options, is determined by the existence of 1 or more pkgfiles,
+	or by the existence of a file or directory in a location in the
+	tmpdir, it can be marked as such, which allows dh to automatically
+	skip running it. This is done by inserting a special comment,
+	of the form:
+
+	# PROMISE: DH NOOP WITHOUT pkgfilea pkgfileb tmp(need/this)
+
 pkgext($package)
 	Pass this command the name of a binary package, and it will return
 	the name to prefix to files in debian/ for this package. For the

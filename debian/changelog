@@ -1,5 +1,8 @@
 debhelper (9.20130505) UNRELEASED; urgency=low
 
+  * dh: Skips running commands that it can tell do nothing. Closes: #560423
+    (This is determined by the presence of special PROMISE directives
+    within commands that provide a high-level description of the command.)
   * perl_makemaker: Unset INSTALL_BASE in case the user has it set.
     Closes: #705141
 

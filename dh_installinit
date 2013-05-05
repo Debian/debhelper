@@ -155,6 +155,8 @@ init(options => {
 	"remove-d" => \$dh{D_FLAG},
 });
 
+# PROMISE: DH NOOP WITHOUT service tmpfile upstart init init.d
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 
@@ -204,7 +206,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	my $job=pkgfile($package,"upstart");
-
 	if ($job ne '' && ! $dh{ONLYSCRIPTS}) {
 		if (! -d "$tmp/etc/init") {
 			doit("install","-d","$tmp/etc/init");

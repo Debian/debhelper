@@ -67,6 +67,9 @@ List all available addons.
 
 Prints commands that would run for a given sequence, but does not run them.
 
+Note that dh normally skips running commands that it knows will do nothing.
+With --no-act, the full list of commands in a sequence is printed.
+
 =back
 
 Other options passed to B<dh> are passed on to each command it runs. This
@@ -545,6 +548,7 @@ my @packages=@{$dh{DOPACKAGES}};
 # Get the options to pass to commands in the sequence.
 # Filter out options intended only for this program.
 my @options;
+my $user_specified_options=0;
 if ($sequence eq 'build-arch' ||
     $sequence eq 'install-arch' ||
     $sequence eq 'binary-arch') {
@@ -573,8 +577,10 @@ while (@ARGV_orig) {
 	}
 	elsif ($opt=~/^-/) {
 		push @options, "-O".$opt;
+		$user_specified_options=1;
 	}
 	elsif (@options) {
+		$user_specified_options=1;
 		if ($options[$#options]=~/^-O--/) {
 			$options[$#options].="=".$opt;
 		}
@@ -667,6 +673,8 @@ foreach my $i (0..$stoppoint) {
 		@todo = run_override($override_type, $command, \@todo, @opts);
 	}
 	next unless @todo;
+
+	next if can_skip($command, @todo) && ! $dh{NO_ACT};
 
 	# No need to run the command for any packages handled by the
 	# override targets.
@@ -897,6 +905,51 @@ sub command_pos {
 	}
 	else {
 		return pop @matches;
+	}
+}
+
+my %skipinfo;
+sub can_skip {
+	my $command=shift;
+	my @packages=@_;
+
+	return 0 if $user_specified_options;
+
+	if (! defined $skipinfo{$command}) {
+		$skipinfo{$command}=[extract_skipinfo($command)];
+	}
+	my @skipinfo=@{$skipinfo{$command}};
+	return 0 unless @skipinfo;
+
+	foreach my $package (@packages) {
+		foreach my $skipinfo (@skipinfo) {
+			if ($skipinfo=~/^tmp(.*)$/) {
+				my $need=$1;
+				my $tmp=tmpdir($package);
+				return 0 if -e "$tmp/$need";
+			}
+			elsif (pkgfile($package, $skipinfo) ne '') {
+				return 0;
+			}
+		}
+	}
+	return 1;
+}
+
+sub extract_skipinfo {
+	my $command=shift;
+
+	foreach my $dir (split (':', $ENV{PATH})) {
+		if (open (my $h, "<", "$dir/$command")) {
+			while (<$h>) {
+				if (m/PROMISE: DH NOOP WITHOUT\s+(.*)/) {
+					close $h;
+					return split(' ', $1);
+				}
+			}
+			close $h;
+			return ();
+		}
 	}
 }
 
