@@ -20,7 +20,7 @@ sub exists_make_target {
 	unshift @opts, "-C", $buildpath if $buildpath ne ".";
 	open(SAVEDERR, ">&STDERR");
 	open(STDERR, ">/dev/null");
-	open(MAKE, "-|", $this->{makecmd}, @opts, $target);
+	open(MAKE, "-|", $this->{makecmd}, @opts, $target, @_);
 	my $output=<MAKE>;
 	chomp $output;
 	close MAKE;
@@ -46,7 +46,7 @@ sub make_first_existing_target {
 	my $targets=shift;
 
 	foreach my $target (@$targets) {
-		if ($this->exists_make_target($target)) {
+		if ($this->exists_make_target($target, @_)) {
 			$this->do_make($target, @_);
 			return $target;
 		}
