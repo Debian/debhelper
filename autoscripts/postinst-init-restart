@@ -1,10 +1,4 @@
 if [ -x "/etc/init.d/#SCRIPT#" ]; then
-	# In case this system is running systemd, we need to ensure that all
-	# necessary tmpfiles (if any) are created before starting.
-	if [ -d /run/systemd/system ] ; then
-		systemd-tmpfiles --create >/dev/null || true
-	fi
-
 	update-rc.d #SCRIPT# #INITPARMS# >/dev/null
 	if [ -n "$2" ]; then
 		_dh_action=restart
