@@ -155,14 +155,7 @@ sub setup_py {
 	}
 
 	foreach my $python (@python_dbg, @python_requested) {
-		my $python_with_version = $python;
-		if ($python eq "python") {
-			$python_with_version = $python_default;
-		}
-		elsif ($python eq "python-dbg") {
-			$python_with_version = $python_default."-dbg";
-		}
-		if (-f "/usr/lib/$python_with_version/distutils/__init__.py") {
+		if (-x "/usr/bin/".$python) {
 			# To allow backports of debhelper we don't pass
 			# --install-layout=deb to 'setup.py install` for
 			# those Python versions where the option is
