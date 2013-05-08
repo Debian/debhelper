@@ -71,8 +71,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("cp",@info,"$tmp/usr/share/info");
 		doit("chmod","-R", "go=rX","$tmp/usr/share/info/");
 		doit("chmod","-R", "u+rw","$tmp/usr/share/info/");
-		# For transition, could be removed later.
-		addsubstvar($package, "misc:Depends", "dpkg (>= 1.15.4) | install-info");
 	}
 }
 
