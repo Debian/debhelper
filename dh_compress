@@ -77,10 +77,12 @@ init();
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
+
 	my $compress=pkgfile($package,"compress");
 
 	# Run the file name gathering commands from within the directory
 	# structure that will be effected.
+	next unless -d $tmp;
 	my $olddir=getcwd();
 	verbose_print("cd $tmp");
 	chdir($tmp) || error("Can't cd to $tmp: $!");
