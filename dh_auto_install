@@ -80,6 +80,13 @@ if (!$destdir) {
 }
 $destdir = File::Spec->rel2abs($destdir, cwd());
 
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	if (! -e $tmp) {
+		doit("install","-d",$tmp);
+	}
+}
+
 buildsystems_do("install", $destdir);
 
 =head1 SEE ALSO

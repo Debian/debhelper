@@ -1,4 +1,4 @@
-debhelper (9.20130508) UNRELEASED; urgency=low
+debhelper (9.20130509) unstable; urgency=low
 
   * dh_installinit: Remove obsolete systemd-tempfiles hack in postinst
     autoscript. Closes: #707159
@@ -8,10 +8,13 @@ debhelper (9.20130508) UNRELEASED; urgency=low
     not exist. (Audited all the rest.)
   * dh: As a workaround for anything not in debhelper that may rely
     on debhelper command that is now skipped creating the package build
-    directory, the directory is created when a command is skipped.
-    This workaround is disabled in compat level 10. Closes: #707336
+    directory as a side effect, the directory is created when a command
+    is skipped. This workaround is disabled in compat level 10.
+    Closes: #707336
+  * dh_auto_install: Create package build directory for those packages
+    whose makefile falls over otherwise. Closes: #707336
 
- -- Joey Hess <joeyh@debian.org>  Tue, 07 May 2013 19:42:52 -0400
+ -- Joey Hess <joeyh@debian.org>  Thu, 09 May 2013 10:34:56 -0400
 
 debhelper (9.20130507) unstable; urgency=low
 
