@@ -5,7 +5,11 @@ debhelper (9.20130508) UNRELEASED; urgency=low
   * dh_installinfo: Stop inserting dependencies for partial upgrades
     from lenny to squeeze. Closes: #707218
   * dh_compress, dh_perl: Avoid failing if the package build directory does
-    not exist.
+    not exist. (Audited all the rest.)
+  * dh: As a workaround for anything not in debhelper that may rely
+    on debhelper command that is now skipped creating the package build
+    directory, the directory is created when a command is skipped.
+    This workaround is disabled in compat level 10. Closes: #707336
 
  -- Joey Hess <joeyh@debian.org>  Tue, 07 May 2013 19:42:52 -0400
 

@@ -673,7 +673,20 @@ foreach my $i (0..$stoppoint) {
 	}
 	next unless @todo;
 
-	next if can_skip($command, @todo) && ! $dh{NO_ACT};
+	if (can_skip($command, @todo) && ! $dh{NO_ACT}) {
+		# This mkdir is to avoid skipping the command causing
+		# breakage if some later command assumed that the
+		# command ran, and created the tmpdir, as a side effect.
+		# No commands in debhelper should make such an assuption,
+		# but there may be third party commands or other things
+		# in the rules file that does.
+		if (! compat(10)) {
+			foreach my $package (@todo) {
+				mkdir(tmpdir($package));
+			}
+		}
+		next;
+	}
 
 	# No need to run the command for any packages handled by the
 	# override targets.
