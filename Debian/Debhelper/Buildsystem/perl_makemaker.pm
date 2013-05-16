@@ -54,7 +54,7 @@ sub configure {
 		push @flags, "LD=$Config{ld} $ENV{CFLAGS} $ENV{LDFLAGS}";
 	}
 
-	$this->doit_in_sourcedir("perl", "Makefile.PL", "INSTALLDIRS=vendor", "INSTALL_BASE=",
+	$this->doit_in_sourcedir("perl", "Makefile.PL", "INSTALLDIRS=vendor",
 		# if perl_build is not tested first, need to pass packlist
 		# option to handle fallthrough case
 		(compat(7) ? "create_packlist=0" : ()),
