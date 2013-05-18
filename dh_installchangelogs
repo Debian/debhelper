@@ -78,6 +78,49 @@ Install this file as the upstream changelog.
 
 =cut
 
+# Install a changelog into a package.
+# For binNMUs the first changelog entry is written into an extra file to keep
+# the packages coinstallable.
+sub install_changelog
+{
+	my ($package, $input_fn, $changelog_name)=@_;
+
+	my $arch=package_arch($package);
+	my $tmp=tmpdir($package);
+	my $output_fn="$tmp/usr/share/doc/$package/$changelog_name";
+	my $mask=umask 0022;
+	my @stat=stat $input_fn or error("could not stat $input_fn: $!");
+
+	open my $input, "<", $input_fn
+		or error("could not read $input_fn: $!");
+	open my $output, ">", $output_fn
+		or error("could not open $output_fn for writing: $!");
+
+	my $line=<$input>;
+	if ($line =~ /\A\S.*;.*\bbinary-only=yes/) {
+		my $output_fn_binary="$output_fn.$arch";
+		open my $output_binary, ">", $output_fn_binary
+			or error("could not open $output_fn_binary for writing: $!");
+		do {
+			print {$output_binary} $line
+				or error("Could not write to $output_fn_binary: $!");
+		} while(defined($line=<$input>) && $line !~ /\A\S/);
+		close $output_binary or error("Couldn't close $output_fn_binary: $!");
+		utime $stat[8], $stat[9], $output_fn_binary;
+	}
+
+	do {
+		print {$output} $line
+			or error("Could not write to $output_fn: $!");
+	} while(defined($line=<$input>));
+
+	close $input or error("Couldn't close $input_fn: $!");
+	close $output or error("Couldn't close $output_fn: $!");
+	utime $stat[8], $stat[9], $output_fn;
+
+	umask $mask;
+}
+
 init();
 
 my $upstream=shift;
@@ -139,8 +182,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (! -d "$tmp/usr/share/doc/$package") {
 		doit("install","-d","$tmp/usr/share/doc/$package");
 	}
-	doit("install","-o",0,"-g",0,"-p","-m644",$changelog,
-		"$tmp/usr/share/doc/$package/$changelog_name");
+	install_changelog($package, $changelog, $changelog_name);
 	if (-e $news) {
 		doit("install","-o",0,"-g",0,"-p","-m644",$news,
 			"$tmp/usr/share/doc/$package/$news_name");
