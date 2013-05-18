@@ -224,6 +224,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	my $init=pkgfile($package,$script) || pkgfile($package,"init") ||
 		pkgfile($package,"init.d");
+
+	if ($job ne '' || ($dh{ONLYSCRIPTS} && -e "$tmp/etc/init/$jobfile.conf")) {
+		# minimal version of invoke-rc.d that supports upstart jobs
+		# directly
+		addsubstvar($package, "misc:Depends", "sysv-rc (>= 2.88dsf-24)");
+	}
+
 	if ($init ne '' && ! $dh{ONLYSCRIPTS}) {
 		if (! -d "$tmp/etc/init.d") {
 			doit("install","-d","$tmp/etc/init.d");
