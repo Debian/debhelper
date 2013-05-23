@@ -228,7 +228,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if ($job ne '' || ($dh{ONLYSCRIPTS} && -e "$tmp/etc/init/$jobfile.conf")) {
 		# minimal version of invoke-rc.d that supports upstart jobs
 		# directly
-		addsubstvar($package, "misc:Depends", "sysv-rc (>= 2.88dsf-24)");
+		addsubstvar($package, "misc:Depends", "sysv-rc (>= 2.88dsf-24) | file-rc (>= 0.8.15+nmu1)");
 	}
 
 	if ($init ne '' && ! $dh{ONLYSCRIPTS}) {
