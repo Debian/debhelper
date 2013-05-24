@@ -80,7 +80,9 @@ debhelper.7: debhelper.pod
 
 clean:
 	rm -f *.1 *.7 Debian/Debhelper/Dh_Version.pm
+ifneq ($(USE_NLS),no)
 	po4a --previous --rm-translations --rm-backups man/po4a/po4a.cfg
+endif
 	for lang in $(LANGS); do \
 		if [ -e man/$$lang ]; then rmdir man/$$lang; fi; \
 	done;
