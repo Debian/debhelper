@@ -23,11 +23,14 @@ specified, it looks for files with names that seem likely to be changelogs.
 (In compatibility level 7 and above.)
 
 If there is an upstream F<changelog> file, it will be be installed as
-F<usr/share/doc/package/changelog> in the package build directory. If the
-changelog is a F<html> file (determined by file extension), it will be
-installed as F<usr/share/doc/package/changelog.html> instead, and will be
-converted to plain text with B<html2text> to generate
-F<usr/share/doc/package/changelog>.
+F<usr/share/doc/package/changelog> in the package build directory.
+
+If the upstream changelog is is a F<html> file (determined by file
+extension), it will be installed as F<usr/share/doc/package/changelog.html>
+instead. If the html changelog is converted to plain text, that variant
+can be specified as a second upstream changelog file. When no plain
+text variant is specified, a short F<usr/share/doc/package/changelog>
+is generated, pointing readers at the html changelog file.
 
 =head1 FILES
 
@@ -129,8 +132,12 @@ sub install_binNMU_changelog {
 
 init();
 
-my $upstream=shift;
+my $news_name="NEWS.Debian";
 my $changelog_name="changelog.Debian";
+
+my $upstream=shift;
+my $upstream_text=$upstream;
+my $upstream_html;
 if (! defined $upstream) {
 	if (! isnative($dh{MAINPACKAGE}) && !compat(6)) {
 		foreach my $dir (qw{. doc docs}) {
@@ -150,7 +157,10 @@ if (! defined $upstream) {
 		$changelog_name='changelog';
 	}
 }
-my $news_name="NEWS.Debian";
+elsif ($upstream=~m/\.html?$/i) {
+	$upstream_html=$upstream;
+	$upstream_text=shift;
+}
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if is_udeb($package);
@@ -201,17 +211,21 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	if (defined $upstream) {
 		my $link_to;
-		if ($upstream=~m/\.html?$/i) {
-			# HTML changelog
+		my $base="$tmp/usr/share/doc/$package";
+		if (defined $upstream_text) {
 			doit("install","-o",0,"-g",0,"-p","-m644",
-				$upstream,"$tmp/usr/share/doc/$package/changelog.html");
-			doit("html2text","-nobs","-o","$tmp/usr/share/doc/$package/changelog",$upstream);
-			$link_to='changelog.html';
-		}
-		else {
-			doit("install","-o",0,"-g",0,"-p","-m644",
-				$upstream,"$tmp/usr/share/doc/$package/changelog");
+				$upstream_text,"$base/changelog");
 			$link_to='changelog';
+		}
+		if (defined $upstream_html) {
+			doit("install","-o",0,"-g",0,"-p","-m644",
+				$upstream_html,"$base/changelog.html");
+			$link_to='changelog.html';
+			if (! defined $upstream_text) {
+				complex_doit("echo 'See changelog.html.gz' > $base/changelog");
+				doit("chmod","644","$base/changelog");
+				doit("chown","0:0","$base/changelog");
+			}
 		}
 		if ($dh{K_FLAG}) {
 			# Install symlink to original name of the upstream changelog file.
