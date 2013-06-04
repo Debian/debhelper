@@ -11,7 +11,8 @@ use Debian::Debhelper::Dh_Lib qw(escape_shell clean_jobserver_makeflags);
 use base 'Debian::Debhelper::Buildsystem';
 
 sub exists_make_target {
-	my ($this, $target) = @_;
+	my $this=shift;
+	my $target=shift;
 
 	# Use make -n to check to see if the target would do
 	# anything. There's no good way to test if a target exists.
