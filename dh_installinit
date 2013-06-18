@@ -266,17 +266,19 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			my @tmpfiles;
 			find({
 				wanted => sub {
-					return unless -f $File::Find::name;
-					if ($File::Find::name =~ m,^$tmpdir/usr/lib/tmpfiles\.d/, ||
-						$File::Find::name =~ m,^$tmpdir/etc/tmpfiles\.d/,) {
-						push @tmpfiles, $File::Find::name;
+					my $name = $File::Find::name;
+					return unless -f $name;
+					$name =~ s/^$tmpdir//g;
+					if ($name =~ m,^/usr/lib/tmpfiles\.d/, ||
+						$name =~ m,^/etc/tmpfiles\.d/,) {
+						push @tmpfiles, $name;
 					}
 				},
 				no_chdir => 1,
 			}, $tmpdir);
 			if (@tmpfiles > 0) {
 				autoscript($package,"postinst", "postinst-init-tmpfiles",
-					"s/#TMPFILES#/" . join(" ", map { basename($_) } @tmpfiles)."/");
+					"s,#TMPFILES#," . join(" ", @tmpfiles).",");
 			}
 
 			if (! $dh{NO_START}) {
