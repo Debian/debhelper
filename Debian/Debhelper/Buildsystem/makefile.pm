@@ -10,23 +10,58 @@ use strict;
 use Debian::Debhelper::Dh_Lib qw(escape_shell clean_jobserver_makeflags);
 use base 'Debian::Debhelper::Buildsystem';
 
+# make makes things difficult by not providing a simple way to test
+# whether a Makefile target exists. Using -n and checking for a nonzero
+# exit status is not good enough, because even with -n, make will
+# run commands needed to eg, generate include files -- and those commands
+# could fail even though the target exists -- and we should let the target
+# run and propigate any failure.
+#
+# Using -n and checking for at least one line of output is better.
+# That will indicate make either wants to run one command, or
+# has output a "nothing to be done" message if the target exists but is a
+# noop.
+#
+# However, that heuristic is also not good enough, because a Makefile
+# could run code that outputs something, even though the -n is asking
+# it not to run anything. (Again, done for includes.) To detect this false
+# positive, there is unfortunately only one approach left: To
+# look for the error message printed by make when a target does not exist.
+#
+# This could break if make's output changes. It would only break a minority
+# of packages where this latter test is needed. The best way to avoid that
+# problem would be to fix make to have this simple and highly useful
+# missing feature.
+#
+# A final option would be to use -p and parse the output data base.
+# It's more practical for dh to use that method, since it operates on
+# only special debian/rules files, and not arbitrary Makefiles which
+# can be arbitrarily complicated, use implicit targets, and so on.
 sub exists_make_target {
 	my $this=shift;
 	my $target=shift;
 
-	# Use make -n to check to see if the target would do
-	# anything. There's no good way to test if a target exists.
 	my @opts=("-s", "-n", "--no-print-directory");
 	my $buildpath = $this->get_buildpath();
 	unshift @opts, "-C", $buildpath if $buildpath ne ".";
-	open(SAVEDERR, ">&STDERR");
-	open(STDERR, ">/dev/null");
-	open(MAKE, "-|", $this->{makecmd}, @opts, $target, @_);
+
+	my $pid = open(MAKE, "-|");
+	defined($pid) || die "can't fork: $!";
+	if (! $pid) {
+		open(STDERR, ">&STDOUT");
+		$ENV{LC_ALL}='C';
+		exec($this->{makecmd}, @opts, $target, @_);
+		exit(1);
+	}
+
+	local $/=undef;
 	my $output=<MAKE>;
 	chomp $output;
 	close MAKE;
-	open(STDERR, ">&SAVEDERR");
-	return defined $output && length $output;
+
+	return defined $output
+		&& length $output
+		&& $output !~ /\*\*\* No rule to make target/;
 }
 
 sub do_make {
