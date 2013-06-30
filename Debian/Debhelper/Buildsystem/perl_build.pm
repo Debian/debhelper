@@ -43,12 +43,12 @@ sub configure {
 	my @flags;
 	$ENV{PERL_MM_USE_DEFAULT}=1;
 	if ($ENV{CFLAGS} && ! compat(8)) {
-		push @flags, "config=optimize=$ENV{CFLAGS} $ENV{CPPFLAGS}";
+		push @flags, "--config", "optimize=$ENV{CFLAGS} $ENV{CPPFLAGS}";
 	}
 	if ($ENV{LDFLAGS} && ! compat(8)) {
-		push @flags, "config=ld=$Config{ld} $ENV{CFLAGS} $ENV{LDFLAGS}";
+		push @flags, "--config", "ld=$Config{ld} $ENV{CFLAGS} $ENV{LDFLAGS}";
 	}
-	$this->do_perl("Build.PL", "installdirs=vendor", @flags, @_);
+	$this->do_perl("Build.PL", "--installdirs", "vendor", @flags, @_);
 }
 
 sub build {
@@ -64,13 +64,13 @@ sub test {
 sub install {
 	my $this=shift;
 	my $destdir=shift;
-	$this->do_perl("Build", "install", "destdir=$destdir", "create_packlist=0", @_);
+	$this->do_perl("Build", "install", "--destdir", "$destdir", "--create_packlist", 0, @_);
 }
 
 sub clean {
 	my $this=shift;
 	if (-e $this->get_sourcepath("Build")) {
-		$this->do_perl("Build", "--allow_mb_mismatch", 1, "distclean", @_);
+		$this->do_perl("Build", "distclean", "--allow_mb_mismatch", 1, @_);
 	}
 }
 
