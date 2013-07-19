@@ -5,8 +5,7 @@
 # bug.
 use Test::More;
 
-# exclude dh_python since it's deprecated
-my @progs=grep { -x $_ && !/dh_python/ } glob("dh_*");
+my @progs=grep { -x $_ } glob("dh_*");
 
 plan(tests => (@progs + @progs));
 
