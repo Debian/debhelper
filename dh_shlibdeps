@@ -48,8 +48,9 @@ It is deprecated; use B<--> instead.
 With recent versions of B<dpkg-shlibdeps>, this option is generally not
 needed.
 
-Before B<dpkg-shlibdeps> is run, B<LD_LIBRARY_PATH> will have added to it the 
-specified directory (or directories -- separate with colons). With recent
+It tells B<dpkg-shlibdeps> (via its B<-l> parameter), to look for private
+package libraries in the specified directory (or directories -- separate
+with colons). With recent
 versions of B<dpkg-shlibdeps>, this is mostly only useful for packages that
 build multiple flavors of the same library, or other situations where
 the library is installed into a directory not on the regular library search
@@ -94,23 +95,6 @@ init(options => {
 	"l=s", => \$dh{L_PARAMS},
 });
 
-if ($dh{L_PARAMS}) {
-	my @paths=();
-	# Add to existing paths, if set.
-	push @paths, $ENV{'LD_LIBRARY_PATH'}
-		if exists $ENV{'LD_LIBRARY_PATH'};
-	foreach (split(/:/, $dh{L_PARAMS})) {
-		# Force the path absolute.
-		if (m:^/:) {
-			push @paths, $_;
-		}
-		else {
-			push @paths, "/$_";
-		}
-	}
-	$dh{L_PARAMS}=join(':', @paths);
-}
-
 if (defined $dh{V_FLAG}) {
 	warning("You probably wanted to pass -V to dh_makeshlibs, it has no effect on dh_shlibdeps");
 }
@@ -152,23 +136,16 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		
 		push @opts, "-tudeb" if is_udeb($package);
 		
-		my $ld_library_path_orig=$ENV{LD_LIBRARY_PATH};
 		if ($dh{L_PARAMS}) {
-			$ENV{LD_LIBRARY_PATH}=$dh{L_PARAMS};
-			verbose_print("LD_LIBRARY_PATH=$dh{L_PARAMS}");
+			foreach (split(/:/, $dh{L_PARAMS})) {
+				# Force the path absolute.
+				my $libdir = m:^/: ? $_ : "/$_";
+				push @opts, "-l$libdir";
+			}
 		}
 		
 		doit("dpkg-shlibdeps","-Tdebian/${ext}substvars",
 			@opts,@{$dh{U_PARAMS}},@filelist);
-
-		if ($dh{L_PARAMS}) {
-			if (defined $ld_library_path_orig) {
-				$ENV{LD_LIBRARY_PATH}=$ld_library_path_orig;
-			}
-			else {
-				delete $ENV{LD_LIBRARY_PATH};
-			}
-		}
 	}
 }
 
