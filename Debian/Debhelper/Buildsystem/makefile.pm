@@ -15,7 +15,7 @@ use base 'Debian::Debhelper::Buildsystem';
 # exit status is not good enough, because even with -n, make will
 # run commands needed to eg, generate include files -- and those commands
 # could fail even though the target exists -- and we should let the target
-# run and propigate any failure.
+# run and propagate any failure.
 #
 # Using -n and checking for at least one line of output is better.
 # That will indicate make either wants to run one command, or

@@ -94,7 +94,7 @@ sub init {
 	# the command line may affect it.
 	$dh{FIRSTPACKAGE}=${$dh{DOPACKAGES}}[0];
 
-	# If no error handling function was specified, just propigate
+	# If no error handling function was specified, just propagate
 	# errors out.
 	if (! exists $dh{ERROR_HANDLER} || ! defined $dh{ERROR_HANDLER}) {
 		$dh{ERROR_HANDLER}='exit \$?';
