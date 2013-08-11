@@ -162,6 +162,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	# Figure out what filename to install it as.
 	my $script;
+	my $scriptsrc;
 	my $jobfile=$package;
 	if (defined $dh{NAME}) {
 		$jobfile=$script=$dh{NAME};
@@ -177,12 +178,20 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		else {
 			warning("\"$package\" has no final d' in its name, but -d was specified.");
 		}
+		$scriptsrc=$script;
 	}       
 	elsif ($dh{INIT_SCRIPT}) {
 		$script=$dh{INIT_SCRIPT};
+		$scriptsrc=$script;
 	}
 	else {
 		$script=$package;
+		if (compat(9)) {
+			$scriptsrc=$script;
+		}
+		else {
+			$scriptsrc="init";
+		}
 	}       
 
 	my $service=pkgfile($package,"service");
@@ -222,7 +231,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("install","-p","-m644",$default,"$tmp/etc/default/$script");
 	}
 
-	my $init=pkgfile($package,$script) || pkgfile($package,"init") ||
+	my $init=pkgfile($package,$scriptsrc) || pkgfile($package,"init") ||
 		pkgfile($package,"init.d");
 
 	if ($job ne '' || ($dh{ONLYSCRIPTS} && -e "$tmp/etc/init/$jobfile.conf")) {
