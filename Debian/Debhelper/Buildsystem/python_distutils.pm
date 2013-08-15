@@ -204,7 +204,7 @@ sub clean {
 	}
 	# The setup.py might import files, leading to python creating pyc
 	# files.
-	$this->doit_in_sourcedir('find', '.', '-name', '*.pyc', '-exec', 'rm', '{}', ';');
+	$this->doit_in_sourcedir('find', '.', '-name', '*.pyc', '-exec', 'rm', '{}', '+');
 }
 
 1

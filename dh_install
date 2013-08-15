@@ -203,10 +203,10 @@ foreach my $package (getpackages()) {
 				my $dir = ($basename eq '.') ? $src : "$src/..";
 				my $pwd=`pwd`;
 				chomp $pwd;
-				complex_doit("cd '$dir' && find '$basename' $exclude \\( -type f -or -type l \\) -exec cp --parents -dp {} $pwd/$tmp/$dest/ \\;");
+				complex_doit("cd '$dir' && find '$basename' $exclude \\( -type f -or -type l \\) -print0 | xargs -0 -I {} cp --parents -dp {} $pwd/$tmp/$dest/");
 				# cp is annoying so I need a separate pass
 				# just for empty directories
-				complex_doit("cd '$dir' && find '$basename' $exclude \\( -type d -and -empty \\) -exec cp --parents -a {} $pwd/$tmp/$dest/ \\;");
+				complex_doit("cd '$dir' && find '$basename' $exclude \\( -type d -and -empty \\) -print0 | xargs -0 -I {} cp --parents -a {} $pwd/$tmp/$dest/");
 			}
 			else {
 				doit("cp", "-a", $src, "$tmp/$dest/");

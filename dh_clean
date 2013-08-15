@@ -128,8 +128,8 @@ if (! $dh{D_FLAG}) {
 		 -o -name '*.orig' -o -name '*.rej' -o -name '*.bak' \\
 		 -o -name '.*.orig' -o -name .*.rej -o -name '.SUMS' \\
 		 -o -name TAGS -o \\( -path '*/.deps/*' -a -name '*.P' \\) \\
-		\\) -exec rm -f {} \\; \\) -o \\
-		\\( -type d -a -name autom4te.cache -prune -exec rm -rf {} \\; \\) \\)");
+		\\) -exec rm -f {} + \\) -o \\
+		\\( -type d -a -name autom4te.cache -prune -exec rm -rf {} + \\) \\)");
 }
 
 doit('rm', '-rf', 'debian/tmp') if -x 'debian/tmp' && ! compat(1) &&
