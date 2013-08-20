@@ -11,6 +11,10 @@ debhelper (9.20130631) UNRELEASED; urgency=low
   * dh_install, dh_installdocs, dh_clean: Fix uses of find -exec
     which cause it to ignore exit status of the commands run.
     Closes: 719598
+  * makefile buildsystem: Tighten heuristic to detect if makefile target
+    exists. An error message that some other target does not exist just means
+    the makefile spaghetti has problems later on when run with -n,
+    but not that the called target didn't exist. Closes: #718121
 
  -- Joey Hess <joeyh@debian.org>  Fri, 19 Jul 2013 18:47:27 -0400
 

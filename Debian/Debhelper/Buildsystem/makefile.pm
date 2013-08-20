@@ -61,7 +61,7 @@ sub exists_make_target {
 
 	return defined $output
 		&& length $output
-		&& $output !~ /\*\*\* No rule to make target/;
+		&& $output !~ /\*\*\* No rule to make target `\Q$target\E'/;
 }
 
 sub do_make {
