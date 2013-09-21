@@ -1,0 +1,252 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dh_strip - strip executables, shared libraries, and some static libraries
+
+=cut
+
+use strict;
+use File::Find;
+use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+B<dh_strip> [S<I<debhelper options>>] [B<-X>I<item>] [B<--dbg-package=>I<package>] [B<--keep-debug>]
+
+=head1 DESCRIPTION
+
+B<dh_strip> is a debhelper program that is responsible for stripping
+executables, shared libraries, and static libraries that are not used for
+debugging.
+
+This program examines your package build directories and works out what
+to strip on its own. It uses L<file(1)> and file permissions and filenames
+to figure out what files are shared libraries (F<*.so>), executable binaries,
+and static (F<lib*.a>) and debugging libraries (F<lib*_g.a>, F<debug/*.so>), and
+strips each as much as is possible. (Which is not at all for debugging
+libraries.) In general it seems to make very good guesses, and will do the
+right thing in almost all cases.
+
+Since it is very hard to automatically guess if a file is a
+module, and hard to determine how to strip a module, B<dh_strip> does not
+currently deal with stripping binary modules such as F<.o> files.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-X>I<item>, B<--exclude=>I<item>
+
+Exclude files that contain I<item> anywhere in their filename from being
+stripped. You may use this option multiple times to build up a list of
+things to exclude.
+
+=item B<--dbg-package=>I<package>
+
+Causes B<dh_strip> to save debug symbols stripped from the packages it acts on
+as independent files in the package build directory of the specified debugging
+package.
+
+For example, if your packages are libfoo and foo and you want to include a
+I<foo-dbg> package with debugging symbols, use B<dh_strip --dbg-package=>I<foo-dbg>.
+
+Note that this option behaves significantly different in debhelper
+compatibility levels 4 and below. Instead of specifying the name of a debug
+package to put symbols in, it specifies a package (or packages) which
+should have separated debug symbols, and the separated symbols are placed
+in packages with B<-dbg> added to their name.
+
+=item B<-k>, B<--keep-debug>
+
+Debug symbols will be retained, but split into an independent
+file in F<usr/lib/debug/> in the package build directory. B<--dbg-package>
+is easier to use than this option, but this option is more flexible.
+
+=back
+
+=head1 NOTES
+
+If the B<DEB_BUILD_OPTIONS> environment variable contains B<nostrip>, nothing
+will be stripped, in accordance with Debian policy (section 10.1
+"Binaries").
+
+=head1 CONFORMS TO
+
+Debian policy, version 3.0.1
+
+=cut
+
+init(options => {
+	"keep-debug" => \$dh{K_FLAG},
+});
+
+# This variable can be used to turn off stripping (see Policy).
+if (get_buildoption('nostrip')) {
+	exit;
+}
+
+my $objcopy = cross_command("objcopy");
+my $strip = cross_command("strip");
+
+# I could just use `file $_[0]`, but this is safer
+sub get_file_type {
+	my $file=shift;
+	open (FILE, '-|') # handle all filenames safely
+		|| exec('file', $file)
+		|| die "can't exec file: $!";
+	my $type=<FILE>;
+	close FILE;
+	return $type;
+}
+
+# Check if a file is an elf binary, shared library, or static library,
+# for use by File::Find. It'll fill the following 3 arrays with anything
+# it finds:
+my (@shared_libs, @executables, @static_libs);
+sub testfile {
+	return if -l $_ or -d $_; # Skip directories and symlinks always.
+	
+	# See if we were asked to exclude this file.
+	# Note that we have to test on the full filename, including directory.
+	my $fn="$File::Find::dir/$_";
+	foreach my $f (@{$dh{EXCLUDE}}) {
+		return if ($fn=~m/\Q$f\E/);
+	}
+
+	# Is it a debug library in a debug subdir?
+	return if $fn=~m/debug\/.*\.so/;
+
+	# Does its filename look like a shared library?
+	# (*.cmxs are OCaml native code shared libraries)
+	if (m/.*\.(so.*?|cmxs$)/) {
+		# Ok, do the expensive test.
+		my $type=get_file_type($_);
+		if ($type=~m/.*ELF.*shared.*/) {
+			push @shared_libs, $fn;
+			return;
+		}
+	}
+	
+	# Is it executable? -x isn't good enough, so we need to use stat.
+	my (undef,undef,$mode,undef)=stat(_);
+	if ($mode & 0111) {
+		# Ok, expensive test.
+		my $type=get_file_type($_);
+		if ($type=~m/.*ELF.*(executable|shared).*/) {
+			push @executables, $fn;
+			return;
+		}
+	}
+	
+	# Is it a static library, and not a debug library?
+	if (m/lib.*\.a$/ && ! m/.*_g\.a$/) {
+		# Is it a binary file, or something else (maybe a liner
+		# script on Hurd, for example? I don't use file, because
+		# file returns a variety of things on static libraries.
+		if (-B $_) {
+			push @static_libs, $fn;
+			return;
+		}
+	}
+}
+
+sub make_debug {
+	my $file=shift;
+	my $tmp=shift;
+	my $desttmp=shift;
+	
+	# Don't try to copy debug symbols out if the file is already
+	# stripped.
+	return unless get_file_type($file) =~ /not stripped/;
+
+	my ($base_file)=$file=~/^\Q$tmp\E(.*)/;
+	my $debug_path;
+	if (! compat(8) && 
+	    `LC_ALL=C readelf -n $file`=~ /^\s+Build ID: ([0-9a-f]{2})([0-9a-f]+)$/m) {
+		$debug_path=$desttmp."/usr/lib/debug/.build-id/$1/$2.debug"
+	}
+	else {
+		$debug_path=$desttmp."/usr/lib/debug/".$base_file;
+	}
+	my $debug_dir=dirname($debug_path);
+	if (! -d $debug_dir) {
+		doit("install", "-d", $debug_dir);
+	}
+	if (compat(8)) {
+		doit($objcopy, "--only-keep-debug", $file, $debug_path);
+	}
+	else {
+		doit($objcopy, "--only-keep-debug", "--compress-debug-sections", $file, $debug_path);
+	}
+	# No reason for this to be executable.
+	doit("chmod", 644, $debug_path);
+	return $debug_path;
+}
+
+sub attach_debug {
+	my $file=shift;
+	my $debug_path=shift;
+	doit($objcopy, "--add-gnu-debuglink", $debug_path, $file);
+}
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+
+	# Support for keeping the debugging symbols in a detached file.
+	my $keep_debug=$dh{K_FLAG};
+	my $debugtmp=$tmp;
+	if (! compat(4)) {
+		if (ref $dh{DEBUGPACKAGES}) {
+			$keep_debug=1;
+			# Note that it's only an array for the v4 stuff;
+			# for v5 only one value is used.
+			my $debugpackage=@{$dh{DEBUGPACKAGES}}[0];
+			if (! grep { $_ eq $debugpackage } getpackages()) {
+				error("debug package $debugpackage is not listed in the control file");
+			}
+			$debugtmp=tmpdir($debugpackage);
+		}
+	}
+	else {
+		if (ref $dh{DEBUGPACKAGES} && grep { $_ eq $package } @{$dh{DEBUGPACKAGES}}) {
+			$keep_debug=1;
+			$debugtmp=tmpdir($package."-dbg");
+		}
+	}
+	
+	@shared_libs=@executables=@static_libs=();
+	find(\&testfile,$tmp);
+
+	foreach (@shared_libs) {
+		my $debug_path = make_debug($_, $tmp, $debugtmp) if $keep_debug;
+		# Note that all calls to strip on shared libs
+		# *must* include the --strip-unneeded.
+		doit($strip,"--remove-section=.comment",
+			"--remove-section=.note","--strip-unneeded",$_);
+		attach_debug($_, $debug_path) if defined $debug_path;
+	}
+	
+	foreach (@executables) {
+		my $debug_path = make_debug($_, $tmp, $debugtmp) if $keep_debug;
+		doit($strip,"--remove-section=.comment",
+			"--remove-section=.note",$_);
+ 		attach_debug($_, $debug_path) if defined $debug_path;
+	}
+
+	foreach (@static_libs) {
+		doit($strip,"--strip-debug",$_);
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

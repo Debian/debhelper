@@ -1,0 +1,23 @@
+Source: debhelper
+Section: devel
+Priority: optional
+Maintainer: Joey Hess <joeyh@debian.org>
+Build-Depends: po4a (>= 0.24)
+Standards-Version: 3.9.4
+Vcs-Git: git://git.debian.org/git/debhelper/debhelper.git
+Vcs-Browser: http://git.debian.org/?p=debhelper/debhelper.git;a=summary
+Homepage: http://kitenet.net/~joey/code/debhelper/
+
+Package: debhelper
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}, file (>= 3.23), dpkg (>= 1.16.2), dpkg-dev (>= 1.16.2), binutils, po-debconf, man-db (>= 2.5.1-1)
+Suggests: dh-make
+Conflicts: dpkg-cross (<< 1.18), python-support (<< 0.5.3), python-central (<< 0.5.6), automake (<< 1.11.2)
+Multi-Arch: foreign
+Description: helper programs for debian/rules
+ A collection of programs that can be used in a debian/rules file to
+ automate common tasks related to building debian packages. Programs
+ are included to install various files into your package, compress 
+ files, fix file permissions, integrate your package with the debian 
+ menu system, debconf, doc-base, etc. Most debian packages use debhelper
+ as part of their build process.

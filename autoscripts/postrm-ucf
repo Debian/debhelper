@@ -1,0 +1,12 @@
+if [ "$1" = "purge" ]; then
+	for ext in .ucf-new .ucf-old .ucf-dist ""; do
+		rm -f "#UCFDEST#$ext"
+	done
+	
+	if [ -x "`which ucf 2>/dev/null`" ]; then
+		ucf --purge "#UCFDEST#"
+	fi
+	if [ -x "`which ucfr 2>/dev/null`" ]; then
+		ucfr --purge #PACKAGE# "#UCFDEST#"
+	fi
+fi

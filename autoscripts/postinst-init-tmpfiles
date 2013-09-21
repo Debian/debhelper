@@ -1,0 +1,5 @@
+# In case this system is running systemd, we need to ensure that all
+# necessary tmpfiles (if any) are created before starting.
+if [ -d /run/systemd/system ] ; then
+	systemd-tmpfiles --create #TMPFILES# >/dev/null || true
+fi

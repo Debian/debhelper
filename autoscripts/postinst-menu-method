@@ -1,0 +1,7 @@
+inst=/etc/menu-methods/#PACKAGE#
+if [ -f $inst ]; then
+	chmod a+x $inst
+	if [ -x "`which update-menus 2>/dev/null`" ]; then
+		update-menus
+	fi
+fi
