@@ -200,9 +200,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("install","-d","$tmp/usr/share/doc/$package");
 	}
 
-	if (! install_binNMU_changelog($package, $changelog, $changelog_name)) {
-		doit("install","-o",0,"-g",0,"-p","-m644",$changelog,
-			"$tmp/usr/share/doc/$package/$changelog_name");
+	if (! $dh{NO_ACT}) {
+		if (! install_binNMU_changelog($package, $changelog, $changelog_name)) {
+			doit("install","-o",0,"-g",0,"-p","-m644",$changelog,
+				"$tmp/usr/share/doc/$package/$changelog_name");
+		}
 	}
 
 	if (-e $news) {
