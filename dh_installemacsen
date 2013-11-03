@@ -19,14 +19,19 @@ B<dh_installemacsen> is a debhelper program that is responsible for installing
 files used by the Debian B<emacsen-common> package into package build
 directories.
 
-It also automatically generates the F<postinst> and F<prerm> commands needed to
-register a package as an Emacs add on package. The commands are added to
-the maintainer scripts by B<dh_installdeb>. See L<dh_installdeb(1)>
-for an explanation of how this works.
+It also automatically generates the F<preinst> F<postinst> and F<prerm>
+commands needed to register a package as an Emacs add on package. The commands
+are added to the maintainer scripts by B<dh_installdeb>. See
+L<dh_installdeb(1)> for an explanation of how this works.
 
 =head1 FILES
 
 =over 4
+
+=item debian/I<package>.emacsen-compat
+
+Installed into F<usr/lib/emacsen-common/packages/compat/package> in the
+package build directory.
 
 =item debian/I<package>.emacsen-install
 
@@ -83,14 +88,22 @@ if (! defined $dh{FLAVOR}) {
 	$dh{FLAVOR}='emacs';
 }
 
-# PROMISE: DH NOOP WITHOUT emacsen-install emacsen-remove emacsen-startup
+# PROMISE: DH NOOP WITHOUT emacsen-common emacsen-install emacsen-remove emacsen-startup
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 
+	my $emacsen_compat=pkgfile($package,"emacsen-compat");
 	my $emacsen_install=pkgfile($package,"emacsen-install");
 	my $emacsen_remove=pkgfile($package,"emacsen-remove");
 	my $emacsen_startup=pkgfile($package,"emacsen-startup");
+
+	if ($emacsen_compat ne '') {
+		if (! -d "$tmp/usr/lib/emacsen-common/packages/compat") {
+			doit("install","-d","$tmp/usr/lib/emacsen-common/packages/compat");
+		}
+		doit("install","-m0644",$emacsen_compat,"$tmp/usr/lib/emacsen-common/packages/compat/$package");
+	}
 
 	if ($emacsen_install ne '') {
 		if (! -d "$tmp/usr/lib/emacsen-common/packages/install") {
@@ -115,6 +128,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	if ($emacsen_install ne '' || $emacsen_remove ne '') {
 		if (! $dh{NOSCRIPTS}) {
+			autoscript($package,"preinst","preinst-emacsen",
+				"s/#PACKAGE#/$package/");
 			autoscript($package,"postinst","postinst-emacsen",
 				"s/#PACKAGE#/$package/");
 			autoscript($package,"prerm","prerm-emacsen",
@@ -126,6 +141,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 =head1 SEE ALSO
 
 L<debhelper(7)>
+L</usr/share/doc/emacsen-common/debian-emacs-policy.gz>
 
 This program is a part of debhelper.
 
