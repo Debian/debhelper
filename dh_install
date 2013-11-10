@@ -1,0 +1,270 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dh_install - install files into package build directories
+
+=cut
+
+use strict;
+use File::Find;
+use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+B<dh_install> [B<-X>I<item>] [B<--autodest>] [B<--sourcedir=>I<dir>] [S<I<debhelper options>>] [S<I<file|dir> ... I<destdir>>]
+
+=head1 DESCRIPTION
+
+B<dh_install> is a debhelper program that handles installing files into package
+build directories. There are many B<dh_install>I<*> commands that handle installing
+specific types of files such as documentation, examples, man pages, and so on,
+and they should be used when possible as they often have extra intelligence for
+those particular tasks. B<dh_install>, then, is useful for installing everything
+else, for which no particular intelligence is needed. It is a replacement for
+the old B<dh_movefiles> command.
+
+This program may be used in one of two ways. If you just have a file or two
+that the upstream Makefile does not install for you, you can run B<dh_install>
+on them to move them into place. On the other hand, maybe you have a large
+package that builds multiple binary packages. You can use the upstream
+F<Makefile> to install it all into F<debian/tmp>, and then use B<dh_install> to copy
+directories and files from there into the proper package build directories.
+
+From debhelper compatibility level 7 on, B<dh_install> will fall back to
+looking in F<debian/tmp> for files, if it doesn't find them in the current
+directory (or whereever you've told it to look using B<--sourcedir>).
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.install
+
+List the files to install into each package and the directory they should be
+installed to. The format is a set of lines, where each line lists a file or
+files to install, and at the end of the line tells the directory it should be
+installed in. The name of the files (or directories) to install should be given
+relative to the current directory, while the installation directory is given
+relative to the package build directory. You may use wildcards in the names of
+the files to install (in v3 mode and above).
+
+Note that if you list exactly one filename or wildcard-pattern on a line by
+itself, with no explicit destination, then B<dh_install>
+will automatically guess the destination to use, the same as if the
+--autodest option were used.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--list-missing>
+
+This option makes B<dh_install> keep track of the files it installs, and then at
+the end, compare that list with the files in the source directory. If any of
+the files (and symlinks) in the source directory were not installed to
+somewhere, it will warn on stderr about that.
+
+This may be useful if you have a large package and want to make sure that
+you don't miss installing newly added files in new upstream releases.
+
+Note that files that are excluded from being moved via the B<-X> option are not
+warned about.
+
+=item B<--fail-missing>
+
+This option is like B<--list-missing>, except if a file was missed, it will
+not only list the missing files, but also fail with a nonzero exit code. 
+
+=item B<-X>I<item>, B<--exclude=>I<item>
+
+Exclude files that contain I<item> anywhere in their filename from
+being installed.
+
+=item B<--sourcedir=>I<dir>
+
+Look in the specified directory for files to be installed.
+
+Note that this is not the same as the B<--sourcedirectory> option used
+by the B<dh_auto_>I<*> commands. You rarely need to use this option, since
+B<dh_install> automatically looks for files in F<debian/tmp> in debhelper
+compatibility level 7 and above.
+
+=item B<--autodest>
+
+Guess as the destination directory to install things to. If this is
+specified, you should not list destination directories in
+F<debian/package.install> files or on the command line. Instead, B<dh_install>
+will guess as follows:
+
+Strip off F<debian/tmp> (or the sourcedir if one is given) from the front of
+the filename, if it is present, and install into the dirname of the
+filename. So if the filename is F<debian/tmp/usr/bin>, then that directory
+will be copied to F<debian/package/usr/>. If the filename is
+F<debian/tmp/etc/passwd>, it will be copied to F<debian/package/etc/>.
+
+=item I<file|dir> ... I<destdir>
+
+Lists files (or directories) to install and where to install them to.
+The files will be installed into the first package F<dh_install> acts on.
+
+=back
+
+=cut
+
+init(options => {
+	"autodest" => \$dh{AUTODEST},
+	"list-missing" => \$dh{LIST_MISSING},
+	"fail-missing" => \$dh{FAIL_MISSING},
+	"sourcedir=s" => \$dh{SOURCEDIR},	
+});
+
+my @installed;
+
+my $srcdir = '.';
+$srcdir = $dh{SOURCEDIR} if defined $dh{SOURCEDIR};
+
+# PROMISE: DH NOOP WITHOUT install
+
+foreach my $package (getpackages()) {
+	# Look at the install files for all packages to handle
+	# list-missing/fail-missing, but skip really installing for
+	# packages that are not being acted on.
+	my $skip_install=! grep { $_ eq $package } @{$dh{DOPACKAGES}};
+
+	my $tmp=tmpdir($package);
+	my $file=pkgfile($package,"install");
+
+	my @install;
+	if ($file) {
+		@install=filedoublearray($file); # no globbing here; done below
+	}
+	
+	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+		push @install, [@ARGV];
+	}
+
+	# Support for -X flag.
+	my $exclude = '';
+	if ($dh{EXCLUDE_FIND}) {
+		$exclude = '! \( '.$dh{EXCLUDE_FIND}.' \)';
+	}
+	
+	foreach my $set (@install) {
+		my $dest;
+		my $tmpdest=0;
+		
+		if (! defined $dh{AUTODEST} && @$set > 1) {
+			$dest=pop @$set;
+		}
+
+		my @filelist;
+		foreach my $glob (@$set) {
+			my @found = glob "$srcdir/$glob";
+			if (! compat(6)) {
+				# Fall back to looking in debian/tmp.
+				if (! @found || ! (-e $found[0] || -l $found[0])) {
+					@found = glob "debian/tmp/$glob";
+				}
+			}
+			push @filelist, @found;
+		}
+
+		if (! compat(4)) { # check added in v5
+			if (! @filelist && ! $skip_install) {
+				error("$package missing files (@$set), aborting");
+			}
+		}
+
+		foreach my $src (@filelist) { 
+			next if excludefile($src);
+			
+			push @installed, $src;
+			next if $skip_install;
+		
+			if (! defined $dest) {
+				# Guess at destination directory.
+				$dest=$src;
+				$dest=~s/^(.*\/)?\Q$srcdir\E\///;
+				$dest=~s/^(.*\/)?debian\/tmp\///;
+				$dest=dirname("/".$dest);
+				$tmpdest=1;
+			}
+			
+			# Make sure the destination directory exists.
+			if (! -e "$tmp/$dest") {
+				doit("install","-d","$tmp/$dest");
+			}
+			
+			if (-d $src && $exclude) {
+				my $basename = basename($src);
+				my $dir = ($basename eq '.') ? $src : "$src/..";
+				my $pwd=`pwd`;
+				chomp $pwd;
+				complex_doit("cd '$dir' && find '$basename' $exclude \\( -type f -or -type l \\) -print0 | xargs -0 -I {} cp --parents -dp {} $pwd/$tmp/$dest/");
+				# cp is annoying so I need a separate pass
+				# just for empty directories
+				complex_doit("cd '$dir' && find '$basename' $exclude \\( -type d -and -empty \\) -print0 | xargs -0 -I {} cp --parents -a {} $pwd/$tmp/$dest/");
+			}
+			else {
+				doit("cp", "-a", $src, "$tmp/$dest/");
+			}
+
+			if ($tmpdest) {
+				$dest=undef;
+			}
+		}
+	}
+}
+
+if ($dh{LIST_MISSING} || $dh{FAIL_MISSING}) {
+	# . as srcdir makes no sense, so this is a special case.
+	if ($srcdir eq '.') {
+		$srcdir='debian/tmp';
+	}
+	
+	my @missing;
+	my $installed=join("|", map {
+		# Kill any extra slashes, for robustness.
+		y:/:/:s;
+		s:/+$::;
+		s:^(\./)*::;
+		"\Q$_\E\/.*|\Q$_\E";
+	} @installed);
+	$installed=qr{^($installed)$};
+	find(sub {
+		-f || -l || return;
+		$_="$File::Find::dir/$_";
+		if (! /$installed/ && ! excludefile($_)) {
+			my $file=$_;
+			$file=~s/^\Q$srcdir\E\///;
+			push @missing, $file;
+		}
+	}, $srcdir);
+	if (@missing) {
+		warning "$_ exists in $srcdir but is not installed to anywhere" foreach @missing;
+		if ($dh{FAIL_MISSING}) {
+			error("missing files, aborting");
+		}
+	}
+}
+
+=head1 LIMITATIONS
+
+B<dh_install> cannot rename files or directories, it can only install them
+with the names they already have into wherever you want in the package
+build tree.
+  
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

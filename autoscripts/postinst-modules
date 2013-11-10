@@ -1,0 +1,5 @@
+if [ "$1" = "configure" ]; then
+	if [ -e /boot/System.map-#KVERS# ]; then
+		depmod -a -F /boot/System.map-#KVERS# #KVERS# || true
+	fi
+fi

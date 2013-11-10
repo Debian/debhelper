@@ -1,0 +1,238 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dh_link - create symlinks in package build directories
+
+=cut
+
+use strict;
+use File::Find;
+use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+B<dh_link> [S<I<debhelper options>>] [B<-A>] [B<-X>I<item>] [S<I<source destination> ...>]
+
+=head1 DESCRIPTION
+
+B<dh_link> is a debhelper program that creates symlinks in package build
+directories.
+
+B<dh_link> accepts a list of pairs of source and destination files. The source
+files are the already existing files that will be symlinked from. The
+destination files are the symlinks that will be created. There B<must> be
+an equal number of source and destination files specified.
+
+Be sure you B<do> specify the full filename to both the source and
+destination files (unlike you would do if you were using something like
+L<ln(1)>).
+
+B<dh_link> will generate symlinks that comply with Debian policy - absolute
+when policy says they should be absolute, and relative links with as short
+a path as possible. It will also create any subdirectories it needs to to put
+the symlinks in.
+
+Any pre-existing destination files will be replaced with symlinks.
+
+B<dh_link> also scans the package build tree for existing symlinks which do not
+conform to Debian policy, and corrects them (v4 or later).
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.links
+
+Lists pairs of source and destination files to be symlinked. Each pair
+should be put on its own line, with the source and destination separated by
+whitespace.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-A>, B<--all>
+
+Create any links specified by command line parameters in ALL packages
+acted on, not just the first.
+
+=item B<-X>I<item>, B<--exclude=>I<item>
+
+Exclude symlinks that contain I<item> anywhere in their filename from
+being corrected to comply with Debian policy.
+
+=item I<source destination> ...
+
+Create a file named I<destination> as a link to a file named I<source>. Do
+this in the package build directory of the first package acted on.
+(Or in all packages if B<-A> is specified.)
+
+=back
+
+=head1 EXAMPLES
+
+ dh_link usr/share/man/man1/foo.1 usr/share/man/man1/bar.1
+
+Make F<bar.1> be a symlink to F<foo.1>
+
+ dh_link var/lib/foo usr/lib/foo \
+   usr/share/man/man1/foo.1 usr/share/man/man1/bar.1
+
+Make F</usr/lib/foo/> be a link to F</var/lib/foo/>, and F<bar.1> be a symlink to
+the F<foo.1>
+
+=cut
+
+# This expand_path expands all path "." and ".." components, but doesn't
+# resolve symbolic links.
+sub expand_path {
+	my $start = @_ ? shift : '.';
+	my @pathname = split(m:/+:,$start);
+
+	my $entry;
+	my @respath;
+	foreach $entry (@pathname) {
+		if ($entry eq '.' || $entry eq '') {
+			# Do nothing
+		}
+		elsif ($entry eq '..') {
+			if ($#respath == -1) {
+				# Do nothing
+			}
+			else {
+				pop @respath;
+			}
+		}
+		else {
+			push @respath, $entry;
+		}
+	}
+
+	my $result;
+	foreach $entry (@respath) {
+		$result .= '/' . $entry;
+	}
+	if (! defined $result) {
+		$result="/"; # special case
+	}
+	return $result;
+}
+
+
+init();
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $file=pkgfile($package,"links");
+
+	my @links;
+	if ($file) {
+		@links=filearray($file);
+	}
+
+	# Make sure it has pairs of symlinks and destinations. If it
+	# doesn't, $#links will be _odd_ (not even, -- it's zero-based).
+	if (int($#links/2) eq $#links/2) {
+		error("$file lists a link without a destination.");
+	}
+
+	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+		push @links, @ARGV;
+	}
+
+	# Same test as above, including arguments this time.
+	if (int($#links/2) eq $#links/2) {
+		error("parameters list a link without a destination.");
+	}
+
+	# v4 or later and only if there is a temp dir already
+	if (! compat(3) && -e $tmp) {
+		# Scan for existing links and add them to @links, so they
+		# are recreated policy conformant.
+		find(
+			sub {
+				return unless -l;
+				return if excludefile($_);
+				my $dir=$File::Find::dir;
+				$dir=~s/^\Q$tmp\E//;
+				my $target = readlink($_);
+				if ($target=~/^\//) {
+					push @links, $target;
+				}
+				else {
+					push @links, "$dir/$target";
+				}
+				push @links, "$dir/$_";
+				
+			},
+			$tmp);
+	}
+	
+	while (@links) {
+		my $dest=pop @links;
+		my $src=expand_path(pop @links);
+
+		$src=~s:^/::;
+		$dest=~s:^/::;
+		
+		if ($src eq $dest) {
+			warning("skipping link from $src to self");
+			next;
+		}
+
+		# Make sure the directory the link will be in exists.
+		my $basedir=dirname("$tmp/$dest");
+		if (! -e $basedir) {
+			doit("install","-d",$basedir);
+		}
+		
+		# Policy says that if the link is all within one toplevel
+		# directory, it should be relative. If it's between
+		# top level directories, leave it absolute.
+		my @src_dirs=split(m:/+:,$src);
+		my @dest_dirs=split(m:/+:,$dest);
+		if (@src_dirs > 0 && $src_dirs[0] eq $dest_dirs[0]) {
+		    	# Figure out how much of a path $src and $dest
+			# share in common.
+			my $x;
+			for ($x=0; $x < @src_dirs && $src_dirs[$x] eq $dest_dirs[$x]; $x++) {}
+			# Build up the new src.
+			$src="";
+			for (1..$#dest_dirs - $x) {
+				$src.="../";
+			}
+			for ($x .. $#src_dirs) {
+				$src.=$src_dirs[$_]."/";
+			}
+			if ($x > $#src_dirs && ! length $src) {
+				$src.="."; # special case
+			}
+			$src=~s:/$::;
+		}
+		else {
+			# Make sure it's properly absolute.
+			$src="/$src";
+		}
+
+		if (-d "$tmp/$dest" && ! -l "$tmp/$dest") {
+			error("link destination $tmp/$dest is a directory");
+		}
+		doit("rm", "-f", "$tmp/$dest");
+		doit("ln","-sf", $src, "$tmp/$dest");
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

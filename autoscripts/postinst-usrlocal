@@ -1,0 +1,16 @@
+if [ "$1" = configure ]; then
+(
+	while read line; do
+		set -- $line
+		dir="$1"; mode="$2"; user="$3"; group="$4"
+		if [ ! -e "$dir" ]; then
+			if mkdir "$dir" 2>/dev/null; then
+				chown "$user":"$group" "$dir"
+				chmod "$mode" "$dir"
+			fi
+		fi
+	done
+) << DATA
+#DIRS#
+DATA
+fi

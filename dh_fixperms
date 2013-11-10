@@ -1,0 +1,137 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dh_fixperms - fix permissions of files in package build directories
+
+=cut
+
+use strict;
+use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+B<dh_fixperms> [S<I<debhelper options>>] [B<-X>I<item>]
+
+=head1 DESCRIPTION
+
+B<dh_fixperms> is a debhelper program that is responsible for setting the
+permissions of files and directories in package build directories to a
+sane state -- a state that complies with Debian policy.
+
+B<dh_fixperms> makes all files in F<usr/share/doc> in the package build directory
+(excluding files in the F<examples/> directory) be mode 644. It also changes
+the permissions of all man pages to mode 644. It makes all files be owned
+by root, and it removes group and other write permission from all files. It
+removes execute permissions from any libraries, headers, Perl modules, or
+desktop files that have it set. It makes all files in the standard F<bin> and
+F<sbin> directories, F<usr/games/> and F<etc/init.d> executable (since v4). Finally,
+it removes the setuid and setgid bits from all files in the package.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-X>I<item>, B<--exclude> I<item>
+
+Exclude files that contain I<item> anywhere in their filename from having
+their permissions changed. You may use this option multiple times to build
+up a list of things to exclude.
+
+=back
+
+=cut
+
+init();
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+
+	my $find_options='';
+	if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
+		$find_options="! \\( $dh{EXCLUDE_FIND} \\)";
+	}
+
+	# General permissions fixing.
+	complex_doit("find $tmp $find_options -print0",
+		"2>/dev/null | xargs -0r chown --no-dereference 0:0");
+	complex_doit("find $tmp ! -type l $find_options -print0",
+		"2>/dev/null | xargs -0r chmod go=rX,u+rw,a-s");
+	
+	# Fix up permissions in usr/share/doc, setting everything to not
+	# executable by default, but leave examples directories alone.
+	complex_doit("find $tmp/usr/share/doc -type f $find_options ! -regex '$tmp/usr/share/doc/[^/]*/examples/.*' -print0 2>/dev/null",
+		"| xargs -0r chmod 644");
+	complex_doit("find $tmp/usr/share/doc -type d $find_options -print0 2>/dev/null",
+		"| xargs -0r chmod 755");
+
+	# Executable man pages are a bad thing..
+	complex_doit("find $tmp/usr/share/man $tmp/usr/man/ $tmp/usr/X11*/man/ -type f",
+		"$find_options -print0 2>/dev/null | xargs -0r chmod 644");
+
+	# ..and so are executable shared and static libraries 
+	# (and .la files from libtool) ..
+	complex_doit("find $tmp -perm -5 -type f",
+		"\\( -name '*.so.*' -or -name '*.so' -or -name '*.la' -or -name '*.a' \\) $find_options -print0",
+		"2>/dev/null | xargs -0r chmod 644");
+	
+	# ..and header files ..
+	complex_doit("find $tmp/usr/include -type f $find_options -print0",
+		"2>/dev/null | xargs -0r chmod 644");
+	
+	# ..and desktop files ..
+	complex_doit("find $tmp/usr/share/applications -type f $find_options -print0",
+		"2>/dev/null | xargs -0r chmod 644");
+
+	# ..and OCaml native-code shared objects ..
+	complex_doit("find $tmp -perm -5 -type f",
+		"\\( -name '*.cmxs' \\) $find_options -print0",
+		"2>/dev/null | xargs -0r chmod 644");
+	
+	# .. and perl modules.
+	complex_doit("find $tmp/usr/lib/perl5 $tmp/usr/share/perl5 -type f",
+		"-perm -5 -name '*.pm' $find_options -print0",
+		"2>/dev/null | xargs -0r chmod a-X");
+	
+	# v4 and up
+	if (! compat(3)) {
+		# Programs in the bin and init.d dirs should be executable..
+		for my $dir (qw{usr/bin bin usr/sbin sbin usr/games etc/init.d}) {
+			if (-d "$tmp/$dir") {
+				complex_doit("find $tmp/$dir -type f $find_options -print0 2>/dev/null",
+					"| xargs -0r chmod a+x");
+			}
+		}
+	}
+	
+	# ADA ali files should be mode 444 to avoid recompilation
+	complex_doit("find $tmp/usr/lib -type f",
+		"-name '*.ali' $find_options -print0",
+		"2>/dev/null | xargs -0r chmod uga-w");
+
+	# Lintian overrides should never be executable, too.
+	if (-d "$tmp/usr/share/lintian") {
+		complex_doit("find $tmp/usr/share/lintian/overrides",
+			"-type f $find_options -print0",
+			"2>/dev/null | xargs -0r chmod 644");
+	}
+
+	# Files in $tmp/etc/sudoers.d/ must be mode 440.
+	if (-d "$tmp/etc/sudoers.d") {
+		complex_doit("find $tmp/etc/sudoers.d",
+			"-type f ! -perm 440 $find_options -print0",
+			"2>/dev/null | xargs -0r chmod 440");
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

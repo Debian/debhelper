@@ -1,0 +1,344 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dh_installdocs - install documentation into package build directories
+
+=cut
+
+use strict;
+use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+B<dh_installdocs> [S<I<debhelper options>>] [B<-A>] [B<-X>I<item>] [S<I<file> ...>]
+
+=head1 DESCRIPTION
+
+B<dh_installdocs> is a debhelper program that is responsible for installing
+documentation into F<usr/share/doc/package> in package build directories.
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.docs
+
+List documentation files to be installed into I<package>.
+
+=item F<debian/copyright>
+
+The copyright file is installed into all packages, unless a more
+specific copyright file is available.
+
+=item debian/I<package>.copyright
+
+=item debian/I<package>.README.Debian
+
+=item debian/I<package>.TODO
+
+Each of these files is automatically installed if present for a
+I<package>.
+
+=item F<debian/README.Debian>
+
+=item F<debian/TODO>
+
+These files are installed into the first binary package listed in
+debian/control.
+
+Note that F<README.debian> files are also installed as F<README.Debian>,
+and F<TODO> files will be installed as F<TODO.Debian> in non-native packages.
+
+=item debian/I<package>.doc-base
+
+Installed as doc-base control files. Note that the doc-id will be
+determined from the B<Document:> entry in the doc-base control file in
+question. In the event that multiple doc-base files in a single source
+package share the same doc-id, they will be installed to
+usr/share/doc-base/package instead of usr/share/doc-base/doc-id.
+
+=item debian/I<package>.doc-base.*
+
+If your package needs to register more than one document, you need
+multiple doc-base files, and can name them like this. In the event
+that multiple doc-base files of this style in a single source package
+share the same doc-id, they will be installed to
+usr/share/doc-base/package-* instead of usr/share/doc-base/doc-id.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-A>, B<--all>
+
+Install all files specified by command line parameters in ALL packages
+acted on.
+
+=item B<-X>I<item>, B<--exclude=>I<item>
+
+Exclude files that contain I<item> anywhere in their filename from
+being installed. Note that this includes doc-base files.
+
+=item B<--link-doc=>I<package>
+
+Make the documentation directory of all packages acted on be a symlink to
+the documentation directory of I<package>. This has no effect when acting on
+I<package> itself, or if the documentation directory to be created already
+exists when B<dh_installdocs> is run. To comply with policy, I<package> must
+be a binary package that comes from the same source package.
+
+debhelper will try to avoid installing files into linked documentation
+directories that would cause conflicts with the linked package. The B<-A>
+option will have no effect on packages with linked documentation
+directories, and F<copyright>, F<changelog>, F<README.Debian>, and F<TODO> files will
+not be installed.
+
+(An older method to accomplish the same thing, which is still supported,
+is to make the documentation directory of a package be a dangling symlink,
+before calling B<dh_installdocs>.)
+
+=item I<file> ...
+
+Install these files as documentation into the first package acted on. (Or
+in all packages if B<-A> is specified).
+
+=back
+
+=head1 EXAMPLES
+
+This is an example of a F<debian/package.docs> file:
+
+  README
+  TODO
+  debian/notes-for-maintainers.txt
+  docs/manual.txt
+  docs/manual.pdf
+  docs/manual-html/
+
+=head1 NOTES
+
+Note that B<dh_installdocs> will happily copy entire directory hierarchies if
+you ask it to (similar to B<cp -a>). If it is asked to install a
+directory, it will install the complete contents of the directory.
+
+Note that this command is not idempotent. L<dh_prep(1)> should be called
+between invocations of this command. Otherwise, it may cause multiple
+instances of the same text to be added to maintainer scripts.
+
+=cut
+
+my %docdir_created;
+# Create documentation directories on demand. This allows us to use dangling
+# symlinks for linked documentation directories unless additional files need
+# to be installed.
+sub ensure_docdir {
+	my $package=shift;
+	return if $docdir_created{$package};
+	my $tmp=tmpdir($package);
+
+	my $target;
+	if ($dh{LINK_DOC} && $dh{LINK_DOC} ne $package) {
+		$target="$tmp/usr/share/doc/$dh{LINK_DOC}";
+	}
+	else {
+		$target="$tmp/usr/share/doc/$package";
+	}
+
+	# If this is a symlink, leave it alone.
+	if (! -d $target && ! -l $target) {
+		doit("install","-g",0,"-o",0,"-d",$target);
+	}
+	$docdir_created{$package}=1;
+}
+
+init(options => {
+	"link-doc=s" => \$dh{LINK_DOC},
+});
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	next if is_udeb($package);
+	
+	my $tmp=tmpdir($package);
+	my $file=pkgfile($package,"docs");
+	my $link_doc=($dh{LINK_DOC} && $dh{LINK_DOC} ne $package);
+
+	if ($link_doc) {
+		# Make sure that the parent directory exists.
+		if (! -d "$tmp/usr/share/doc" && ! -l "$tmp/usr/share/doc") {
+			doit("install","-g",0,"-o",0,"-d","$tmp/usr/share/doc");
+		}
+		# Create symlink to another documentation directory if
+		# necessary.
+		if (! -d "$tmp/usr/share/doc/$package" &&
+		    ! -l "$tmp/usr/share/doc/$package") {
+			doit("ln", "-sf", $dh{LINK_DOC}, "$tmp/usr/share/doc/$package");
+			# Policy says that if you make your documentation
+			# directory a symlink, then you have to depend on
+			# the target.
+			addsubstvar($package, "misc:Depends", $dh{LINK_DOC});
+		}
+	}
+	else {
+		ensure_docdir($package);
+	}
+
+	my @docs;
+
+	if ($file) {
+		@docs=filearray($file, ".");
+	}
+
+	if (($package eq $dh{FIRSTPACKAGE} || ($dh{PARAMS_ALL} && ! $link_doc)) && @ARGV) {
+		push @docs, @ARGV;
+	}
+
+	if (@docs) {
+		my $exclude = '';
+		if ($dh{EXCLUDE_FIND}) {
+			$exclude .= ' -and ! \( '.$dh{EXCLUDE_FIND}.' \)';
+		}
+		if (! compat(4)) {
+			# ignore empty files in subdirs
+			$exclude .= ' -and ! -empty';
+		}
+		foreach my $doc (@docs) {
+			next if excludefile($doc);
+			next if -e $doc && ! -s $doc && ! compat(4); # ignore empty files
+			ensure_docdir($package);
+			if (-d $doc && length $exclude) {
+				my $basename = basename($doc);
+				my $dir = ($basename eq '.') ? $doc : "$doc/..";
+				my $pwd=`pwd`;
+				chomp $pwd;
+				my $docdir = "$pwd/$tmp/usr/share/doc/$package";
+				complex_doit("cd '$dir' && find '$basename' \\( -type f -or -type l \\)$exclude -print0 | xargs -0 -I {} cp --parents -dp {} $docdir");
+			}
+			else {
+				doit("cp", "-a", $doc, "$tmp/usr/share/doc/$package");
+			}
+		}
+		doit("chown","-R","0:0","$tmp/usr/share/doc");
+		doit("chmod","-R","go=rX","$tmp/usr/share/doc");
+		doit("chmod","-R","u+rw","$tmp/usr/share/doc");
+	}
+
+	# .Debian is correct, according to policy, but I'm easy.
+	my $readme_debian=pkgfile($package,'README.Debian');
+	if (! $readme_debian) {
+		$readme_debian=pkgfile($package,'README.debian');
+	}
+	if (! $link_doc && $readme_debian && ! excludefile($readme_debian)) {
+		ensure_docdir($package);
+		doit("install","-g",0,"-o",0,"-m","644","-p","$readme_debian",
+			"$tmp/usr/share/doc/$package/README.Debian");
+	}
+
+	my $todo=pkgfile($package,'TODO');
+	if (! $link_doc && $todo && ! excludefile($todo)) {
+		ensure_docdir($package);
+		if (isnative($package)) {
+			doit("install","-g",0,"-o",0,"-m","644","-p",$todo,
+				"$tmp/usr/share/doc/$package/TODO");
+		}
+		else {
+			doit("install","-g",0,"-o",0,"-m","644","-p",$todo,
+				"$tmp/usr/share/doc/$package/TODO.Debian");
+		}
+	}
+
+	# If the "directory" is a dangling symlink, then don't install
+	# the copyright file. This is useful for multibinary packages 
+	# that share a doc directory.
+	if (! $link_doc && (! -l "$tmp/usr/share/doc/$package" || -d "$tmp/usr/share/doc/$package")) {
+		# Support debian/package.copyright, but if not present, fall
+		# back on debian/copyright for all packages, not just the 
+		# main binary package.
+		my $copyright=pkgfile($package,'copyright');
+		if (! $copyright && -e "debian/copyright") {
+			$copyright="debian/copyright";
+		}
+		if ($copyright && ! excludefile($copyright)) {
+			ensure_docdir($package);
+			doit("install","-g",0,"-o",0,"-m","644","-p",$copyright,
+				"$tmp/usr/share/doc/$package/copyright");
+		}
+	}
+
+	# Handle doc-base files. There are two filename formats, the usual
+	# plus an extended format (debian/package.*).
+	my %doc_ids;
+	
+	opendir(DEB,"debian/") || error("can't read debian directory: $!");
+	# If this is the main package, we need to handle unprefixed filenames.
+	# For all packages, we must support both the usual filename format plus
+	# that format with a period an something appended.
+	my $regexp="\Q$package\E\.";
+	if ($package eq $dh{MAINPACKAGE}) {
+		$regexp="(|$regexp)";
+	}
+	foreach my $fn (grep {/^${regexp}doc-base(\..*)?$/} readdir(DEB)) {
+		# .EX are example files, generated by eg, dh-make
+		next if $fn=~/\.EX$/;
+		next if excludefile($fn);
+		# Parse the file to get the doc id.
+		open (IN, "debian/$fn") || die "Cannot read debian/$fn.";
+		while (<IN>) {
+			s/\s*$//;
+			if (/^Document\s*:\s*(.*)/) {
+				$doc_ids{$fn}=$1;
+				last;
+			}
+		}
+		if (! exists $doc_ids{$fn}) {
+			warning("Could not parse $fn for doc-base Document id; skipping");
+		}
+		close IN;
+	}
+	closedir(DEB);
+	
+	if (%doc_ids) {
+		if (! -d "$tmp/usr/share/doc-base/") {
+			doit("install","-g",0,"-o",0,"-d","$tmp/usr/share/doc-base/");
+		}
+	}
+	# check for duplicate document ids
+	my %used_doc_ids;
+	for my $fn (keys %doc_ids) {
+		$used_doc_ids{$doc_ids{$fn}}++;
+	}
+	foreach my $fn (keys %doc_ids) {
+		# if this document ID is duplicated, we will install
+		# to usr/share/doc-base/packagename instead of
+		# usr/share/doc-base/doc_id. To allow for multiple
+		# conflicting doc-bases in a single package, we will
+		# install to usr/share/doc-base/packagename-extrabits
+		# if the doc-base file is
+		# packagename.doc-base.extrabits
+		if ($used_doc_ids{$doc_ids{$fn}} > 1) {
+			my $fn_no_docbase = $fn;
+			$fn_no_docbase =~ s/\.doc-base(?:\.(.*))?/
+			    if (defined $1 and length $1) {"-$1"} else {''}/xe;
+			doit("install","-g",0,"-o",0,"-m644","-p","debian/$fn",
+			     "$tmp/usr/share/doc-base/$fn_no_docbase");
+		}
+		else {
+			doit("install","-g",0,"-o",0,"-m644","-p","debian/$fn",
+			     "$tmp/usr/share/doc-base/$doc_ids{$fn}");
+		}
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

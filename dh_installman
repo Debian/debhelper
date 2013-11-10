@@ -1,0 +1,273 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dh_installman - install man pages into package build directories
+
+=cut
+
+use strict;
+use File::Find;
+use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+B<dh_installman> [S<I<debhelper options>>] [S<I<manpage> ...>]
+
+=head1 DESCRIPTION
+
+B<dh_installman> is a debhelper program that handles installing
+man pages into the correct locations in package build directories. You tell
+it what man pages go in your packages, and it figures out where to install
+them based on the section field in their B<.TH> or B<.Dt> line. If you have
+a properly formatted B<.TH> or B<.Dt> line, your man page will be installed
+into the right directory, with the right name (this includes proper handling
+of pages with a subsection, like B<3perl>, which are placed in F<man3>, and
+given an extension of F<.3perl>). If your B<.TH> or B<.Dt> line is incorrect
+or missing, the program may guess wrong based on the file extension.
+
+It also supports translated man pages, by looking for extensions
+like F<.ll.8> and F<.ll_LL.8>, or by use of the B<--language> switch.
+
+If B<dh_installman> seems to install a man page into the wrong section or with
+the wrong extension, this is because the man page has the wrong section
+listed in its B<.TH> or B<.Dt> line. Edit the man page and correct the
+section, and B<dh_installman> will follow suit. See L<man(7)> for details
+about the B<.TH> section, and L<mdoc(7)> for the B<.Dt> section. If
+B<dh_installman> seems to install a man page into a directory
+like F</usr/share/man/pl/man1/>, that is because your program has a
+name like F<foo.pl>, and B<dh_installman> assumes that means it is translated
+into Polish. Use B<--language=C> to avoid this.
+
+After the man page installation step, B<dh_installman> will check to see if
+any of the man pages in the temporary directories of any of the packages it
+is acting on contain F<.so> links. If so, it changes them to symlinks.
+
+Also, B<dh_installman> will use man to guess the character encoding of each
+manual page and convert it to UTF-8. If the guesswork fails for some
+reason, you can override it using an encoding declaration. See
+L<manconv(1)> for details.
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.manpages
+
+Lists man pages to be installed.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-A>, B<--all>
+
+Install all files specified by command line parameters in ALL packages
+acted on.
+
+=item B<--language=>I<ll>
+
+Use this to specify that the man pages being acted on are written in the
+specified language.
+
+=item I<manpage> ...
+
+Install these man pages into the first package acted on. (Or in all
+packages if B<-A> is specified).
+
+=back
+
+=head1 NOTES
+
+An older version of this program, L<dh_installmanpages(1)>, is still used
+by some packages, and so is still included in debhelper.
+It is, however, deprecated, due to its counterintuitive and inconsistent
+interface. Use this program instead.
+
+=cut
+
+init(options => {
+	"language=s" => \$dh{LANGUAGE},
+});
+
+my @sofiles;
+my @sodests;
+
+# PROMISE: DH NOOP WITHOUT manpages tmp(usr/share/man)
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	next if is_udeb($package);
+
+	my $tmp=tmpdir($package);
+	my $file=pkgfile($package,"manpages");
+	my @manpages;
+
+	@manpages=filearray($file, ".") if $file;
+
+	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+		push @manpages, @ARGV;
+	}
+
+	foreach my $page (@manpages) {
+		my $basename=basename($page);
+
+		# Support compressed pages.
+		my $gz='';
+		if ($basename=~m/(.*)(\.gz)/) {
+			$basename=$1;
+			$gz=$2;
+		}
+
+		my $section;
+		# See if there is a .TH or .Dt entry in the man page. If so,
+		# we'll pull the section field from that.
+		if ($gz) {
+			open (IN, "zcat $page|") or die "$page: $!";
+		}
+		else {
+			open (IN, $page) or die "$page: $!";
+		}
+		while (<IN>) {
+			if (/^\.TH\s+\S+\s+"?(\d+[^"\s]*)"?/ ||
+			    /^\.Dt\s+\S+\s+(\d+[^\s]*)/) {
+				$section=$1;
+				last;
+			}
+		}
+		# Failing that, we can try to get it from the filename.
+		if (! $section) {
+			($section)=$basename=~m/.*\.([1-9]\S*)/;
+		}
+
+		# Now get the numeric component of the section.
+		my ($realsection)=$section=~m/^(\d)/ if defined $section;
+		if (! $realsection) {
+			error("Could not determine section for $page");
+		}
+		
+		# Get the man page's name -- everything up to the last dot.
+		my ($instname)=$basename=~m/^(.*)\./;
+	
+		my $destdir="$tmp/usr/share/man/man$realsection/";
+		my $langcode;
+		if (! defined $dh{LANGUAGE} || ! exists $dh{LANGUAGE}) {
+			# Translated man pages are typically specified by adding the
+			# language code to the filename, so detect that and
+			# redirect to appropriate directory, stripping the code.
+			($langcode)=$basename=~m/.*\.([a-z][a-z](?:_[A-Z][A-Z])?)\.(?:[1-9]|man)/;
+		}
+		elsif ($dh{LANGUAGE} ne 'C') {
+			$langcode=$dh{LANGUAGE};
+		}
+		
+		if (defined $langcode && $langcode ne '') {
+			# Strip the language code from the instname.
+			$instname=~s/\.$langcode$//;
+		}
+		
+		if (defined $langcode && $langcode ne '') {
+			$destdir="$tmp/usr/share/man/$langcode/man$realsection/";
+		}
+		$destdir=~tr:/:/:s; # just for looks
+		my $instpage="$destdir$instname.$section";
+
+		next if -l $instpage;
+		next if compat(5) && -e $instpage;
+
+		if (! -d $destdir) {
+			doit "install","-d",$destdir;
+		}
+		if ($gz) {
+			complex_doit "zcat \Q$page\E > \Q$instpage\E";
+		}
+		else {
+			doit "install","-p","-m644",$page,$instpage;
+		}
+	}
+
+	# Now the .so conversion.
+	@sofiles=@sodests=();
+	foreach my $dir (qw{usr/share/man}) {
+		if (-e "$tmp/$dir") {
+			find(\&find_so_man, "$tmp/$dir");
+		}
+	}
+	foreach my $sofile (@sofiles) {
+		my $sodest=shift(@sodests);
+		doit "rm","-f",$sofile;
+		doit "ln","-sf",$sodest,$sofile;
+	}
+
+	# Now utf-8 conversion.
+	if (defined `man --version`) {
+		foreach my $dir (qw{usr/share/man}) {
+			next unless -e "$tmp/$dir";
+			find(sub {
+				return if ! -f $_ || -l $_;
+				my ($tmp, $orig)=($_.".new", $_);
+				complex_doit "man --recode UTF-8 ./\Q$orig\E > \Q$tmp\E";
+				# recode uncompresses compressed pages
+				doit "rm", "-f", $orig if s/\.(gz|Z)$//;
+				doit "chmod", 644, $tmp;
+				doit "mv", "-f", $tmp, $_;
+			}, "$tmp/$dir");
+		}
+	}
+}
+
+# Check if a file is a .so man page, for use by File::Find.
+sub find_so_man {
+	# The -s test is becuase a .so file tends to be small. We don't want
+	# to open every man page. 1024 is arbitrary.
+	if (! -f $_ || -s $_ > 1024 || -s == 0) {
+		return;
+	}
+
+	# Test first line of file for the .so thing.
+	if (/\.gz$/) {
+		open (SOTEST, "zcat $_|") or die "$_: $!";
+	}
+	else {
+		open (SOTEST,$_) || die "$_: $!";
+	}
+	my $l=<SOTEST>;
+	close SOTEST;
+
+	if (! defined $l) {
+		error("failed to read $_");
+	}
+	
+	if ($l=~m/\.so\s+(.*)\s*/) {
+		my $solink=$1;
+		# This test is here to prevent links like ... man8/../man8/foo.8
+		if (basename($File::Find::dir) eq
+		    dirname($solink)) {
+			$solink=basename($solink);
+		}
+		# A so link with a path is relative to the base of the man
+		# page hierarchy, but without a path, is relative to the
+		# current section.
+		elsif ($solink =~ m!/!) {
+			$solink="../$solink";
+		}
+	
+		if (-e $solink || -e "$solink.gz") {
+			push @sofiles,"$File::Find::dir/$_";
+			push @sodests,$solink;
+		}
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut
