@@ -1,3 +1,17 @@
+debhelper (9.20131106) UNRELEASED; urgency=low
+
+  * dh_installinit: Revert changes that added versioned dependency on
+    sysv-rc to support upstart, which later grew to a versioned dependency
+    on sysv-rc | file-rc, and which seems to want to continue growing
+    to list other init systems, which there currently seem to be far too
+    many of, for far too little benefit.
+    The sysv-rc dependency is already met in stable.
+    The file-rc dependency is not, so if someone cares about that, they
+    need to find a properly designed solution, which this was not.
+    Closes: #729248
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 10 Nov 2013 15:17:25 -0400
+
 debhelper (9.20131105) unstable; urgency=low
 
   * Fix (horrible) make output parsing code to work with make 4.0.
