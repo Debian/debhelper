@@ -10,9 +10,10 @@ use strict;
 use Exporter;
 use vars qw(@ISA @EXPORT %dh);
 @ISA=qw(Exporter);
-@EXPORT=qw(&init &doit &complex_doit &verbose_print &error &warning &tmpdir
-	    &pkgfile &pkgext &pkgfilename &isnative &autoscript &filearray
-	    &filedoublearray &getpackages &basename &dirname &xargs %dh
+@EXPORT=qw(&init &doit &doit_noerror &complex_doit &verbose_print &error
+            &warning &tmpdir &pkgfile &pkgext &pkgfilename &isnative
+	    &autoscript &filearray &filedoublearray
+	    &getpackages &basename &dirname &xargs %dh
 	    &compat &addsubstvar &delsubstvar &excludefile &package_arch
 	    &is_udeb &udeb_filename &debhelper_script_subst &escape_shell
 	    &inhibit_log &load_log &write_log &commit_override_log
@@ -206,16 +207,22 @@ sub escape_shell {
 }
 
 # Run a command, and display the command to stdout if verbose mode is on.
+# Throws error if command exits nonzero.
+#
 # All commands that modifiy files in $TMP should be ran via this 
 # function.
 #
 # Note that this cannot handle complex commands, especially anything
 # involving redirection. Use complex_doit instead.
 sub doit {
+	doit_noerror(@_) || _error_exitcode(join(" ", @_));
+}
+
+sub doit_noerror {
 	verbose_print(escape_shell(@_));
 
 	if (! $dh{NO_ACT}) {
-		system(@_) == 0 || _error_exitcode(join(" ", @_));
+		return (system(@_) == 0)
 	}
 }
 

@@ -129,6 +129,8 @@ init(options => {
 my $objdump=cross_command("objdump");
 my $multiarch=dpkg_architecture_value("DEB_HOST_MULTIARCH");
 
+my $ok=1;
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if is_udeb($package);
 	
@@ -242,8 +244,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# own search for symbols files, since that search
 		# is not 100% compatible with debhelper. (For example,
 		# this supports --ignore being used.)
-		doit("dpkg-gensymbols", "-p$package", "-I$symbols",
-			"-P$tmp",
+		$ok = $ok && doit_noerror("dpkg-gensymbols",
+			"-p$package", "-I$symbols", "-P$tmp",
 			@liblist,
 			@{$dh{U_PARAMS}});
 		if (-s "$tmp/DEBIAN/symbols" == 0) {
@@ -253,6 +255,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if ($is_multiarch) {
 		addsubstvar($package, "misc:Pre-Depends", "multiarch-support");
 	}
+}
+
+unless ($ok) {
+	error "failing due to earlier errors";
 }
 
 =head1 SEE ALSO
