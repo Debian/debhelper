@@ -761,6 +761,44 @@ sub buildos {
 	}
 }
 
+# Passed a list of profiles to match against, returns true if
+# DEB_BUILD_PROFILES environment variable matched
+sub buildprofilesmatch {
+	my %debbuildprofiles = ();
+	if (exists $ENV{'DEB_BUILD_PROFILES'}) {
+		foreach my $profile (split(/\s+/, $ENV{'DEB_BUILD_PROFILES'})) {
+			$debbuildprofiles{$profile} = 1;
+		}
+	}
+
+	my $packageprofilesstr = shift;
+	my $package = shift;
+	my @packageprofiles = split(/\s+/, $packageprofilesstr);
+	my $err = sub { error("Build-Profiles field for package $package contains both positive and negative entries"); };
+	if ($#packageprofiles < 0 || $packageprofiles[0] =~ /^!/) {
+		# package profiles list is negative or empty
+		foreach my $packageprofile (@packageprofiles) {
+			$packageprofile =~ /^!(.*)$/ || &{$err}();
+			if ($debbuildprofiles{$1}) {
+				return 0;
+			}
+		}
+		return 1;
+	}
+	else {
+		# package profiles list is positive
+		foreach my $packageprofile (@packageprofiles) {
+			if ($packageprofile =~ /^!/) {
+				&{$err}();
+			}
+			if ($debbuildprofiles{$packageprofile}) {
+				return 1;
+			}
+		}
+		return 0;
+	}
+}
+
 # Returns source package name
 sub sourcepackage {
 	open (CONTROL, 'debian/control') ||
@@ -785,18 +823,20 @@ sub sourcepackage {
 # packages.
 # As a side effect, populates %package_arches and %package_types with the
 # types of all packages (not only those returned).
-my (%package_types, %package_arches);
+my (%package_types, %package_arches, %package_profiles);
 sub getpackages {
 	my $type=shift;
 
 	%package_types=();
 	%package_arches=();
+	%package_profiles=();
 	
 	$type="" if ! defined $type;
 
 	my $package="";
 	my $arch="";
 	my $package_type;
+	my $build_profiles;
 	my @list=();
 	my %seen;
 	open (CONTROL, 'debian/control') ||
@@ -814,6 +854,7 @@ sub getpackages {
 				error("debian/control has a duplicate entry for $package");
 			}
 			$package_type="deb";
+			$build_profiles="";
 		}
 		if (/^Architecture:\s*(.*)/) {
 			$arch=$1;
@@ -821,11 +862,15 @@ sub getpackages {
 		if (/^(?:X[BC]*-)?Package-Type:\s*(.*)/) {
 			$package_type=$1;
 		}
-		
+		if (/^Build-Profiles:\s*(.*)/) {
+		        $build_profiles=$1;
+		}
+
 		if (!$_ or eof) { # end of stanza.
 			if ($package) {
 				$package_types{$package}=$package_type;
 				$package_arches{$package}=$arch;
+				$package_profiles{$package}=$build_profiles;
 			}
 
 			if ($package &&
@@ -833,7 +878,8 @@ sub getpackages {
 			     (($type eq 'arch'  || $type eq 'both') && ($arch eq 'any' ||
 					     ($arch ne 'all' &&
 			                      samearch(buildarch(), $arch)))) ||
-			     ! $type)) {
+			     ! $type) &&
+			    buildprofilesmatch($build_profiles, $package)) {
 				push @list, $package;
 				$package="";
 				$arch="";

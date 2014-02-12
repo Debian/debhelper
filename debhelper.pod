@@ -566,7 +566,16 @@ To facilitate this, as well as give you more control over which packages
 are acted on by debhelper programs, all debhelper programs accept the
 B<-a>, B<-i>, B<-p>, and B<-s> parameters. These parameters are cumulative. 
 If none are given, debhelper programs default to acting on all packages listed
-in the control file.
+in the control file, with the exceptions below.
+
+First, any package whose B<Architecture> field in B<debian/control> does not
+match the build architecture will be excluded
+(L<Debian Policy, section 5.6.8>).
+
+Also, some additional packages may be excluded based on the contents of the
+B<DEB_BUILD_PROFILES> environment variable and B<Build-Profiles> fields in
+binary package stanzas in B<debian/control>, according to the draft policy at
+L<https://wiki.debian.org/BuildProfileSpec>.
 
 =head2 Automatic generation of Debian install scripts
 
