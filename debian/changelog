@@ -12,6 +12,12 @@ debhelper (9.20140210) UNRELEASED; urgency=medium
   * perl_build: Use realclean instead of distclean. Closes: #737662
   * Initial implementation of support for Build-Profiles fields.
     Thanks, Daniel Schepler.
+  * dh_gencontrol: Revert change made in version 4.0.13 that avoided
+    passing -p to dpkg-gencontrol when only operating on one package.
+    There seems to be no benefit to doing that, and it breaks when using
+    Build-Profiles, since while debhelper may know a profile only allows
+    for one package, dpkg-gencontrol may see other packages in the
+    control file.
 
  -- Joey Hess <joeyh@debian.org>  Sat, 25 Jan 2014 15:49:45 -0400
 

@@ -65,11 +65,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 	
 	# Generate and install control file.
-	my @command="dpkg-gencontrol";
-	if (getpackages() > 1) {
-		push @command, "-p$package";
-	}
-	doit(@command, "-l$changelog", "-T$substvars", 
+	doit("dpkg-gencontrol", "-p$package", "-l$changelog", "-T$substvars", 
 		"-P$tmp",@{$dh{U_PARAMS}});
 
 	# This chmod is only necessary if the user sets the umask to
