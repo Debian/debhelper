@@ -224,6 +224,9 @@ sub doit_noerror {
 	if (! $dh{NO_ACT}) {
 		return (system(@_) == 0)
 	}
+	else {
+		return 1;
+	}
 }
 
 # Run a command and display the command to stdout if verbose mode is on.
