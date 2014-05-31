@@ -86,6 +86,7 @@ my $version;
 use constant PROGRAM   => 1;
 use constant PM_MODULE => 2;
 use constant XS_MODULE => 4;
+use constant ARCHDEP_MODULE => 8;
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
@@ -101,6 +102,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		return unless -f;
 		$deps |= PM_MODULE if /\.pm$/;
 		$deps |= XS_MODULE if /\.so$/;
+		$deps |= ARCHDEP_MODULE
+			if $File::Find::dir =~ /\Q$vendorarch\E/;
 	}, @dirs if @dirs;
 
 	# find scripts
@@ -129,10 +132,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		addsubstvar($package, "perl:Depends", $perl, $version)
 			unless $perl eq 'perl-base' && ! length($version);
 
-		# add perlapi-<ver> for XS modules
+		# add perlapi-<ver> for XS modules and other modules
+		# installed into vendorarch
 		addsubstvar($package, "perl:Depends",
 			"perlapi-" . ($Config{debian_abi} || $Config{version}))
-			if $deps & XS_MODULE;
+			if $deps & ( XS_MODULE | ARCHDEP_MODULE );
 	}
 
 	# MakeMaker always makes lib and share dirs, but typically
