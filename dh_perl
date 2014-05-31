@@ -141,7 +141,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	# MakeMaker always makes lib and share dirs, but typically
 	# only one directory is installed into.
-	foreach my $dir ("$tmp/usr/share/perl5", "$tmp/usr/lib/perl5") {
+	foreach my $dir ("$tmp/$vendorlib", "$tmp/$vendorarch") {
 		if (-d $dir) {
 			doit("rmdir", "--ignore-fail-on-non-empty", "--parents",
 				"$dir");

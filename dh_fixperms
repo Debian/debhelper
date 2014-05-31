@@ -7,6 +7,7 @@ dh_fixperms - fix permissions of files in package build directories
 =cut
 
 use strict;
+use Config;
 use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
@@ -43,6 +44,9 @@ up a list of things to exclude.
 =cut
 
 init();
+
+my $vendorlib = substr $Config{vendorlib}, 1;
+my $vendorarch = substr $Config{vendorarch}, 1;
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
@@ -89,7 +93,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		"2>/dev/null | xargs -0r chmod 644");
 	
 	# .. and perl modules.
-	complex_doit("find $tmp/usr/lib/perl5 $tmp/usr/share/perl5 -type f",
+	complex_doit("find $tmp/$vendorarch $tmp/$vendorlib -type f",
 		"-perm -5 -name '*.pm' $find_options -print0",
 		"2>/dev/null | xargs -0r chmod a-X");
 	
