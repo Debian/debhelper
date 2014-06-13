@@ -37,6 +37,9 @@ sub configure {
 	push @opts, "--infodir=\${prefix}/share/info";
 	push @opts, "--sysconfdir=/etc";
 	push @opts, "--localstatedir=/var";
+	if (defined $ENV{DH_VERBOSE} && $ENV{DH_VERBOSE} ne "") {
+		push @opts, "--disable-silent-rules";
+	}
 	my $multiarch=dpkg_architecture_value("DEB_HOST_MULTIARCH");
 	if (! compat(8)) {
 	       if (defined $multiarch) {
