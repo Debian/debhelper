@@ -1,14 +1,14 @@
 # Translation of the debhelper documentation to German.
 # Copyright (C) 1997-2011 Joey Hess.
 # This file is distributed under the same license as the debhelper package.
-# Copyright (C) of this file 2011, 2012 Chris Leick.
+# Copyright (C) of this file 2011-2014 Chris Leick.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: debhelper 9.20120909\n"
+"Project-Id-Version: debhelper 9.20131227\n"
 "Report-Msgid-Bugs-To: debhelper@packages.debian.org\n"
 "POT-Creation-Date: 2014-08-09 11:26-0400\n"
-"PO-Revision-Date: 2012-10-22 22:00+0100\n"
+"PO-Revision-Date: 2012-10-22 22:47+0100\n"
 "Last-Translator: Chris Leick <c.leick@vollbio.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
 "Language: de\n"
@@ -1258,6 +1258,8 @@ msgid ""
 "B<dh_installinit> will no longer install a file named debian/I<package> as "
 "an init script."
 msgstr ""
+"B<dh_installinit> wird nicht mehr eine Datei namens debian/I<Paket> als Init-"
+"Skript installieren."
 
 #. type: textblock
 #: debhelper.pod:544
@@ -1267,6 +1269,10 @@ msgid ""
 "debhelper commands, but it may expose bugs in commands not included in "
 "debhelper."
 msgstr ""
+"B<dh> erstellt das Bauverzeichnis des Pakets nicht mehr, wenn die Ausführung "
+"von Debhelper-Befehlen übersprungen wird. Dies wird auf Pakete, die nur mit "
+"Debhelper-Befehlen bauen, keine Auswirkungen haben, es könnte aber Fehler in "
+"Befehlen offenlegen, die nicht in Debhelper enthalten sind."
 
 #. type: =head1
 #: debhelper.pod:553 dh_auto_test:45 dh_installcatalogs:59 dh_installdocs:121
@@ -1762,14 +1768,6 @@ msgstr ""
 
 #. type: textblock
 #: dh:28
-#, fuzzy
-#| msgid ""
-#| "To override I<dh_command>, add a target named B<override_>I<dh_command> "
-#| "to the rules file. When it would normally run I<dh_command>, B<dh> will "
-#| "instead call that target. The override target can then run the command "
-#| "with additional options, or run entirely different commands instead. See "
-#| "examples below.  (Note that to use this feature, you should Build-Depend "
-#| "on debhelper 7.0.50 or above.)"
 msgid ""
 "To override I<dh_command>, add a target named B<override_>I<dh_command> to "
 "the rules file. When it would normally run I<dh_command>, B<dh> will instead "
@@ -1781,9 +1779,7 @@ msgstr ""
 "mit Namen B<override_>I<dh_Befehl> hinzu. Wenn es normalerweise I<dh_Befehl> "
 "ausführen würde, wird B<dh> stattdessen dieses Ziel aufrufen. Das außer "
 "Kraft setzende Ziel kann dann den Befehl mit zusätzlichen Optionen oder "
-"stattdessen ganz andere Befehle ausführen. Lesen Sie die folgenden "
-"Beispiele. (Beachten Sie, dass Sie, um diese Funktion benutzen zu können, "
-"Build-Depend auf Debhelper 7.0.50 oder höher haben sollten.)"
+"stattdessen ganz andere Befehle ausführen. Lesen Sie die folgenden Beispiele."
 
 #. type: textblock
 #: dh:34
@@ -1874,6 +1870,9 @@ msgid ""
 "Note that dh normally skips running commands that it knows will do nothing.  "
 "With --no-act, the full list of commands in a sequence is printed."
 msgstr ""
+"Beachten Sie, dass dh normalerweise die Ausführung von Befehlen, von denen "
+"es weiß, dass sie nichts tun, überspringt. Mit »--no-act« wird die "
+"vollständige Liste der Befehle der Reihe nach ausgegeben."
 
 #. type: textblock
 #: dh:73
@@ -2829,6 +2828,8 @@ msgid ""
 "dh_auto_test does not run the test suite when a package is being cross "
 "compiled."
 msgstr ""
+"dh_auto_test führt die Testsuite nicht aus, wenn das Paket cross-kompiliert "
+"wird."
 
 #. type: textblock
 #: dh_bugfiles:5
@@ -3075,16 +3076,12 @@ msgstr ""
 
 #. type: textblock
 #: dh_clean:28
-#, fuzzy
-#| msgid ""
-#| "B<dh_clean> (or \"B<dh clean>\") should be the last debhelper command run "
-#| "in the B<clean> target in F<debian/rules>."
 msgid ""
 "B<dh_clean> should be the last debhelper command run in the B<clean> target "
 "in F<debian/rules>."
 msgstr ""
-"B<dh_clean> (oder »B<dh clean>«) sollte der zuletzt ausgeführte Debhelper-"
-"Befehl im B<clean>-Ziel in F<debian/rules> sein."
+"B<dh_clean> sollte der zuletzt ausgeführte Debhelper-Befehl im B<clean>-Ziel "
+"in F<debian/rules> sein."
 
 #. type: =item
 #: dh_clean:35
@@ -3494,8 +3491,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_icons:5
-#, fuzzy
-#| msgid "dh_icons - Update Freedesktop icon caches"
 msgid "dh_icons - Update caches of Freedesktop icons"
 msgstr "dh_icons - aktualisiert die Zwischenspeicher von Freedesktop-Symbolen"
 
@@ -3506,13 +3501,6 @@ msgstr "B<dh_icons> [S<I<Debhelper-Optionen>>] [B<-n>]"
 
 #. type: textblock
 #: dh_icons:19
-#, fuzzy
-#| msgid ""
-#| "B<dh_icons> is a debhelper program that updates Freedesktop icon caches "
-#| "when needed, using the B<update-icon-caches> program provided by GTK"
-#| "+2.12.  Currently this program does not handle installation of the files, "
-#| "though it may do so at a later date, so should be run after icons are "
-#| "installed in the package build directories."
 msgid ""
 "B<dh_icons> is a debhelper program that updates caches of Freedesktop icons "
 "when needed, using the B<update-icon-caches> program provided by GTK+2.12.  "
@@ -3967,16 +3955,12 @@ msgstr ""
 
 #. type: textblock
 #: dh_installchangelogs:25
-#, fuzzy
-#| msgid ""
-#| "Automatically installed into usr/share/doc/I<package>/ in the package "
-#| "build directory."
 msgid ""
 "If there is an upstream F<changelog> file, it will be be installed as F<usr/"
 "share/doc/package/changelog> in the package build directory."
 msgstr ""
-"werden automatisch im Paketbauverzeichnis in usr/share/doc/I<Paket>/ "
-"installiert."
+"Falls es eine F<changelog>-Datei der Ursprungsautoren gibt, wird sie im "
+"Paketbauverzeichnis als F<usr/share/doc/Paket/changelog> installiert."
 
 #. type: textblock
 #: dh_installchangelogs:28
@@ -3988,6 +3972,13 @@ msgid ""
 "is specified, a short F<usr/share/doc/package/changelog> is generated, "
 "pointing readers at the html changelog file."
 msgstr ""
+"Falls das Changelog der Ursprungsautoren eine F<html>-Datei ist (durch die "
+"Dateiendung festgelegt), wird es stattdessen als F<usr/share/doc/Paket/"
+"changelog.html> installiert. Falls das HTML-Changelog in Klartext "
+"umgewandelt wird, kann dies als eine zweite Variante der Changelog-Datei der "
+"Ursprungsautoren angegeben werden. Wenn keine Klartextvariante angegeben "
+"wurde, wird ein kurzes F<usr/share/doc/Paket/changelog> erzeugt, das Leser "
+"auf die HTML-Changelog-Datei verweist."
 
 #. type: =item
 #: dh_installchangelogs:39
@@ -4722,41 +4713,30 @@ msgstr ""
 
 #. type: textblock
 #: dh_installemacsen:22
-#, fuzzy
-#| msgid ""
-#| "It also automatically generates the F<postinst> and F<prerm> commands "
-#| "needed to register a package as an Emacs add on package. The commands are "
-#| "added to the maintainer scripts by B<dh_installdeb>. See "
-#| "L<dh_installdeb(1)> for an explanation of how this works."
 msgid ""
 "It also automatically generates the F<preinst> F<postinst> and F<prerm> "
 "commands needed to register a package as an Emacs add on package. The "
 "commands are added to the maintainer scripts by B<dh_installdeb>. See "
 "L<dh_installdeb(1)> for an explanation of how this works."
 msgstr ""
-"Es erzeugt außerdem automatisch die F<postinst>- und F<prerm>-Befehle, die "
-"benötigt werden, um ein Paket als ein Emacs-Add-on-Paket zu registrieren. "
-"Die Befehle werden den Betreuerskripten durch B<dh_installdeb> hinzugefügt. "
-"Eine Erklärung, wie dies funktioniert, finden Sie in L<dh_installdeb(1)>."
+"Es erzeugt außerdem automatisch die F<preinst>, F<postinst>- und F<prerm>-"
+"Befehle, die benötigt werden, um ein Paket als ein Emacs-Add-on-Paket zu "
+"registrieren. Die Befehle werden den Betreuerskripten durch B<dh_installdeb> "
+"hinzugefügt. Eine Erklärung, wie dies funktioniert, finden Sie in "
+"L<dh_installdeb(1)>."
 
 #. type: =item
 #: dh_installemacsen:31
-#, fuzzy
-#| msgid "debian/I<package>.emacsen-startup"
 msgid "debian/I<package>.emacsen-compat"
-msgstr "debian/I<Paket>.emacsen-startup"
+msgstr "debian/I<Paket>.emacsen-compat"
 
 #. type: textblock
 #: dh_installemacsen:33
-#, fuzzy
-#| msgid ""
-#| "Installed into F<usr/lib/emacsen-common/packages/remove/package> in the "
-#| "package build directory."
 msgid ""
 "Installed into F<usr/lib/emacsen-common/packages/compat/package> in the "
 "package build directory."
 msgstr ""
-"installiert in F<usr/lib/emacsen-common/packages/remove/Paket> im "
+"installiert in F<usr/lib/emacsen-common/packages/compat/Paket> im "
 "Paketbauverzeichnis."
 
 #. type: =item
@@ -4835,6 +4815,7 @@ msgstr ""
 #: dh_installemacsen:143
 msgid "L<debhelper(7)> L</usr/share/doc/emacsen-common/debian-emacs-policy.gz>"
 msgstr ""
+"L<debhelper(7)> L</usr/share/doc/emacsen-common/debian-emacs-policy.gz>"
 
 #. type: textblock
 #: dh_installexamples:5
@@ -5122,13 +5103,6 @@ msgstr "B<-o>, B<--onlyscripts>"
 
 #. type: textblock
 #: dh_installinit:69
-#, fuzzy
-#| msgid ""
-#| "Only modify F<postinst>/F<postrm>/F<prerm> scripts, do not actually "
-#| "install any init script, default files, upstart job or systemd service "
-#| "file. May be useful if the init script, upstart job or systemd service "
-#| "file is shipped and/or installed by upstream in a way that doesn't make "
-#| "it easy to let B<dh_installinit> find it."
 msgid ""
 "Only modify F<postinst>/F<postrm>/F<prerm> scripts, do not actually install "
 "any init script, default files, upstart job or systemd service file. May be "
@@ -5136,11 +5110,10 @@ msgid ""
 "doesn't make it easy to let B<dh_installinit> find it."
 msgstr ""
 "verändert nur die F<postinst>-/F<postrm>-/F<prerm>-Skripte, installiert aber "
-"tatsächlich kein Init-Skript, kein Standardskript, keinen Upstart-Job und "
-"keine Systemd-Dienstdatei; kann nützlich sein, falls das Init-Skript, der "
-"Upstart-Job oder die Systemd-Dienstdatei von den Originalautoren auf eine "
-"Art mitgeliefert/installiert wird, die es B<dh_installinit> nicht leicht "
-"macht, sie zu finden."
+"tatsächlich kein Init-Skript, keine Vorgabedateien, keinen Upstart-Job und "
+"keine Systemd-Dienstdatei; kann nützlich sein, falls die Datei von den "
+"Originalautoren auf eine Art mitgeliefert/installiert wird, die es "
+"B<dh_installinit> nicht leicht macht, sie zu finden."
 
 #. type: =item
 #: dh_installinit:74
@@ -5812,10 +5785,8 @@ msgstr ""
 
 #. type: textblock
 #: dh_installmodules:5
-#, fuzzy
-#| msgid "dh_installmodules - register modules with modutils"
 msgid "dh_installmodules - register kernel modules"
-msgstr "dh_installmodules - registriert Module mit Modutils"
+msgstr "dh_installmodules - registriert Kernel-Module"
 
 #. type: textblock
 #: dh_installmodules:15
@@ -6028,11 +5999,8 @@ msgstr "B<--priority=>I<Priorität>"
 
 #. type: textblock
 #: dh_installudev:47
-#, fuzzy
-#| msgid "Sets the priority number of a F<site-start.d> file. Default is 50."
 msgid "Sets the priority the file. Default is 60."
-msgstr ""
-"setzt die Prioritätsnummer einer F<site-start.d>-Datei. Vorgabe ist 50."
+msgstr "setzt die Priorität der Datei. Vorgabe ist 60."
 
 #. type: textblock
 #: dh_installudev:51
@@ -6742,10 +6710,6 @@ msgstr "dh_movefiles - verschiebt Dateien aus debian/tmp in Unterpakete"
 
 #. type: textblock
 #: dh_movefiles:14
-#, fuzzy
-#| msgid ""
-#| "B<dh_movefiles> [S<I<debhelper options>>] [B<--sourcedir=>I<dir>] [B<-"
-#| "X>I<item>] S<I<file> ...>]"
 msgid ""
 "B<dh_movefiles> [S<I<debhelper options>>] [B<--sourcedir=>I<dir>] [B<-"
 "X>I<item>] [S<I<file> ...>]"
@@ -7140,14 +7104,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_shlibdeps:51
-#, fuzzy
-#| msgid ""
-#| "Before B<dpkg-shlibdeps> is run, B<LD_LIBRARY_PATH> will have added to it "
-#| "the specified directory (or directories -- separate with colons). With "
-#| "recent versions of B<dpkg-shlibdeps>, this is mostly only useful for "
-#| "packages that build multiple flavors of the same library, or other "
-#| "situations where the library is installed into a directory not on the "
-#| "regular library search path."
 msgid ""
 "It tells B<dpkg-shlibdeps> (via its B<-l> parameter), to look for private "
 "package libraries in the specified directory (or directories -- separate "
@@ -7156,13 +7112,13 @@ msgid ""
 "other situations where the library is installed into a directory not on the "
 "regular library search path."
 msgstr ""
-"Bevor B<dpkg-shlibdeps> ausgeführt wird, wird B<LD_LIBRARY_PATH> das "
-"angegebene Verzeichnis (oder Verzeichnisse – durch Doppelpunkte getrennt) "
-"hinzugefügt worden sein. Mit aktuellen Versionen von B<dpkg-shlibdeps> ist "
-"dies meist nur für Pakete nützlich, die mehrere Geschmacksrichtungen der "
-"gleichen Bibliothek bauen oder in anderen Situationen, in denen die "
-"Bibliothek in einem Verzeichnis installiert ist, das nicht im regulären "
-"Bibliothekssuchpfad liegt."
+"Es teilt B<dpkg-shlibdeps> (über seinen Parameter B<-l>) mit, dass es im "
+"angegebenen Verzeichnis (oder durch Doppelpunkte getrennten Verzeichnissen) "
+"nach privaten Paketbibliotheken Ausschau halten soll. Mit aktuellen "
+"Versionen von B<dpkg-shlibdeps> ist dies meist nur für Pakete nützlich, die "
+"mehrere Varianten der gleichen Bibliothek bauen oder in anderen Situationen, "
+"in denen die Bibliothek in einem Verzeichnis installiert wird, das nicht im "
+"regulären Bibliothekssuchpfad liegt."
 
 #. type: =item
 #: dh_shlibdeps:59
