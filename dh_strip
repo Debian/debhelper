@@ -236,7 +236,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	foreach (@static_libs) {
-		doit($strip,"--strip-debug",$_);
+		doit($strip,"--enable-deterministic-archives","--strip-debug",$_);
 	}
 }
 
