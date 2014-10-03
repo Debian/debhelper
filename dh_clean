@@ -122,8 +122,13 @@ if (! $dh{D_FLAG}) {
 		$find_options="! \\( $dh{EXCLUDE_FIND} \\) -a";
 	}
 
+	# vcs directories that should not have their contents cleaned
+	my $vcs_dirs=join " -o ", map { "-path .\\*/" . $_ }
+		(".git", ".svn", ".bzr", ".hg", "CVS");
+
 	# Remove other temp files.
-	complex_doit("find . $find_options \\( \\( -type f -a \\
+	complex_doit("find . $find_options \\( \\( \\
+		\\( $vcs_dirs \\) -prune -o -type f -a \\
 	        \\( -name '#*#' -o -name '.*~' -o -name '*~' -o -name DEADJOE \\
 		 -o -name '*.orig' -o -name '*.rej' -o -name '*.bak' \\
 		 -o -name '.*.orig' -o -name .*.rej -o -name '.SUMS' \\
