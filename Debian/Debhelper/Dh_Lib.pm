@@ -861,8 +861,7 @@ sub getpackages {
 			if ($package &&
 			    ((($type eq 'indep' || $type eq 'both') && $arch eq 'all') ||
 			     (($type eq 'arch'  || $type eq 'both') && ($arch eq 'any' ||
-					     ($arch ne 'all' &&
-			                      samearch(buildarch(), $arch)))) ||
+				($arch ne 'all' && samearch(buildarch(), $arch)))) ||
 			     ! $type) &&
 			    $profile_is_concerned) {
 				push @list, $package;
