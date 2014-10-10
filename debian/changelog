@@ -1,5 +1,6 @@
-debhelper (9.20141010) UNRELEASED; urgency=medium
+debhelper (9.20141010) unstable; urgency=medium
 
+  [ Johannes Schauer ]
   * Depend on libdpkg-perl (>= 1.17.14) for build profiles support. Note to
     backporters: If you remove that dependency, debhelper will throw an error
     when a binary package stanza in debian/control has the Build-Profiles
@@ -7,8 +8,9 @@ debhelper (9.20141010) UNRELEASED; urgency=medium
   * Use libdpkg-perl functionality to parse the content of the Build-Profiles
     field, if there is one. In that case, use libdpkg-perl to evaluate whether
     the binary package should be built or not.
+    Closes: #763766
 
- -- Johannes Schauer <j.schauer@email.de>  Thu, 09 Oct 2014 23:27:40 +0200
+ -- Joey Hess <joeyh@debian.org>  Fri, 10 Oct 2014 17:42:56 -0400
 
 debhelper (9.20141003) unstable; urgency=medium
 
