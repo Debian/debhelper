@@ -844,7 +844,7 @@ sub getpackages {
 				}
 			};
 			if ($@) {
-				error("The package $package has a Build-Profiles field. Requires libdpkg-perl >= 1.17.14");
+				error("The control file has a Build-Profiles field. Requires libdpkg-perl >= 1.17.14");
 			}
 		}
 
