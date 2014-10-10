@@ -786,8 +786,9 @@ sub sourcepackage {
 # for the system's arch) or independant. If nothing is specified,
 # returns all packages. Also, "both" returns the union of "arch" and "indep"
 # packages.
-# As a side effect, populates %package_arches and %package_types with the
-# types of all packages (not only those returned).
+#
+# As a side effect, populates %package_arches, %package_types, and
+# %package_profiles with the types of all packages (not only those returned).
 my (%package_types, %package_arches, %package_profiles);
 sub getpackages {
 	my $type=shift;
@@ -805,9 +806,8 @@ sub getpackages {
 	my @list=();
 	my %seen;
 	my @profiles=();
-	my @restrictions=();
-	my $profile_is_concerned;
-	if ($ENV{'DEB_BUILD_PROFILES'}) {
+	my $included_in_build_profile;
+	if (exists $ENV{'DEB_BUILD_PROFILES'}) {
 		@profiles=split /\s+/, $ENV{'DEB_BUILD_PROFILES'};
 	}
 	open (CONTROL, 'debian/control') ||
@@ -826,7 +826,7 @@ sub getpackages {
 			}
 			$package_type="deb";
 			$build_profiles="";
-			$profile_is_concerned=1;
+			$included_in_build_profile=1;
 		}
 		if (/^Architecture:\s*(.*)/) {
 			$arch=$1;
@@ -841,13 +841,13 @@ sub getpackages {
 		        $build_profiles=$1;
 			eval {
 				require Dpkg::BuildProfiles;
-				@restrictions=Dpkg::BuildProfiles::parse_build_profiles($build_profiles);
+				my @restrictions=Dpkg::BuildProfiles::parse_build_profiles($build_profiles);
 				if (@restrictions) {
-					$profile_is_concerned=Dpkg::BuildProfiles::evaluate_restriction_formula(\@restrictions, \@profiles);
+					$included_in_build_profile=Dpkg::BuildProfiles::evaluate_restriction_formula(\@restrictions, \@profiles);
 				}
 			};
 			if ($@) {
-				error("The package $package has a Build-Profiles field. Require libdpkg-perl >= 1.17.14");
+				error("The package $package has a Build-Profiles field. Requires libdpkg-perl >= 1.17.14");
 			}
 		}
 
@@ -858,12 +858,14 @@ sub getpackages {
 				$package_profiles{$package}=$build_profiles;
 			}
 
-			if ($package &&
+			if ($package && $included_in_build_profile &&
 			    ((($type eq 'indep' || $type eq 'both') && $arch eq 'all') ||
-			     (($type eq 'arch'  || $type eq 'both') && ($arch eq 'any' ||
-				($arch ne 'all' && samearch(buildarch(), $arch)))) ||
-			     ! $type) &&
-			    $profile_is_concerned) {
+			     (($type eq 'arch'  || $type eq 'both') &&
+				($arch eq 'any' ||
+				  ($arch ne 'all' && samearch(buildarch(), $arch))
+			        )
+			     ) || ! $type)
+			    ) {
 				push @list, $package;
 				$package="";
 				$arch="";
