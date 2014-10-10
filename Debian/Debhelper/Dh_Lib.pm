@@ -764,44 +764,6 @@ sub buildos {
 	}
 }
 
-# Passed a list of profiles to match against, returns true if
-# DEB_BUILD_PROFILES environment variable matched
-sub buildprofilesmatch {
-	my %debbuildprofiles = ();
-	if (exists $ENV{'DEB_BUILD_PROFILES'}) {
-		foreach my $profile (split(/\s+/, $ENV{'DEB_BUILD_PROFILES'})) {
-			$debbuildprofiles{$profile} = 1;
-		}
-	}
-
-	my $packageprofilesstr = shift;
-	my $package = shift;
-	my @packageprofiles = split(/\s+/, $packageprofilesstr);
-	my $err = sub { error("Build-Profiles field for package $package contains both positive and negative entries"); };
-	if ($#packageprofiles < 0 || $packageprofiles[0] =~ /^!/) {
-		# package profiles list is negative or empty
-		foreach my $packageprofile (@packageprofiles) {
-			$packageprofile =~ /^!(.*)$/ || &{$err}();
-			if ($debbuildprofiles{$1}) {
-				return 0;
-			}
-		}
-		return 1;
-	}
-	else {
-		# package profiles list is positive
-		foreach my $packageprofile (@packageprofiles) {
-			if ($packageprofile =~ /^!/) {
-				&{$err}();
-			}
-			if ($debbuildprofiles{$packageprofile}) {
-				return 1;
-			}
-		}
-		return 0;
-	}
-}
-
 # Returns source package name
 sub sourcepackage {
 	open (CONTROL, 'debian/control') ||
@@ -842,6 +804,12 @@ sub getpackages {
 	my $build_profiles;
 	my @list=();
 	my %seen;
+	my @profiles=();
+	my @restrictions=();
+	my $profile_is_concerned;
+	if ($ENV{'DEB_BUILD_PROFILES'}) {
+		@profiles=split /\s+/, $ENV{'DEB_BUILD_PROFILES'};
+	}
 	open (CONTROL, 'debian/control') ||
 		error("cannot read debian/control: $!\n");
 	while (<CONTROL>) {
@@ -858,6 +826,7 @@ sub getpackages {
 			}
 			$package_type="deb";
 			$build_profiles="";
+			$profile_is_concerned=1;
 		}
 		if (/^Architecture:\s*(.*)/) {
 			$arch=$1;
@@ -865,8 +834,21 @@ sub getpackages {
 		if (/^(?:X[BC]*-)?Package-Type:\s*(.*)/) {
 			$package_type=$1;
 		}
+		# rely on libdpkg-perl providing the parsing functions because
+		# if we work on a package with a Build-Profiles field, then a
+		# high enough version of dpkg-dev is needed anyways
 		if (/^Build-Profiles:\s*(.*)/) {
 		        $build_profiles=$1;
+			eval {
+				require Dpkg::BuildProfiles;
+				@restrictions=Dpkg::BuildProfiles::parse_build_profiles($build_profiles);
+				if (@restrictions) {
+					$profile_is_concerned=Dpkg::BuildProfiles::evaluate_restriction_formula(\@restrictions, \@profiles);
+				}
+			};
+			if ($@) {
+				error("The package $package has a Build-Profiles field. Require libdpkg-perl >= 1.17.14");
+			}
 		}
 
 		if (!$_ or eof) { # end of stanza.
@@ -882,7 +864,7 @@ sub getpackages {
 					     ($arch ne 'all' &&
 			                      samearch(buildarch(), $arch)))) ||
 			     ! $type) &&
-			    buildprofilesmatch($build_profiles, $package)) {
+			    $profile_is_concerned) {
 				push @list, $package;
 				$package="";
 				$arch="";
