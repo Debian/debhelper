@@ -787,22 +787,20 @@ sub sourcepackage {
 # returns all packages. Also, "both" returns the union of "arch" and "indep"
 # packages.
 #
-# As a side effect, populates %package_arches, %package_types, and
-# %package_profiles with the types of all packages (not only those returned).
-my (%package_types, %package_arches, %package_profiles);
+# As a side effect, populates %package_arches and %package_types
+# with the types of all packages (not only those returned).
+my (%package_types, %package_arches);
 sub getpackages {
 	my $type=shift;
 
 	%package_types=();
 	%package_arches=();
-	%package_profiles=();
 	
 	$type="" if ! defined $type;
 
 	my $package="";
 	my $arch="";
 	my $package_type;
-	my $build_profiles;
 	my @list=();
 	my %seen;
 	my @profiles=();
@@ -825,7 +823,6 @@ sub getpackages {
 				error("debian/control has a duplicate entry for $package");
 			}
 			$package_type="deb";
-			$build_profiles="";
 			$included_in_build_profile=1;
 		}
 		if (/^Architecture:\s*(.*)/) {
@@ -838,7 +835,7 @@ sub getpackages {
 		# if we work on a package with a Build-Profiles field, then a
 		# high enough version of dpkg-dev is needed anyways
 		if (/^Build-Profiles:\s*(.*)/) {
-		        $build_profiles=$1;
+		        my $build_profiles=$1;
 			eval {
 				require Dpkg::BuildProfiles;
 				my @restrictions=Dpkg::BuildProfiles::parse_build_profiles($build_profiles);
@@ -855,7 +852,6 @@ sub getpackages {
 			if ($package) {
 				$package_types{$package}=$package_type;
 				$package_arches{$package}=$arch;
-				$package_profiles{$package}=$build_profiles;
 			}
 
 			if ($package && $included_in_build_profile &&
