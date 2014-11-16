@@ -182,7 +182,7 @@ sub split_options_string {
 sub parseopts {
 	my %params=@_;
 	
-	my @ARGV_extra;
+	my (@ARGV_extra, %internal_excluded);
 
 	# DH_INTERNAL_OPTIONS is used to pass additional options from
 	# dh through an override target to a command.
@@ -199,6 +199,7 @@ sub parseopts {
 			foreach my $package (getpackages()) {
 				if (! grep { $_ eq $package } @{$dh{DOPACKAGES}}) {
 					$exclude_package{$package}=1;
+					$internal_excluded{$package}=1;
 				}
 			}
 		}
@@ -260,6 +261,14 @@ sub parseopts {
 				$packages_seen{$package}=1;
 				push @package_list, $package;	
 			}
+		} elsif ($internal_excluded{$package}) {
+			# Record packages we would have processed if not for
+			# DH_INTERNAL_OPTIONS.
+			# We need this for dh_installdocs to check for broken
+			# binNMUs with --link-doc
+			push @{$dh{_INTERNAL_EXCL_DOPACKAGES}}, $package;
+			# Remove it to avoid duplicates
+			delete $internal_excluded{$package};
 		}
 	}
 	@{$dh{DOPACKAGES}}=@package_list;
@@ -286,3 +295,9 @@ sub parseopts {
 }
 
 1
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 4
+# cperl-indent-level: 4
+# End:
