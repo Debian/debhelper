@@ -219,7 +219,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 # Check if a file is a .so man page, for use by File::Find.
 sub find_so_man {
-	# The -s test is becuase a .so file tends to be small. We don't want
+	# The -s test is because a .so file tends to be small. We don't want
 	# to open every man page. 1024 is arbitrary.
 	if (! -f $_ || -s $_ > 1024 || -s == 0) {
 		return;
