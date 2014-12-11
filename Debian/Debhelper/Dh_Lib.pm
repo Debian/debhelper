@@ -771,7 +771,7 @@ sub sourcepackage {
 	while (<CONTROL>) {
 		chomp;
 		s/\s+$//;
-		if (/^Source:\s*(.*)/) {
+		if (/^Source:\s*(.*)/i) {
 			close CONTROL;
 			return $1;
 		}
@@ -813,7 +813,7 @@ sub getpackages {
 	while (<CONTROL>) {
 		chomp;
 		s/\s+$//;
-		if (/^Package:\s*(.*)/) {
+		if (/^Package:\s*(.*)/i) {
 			$package=$1;
 			# Detect duplicate package names in the same control file.
 			if (! $seen{$package}) {
@@ -825,16 +825,16 @@ sub getpackages {
 			$package_type="deb";
 			$included_in_build_profile=1;
 		}
-		if (/^Architecture:\s*(.*)/) {
+		if (/^Architecture:\s*(.*)/i) {
 			$arch=$1;
 		}
-		if (/^(?:X[BC]*-)?Package-Type:\s*(.*)/) {
+		if (/^(?:X[BC]*-)?Package-Type:\s*(.*)/i) {
 			$package_type=$1;
 		}
 		# rely on libdpkg-perl providing the parsing functions because
 		# if we work on a package with a Build-Profiles field, then a
 		# high enough version of dpkg-dev is needed anyways
-		if (/^Build-Profiles:\s*(.*)/) {
+		if (/^Build-Profiles:\s*(.*)/i) {
 		        my $build_profiles=$1;
 			eval {
 				require Dpkg::BuildProfiles;
