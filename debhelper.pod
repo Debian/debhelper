@@ -537,6 +537,12 @@ Changes from v9 are:
 B<dh_installinit> will no longer install a file named debian/I<package>
 as an init script.
 
+=item -
+
+B<dh_installdocs> will error out if it detects links created with
+--link-doc between packages of architecture "all" and non-"all" as it
+breaks binNMUs.
+
 =over 8
 
 =item -
