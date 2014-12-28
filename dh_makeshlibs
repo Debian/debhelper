@@ -153,7 +153,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
 		$exclude="! \\( $dh{EXCLUDE_FIND} \\) ";
 	}
-	open (FIND, "find $tmp -type f \\( -name '*.so' -or -name '*.so.*' \\) $exclude |");
+	open (FIND, "find $tmp -type f \\( -name '*.so' -or -name '*.so.*' \\) $exclude | LC_ALL=C sort |");
 	while (<FIND>) {
 		my ($library, $major);
 		push @lib_files, $_;
