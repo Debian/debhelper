@@ -61,7 +61,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			push @dirlist, "$baseicondir/$subdir" if $needs_cache;
 		}
 		if (@dirlist and ! $dh{NOSCRIPTS}) {
-			my $list=join(" ", @dirlist);
+			my $list=join(" ", sort @dirlist);
 			autoscript($package,"postinst","postinst-icons","s%#DIRLIST#%$list%");
 			autoscript($package,"postrm","postrm-icons","s%#DIRLIST#%$list%");
 		}
