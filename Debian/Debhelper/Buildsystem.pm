@@ -294,35 +294,35 @@ sub _cd {
 }
 
 # Changes working directory to the source directory (if needed),
-# calls doit(@_) and changes working directory back to the top
-# directory.
+# calls print_and_doit(@_) and changes working directory back to the
+# top directory.
 sub doit_in_sourcedir {
 	my $this=shift;
 	if ($this->get_sourcedir() ne '.') {
 		my $sourcedir = $this->get_sourcedir();
 		$this->_cd($sourcedir);
-		doit(@_);
+		print_and_doit(@_);
 		$this->_cd($this->_rel2rel($this->{cwd}, $sourcedir));
 	}
 	else {
-		doit(@_);
+		print_and_doit(@_);
 	}
 	return 1;
 }
 
 # Changes working directory to the build directory (if needed),
-# calls doit(@_) and changes working directory back to the top
-# directory.
+# calls print_and_doit(@_) and changes working directory back to the
+# top directory.
 sub doit_in_builddir {
 	my $this=shift;
 	if ($this->get_buildpath() ne '.') {
 		my $buildpath = $this->get_buildpath();
 		$this->_cd($buildpath);
-		doit(@_);
+		print_and_doit(@_);
 		$this->_cd($this->_rel2rel($this->{cwd}, $buildpath));
 	}
 	else {
-		doit(@_);
+		print_and_doit(@_);
 	}
 	return 1;
 }
