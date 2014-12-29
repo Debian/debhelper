@@ -11,6 +11,7 @@ use Exporter;
 use vars qw(@ISA @EXPORT %dh);
 @ISA=qw(Exporter);
 @EXPORT=qw(&init &doit &doit_noerror &complex_doit &verbose_print &error
+            &nonquiet_print &print_and_doit &print_and_doit_noerror
             &warning &tmpdir &pkgfile &pkgext &pkgfilename &isnative
 	    &autoscript &filearray &filedoublearray
 	    &getpackages &basename &dirname &xargs %dh
@@ -61,9 +62,11 @@ sub init {
 	}
 	
 	# Check to see if DH_VERBOSE environment variable was set, if so,
-	# make sure verbose is on.
+	# make sure verbose is on. Otherwise, check DH_QUIET.
 	if (defined $ENV{DH_VERBOSE} && $ENV{DH_VERBOSE} ne "") {
 		$dh{VERBOSE}=1;
+	} elsif (defined $ENV{DH_QUIET} && $ENV{DH_QUIET} ne "") {
+		$dh{QUIET}=1;
 	}
 
 	# Check to see if DH_NO_ACT environment variable was set, if so, 
@@ -231,6 +234,21 @@ sub doit_noerror {
 	}
 }
 
+sub print_and_doit {
+	print_and_doit_noerror(@_) || _error_exitcode(join(" ", @_));
+}
+
+sub print_and_doit_noerror {
+	nonquiet_print(escape_shell(@_));
+
+	if (! $dh{NO_ACT}) {
+		return (system(@_) == 0)
+	}
+	else {
+		return 1;
+	}
+}
+
 # Run a command and display the command to stdout if verbose mode is on.
 # Use doit() if you can, instead of this function, because this function
 # forks a shell. However, this function can handle more complicated stuff
@@ -299,6 +317,15 @@ sub verbose_print {
 	my $message=shift;
 	
 	if ($dh{VERBOSE}) {
+		print "\t$message\n";
+	}
+}
+
+# Print something unless the quiet flag is on
+sub nonquiet_print {
+	my $message=shift;
+
+	if (!$dh{QUIET}) {
 		print "\t$message\n";
 	}
 }

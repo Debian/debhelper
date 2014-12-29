@@ -713,7 +713,9 @@ sub run {
 
 	# 3 space indent lines the command being run up under the
 	# sequence name after "dh ".
-	print "   ".escape_shell($command, @options)."\n";
+	if (!$dh{QUIET}) {
+		print "   ".escape_shell($command, @options)."\n";
+	}
 
 	return if $dh{NO_ACT};
 			

@@ -667,6 +667,15 @@ F<preinst>, F<postrm>, F<prerm>, and F<config> scripts, etc.
 Set to B<1> to enable verbose mode. Debhelper will output every command it
 runs. Also enables verbose build logs for some build systems like autoconf.
 
+=item B<DH_QUIET>
+
+Set to B<1> to enable quiet mode. Debhelper will not output commands calling
+the upstream build system nor will dh print which subcommands are called
+and depending on the upstream build system might make that more quiet, too.
+This makes it easier to spot important messages but makes the output quite
+useless as buildd log.
+Ignored if DH_VERBOSE is also set.
+
 =item B<DH_COMPAT>
 
 Temporarily specifies what compatibility level debhelper should run at,

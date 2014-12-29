@@ -18,6 +18,11 @@ output the commands, you should indent them with 1 tab). This is so we don't
 have a lot of noise output when all the debhelper commands in a debian/rules
 are run, so the important stuff is clearly visible.
 
+An exception to above rule are dh_auto_* commands and dh itself. They will
+also print the commands interacting with the upstream build system and which
+of the simple debhelper programms are called. (i.e. print what a traditional
+non-dh(1) using debian/rules would print but nothing else).
+
 Debhelper programs should accept all options listed in the "SHARED
 DEBHELPER OPTIONS" section of debhelper(7), including any long forms of
 these options, like --verbose . If necessary, the options may be ignored.
@@ -152,6 +157,9 @@ doit(@command)
 	if $dh{VERBOSE} is set, it will also output the command to stdout. You
 	should use this function for almost all commands your program performs
 	that manipulate files in the package build directories.
+print_and_doit(@command)
+        Like doit but will print unless $dh{QUIET} is set. See "Standardization"
+        above for when this is allowed to be called.
 complex_doit($command)
 	Pass this function a string that is a shell command, it will run it
 	similarly to how doit() does. You can pass more complicated commands 
@@ -159,6 +167,9 @@ complex_doit($command)
 	have to worry about things like escaping shell metacharacters.
 verbose_print($message)
 	Pass this command a string, and it will echo it if $dh{VERBOSE} is set.
+nonquiet_print($message)
+	Pass this command a string, and it will echo it unless $dh{QUIET} is set.
+	See "Standardization" above for when this is allowed to be called.
 error($errormsg)
 	Pass this command a string, it will output it to standard error and
 	exit.
