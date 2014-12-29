@@ -159,7 +159,6 @@ init(options => {
 });
 
 my $called_getpackages = 0;
-my $link_doc_arch;
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if is_udeb($package);
@@ -169,22 +168,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $link_doc=($dh{LINK_DOC} && $dh{LINK_DOC} ne $package);
 
 	if ($link_doc) {
-		my $has_issue = 0;
-		unless ($called_getpackages++) {
-			# Called for the side-effect of making package_arch work.
-			getpackages('both');
-			$link_doc_arch = package_arch($dh{LINK_DOC});
-			# Check for broken --link-doc during binNMUs.
-			for my $excl_pkg (@{$dh{_INTERNAL_EXCL_DOPACKAGES}}) {
-				if (package_arch($excl_pkg) ne $link_doc_arch) {
-					$has_issue = $excl_pkg;
-					last;
-				}
-			}
-		}
+		getpackages('both') unless $called_getpackages++;
 
-		$has_issue = $package if (package_arch($package) ne $link_doc_arch);
-		if ($has_issue) {
+		if (package_arch($package) ne package_arch($dh{LINK_DOC})) {
 			if (compat(9)) {
 				my $changelog=pkgfile($package, 'changelog') || 'debian/changelog';
 				if (! -e $changelog) {
@@ -200,7 +186,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 					error("Aborting build as this is a binNMU (leading to a broken package)");
 				}
 			} else {
-				error("--link-doc not allowed between ${has_issue} and $dh{LINK_DOC} (one is all and the other not)");
+				error("--link-doc not allowed between ${package} and $dh{LINK_DOC} (one is all and the other not)");
 			}
 		}
 		# Make sure that the parent directory exists.
