@@ -158,8 +158,6 @@ init(options => {
 	"link-doc=s" => \$dh{LINK_DOC},
 });
 
-my $called_getpackages = 0;
-
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if is_udeb($package);
 	
@@ -168,27 +166,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $link_doc=($dh{LINK_DOC} && $dh{LINK_DOC} ne $package);
 
 	if ($link_doc) {
-		getpackages('both') unless $called_getpackages++;
-
-		if (package_arch($package) ne package_arch($dh{LINK_DOC})) {
-			if (compat(9)) {
-				my $changelog=pkgfile($package, 'changelog') || 'debian/changelog';
-				if (! -e $changelog) {
-					error("could not find changelog $changelog");
-				}
-
-				open(my $fd, '<', $changelog) or error("open $changelog: $!");
-				my $line = <$fd>;
-				close($fd);
-
-				warning("WARNING: --link-doc between architecture all and not all packages breaks binNMUs");
-				if (defined($line) && $line =~ m/\A\S.*;.*\bbinary-only=yes/) {
-					error("Aborting build as this is a binNMU (leading to a broken package)");
-				}
-			} else {
-				error("--link-doc not allowed between ${package} and $dh{LINK_DOC} (one is all and the other not)");
-			}
-		}
 		# Make sure that the parent directory exists.
 		if (! -d "$tmp/usr/share/doc" && ! -l "$tmp/usr/share/doc") {
 			doit("install","-g",0,"-o",0,"-d","$tmp/usr/share/doc");
@@ -368,9 +345,3 @@ This program is a part of debhelper.
 Joey Hess <joeyh@debian.org>
 
 =cut
-
-# Local Variables:
-# indent-tabs-mode: t
-# tab-width: 4
-# cperl-indent-level: 4
-# End:
