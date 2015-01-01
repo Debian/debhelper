@@ -118,8 +118,9 @@ sub testfile {
 	return if $fn=~m/debug\/.*\.so/;
 
 	# Does its filename look like a shared library?
-	# (*.cmxs are OCaml native code shared libraries)
-	if (m/.*\.(so.*?|cmxs$)/) {
+	#  - *.cmxs are OCaml native code shared libraries
+        #  - *.node are also native ELF binaries (for node-js)
+	if (m/.*\.(?:so.*?|cmxs|node)$/) {
 		# Ok, do the expensive test.
 		my $type=get_file_type($_);
 		if ($type=~m/.*ELF.*shared.*/) {
