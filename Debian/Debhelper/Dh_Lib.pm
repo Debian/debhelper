@@ -1107,3 +1107,9 @@ sub get_buildoption {
 }
 
 1
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 4
+# cperl-indent-level: 4
+# End:
