@@ -10,3 +10,9 @@ foreach my $file (@progs, @libs) {
 	print "# Testing $file\n";
 	ok(system("perl -c $file >/dev/null 2>&1"), 0);
 }
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 4
+# cperl-indent-level: 4
+# End:

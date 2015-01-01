@@ -86,3 +86,9 @@ system("mkdir -p bar/usr/bin; touch bar/usr/bin/foo");
 system("./dh_install", "bar/usr/bin/foo");
 ok(-e "debian/debhelper/bar/usr/bin/foo");
 system("rm -rf debian/debhelper bar");
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 4
+# cperl-indent-level: 4
+# End:

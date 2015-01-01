@@ -43,3 +43,9 @@ ok(! -l "debian/debhelper/usr/lib/foo");
 ok(readlink("debian/debhelper/usr/lib/bar"), "/etc/foo");
 ok(readlink("debian/debhelper/usr/bin/bar"), "foo");
 ok(readlink("debian/debhelper/usr/bin/2"),"../lib/1");
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 4
+# cperl-indent-level: 4
+# End:
