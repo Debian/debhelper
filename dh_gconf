@@ -63,20 +63,15 @@ if (defined $dh{PRIORITY}) {
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	
-	my $gconf_dep = 0;
 	my $mandatory = pkgfile($package, "gconf-mandatory");
 	if ($mandatory ne '') {
 		doit("mkdir","-p","$tmp/usr/share/gconf/mandatory");
 		doit("install","-p","-m644",$mandatory,"$tmp/usr/share/gconf/mandatory/${priority}_$package");
-		addsubstvar($package, "misc:Depends", "gconf2 (>= 2.28.1-2)");
-		$gconf_dep = 1;
 	}
 	my $defaults = pkgfile($package,"gconf-defaults");
 	if ($defaults ne '') {
 		doit("mkdir","-p","$tmp/usr/share/gconf/defaults");
 		doit("install","-p","-m644",$defaults,"$tmp/usr/share/gconf/defaults/${priority}_$package");
-		addsubstvar($package, "misc:Depends", "gconf2 (>= 2.28.1-2)") unless $gconf_dep;
-		$gconf_dep = 1;
 	}
 
 	my $old_schemas_dir = "$tmp/etc/gconf/schemas";
@@ -93,7 +88,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# Get a list of the schemas
 		my $schemas = `find $new_schemas_dir -type f -name \\*.schemas -printf '%P '`;
 		if ($schemas ne '') {
-			addsubstvar($package, "misc:Depends", "gconf2 (>= 2.28.1-2)") unless $gconf_dep;
+			addsubstvar($package, "misc:Depends", "gconf2 (>= 2.28.1-2)");
 		}
 	}
 }
