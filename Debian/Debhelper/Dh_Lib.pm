@@ -19,7 +19,9 @@ use vars qw(@ISA @EXPORT %dh);
 	    &inhibit_log &load_log &write_log &commit_override_log
 	    &dpkg_architecture_value &sourcepackage &make_symlink
 	    &is_make_jobserver_unavailable &clean_jobserver_makeflags
-	    &cross_command &set_buildflags &get_buildoption);
+	    &cross_command &set_buildflags &get_buildoption
+	    &install_dh_config_file
+);
 
 my $max_compat=10;
 
@@ -1104,6 +1106,37 @@ sub get_buildoption {
 			return 1;
 		}
 	}
+}
+
+# install a dh config file (e.g. debian/<pkg>.lintian-overrides) into
+# the package.  Under compat 9+ it may execute the file and use its
+# output instead.
+#
+# install_dh_config_file(SOURCE, TARGET[, MODE])
+sub install_dh_config_file {
+	my ($source, $target, $mode) = @_;
+	$mode = 0644 if not defined($mode);
+
+	if (!compat(8) and -x $source) {
+		my @sstat = stat($source) || error("cannot stat $file: $!");
+		open(my $tfd, '>', $target) || error("cannot open $file: $!");
+		chmod($mode, $tfd) || error("cannot chmod $file: $!");
+		open(my $sfd, '-|', $source) || error("cannot run $file: $!");
+		while (my $line = <$sfd>) {
+			print ${tfd} $line;
+		}
+		if (!close($sfd)) {
+			error("cannot close handle from $file: $!") if $!;
+			_error_exitcode($source);
+		}
+		close($tfd) || error("cannot close $file: $!");
+		# Set the mtime (and atime) to ensure reproducibility.
+		utime($sstat[9], $sstat[9], $target);
+	} else {
+		my $str_mode = sprintf('%#4o', $mode);
+		doit('install', '-p', "-m${str_mode}", $source, $target);
+	}
+	return 1;
 }
 
 1

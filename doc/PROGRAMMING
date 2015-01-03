@@ -267,6 +267,11 @@ make_symlink($src, $dest, $tmp)
 	Creates a Policy compliant sytem link called $dest pointing to
 	$src. If $tmp is given, then $tmp will be prefixed to $dest when
 	creating the actual symlink.
+install_dh_config_file($src, $dest[, $mode])
+	Installs $src into $dest with $mode (defaults to 0644).  If
+	compat is 9 (or later) and $src is executable, $src will be
+	executed instead and its output will be used to generate the
+	$dest file.
 
 Sequence Addons:
 ---------------

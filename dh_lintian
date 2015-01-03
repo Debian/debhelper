@@ -52,7 +52,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (! -d "$or_dir") {
 			 doit("install","-d","$or_dir");
 		}
-		doit("install","-p","-m644",$overrides,"$or_dir/$package");
+		install_dh_config_file($overrides, "$or_dir/$package");
 	}
 }
 
