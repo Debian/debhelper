@@ -26,12 +26,22 @@ sub new {
 
 sub build {
 	my $this=shift;
-	$this->doit_in_sourcedir("ant", @_);
+	my $d_ant_prop = $this->get_sourcepath('debian/ant.properties');
+	my @args;
+	if ( -f $d_ant_prop ) {
+		push(@args, '-propertyfile', $d_ant_prop);
+	}
+	$this->doit_in_sourcedir("ant", @args, @_);
 }
 
 sub clean {
 	my $this=shift;
-	$this->doit_in_sourcedir("ant", "clean", @_);
+	my $d_ant_prop = $this->get_sourcepath('debian/ant.properties');
+	my @args;
+	if ( -f $d_ant_prop ) {
+		push(@args, '-propertyfile', $d_ant_prop);
+	}
+	$this->doit_in_sourcedir("ant", @args, "clean", @_);
 }
 
 1
