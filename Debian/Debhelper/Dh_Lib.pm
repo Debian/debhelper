@@ -1118,18 +1118,18 @@ sub install_dh_config_file {
 	$mode = 0644 if not defined($mode);
 
 	if (!compat(8) and -x $source) {
-		my @sstat = stat($source) || error("cannot stat $file: $!");
-		open(my $tfd, '>', $target) || error("cannot open $file: $!");
-		chmod($mode, $tfd) || error("cannot chmod $file: $!");
-		open(my $sfd, '-|', $source) || error("cannot run $file: $!");
+		my @sstat = stat($source) || error("cannot stat $source: $!");
+		open(my $tfd, '>', $target) || error("cannot open $target: $!");
+		chmod($mode, $tfd) || error("cannot chmod $target: $!");
+		open(my $sfd, '-|', $source) || error("cannot run $source: $!");
 		while (my $line = <$sfd>) {
 			print ${tfd} $line;
 		}
 		if (!close($sfd)) {
-			error("cannot close handle from $file: $!") if $!;
+			error("cannot close handle from $source: $!") if $!;
 			_error_exitcode($source);
 		}
-		close($tfd) || error("cannot close $file: $!");
+		close($tfd) || error("cannot close $target: $!");
 		# Set the mtime (and atime) to ensure reproducibility.
 		utime($sstat[9], $sstat[9], $target);
 	} else {
