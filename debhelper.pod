@@ -552,6 +552,13 @@ running debhelper commands. This will not affect packages that only build
 with debhelper commands, but it may expose bugs in commands not included in
 debhelper.
 
+=item -
+
+B<dh_makeshlibs> now invokes I<ldconfig -X> instead of just
+I<ldconfig> in its generated maintainer scripts snippets.  The new
+call will only update the ld cache (instead of also updating
+symlinks).
+
 =back
 
 =back

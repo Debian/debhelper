@@ -42,6 +42,11 @@ debhelper (9.20150101.1) UNRELEASED; urgency=medium
     files.  Thanks to Axel Beckert for the report.  (Closes: #698500)
   * d/rules: Remove makefile target only intended for/used by the
     previous maintainer.
+  * dh_makeshlibs: In compat 10+, pass "-X" to ldconfig to
+    only  regenerate the cache (instead of also creating missing
+    symlinks).  Thanks to Joss Mouette for the suggestion.
+    (Closes: #549990)
+  * autoscripts/post{inst,rm}-makeshlibs-c10: New files.
 
   [ Bernhard R. Link ]
   * Dh_lib: apply patch from Guillem Jover to support case-insensitive
