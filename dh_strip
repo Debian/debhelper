@@ -235,8 +235,17 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
  		attach_debug($_, $debug_path) if defined $debug_path;
 	}
 
-	foreach (@static_libs) {
-		doit($strip,"--enable-deterministic-archives","--strip-debug",$_);
+	if (@static_libs) {
+		my $strip_help = qx{$strip};
+		my @opts = ('--strip-debug');
+		if (index($strip_help, '--enable-deterministic-archives') > -1) {
+			# NB: The short variant (-D) is broken in Jessie
+			# (binutils/2.25-3)
+			push(@opts, '--enable-deterministic-archives');
+		}
+		foreach (@static_libs) {
+			doit($strip, @opts, $_);
+		}
 	}
 }
 

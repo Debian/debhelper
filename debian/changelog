@@ -47,6 +47,10 @@ debhelper (9.20150101.1) UNRELEASED; urgency=medium
     symlinks).  Thanks to Joss Mouette for the suggestion.
     (Closes: #549990)
   * autoscripts/post{inst,rm}-makeshlibs-c10: New files.
+  * dh_strip: Pass the --enable-deterministic-archives option to strip
+    when it is stripping static libaries.  This avoids some
+    unnecessary non-determinism in builds.  Based on patch by
+    Andrew Ayer.
 
   [ Bernhard R. Link ]
   * Dh_lib: apply patch from Guillem Jover to support case-insensitive
