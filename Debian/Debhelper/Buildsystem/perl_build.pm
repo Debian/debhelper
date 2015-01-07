@@ -58,7 +58,7 @@ sub build {
 
 sub test {
 	my $this=shift;
-	$this->do_perl("Build", "test", @_);
+	$this->do_perl("Build", "test", "--verbose", 1, @_);
 }
 
 sub install {

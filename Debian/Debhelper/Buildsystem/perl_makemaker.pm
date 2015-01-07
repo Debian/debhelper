@@ -61,6 +61,12 @@ sub configure {
 		@flags, @_);
 }
 
+sub test {
+	my $this=shift;
+	# Make tests verbose
+	$this->SUPER::test("TEST_VERBOSE=1", @_);
+}
+
 sub install {
 	my $this=shift;
 	my $destdir=shift;
