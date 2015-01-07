@@ -30,6 +30,15 @@ debian/control file for packages supporting multiarch.
 
 =over 4
 
+=item debian/I<package>.shlibs
+
+Installs this file, if present, into the package as DEBIAN/shlibs.  If
+omitted, debhelper will generate a shlibs file automatically if it
+detects any libraries.
+
+Note in compat levels 9 and earlier, this file was installed by
+qL<dh_installdeb(1)> rather than B<dh_makeshlibs>.
+
 =item debian/I<package>.symbols
 
 =item debian/I<package>.symbols.I<arch>
@@ -139,6 +148,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my %seen;
 	my $need_ldconfig = 0;
 	my $is_multiarch = 0;
+	my $shlibs_file = pkgfile($package, 'shlibs');
 
 	doit("rm", "-f", "$tmp/DEBIAN/shlibs");
 
@@ -181,6 +191,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 		my $deps=$package;
 		if ($dh{V_FLAG_SET}) {
+			if ($shlibs_file) {
+				warning("The provided ${shlibs_file} file overwrites -V");
+				# Clear the flag to avoid duplicate warnings.  Note
+				# we can safely fallthrough as the result will be
+				# replaced regardless.
+				$dh{V_FLAG_SET} = 0;
+			}
 			if ($dh{V_FLAG} ne '') {
 				$deps=$dh{V_FLAG};
 			}	
@@ -231,6 +248,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			autoscript($package,"postinst","postinst-makeshlibs-c10");
 			autoscript($package,"postrm","postrm-makeshlibs-c10");
 		}
+	}
+
+	if ($shlibs_file) {
+		if (! -d "$tmp/DEBIAN") {
+			install_dir("$tmp/DEBIAN");
+		}
+		install_file($shlibs_file, "$tmp/DEBIAN/shlibs");
 	}
 
 	if (-e "$tmp/DEBIAN/shlibs") {
