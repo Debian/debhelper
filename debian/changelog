@@ -51,6 +51,9 @@ debhelper (9.20150101.1) UNRELEASED; urgency=medium
     when it is stripping static libaries.  This avoids some
     unnecessary non-determinism in builds.  Based on patch by
     Andrew Ayer.
+  * dh_install, dh_installdocs, dh_installexamples and dh_installinfo:
+    Pass --reflink=auto to cp.  On supported filesystems, this provides
+    faster copying.
 
   [ Bernhard R. Link ]
   * Dh_lib: apply patch from Guillem Jover to support case-insensitive

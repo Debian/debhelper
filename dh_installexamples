@@ -96,10 +96,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				my $pwd=`pwd`;
 				chomp $pwd;
 				my $exclude2 = '-type f'.$exclude;
-				complex_doit("cd '$dir' && find '$basename' -type f$exclude -exec cp --parents -dp {} $pwd/$tmp/usr/share/doc/$package/examples \\;");
+				complex_doit("cd '$dir' && find '$basename' -type f$exclude -exec cp --reflink=auto --parents -dp {} $pwd/$tmp/usr/share/doc/$package/examples \\;");
 			}
 			else {
-				doit("cp", "-a", $example, "$tmp/usr/share/doc/$package/examples");
+				doit("cp", '--reflink=auto', "-a", $example,
+					 "$tmp/usr/share/doc/$package/examples");
 			}
 		}
 	}
