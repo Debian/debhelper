@@ -60,6 +60,12 @@ debhelper (9.20150101.1) UNRELEASED; urgency=medium
   [ Bernhard R. Link ]
   * Dh_lib: apply patch from Guillem Jover to support case-insensitive
     control field names. (Closes: #772129)
+  * add DH_QUIET environment variable to make things more silent
+  * dh: don't output commands to run if DH_QUIET is set
+  * buildsystems print commands unless DH_QUIET is set (Closes: #639168, #680687)
+  * autoconf is always passed one of
+     --enable-silent-rules (if DH_QUIET is set) or
+     --disable-silent-rules (otherwise). (Closes: #551463, #680686)
 
  -- Niels Thykier <niels@thykier.net>  Thu, 01 Jan 2015 17:24:38 +0100
 
