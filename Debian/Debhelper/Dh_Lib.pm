@@ -986,8 +986,8 @@ sub debhelper_script_subst {
 }
 
 
-# symlink($dest, $src[, $tmp]) creates a symlink from  $dest -> $src.
-# if $tmp is given, $dest will be created in $base.
+# make_symlink($dest, $src[, $tmp]) creates a symlink from  $dest -> $src.
+# if $tmp is given, $dest will be created within it.
 # Usually $tmp should be the value of tmpdir($package);
 sub make_symlink{
 	my $dest = shift;
