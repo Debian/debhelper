@@ -56,6 +56,15 @@ debhelper (9.20150101.1) UNRELEASED; urgency=medium
     faster copying.
   * Make perl tests verbose.  Thanks to gregor herrmann for the patch.
     (Closes: #714546)
+  * Dh_Lib.pm: Apply patch from Martin Koeppe to provide
+    install_{dir,file,prog,lib} subroutines for installing directories,
+    regular files, scripts/executables and libraries (respectively).
+  * Migrate many "ad-hoc" calls to "install" to the new "install_X"
+    subroutines from Dh_Lib.pm.  Based on patch from Martin Koeppe.
+    (Closes: #438930)
+  * dh_gconf: Apply patch from Martin Koeppe to avoid adding a layer
+    of shell-escaping to a printed command line when the command was
+    in fact run without said layet of shell-escaping.
 
   [ Bernhard R. Link ]
   * Dh_lib: apply patch from Guillem Jover to support case-insensitive
