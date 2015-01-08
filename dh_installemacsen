@@ -107,23 +107,23 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	if ($emacsen_install ne '') {
 		if (! -d "$tmp/usr/lib/emacsen-common/packages/install") {
-			doit("install","-d","$tmp/usr/lib/emacsen-common/packages/install");
+			install_dir("$tmp/usr/lib/emacsen-common/packages/install");
 		}
-		doit("install","-m0755",$emacsen_install,"$tmp/usr/lib/emacsen-common/packages/install/$package");
+		install_prog($emacsen_install,"$tmp/usr/lib/emacsen-common/packages/install/$package");
 	}
 
 	if ($emacsen_remove ne '') {
 		if (! -d "$tmp/usr/lib/emacsen-common/packages/remove") {
-			doit("install","-d","$tmp/usr/lib/emacsen-common/packages/remove");
+			install_dir("$tmp/usr/lib/emacsen-common/packages/remove");
 		}
-		doit("install","-m0755","$emacsen_remove","$tmp/usr/lib/emacsen-common/packages/remove/$package");
+		install_prog("$emacsen_remove","$tmp/usr/lib/emacsen-common/packages/remove/$package");
 	}
-	
+
 	if ($emacsen_startup ne '') {
 		if (! -d "$tmp/etc/$dh{FLAVOR}/site-start.d/") {
-			doit("install","-d","$tmp/etc/$dh{FLAVOR}/site-start.d/");
+			install_dir("$tmp/etc/$dh{FLAVOR}/site-start.d/");
 		}
-		doit("install","-m0644",$emacsen_startup,"$tmp/etc/$dh{FLAVOR}/site-start.d/$dh{PRIORITY}$package.el");
+		install_file($emacsen_startup,"$tmp/etc/$dh{FLAVOR}/site-start.d/$dh{PRIORITY}$package.el");
 	}
 
 	if ($emacsen_install ne '' || $emacsen_remove ne '') {

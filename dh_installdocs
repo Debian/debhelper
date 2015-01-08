@@ -149,7 +149,7 @@ sub ensure_docdir {
 
 	# If this is a symlink, leave it alone.
 	if (! -d $target && ! -l $target) {
-		doit("install","-g",0,"-o",0,"-d",$target);
+		install_dir($target);
 	}
 	$docdir_created{$package}=1;
 }
@@ -179,7 +179,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 		# Make sure that the parent directory exists.
 		if (! -d "$tmp/usr/share/doc" && ! -l "$tmp/usr/share/doc") {
-			doit("install","-g",0,"-o",0,"-d","$tmp/usr/share/doc");
+			install_dir("$tmp/usr/share/doc");
 		}
 		# Create symlink to another documentation directory if
 		# necessary.
@@ -247,19 +247,18 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 	if (! $link_doc && $readme_debian && ! excludefile($readme_debian)) {
 		ensure_docdir($package);
-		doit("install","-g",0,"-o",0,"-m","644","-p","$readme_debian",
-			"$tmp/usr/share/doc/$package/README.Debian");
+		install_file($readme_debian,
+					 "$tmp/usr/share/doc/$package/README.Debian");
 	}
 
 	my $todo=pkgfile($package,'TODO');
 	if (! $link_doc && $todo && ! excludefile($todo)) {
 		ensure_docdir($package);
 		if (isnative($package)) {
-			doit("install","-g",0,"-o",0,"-m","644","-p",$todo,
-				"$tmp/usr/share/doc/$package/TODO");
+			install_file($todo, "$tmp/usr/share/doc/$package/TODO");
 		}
 		else {
-			doit("install","-g",0,"-o",0,"-m","644","-p",$todo,
+			install_file($todo,
 				"$tmp/usr/share/doc/$package/TODO.Debian");
 		}
 	}
@@ -277,7 +276,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 		if ($copyright && ! excludefile($copyright)) {
 			ensure_docdir($package);
-			doit("install","-g",0,"-o",0,"-m","644","-p",$copyright,
+			install_file($copyright,
 				"$tmp/usr/share/doc/$package/copyright");
 		}
 	}
@@ -316,7 +315,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	
 	if (%doc_ids) {
 		if (! -d "$tmp/usr/share/doc-base/") {
-			doit("install","-g",0,"-o",0,"-d","$tmp/usr/share/doc-base/");
+			install_dirdd("$tmp/usr/share/doc-base/");
 		}
 	}
 	# check for duplicate document ids
@@ -336,12 +335,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			my $fn_no_docbase = $fn;
 			$fn_no_docbase =~ s/\.doc-base(?:\.(.*))?/
 			    if (defined $1 and length $1) {"-$1"} else {''}/xe;
-			doit("install","-g",0,"-o",0,"-m644","-p","debian/$fn",
-			     "$tmp/usr/share/doc-base/$fn_no_docbase");
+			install_file("debian/$fn",
+						 "$tmp/usr/share/doc-base/$fn_no_docbase");
 		}
 		else {
-			doit("install","-g",0,"-o",0,"-m644","-p","debian/$fn",
-			     "$tmp/usr/share/doc-base/$doc_ids{$fn}");
+			install_file("debian/$fn",
+						 "$tmp/usr/share/doc-base/$doc_ids{$fn}");
 		}
 	}
 }

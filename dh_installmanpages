@@ -168,18 +168,18 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				$destdir="$tmp/usr/$extdir/man/$langcode/man$section/";
 				$instname=~s/\.$langcode\./\./;
 			}
-			
+
 			$destdir=~tr:/:/:s; # just for looks
-			
+
 			if (! -e "$destdir/$basename" && !-l "$destdir/$basename") {
 				if (! -d $destdir) {
-					doit "install","-d",$destdir;
+					install_dir($destdir);
 				}
-				doit "install","-p","-m644",$page,$destdir.$instname;
+				install_file($page,$destdir.$instname);
 			}
 		}
 	}
-	
+
 	# Now the .so conversion.
 	@sofiles=@sodests=();
 	foreach my $dir (qw{usr/share/man}) {

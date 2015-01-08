@@ -80,7 +80,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	
 	if (@examples) {
 		if (! -d "$tmp/usr/share/doc/$package/examples") {
-			doit("install","-d","$tmp/usr/share/doc/$package/examples");
+			install_dir("$tmp/usr/share/doc/$package/examples");
 		}
 		
 		my $exclude = '';

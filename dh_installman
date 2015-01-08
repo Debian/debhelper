@@ -177,13 +177,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		next if compat(5) && -e $instpage;
 
 		if (! -d $destdir) {
-			doit "install","-d",$destdir;
+			install_dir($destdir);
 		}
 		if ($gz) {
 			complex_doit "zcat \Q$page\E > \Q$instpage\E";
 		}
 		else {
-			doit "install","-p","-m644",$page,$instpage;
+			install_file($page, $instpage);
 		}
 	}
 

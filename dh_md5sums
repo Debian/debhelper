@@ -54,7 +54,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 
 	if (! -d "$tmp/DEBIAN") {
-		doit("install","-d","$tmp/DEBIAN");
+		install_dir("$tmp/DEBIAN");
 	}
 
 	# Check if we should exclude conffiles.

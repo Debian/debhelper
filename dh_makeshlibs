@@ -177,7 +177,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 		
 		if (! -d "$tmp/DEBIAN") {
-			doit("install","-d","$tmp/DEBIAN");
+			install_dir("$tmp/DEBIAN");
 		}
 		my $deps=$package;
 		if ($dh{V_FLAG_SET}) {

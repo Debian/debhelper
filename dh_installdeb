@@ -77,7 +77,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 
 	if (! -d "$tmp/DEBIAN") {
-		doit("install","-o",0,"-g",0,"-d","$tmp/DEBIAN");
+		install_dir("$tmp/DEBIAN");
 	}
 
 	if (is_udeb($package)) {
@@ -86,8 +86,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		foreach my $script (qw{postinst menutest isinstallable}) {
 			my $f=pkgfile($package,$script);
 			if ($f) {
-				doit("install", "-o", 0, "-g", 0, "-m", 755, 
-				     $f, "$tmp/DEBIAN/$script");
+				install_prog($f, "$tmp/DEBIAN/$script");
 			}
 		}
 
@@ -121,7 +120,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	foreach my $file (qw{shlibs conffiles triggers}) {
 		my $f=pkgfile($package,$file);
 		if ($f) {
-			doit("install","-o",0,"-g",0,"-m",644,"-p",$f,"$tmp/DEBIAN/$file");
+			install_file($f, "$tmp/DEBIAN/$file");
 		}
 	}
 

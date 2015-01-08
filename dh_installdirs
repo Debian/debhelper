@@ -55,7 +55,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $file=pkgfile($package,"dirs");
 
 	if (! -e $tmp) {
-		doit("install","-d",$tmp);
+		install_dir($tmp);
 	}
 
 	my @dirs;
@@ -81,7 +81,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			  } @dirs;
 
 		# Create dirs.
-		doit("install","-d",@dirs);
+		install_dir(@dirs);
 	}
 }
 

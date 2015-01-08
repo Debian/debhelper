@@ -83,11 +83,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$fulldest =~ s|//|/|g; # beautification
 	
 			if (! -d dirname($fulldest)) {
-				doit("install","-d","-m755",$tmpdir."/".dirname($dest));
+				install_dir($tmpdir."/".dirname($dest));
 			}
 
-			doit("install","-p","-m644",$source,$fulldest);
-	
+			install_file($source,$fulldest);
+
 			push(@sgmlinstalled,$dest);
 		}
 	}
@@ -95,7 +95,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		addsubstvar($package, "misc:Depends", "sgml-base", ">= $sgmlbasever");
 
 		if (! -d "$tmpdir/etc/sgml") {
-			doit("install","-d","-m755","$tmpdir/etc/sgml");
+			install_dir("$tmpdir/etc/sgml");
 		}
 
 		my $centralcat = "/etc/sgml/$package.cat";

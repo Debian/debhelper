@@ -192,10 +192,10 @@ foreach my $package (getpackages()) {
 				$dest=dirname("/".$dest);
 				$tmpdest=1;
 			}
-			
+
 			# Make sure the destination directory exists.
 			if (! -e "$tmp/$dest") {
-				doit("install","-d","$tmp/$dest");
+				install_dir("$tmp/$dest");
 			}
 			
 			if (-d $src && $exclude) {

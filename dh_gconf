@@ -71,7 +71,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $defaults = pkgfile($package,"gconf-defaults");
 	if ($defaults ne '') {
 		doit("mkdir","-p","$tmp/usr/share/gconf/defaults");
-		doit("install","-p","-m644",$defaults,"$tmp/usr/share/gconf/defaults/${priority}_$package");
+		install_file($defaults, "$tmp/usr/share/gconf/defaults/${priority}_$package");
 	}
 
 	my $old_schemas_dir = "$tmp/etc/gconf/schemas";

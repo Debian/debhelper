@@ -43,9 +43,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	if ($file) {
 		if (! -d "$tmp/etc/logrotate.d") {
-			doit("install","-o",0,"-g",0,"-d","$tmp/etc/logrotate.d");
+			install_dir("$tmp/etc/logrotate.d");
 		}
-		doit("install","-m",644,$file,"$tmp/etc/logrotate.d/".pkgfilename($package));
+		install_file($file,"$tmp/etc/logrotate.d/".pkgfilename($package));
 	}
 }
 

@@ -49,12 +49,12 @@ init();
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $pam=pkgfile($package,"pam");
-	
+
 	if ($pam ne '') {
 		if (! -d "$tmp/etc/pam.d") {
-			doit("install","-d","$tmp/etc/pam.d");
+			install_dir("$tmp/etc/pam.d");
 		}
-		doit("install","-p","-m644",$pam,"$tmp/etc/pam.d/".pkgfilename($package));
+		install_file($pam,"$tmp/etc/pam.d/".pkgfilename($package));
 	}
 }
 

@@ -1005,7 +1005,7 @@ sub make_symlink{
 	# Make sure the directory the link will be in exists.
 	my $basedir=dirname("$tmp/$dest");
 	if (! -e $basedir) {
-		doit("install","-d",$basedir);
+		install_dir($basedir);
 	}
 
 	# Policy says that if the link is all within one toplevel

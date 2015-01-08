@@ -197,32 +197,29 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	if (! -d "$tmp/usr/share/doc/$package") {
-		doit("install","-d","$tmp/usr/share/doc/$package");
+		install_dir("$tmp/usr/share/doc/$package");
 	}
 
 	if (! $dh{NO_ACT}) {
 		if (! install_binNMU_changelog($package, $changelog, $changelog_name)) {
-			doit("install","-o",0,"-g",0,"-p","-m644",$changelog,
-				"$tmp/usr/share/doc/$package/$changelog_name");
+			install_file($changelog,
+						 "$tmp/usr/share/doc/$package/$changelog_name");
 		}
 	}
 
 	if (-e $news) {
-		doit("install","-o",0,"-g",0,"-p","-m644",$news,
-			"$tmp/usr/share/doc/$package/$news_name");
+		install_file($news, "$tmp/usr/share/doc/$package/$news_name");
 	}
 
 	if (defined $upstream) {
 		my $link_to;
 		my $base="$tmp/usr/share/doc/$package";
 		if (defined $upstream_text) {
-			doit("install","-o",0,"-g",0,"-p","-m644",
-				$upstream_text,"$base/changelog");
+			install_file($upstream_text, "$base/changelog");
 			$link_to='changelog';
 		}
 		if (defined $upstream_html) {
-			doit("install","-o",0,"-g",0,"-p","-m644",
-				$upstream_html,"$base/changelog.html");
+			install_file($upstream_html,"$base/changelog.html");
 			$link_to='changelog.html';
 			if (! defined $upstream_text) {
 				complex_doit("echo 'See changelog.html.gz' > $base/changelog");

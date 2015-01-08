@@ -226,9 +226,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $default=pkgfile($package,'default');
 	if ($default ne '' && ! $dh{ONLYSCRIPTS}) {
 		if (! -d "$tmp/etc/default") {
-			doit("install","-d","$tmp/etc/default");
+			install_dir("$tmp/etc/default");
 		}
-		doit("install","-p","-m644",$default,"$tmp/etc/default/$script");
+		install_file($default, "$tmp/etc/default/$script");
 	}
 
 	my $init=pkgfile($package,$scriptsrc) || pkgfile($package,"init") ||
@@ -236,10 +236,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	if ($init ne '' && ! $dh{ONLYSCRIPTS}) {
 		if (! -d "$tmp/etc/init.d") {
-			doit("install","-d","$tmp/etc/init.d");
+			install_dir("$tmp/etc/init.d");
 		}
 		
-		doit("install","-p","-m755",$init,"$tmp/etc/init.d/$script");
+		install_prog($init,"$tmp/etc/init.d/$script");
 	}
 
 	if ($dh{INIT_SCRIPT} && $job ne '' && $init ne '') {

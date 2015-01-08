@@ -90,16 +90,16 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $modprobe_file=pkgfile($package,"modprobe");
 
 	if (! -e $tmp) {
-		doit("install","-d",$tmp);
+		install_dir($tmp);
 	}
 
 	if ($modprobe_file) {
 		if (! -e "$tmp/etc/modprobe.d") {
-			doit("install","-d","$tmp/etc/modprobe.d");
+			install_dir("$tmp/etc/modprobe.d");
 		}
 		my $old="/etc/modprobe.d/".pkgfilename($package);
 		my $new=$old.".conf";
-		doit("install","-m","0644",$modprobe_file,"$tmp/$new");
+		install_file($modprobe_file, "$tmp/$new");
 		autoscript($package,"preinst","preinst-moveconffile","s!#OLD#!$old!g;s!#PACKAGE#!$package!g");
 		autoscript($package,"postinst","postinst-moveconffile","s!#OLD#!$old!g;s!#NEW#!$new!g");
 	}
