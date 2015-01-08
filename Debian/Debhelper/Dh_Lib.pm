@@ -22,6 +22,7 @@ use vars qw(@ISA @EXPORT %dh);
 	    &is_make_jobserver_unavailable &clean_jobserver_makeflags
 	    &cross_command &set_buildflags &get_buildoption
 	    &install_dh_config_file
+	    &install_file &install_prog &install_lib &install_dir
 );
 
 my $max_compat=10;
@@ -273,6 +274,25 @@ sub _error_exitcode {
 	else {
 		error("$command returned exit code ".($? >> 8));
 	}
+}
+
+# Some shortcut functions for installing files and dirs to always
+# have the same owner and mode
+# install_file - installs a non-executable
+# install_prog - installs an executable
+# install_lib  - installs a shared library (some systems may need x-bit, others don't)
+# install_dir  - installs a directory
+sub install_file {
+	doit('install', '-p', '-m0644', @_);
+}
+sub install_prog {
+	doit('install', '-p', '-m0755', @_);
+}
+sub install_lib {
+	doit('install', '-p', '-m0644', @_);
+}
+sub install_dir {
+	doit('install', '-d', @_);
 }
 
 # Run a command that may have a huge number of arguments, like xargs does.
