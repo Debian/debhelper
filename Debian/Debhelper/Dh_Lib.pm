@@ -975,13 +975,13 @@ sub debhelper_script_subst {
 			complex_doit("sed s/#DEBHELPER#// < $file > $tmp/DEBIAN/$script");
 		}
 		doit("chown","0:0","$tmp/DEBIAN/$script");
-		doit("chmod",755,"$tmp/DEBIAN/$script");
+		doit("chmod","0755","$tmp/DEBIAN/$script");
 	}
 	elsif ( -f "debian/$ext$script.debhelper" ) {
 		complex_doit("printf '#!/bin/sh\nset -e\n' > $tmp/DEBIAN/$script");
 		complex_doit("cat debian/$ext$script.debhelper >> $tmp/DEBIAN/$script");
 		doit("chown","0:0","$tmp/DEBIAN/$script");
-		doit("chmod",755,"$tmp/DEBIAN/$script");
+		doit("chmod","0755","$tmp/DEBIAN/$script");
 	}
 }
 
