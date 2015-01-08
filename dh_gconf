@@ -65,8 +65,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	
 	my $mandatory = pkgfile($package, "gconf-mandatory");
 	if ($mandatory ne '') {
-		doit("mkdir","-p","$tmp/usr/share/gconf/mandatory");
-		doit("install","-p","-m644",$mandatory,"$tmp/usr/share/gconf/mandatory/${priority}_$package");
+		install_dir("$tmp/usr/share/gconf/mandatory");
+		install_file($mandatory,
+					 "$tmp/usr/share/gconf/mandatory/${priority}_$package");
 	}
 	my $defaults = pkgfile($package,"gconf-defaults");
 	if ($defaults ne '') {

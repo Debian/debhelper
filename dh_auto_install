@@ -83,7 +83,7 @@ $destdir = File::Spec->rel2abs($destdir, cwd());
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	if (! -e $tmp) {
-		doit("install","-d",$tmp);
+		install_dir($tmp);
 	}
 }
 

@@ -197,30 +197,30 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $service=pkgfile($package,"service");
 	if ($service ne '' && ! $dh{ONLYSCRIPTS}) {
 		my $path="$tmp/lib/systemd/system";
-		if (! -d "$path") {
-			doit("install","-d","$path");
+		if (! -d $path) {
+			install_dir($path);
 		}
 
-		doit("install","-p","-m644",$service,"$path/$script.service");
+		install_file($service, "$path/$script.service");
 	}
 
 	my $tmpfile=pkgfile($package,"tmpfile");
 	if ($tmpfile ne '' && ! $dh{ONLYSCRIPTS}) {
 		my $path="$tmp/usr/lib/tmpfiles.d";
-		if (! -d "$path") {
-			doit("install","-d","$path");
+		if (! -d $path) {
+			install_dir($path);
 		}
 
-		doit("install","-p","-m644",$tmpfile,"$path/$script.conf");
+		install_file($tmpfile, "$path/$script.conf");
 	}
 
 	my $job=pkgfile($package,"upstart");
 	if ($job ne '' && ! $dh{ONLYSCRIPTS}) {
 		if (! -d "$tmp/etc/init") {
-			doit("install","-d","$tmp/etc/init");
+			install_dir("$tmp/etc/init");
 		}
 		
-		doit("install","-p","-m644",$job,"$tmp/etc/init/$jobfile.conf");
+		install_file($job, "$tmp/etc/init/$jobfile.conf");
 	}
 
 	my $default=pkgfile($package,'default');

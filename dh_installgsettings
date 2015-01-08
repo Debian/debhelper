@@ -68,8 +68,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	my $override = pkgfile($package,"gsettings-override");
 	if ($override ne '') {
-		doit("mkdir","-p",$gsettings_schemas_dir);
-		doit("install","-p","-m644",$override,"$gsettings_schemas_dir/${priority}_$package.gschema.override");
+		install_dir($gsettings_schemas_dir);
+		install_file($override,
+					 "$gsettings_schemas_dir/${priority}_$package.gschema.override");
 	}
 
 	if (-d "$gsettings_schemas_dir") {

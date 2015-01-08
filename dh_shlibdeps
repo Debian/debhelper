@@ -105,7 +105,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	# dpkg-shlibdeps expects this directory to exist
 	if (! -d "$tmp/DEBIAN") {
-		doit("install","-o",0,"-g",0,"-d","$tmp/DEBIAN");
+		install_dir("$tmp/DEBIAN");
 	}
 
 	my @filelist;
