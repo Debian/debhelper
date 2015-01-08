@@ -283,6 +283,21 @@ install_dh_config_file($src, $dest[, $mode])
 	compat is 9 (or later) and $src is executable, $src will be
 	executed instead and its output will be used to generate the
 	$dest file.
+install_dir($dir)
+	Create the directory denoted by the path $dir and all parent
+	entries as well (as needed).
+install_file($src, $dest)
+	Installs $src into $dest with mode 0644.  The parent dir of
+	$dest must exist (can be created with install_dir).
+	This is intended for installing regular non-executable files.
+install_prog($src, $dest)
+	Installs $src into $dest with mode 0755.  The parent dir of
+	$dest must exist (can be created with install_dir).
+	This is intended for installing scripts or binaries.
+install_lib($src, $dest)
+	Installs a library at the path $src into $dest.  The parent
+	dir of $dest must exist (can be created with install_dir).
+	This is intended for installing libraries.
 
 Sequence Addons:
 ---------------
