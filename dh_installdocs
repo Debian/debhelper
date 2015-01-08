@@ -186,13 +186,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (! -d "$tmp/usr/share/doc/$package" &&
 		    ! -l "$tmp/usr/share/doc/$package") {
 			doit("ln", "-sf", $dh{LINK_DOC}, "$tmp/usr/share/doc/$package");
-			# Call isnative because it sets $dh{VERSION}
-			# as a side effect.
-			isnative($dh{LINK_DOC});
 			# Policy says that if you make your documentation
 			# directory a symlink, then you have to depend on
 			# the target.
-			addsubstvar($package, "misc:Depends", "$dh{LINK_DOC} (= $dh{VERSION})");
+			addsubstvar($package, 'misc:Depends', "$dh{LINK_DOC} (= \${binary:Version})");
 		}
 	}
 	else {
