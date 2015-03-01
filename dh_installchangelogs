@@ -142,14 +142,16 @@ if (! defined $upstream) {
 	if (! isnative($dh{MAINPACKAGE}) && !compat(6)) {
 		foreach my $dir (qw{. doc docs}) {
 			my @files=sort glob("$dir/*");
-			foreach my $name (qw{changelog changes changelog.txt changes.txt history history.txt changelog.md changes.md}) {
-				my @matches=grep {
-					lc basename($_) eq $name && -s $_ && ! excludefile($_)
-				} @files;
-				if (@matches) {
-					$upstream=shift @matches;
-					$upstream_text=$upstream;
-					last;
+			foreach my $suffix ('', qw(.txt .md)) {
+				foreach my $name (qw{changelog changes history}) {
+					my @matches=grep {
+						lc basename($_) eq "$name$suffix" && -s $_ && ! excludefile($_)
+					} @files;
+					if (@matches) {
+						$upstream=shift @matches;
+						$upstream_text=$upstream;
+						last;
+					}
 				}
 			}
 		}
