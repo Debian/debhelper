@@ -660,6 +660,12 @@ F<preinst>, F<postrm>, F<prerm>, and F<config> scripts, etc.
 
 =head1 ENVIRONMENT
 
+The following environment variables can influence the behavior of debhelper.
+It is important to note that these must be actual environment variables in
+order to function properly (not simply F<Makefile> variables). To specify
+them properly in F<debian/rules>, be sure to "B<export>" them. For example,
+"B<export DH_VERBOSE>".
+
 =over 4
 
 =item B<DH_VERBOSE>
