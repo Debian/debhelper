@@ -153,19 +153,21 @@ sub testfile {
 }
 
 sub make_debug {
-	my $file=shift;
-	my $tmp=shift;
-	my $desttmp=shift;
-	
+	my ($file, $tmp, $desttmp, $use_build_id) = @_;
+
 	# Don't try to copy debug symbols out if the file is already
 	# stripped.
 	return unless get_file_type($file) =~ /not stripped/;
 
 	my ($base_file)=$file=~/^\Q$tmp\E(.*)/;
 	my $debug_path;
-	if (! compat(8) && 
+	if ($use_build_id &&
 	    `LC_ALL=C readelf -n $file`=~ /^\s+Build ID: ([0-9a-f]{2})([0-9a-f]+)$/m) {
 		$debug_path=$desttmp."/usr/lib/debug/.build-id/$1/$2.debug"
+	}
+	elsif ($use_build_id > 1) {
+		# For ddebs, we need build-id (else it will not be co-installable).
+		return;
 	}
 	else {
 		$debug_path=$desttmp."/usr/lib/debug/".$base_file;
@@ -196,7 +198,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	# Support for keeping the debugging symbols in a detached file.
 	my $keep_debug=$dh{K_FLAG};
-	my $debugtmp=$tmp;
+	my $debugtmp;
+	my $use_build_id = compat(8) ? 0 : 1;
 	if (! compat(4)) {
 		if (ref $dh{DEBUGPACKAGES}) {
 			$keep_debug=1;
@@ -215,12 +218,18 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$debugtmp=tmpdir($package."-dbg");
 		}
 	}
-	
+	if ($ENV{'DH_BUILD_DDEBS'} and package_arch($package) ne 'all') {
+		$debugtmp = "debian/.debhelper/${package}/ddeb-root";
+		$keep_debug = 1;
+		$use_build_id = 2;
+	} else {
+		$debugtmp = $tmp;
+	}
 	@shared_libs=@executables=@static_libs=();
 	find(\&testfile,$tmp);
 
 	foreach (@shared_libs) {
-		my $debug_path = make_debug($_, $tmp, $debugtmp) if $keep_debug;
+		my $debug_path = make_debug($_, $tmp, $debugtmp, $use_build_id) if $keep_debug;
 		# Note that all calls to strip on shared libs
 		# *must* include the --strip-unneeded.
 		doit($strip,"--remove-section=.comment",
@@ -229,7 +238,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 	
 	foreach (@executables) {
-		my $debug_path = make_debug($_, $tmp, $debugtmp) if $keep_debug;
+		my $debug_path = make_debug($_, $tmp, $debugtmp, $use_build_id) if $keep_debug;
 		doit($strip,"--remove-section=.comment",
 			"--remove-section=.note",$_);
  		attach_debug($_, $debug_path) if defined $debug_path;
