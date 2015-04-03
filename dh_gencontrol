@@ -44,9 +44,13 @@ init(options => {
 	"dpkg-gencontrol-params=s", => \$dh{U_PARAMS},
 });
 
+
+my $src_pkg;
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $ext=pkgext($package);
+	my $ddeb_tmp = "debian/.debhelper/${package}/ddeb-root";
 
 	my $substvars="debian/${ext}substvars";
 	
@@ -68,8 +72,35 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		complex_doit("echo misc:Pre-Depends= >> $substvars");
 	}
 	
+
+	if ( -d $ddeb_tmp) {
+		my $arch = package_arch($package);
+		my $ddeb_filename = ddeb_filename($package);
+		$src_pkg = sourcepackage() if not defined($src_pkg);
+		# Remove and override more or less every standard field.
+		my @ddeb_options = (qw(
+			-UPre-Depends -URecommends -USuggests -UEnhances -UProvides -UEssential
+			-UReplaces -UBreaks -UConflicts
+			-DPriority=extra
+			),
+			 "-DPackage=${package}-dbgsym",
+			 "-DDepends=${package}:${arch} (= \${binary:Version})",
+			 "-DDescription=Debug symbols for ${package}",
+			 "-DSource=${src_pkg}",
+			 "-n${ddeb_filename}",
+		);
+		if ( ! -d "${ddeb_tmp}/DEBIAN" ) {
+			install_dir("${ddeb_tmp}/DEBIAN");
+                }
+		doit("dpkg-gencontrol", "-p${package}", "-l$changelog", "-T$substvars",
+			"-P${ddeb_tmp}",@{$dh{U_PARAMS}}, @ddeb_options);
+
+		doit("chmod","0644","${ddeb_tmp}/DEBIAN/control");
+		doit("chown","0:0","${ddeb_tmp}/DEBIAN/control");
+	}
+
 	# Generate and install control file.
-	doit("dpkg-gencontrol", "-p$package", "-l$changelog", "-T$substvars", 
+	doit("dpkg-gencontrol", "-p$package", "-l$changelog", "-T$substvars",
 		"-P$tmp",@{$dh{U_PARAMS}});
 
 	# This chmod is only necessary if the user sets the umask to

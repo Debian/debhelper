@@ -21,7 +21,7 @@ use vars qw(@ISA @EXPORT %dh);
 	    &dpkg_architecture_value &sourcepackage &make_symlink
 	    &is_make_jobserver_unavailable &clean_jobserver_makeflags
 	    &cross_command &set_buildflags &get_buildoption
-	    &install_dh_config_file
+	    &install_dh_config_file &ddeb_filename
 	    &install_file &install_prog &install_lib &install_dir
 );
 
@@ -944,15 +944,29 @@ sub is_udeb {
 	return $package_types{$package} eq 'udeb';
 }
 
-# Generates the filename that is used for a udeb package.
-sub udeb_filename {
-	my $package=shift;
-	
+sub _xdeb_filename {
+	my ($package, $ext, $actual_name) = @_;
+
 	my $filearch=package_arch($package);
 	isnative($package); # side effect
 	my $version=$dh{VERSION};
 	$version=~s/^[0-9]+://; # strip any epoch
-	return "${package}_${version}_$filearch.udeb";
+	$actual_name = $package if not defined($actual_name);
+	return "${actual_name}_${version}_${filearch}.${ext}";
+}
+
+# Generates the filename that is used for a udeb package.
+sub udeb_filename {
+	my ($package) = @_;
+
+	return _xdeb_filename($package, 'udeb');
+}
+
+# Generates the filename that is used for a ddeb package.
+sub ddeb_filename {
+	my ($package) = @_;
+
+	return _xdeb_filename($package, 'ddeb', "${package}-dbgsym");
 }
 
 # Handles #DEBHELPER# substitution in a script; also can generate a new

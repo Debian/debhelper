@@ -50,7 +50,8 @@ init(options => {
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if is_udeb($package);
-	
+
+	my $ddeb_tmp = "debian/.debhelper/${package}/ddeb-root";
 	my $tmp=tmpdir($package);
 
 	if (! -d "$tmp/DEBIAN") {
@@ -83,7 +84,19 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 	else {
 		doit("chmod", "0644", "$tmp/DEBIAN/md5sums");
-		doit("chown","0:0","$tmp/DEBIAN/md5sums");
+		doit("chown", "0:0", "$tmp/DEBIAN/md5sums");
+	}
+	if ( -d $ddeb_tmp) {
+		$find = "find . -type f ! -regex './DEBIAN/.*' -printf '%P\\0'";
+		complex_doit("(cd $ddeb_tmp >/dev/null ; $find | LC_ALL=C sort -z | xargs -r0 md5sum > DEBIAN/md5sums) >/dev/null");
+		# If the file's empty, no reason to waste inodes on it.
+		if (-z "${ddeb_tmp}/DEBIAN/md5sums") {
+			doit('rm', '-f', "${ddeb_tmp}/DEBIAN/md5sums");
+		}
+		else {
+			doit('chmod', '0644', "${ddeb_tmp}/DEBIAN/md5sums");
+			doit('chown', '0:0', "${ddeb_tmp}/DEBIAN/md5sums");
+		}
 	}
 }
 
