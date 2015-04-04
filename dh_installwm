@@ -102,6 +102,10 @@ WM:		foreach my $wm (@wm) {
 					}
 				}
 			}
+			if (! compat(9)) {
+				error("no manpage found (creating an x-window-manager alternative requires a slave symlink for the manpage)");
+			}
+			# Reaching this code means a broken package will be produced.
 			autoscript($package,"postinst","postinst-wm-noman","s:#WM#:$wm:;s/#PRIORITY#/$dh{PRIORITY}/",);
 		}
 	}
