@@ -80,6 +80,17 @@ sub reap {
 	}
 }
 
+sub default_compressor_args {
+	my ($default_comp, @args) = @_;
+
+	for my $arg (@args) {
+		# Explicit compressor arg given
+		return @args if $arg =~ m/^-Z/;
+	}
+
+	return (@{$default_comp}, @args);
+}
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $pid=fork();
 	if (! defined $pid) {
@@ -107,11 +118,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 	if ( -d $ddeb_tmpdir) {
 		my $ddeb_filename = '/' . ddeb_filename($package);
-		doit("dpkg-deb", "-z1", "-Zxz", "-Sextreme",
-			 @{$dh{U_PARAMS}}, "--build", $ddeb_tmpdir, $dh{DESTDIR}.$ddeb_filename);
+		# XXX: Should we blindly overrule the maintainer here?  It is
+		# not apparent that their explicit -z was intended for the
+		# ddeb.
+		my @args = default_compressor_args(["-z1", "-Zxz", "-Sextreme"],
+										   @{$dh{U_PARAMS}});
+		doit("dpkg-deb", @args,
+			 "--build", $ddeb_tmpdir, $dh{DESTDIR}.$ddeb_filename);
 	}
 	if (! is_udeb($package)) {
-
 		doit("dpkg-deb", @{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$dh{FILENAME});
 	}
 	else {
