@@ -218,7 +218,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$debugtmp=tmpdir($package."-dbg");
 		}
 	}
-	if ($ENV{'DH_BUILD_DDEBS'} and package_arch($package) ne 'all') {
+	if ($ENV{'DH_BUILD_DDEBS'} and not $keep_debug and package_arch($package) ne 'all') {
 		$debugtmp = "debian/.debhelper/${package}/ddeb-root";
 		$keep_debug = 1;
 		$use_build_id = 2;
