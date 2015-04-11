@@ -93,6 +93,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	# child
 	my $tmp=tmpdir($package);
+	my $ddeb_tmpdir = "debian/.debhelper/${package}/ddeb-root";
 	if (exists $ENV{DH_ALWAYS_EXCLUDE} && length $ENV{DH_ALWAYS_EXCLUDE}) {
 		if (! compat(5)) {
 			complex_doit("find $tmp $dh{EXCLUDE_FIND} | xargs rm -rf");
@@ -104,13 +105,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				foreach split(":", $ENV{DH_ALWAYS_EXCLUDE});
 		}
 	}
+	if ( -d $ddeb_tmpdir) {
+		my $ddeb_filename = '/' . ddeb_filename($package);
+		doit("dpkg-deb", "-z1", "-Zxz", "-Sextreme",
+			 @{$dh{U_PARAMS}}, "--build", $ddeb_tmpdir, $dh{DESTDIR}.$ddeb_filename);
+	}
 	if (! is_udeb($package)) {
-		my $ddeb_tmpdir = "debian/.debhelper/${package}/ddeb-root";
-		if ( -d $ddeb_tmpdir) {
-			my $ddeb_filename = '/' . ddeb_filename($package);
-			doit("dpkg-deb", "-z1", "-Zxz", "-Sextreme",
-				@{$dh{U_PARAMS}}, "--build", $ddeb_tmpdir, $dh{DESTDIR}.$ddeb_filename);
-		}
 
 		doit("dpkg-deb", @{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$dh{FILENAME});
 	}
