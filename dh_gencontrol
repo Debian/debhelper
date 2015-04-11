@@ -81,7 +81,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		my @ddeb_options = (qw(
 			-UPre-Depends -URecommends -USuggests -UEnhances -UProvides -UEssential
 			-UReplaces -UBreaks -UConflicts
-			-DPriority=extra
+			-DPriority=extra -DSection=debug -DMulti-Arch=same
 			),
 			 "-DPackage=${package}-dbgsym",
 			 "-DDepends=${package}:${arch} (= \${binary:Version})",
