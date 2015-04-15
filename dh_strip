@@ -198,7 +198,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	# Support for keeping the debugging symbols in a detached file.
 	my $keep_debug=$dh{K_FLAG};
-	my $debugtmp;
+	my $debugtmp=$tmp;
 	my $use_build_id = compat(8) ? 0 : 1;
 	if (! compat(4)) {
 		if (ref $dh{DEBUGPACKAGES}) {
@@ -222,8 +222,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		$debugtmp = "debian/.debhelper/${package}/ddeb-root";
 		$keep_debug = 1;
 		$use_build_id = 2;
-	} else {
-		$debugtmp = $tmp;
 	}
 	@shared_libs=@executables=@static_libs=();
 	find(\&testfile,$tmp);
