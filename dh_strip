@@ -236,7 +236,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	if (@static_libs) {
-		my $strip_help = qx{$strip};
+		my $strip_help = qx{$strip 2>&1};
 		my @opts = ('--strip-debug');
 		if (index($strip_help, '--enable-deterministic-archives') > -1) {
 			# NB: The short variant (-D) is broken in Jessie
