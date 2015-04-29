@@ -258,6 +258,25 @@ if ($dh{LIST_MISSING} || $dh{FAIL_MISSING}) {
 B<dh_install> cannot rename files or directories, it can only install them
 with the names they already have into wherever you want in the package
 build tree.
+
+However, renaming can be achieved by using B<dh-exec> with compat 9 or
+later.  An example debian/I<package>.install file using B<dh-exec>
+could look like:
+
+ #!/usr/bin/dh-exec
+ debian/default.conf => /etc/my-package/start.conf
+
+Please remember the following three things:
+
+=over 4
+
+=item * The package must be using compat 9 or later (see L<debhelper(7)>)
+
+=item * The package will need a build-dependency on dh-exec.
+
+=item * The install file must be marked executable.
+
+=back
   
 =head1 SEE ALSO
 
