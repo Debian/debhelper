@@ -21,11 +21,6 @@ libraries, and generates a shlibs file for the libraries it finds.
 It also adds a call to ldconfig in the F<postinst> and F<postrm> scripts (in
 v3 mode and above only) to any packages in which it finds shared libraries.
 
-Packages that support multiarch are detected, and
-a Pre-Dependency on multiarch-support is set in ${misc:Pre-Depends} ;
-you should make sure to put that token into an appropriate place in your
-debian/control file for packages supporting multiarch.
-
 =head1 FILES
 
 =over 4
@@ -136,7 +131,6 @@ init(options => {
 });
 
 my $objdump=cross_command("objdump");
-my $multiarch=dpkg_architecture_value("DEB_HOST_MULTIARCH");
 
 my $ok=1;
 
@@ -147,7 +141,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	my %seen;
 	my $need_ldconfig = 0;
-	my $is_multiarch = 0;
 	my $shlibs_file = pkgfile($package, 'shlibs');
 
 	doit("rm", "-f", "$tmp/DEBIAN/shlibs");
@@ -167,9 +160,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	while (<FIND>) {
 		my ($library, $major);
 		push @lib_files, $_;
-		if (defined $multiarch && $multiarch ne '' && m,/$multiarch/,) {
-			$is_multiarch=1;
-		}
 		my $ret=`$objdump -p $_`;
 		if ($ret=~m/\s+SONAME\s+(.+)\.so\.(.+)/) {
 			# proper soname format
@@ -280,9 +270,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (-s "$tmp/DEBIAN/symbols" == 0) {
 			doit("rm", "-f", "$tmp/DEBIAN/symbols");
 		}
-	}
-	if ($is_multiarch) {
-		addsubstvar($package, "misc:Pre-Depends", "multiarch-support");
 	}
 }
 
