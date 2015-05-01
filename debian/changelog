@@ -85,6 +85,11 @@ debhelper (9.20150101.1) UNRELEASED; urgency=medium
     it.  (Closes: #736896)
   * dh_install.1: Document that dh-exec can be used to do renaming
     and provide a trivial example of how to achieve it.  (Closes: #245554)
+  * dh_makeshlibs: Apply patch from Guillem Jover to stop adding
+    Pre-Depends on multiarch-support.  The transition is far enough that
+    we do not need it any longer.  (Closes: #783898)
+  * dh_gencontrol: Insert an empty misc:Pre-Depends to avoid warnings
+    in packages for using a (now often) non-existing substvars.
 
   [ Bernhard R. Link ]
   * Dh_lib: apply patch from Guillem Jover to support case-insensitive
