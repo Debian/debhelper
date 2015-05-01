@@ -63,6 +63,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (! -e $substvars || system("grep -q '^misc:Depends=' $substvars") != 0) {
 		complex_doit("echo misc:Depends= >> $substvars");
 	}
+	# avoid (another) gratuitous warning
+	if (! -e $substvars || system("grep -q '^misc:Pre-Depends=' $substvars") != 0) {
+		complex_doit("echo misc:Pre-Depends= >> $substvars");
+	}
 	
 	# Generate and install control file.
 	doit("dpkg-gencontrol", "-p$package", "-l$changelog", "-T$substvars", 
