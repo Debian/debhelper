@@ -77,7 +77,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if is_udeb($package);
 
 	my $tmp=tmpdir($package);
-	my $dir="$tmp/usr/share/bug/$package";
+	my $p_dir="${tmp}/usr/share/bug";
+	my $dir="${p_dir}/$package";
 	
 	# Gather information which bug files are available for the
 	# package in question
@@ -95,8 +96,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# If there is only a bug script to install, install it as
 	# usr/share/bug/$package (unless this path is a directory)
 	if (! -d $dir && scalar(keys(%bugfiles)) == 1 && exists $bugfiles{script}) {
-		install_dir($dir);
-		install_file($bugfiles{script}, $dir);
+		install_dir($p_dir);
+		install_prog($bugfiles{script}, $dir);
 	}
 	elsif (scalar(keys(%bugfiles)) > 0) {
 		if (-f $dir) {
@@ -109,7 +110,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			install_dir($dir);
 		}
 		while (my ($type, $srcfile) = each(%bugfiles)) {
-			install_file($srcfile, "$dir/$type");
+			if ($type eq 'script') {
+				install_prog($srcfile, "$dir/$type");
+			} else {
+				install_file($srcfile, "$dir/$type");
+			}
 		}
 	}
 	
