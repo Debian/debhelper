@@ -982,7 +982,7 @@ sub udeb_filename {
 sub ddeb_filename {
 	my ($package) = @_;
 
-	return _xdeb_filename($package, 'ddeb', "${package}-dbgsym");
+	return _xdeb_filename($package, 'deb', "${package}-dbgsym");
 }
 
 # Handles #DEBHELPER# substitution in a script; also can generate a new
