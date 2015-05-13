@@ -254,6 +254,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			doit($strip, @opts, $_);
 		}
 	}
+	if ($use_build_id > 1 and -d $debugtmp) {
+		my $ddeb_docdir = "${debugtmp}/usr/share/doc";
+		my $doc_symlink = "${ddeb_docdir}/${package}-dbgsym";
+		if ( not -l $doc_symlink and not -e $doc_symlink ) {
+			install_dir($ddeb_docdir) if not -d $ddeb_docdir;
+			doit('ln', '-s', $package, $doc_symlink);
+		}
+	}
 }
 
 =head1 SEE ALSO
