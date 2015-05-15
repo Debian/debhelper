@@ -21,7 +21,7 @@ use vars qw(@ISA @EXPORT %dh);
 	    &dpkg_architecture_value &sourcepackage &make_symlink
 	    &is_make_jobserver_unavailable &clean_jobserver_makeflags
 	    &cross_command &set_buildflags &get_buildoption
-	    &install_dh_config_file &ddeb_filename
+	    &install_dh_config_file &ddeb_filename &package_multiarch
 	    &install_file &install_prog &install_lib &install_dir
 );
 
@@ -838,22 +838,20 @@ sub sourcepackage {
 #
 # As a side effect, populates %package_arches and %package_types
 # with the types of all packages (not only those returned).
-my (%package_types, %package_arches);
+my (%package_types, %package_arches, %package_multiarches);
 sub getpackages {
 	my $type=shift;
 
 	%package_types=();
 	%package_arches=();
+	%package_multiarches=();
 	
 	$type="" if ! defined $type;
 
 	my $package="";
 	my $arch="";
-	my $package_type;
-	my @list=();
-	my %seen;
-	my @profiles=();
-	my $included_in_build_profile;
+	my ($package_type, $multiarch, @list, %seen, @profiles,
+		$included_in_build_profile);
 	if (exists $ENV{'DEB_BUILD_PROFILES'}) {
 		@profiles=split /\s+/, $ENV{'DEB_BUILD_PROFILES'};
 	}
@@ -880,6 +878,9 @@ sub getpackages {
 		if (/^(?:X[BC]*-)?Package-Type:\s*(.*)/i) {
 			$package_type=$1;
 		}
+		if (/^Multi-Arch: \s*(.*)\s*/i) {
+			$multiarch = $1;
+		}
 		# rely on libdpkg-perl providing the parsing functions because
 		# if we work on a package with a Build-Profiles field, then a
 		# high enough version of dpkg-dev is needed anyways
@@ -901,6 +902,7 @@ sub getpackages {
 			if ($package) {
 				$package_types{$package}=$package_type;
 				$package_arches{$package}=$arch;
+				$package_multiarches{$package} = $multiarch;
 			}
 
 			if ($package && $included_in_build_profile &&
@@ -931,6 +933,20 @@ sub package_arch {
 		return buildarch();
 	}
 	return $package_arches{$package} eq 'all' ? "all" : buildarch();
+}
+
+# Returns the multiarch value of a package.
+sub package_multiarch {
+	my $package=shift;
+
+	# Test the architecture field instead, as it is common for a
+	# package to not have a multi-arch value.
+	if (! exists $package_arches{$package}) {
+		warning "package $package is not in control info";
+		# The only sane default
+		return 'no';
+	}
+	return $package_multiarches{$package} // 'no';
 }
 
 # Return true if a given package is really a udeb.

@@ -76,12 +76,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if ( -d $ddeb_tmp) {
 		my $arch = package_arch($package);
 		my $ddeb_filename = ddeb_filename($package);
+		my $multiarch = package_multiarch($package);
 		$src_pkg = sourcepackage() if not defined($src_pkg);
+
 		# Remove and override more or less every standard field.
 		my @ddeb_options = (qw(
 			-UPre-Depends -URecommends -USuggests -UEnhances -UProvides -UEssential
 			-UReplaces -UBreaks -UConflicts
-			-DPriority=extra -DSection=debug -DMulti-Arch=same
+			-DPriority=extra -DSection=debug
 			),
 			 "-DPackage=${package}-dbgsym",
 			 "-DDepends=${package}:${arch} (= \${binary:Version})",
@@ -89,6 +91,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			 "-DSource=${src_pkg}",
 			 "-n${ddeb_filename}",
 		);
+		# Disable multi-arch unless the original package is an
+		# multi-arch: same package.  In all other cases, we do not
+		# need a multi-arch value.
+		if ($multiarch ne 'same') {
+			push(@ddeb_options, '-UMulti-Arch');
+		}
 		if ( ! -d "${ddeb_tmp}/DEBIAN" ) {
 			install_dir("${ddeb_tmp}/DEBIAN");
                 }
