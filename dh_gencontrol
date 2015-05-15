@@ -75,7 +75,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	
 
 	if ( -d $ddeb_tmp) {
-		my $arch = package_arch($package);
 		my $ddeb_filename = ddeb_filename($package);
 		my $multiarch = package_multiarch($package);
 		my $replaces = read_ddeb_migration($ddeb_info_dir);
@@ -87,7 +86,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			-UConflicts -DPriority=extra -DSection=debug
 			),
 			 "-DPackage=${package}-dbgsym",
-			 "-DDepends=${package}:${arch} (= \${binary:Version})",
+			 "-DDepends=${package} (= \${binary:Version})",
 			 "-DDescription=Debug symbols for ${package}",
 			 "-DSource=${src_pkg}",
 			 "-n${ddeb_filename}",
