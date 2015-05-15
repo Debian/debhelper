@@ -50,7 +50,8 @@ my $src_pkg;
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $ext=pkgext($package);
-	my $ddeb_tmp = "debian/.debhelper/${package}/ddeb-root";
+	my $ddeb_info_dir = "debian/.debhelper/${package}";
+	my $ddeb_tmp = "${ddeb_info_dir}/ddeb-root";
 
 	my $substvars="debian/${ext}substvars";
 	
@@ -77,13 +78,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		my $arch = package_arch($package);
 		my $ddeb_filename = ddeb_filename($package);
 		my $multiarch = package_multiarch($package);
+		my $replaces = read_ddeb_migration($ddeb_info_dir);
 		$src_pkg = sourcepackage() if not defined($src_pkg);
 
 		# Remove and override more or less every standard field.
 		my @ddeb_options = (qw(
 			-UPre-Depends -URecommends -USuggests -UEnhances -UProvides -UEssential
-			-UReplaces -UBreaks -UConflicts
-			-DPriority=extra -DSection=debug
+			-UConflicts -DPriority=extra -DSection=debug
 			),
 			 "-DPackage=${package}-dbgsym",
 			 "-DDepends=${package}:${arch} (= \${binary:Version})",
@@ -96,6 +97,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# need a multi-arch value.
 		if ($multiarch ne 'same') {
 			push(@ddeb_options, '-UMulti-Arch');
+		}
+		# If the ddeb is replacing an existing -dbg package, then
+		# declare the necessary Breaks + Replaces.  Otherwise, clear
+		# the fields.
+		if ($replaces) {
+			push(@ddeb_options, "-DReplaces=${replaces}",
+				 "-DBreaks=${replaces}");
+		} else {
+			push(@ddeb_options, '-UReplaces', '-UBreaks');
 		}
 		if ( ! -d "${ddeb_tmp}/DEBIAN" ) {
 			install_dir("${ddeb_tmp}/DEBIAN");
@@ -116,6 +126,19 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	doit("chmod","0644","$tmp/DEBIAN/control");
 	
 	doit("chown","0:0","$tmp/DEBIAN/control");
+}
+
+sub read_ddeb_migration {
+	my ($ddeb_info_dir) = @_;
+	my $ddeb_migration = "${ddeb_info_dir}/ddeb-migration";
+	my $result;
+	if (-f $ddeb_migration) {
+		open(my $fd, '<', $ddeb_migration)
+			or error("open $ddeb_migration failed: $!");
+		chomp($result = <$fd>);
+		close($fd);
+	}
+	return $result;
 }
 
 =head1 SEE ALSO

@@ -44,6 +44,13 @@ things to exclude.
 
 =item B<--dbg-package=>I<package>
 
+B<This option is a now special purpose option that you normally do not
+need>.  In most cases, there should be little reason to use this
+option for new source packages as debhelper generates automatic debug
+packages ("ddebs").  B<If you have a manual --dbg-package> that you
+want to migrate to the automatic ddeb, please see the
+B<--ddeb-migration> option.
+
 Causes B<dh_strip> to save debug symbols stripped from the packages it acts on
 as independent files in the package build directory of the specified debugging
 package.
@@ -66,6 +73,22 @@ is easier to use than this option, but this option is more flexible.
 This option will inhibit the creation of automatic "ddebs" for the
 affected packages.
 
+=item B<--ddeb-migration=>I<package-relation>
+
+This option is used to migrate from a manual "-dbg" package (created
+with B<--dbg-package>) to the automatic "ddebs".  The value of this
+option should describe a valid B<Replaces>- and B<Breaks>-relation,
+which will be added to the ddebs to avoid file conflicts with the (now
+obsolete) -dbg package.
+
+This option B<cannot> be used with B<--keep-debug> nor B<--dbg-package>.
+
+Examples:
+
+  dh_strip --ddeb-migration='libfoo-dbg (<< 2.1-3~)'
+
+  dh_strip --ddeb-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< 2.1-3~)'
+
 =back
 
 =head1 NOTES
@@ -83,9 +106,19 @@ Debian policy, version 3.0.1
 
 =cut
 
+my $migrate_ddeb;
+
 init(options => {
-	"keep-debug" => \$dh{K_FLAG},
+	"keep-debug"       => \$dh{K_FLAG},
+	'ddeb-migration=s' => \$migrate_ddeb,
 });
+
+if ($dh{K_FLAG} and $migrate_ddeb) {
+	error("--keep-debug and --ddeb-migration are mutually exclusive");
+}
+if ($dh{DEBUGPACKAGES} and $migrate_ddeb) {
+	error("--dbg-package and --ddeb-migration are mutually exclusive");
+}
 
 # This variable can be used to turn off stripping (see Policy).
 if (get_buildoption('nostrip')) {
@@ -273,6 +306,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if ( not -l $doc_symlink and not -e $doc_symlink ) {
 			install_dir($ddeb_docdir) if not -d $ddeb_docdir;
 			doit('ln', '-s', $package, $doc_symlink);
+		}
+		if ($migrate_ddeb) {
+			my $path = "debian/.debhelper/${package}/ddeb-migration";
+			open(my $fd, '>', $path) or error("open $path failed: $!");
+			print {$fd} "$migrate_ddeb\n";
+			close($fd) or error("close $path failed: $!");
 		}
 	}
 }
