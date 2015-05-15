@@ -71,6 +71,9 @@ If the B<DEB_BUILD_OPTIONS> environment variable contains B<nostrip>, nothing
 will be stripped, in accordance with Debian policy (section 10.1
 "Binaries").  This will also inhibit the creation of automatic "ddebs".
 
+The creation of automatic "ddebs" can also be prevented by adding
+B<noddebs> to the B<DEB_BUILD_OPTIONS> environment variable.
+
 =head1 CONFORMS TO
 
 Debian policy, version 3.0.1
@@ -86,8 +89,10 @@ if (get_buildoption('nostrip')) {
 	exit;
 }
 
+my $enable_ddebs = 1;
 my $objcopy = cross_command("objcopy");
 my $strip = cross_command("strip");
+$enable_ddebs = 0 if get_buildoption('noddebs');
 
 # I could just use `file $_[0]`, but this is safer
 sub get_file_type {
@@ -220,7 +225,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$debugtmp=tmpdir($package."-dbg");
 		}
 	}
-	if ($ENV{'DH_BUILD_DDEBS'} and not $keep_debug and package_arch($package) ne 'all') {
+	if ($ENV{'DH_BUILD_DDEBS'} and $enable_ddebs and not $keep_debug and package_arch($package) ne 'all') {
 		# Avoid creating a ddeb that would clash with a registered package
 		if (!$all_packages{"${package}-dbgsym"}) {
 			$debugtmp = "debian/.debhelper/${package}/ddeb-root";
