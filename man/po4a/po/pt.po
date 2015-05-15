@@ -2,13 +2,13 @@
 # Copyright (C) 2014 The debhelper's copyright holder.
 # This file is distributed under the same license as the debhelper package.
 #
-# Américo Monteiro <a_monteiro@gmx.com>, 2014.
+# Américo Monteiro <a_monteiro@gmx.com>, 2014, 2015.
 msgid ""
 msgstr ""
 "Project-Id-Version: debhelper 9.20140817\n"
 "Report-Msgid-Bugs-To: debhelper@packages.debian.org\n"
 "POT-Creation-Date: 2015-05-01 05:12+0000\n"
-"PO-Revision-Date: 2014-08-18 22:47+0100\n"
+"PO-Revision-Date: 2015-05-06 23:25+0100\n"
 "Last-Translator: Américo Monteiro <a_monteiro@gmx.com>\n"
 "Language-Team: Portuguese <traduz@debianpt.org>\n"
 "Language: pt\n"
@@ -1250,6 +1250,9 @@ msgid ""
 "between packages of architecture \"all\" and non-\"all\" as it breaks "
 "binNMUs."
 msgstr ""
+"O B<dh_installdocs> irá dar erro se detectar links criados com --link-doc "
+"entre pacotes de arquitectura \"all\" e não-\"all\" porque isso faz quebrar "
+"binNMUs."
 
 #. type: textblock
 #: debhelper.pod:550
@@ -1271,19 +1274,19 @@ msgid ""
 "its generated maintainer scripts snippets.  The new call will only update "
 "the ld cache (instead of also updating symlinks)."
 msgstr ""
+"O B<dh_makeshlibs> agora invoca I<ldconfig -X> em vez de apenas fazer "
+"I<ldconfig> nos fragmentos de script de mantenedor gerados. A nova chamada "
+"irá apenas actualizar a cache ld (em vez de também actualizar os symlinks)."
 
 #. type: textblock
 #: debhelper.pod:564
-#, fuzzy
-#| msgid ""
-#| "B<dh_installinit> will no longer install a file named debian/I<package> "
-#| "as an init script."
 msgid ""
 "B<dh_installdeb> no longer installs a maintainer-provided debian/I<package>."
 "shlibs file.  This is now done by B<dh_makeshlibs> instead."
 msgstr ""
-"B<dh_installinit> não irá mais instalar um ficheiro chamado debian/I<pacote> "
-"como um script de iniciação (init)."
+"O B<dh_installdeb> já não instala um ficheiro debian/I<pacote>.shlibs "
+"disponibilizado pelo mantenedor. Em vez disso, isto agora é feito pelo "
+"B<dh_makeshlibs>."
 
 #. type: textblock
 #: debhelper.pod:570
@@ -1291,6 +1294,9 @@ msgid ""
 "B<dh_installwm> refuses to create a broken package if no man page can be "
 "found (required to register for the x-window-manager alternative)."
 msgstr ""
+"O B<dh_installwm> recusa-se a criar um pacote quebrado se não encontrar "
+"nenhuma página de manual (necessário para registo para a alternativa do x-"
+"window-manager)."
 
 #. type: =head1
 #: debhelper.pod:577 dh_auto_test:45 dh_installcatalogs:59 dh_installdocs:131
@@ -1557,6 +1563,12 @@ msgid ""
 "To specify them properly in F<debian/rules>, be sure to \"B<export>\" them. "
 "For example, \"B<export DH_VERBOSE>\"."
 msgstr ""
+"As seguintes variáveis de ambiente podem influenciar o comportamento do "
+"debhelper. É importante notar que estas que estas têm de ser mesmo variáveis "
+"de ambiente de modo a funcionarem correctamente (e não simplesmente "
+"variáveis do F<Makefile>). Para as especificar correctamente em F<debian/"
+"rules>, assegure-se de lhes fazer \"B<export>\". Por exemplo, \"B<export "
+"DH_VERBOSE>\""
 
 #. type: =item
 #: debhelper.pod:682
@@ -1575,10 +1587,8 @@ msgstr ""
 
 #. type: =item
 #: debhelper.pod:687
-#, fuzzy
-#| msgid "B<DH_COMPAT>"
 msgid "B<DH_QUIET>"
-msgstr "B<DH_COMPAT>"
+msgstr "B<DH_QUIET>"
 
 #. type: textblock
 #: debhelper.pod:689
@@ -1589,6 +1599,13 @@ msgid ""
 "This makes it easier to spot important messages but makes the output quite "
 "useless as buildd log.  Ignored if DH_VERBOSE is also set."
 msgstr ""
+"Definir para B<1> para activar o modo silencioso. O Debhelper não irá "
+"escrever os comandos a chamar o sistema de compilação do autor nem o dh irá "
+"escrever quais sub-comandos são chamados e dependendo do sistema de "
+"compilação do autor, poderá também tornar isso mais silencioso. Isto "
+"facilita a identificação de mensagens importantes mas torna os resultados "
+"inúteis como relatório do buildd. É ignorado se DH_VERBOSE for também "
+"definido."
 
 #. type: =item
 #: debhelper.pod:696
@@ -1713,10 +1730,8 @@ msgstr "Um conjunto de ficheiros F<debian/rules> exemplo que usam debhelper."
 
 #. type: =item
 #: debhelper.pod:739
-#, fuzzy
-#| msgid "L<http://kitenet.net/~joey/code/debhelper/>"
 msgid "L<http://joeyh.name/code/debhelper/>"
-msgstr "L<http://kitenet.net/~joey/code/debhelper/>"
+msgstr "L<http://joeyh.name/code/debhelper/>"
 
 #. type: textblock
 #: debhelper.pod:741
@@ -3805,22 +3820,14 @@ msgstr "LIMITAÇÕES"
 
 #. type: textblock
 #: dh_install:258
-#, fuzzy
-#| msgid ""
-#| "B<dh_install> cannot rename files or directories, it can only install "
-#| "them\n"
-#| "with the names they already have into wherever you want in the package\n"
-#| "build tree.\n"
-#| "  \n"
 msgid ""
 "B<dh_install> cannot rename files or directories, it can only install them "
 "with the names they already have into wherever you want in the package build "
 "tree."
 msgstr ""
-"B<dh_install> não pode renomear ficheiros ou directórios, pode apenas\n"
-"instalá-los com os nomes que já têm para onde você os deseja na árvore\n"
-"de compilação do pacote.\n"
-"  \n"
+"B<dh_install> não pode renomear ficheiros ou directórios, pode apenas "
+"instalá-los com os nomes que já têm para onde você os deseja na árvore de "
+"compilação do pacote."
 
 #. type: textblock
 #: dh_install:262
@@ -3829,6 +3836,9 @@ msgid ""
 "level 9 or later.  An example debian/I<package>.install file using B<dh-"
 "exec> could look like:"
 msgstr ""
+"No entanto, o renomear pode ser conseguido ao usar o B<dh-exec> com "
+"compatibilidade 9 ou posterior. Um ficheiro exemplo debian/I<pacote>.install "
+"que usa o B<dh-exec> poderá ser parecer com:"
 
 #. type: verbatim
 #: dh_install:266
@@ -3838,11 +3848,14 @@ msgid ""
 " debian/default.conf => /etc/my-package/start.conf\n"
 "\n"
 msgstr ""
+" #!/usr/bin/dh-exec\n"
+" debian/default.conf => /etc/my-package/start.conf\n"
+"\n"
 
 #. type: textblock
 #: dh_install:269
 msgid "Please remember the following three things:"
-msgstr ""
+msgstr "Por favor lembre-se das três coisas seguintes:"
 
 #. type: =item
 #: dh_install:273
@@ -3850,16 +3863,18 @@ msgid ""
 "* The package must be using compatibility level 9 or later (see "
 "L<debhelper(7)>)"
 msgstr ""
+"* O pacote tem se usar nível de compatibilidade 9 ou superior veja "
+"L<debhelper(7)>)"
 
 #. type: =item
 #: dh_install:275
 msgid "* The package will need a build-dependency on dh-exec."
-msgstr ""
+msgstr "* O pacote irá precisar de uma dependência de compilação em dh-exec."
 
 #. type: =item
 #: dh_install:277
 msgid "* The install file must be marked as executable."
-msgstr ""
+msgstr "* O ficheiro install tem de ser marcado como executável."
 
 #. type: textblock
 #: dh_installcatalogs:5
@@ -4259,6 +4274,8 @@ msgid ""
 "Note that I<package>.shlibs is only installed in compat level 9 and "
 "earlier.  In compat 10, please use L<dh_makeshlibs(1)>."
 msgstr ""
+"Note que o I<pacote>.shlibs é apenas instalado em nível de compatibilidade 9 "
+"e anteriores. Em compatibilidade 10, use L<dh_makeshlibs(1)>."
 
 #. type: =item
 #: dh_installdeb:48
@@ -4701,6 +4718,11 @@ msgid ""
 "symlink\" (or \"symlink to dir\") migration.  Since debhelper has no "
 "knowledge of previous versions, you have to enable this migration itself."
 msgstr ""
+"B<CAVEAT>: Se uma versão anterior do pacote foi compilada sem esta opção e "
+"for agora compilada com ela (ou vice-versa), precisa de uma migração de dir "
+"para symlink\" (ou de \"symlink para dir\"). Como o debhelper não tem "
+"conhecimento das versões anteriores, você terá que ser o próprio a activar "
+"esta migração."
 
 #. type: textblock
 #: dh_installdocs:109
@@ -4708,6 +4730,9 @@ msgid ""
 "This can be done by providing a \"debian/I<package>.maintscript\" file and "
 "using L<dh_installdeb(1)> to provide the relevant maintainer script snippets."
 msgstr ""
+"Isto pode ser feito ao fornecer um ficheiro \"debian/I<pacote>.maintscript\" "
+"e usar o L<dh_installdeb(1)> para fornecer os fragmentos relevantes do "
+"script do mantenedor."
 
 #. type: textblock
 #: dh_installdocs:115
@@ -6521,10 +6546,8 @@ msgstr ""
 
 #. type: =item
 #: dh_makeshlibs:28
-#, fuzzy
-#| msgid "debian/I<package>.links"
 msgid "debian/I<package>.shlibs"
-msgstr "debian/I<pacote>.links"
+msgstr "debian/I<pacote>.shlibs"
 
 #. type: textblock
 #: dh_makeshlibs:30
@@ -6533,6 +6556,9 @@ msgid ""
 "omitted, debhelper will generate a shlibs file automatically if it detects "
 "any libraries."
 msgstr ""
+"Instala este ficheiro, se presente, no pacote como DEBIAN/shlibs. Se "
+"omitido, o debhelper irá gerar um ficheiro shlibs automaticamente se "
+"detectar quaisquer bibliotecas."
 
 #. type: textblock
 #: dh_makeshlibs:34
@@ -6540,6 +6566,8 @@ msgid ""
 "Note in compat levels 9 and earlier, this file was installed by "
 "qL<dh_installdeb(1)> rather than B<dh_makeshlibs>."
 msgstr ""
+"Note que em níveis de compatibilidade 9 e anteriores, este ficheiro era "
+"instalado pelo qL<dh_installdeb(1)> em vez do B<dh_makeshlibs>."
 
 #. type: =item
 #: dh_makeshlibs:37
