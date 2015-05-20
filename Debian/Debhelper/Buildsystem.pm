@@ -310,6 +310,23 @@ sub doit_in_sourcedir {
 	return 1;
 }
 
+# Changes working directory to the source directory (if needed),
+# calls print_and_doit(@_) and changes working directory back to the
+# top directory. Errors are ignored.
+sub doit_in_sourcedir_noerror {
+        my $this=shift;
+        if ($this->get_sourcedir() ne '.') {
+                my $sourcedir = $this->get_sourcedir();
+                $this->_cd($sourcedir);
+                print_and_doit_noerror(@_);
+                $this->_cd($this->_rel2rel($this->{cwd}, $sourcedir));
+        }
+        else {
+                print_and_doit_noerror(@_);
+        }
+        return 1;
+}
+
 # Changes working directory to the build directory (if needed),
 # calls print_and_doit(@_) and changes working directory back to the
 # top directory.
@@ -325,6 +342,23 @@ sub doit_in_builddir {
 		print_and_doit(@_);
 	}
 	return 1;
+}
+
+# Changes working directory to the build directory (if needed),
+# calls print_and_doit(@_) and changes working directory back to the
+# top directory. Errors are ignored.
+sub doit_in_builddir_noerror {
+        my $this=shift;
+        if ($this->get_buildpath() ne '.') {
+                my $buildpath = $this->get_buildpath();
+                $this->_cd($buildpath);
+                print_and_doit_noerror(@_);
+                $this->_cd($this->_rel2rel($this->{cwd}, $buildpath));
+        }
+        else {
+                print_and_doit_noerror(@_);
+        }
+        return 1;
 }
 
 # In case of out of source tree building, whole build directory
