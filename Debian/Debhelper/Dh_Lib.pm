@@ -215,7 +215,7 @@ sub escape_shell {
 # Run a command, and display the command to stdout if verbose mode is on.
 # Throws error if command exits nonzero.
 #
-# All commands that modifiy files in $TMP should be ran via this 
+# All commands that modify files in $TMP should be run via this
 # function.
 #
 # Note that this cannot handle complex commands, especially anything
