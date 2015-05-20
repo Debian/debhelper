@@ -263,13 +263,6 @@ sub complex_doit {
 	}			
 }
 
-sub _error_exitcode {
-	# A little "reminder" warning to a dh-like tool that have abused
-	# this internal subroutine...
-	warning('[Deprecation] The internal sub _error_exitcode will be removed - please stop using it');
-	error_exitcode(@_);
-}
-
 sub error_exitcode {
 	my $command=shift;
 	if ($? == -1) {
