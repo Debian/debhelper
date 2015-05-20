@@ -19,9 +19,16 @@ B<dh_gencontrol> is a debhelper program that is responsible for generating
 control files, and installing them into the I<DEBIAN> directory with the
 proper permissions.
 
-This program is merely a wrapper around L<dpkg-gencontrol(1)>, which calls
-it once for each package being acted on, and passes in some additional
-useful flags.
+This program is merely a wrapper around L<dpkg-gencontrol(1)>, which
+calls it once for each package being acted on (plus related ddebs),
+and passes in some additional useful flags.
+
+B<Note> that if you use B<dh_gencontrol>, you must also use
+L<dh_builddeb(1)> to build the packages.  Otherwise, your build may
+fail to build as B<dh_gencontrol> (via L<dpkg-gencontrol(1)>) declares
+which packages are built.  As debhelper automatically generates ddebs,
+it some times adds additional packages, which will be built by L<dh_builddeb(1)>.
+
 
 =head1 OPTIONS
 
