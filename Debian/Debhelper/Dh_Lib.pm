@@ -21,7 +21,7 @@ use vars qw(@ISA @EXPORT %dh);
 	    &dpkg_architecture_value &sourcepackage &make_symlink
 	    &is_make_jobserver_unavailable &clean_jobserver_makeflags
 	    &cross_command &set_buildflags &get_buildoption
-	    &install_dh_config_file
+	    &install_dh_config_file &error_exitcode
 	    &install_file &install_prog &install_lib &install_dir
 );
 
@@ -221,7 +221,7 @@ sub escape_shell {
 # Note that this cannot handle complex commands, especially anything
 # involving redirection. Use complex_doit instead.
 sub doit {
-	doit_noerror(@_) || _error_exitcode(join(" ", @_));
+	doit_noerror(@_) || error_exitcode(join(" ", @_));
 }
 
 sub doit_noerror {
@@ -236,7 +236,7 @@ sub doit_noerror {
 }
 
 sub print_and_doit {
-	print_and_doit_noerror(@_) || _error_exitcode(join(" ", @_));
+	print_and_doit_noerror(@_) || error_exitcode(join(" ", @_));
 }
 
 sub print_and_doit_noerror {
@@ -259,20 +259,32 @@ sub complex_doit {
 	
 	if (! $dh{NO_ACT}) {
 		# The join makes system get a scalar so it forks off a shell.
-		system(join(" ", @_)) == 0 || _error_exitcode(join(" ", @_))
+		system(join(" ", @_)) == 0 || error_exitcode(join(" ", @_))
 	}			
 }
 
 sub _error_exitcode {
+	# A little "reminder" warning to a dh-like tool that have abused
+	# this internal subroutine...
+	warning('[Deprecation] The internal sub _error_exitcode will be removed - please stop using it');
+	error_exitcode(@_);
+}
+
+sub error_exitcode {
 	my $command=shift;
 	if ($? == -1) {
 		error("$command failed to to execute: $!");
 	}
 	elsif ($? & 127) {
 		error("$command died with signal ".($? & 127));
-        }
-	else {
+	}
+	elsif ($?) {
 		error("$command returned exit code ".($? >> 8));
+	}
+	else {
+		warning("This tool claimed that $command have failed, but it");
+		warning("appears to have returned 0.");
+		error("Probably a bug in this tool is hiding the actual problem.");
 	}
 }
 
@@ -1174,7 +1186,7 @@ sub install_dh_config_file {
 		}
 		if (!close($sfd)) {
 			error("cannot close handle from $source: $!") if $!;
-			_error_exitcode($source);
+			error_exitcode($source);
 		}
 		close($tfd) || error("cannot close $target: $!");
 		# Set the mtime (and atime) to ensure reproducibility.
