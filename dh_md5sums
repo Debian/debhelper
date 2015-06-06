@@ -87,6 +87,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("chown", "0:0", "$tmp/DEBIAN/md5sums");
 	}
 	if ( -d $ddeb_tmp) {
+		if (! -d "${ddeb_tmp}/DEBIAN") {
+			install_dir("${ddeb_tmp}/DEBIAN");
+		}
+
 		$find = "find . -type f ! -regex './DEBIAN/.*' -printf '%P\\0'";
 		complex_doit("(cd $ddeb_tmp >/dev/null ; $find | LC_ALL=C sort -z | xargs -r0 md5sum > DEBIAN/md5sums) >/dev/null");
 		# If the file's empty, no reason to waste inodes on it.
