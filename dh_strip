@@ -64,14 +64,17 @@ package to put symbols in, it specifies a package (or packages) which
 should have separated debug symbols, and the separated symbols are placed
 in packages with B<-dbg> added to their name.
 
+This option implies B<--no-ddebs> and I<cannot> be used with B<--ddeb>
+or B<--ddeb-migration>.
+
 =item B<-k>, B<--keep-debug>
 
 Debug symbols will be retained, but split into an independent
 file in F<usr/lib/debug/> in the package build directory. B<--dbg-package>
 is easier to use than this option, but this option is more flexible.
 
-This option will inhibit the creation of automatic "ddebs" for the
-affected packages.
+This option implies B<--no-ddebs> and I<cannot> be used with
+B<--ddebs>.
 
 =item B<--ddeb-migration=>I<package-relation>
 
@@ -81,13 +84,20 @@ option should describe a valid B<Replaces>- and B<Breaks>-relation,
 which will be added to the ddebs to avoid file conflicts with the (now
 obsolete) -dbg package.
 
-This option B<cannot> be used with B<--keep-debug> nor B<--dbg-package>.
+This option implies B<--ddebs> and I<cannot> be used with
+B<--keep-debug>, B<--dbg-package> or B<--no-ddebs>.
 
 Examples:
 
   dh_strip --ddeb-migration='libfoo-dbg (<< 2.1-3~)'
 
   dh_strip --ddeb-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< 2.1-3~)'
+
+=item B<--ddebs>, B<--no-ddebs>
+
+Control whether B<dh_strip> should be creating ddebs when possible.
+By default, B<dh_strip> will attempt to build ddebs and this option is
+primarily useful for disabling this.
 
 =back
 
@@ -107,10 +117,12 @@ Debian policy, version 3.0.1
 =cut
 
 my $migrate_ddeb;
+my $enable_ddebs = 'auto';
 
 init(options => {
 	"keep-debug"       => \$dh{K_FLAG},
 	'ddeb-migration=s' => \$migrate_ddeb,
+	'ddebs!'           => \$enable_ddebs,
 });
 
 if ($dh{K_FLAG} and $migrate_ddeb) {
@@ -120,12 +132,26 @@ if ($dh{DEBUGPACKAGES} and $migrate_ddeb) {
 	error("--dbg-package and --ddeb-migration are mutually exclusive");
 }
 
+if ($enable_ddebs and $enable_ddebs ne 'auto') {
+	if ($dh{K_FLAG}) {
+		error("--keep-debug and explicit --ddebs are mutually exclusive");
+	}
+	if ($dh{DEBUGPACKAGES}) {
+		error("--dbg-package and explicit --ddebs are mutually exclusive");
+	}
+}
+if ($migrate_ddeb and not $enable_ddebs) {
+	error("--ddeb-migration and --no-ddebs are mutually exclusive");
+}
+
+$enable_ddebs = 1 if $enable_ddebs eq 'auto';
+$enable_ddebs = 0 if not $ENV{'DH_BUILD_DDEBS'};
+
 # This variable can be used to turn off stripping (see Policy).
 if (get_buildoption('nostrip')) {
 	exit;
 }
 
-my $enable_ddebs = 1;
 my $objcopy = cross_command("objcopy");
 my $strip = cross_command("strip");
 $enable_ddebs = 0 if get_buildoption('noddebs');
@@ -261,7 +287,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$debugtmp=tmpdir($package."-dbg");
 		}
 	}
-	if ($ENV{'DH_BUILD_DDEBS'} and $enable_ddebs and not $keep_debug and package_arch($package) ne 'all') {
+	if ($enable_ddebs and not $keep_debug and package_arch($package) ne 'all') {
 		# Avoid creating a ddeb that would clash with a registered package
 		if (!$all_packages{"${package}-dbgsym"}) {
 			$debugtmp = "debian/.debhelper/${package}/ddeb-root";
