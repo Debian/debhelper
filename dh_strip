@@ -289,7 +289,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 	if ($enable_ddebs and not $keep_debug and package_arch($package) ne 'all') {
 		# Avoid creating a ddeb that would clash with a registered package
-		if (!$all_packages{"${package}-dbgsym"}) {
+		# or looks like a manual -dbg package.
+		if (!$all_packages{"${package}-dbgsym"} or $package =~ m/-dbg$/) {
 			$debugtmp = "debian/.debhelper/${package}/ddeb-root";
 			$keep_debug = 1;
 			$use_build_id = 2;
