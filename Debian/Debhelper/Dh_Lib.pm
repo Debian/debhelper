@@ -21,7 +21,7 @@ use vars qw(@ISA @EXPORT %dh);
 	    &dpkg_architecture_value &sourcepackage &make_symlink
 	    &is_make_jobserver_unavailable &clean_jobserver_makeflags
 	    &cross_command &set_buildflags &get_buildoption
-	    &install_dh_config_file &ddeb_filename &package_multiarch
+	    &install_dh_config_file &package_multiarch
 	    &install_file &install_prog &install_lib &install_dir
 );
 
@@ -976,13 +976,6 @@ sub udeb_filename {
 	my ($package) = @_;
 
 	return _xdeb_filename($package, 'udeb');
-}
-
-# Generates the filename that is used for a ddeb package.
-sub ddeb_filename {
-	my ($package) = @_;
-
-	return _xdeb_filename($package, 'deb', "${package}-dbgsym");
 }
 
 # Handles #DEBHELPER# substitution in a script; also can generate a new

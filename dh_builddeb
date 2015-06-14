@@ -122,14 +122,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# Only build the ddeb if it has a control file.  People might
 		# have skipped dh_gencontrol.
 		if ( -f $ddeb_control ) {
-			my $ddeb_filename = '/' . ddeb_filename($package);
 			# XXX: Should we blindly overrule the maintainer here?  It
 			# is not apparent that their explicit -z was intended for
 			# the ddeb.
 			my @args = default_compressor_args(["-z1", "-Zxz", "-Sextreme"],
 											   @{$dh{U_PARAMS}});
 			doit("dpkg-deb", @args,
-				 "--build", $ddeb_tmpdir, $dh{DESTDIR}.$ddeb_filename);
+				 "--build", $ddeb_tmpdir, $dh{DESTDIR});
 		} else {
 			warning("Not building ddeb for ${package} as it has no control file");
 			warning("Please use dh_gencontrol to avoid this issue");
