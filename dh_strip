@@ -116,23 +116,20 @@ Debian policy, version 3.0.1
 
 =cut
 
-my $migrate_ddeb;
-my $enable_ddebs = 'auto';
-
 init(options => {
 	"keep-debug"       => \$dh{K_FLAG},
-	'ddeb-migration=s' => \$migrate_ddeb,
-	'ddebs!'           => \$enable_ddebs,
+	'ddeb-migration=s' => \$dh{MIGRATE_DDEB},
+	'ddebs!'           => \$dh{ENABLE_DDEBS},
 });
 
-if ($dh{K_FLAG} and $migrate_ddeb) {
+if ($dh{K_FLAG} and $dh{MIGRATE_DDEB}) {
 	error("--keep-debug and --ddeb-migration are mutually exclusive");
 }
-if ($dh{DEBUGPACKAGES} and $migrate_ddeb) {
+if ($dh{DEBUGPACKAGES} and $dh{MIGRATE_DDEB}) {
 	error("--dbg-package and --ddeb-migration are mutually exclusive");
 }
 
-if ($enable_ddebs and $enable_ddebs ne 'auto') {
+if ($dh{ENABLE_DDEBS} and $dh{ENABLE_DDEBS} ne 'auto') {
 	if ($dh{K_FLAG}) {
 		error("--keep-debug and explicit --ddebs are mutually exclusive");
 	}
@@ -140,12 +137,14 @@ if ($enable_ddebs and $enable_ddebs ne 'auto') {
 		error("--dbg-package and explicit --ddebs are mutually exclusive");
 	}
 }
-if ($migrate_ddeb and not $enable_ddebs) {
+
+$dh{ENABLE_DDEBS} = 1 if not defined($dh{ENABLE_DDEBS});
+
+if ($dh{MIGRATE_DDEB} and not $dh{ENABLE_DDEBS}) {
 	error("--ddeb-migration and --no-ddebs are mutually exclusive");
 }
 
-$enable_ddebs = 1 if $enable_ddebs eq 'auto';
-$enable_ddebs = 0 if not $ENV{'DH_BUILD_DDEBS'};
+$dh{ENABLE_DDEBS} = 0 if not $ENV{'DH_BUILD_DDEBS'};
 
 # This variable can be used to turn off stripping (see Policy).
 if (get_buildoption('nostrip')) {
@@ -154,7 +153,7 @@ if (get_buildoption('nostrip')) {
 
 my $objcopy = cross_command("objcopy");
 my $strip = cross_command("strip");
-$enable_ddebs = 0 if get_buildoption('noddebs');
+$dh{ENABLE_DDEBS} = 0 if get_buildoption('noddebs');
 
 # I could just use `file $_[0]`, but this is safer
 sub get_file_type {
@@ -287,7 +286,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$debugtmp=tmpdir($package."-dbg");
 		}
 	}
-	if ($enable_ddebs and not $keep_debug and package_arch($package) ne 'all') {
+	if ($dh{ENABLE_DDEBS} and not $keep_debug and package_arch($package) ne 'all') {
 		# Avoid creating a ddeb that would clash with a registered package
 		# or looks like a manual -dbg package.
 		if (!$all_packages{"${package}-dbgsym"} or $package =~ m/-dbg$/) {
@@ -334,10 +333,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			install_dir($ddeb_docdir) if not -d $ddeb_docdir;
 			doit('ln', '-s', $package, $doc_symlink);
 		}
-		if ($migrate_ddeb) {
+		if ($dh{MIGRATE_DDEB}) {
 			my $path = "debian/.debhelper/${package}/ddeb-migration";
 			open(my $fd, '>', $path) or error("open $path failed: $!");
-			print {$fd} "$migrate_ddeb\n";
+			print {$fd} "$dh{MIGRATE_DDEB}\n";
 			close($fd) or error("close $path failed: $!");
 		}
 	}
