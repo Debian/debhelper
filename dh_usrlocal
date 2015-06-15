@@ -103,7 +103,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# is parsed by the shell in double-quotes
 		my $dirs = join("$ebs\n", sort @dirs);
 		pop @justdirs; # don't remove directories directly in /usr/local
-		my $justdirs = join("$ebs\n", sort @justdirs);
+		my $justdirs = join("$ebs\n", reverse sort @justdirs);
 		if (! $dh{NOSCRIPTS}) { 
 			autoscript($package,"postinst", "postinst-usrlocal",
 				   "/#DIRS#/ c${ebs}\n${dirs}");
