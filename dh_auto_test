@@ -52,8 +52,7 @@ compiled.
 
 =cut
 
-if (get_buildoption("nocheck")
-    || (dpkg_architecture_value("DEB_HOST_GNU_TYPE") ne dpkg_architecture_value("DEB_BUILD_GNU_TYPE"))) {
+if (get_buildoption("nocheck")) {
 	exit 0;
 }
 
