@@ -1,5 +1,5 @@
 # List of files of dh_* commands. Sorted for debhelper man page.
-COMMANDS=$(shell find . -maxdepth 1 -type f -perm /100 -name "dh_*" -printf "%f\n" | sort)
+COMMANDS=$(shell find . -maxdepth 1 -type f -perm /100 -name "dh_*" -printf "%f\n" | LC_ALL=C sort)
 
 # Find deprecated commands by looking at their synopsis.
 DEPRECATED=$(shell egrep -l '^dh_.* - .*deprecated' $(COMMANDS))
@@ -63,7 +63,7 @@ ifneq ($(USE_NLS),no)
 		done; \
 		if [ -e $$dir/debhelper.pod ]; then \
 			cat $$dir/debhelper.pod | \
-				$(MAKEMANLIST) `find $$dir -type f -maxdepth 1 -name "dh_*.pod" | sort` | \
+				$(MAKEMANLIST) `find $$dir -type f -maxdepth 1 -name "dh_*.pod" | LC_ALL=C sort` | \
 				$(POD2MAN) --name="debhelper" --section=7 > debhelper.$$lang.7; \
 		fi; \
 	done
