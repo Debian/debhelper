@@ -6,7 +6,8 @@
 package Debian::Debhelper::Buildsystem::ant;
 
 use strict;
-use base 'Debian::Debhelper::Buildsystem';
+use warnings;
+use parent qw(Debian::Debhelper::Buildsystem);
 
 sub DESCRIPTION {
 	"Ant (build.xml)"

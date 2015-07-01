@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 #
 # Debhelper option processing library.
 #
@@ -6,6 +6,7 @@
 
 package Debian::Debhelper::Dh_Getopt;
 use strict;
+use warnings;
 
 use Debian::Debhelper::Dh_Lib;
 use Getopt::Long;

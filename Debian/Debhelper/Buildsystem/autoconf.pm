@@ -7,8 +7,9 @@
 package Debian::Debhelper::Buildsystem::autoconf;
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value sourcepackage compat);
-use base 'Debian::Debhelper::Buildsystem::makefile';
+use parent qw(Debian::Debhelper::Buildsystem::makefile);
 
 sub DESCRIPTION {
 	"GNU Autoconf (configure)"

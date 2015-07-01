@@ -7,8 +7,9 @@
 package Debian::Debhelper::Buildsystem::perl_build;
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib qw(compat);
-use base 'Debian::Debhelper::Buildsystem';
+use parent qw(Debian::Debhelper::Buildsystem);
 use Config;
 
 sub DESCRIPTION {

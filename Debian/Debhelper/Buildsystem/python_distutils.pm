@@ -8,9 +8,10 @@
 package Debian::Debhelper::Buildsystem::python_distutils;
 
 use strict;
+use warnings;
 use Cwd ();
 use Debian::Debhelper::Dh_Lib qw(error);
-use base 'Debian::Debhelper::Buildsystem';
+use parent qw(Debian::Debhelper::Buildsystem);
 
 sub DESCRIPTION {
 	"Python Distutils (setup.py)"

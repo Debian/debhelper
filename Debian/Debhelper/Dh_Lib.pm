@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 #
 # Library functions for debhelper programs, perl version.
 #
@@ -6,6 +6,7 @@
 
 package Debian::Debhelper::Dh_Lib;
 use strict;
+use warnings;
 
 use Exporter;
 use vars qw(@ISA @EXPORT %dh);

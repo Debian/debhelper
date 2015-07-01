@@ -7,8 +7,9 @@
 package Debian::Debhelper::Buildsystem::makefile;
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib qw(escape_shell clean_jobserver_makeflags);
-use base 'Debian::Debhelper::Buildsystem';
+use parent qw(Debian::Debhelper::Buildsystem);
 
 # make makes things difficult by not providing a simple way to test
 # whether a Makefile target exists. Using -n and checking for a nonzero

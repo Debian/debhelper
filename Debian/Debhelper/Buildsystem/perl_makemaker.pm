@@ -7,8 +7,9 @@
 package Debian::Debhelper::Buildsystem::perl_makemaker;
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib qw(compat);
-use base 'Debian::Debhelper::Buildsystem::makefile';
+use parent qw(Debian::Debhelper::Buildsystem::makefile);
 use Config;
 
 sub DESCRIPTION {
