@@ -575,6 +575,14 @@ while (@ARGV_orig) {
 		next;
 	}
 	elsif ($opt=~/^-/) {
+		if (not @options and $opt eq '--parallel') {
+			# Having an non-empty "@options" hurts performance quite a
+			# bit.  At the same time, we want to promote the use of
+			# --parallel, so "tweak" the options a bit if there is no
+			# reason to include it.
+			my $max_parallel = get_buildoption('parallel') // 1;
+			next if $max_parallel == 1;
+		}
 		push @options, "-O".$opt;
 		$user_specified_options=1
 			unless $opt =~ /^--(parallel|buildsystem|sourcedirectory|builddirectory|)/;
