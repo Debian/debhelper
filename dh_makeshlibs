@@ -268,7 +268,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			"-p$package", "-I$symbols", "-P$tmp",
 			@liblist,
 			@{$dh{U_PARAMS}});
-		if (-s "$tmp/DEBIAN/symbols" == 0) {
+		if (-f "$tmp/DEBIAN/symbols" and -s _ == 0) {
 			doit("rm", "-f", "$tmp/DEBIAN/symbols");
 		}
 	}
