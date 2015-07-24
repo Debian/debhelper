@@ -16,6 +16,10 @@ debhelper (9.20150629) UNRELEASED; urgency=medium
     if present.  (Closes: #793440)
   * Dh_Buildsystems.pm/Dh_Lib.pm: Import Exporter's import
     subroutine rather than adding Exporter to @ISA.
+  * Dh_Lib.pm: Use Dpkg::Arch's debarch_is rather than running
+    dpkg-architecture to determine if an architecture matches
+    a wildcard.  Heavily based on a patch from Guillem Jover.
+    (Closes: #793443)
 
  -- Niels Thykier <niels@thykier.net>  Sun, 28 Jun 2015 15:08:19 +0200
 

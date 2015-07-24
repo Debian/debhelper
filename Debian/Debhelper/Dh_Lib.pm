@@ -799,17 +799,13 @@ sub buildos {
 		my @archlist=split(/\s+/,shift);
 	
 		foreach my $a (@archlist) {
-			# Avoid expensive dpkg-architecture call to compare
-			# with a simple architecture name. "linux-any" and
-			# other architecture wildcards are (currently)
-			# always hypenated.
-			if ($a !~ /-/) {
-				return 1 if $arch eq $a;
-			}
-			elsif (exists $knownsame{$arch}{$a}) {
+			if (exists $knownsame{$arch}{$a}) {
 				return 1 if $knownsame{$arch}{$a};
+				next;
 			}
-			elsif (system("dpkg-architecture", "-a$arch", "-i$a") == 0) {
+
+			require Dpkg::Arch;
+			if (Dpkg::Arch::debarch_is($arch, $a)) {
 				return $knownsame{$arch}{$a}=1;
 			}
 			else {
