@@ -763,7 +763,10 @@ sub excludefile {
 	my %dpkg_arch_output;
 	sub dpkg_architecture_value {
 		my $var = shift;
-		if (! exists($dpkg_arch_output{$var})) {
+		if (exists($ENV{$var})) {
+			return $ENV{$var};
+		}
+		elsif (! exists($dpkg_arch_output{$var})) {
 			local $_;
 			open(PIPE, '-|', 'dpkg-architecture')
 				or error("dpkg-architecture failed");
