@@ -8,9 +8,8 @@ package Debian::Debhelper::Dh_Lib;
 use strict;
 use warnings;
 
-use Exporter;
-use vars qw(@ISA @EXPORT %dh);
-@ISA=qw(Exporter);
+use Exporter qw(import);
+use vars qw(@EXPORT %dh);
 @EXPORT=qw(&init &doit &doit_noerror &complex_doit &verbose_print &error
             &nonquiet_print &print_and_doit &print_and_doit_noerror
             &warning &tmpdir &pkgfile &pkgext &pkgfilename &isnative

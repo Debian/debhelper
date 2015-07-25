@@ -11,7 +11,7 @@ use warnings;
 use Debian::Debhelper::Dh_Lib;
 use File::Spec;
 
-use base 'Exporter';
+use Exporter qw(import);
 our @EXPORT=qw(&buildsystems_init &buildsystems_do &load_buildsystem &load_all_buildsystems);
 
 use constant BUILD_STEPS => qw(configure build test install clean);
