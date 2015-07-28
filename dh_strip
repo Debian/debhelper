@@ -243,10 +243,11 @@ sub make_debug {
 	if (! -d $debug_dir) {
 		install_dir($debug_dir);
 	}
-	if (compat(8)) {
+	if (compat(8) && $use_build_id < 2) {
 		doit($objcopy, "--only-keep-debug", $file, $debug_path);
 	}
 	else {
+		# Compat 9 OR a ddeb.
 		doit($objcopy, "--only-keep-debug", "--compress-debug-sections", $file, $debug_path);
 	}
 	# No reason for this to be executable.
