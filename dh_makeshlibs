@@ -264,10 +264,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# own search for symbols files, since that search
 		# is not 100% compatible with debhelper. (For example,
 		# this supports --ignore being used.)
-		$ok = $ok && doit_noerror("dpkg-gensymbols",
-			"-p$package", "-I$symbols", "-P$tmp",
-			@liblist,
-			@{$dh{U_PARAMS}});
+		$ok = doit_noerror(
+				"dpkg-gensymbols",
+				"-p$package",
+				"-I$symbols",
+				"-P$tmp",
+				@liblist,
+				@{$dh{U_PARAMS}}
+			) && $ok;
+
 		if (-f "$tmp/DEBIAN/symbols" and -s _ == 0) {
 			doit("rm", "-f", "$tmp/DEBIAN/symbols");
 		}
