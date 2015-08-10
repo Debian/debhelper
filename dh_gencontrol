@@ -53,8 +53,6 @@ init(options => {
 });
 
 
-my $src_pkg;
-
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $ext=pkgext($package);
@@ -85,7 +83,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if ( -d $ddeb_tmp) {
 		my $multiarch = package_multiarch($package);
 		my $replaces = read_ddeb_migration($ddeb_info_dir);
-		$src_pkg = sourcepackage() if not defined($src_pkg);
 
 		# Remove and override more or less every standard field.
 		my @ddeb_options = (qw(
@@ -95,7 +92,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			 "-DPackage=${package}-dbgsym",
 			 "-DDepends=${package} (= \${binary:Version})",
 			 "-DDescription=Debug symbols for ${package}",
-			 "-DSource=${src_pkg}",
 		);
 		# Disable multi-arch unless the original package is an
 		# multi-arch: same package.  In all other cases, we do not

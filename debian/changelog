@@ -25,6 +25,13 @@ debhelper (9.20150629) UNRELEASED; urgency=medium
   * dh_strip: Strip ".comment" and ".note" sections from static
     libraries.  Thanks to Helmut Grohne for the suggestion.
     (Closes: #789351)
+  * dh_gencontrol: Stop explicitly passing -DSource to
+    dpkg-gencontrol when building ddebs.  The passed value was
+    wrong sometimes (e.g. with binNMUs) and dpkg-gencontrol
+    since 1.18.2~ computes the value correctly.
+  * d/control: Bump dependency on dpkg-dev to 1.18.2~ for
+    ddebs.  Build-depends not bumped since debhelper itself
+    does not produce any ddebs.
 
  -- Niels Thykier <niels@thykier.net>  Sun, 28 Jun 2015 15:08:19 +0200
 
