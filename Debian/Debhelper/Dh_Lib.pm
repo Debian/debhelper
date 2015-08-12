@@ -1143,11 +1143,11 @@ sub cross_command {
 	}
 }
 
-# Read latest debian/changelog timestamp and export the environment
-# variable SOURCE_DATE_EPOCH with its value, so that any package can
-# read it and replace calls to localtime (or other undeterministic
-# timestamps) with the exported timestamp to get reproducible builds.
-sub set_source_date_epoch {
+# Returns the SOURCE_DATE_EPOCH ENV variable if set OR computes it
+# from the latest changelog entry, sets the SOURCE_DATE_EPOCH ENV
+# variable and returns the computed value.
+sub get_source_date_epoch {
+	return $ENV{SOURCE_DATE_EPOCH} if exists($ENV{SOURCE_DATE_EPOCH});
 	eval "use Dpkg::Changelog::Debian";
 	if ($@) {
 		warning "unable to set SOURCE_DATE_EPOCH: $@";
@@ -1166,7 +1166,7 @@ sub set_source_date_epoch {
 	$tt =~ s/\s*\([^\)]+\)\s*$//; # Remove the optional timezone codename
 	my $timestamp = Time::Piece->strptime($tt, "%a, %d %b %Y %T %z");
 
-	$ENV{SOURCE_DATE_EPOCH} = $timestamp->epoch();
+	return $ENV{SOURCE_DATE_EPOCH} = $timestamp->epoch();
 }
 
 # Sets environment variables from dpkg-buildflags. Avoids changing
@@ -1175,7 +1175,8 @@ sub set_buildflags {
 	return if $ENV{DH_INTERNAL_BUILDFLAGS};
 	$ENV{DH_INTERNAL_BUILDFLAGS}=1;
 
-	set_source_date_epoch();
+	# For the side effect of computing the SOURCE_DATE_EPOCH variable.
+	get_source_date_epoch();
 
 	return if compat(8);
 
