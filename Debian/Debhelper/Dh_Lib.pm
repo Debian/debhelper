@@ -23,6 +23,7 @@ use vars qw(@EXPORT %dh);
 	    &cross_command &set_buildflags &get_buildoption
 	    &install_dh_config_file &error_exitcode &package_multiarch
 	    &install_file &install_prog &install_lib &install_dir
+	    &get_source_date_epoch
 );
 
 my $max_compat=10;
