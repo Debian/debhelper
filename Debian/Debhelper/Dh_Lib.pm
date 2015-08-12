@@ -23,7 +23,7 @@ use vars qw(@EXPORT %dh);
 	    &cross_command &set_buildflags &get_buildoption
 	    &install_dh_config_file &error_exitcode &package_multiarch
 	    &install_file &install_prog &install_lib &install_dir
-	    &get_source_date_epoch
+	    &get_source_date_epoch &is_cross_compiling
 );
 
 my $max_compat=10;
@@ -791,6 +791,12 @@ sub buildos {
 	dpkg_architecture_value("DEB_HOST_ARCH_OS");
 }
 
+# Returns a truth value if this seems to be a cross-compile
+sub is_cross_compiling {
+	return dpkg_architecture_value("DEB_BUILD_GNU_TYPE")
+	    ne dpkg_architecture_value("DEB_HOST_GNU_TYPE");
+}
+
 # Passed an arch and a list of arches to match against, returns true if matched
 {
 	my %knownsame;
@@ -1135,8 +1141,7 @@ sub clean_jobserver_makeflags {
 # If cross-compiling, returns appropriate cross version of command.
 sub cross_command {
 	my $command=shift;
-	if (dpkg_architecture_value("DEB_BUILD_GNU_TYPE")
-	    ne dpkg_architecture_value("DEB_HOST_GNU_TYPE")) {
+	if (is_cross_compiling()) {
 		return dpkg_architecture_value("DEB_HOST_GNU_TYPE")."-$command";
 	}
 	else {
