@@ -1,4 +1,6 @@
-if [ -x "/etc/init.d/#SCRIPT#" ]; then
-	update-rc.d #SCRIPT# #INITPARMS# >/dev/null
-	invoke-rc.d #SCRIPT# start || #ERROR_HANDLER#
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ]; then
+	if [ -x "/etc/init.d/#SCRIPT#" ]; then
+		update-rc.d #SCRIPT# #INITPARMS# >/dev/null
+		invoke-rc.d #SCRIPT# start || #ERROR_HANDLER#
+	fi
 fi
