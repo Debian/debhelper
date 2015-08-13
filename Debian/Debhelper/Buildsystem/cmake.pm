@@ -11,6 +11,14 @@ use warnings;
 use Debian::Debhelper::Dh_Lib qw(compat dpkg_architecture_value error is_cross_compiling);
 use parent qw(Debian::Debhelper::Buildsystem::makefile);
 
+my @STANDARD_CMAKE_FLAGS = qw(
+  -DCMAKE_INSTALL_PREFIX=/usr
+  -DCMAKE_VERBOSE_MAKEFILE=ON
+  -DCMAKE_BUILD_TYPE=None
+  -DCMAKE_INSTALL_SYSCONFDIR=/etc
+  -DCMAKE_INSTALL_LOCALSTATEDIR=/var
+);
+
 my %DEB_HOST2CMAKE_SYSTEM = (
 	'linux'    => 'Linux',
 	'kfreebsd' => 'FreeBSD',
@@ -45,12 +53,8 @@ sub new {
 
 sub configure {
 	my $this=shift;
-	my @flags;
-
 	# Standard set of cmake flags
-	push @flags, "-DCMAKE_INSTALL_PREFIX=/usr";
-	push @flags, "-DCMAKE_VERBOSE_MAKEFILE=ON";
-	push @flags, "-DCMAKE_BUILD_TYPE=None";
+	my @flags = @STANDARD_CMAKE_FLAGS;
 
 	if (is_cross_compiling()) {
 		my $deb_host = dpkg_architecture_value("DEB_HOST_ARCH_OS");
