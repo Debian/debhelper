@@ -247,10 +247,28 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		error("Can't use --init-script with an upstart job");
 	}
 
-	# NB: The case that only $tmpfile is set makes no sense. The
-	# tmpfiles.d(5) mechanism is only available when using systemd (at
-	# least currently), so there has to be an init script which does the
-	# same thing for sysvinit.
+	if (!$dh{NOSCRIPTS}) {
+		# Include postinst-init-tmpfiles if the package ships any files
+		# in /usr/lib/tmpfiles.d or /etc/tmpfiles.d
+		my @tmpfiles;
+		find({
+			wanted => sub {
+				my $name = $File::Find::name;
+				return unless -f $name;
+				$name =~ s/^\Q$tmp\E//g;
+				if ($name =~ m,^/usr/lib/tmpfiles\.d/, ||
+					$name =~ m,^/etc/tmpfiles\.d/,) {
+					push @tmpfiles, $name;
+				}
+			},
+			no_chdir => 1,
+		}, $tmp);
+		if (@tmpfiles > 0) {
+			autoscript($package,"postinst", "postinst-init-tmpfiles",
+				"s,#TMPFILES#," . join(" ", @tmpfiles).",");
+		}
+	}
+
 	if ($service ne '' || $job ne '' || $init ne '' || $dh{ONLYSCRIPTS}) {
 		# This is set by the -u "foo" command line switch, it's
 		# the parameters to pass to update-rc.d. If not set,
@@ -264,26 +282,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 		
 		if (! $dh{NOSCRIPTS}) {
-			# Include postinst-init-tmpfiles if the package ships any files
-			# in /usr/lib/tmpfiles.d or /etc/tmpfiles.d
-			my @tmpfiles;
-			find({
-				wanted => sub {
-					my $name = $File::Find::name;
-					return unless -f $name;
-					$name =~ s/^\Q$tmp\E//g;
-					if ($name =~ m,^/usr/lib/tmpfiles\.d/, ||
-						$name =~ m,^/etc/tmpfiles\.d/,) {
-						push @tmpfiles, $name;
-					}
-				},
-				no_chdir => 1,
-			}, $tmp);
-			if (@tmpfiles > 0) {
-				autoscript($package,"postinst", "postinst-init-tmpfiles",
-					"s,#TMPFILES#," . join(" ", @tmpfiles).",");
-			}
-
 			if (! $dh{NO_START}) {
 				if ($dh{RESTART_AFTER_UPGRADE}) {
 					# update-rc.d, and restart (or
