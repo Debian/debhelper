@@ -83,6 +83,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if ( -d $ddeb_tmp) {
 		my $multiarch = package_multiarch($package);
 		my $replaces = read_ddeb_migration($ddeb_info_dir);
+		my $build_ids = read_ddeb_build_ids($ddeb_info_dir);
 
 		# Remove and override more or less every standard field.
 		my @ddeb_options = (qw(
@@ -92,6 +93,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			 "-DPackage=${package}-dbgsym",
 			 "-DDepends=${package} (= \${binary:Version})",
 			 "-DDescription=Debug symbols for ${package}",
+			 "-DX-Build-Ids=${build_ids}",
 		);
 		# Disable multi-arch unless the original package is an
 		# multi-arch: same package.  In all other cases, we do not
@@ -129,17 +131,25 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	doit("chown","0:0","$tmp/DEBIAN/control");
 }
 
-sub read_ddeb_migration {
-	my ($ddeb_info_dir) = @_;
-	my $ddeb_migration = "${ddeb_info_dir}/ddeb-migration";
+sub read_ddeb_file {
+	my ($ddeb_info_file, $ddeb_info_dir) = @_;
+	my $ddeb_path = "${ddeb_info_dir}/${ddeb_info_file}";
 	my $result;
-	if (-f $ddeb_migration) {
-		open(my $fd, '<', $ddeb_migration)
-			or error("open $ddeb_migration failed: $!");
+	if (-f $ddeb_path) {
+		open(my $fd, '<', $ddeb_path)
+			or error("open $ddeb_path failed: $!");
 		chomp($result = <$fd>);
 		close($fd);
 	}
 	return $result;
+}
+
+sub read_ddeb_migration {
+	return read_ddeb_file('ddeb-migration', @_);
+}
+
+sub read_ddeb_build_ids {
+	return read_ddeb_file('ddeb-build-ids', @_);
 }
 
 =head1 SEE ALSO
