@@ -9,6 +9,7 @@ dh_strip - strip executables, shared libraries, and some static libraries
 use strict;
 use warnings;
 use File::Find;
+use File::Path 'make_path';
 use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
@@ -254,8 +255,15 @@ sub make_debug {
 		doit($objcopy, "--only-keep-debug", "--compress-debug-sections", $file, $debug_path);
 	}
 
-	if ($use_build_id > 1) {
-		my $path = "debian/.debhelper/${package}/ddeb-build-ids";
+	if ($use_build_id) {
+		my $debugpackagename=$package;
+		if (ref $dh{DEBUGPACKAGES}) {
+			$debugpackagename=@{$dh{DEBUGPACKAGES}}[0];
+		}
+
+		my $internal_path = "debian/.debhelper/${debugpackagename}";
+		make_path($internal_path) if ! -d $internal_path;
+		my $path = "${internal_path}/ddeb-build-ids";
 		open(my $fd, '>>', $path) or error("open $path failed: $!");
 		print {$fd} "$debug_build_id ";
 		close($fd) or error("close $path failed: $!");
