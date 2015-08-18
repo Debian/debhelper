@@ -232,13 +232,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	# New as of dh_v3.
 	if (! compat(2) && ! $dh{NOSCRIPTS} && $need_ldconfig) {
-		if (compat(9)) {
-			autoscript($package,"postinst","postinst-makeshlibs");
-			autoscript($package,"postrm","postrm-makeshlibs");
-		} else {
-			autoscript($package,"postinst","postinst-makeshlibs-c10");
-			autoscript($package,"postrm","postrm-makeshlibs-c10");
-		}
+		autoscript($package,"postinst","postinst-makeshlibs");
+		autoscript($package,"postrm","postrm-makeshlibs");
 	}
 
 	if ($shlibs_file) {
