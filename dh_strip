@@ -254,7 +254,7 @@ sub make_debug {
 		doit($objcopy, "--only-keep-debug", "--compress-debug-sections", $file, $debug_path);
 	}
 
-	if ($use_build_id) {
+	if ($use_build_id > 1) {
 		my $path = "debian/.debhelper/${package}/ddeb-build-ids";
 		open(my $fd, '>>', $path) or error("open $path failed: $!");
 		print {$fd} "$debug_build_id ";
