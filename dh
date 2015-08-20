@@ -355,7 +355,7 @@ my @bd = qw{
 	dh_auto_build
 	dh_auto_test
 };
-my @i = qw{
+my @i = (qw{
 	dh_testroot
 	dh_prep
 	dh_installdirs
@@ -394,10 +394,12 @@ my @i = qw{
 	dh_link
 	dh_installwm
 	dh_installxfonts
-	dh_strip_nondeterminism
+},
+	optional_command('dh_strip_nondeterminism'),
+qw{
 	dh_compress
 	dh_fixperms
-};
+});
 my @ba=qw{
 	dh_strip
 	dh_makeshlibs
@@ -962,6 +964,18 @@ sub can_skip {
 		}
 	}
 	return 1;
+}
+
+sub optional_command {
+	my ($command) = @_;
+
+	foreach my $dir (split(':', $ENV{'PATH'})) {
+		if (open(my $h, '<', "$dir/$command")) {
+			close($h);
+			return 1;
+		}
+	}
+	return 0;
 }
 
 sub extract_skipinfo {

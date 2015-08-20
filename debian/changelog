@@ -21,11 +21,18 @@ debhelper (9.20150811+unreleased) UNRELEASED; urgency=medium
     after talking with the glibc maintainer.  The is not the
     right place to make this change.
   * d/control: Remove the homepage field.
+  * dh: Make dh_strip_nondeterminism optional, so debhelper
+    does not need to build-depend on it.
 
   [ Paul Tagliamonte ]
   * dh_gencontrol: Put debug debs back in the "debug" section.
   * dh_strip/dh_gencontrol: Add a space separated list of
     build-ids.
+
+  [ Andrew Ayer ]
+  * d/control: Depend on dh-strip-nondeterminism
+  * dh: Call dh_strip_nondeterminism during build.
+    (Closes: #759895)
 
  -- Paul Tagliamonte <paultag@debian.org>  Fri, 14 Aug 2015 21:25:16 +0200
 
