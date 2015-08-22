@@ -9,7 +9,6 @@ dh_strip - strip executables, shared libraries, and some static libraries
 use strict;
 use warnings;
 use File::Find;
-use File::Path 'make_path';
 use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
@@ -169,9 +168,9 @@ sub get_file_type {
 }
 
 # Check if a file is an elf binary, shared library, or static library,
-# for use by File::Find. It'll fill the following 3 arrays with anything
-# it finds:
-my (@shared_libs, @executables, @static_libs);
+# for use by File::Find. It'll fill the 3 first arrays with anything
+# it finds.  The @build_ids will be the collected build-ids (if any)
+my (@shared_libs, @executables, @static_libs, @build_ids);
 sub testfile {
 	return if -l $_ or -d $_; # Skip directories and symlinks always.
 	
@@ -228,8 +227,7 @@ sub make_debug {
 	return unless get_file_type($file) =~ /not stripped/;
 
 	my ($base_file)=$file=~/^\Q$tmp\E(.*)/;
-	my $debug_path;
-	my $debug_build_id;
+	my ($debug_path, $debug_build_id);
 
 	if ($use_build_id &&
 	    `LC_ALL=C readelf -n $file`=~ /^\s+Build ID: ([0-9a-f]{2})([0-9a-f]+)$/m) {
@@ -256,17 +254,7 @@ sub make_debug {
 	}
 
 	if ($use_build_id) {
-		my $debugpackagename=$package;
-		if (ref $dh{DEBUGPACKAGES}) {
-			$debugpackagename=@{$dh{DEBUGPACKAGES}}[0];
-		}
-
-		my $internal_path = "debian/.debhelper/${debugpackagename}";
-		make_path($internal_path) if ! -d $internal_path;
-		my $path = "${internal_path}/ddeb-build-ids";
-		open(my $fd, '>>', $path) or error("open $path failed: $!");
-		print {$fd} "$debug_build_id ";
-		close($fd) or error("close $path failed: $!");
+		push(@build_ids, $debug_build_id);
 	}
 
 	# No reason for this to be executable.
@@ -316,7 +304,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$use_build_id = 2;
 		}
 	}
-	@shared_libs=@executables=@static_libs=();
+	@shared_libs=@executables=@static_libs=@build_ids=();
 	find(\&testfile,$tmp);
 
 	foreach (@shared_libs) {
@@ -361,6 +349,20 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			print {$fd} "$dh{MIGRATE_DDEB}\n";
 			close($fd) or error("close $path failed: $!");
 		}
+	}
+	if (@build_ids && ($use_build_id > 1 || ref($dh{DEBUGPACKAGES}))) {
+		my ($dir, $path);
+		if ($use_build_id > 1) {
+			$dir = "debian/.debhelper/${package}";
+		} else {
+			my $dbg_pkg = @{$dh{DEBUGPACKAGES}}[0];
+			$dir = "debian/.debhelper/${dbg_pkg}";
+		}
+		$path = "${dir}/ddeb-build-ids";
+		install_dir($dir) if ! -d $dir;
+		open(my $fd, '>>', $path) or error("open $path failed: $!");
+		print {$fd} join(q{ }, @build_ids) . "\n";
+		close($fd) or error("close $path failed: $!");
 	}
 }
 
