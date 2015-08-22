@@ -972,10 +972,10 @@ sub optional_command {
 	foreach my $dir (split(':', $ENV{'PATH'})) {
 		if (open(my $h, '<', "$dir/$command")) {
 			close($h);
-			return 1;
+			return ($command);
 		}
 	}
-	return 0;
+	return;
 }
 
 sub extract_skipinfo {
