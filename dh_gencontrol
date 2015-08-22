@@ -121,9 +121,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 		doit("chmod","0644","${ddeb_tmp}/DEBIAN/control");
 		doit("chown","0:0","${ddeb_tmp}/DEBIAN/control");
-	}
-
-	if ($build_ids) {
+	} elsif ($build_ids) {
+		# Only include the build-id if there is no ddeb (if there is a
+		# ddeb, the build-ids into the ddeb's control file)
 		push(@debug_info_params, "-DX-Build-Ids=${build_ids}");
 	}
 
