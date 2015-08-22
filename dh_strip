@@ -234,7 +234,7 @@ sub make_debug {
 	if ($use_build_id &&
 	    `LC_ALL=C readelf -n $file`=~ /^\s+Build ID: ([0-9a-f]{2})([0-9a-f]+)$/m) {
 		$debug_path=$desttmp."/usr/lib/debug/.build-id/$1/$2.debug";
-		$debug_build_id=$2;
+		$debug_build_id="${1}${2}";
 	}
 	elsif ($use_build_id > 1) {
 		# For ddebs, we need build-id (else it will not be co-installable).
