@@ -79,7 +79,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		complex_doit("echo misc:Pre-Depends= >> $substvars");
 	}
 
-	my $build_ids = undef;
+	my (@debug_info_params, $build_ids);
 	if ( -d $ddeb_info_dir ) {
 		$build_ids = read_ddeb_build_ids($ddeb_info_dir);
 	}
@@ -123,7 +123,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("chown","0:0","${ddeb_tmp}/DEBIAN/control");
 	}
 
-	my @debug_info_params = ();
 	if ($build_ids) {
 		push(@debug_info_params, "-DX-Build-Ids=${build_ids}");
 	}
