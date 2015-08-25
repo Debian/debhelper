@@ -96,7 +96,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			 "-DPackage=${package}-dbgsym",
 			 "-DDepends=${package} (= \${binary:Version})",
 			 "-DDescription=Debug symbols for ${package}",
-			 "-DX-Build-Ids=${build_ids}",
+			 "-DBuild-Ids=${build_ids}",
 		);
 		# Disable multi-arch unless the original package is an
 		# multi-arch: same package.  In all other cases, we do not
@@ -124,7 +124,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	} elsif ($build_ids) {
 		# Only include the build-id if there is no ddeb (if there is a
 		# ddeb, the build-ids into the ddeb's control file)
-		push(@debug_info_params, "-DX-Build-Ids=${build_ids}");
+		push(@debug_info_params, "-DBuild-Ids=${build_ids}");
 	}
 
 	# Generate and install control file.
