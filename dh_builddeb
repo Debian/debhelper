@@ -139,9 +139,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("dpkg-deb", @{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$dh{FILENAME});
 	}
 	else {
-		my @dpkg_args = default_compressor_args(["-z1", "-Zxz", "-Sextreme"],
-												@{$dh{U_PARAMS}});
-		doit("dpkg-deb", @dpkg_args, "--build", $tmp, $dh{DESTDIR}.$dh{FILENAME});
+		my $filename=$dh{FILENAME};
+		if (! $filename) {
+			$filename="/".udeb_filename($package);
+		}
+		doit("dpkg-deb", "-z1", "-Zxz", "-Sextreme",
+			@{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$filename);
 	}
 	exit 0;
 }

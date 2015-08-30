@@ -16,7 +16,7 @@ use vars qw(@EXPORT %dh);
 	    &autoscript &filearray &filedoublearray
 	    &getpackages &basename &dirname &xargs %dh
 	    &compat &addsubstvar &delsubstvar &excludefile &package_arch
-	    &is_udeb &debhelper_script_subst &escape_shell
+	    &is_udeb &udeb_filename &debhelper_script_subst &escape_shell
 	    &inhibit_log &load_log &write_log &commit_override_log
 	    &dpkg_architecture_value &sourcepackage &make_symlink
 	    &is_make_jobserver_unavailable &clean_jobserver_makeflags
@@ -969,6 +969,24 @@ sub is_udeb {
 		return 0;
 	}
 	return $package_types{$package} eq 'udeb';
+}
+
+sub _xdeb_filename {
+	my ($package, $ext, $actual_name) = @_;
+
+	my $filearch=package_arch($package);
+	isnative($package); # side effect
+	my $version=$dh{VERSION};
+	$version=~s/^[0-9]+://; # strip any epoch
+	$actual_name = $package if not defined($actual_name);
+	return "${actual_name}_${version}_${filearch}.${ext}";
+}
+
+# Generates the filename that is used for a udeb package.
+sub udeb_filename {
+	my ($package) = @_;
+
+	return _xdeb_filename($package, 'udeb');
 }
 
 # Handles #DEBHELPER# substitution in a script; also can generate a new
