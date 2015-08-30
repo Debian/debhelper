@@ -26,6 +26,11 @@ debhelper (9.20150811+unreleased) UNRELEASED; urgency=medium
   * dh_gencontrol/dh_builddeb: Temporarily stop building ddebs
     for udebs as dpkg-gencontrol and dpkg-deb does not agree
     the default file extension for these.
+  * dh_builddeb: Generate udebs with the correct filename even
+    when "-V" is passed to dpkg-gencontrol.  This relies on
+    dpkg-deb getting everything but the extension correct
+    (see #575059, #452273 for why it does not produce the
+     correct extesion).  (Closes: #516721, #677353)
 
   [ Paul Tagliamonte ]
   * dh_gencontrol: Put debug debs back in the "debug" section.

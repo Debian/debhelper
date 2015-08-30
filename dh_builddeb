@@ -93,6 +93,33 @@ sub default_compressor_args {
 	return (@{$default_comp}, @args);
 }
 
+sub build_and_rename_deb {
+	my ($package, $destdir, $cmd, $rename_sub) = @_;
+	my $build_dir = "debian/.debhelper/scratch-space/build-${package}";
+	my ($dpkg_filename, $desired_filename);
+	if ( ! -d $build_dir) {
+		install_dir($build_dir);
+	}
+	doit(@${cmd}, $build_dir);
+	opendir(my $fd, $build_dir);
+	for my $name (readdir($fd)) {
+		next if $name eq '.' or $name eq '..';
+		if ($dpkg_filename) {
+			error("\"@{$cmd}\" produced two debs: $dpkg_filename and $name");
+		}
+		$dpkg_filename = $name;
+	}
+	closedir($fd);
+	local $_ = $dpkg_filename;
+	$rename_sub->();
+	$desired_filename = $_;
+	if ($desired_filename ne $dpkg_filename) {
+		print "\tRenaming $dpkg_filename to $desired_filename\n";
+	}
+	doit('mv', '-f', "${build_dir}/${dpkg_filename}",
+		 "${destdir}/${desired_filename}");
+}
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $pid=fork();
 	if (! defined $pid) {
@@ -140,11 +167,23 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 	else {
 		my $filename=$dh{FILENAME};
+		my @cmd = qw(dpkg-deb -z1 -Zxz -Sextreme);
+		push(@cmd, @{$dh{U_PARAMS}}) if $dh{U_PARAMS};
+		push(@cmd, '--build', $tmp);
 		if (! $filename) {
-			$filename="/".udeb_filename($package);
+			# dpkg-gencontrol does not include "Package-Type" in the
+			# control file (see #575059, #452273) for political
+			# reasons.
+			#
+			# dh_builddeb used to guess the "correct" filename, but it
+			# fell short when dpkg-gencontrol -V was used.  The best
+			# solution so far: Let dpkg-deb build the deb and
+			# have dh_builddeb fix the extension.
+			build_and_rename_deb($package, $dh{DESTDIR}, \@cmd,
+								 sub { s/\.deb$/\.udeb/g });
+		} else {
+			doit(@cmd, $dh{DESTDIR}.$filename);
 		}
-		doit("dpkg-deb", "-z1", "-Zxz", "-Sextreme",
-			@{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$filename);
 	}
 	exit 0;
 }
