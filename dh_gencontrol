@@ -84,7 +84,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		$build_ids = read_ddeb_build_ids($ddeb_info_dir);
 	}
 
-	if ( -d $ddeb_tmp) {
+	# Temporary workaround: Do not build ddebs for udebs as
+	# dpkg-gencontrol and dpkg-deb does not agree on the file
+	# extension.
+	if ( -d $ddeb_tmp and not is_udeb($package)) {
 		my $multiarch = package_multiarch($package);
 		my $replaces = read_ddeb_migration($ddeb_info_dir);
 

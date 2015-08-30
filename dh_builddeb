@@ -130,7 +130,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 											   @{$dh{U_PARAMS}});
 			doit("dpkg-deb", @args,
 				 "--build", $ddeb_tmpdir, $dh{DESTDIR});
-		} else {
+		} elsif (not is_udeb($package)) {
 			warning("Not building ddeb for ${package} as it has no control file");
 			warning("Please use dh_gencontrol to avoid this issue");
 		}
