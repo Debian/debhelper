@@ -45,12 +45,16 @@ things to exclude.
 
 =item B<--dbg-package=>I<package>
 
+=begin comment
+
 B<This option is a now special purpose option that you normally do not
 need>.  In most cases, there should be little reason to use this
 option for new source packages as debhelper generates automatic debug
 packages ("ddebs").  B<If you have a manual --dbg-package> that you
 want to migrate to the automatic ddeb, please see the
 B<--ddeb-migration> option.
+
+=end
 
 Causes B<dh_strip> to save debug symbols stripped from the packages it acts on
 as independent files in the package build directory of the specified debugging
@@ -97,8 +101,16 @@ Examples:
 =item B<--ddebs>, B<--no-ddebs>
 
 Control whether B<dh_strip> should be creating ddebs when possible.
-By default, B<dh_strip> will attempt to build ddebs and this option is
-primarily useful for disabling this.
+
+Once the Debian archive supports ddebs, debhelper will generate ddebs
+by default.  Until then, this option does nothing except allow you to
+pre-emptively disable ddebs if you know the generated ddebs will not
+work for your package.
+
+If you want to test the ddebs feature, you can set the environment
+variable I<DH_BUILD_DDEBS> to 1.  Keep in mind that the Debian archive
+does B<not> accept them yet.  This variable is only a temporary safe
+guard and will be removed once the archive is ready to accept ddebs.
 
 =back
 
