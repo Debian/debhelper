@@ -48,6 +48,21 @@ init();
 
 my $vendorlib = substr $Config{vendorlib}, 1;
 my $vendorarch = substr $Config{vendorarch}, 1;
+my @mode_0644_patterns = (
+	# Libraries and related files
+	'*.so.*', '*.so', '*.la', '*.a',
+	# Web application related files
+	'*.js', '*.css',
+	# Images
+	'*.jpeg', '*.jpg', '*.png', '*.gif',
+	# OCaml native-code shared objects
+	'*.cmxs',
+);
+# Turn the patterns in to a find pattern
+my $mode_0644_find_pattern = sprintf('\\( -name %s \\)',
+									 join(' -o -name ',
+										  map { "'$_'" } @mode_0644_patterns));
+
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
@@ -74,12 +89,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	complex_doit("find $tmp/usr/share/man $tmp/usr/man/ $tmp/usr/X11*/man/ -type f",
 		"$find_options -print0 2>/dev/null | xargs -0r chmod 0644");
 
-	# ..and so are executable shared and static libraries 
-	# (and .la files from libtool) ..
-	complex_doit("find $tmp -perm -5 -type f",
-		"\\( -name '*.so.*' -or -name '*.so' -or -name '*.la' -or -name '*.a' \\) $find_options -print0",
-		"2>/dev/null | xargs -0r chmod 0644");
-	
 	# ..and header files ..
 	complex_doit("find $tmp/usr/include -type f $find_options -print0",
 		"2>/dev/null | xargs -0r chmod 0644");
@@ -87,16 +96,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# ..and desktop files ..
 	complex_doit("find $tmp/usr/share/applications -type f $find_options -print0",
 		"2>/dev/null | xargs -0r chmod 0644");
-
-	# ..and OCaml native-code shared objects ..
-	complex_doit("find $tmp -perm -5 -type f",
-		"\\( -name '*.cmxs' \\) $find_options -print0",
-		"2>/dev/null | xargs -0r chmod 0644");
 	
 	# .. and perl modules.
 	complex_doit("find $tmp/$vendorarch $tmp/$vendorlib -type f",
 		"-perm -5 -name '*.pm' $find_options -print0",
 		"2>/dev/null | xargs -0r chmod a-X");
+
+	complex_doit("find $tmp -perm 5 -type f ${mode_0644_find_pattern}",
+				 "${find_options} -print0 2>/dev/null",
+				 "| xargs -0r chmod 0644");
 	
 	# v4 and up
 	if (! compat(3)) {
