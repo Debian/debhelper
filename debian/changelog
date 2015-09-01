@@ -39,6 +39,11 @@ debhelper (9.20150811+unreleased) UNRELEASED; urgency=medium
   * dh_fixperms: Reset permissions to 0644 for .js, .css,
     .jpeg, .jpg, .png, and .gif files.  Thanks to Ernesto
     Hernández-Novich for the suggestion.  (Closes: #595097)
+  * dh_install: Read debian/not-installed if present as a
+    list of files that are deliberately not installed.
+    Files listed here will not cause dh_install to complain
+    with --list-missing.  Thanks to Peter Eisentraut for the
+    suggestion.  (Closes: #436240)
 
   [ Paul Tagliamonte ]
   * dh_gencontrol: Put debug debs back in the "debug" section.

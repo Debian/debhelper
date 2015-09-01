@@ -55,6 +55,15 @@ itself, with no explicit destination, then B<dh_install>
 will automatically guess the destination to use, the same as if the
 --autodest option were used.
 
+=item debian/not-installed
+
+List the files that are deliberately not installed in any package.
+This is used with B<--list-missing> (or B<--fail-missing>) as an
+exclude file.
+
+Please keep in mind that dh_install will B<not> expand wildcards in
+this file.
+
 =back
 
 =head1 OPTIONS
@@ -229,6 +238,10 @@ if ($dh{LIST_MISSING} || $dh{FAIL_MISSING}) {
 	}
 	
 	my @missing;
+	if ( -f 'debian/not-installed') {
+		# Pretend that these are also installed.
+		push(@installed, filearray('debian/not-installed'));
+	}
 	my $installed=join("|", map {
 		# Kill any extra slashes, for robustness.
 		y:/:/:s;
