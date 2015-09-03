@@ -1147,7 +1147,7 @@ sub get_source_date_epoch {
 		return;
 	}
 
-	my $changelog = Dpkg::Changelog::Debian->new();
+	my $changelog = Dpkg::Changelog::Debian->new(range => {"count" => 1});
 	$changelog->load("debian/changelog");
 
 	my $tt = @{$changelog}[0]->get_timestamp();
