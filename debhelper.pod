@@ -617,8 +617,15 @@ the set command):
   my $temp="set -e\nset -- @ARGV\n" . << 'EOF';
   #DEBHELPER#
   EOF
-  system ($temp) / 256 == 0
-  	or die "Problem with debhelper scripts: $!";
+  if (system($temp)) {
+     my $exit_code = ($? >> 8) & 0xff;
+     my $signal = $? & 0xff;
+     if ($exit_code) {
+         die("The debhelper script failed with error code: ${exit_code}");
+     } else {
+         die("The debhelper script was killed by signal: ${signal}");
+     }
+  }
 
 =head2 Automatic generation of miscellaneous dependencies.
 
