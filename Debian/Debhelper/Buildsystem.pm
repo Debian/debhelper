@@ -301,8 +301,12 @@ sub doit_in_sourcedir {
 	if ($this->get_sourcedir() ne '.') {
 		my $sourcedir = $this->get_sourcedir();
 		$this->_cd($sourcedir);
-		print_and_doit(@_);
+		eval {
+			print_and_doit(@_);
+		};
+		my $saved_exception = $@;
 		$this->_cd($this->_rel2rel($this->{cwd}, $sourcedir));
+		die $saved_exception if $saved_exception;
 	}
 	else {
 		print_and_doit(@_);
@@ -336,8 +340,12 @@ sub doit_in_builddir {
 	if ($this->get_buildpath() ne '.') {
 		my $buildpath = $this->get_buildpath();
 		$this->_cd($buildpath);
-		print_and_doit(@_);
+		eval {
+			print_and_doit(@_);
+		};
+		my $saved_exception = $@;
 		$this->_cd($this->_rel2rel($this->{cwd}, $buildpath));
+		die $saved_exception if $saved_exception;
 	}
 	else {
 		print_and_doit(@_);
