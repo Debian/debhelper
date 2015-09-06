@@ -18,7 +18,7 @@ debhelper (9.20150811+unreleased) UNRELEASED; urgency=medium
     explicit debian/<package>.service file.
     (Closes: #795519)
   * dh_makeshlibs: Revert passing -X to ldconfig in compat 10
-    after talking with the glibc maintainer.  The is not the
+    after talking with the glibc maintainer.  This is not the
     right place to make this change.
   * d/control: Remove the homepage field.
   * dh: Make dh_strip_nondeterminism optional, so debhelper
@@ -44,13 +44,13 @@ debhelper (9.20150811+unreleased) UNRELEASED; urgency=medium
     Files listed here will not cause dh_install to complain
     with --list-missing.  Thanks to Peter Eisentraut for the
     suggestion.  (Closes: #436240)
-  * Cherry-pick patch from Chris Lamb to only read the
-    latest changelog entry when determing the
+  * Dh_Lib: Cherry-pick patch from Chris Lamb to only read
+    the latest changelog entry when determing the
     SOURCE_DATE_EPOCH.
-  * Provide a better example of how to insert the debhelper
-    maintainer script snippets into a maintainer script
-    written in Perl.  Thanks to Jakub Wilk for reporting the
-    issues.  (Closes: #797904)
+  * debhelper.7: Provide a better example of how to insert
+    the debhelper maintainer script snippets into a maintainer
+    script written in Perl.  Thanks to Jakub Wilk for
+    reporting the issues.  (Closes: #797904)
   * dh_shlibdeps: The "-L" option can now be passed multiple
     times with different package names.  Thanks to Tristan
     Schmelcher for the suggestion.  (Closes: #776103)
