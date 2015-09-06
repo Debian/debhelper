@@ -232,15 +232,21 @@ If the build system prefers out of source tree building but still
 allows in source building, the latter can be re-enabled by passing a build
 directory path that is the same as the source directory path.
 
-=item B<--parallel>
+=item B<--parallel>, B<--no-parallel>
 
-Enable parallel builds if underlying build system supports them.
-The number of parallel jobs is controlled by the
-B<DEB_BUILD_OPTIONS> environment variable (L<Debian Policy, section 4.9.1>) at
-build time. It might also be subject to a build system specific limit.
+Control whether parallel builds should be used if underlying build
+system supports them.  The number of parallel jobs is controlled by
+the B<DEB_BUILD_OPTIONS> environment variable (L<Debian Policy,
+section 4.9.1>) at build time. It might also be subject to a build
+system specific limit.
 
-If this option is not specified, debhelper currently defaults to not
-allowing parallel package builds.
+If neither option are not specified, debhelper currently defaults to
+B<--parallel> in compat 10 (or later) and B<--no-parallel> otherwise.
+
+As an optimization, B<dh> will try to avoid passing these options to
+subprocesses, if they are unncessary and the only options passed.
+Notably this happens when B<DEB_BUILD_OPTIONS> does not have a
+I<parallel> parameter (or its value is 1).
 
 =item B<--max-parallel=>I<maximum>
 
@@ -248,6 +254,9 @@ This option implies B<--parallel> and allows further limiting the number of
 jobs that can be used in a parallel build. If the package build is known to
 only work with certain levels of concurrency, you can set this to the maximum
 level that is known to work, or that you wish to support.
+
+Notably, setting the maximum to 1 is effectively the same as using
+B<--no-parallel>.
 
 =item B<--list>, B<-l>
 
@@ -562,6 +571,12 @@ instead.
 
 B<dh_installwm> refuses to create a broken package if no man page
 can be found (required to register for the x-window-manager alternative).
+
+=item -
+
+Debhelper will default to B<--parallel> for all buildsystems that
+support parallel building.  This can be disabled by using either
+B<--no-parallel> or passing B<--max-parallel> with a value of 1.
 
 =back
 

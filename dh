@@ -167,12 +167,21 @@ in a subdirectory, which will be removed on B<clean>.
 	%:
 		dh $@ --builddirectory=build
 
-If your package can be built in parallel, you can support parallel building
-as follows. Then B<dpkg-buildpackage -j> will work.
+If your package can be built in parallel, please either use compat 10 or
+pass B<--parallel> to dh. Then B<dpkg-buildpackage -j> will work.
 
 	#!/usr/bin/make -f
 	%:
 		dh $@ --parallel
+
+If your package cannot be built reliably while using multiple threads,
+please pass B<--no-parallel> to dh (or the relevant B<dh_auto_>I<*>
+command):
+
+
+	#!/usr/bin/make -f
+	%:
+		dh $@ --no-parallel
 
 Here is a way to prevent B<dh> from running several commands that you don't
 want it to run, by defining empty override targets for each command.
@@ -578,17 +587,22 @@ while (@ARGV_orig) {
 		next;
 	}
 	elsif ($opt=~/^-/) {
-		if (not @options and $opt eq '--parallel') {
+		if (not @options and $opt eq '--parallel' or $opt eq '--no-parallel') {
+			my $max_parallel;
+			# Ignore the option if it is the default for the given
+			# compat level.
+			next if compat(9) and $opt eq '--no-parallel';
+			next if not compat(9) and $opt eq '--parallel';
 			# Having an non-empty "@options" hurts performance quite a
 			# bit.  At the same time, we want to promote the use of
-			# --parallel, so "tweak" the options a bit if there is no
-			# reason to include it.
-			my $max_parallel = get_buildoption('parallel') // 1;
+			# --(no-)parallel, so "tweak" the options a bit if there
+			# is no reason to include this option.
+			$max_parallel = get_buildoption('parallel') // 1;
 			next if $max_parallel == 1;
 		}
 		push @options, "-O".$opt;
 		$user_specified_options=1
-			unless $opt =~ /^--(parallel|buildsystem|sourcedirectory|builddirectory|)/;
+			unless $opt =~ /^--((?:no-)?parallel|buildsystem|sourcedirectory|builddirectory|)/;
 	}
 	elsif (@options) {
 		$user_specified_options=1;
