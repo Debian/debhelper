@@ -66,6 +66,9 @@ It tells B<dpkg-shlibdeps> (via its B<-S> parameter) to look first in the packag
 build directory for the specified package, when searching for libraries,
 symbol files, and shlibs files.
 
+If needed, this can be passed multiple times with different package
+names.
+
 =back
 
 =head1 EXAMPLES
@@ -91,9 +94,9 @@ on libbar1 as follows:
 =cut
 
 init(options => {
-	"L|libpackage=s" => \$dh{LIBPACKAGE},
-	"dpkg-shlibdeps-params=s", => \$dh{U_PARAMS},
-	"l=s", => \$dh{L_PARAMS},
+	"L|libpackage=s@" => \$dh{LIBPACKAGE},
+	"dpkg-shlibdeps-params=s" => \$dh{U_PARAMS},
+	"l=s" => \$dh{L_PARAMS},
 });
 
 if (defined $dh{V_FLAG}) {
@@ -131,8 +134,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	if (@filelist) {
 		my @opts;
-		if (defined $dh{LIBPACKAGE} && length $dh{LIBPACKAGE}) {
-			@opts=("-S".tmpdir($dh{LIBPACKAGE}));
+		if (defined($dh{LIBPACKAGE})) {
+			@opts = map { '-S' . tmpdir($_) } @{$dh{LIBPACKAGE}};
 		}
 		
 		push @opts, "-tudeb" if is_udeb($package);
