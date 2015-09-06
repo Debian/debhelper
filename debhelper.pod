@@ -634,7 +634,7 @@ the set command):
   EOF
   if (system($temp)) {
      my $exit_code = ($? >> 8) & 0xff;
-     my $signal = $? & 0xff;
+     my $signal = $? & 0x7f;
      if ($exit_code) {
          die("The debhelper script failed with error code: ${exit_code}");
      } else {
