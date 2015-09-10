@@ -233,6 +233,12 @@ autoscript($package, $scriptname, $snippetname, $sedcommands || $sub)
 	maintainer script (like the postinst or prerm).
 	Note that in v6 mode and up, the snippets are added in reverse
 	order for the removal scripts.
+autotrigger($package, $trigger_type, $trigger_target)
+	This command automatically adds a trigger to the package.  The
+	parameters:
+	- binary package to be affected
+	- the type of trigger (e.g. "activate-noawait")
+	- the target (e.g. "ldconfig" or "/usr/share/foo")
 dirname($pathname)
 	Return directory part of pathname.
 basename($pathname)

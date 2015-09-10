@@ -24,6 +24,7 @@ use vars qw(@EXPORT %dh);
 	    &install_dh_config_file &error_exitcode &package_multiarch
 	    &install_file &install_prog &install_lib &install_dir
 	    &get_source_date_epoch &is_cross_compiling
+	    &generated_file &autotrigger
 );
 
 my $max_compat=10;
@@ -628,6 +629,51 @@ sub autoscript_sed {
 	else {
 		complex_doit("sed \"$sed\" $infile >> $outfile");
 	}
+}
+
+# Adds a trigger to the package
+{
+	my %VALID_TRIGGER_TYPES = map { $_ => 1 } qw(
+		interest interest-await interest-noawait
+		activate activate-await activate-noawait
+	);
+
+	sub autotrigger {
+		my ($package, $trigger_type, $trigger_target) = @_;
+		my $triggers_file = generated_file($package, 'triggers');
+		my $ifd;
+		if ( -f $triggers_file ) {
+			open($ifd, '<', $triggers_file)
+				or error("open $triggers_file failed $!");
+		} else {
+			open($ifd, '<', '/dev/null')
+				or error("open /dev/null failed $!");
+		}
+		open(my $ofd, '>', "${triggers_file}.new")
+			or error("open ${triggers_file}.new failed $!");
+		while (my $line = <$ifd>) {
+			next if $line =~ m{\A  \Q${triggers_file}\E  \s+
+                                   \Q${trigger_target}\E (?:\s|\Z)
+                              }x;
+			print {$ofd} $line;
+		}
+		print {$ofd} '# Triggers added by ' . basename($0) . "\n";
+		print {$ofd} "${trigger_type} ${trigger_target}\n";
+		close($ofd) or error("closing ${triggers_file}.new failed: $!");
+		close($ifd);
+		doit('mv', '-f', "${triggers_file}.new", $triggers_file);
+	}
+}
+
+sub generated_file {
+	my ($package, $filename, $mkdirs) = @_;
+	my $dir = "debian/.debhelper/generated/${package}";
+	my $path = "${dir}/${filename}";
+	$mkdirs //= 1;
+	if ($mkdirs and not -d $dir) {
+		install_dir($dir);
+	}
+	return $path;
 }
 
 # Removes a whole substvar line.

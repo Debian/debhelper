@@ -121,7 +121,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	# Install non-executable files
-	my @non_exec_files = (qw{conffiles triggers});
+	my @non_exec_files = (qw{conffiles});
 	# In compat 10, we let dh_makeshlibs handle "shlibs".
 	push(@non_exec_files, 'shlibs') if compat(9);
 	foreach my $file (@non_exec_files) {
@@ -130,6 +130,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			install_file($f, "$tmp/DEBIAN/$file");
 		}
 	}
+
+	install_triggers($package, $tmp);
 
 	# Automatic conffiles registration: If it is in /etc, it is a
 	# conffile.
@@ -143,6 +145,31 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			doit("chmod","0644","$tmp/DEBIAN/conffiles");
 		}
 	}
+}
+
+sub install_triggers {
+	my ($package, $tmp) = @_;
+	my $generated = generated_file($package, 'triggers', 0);
+	my @sources = grep { -f $_ } (
+		pkgfile($package, 'triggers'),
+		$generated,
+	);
+	my $target = "$tmp/DEBIAN/triggers";
+	return if not @sources;
+	if (@sources > 1) {
+		my $merged = "${generated}.merged";
+		open(my $ofd, '>', $merged)
+			or error("open ${target} failed: $!");
+		for my $src (@sources) {
+			open(my $ifd, '<', $src)
+				or error("open ${src} failed: $!");
+			print {$ofd} $_ while <$ifd>;
+			close($ifd);
+		}
+		close($ofd)	or error("close ${merged} failed: $!");
+		@sources = ($merged);
+	}
+	install_file($sources[0], $target);
 }
 
 =head1 SEE ALSO

@@ -81,7 +81,10 @@ be upgraded.
 
 =item B<-n>, B<--noscripts>
 
-Do not modify F<postinst>/F<postrm> scripts.
+Do not add the "ldconfig" trigger even if it seems like the package
+might need it.  The option is called B<--noscripts> for historical
+reasons as B<dh_makeshlibs> would previously generate maintainer
+scripts that called B<ldconfig>.
 
 =item B<-X>I<item>, B<--exclude=>I<item>
 
@@ -230,10 +233,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		complex_doit("echo '$_' >>$tmp/DEBIAN/shlibs");
 	}
 
-	# New as of dh_v3.
-	if (! compat(2) && ! $dh{NOSCRIPTS} && $need_ldconfig) {
-		autoscript($package,"postinst","postinst-makeshlibs");
-		autoscript($package,"postrm","postrm-makeshlibs");
+	# Historically, --noscripts would disable the creation of
+	# maintscripts for calling ldconfig.
+	if (! $dh{NOSCRIPTS} && $need_ldconfig) {
+		autotrigger($package, 'activate-noawait', 'ldconfig');
 	}
 
 	if ($shlibs_file) {
