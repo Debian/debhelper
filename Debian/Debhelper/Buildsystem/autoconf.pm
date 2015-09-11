@@ -23,6 +23,10 @@ sub check_auto_buildable {
 	if ($step eq "configure") {
 		return 1 if -x $this->get_sourcepath("configure");
 	}
+	if ($step eq "test") {
+		return 1 if (-e $this->get_buildpath("Makefile") &&
+			     -x $this->get_sourcepath("configure"));
+	}
 	return 0;
 }
 
@@ -76,6 +80,12 @@ sub configure {
 		}
 		die $@;
 	}
+}
+
+sub test {
+	my $this=shift;
+	$this->make_first_existing_target(['test', 'check'],
+		"VERBOSE=1", @_);
 }
 
 1

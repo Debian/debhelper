@@ -51,7 +51,7 @@ all: stamp_configure \$(CONFIGURE)
 
 # Tests if dh_auto_test executes 'check' target if 'test' does not exist
 check: \$(CONFIGURE) stamp_build
-	\@echo Tested > stamp_test
+	\@echo VERBOSE=\$(VERBOSE) > stamp_test
 
 install: stamp_build
 	\@echo DESTDIR=\$(DESTDIR) > stamp_install

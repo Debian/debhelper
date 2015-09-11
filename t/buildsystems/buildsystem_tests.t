@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 297;
+use Test::More tests => 299;
 
 use strict;
 use warnings;
@@ -264,7 +264,7 @@ test_check_auto_buildable($bs{perl_makemaker}, "Makefile.PL", { configure => 1 }
 # With Makefile
 touch "$builddir/Makefile";
 test_check_auto_buildable($bs{makefile}, "Makefile", 1);
-test_check_auto_buildable($bs{autoconf}, "configure+Makefile", { configure => 1 });
+test_check_auto_buildable($bs{autoconf}, "configure+Makefile", { configure => 1, test => 1 });
 test_check_auto_buildable($bs{cmake}, "CMakeLists.txt+Makefile", 1);
 touch "$builddir/CMakeCache.txt"; # strong evidence that cmake was run
 test_check_auto_buildable($bs{cmake}, "CMakeCache.txt+Makefile", 2);
@@ -317,7 +317,7 @@ touch "$tmpdir/configure", 0755;
 touch "$builddir/Makefile";
 test_autoselection("autoconf",
     { configure => "autoconf", build => "makefile",
-      test => "makefile", install => "makefile", clean => "makefile" }, %tmp);
+      test => "autoconf", install => "makefile", clean => "makefile" }, %tmp);
 cleandir $tmpdir;
 
 # Perl Makemaker (build, test, clean fail with builddir set [not supported])
@@ -474,7 +474,12 @@ sub dh_auto_do_autoconf {
 	&$do_dh_auto('build');
 	ok ( -f "$buildpath/stamp_build", "$buildpath/stamp_build exists" );
 	&$do_dh_auto('test');
-	ok ( -f "$buildpath/stamp_test", "$buildpath/stamp_test exists" );
+	@lines=();
+	if ( ok(open(FILE, "$buildpath/stamp_test"), "$buildpath/stamp_test exists") ) {
+		@lines = @{readlines(\*FILE)};
+	}
+	is_deeply( \@lines, [ "VERBOSE=1" ],
+	    "$buildpath/stamp_test contains VERBOSE=1" );
 	&$do_dh_auto('install');
 	@lines=();
 	if ( ok(open(FILE, "$buildpath/stamp_install"), "$buildpath/stamp_install exists") ) {
