@@ -640,8 +640,14 @@ sub autoscript_sed {
 
 	sub autotrigger {
 		my ($package, $trigger_type, $trigger_target) = @_;
-		my $triggers_file = generated_file($package, 'triggers');
-		my $ifd;
+		my ($triggers_file, $ifd);
+
+		if (not exists($VALID_TRIGGER_TYPES{$trigger_type})) {
+			require Carp;
+			confess("Invalid/unknown trigger ${trigger_type}");
+		}
+
+		$triggers_file = generated_file($package, 'triggers');
 		if ( -f $triggers_file ) {
 			open($ifd, '<', $triggers_file)
 				or error("open $triggers_file failed $!");
