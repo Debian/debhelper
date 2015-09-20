@@ -19,6 +19,10 @@ B<dh_installdirs> [S<I<debhelper options>>] [B<-A>] [S<I<dir> ...>]
 B<dh_installdirs> is a debhelper program that is responsible for creating
 subdirectories in package build directories.
 
+Many packages can get away with omitting the call to B<dh_installdirs>
+completely.  Notably, other B<dh_*> commands are expected to create
+directories as needed.
+
 =head1 FILES
 
 =over 4
@@ -26,6 +30,10 @@ subdirectories in package build directories.
 =item debian/I<package>.dirs
 
 Lists directories to be created in I<package>.
+
+Generally, there is not need to list directories created by the
+upstream build system or directories needed by other B<debhelper>
+commands.
 
 =back
 
