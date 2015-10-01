@@ -5,10 +5,10 @@
 # Américo Monteiro <a_monteiro@gmx.com>, 2014, 2015.
 msgid ""
 msgstr ""
-"Project-Id-Version: debhelper 9.20140817\n"
+"Project-Id-Version: debhelper 9.20150628\n"
 "Report-Msgid-Bugs-To: debhelper@packages.debian.org\n"
 "POT-Creation-Date: 2015-06-28 11:53+0000\n"
-"PO-Revision-Date: 2015-05-06 23:25+0100\n"
+"PO-Revision-Date: 2015-07-02 02:29+0100\n"
 "Last-Translator: Américo Monteiro <a_monteiro@gmx.com>\n"
 "Language-Team: Portuguese <traduz@debianpt.org>\n"
 "Language: pt\n"
@@ -57,7 +57,7 @@ msgstr "debhelper - a suite de ferramentas debhelper"
 #: dh_strip:13 dh_suidregister:7 dh_testdir:12 dh_testroot:7
 #: dh_undocumented:12 dh_usrlocal:15
 msgid "SYNOPSIS"
-msgstr "SINOPSE"
+msgstr "RESUMO"
 
 #. type: textblock
 #: debhelper.pod:7
@@ -3000,7 +3000,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_builddeb:18
-#, fuzzy
 #| msgid ""
 #| "B<dh_builddeb> simply calls L<dpkg-deb(1)> to build a Debian package or "
 #| "packages."
@@ -3010,7 +3009,8 @@ msgid ""
 "L<dh_gencontrol(1)> have prepared them."
 msgstr ""
 "B<dh_builddeb> chama simplesmente L<dpkg-deb(1)> para compilar um pacote ou "
-"vários pacotes Debian."
+"vários pacotes Debian. Também compila pacotes para ddebs quando foram "
+"preparados por L<dh_strip(1)> e L<dh_gencontrol(1)>."
 
 #. type: textblock
 #: dh_builddeb:22
@@ -3082,7 +3082,8 @@ msgstr ""
 #: dh_clean:18
 #, no-wrap
 msgid ""
-"B<dh_clean> is a debhelper program that is responsible for cleaning up after a\n"
+"B<dh_clean> is a debhelper program that is responsible for cleaning up after "
+"a\n"
 "package is built. It removes the package build directories, and removes some\n"
 "other files including F<debian/files>, and any detritus left behind by other\n"
 "debhelper commands. It also removes common files that should not appear in a\n"
@@ -3495,7 +3496,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_gencontrol:22
-#, fuzzy
 #| msgid ""
 #| "This program is merely a wrapper around L<dpkg-gencontrol(1)>, which "
 #| "calls it once for each package being acted on, and passes in some "
@@ -3506,8 +3506,8 @@ msgid ""
 "some additional useful flags."
 msgstr ""
 "Este programa é meramente um wrapper em volta de L<dpkg-gencontrol(1)>, o "
-"qual o chama uma vez por cada pacote em que actua, e passa para ele algumas "
-"bandeiras úteis adicionais."
+"qual o chama uma vez por cada pacote em que actua (mais os ddebs "
+"relacionados), e passa para ele algumas bandeiras adicionais úteis."
 
 #. type: textblock
 #: dh_gencontrol:26
@@ -3518,6 +3518,12 @@ msgid ""
 "packages are built.  As debhelper automatically generates ddebs, it some "
 "times adds additional packages, which will be built by L<dh_builddeb(1)>."
 msgstr ""
+"B<Note> que se você usar B<dh_gencontrol>, você também tem de usar "
+"L<dh_builddeb(1)> para compilar os pacotes. Caso contrário, a sua compilação "
+"pode falhar pois o B<dh_gencontrol> (via L<dpkg-gencontrol(1)>) declara "
+"quais pacotes são compilados. Como o debhelper gera automaticamente ddebs, "
+"por vezes adiciona pacotes adicionais, que serão compilados por "
+"L<dh_builddeb(1)>."
 
 #. type: textblock
 #: dh_gencontrol:39
@@ -6582,7 +6588,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_makeshlibs:34
-#, fuzzy
 #| msgid ""
 #| "Note in compat levels 9 and earlier, this file was installed by "
 #| "qL<dh_installdeb(1)> rather than B<dh_makeshlibs>."
@@ -6591,7 +6596,7 @@ msgid ""
 "L<dh_installdeb(1)> rather than B<dh_makeshlibs>."
 msgstr ""
 "Note que em níveis de compatibilidade 9 e anteriores, este ficheiro era "
-"instalado pelo qL<dh_installdeb(1)> em vez do B<dh_makeshlibs>."
+"instalado pelo L<dh_installdeb(1)> em vez do B<dh_makeshlibs>."
 
 #. type: =item
 #: dh_makeshlibs:37
@@ -7417,6 +7422,12 @@ msgid ""
 "\").  B<If you have a manual --dbg-package> that you want to migrate to the "
 "automatic ddeb, please see the B<--ddeb-migration> option."
 msgstr ""
+"B<Esta opção é agora uma opção de objectivo especial que normalmente "
+"vocẽ não precisa>. Na maioria dos casos, deverá haver poucas razões para "
+"usar esta opção para novos pacotes fonte pois o debhelper automaticamente "
+"gera pacotes de depuração (\"ddebs\"). B<Se você tem um --dbg-package manual> "
+"que deseja migrar para o ddeb automático, por favor veja a opção "
+"B<--ddeb-migration>."
 
 #. type: textblock
 #: dh_strip:54
@@ -7462,6 +7473,8 @@ msgid ""
 "This option implies B<--no-ddebs> and I<cannot> be used with B<--ddeb> or "
 "B<--ddeb-migration>."
 msgstr ""
+"Esta opção implica que B<--no-ddebs> e I<cannot> seja usado com B<--ddeb> "
+"ou B<--ddeb-migration>."
 
 #. type: =item
 #: dh_strip:70
@@ -7485,13 +7498,13 @@ msgstr ""
 msgid ""
 "This option implies B<--no-ddebs> and I<cannot> be used with B<--ddebs>."
 msgstr ""
+"Esta opção implica que B<--no-ddebs> e I<cannot> seja usado com B<--ddebs>."
 
 #. type: =item
 #: dh_strip:79
-#, fuzzy
 #| msgid "B<--dbg-package=>I<package>"
 msgid "B<--ddeb-migration=>I<package-relation>"
-msgstr "B<--dbg-package=>I<pacote>"
+msgstr "B<--ddeb-migration=>I<package-relation>"
 
 #. type: textblock
 #: dh_strip:81
@@ -7502,6 +7515,11 @@ msgid ""
 "added to the ddebs to avoid file conflicts with the (now obsolete) -dbg "
 "package."
 msgstr ""
+"Esta opção é usada para migrar de um pacote \"-dbg\" manual (criado com "
+"B<--dbg-package>) para os \"ddebs\" automáticos. O valor desta opção deve "
+"descrever uma relação B<Replaces>- e B<Breaks> válida, a qual será "
+"adicionada aos ddebs para evitar conflitos de ficheiros com o pacote -dbg "
+"(agora obsoleto)."
 
 #. type: textblock
 #: dh_strip:87
@@ -7509,11 +7527,13 @@ msgid ""
 "This option implies B<--ddebs> and I<cannot> be used with B<--keep-debug>, "
 "B<--dbg-package> or B<--no-ddebs>."
 msgstr ""
+"Esta opção implica que B<--ddebs> e I<cannot> seja usado com "
+"B<--keep-debug>, B<--dbg-package> ou B<--no-ddebs>."
 
 #. type: textblock
 #: dh_strip:90
 msgid "Examples:"
-msgstr ""
+msgstr "Exemplos:"
 
 #. type: verbatim
 #: dh_strip:92
@@ -7522,21 +7542,26 @@ msgid ""
 "  dh_strip --ddeb-migration='libfoo-dbg (<< 2.1-3~)'\n"
 "\n"
 msgstr ""
+"  dh_strip --ddeb-migration='libfoo-dbg (<< 2.1-3~)'\n"
+"\n"
 
 #. type: verbatim
 #: dh_strip:94
 #, no-wrap
 msgid ""
-"  dh_strip --ddeb-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< 2.1-3~)'\n"
+"  dh_strip --ddeb-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< "
+"2.1-3~)'\n"
 "\n"
 msgstr ""
+"  dh_strip --ddeb-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< "
+"2.1-3~)'\n"
+"\n"
 
 #. type: =item
 #: dh_strip:96
-#, fuzzy
 #| msgid "B<-i>, B<--indep>"
 msgid "B<--ddebs>, B<--no-ddebs>"
-msgstr "B<-i>, B<--indep>"
+msgstr "B<--ddebs>, B<--no-ddebs>"
 
 #. type: textblock
 #: dh_strip:98
@@ -7545,10 +7570,12 @@ msgid ""
 "default, B<dh_strip> will attempt to build ddebs and this option is "
 "primarily useful for disabling this."
 msgstr ""
+"Controla se B<dh_strip> deverá criar ddebs quando possível. Por "
+"predefinição, B<dh_strip> irá tentar compilar ddebs e esta opção é útil "
+"principalmente para desactivar isto."
 
 #. type: textblock
 #: dh_strip:106
-#, fuzzy
 #| msgid ""
 #| "If the B<DEB_BUILD_OPTIONS> environment variable contains B<nostrip>, "
 #| "nothing will be stripped, in accordance with Debian policy (section 10.1 "
@@ -7559,7 +7586,8 @@ msgid ""
 "\"Binaries\").  This will also inhibit the creation of automatic \"ddebs\"."
 msgstr ""
 "Se a variável de ambiente B<DEB_BUILD_OPTIONS> conter B<nostrip>,  nada será "
-"despojado, em conformidade com a política Debian (secção 10.1 \"Binários\")."
+"despojado, em conformidade com a política Debian (secção 10.1 \"Binários\"). "
+"Isto irá também inibir a criação de \"ddebs\" automáticos."
 
 #. type: textblock
 #: dh_strip:110
@@ -7567,6 +7595,8 @@ msgid ""
 "The creation of automatic \"ddebs\" can also be prevented by adding "
 "B<noddebs> to the B<DEB_BUILD_OPTIONS> environment variable."
 msgstr ""
+"A criação de \"ddebs\" automáticos também pode ser prevenida ao adicionar "
+"B<noddebs> à variável de ambiente B<DEB_BUILD_OPTIONS>."
 
 #. type: textblock
 #: dh_strip:115
