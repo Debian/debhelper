@@ -72,6 +72,15 @@ any init script, default files, upstart job or systemd service file. May be
 useful if the file is shipped and/or installed by upstream in a way that
 doesn't make it easy to let B<dh_installinit> find it.
 
+B<Caveat>: This will bypass all the regular checks and
+I<unconditionally> modify the scripts.  You will almost certainly want
+to use this with B<-p> to limit, which packages are affected by the
+call.  Example:
+
+ override_dh_installinit:
+	dh_installinit -pfoo --onlyscripts
+	dh_installinit --remaining
+
 =item B<-R>, B<--restart-after-upgrade>
 
 Do not stop the init script until after the package upgrade has been
