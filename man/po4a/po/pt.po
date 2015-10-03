@@ -5,10 +5,10 @@
 # Américo Monteiro <a_monteiro@gmx.com>, 2014, 2015.
 msgid ""
 msgstr ""
-"Project-Id-Version: debhelper 9.20150628\n"
+"Project-Id-Version: debhelper 9.20151002\n"
 "Report-Msgid-Bugs-To: debhelper@packages.debian.org\n"
 "POT-Creation-Date: 2015-10-02 12:59+0000\n"
-"PO-Revision-Date: 2015-07-02 02:29+0100\n"
+"PO-Revision-Date: 2015-10-03 01:00+0100\n"
 "Last-Translator: Américo Monteiro <a_monteiro@gmx.com>\n"
 "Language-Team: Portuguese <traduz@debianpt.org>\n"
 "Language: pt\n"
@@ -649,14 +649,12 @@ msgstr ""
 
 #. type: =item
 #: debhelper.pod:235
-#, fuzzy
 #| msgid "B<-A>, B<--all>"
 msgid "B<--parallel>, B<--no-parallel>"
-msgstr "B<-A>, B<--all>"
+msgstr "B<--parallel>, B<--no-parallel>"
 
 #. type: textblock
 #: debhelper.pod:237
-#, fuzzy
 #| msgid ""
 #| "Enable parallel builds if underlying build system supports them.  The "
 #| "number of parallel jobs is controlled by the B<DEB_BUILD_OPTIONS> "
@@ -668,14 +666,14 @@ msgid ""
 "B<DEB_BUILD_OPTIONS> environment variable (L<Debian Policy, section 4.9.1>) "
 "at build time. It might also be subject to a build system specific limit."
 msgstr ""
-"Activa compilações paralelas se o sistema de compilação o suportar. O número "
-"de trabalhos paralelos é controlado pela variável de ambiente "
-"B<DEB_BUILD_OPTIONS> (L<Debian Policy, secção 4.9.1>) durante a compilação. "
-"Também pode servir como um limite específico do sistema de compilação."
+"Controla se devem ser usadas compilações paralelas se o sistema de "
+"compilação o suportar. O número de trabalhos paralelos é controlado pela "
+"variável de ambiente B<DEB_BUILD_OPTIONS> (L<Debian Policy, secção 4.9.1>) "
+"durante a compilação. Também pode servir como um limite específico do "
+"sistema de compilação."
 
 #. type: textblock
 #: debhelper.pod:243
-#, fuzzy
 #| msgid ""
 #| "If this option is not specified, debhelper currently defaults to not "
 #| "allowing parallel package builds."
@@ -683,8 +681,9 @@ msgid ""
 "If neither option are not specified, debhelper currently defaults to B<--"
 "parallel> in compat 10 (or later) and B<--no-parallel> otherwise."
 msgstr ""
-"Se esta opção não for especificada, presentemente o debhelper usa por "
-"predefinição a não autorização de compilação de pacotes em paralelo."
+"Se nenhuma destas opções for especificada, presentemente o debhelper usa "
+"por predefinição B<--parallel> em modo compatibilidade 10 (ou posterior) "
+"e B<--no-parallel> em caso contrário."
 
 #. type: textblock
 #: debhelper.pod:246
@@ -694,6 +693,10 @@ msgid ""
 "this happens when B<DEB_BUILD_OPTIONS> does not have a I<parallel> parameter "
 "(or its value is 1)."
 msgstr ""
+"Como uma optimização, o B<dh> irá tentar evitar passar estas opções aos "
+"sub-processos, se estas forem desnecessárias e as únicas opções a passar. "
+"De notar que isto acontece quando B<DEB_BUILD_OPTIONS> não tem um parâmetro "
+"I<parallel> (ou o seu valor é 1)."
 
 #. type: =item
 #: debhelper.pod:251
@@ -720,6 +723,8 @@ msgid ""
 "Notably, setting the maximum to 1 is effectively the same as using B<--no-"
 "parallel>."
 msgstr ""
+"De notar que, definir o máximo para 1 é efectivamente o mesmo que usar "
+"B<--no-parallel>."
 
 #. type: =item
 #: debhelper.pod:261 dh:61
@@ -1320,6 +1325,9 @@ msgid ""
 "parallel building.  This can be disabled by using either B<--no-parallel> or "
 "passing B<--max-parallel> with a value of 1."
 msgstr ""
+"Debhelper irá predefinir para B<--parallel> em todos os sistemas de "
+"compilação que suportam compilação paralela. Isto pode ser desactivado "
+"usando B<--no-parallel> ou passando B<--max-parallel> com o valor de 1."
 
 #. type: =head1
 #: debhelper.pod:585 dh_auto_test:46 dh_installcatalogs:60 dh_installdocs:132
@@ -1464,6 +1472,19 @@ msgid ""
 "  }\n"
 "\n"
 msgstr ""
+"  my $temp=\"set -e\\nset -- @ARGV\\n\" . << 'EOF';\n"
+"  #DEBHELPER#\n"
+"  EOF\n"
+"  if (system($temp)) {\n"
+"     my $exit_code = ($? >> 8) & 0xff;\n"
+"     my $signal = $? & 0x7f;\n"
+"     if ($exit_code) {\n"
+"         die(\"The debhelper script failed with error code: ${exit_code}\");\n"
+"     } else {\n"
+"         die(\"The debhelper script was killed by signal: ${signal}\");\n"
+"     }\n"
+"  }\n"
+"\n"
 
 #. type: =head2
 #: debhelper.pod:645
@@ -2236,7 +2257,6 @@ msgstr ""
 
 #. type: textblock
 #: dh:170
-#, fuzzy
 #| msgid ""
 #| "If your package can be built in parallel, you can support parallel "
 #| "building as follows. Then B<dpkg-buildpackage -j> will work."
@@ -2244,9 +2264,9 @@ msgid ""
 "If your package can be built in parallel, please either use compat 10 or "
 "pass B<--parallel> to dh. Then B<dpkg-buildpackage -j> will work."
 msgstr ""
-"Se o seu pacote poder ser compilado em paralelo, você pode suportar a "
-"compilação em paralelo como se seque. Depois o B<dpkg-buildpackage -j> irá "
-"funcionar."
+"Se o seu pacote poder ser compilado em paralelo, por favor use "
+"compatibilidade 10 ou passe B<--parallel> ao dh. Assim o "
+"B<dpkg-buildpackage -j> irá funcionar."
 
 #. type: verbatim
 #: dh:173
@@ -2268,10 +2288,13 @@ msgid ""
 "If your package cannot be built reliably while using multiple threads, "
 "please pass B<--no-parallel> to dh (or the relevant B<dh_auto_>I<*> command):"
 msgstr ""
+"Se o seu pacote não pode ser compilado correctamente usando múltiplos "
+"processos, por favor passe B<--no-parallel> ao dh (ou ao comando "
+"B<dh_auto_>I<*> relevante):"
 
 #. type: verbatim
 #: dh:182
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid ""
 #| "\t#!/usr/bin/make -f\n"
 #| "\t%:\n"
@@ -2285,7 +2308,7 @@ msgid ""
 msgstr ""
 "\t#!/usr/bin/make -f\n"
 "\t%:\n"
-"\t\tdh $@ --parallel\n"
+"\t\tdh $@ --no-parallel\n"
 "\n"
 
 #. type: textblock
@@ -3132,7 +3155,8 @@ msgstr ""
 #: dh_clean:19
 #, no-wrap
 msgid ""
-"B<dh_clean> is a debhelper program that is responsible for cleaning up after a\n"
+"B<dh_clean> is a debhelper program that is responsible for cleaning up after "
+"a\n"
 "package is built. It removes the package build directories, and removes some\n"
 "other files including F<debian/files>, and any detritus left behind by other\n"
 "debhelper commands. It also removes common files that should not appear in a\n"
@@ -3753,10 +3777,9 @@ msgstr ""
 
 #. type: =item
 #: dh_install:58
-#, fuzzy
 #| msgid "debian/I<package>.install"
 msgid "debian/not-installed"
-msgstr "debian/I<pacote>.install"
+msgstr "debian/not-installed"
 
 #. type: textblock
 #: dh_install:60
@@ -3764,6 +3787,9 @@ msgid ""
 "List the files that are deliberately not installed in any package.  This is "
 "used with B<--list-missing> (or B<--fail-missing>) as an exclude file."
 msgstr ""
+"Lista os ficheiros que são deliberadamente não instalados em nenhum "
+"pacote. Isto é usado com B<--list-missing> (ou B<--fail-missing>) como "
+"um ficheiro a excluir."
 
 #. type: textblock
 #: dh_install:64
@@ -3771,6 +3797,8 @@ msgid ""
 "Please keep in mind that dh_install will B<not> expand wildcards in this "
 "file."
 msgstr ""
+"Por favor tenha em mente que o dh_install B<não> irá expandir as wildcards "
+"neste ficheiro."
 
 #. type: =item
 #: dh_install:73
@@ -4570,6 +4598,9 @@ msgid ""
 "completely.  Notably, other B<dh_*> commands are expected to create "
 "directories as needed."
 msgstr ""
+"Muitos pacotes conseguem omitir completamente a chamada a B<dh_installdirs>. "
+"De notar, é de esperar que outros comandos B<dh_*> criem directórios quando "
+"é necessário."
 
 #. type: =item
 #: dh_installdirs:30
@@ -4587,6 +4618,9 @@ msgid ""
 "Generally, there is not need to list directories created by the upstream "
 "build system or directories needed by other B<debhelper> commands."
 msgstr ""
+"Geralmente, não há necessidade de listar os directórios criados pelo sistema "
+"de compilação do autor ou os directórios necessários por outros comandos "
+"B<debhelper>."
 
 #. type: textblock
 #: dh_installdirs:46
@@ -5325,6 +5359,10 @@ msgid ""
 "modify the scripts.  You will almost certainly want to use this with B<-p> "
 "to limit, which packages are affected by the call.  Example:"
 msgstr ""
+"B<Caveat>: Isto irá passar ao lado de todas as verificações regulares e "
+"modificar I<incondicionalmente> os scripts. Quase de certeza que você "
+"irá querer usar isto com B<-p> para limitar quais pacotes serão afectados "
+"pela chamada. Exemplo:"
 
 #. type: verbatim
 #: dh_installinit:80
@@ -5335,6 +5373,10 @@ msgid ""
 "\tdh_installinit --remaining\n"
 "\n"
 msgstr ""
+" override_dh_installinit:\n"
+"\tdh_installinit -pfoo --onlyscripts\n"
+"\tdh_installinit --remaining\n"
+"\n"
 
 #. type: =item
 #: dh_installinit:84
@@ -6797,6 +6839,10 @@ msgid ""
 "B<dh_makeshlibs> would previously generate maintainer scripts that called "
 "B<ldconfig>."
 msgstr ""
+"Não adiciona o trigger \"ldconfig\" mesmo que parece que o pacote possa "
+"precisar dele. A opção é chamada B<--noscripts> por razões históricas "
+"pois o B<dh_makeshlibs> previamente gerava scripts do mantenedor "
+"que chamavam B<ldconfig>."
 
 #. type: textblock
 #: dh_makeshlibs:91
@@ -7386,6 +7432,8 @@ msgstr ""
 msgid ""
 "If needed, this can be passed multiple times with different package names."
 msgstr ""
+"Se necessário, isto pode ser passado várias vezes com diferentes nomes de "
+"pacotes."
 
 #. type: textblock
 #: dh_shlibdeps:76
@@ -7527,7 +7575,7 @@ msgstr "B<--dbg-package=>I<pacote>"
 #. type: =end
 #: dh_strip:48 dh_strip:57
 msgid "comment"
-msgstr ""
+msgstr "comment"
 
 #. type: textblock
 #: dh_strip:50
@@ -7664,10 +7712,12 @@ msgstr ""
 #: dh_strip:99
 #, no-wrap
 msgid ""
-"  dh_strip --ddeb-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< 2.1-3~)'\n"
+"  dh_strip --ddeb-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< "
+"2.1-3~)'\n"
 "\n"
 msgstr ""
-"  dh_strip --ddeb-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< 2.1-3~)'\n"
+"  dh_strip --ddeb-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< "
+"2.1-3~)'\n"
 "\n"
 
 #. type: =item
@@ -7678,7 +7728,7 @@ msgstr "B<--ddebs>, B<--no-ddebs>"
 #. type: textblock
 #: dh_strip:103
 msgid "Control whether B<dh_strip> should be creating ddebs when possible."
-msgstr ""
+msgstr "Controla se o B<dh_strip> deve criar ddebs quando possível."
 
 #. type: textblock
 #: dh_strip:105
@@ -7688,6 +7738,10 @@ msgid ""
 "emptively disable ddebs if you know the generated ddebs will not work for "
 "your package."
 msgstr ""
+"Assim que o arquivo Debian suportar ddebs, o debhelper irá gerar ddebs "
+"por predefinição. Até lá, esta opção não faz nada excepto permitir-lhe "
+"preventivamente desactivar os ddebs quando sabe que os ddebs gerados "
+"não irá funcionar com o seu pacote."
 
 #. type: textblock
 #: dh_strip:110
@@ -7697,6 +7751,10 @@ msgid ""
 "accept them yet.  This variable is only a temporary safe guard and will be "
 "removed once the archive is ready to accept ddebs."
 msgstr ""
+"Se desejar testar a funcionalidade ddebs, você pode definir a variável de "
+"ambiente I<DH_BUILD_DDEBS> para 1. Lembre-se que o arquivo Debian ainda "
+"B<não> os aceita. Esta variável é apenas uma segurança temporária e será "
+"removida assim que o arquivo esteja pronto para aceitar ddebs."
 
 #. type: textblock
 #: dh_strip:119
