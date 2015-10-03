@@ -68,6 +68,7 @@ sub configure {
 	push @flags, "QMAKE_STRIP=:";
 	push @flags, "PREFIX=/usr";
 
+	$this->mkdir_builddir();
 	$this->doit_in_builddir($qmake, @options, @flags, @_);
 }
 
