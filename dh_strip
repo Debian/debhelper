@@ -373,7 +373,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		$path = "${dir}/ddeb-build-ids";
 		install_dir($dir) if ! -d $dir;
 		open(my $fd, '>>', $path) or error("open $path failed: $!");
-		print {$fd} join(q{ }, @build_ids) . "\n";
+		print {$fd} join(q{ }, sort(@build_ids)) . "\n";
 		close($fd) or error("close $path failed: $!");
 	}
 }
