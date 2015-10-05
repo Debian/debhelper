@@ -646,6 +646,7 @@ sub autoscript_sed {
 			require Carp;
 			confess("Invalid/unknown trigger ${trigger_type}");
 		}
+		return if $dh{NO_ACT};
 
 		$triggers_file = generated_file($package, 'triggers');
 		if ( -f $triggers_file ) {
@@ -656,7 +657,7 @@ sub autoscript_sed {
 				or error("open /dev/null failed $!");
 		}
 		open(my $ofd, '>', "${triggers_file}.new")
-			or error("open ${triggers_file}.new failed $!");
+			or error("open ${triggers_file}.new failed: $!");
 		while (my $line = <$ifd>) {
 			next if $line =~ m{\A  \Q${triggers_file}\E  \s+
                                    \Q${trigger_target}\E (?:\s|\Z)
