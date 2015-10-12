@@ -97,7 +97,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				my $pwd=`pwd`;
 				chomp $pwd;
 				my $exclude2 = '-type f'.$exclude;
-				complex_doit("cd '$dir' && find '$basename' -type f$exclude -exec cp --reflink=auto --parents -dp {} $pwd/$tmp/usr/share/doc/$package/examples \\;");
+				complex_doit("cd '$dir' && " .
+							 "find '$basename' -type f$exclude -print0 | xargs -0 -I {} cp --reflink=auto --parents -dp {} $pwd/$tmp/usr/share/doc/$package/examples");
 			}
 			else {
 				doit("cp", '--reflink=auto', "-a", $example,
