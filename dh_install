@@ -214,11 +214,13 @@ foreach my $package (getpackages()) {
 				my $pwd=`pwd`;
 				chomp $pwd;
 				complex_doit("cd '$dir' && " .
-							 "find '$basename' $exclude \\( -type f -or -type l \\) -print0 | xargs -0 -I {} cp --reflink=auto --parents -dp {} $pwd/$tmp/$dest/");
+							 "find '$basename' $exclude \\( -type f -or -type l \\) -print0 | LC_ALL=C sort -z | " .
+							 "xargs -0 -I {} cp --reflink=auto --parents -dp {} $pwd/$tmp/$dest/");
 				# cp is annoying so I need a separate pass
 				# just for empty directories
 				complex_doit("cd '$dir' && " .
-							 "find '$basename' $exclude \\( -type d -and -empty \\) -print0 | xargs -0 -I {} cp --reflink=auto --parents -a {} $pwd/$tmp/$dest/");
+							 "find '$basename' $exclude \\( -type d -and -empty \\) -print0 | LC_ALL=C sort -z | " .
+							 "xargs -0 -I {} cp --reflink=auto --parents -a {} $pwd/$tmp/$dest/");
 			}
 			else {
 				doit("cp", '--reflink=auto', "-a", $src, "$tmp/$dest/");

@@ -232,7 +232,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				my $pwd=`pwd`;
 				chomp $pwd;
 				my $docdir = "$pwd/$tmp/usr/share/doc/$package";
-				complex_doit("cd '$dir' && find '$basename' \\( -type f -or -type l \\)$exclude -print0 | xargs -0 -I {} cp --reflink=auto --parents -dp {} $docdir");
+				complex_doit("cd '$dir' && " .
+							 "find '$basename' \\( -type f -or -type l \\)$exclude -print0 | LC_ALL=C sort -z | " .
+							 "xargs -0 -I {} cp --reflink=auto --parents -dp {} $docdir");
 			}
 			else {
 				doit("cp", '--reflink=auto', "-a", $doc,
