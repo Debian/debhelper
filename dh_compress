@@ -77,6 +77,8 @@ Debian policy, version 3.0
 
 init();
 
+my $olddir;
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 
@@ -85,7 +87,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# Run the file name gathering commands from within the directory
 	# structure that will be effected.
 	next unless -d $tmp;
-	my $olddir=getcwd();
+	$olddir = getcwd() if not defined $olddir;
 	verbose_print("cd $tmp");
 	chdir($tmp) || error("Can't cd to $tmp: $!");
 
