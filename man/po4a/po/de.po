@@ -1,14 +1,14 @@
 # Translation of the debhelper documentation to German.
 # Copyright (C) 1997-2011 Joey Hess.
 # This file is distributed under the same license as the debhelper package.
-# Copyright (C) of this file 2011-2014 Chris Leick.
+# Copyright (C) of this file 2011-2015 Chris Leick.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: debhelper 9.20131227\n"
+"Project-Id-Version: debhelper 9.20151002\n"
 "Report-Msgid-Bugs-To: debhelper@packages.debian.org\n"
 "POT-Creation-Date: 2015-10-02 12:59+0000\n"
-"PO-Revision-Date: 2012-10-22 22:47+0100\n"
+"PO-Revision-Date: 2015-10-18 10:37+0100\n"
 "Last-Translator: Chris Leick <c.leick@vollbio.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
 "Language: de\n"
@@ -618,11 +618,6 @@ msgstr "B<-B>[I<Verzeichnis>], B<--builddirectory=>[I<Verzeichnis>]"
 
 #. type: textblock
 #: debhelper.pod:222
-#, fuzzy
-#| msgid ""
-#| "Enable out of source building and use the specified I<directory> as the "
-#| "build directory. If I<directory> parameter is omitted, a default build "
-#| "directory will chosen."
 msgid ""
 "Enable out of source building and use the specified I<directory> as the "
 "build directory. If I<directory> parameter is omitted, a default build "
@@ -660,43 +655,32 @@ msgstr ""
 
 #. type: =item
 #: debhelper.pod:235
-#, fuzzy
-#| msgid "B<-A>, B<--all>"
 msgid "B<--parallel>, B<--no-parallel>"
-msgstr "B<-A>, B<--all>"
+msgstr "B<--parallel>, B<--no-parallel>"
 
 #. type: textblock
 #: debhelper.pod:237
-#, fuzzy
-#| msgid ""
-#| "Enable parallel builds if underlying build system supports them.  The "
-#| "number of parallel jobs is controlled by the B<DEB_BUILD_OPTIONS> "
-#| "environment variable (L<Debian Policy, section 4.9.1>) at build time. It "
-#| "might also be subject to a build system specific limit."
 msgid ""
 "Control whether parallel builds should be used if underlying build system "
 "supports them.  The number of parallel jobs is controlled by the "
 "B<DEB_BUILD_OPTIONS> environment variable (L<Debian Policy, section 4.9.1>) "
 "at build time. It might also be subject to a build system specific limit."
 msgstr ""
-"aktiviert paralleles Bauen, falls das zugrundeliegende Bausystem dies "
-"unterstützt. Die Anzahl paralleler Aufgaben wird zur Bauzeit durch die "
+"prüft, ob parallel gebaut werden soll, falls das zugrundeliegende Bausystem "
+"dies unterstützt. Die Anzahl paralleler Aufgaben wird zur Bauzeit durch die "
 "Umgebungsvariable B<DEB_BUILD_OPTIONS> (L<Debian-Richtlinie, Abschnitt "
 "4.9.1>) gesteuert, Sie könnte außerdem Gegenstand einer "
 "bausystemspezifischen Begrenzung sein."
 
 #. type: textblock
 #: debhelper.pod:243
-#, fuzzy
-#| msgid ""
-#| "If this option is not specified, debhelper currently defaults to not "
-#| "allowing parallel package builds."
 msgid ""
-"If neither option are not specified, debhelper currently defaults to B<--"
+"If neither option is specified, debhelper currently defaults to B<--"
 "parallel> in compat 10 (or later) and B<--no-parallel> otherwise."
 msgstr ""
-"Falls diese Option nicht angegeben wurde, erlaubt Debhelper derzeit "
-"standardmäßig kein paralleles Bauen von Paketen."
+"Falls keine der Optionen angegeben wurde, ist die Voreinstellung von "
+"Debhelper derzeit B<--parallel> in Kompatibilitätsversion 10 (oder neuer) und "
+"andernfalls B<--no-parallel>."
 
 #. type: textblock
 #: debhelper.pod:246
@@ -706,6 +690,10 @@ msgid ""
 "this happens when B<DEB_BUILD_OPTIONS> does not have a I<parallel> parameter "
 "(or its value is 1)."
 msgstr ""
+"Als Optimierung wird B<Dh> versuchen, die Übergabe dieser Optionen an "
+"Unterprozesse zu vermeiden, falls sie unnötig sind und als einzige Optionen "
+"übergeben werden. Dies geschieht insbesondere dann, wenn B<DEB_BUILD_OPTIONS> "
+"keinen I<parallel>-Parameter hat (oder dessen Wert 1 ist)."
 
 #. type: =item
 #: debhelper.pod:251
@@ -733,6 +721,8 @@ msgid ""
 "Notably, setting the maximum to 1 is effectively the same as using B<--no-"
 "parallel>."
 msgstr ""
+"Bemerkenswerterweise ist das Setzen des Maximums auf 1 tatsächlich dasselbe "
+"wie die Verwendung von B<--no-parallel>."
 
 #. type: =item
 #: debhelper.pod:261 dh:61
@@ -1295,6 +1285,9 @@ msgid ""
 "between packages of architecture \"all\" and non-\"all\" as it breaks "
 "binNMUs."
 msgstr ""
+"B<dh_installdocs> wird mit einem Fehler fehlschlagen, falls es Links "
+"entdeckt, die mit --link-doc zwischen Paketen der Architektur »all« und "
+"nicht-»all« erzeugt wurden, da es binNMUs beschädigt."
 
 #. type: textblock
 #: debhelper.pod:559
@@ -1311,16 +1304,13 @@ msgstr ""
 
 #. type: textblock
 #: debhelper.pod:566
-#, fuzzy
-#| msgid ""
-#| "B<dh_installinit> will no longer install a file named debian/I<package> "
-#| "as an init script."
 msgid ""
 "B<dh_installdeb> no longer installs a maintainer-provided debian/I<package>."
 "shlibs file.  This is now done by B<dh_makeshlibs> instead."
 msgstr ""
-"B<dh_installinit> wird nicht mehr eine Datei namens debian/I<Paket> als Init-"
-"Skript installieren."
+"B<dh_installdeb> installiert keine vom Paketbetreuer bereitgestellte "
+"debian/I<Paket>.shlibs-Datei mehr. Dies wird stattdessen von B<dh_makeshlibs> "
+"erledigt."
 
 #. type: textblock
 #: debhelper.pod:572
@@ -1328,6 +1318,9 @@ msgid ""
 "B<dh_installwm> refuses to create a broken package if no man page can be "
 "found (required to register for the x-window-manager alternative)."
 msgstr ""
+"B<dh_installwm> weigert sich, ein kaputtes Paket zu erstellen, falls keine "
+"Handbuchseite gefunden wird (erforderlich, um die Alternative zum "
+"X-Window-Manager zu registrieren)."
 
 #. type: textblock
 #: debhelper.pod:577
@@ -1336,6 +1329,10 @@ msgid ""
 "parallel building.  This can be disabled by using either B<--no-parallel> or "
 "passing B<--max-parallel> with a value of 1."
 msgstr ""
+"B<--parallel> ist Debhelpers Voreinstellung für alle Bausysteme, die "
+"paralleles Bauen unterstützen. Dies kann entweder durch Verwendung von "
+"B<--no-parallel> oder durch Übergabe von B<--max-parallel> mit einem Wert von "
+"1 deaktiviert werden."
 
 #. type: =head1
 #: debhelper.pod:585 dh_auto_test:46 dh_installcatalogs:60 dh_installdocs:132
@@ -1371,13 +1368,6 @@ msgstr ""
 
 #. type: textblock
 #: debhelper.pod:597
-#, fuzzy
-#| msgid ""
-#| "To facilitate this, as well as give you more control over which packages "
-#| "are acted on by debhelper programs, all debhelper programs accept the B<-"
-#| "a>, B<-i>, B<-p>, and B<-s> parameters. These parameters are cumulative.  "
-#| "If none are given, debhelper programs default to acting on all packages "
-#| "listed in the control file."
 msgid ""
 "To facilitate this, as well as give you more control over which packages are "
 "acted on by debhelper programs, all debhelper programs accept the B<-a>, B<-"
@@ -1385,12 +1375,12 @@ msgid ""
 "are given, debhelper programs default to acting on all packages listed in "
 "the control file, with the exceptions below."
 msgstr ""
-"Um dies zu erleichtern als auch, um Ihnen mehr Kontrolle darüber zu geben, "
-"auf welche Pakete Debhelper-Programme einwirken, akzepieren alle Debhelper-"
+"Um dies zu erleichtern sowie Ihnen mehr Kontrolle darüber zu geben, auf "
+"welche Pakete Debhelper-Programme einwirken, akzeptieren alle Debhelper-"
 "Programme die Parameter B<-a>, B<-i>, B<-p> und B<-s>. Diese Parameter sind "
 "kumulativ. Falls keiner angegeben wurde, wirken Debhelper-Programme "
 "standardmäßig auf alle Paketen ein, die in der Datei »control« aufgeführt "
-"sind."
+"sind, mit nachfolgenden Ausnahmen."
 
 #. type: textblock
 #: debhelper.pod:603
@@ -1399,6 +1389,9 @@ msgid ""
 "match the build architecture will be excluded (L<Debian Policy, section "
 "5.6.8>)."
 msgstr ""
+"Zuerst werden alle Pakete deren B<Architecture>-Feld in B<debian/control> "
+"nicht mit der Bauarchitektur übereinstimmt ausgeschlossen (L<Debian Policy, "
+"Abschnitt 5.6.8>)."
 
 #. type: textblock
 #: debhelper.pod:607
@@ -1408,6 +1401,11 @@ msgid ""
 "binary package stanzas in B<debian/control>, according to the draft policy "
 "at L<https://wiki.debian.org/BuildProfileSpec>."
 msgstr ""
+"Außerdem können einige zusätzliche Paket basierend auf dem Inhalt der "
+"Umgebungsvariable B<DEB_BUILD_PROFILES> und den Feldern B<Build-Profiles> in "
+"den Absätzen für binäre Pakete in B<debian/control> ausgeschlossen werden. "
+"Dies geschieht gemäß der Entwurfrichtlinie unter "
+"L<https://wiki.debian.org/BuildProfileSpec>."
 
 #. type: =head2
 #: debhelper.pod:612
@@ -1481,6 +1479,21 @@ msgid ""
 "  }\n"
 "\n"
 msgstr ""
+"  my $temp=\"set -e\\nset -- @ARGV\\n\" . << 'EOF';\n"
+"  #DEBHELPER#\n"
+"  EOF\n"
+"  if (system($temp)) {\n"
+"     my $exit_code = ($? >> 8) & 0xff;\n"
+"     my $signal = $? & 0x7f;\n"
+"     if ($exit_code) {\n"
+"         die(\"Das Debhelper-Skript scheiterte mit folgendem Fehlercode: "
+"${exit_code}\");\n"
+"     } else {\n"
+"         die(\"Das Debhelper-Skript wurde per Signal abgebrochen: "
+"${signal}\");\n"
+"     }\n"
+"  }\n"
+"\n"
 
 #. type: =head2
 #: debhelper.pod:645
@@ -1575,15 +1588,14 @@ msgstr ""
 msgid "udebs"
 msgstr "Udebs"
 
-# FIXME : an udeb
 #. type: textblock
 #: debhelper.pod:680
 msgid ""
-"Debhelper includes support for udebs. To create a udeb with debhelper, add "
+"Debhelper includes support for udebs. To create an udeb with debhelper, add "
 "\"B<Package-Type: udeb>\" to the package's stanza in F<debian/control>.  "
 "Debhelper will try to create udebs that comply with debian-installer policy, "
 "by making the generated package files end in F<.udeb>, not installing any "
-"documentation into a udeb, skipping over F<preinst>, F<postrm>, F<prerm>, "
+"documentation into an udeb, skipping over F<preinst>, F<postrm>, F<prerm>, "
 "and F<config> scripts, etc."
 msgstr ""
 "Debhelper beinhaltet Unterstützung für Udebs. Um ein Udeb mit Debhelper zu "
@@ -1608,6 +1620,12 @@ msgid ""
 "To specify them properly in F<debian/rules>, be sure to \"B<export>\" them. "
 "For example, \"B<export DH_VERBOSE>\"."
 msgstr ""
+"Die folgenden Umgebungsvariablen können das Verhalten von Debhelper "
+"beeinflussen. Es ist wichtig, darauf hinzuweisen, dass dies tatsächlich "
+"Umgebungsvariablen (nicht nur einfache F<Makefile>-Variablen) sein müssen, "
+"damit dies korrekt funktioniert. Um sie ordnungsgemäß in F<debian/rules> "
+"anzugeben, müssen sie sicherstellen, dass sie »B<export>«iert werden, zum "
+"Beispiel »B<export DH_VERBOSE>«."
 
 #. type: =item
 #: debhelper.pod:697
@@ -1616,24 +1634,19 @@ msgstr "B<DH_VERBOSE>"
 
 #. type: textblock
 #: debhelper.pod:699
-#, fuzzy
-#| msgid ""
-#| "Set to B<1> to enable verbose mode. Debhelper will output every command "
-#| "it runs that modifies files on the build system."
 msgid ""
 "Set to B<1> to enable verbose mode. Debhelper will output every command it "
 "runs. Also enables verbose build logs for some build systems like autoconf."
 msgstr ""
-"auf B<1> gesetzt, um Modus mit detailreicher Ausgabe zu aktivieren. "
-"Debhelper wird jeden von ihm ausgeführten Befehl ausgeben, der Dateien im "
-"Bausystem verändert."
+"auf B<1> gesetzt, um den Modus mit detailreicher Ausgabe zu aktivieren. "
+"Debhelper wird jeden von ihm ausgeführten Befehl ausgeben. Außerdem wird die "
+"detailreiche Ausgabe von Bauprotokollen für einige Bausysteme wie Autoconf "
+"aktiviert."
 
 #. type: =item
 #: debhelper.pod:702
-#, fuzzy
-#| msgid "B<DH_COMPAT>"
 msgid "B<DH_QUIET>"
-msgstr "B<DH_COMPAT>"
+msgstr "B<DH_QUIET>"
 
 #. type: textblock
 #: debhelper.pod:704
@@ -1644,6 +1657,13 @@ msgid ""
 "This makes it easier to spot important messages but makes the output quite "
 "useless as buildd log.  Ignored if DH_VERBOSE is also set."
 msgstr ""
+"auf B<1> gesetzt, um den detailarmen Modus zu aktivieren. Debhelper wird "
+"weder Befehle ausgeben, die das Bausystem der Ursprungsautoren aufrufen, noch "
+"wird Dh ausgeben, welche Unterbefehle aufgerufen werden. Abhängig vom "
+"benutzten Bausystem wird auch dieses weniger Details ausgeben. Dadurch wird "
+"es einfacher, wichtige Nachrichten zu erkennen, die Ausgabe wird jedoch als "
+"Buildd-Protokoll ziemlich nutzlos. Falls DH_VERBOSE ebenfalls gesetzt ist, "
+"wird diese Einstellung ignoriert."
 
 #. type: =item
 #: debhelper.pod:711
@@ -1770,10 +1790,8 @@ msgstr ""
 
 #. type: =item
 #: debhelper.pod:754
-#, fuzzy
-#| msgid "L<http://kitenet.net/~joey/code/debhelper/>"
 msgid "L<http://joeyh.name/code/debhelper/>"
-msgstr "L<http://kitenet.net/~joey/code/debhelper/>"
+msgstr "L<http://joeyh.name/code/debhelper/>"
 
 #. type: textblock
 #: debhelper.pod:756
@@ -2257,16 +2275,13 @@ msgstr ""
 
 #. type: textblock
 #: dh:170
-#, fuzzy
-#| msgid ""
-#| "If your package can be built in parallel, you can support parallel "
-#| "building as follows. Then B<dpkg-buildpackage -j> will work."
 msgid ""
 "If your package can be built in parallel, please either use compat 10 or "
 "pass B<--parallel> to dh. Then B<dpkg-buildpackage -j> will work."
 msgstr ""
-"Falls Ihr Paket parallel gebaut werden kann, können Sie das parallele Bauen "
-"wie folgt unterstützen. Dann wird B<dpkg-buildpackage -j> funktionieren."
+"Falls Ihr Paket parallel gebaut werden kann, benutzen Sie bitte entweder "
+"Kompatibilitätsmodus 10 oder übergeben Sie B<--parallel> an Dh. Dann wird "
+"B<dpkg-buildpackage -j> funktionieren."
 
 #. type: verbatim
 #: dh:173
@@ -2288,15 +2303,13 @@ msgid ""
 "If your package cannot be built reliably while using multiple threads, "
 "please pass B<--no-parallel> to dh (or the relevant B<dh_auto_>I<*> command):"
 msgstr ""
+"Falls Ihr Paket nicht verlässlich unter Verwendung mehrerer Threads gebaut "
+"werden kann, übergeben Sie bitte B<--no-parallel> an Dh (oder den zuständigen "
+"B<dh_auto_>I<*>-Befehl):"
 
 #. type: verbatim
 #: dh:182
-#, fuzzy, no-wrap
-#| msgid ""
-#| "\t#!/usr/bin/make -f\n"
-#| "\t%:\n"
-#| "\t\tdh $@ --parallel\n"
-#| "\n"
+#, no-wrap
 msgid ""
 "\t#!/usr/bin/make -f\n"
 "\t%:\n"
@@ -2305,7 +2318,7 @@ msgid ""
 msgstr ""
 "\t#!/usr/bin/make -f\n"
 "\t%:\n"
-"\t\tdh $@ --parallel\n"
+"\t\tdh $@ --no-parallel\n"
 "\n"
 
 #. type: textblock
@@ -2466,7 +2479,7 @@ msgstr ""
 "B<dh> benutzt die Umgebungsvariable B<DH_INTERNAL_OPTIONS>, um Informationen "
 "an die Debhelper-Befehle durchzureichen, die innerhalb der Ziele ausgeführt "
 "werden. Der Inhalt (und die tatsächliche Existenz) dieser "
-"Umgebungsvariableist, wie der Name schon andeutet, Gegenstand dauernder "
+"Umgebungsvariable ist, wie der Name schon andeutet, Gegenstand dauernder "
 "Änderungen."
 
 #. type: textblock
@@ -3092,17 +3105,14 @@ msgstr ""
 
 #. type: textblock
 #: dh_builddeb:19
-#, fuzzy
-#| msgid ""
-#| "B<dh_builddeb> simply calls L<dpkg-deb(1)> to build a Debian package or "
-#| "packages."
 msgid ""
 "B<dh_builddeb> simply calls L<dpkg-deb(1)> to build a Debian package or "
 "packages.  It will also build packages for ddebs when L<dh_strip(1)> and "
 "L<dh_gencontrol(1)> have prepared them."
 msgstr ""
 "B<dh_builddeb> ruft einfach L<dpkg-deb(1)> auf, um ein oder mehrere Debian-"
-"Pakete zu bauen."
+"Pakete zu bauen. Es wird außerdem Pakete für Ddebs bauen, wenn sie von "
+"L<dh_strip(1)> und L<dh_gencontrol(1)> vorbereitet wurden."
 
 #. type: textblock
 #: dh_builddeb:23
@@ -3588,19 +3598,14 @@ msgstr ""
 
 #. type: textblock
 #: dh_gencontrol:23
-#, fuzzy
-#| msgid ""
-#| "This program is merely a wrapper around L<dpkg-gencontrol(1)>, which "
-#| "calls it once for each package being acted on, and passes in some "
-#| "additional useful flags."
 msgid ""
 "This program is merely a wrapper around L<dpkg-gencontrol(1)>, which calls "
 "it once for each package being acted on (plus related ddebs), and passes in "
 "some additional useful flags."
 msgstr ""
 "Dieses Programm ist bloß ein Wrapper um L<dpkg-gencontrol(1)>, das es einmal "
-"für jedes Paket, auf das es sich auswirkt, aufruft und einige zusätzliche "
-"nützliche Schalter übergibt."
+"für jedes Paket, auf das es sich auswirkt (plus nötige Ddebs), aufruft und "
+"einige zusätzliche nützliche Schalter übergibt."
 
 #. type: textblock
 #: dh_gencontrol:27
@@ -3611,6 +3616,12 @@ msgid ""
 "packages are built.  As debhelper automatically generates ddebs, it some "
 "times adds additional packages, which will be built by L<dh_builddeb(1)>."
 msgstr ""
+"B<Beachten Sie>, dass Sie, falls Sie B<dh_gencontrol> verwenden, zum Bauen "
+"der Pakete auch L<dh_builddeb(1)> verwenden müssen. Andernfalls könnte Ihr "
+"Bauen fehlschlagen, da B<dh_gencontrol> (über L<dpkg-gencontrol(1)>) "
+"deklariert, welche Pakete gebaut werden. Da Debhelper Ddebs automatisch "
+"erzeugt, fügt es manchmal zusätzliche Pakete hinzu, die durch "
+"L<dh_builddeb(1)> gebaut werden."
 
 #. type: textblock
 #: dh_gencontrol:40
@@ -3747,12 +3758,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_install:35
-#, fuzzy
-#| msgid ""
-#| "From debhelper compatibility level 7 on, B<dh_install> will fall back to "
-#| "looking in F<debian/tmp> for files, if it doesn't find them in the "
-#| "current directory (or whereever you've told it to look using B<--"
-#| "sourcedir>)."
 msgid ""
 "From debhelper compatibility level 7 on, B<dh_install> will fall back to "
 "looking in F<debian/tmp> for files, if it doesn't find them in the current "
@@ -3802,10 +3807,8 @@ msgstr ""
 
 #. type: =item
 #: dh_install:58
-#, fuzzy
-#| msgid "debian/I<package>.install"
 msgid "debian/not-installed"
-msgstr "debian/I<Paket>.install"
+msgstr "debian/not-installed"
 
 #. type: textblock
 #: dh_install:60
@@ -3813,6 +3816,9 @@ msgid ""
 "List the files that are deliberately not installed in any package.  This is "
 "used with B<--list-missing> (or B<--fail-missing>) as an exclude file."
 msgstr ""
+"listet die Dateien auf, die absichtlich in keinem Paket installiert sind. "
+"Dies wird mit B<--list-missing> (oder B<--fail-missing>) als Ausschlussdatei "
+"benutzt."
 
 #. type: textblock
 #: dh_install:64
@@ -3820,6 +3826,8 @@ msgid ""
 "Please keep in mind that dh_install will B<not> expand wildcards in this "
 "file."
 msgstr ""
+"Bitte vergessen Sie nicht, dass Dh_install Platzhalter in dieser Datei "
+"B<nicht> expandiert."
 
 #. type: =item
 #: dh_install:73
@@ -3964,23 +3972,14 @@ msgstr "EINSCHRÄNKUNGEN"
 
 #. type: textblock
 #: dh_install:272
-#, fuzzy
-#| msgid ""
-#| "B<dh_install> cannot rename files or directories, it can only install "
-#| "them\n"
-#| "with the names they already have into wherever you want in the package\n"
-#| "build tree.\n"
-#| "  \n"
 msgid ""
 "B<dh_install> cannot rename files or directories, it can only install them "
 "with the names they already have into wherever you want in the package build "
 "tree."
 msgstr ""
 "B<dh_install> kann keine Dateien oder Verzeichnisse umbenennen, es kann sie "
-"nur\n"
-"mit den Namen, die sie bereits haben, im Paketbauverzeichnisbaum dorthin\n"
-"installieren, wo Sie es wünschen.\n"
-"  \n"
+"nur mit den Namen, die sie bereits haben, im Paketbauverzeichnisbaum dorthin "
+"installieren, wo Sie es wünschen."
 
 #. type: textblock
 #: dh_install:276
@@ -3989,6 +3988,10 @@ msgid ""
 "level 9 or later.  An example debian/I<package>.install file using B<dh-"
 "exec> could look like:"
 msgstr ""
+"Umbenennen kann jedoch durch Verwenden von B<dh-exec> mit der "
+"Kompatibilitätsstufe 9 oder höher erreicht werden. Eine "
+"debian/I<package>.install-Beispieldatei, die B<dh-exec> verwendet, könnte wie "
+"folgt aussehen:"
 
 #. type: verbatim
 #: dh_install:280
@@ -3998,11 +4001,14 @@ msgid ""
 " debian/default.conf => /etc/my-package/start.conf\n"
 "\n"
 msgstr ""
+" #!/usr/bin/dh-exec\n"
+" debian/default.conf => /etc/my-package/start.conf\n"
+"\n"
 
 #. type: textblock
 #: dh_install:283
 msgid "Please remember the following three things:"
-msgstr ""
+msgstr "Bitte vergessen Sie nicht die folgenden drei Dinge:"
 
 #. type: =item
 #: dh_install:287
@@ -4010,16 +4016,18 @@ msgid ""
 "* The package must be using compatibility level 9 or later (see "
 "L<debhelper(7)>)"
 msgstr ""
+"* Das Paket muss Kompatibilitätsstufe 9 oder höher verwenden (siehe "
+"L<debhelper(7)>)."
 
 #. type: =item
 #: dh_install:289
 msgid "* The package will need a build-dependency on dh-exec."
-msgstr ""
+msgstr "* Das Paket muss eine Bauabhängigkeit zu Dh-exec haben."
 
 #. type: =item
 #: dh_install:291
 msgid "* The install file must be marked as executable."
-msgstr ""
+msgstr "* Die Installationsdatei muss als ausführbar markiert sein."
 
 #. type: textblock
 #: dh_installcatalogs:5
@@ -4418,6 +4426,9 @@ msgid ""
 "Note that I<package>.shlibs is only installed in compat level 9 and "
 "earlier.  In compat 10, please use L<dh_makeshlibs(1)>."
 msgstr ""
+"Beachten Sie, dass I<Paket>.shlibs nur auf Kompatibilitätsstufe 9 und früher "
+"installiert wurde. Verwenden Sie im Kompatibilitätsmodus 10 bitte "
+"L<dh_makeshlibs(1)>."
 
 #. type: =item
 #: dh_installdeb:49
@@ -4621,6 +4632,9 @@ msgid ""
 "completely.  Notably, other B<dh_*> commands are expected to create "
 "directories as needed."
 msgstr ""
+"Viele Pakete kommen um den Aufruf von B<dh_installdirs> komplett herum. "
+"Insbesondere ist von anderen B<dh_*>-Befehlen zu erwarten, dass sie "
+"Verzeichnisse bei Bedarf selbst erstellen."
 
 #. type: =item
 #: dh_installdirs:30
@@ -4638,6 +4652,9 @@ msgid ""
 "Generally, there is not need to list directories created by the upstream "
 "build system or directories needed by other B<debhelper> commands."
 msgstr ""
+"Meist ist es nicht erforderlich, Verzeichnisse aufzuführen, die vom Bausystem "
+"der Ursprungsautoren erstellt wurden oder die von anderen "
+"B<Debhelper>-Befehlen benötigt werden."
 
 #. type: textblock
 #: dh_installdirs:46
@@ -4835,7 +4852,7 @@ msgid ""
 "be a binary package that comes from the same source package."
 msgstr ""
 "veranlasst, dass das Dokumentationsverzeichnis aller Pakete, auf die es sich "
-"auswirkt, ein symbolischer Verweis auf das Dokumentationsverzeichnis von "
+"auswirkt, ein symbolischer Link auf das Dokumentationsverzeichnis von "
 "I<Paket> ist. Dies hat keine Auswirkungen, wenn auf das I<Paket> selbst "
 "eingewirkt wird oder falls das Dokumentationsverzeichnis, das erstellt "
 "werden soll, bereits bei der Ausführung von B<dh_installdocs> existiert. Um "
@@ -4867,7 +4884,7 @@ msgid ""
 msgstr ""
 "(Eine ältere Methode, um dasselbe zu erreichen, die immer noch unterstützt "
 "wird, besteht darin, das Dokumentationsverzeichnis eines Pakets als defekten "
-"symbolischen Verweis zu erstellen, bevor B<dh_installdocs> aufgerufen wird.)"
+"symbolischen Link zu erstellen, bevor B<dh_installdocs> aufgerufen wird.)"
 
 #. type: textblock
 #: dh_installdocs:104
@@ -4877,6 +4894,11 @@ msgid ""
 "symlink\" (or \"symlink to dir\") migration.  Since debhelper has no "
 "knowledge of previous versions, you have to enable this migration itself."
 msgstr ""
+"B<WARNUNG>: Falls eine vorhergehende Version des Pakets ohne diese Option "
+"gebaut wurde und nun mit ihr gebaut wird (oder umgekehrt), erfordert es eine "
+"»Verzeichnis-zu-symbolischer-Link-Migration (oder "
+"»symbolischer-Link-zu-Verzeichnis«). Da Debhelper nichts von "
+"vorhergehenden Versionen weiß, müssen Sie diese Migration selbst anstoßen."
 
 #. type: textblock
 #: dh_installdocs:110
@@ -4884,6 +4906,9 @@ msgid ""
 "This can be done by providing a \"debian/I<package>.maintscript\" file and "
 "using L<dh_installdeb(1)> to provide the relevant maintainer script snippets."
 msgstr ""
+"Dies kann durch Bereitstellen einer »debian/I<Paket>.maintscript«-Datei und "
+"mittels L<dh_installdeb(1)> erledigt werden. Dadurch werden die passenden "
+"Betreuerskriptschnipsel zur Verfügung gestellt."
 
 #. type: textblock
 #: dh_installdocs:116
@@ -5266,7 +5291,7 @@ msgid ""
 "the init scripts."
 msgstr ""
 "Es erzeugt außerdem automatisch die F<postinst>-, F<postrm>- und F<prerm>-"
-"Skripte, die nötig sind, um die symbolischen Verweise in F</etc/rc*.d/> "
+"Skripte, die nötig sind, um die symbolischen Links in F</etc/rc*.d/> "
 "einzurichten und die Init-Skripte zu starten und zu stoppen."
 
 #. type: =item
@@ -5367,6 +5392,10 @@ msgid ""
 "modify the scripts.  You will almost certainly want to use this with B<-p> "
 "to limit, which packages are affected by the call.  Example:"
 msgstr ""
+"B<Warnung>: Dies wird alle normalen Prüfungen umgehen und die Skripte "
+"I<bedingungslos> verändern. Sie werden dies in den meisten Fällen mit B<-p> "
+"verwenden wollen, um einzugrenzen, welche Pakete von dem Aufruf betroffen "
+"sind. Beispiel:"
 
 #. type: verbatim
 #: dh_installinit:80
@@ -5377,6 +5406,10 @@ msgid ""
 "\tdh_installinit --remaining\n"
 "\n"
 msgstr ""
+" override_dh_installinit:\n"
+"\tdh_installinit -pfoo --onlyscripts\n"
+"\tdh_installinit --remaining\n"
+"\n"
 
 #. type: =item
 #: dh_installinit:84
@@ -5437,14 +5470,13 @@ msgstr ""
 msgid "B<-d>, B<--remove-d>"
 msgstr "B<-d>, B<--remove-d>"
 
-# FIXME s#F<etc/default/> .#F<etc/default/>.#
 #. type: textblock
 #: dh_installinit:106
 msgid ""
 "Remove trailing B<d> from the name of the package, and use the result for "
 "the filename the upstart job file is installed as in F<etc/init/> , and for "
 "the filename the init script is installed as in etc/init.d and the default "
-"file is installed as in F<etc/default/> . This may be useful for daemons "
+"file is installed as in F<etc/default/>. This may be useful for daemons "
 "with names ending in B<d>. (Note: this takes precedence over the B<--init-"
 "script> parameter described below.)"
 msgstr ""
@@ -5747,8 +5779,8 @@ msgid ""
 msgstr ""
 "Nach dem Installationsschritt für Handbuchseiten wird B<dh_installman> "
 "prüfen, ob einige der Handbuchseiten in den temporären Verzeichnissen in "
-"irgendwelchen Paketen, auf die es sich auswirkt, F<.so>-Verweise enthalten. "
-"Falls dies so ist, ändert es sie in symbolische Verweise."
+"irgendwelchen Paketen, auf die es sich auswirkt, F<.so>-Links enthalten. "
+"Falls dies so ist, ändert es sie in symbolische Links."
 
 #. type: textblock
 #: dh_installman:47
@@ -5860,7 +5892,7 @@ msgstr ""
 "B<dh_installmanpages> durchsucht das aktuelle Verzeichnis und alle "
 "Unterverzeichnisse nach Dateinamen, die wie Handbuchseiten aussehen. "
 "(Beachten Sie, dass nur echte Dateien berücksichtigt werden; symbolische "
-"Verweise werden ignoriert.) Es benutzt L<file(1)>, um zu überprüfen, ob die "
+"Links werden ignoriert.) Es benutzt L<file(1)>, um zu überprüfen, ob die "
 "Dateien das korrekte Format haben. Dann installiert es sie, basierend auf "
 "den Endungen der Dateien, in das korrekte Handbuchseitenverzeichnis."
 
@@ -5883,8 +5915,8 @@ msgid ""
 "symlinks."
 msgstr ""
 "Nach dem Handbuchseiten-Installationsschritt wird B<dh_installmanpages> "
-"prüfen, ob einige der Handbuchseiten F<.so>-Verweise sind. Falls dies der "
-"Fall ist, ändert es sie in symbolische Verweise."
+"prüfen, ob einige der Handbuchseiten F<.so>-Links sind. Falls dies der "
+"Fall ist, ändert es sie in symbolische Links."
 
 #. type: textblock
 #: dh_installmanpages:47
@@ -6296,8 +6328,8 @@ msgstr ""
 "B<dh_installwm> ist ein Debhelper-Programm, das für das Erzeugen der "
 "F<postinst>- und F<prerm>-Befehle zuständig ist, die einen Fenster-Manager "
 "mit L<update-alternatives(8)> registrieren. Außerdem wird die Handbuchseite "
-"des Fenster-Managers als untergeordneter symbolischer Verweis (im v6-Modus "
-"und darüber) registriert, falls sie in F<usr/share/man/man1/> im "
+"des Fenster-Managers als untergeordneter symbolischer Link (im v6-Modus und "
+"darüber) registriert, falls sie in F<usr/share/man/man1/> im "
 "Paketbauverzeichnis gefunden wird."
 
 #. type: =item
@@ -6421,7 +6453,7 @@ msgstr ""
 #. type: textblock
 #: dh_link:5
 msgid "dh_link - create symlinks in package build directories"
-msgstr "dh_link - erzeugt symbolische Verweise in Paketbauverzeichnisse"
+msgstr "dh_link - erzeugt symbolische Links in Paketbauverzeichnisse"
 
 #. type: textblock
 #: dh_link:16
@@ -6438,7 +6470,7 @@ msgid ""
 "B<dh_link> is a debhelper program that creates symlinks in package build "
 "directories."
 msgstr ""
-"B<dh_link> ist ein Debhelper-Programm, das symbolische Verweise in "
+"B<dh_link> ist ein Debhelper-Programm, das symbolische Links in "
 "Paketbauverzeichnissen erstellt."
 
 #. type: textblock
@@ -6451,7 +6483,7 @@ msgid ""
 msgstr ""
 "B<dh_link> akzeptiert eine Liste von Paaren aus Quell- und Zieldateien. Die "
 "Quelldateien sind bereits existierende Dateien, auf die dann symbolisch "
-"verwiesen wird. Die Zieldateien sind die symbolischen Verweise, die erstellt "
+"verwiesen wird. Die Zieldateien sind die symbolischen Links, die erstellt "
 "werden. Es B<muss> eine gleiche Anzahl von Quell- und Zieldateien angegeben "
 "werden."
 
@@ -6474,18 +6506,17 @@ msgid ""
 "path as possible. It will also create any subdirectories it needs to to put "
 "the symlinks in."
 msgstr ""
-"B<dh_link> wird symbolische Verweise erzeugen, die die Debian-Richtlinie "
+"B<dh_link> wird symbolische Links erzeugen, die die Debian-Richtlinie "
 "erfüllen – absolute, wenn die Debian-Richtlinie sagt, sie sollten absolut "
-"sein und relative Verweise mit einem so kurzen Pfad wie möglich. Es wird "
+"sein und relative Links mit einem so kurzen Pfad wie möglich. Es wird "
 "außerdem jegliche Unterverzeichnisse erzeugen, die es benötigt, um die "
-"symbolischen Verweise darin abzulegen."
+"symbolischen Links darin abzulegen."
 
 #. type: textblock
 #: dh_link:37
 msgid "Any pre-existing destination files will be replaced with symlinks."
 msgstr ""
-"Alle vorher existierenden Zieldateien werden durch symbolische Verweise "
-"ersetzt."
+"Alle vorher existierenden Zieldateien werden durch symbolische Link ersetzt."
 
 #. type: textblock
 #: dh_link:39
@@ -6494,8 +6525,8 @@ msgid ""
 "not conform to Debian policy, and corrects them (v4 or later)."
 msgstr ""
 "B<dh_link> durchsucht außerdem den Bauverzeichnisbaum des Pakets nach "
-"existierenden symbolischen Verweisen, die nicht der Debian-Richtlinie "
-"entsprechen und korrigiert sie (v4 und neuer)."
+"existierenden symbolischen Links, die nicht der Debian-Richtlinie entsprechen "
+"und korrigiert sie (v4 und neuer)."
 
 #. type: =item
 #: dh_link:46
@@ -6509,7 +6540,7 @@ msgid ""
 "should be put on its own line, with the source and destination separated by "
 "whitespace."
 msgstr ""
-"listet Paare von Quell- und Zieldateien auf, von denen symbolische Verweise "
+"listet Paare von Quell- und Zieldateien auf, von denen symbolische Links "
 "erstellt werden sollen. Jedes Paar sollte in einer eigenen Zeile stehen, in "
 "der Quell- und Zieldatei durch Leerzeichen getrennt sind."
 
@@ -6519,7 +6550,7 @@ msgid ""
 "Create any links specified by command line parameters in ALL packages acted "
 "on, not just the first."
 msgstr ""
-"erstellt jegliche durch Befehlszeilenparameter angegebenen Verweise in ALLEN "
+"erstellt jegliche durch Befehlszeilenparameter angegebenen Links in ALLEN "
 "Paketen, auf die es sich auswirkt, nicht nur im ersten."
 
 #. type: textblock
@@ -6528,7 +6559,7 @@ msgid ""
 "Exclude symlinks that contain I<item> anywhere in their filename from being "
 "corrected to comply with Debian policy."
 msgstr ""
-"schließt symbolische Verweise von der Korrektur zur Einhaltung der Debian-"
+"schließt symbolische Links von der Korrektur zur Einhaltung der Debian-"
 "Richtlinie aus, die irgendwo in ihrem Dateinamen I<Element> enthalten."
 
 #. type: =item
@@ -6543,7 +6574,7 @@ msgid ""
 "this in the package build directory of the first package acted on.  (Or in "
 "all packages if B<-A> is specified.)"
 msgstr ""
-"erstellt eine Datei mit Namen I<Ziel> als Verweis auf eine Datei mit Namen "
+"erstellt eine Datei mit Namen I<Ziel> als Link auf eine Datei mit Namen "
 "I<Quelle>. Dies wird im Paketbauverzeichnis des ersten Pakets getan, auf das "
 "es sich auswirkt (oder in allen Paketen, falls B<-A> angegeben wurde)."
 
@@ -6560,7 +6591,7 @@ msgstr ""
 #. type: textblock
 #: dh_link:80
 msgid "Make F<bar.1> be a symlink to F<foo.1>"
-msgstr "sorgt dafür, dass F<bar.1> ein symbolischer Verweis auf F<foo.1> ist."
+msgstr "sorgt dafür, dass F<bar.1> ein symbolischer Link auf F<foo.1> ist."
 
 #. type: verbatim
 #: dh_link:82
@@ -6580,8 +6611,8 @@ msgid ""
 "Make F</usr/lib/foo/> be a link to F</var/lib/foo/>, and F<bar.1> be a "
 "symlink to the F<foo.1>"
 msgstr ""
-"sorgt dafür, dass F</usr/lib/foo/> ein symbolischer Verweis auf F</var/lib/"
-"foo/> und F<bar.1> ein symbolischer Verweis auf F<foo.1> ist."
+"sorgt dafür, dass F</usr/lib/foo/> ein symbolischer Link auf F</var/lib/"
+"foo/> und F<bar.1> ein symbolischer Link auf F<foo.1> ist."
 
 #. type: textblock
 #: dh_lintian:5
@@ -6708,10 +6739,8 @@ msgstr ""
 
 #. type: =item
 #: dh_makeshlibs:29
-#, fuzzy
-#| msgid "debian/I<package>.links"
 msgid "debian/I<package>.shlibs"
-msgstr "debian/I<Paket>.links"
+msgstr "debian/I<Paket>.shlibs"
 
 #. type: textblock
 #: dh_makeshlibs:31
@@ -6720,6 +6749,9 @@ msgid ""
 "omitted, debhelper will generate a shlibs file automatically if it detects "
 "any libraries."
 msgstr ""
+"installiert, falls vorhanden, diese Datei in das Paket als DEBIAN/shlibs. "
+"Falls es weggelassen wird, erzeugt Debhelper automatisch eine Shlibs-Datei "
+"falls es irgendwelche Bibliotheken entdeckt."
 
 #. type: textblock
 #: dh_makeshlibs:35
@@ -6727,6 +6759,8 @@ msgid ""
 "Note in compat levels 9 and earlier, this file was installed by "
 "L<dh_installdeb(1)> rather than B<dh_makeshlibs>."
 msgstr ""
+"Beachten Sie, dass diese Datei in Kompatibilitätsmodi 9 und früher durch "
+"L<dh_installdeb(1)> anstatt durch B<dh_makeshlibs> installiert wurde."
 
 #. type: =item
 #: dh_makeshlibs:38
@@ -6832,6 +6866,10 @@ msgid ""
 "B<dh_makeshlibs> would previously generate maintainer scripts that called "
 "B<ldconfig>."
 msgstr ""
+"Fügen Sie den Trigger »ldconfig« selbst dann nicht hinzu, wenn das Paket ihn "
+"scheinbar benötigt. Diese Option wird aus historischen Gründen B<--noscripts> "
+"genannt, da B<dh_makeshlibs> früher Betreuerskripte erzeugen würde, die "
+"B<ldconfig> aufriefen."
 
 #. type: textblock
 #: dh_makeshlibs:91
@@ -7431,6 +7469,8 @@ msgstr ""
 msgid ""
 "If needed, this can be passed multiple times with different package names."
 msgstr ""
+"Falls nötig, kann dies mehrfach mit unterschiedlichen Paketnamen übergeben "
+"werden."
 
 #. type: textblock
 #: dh_shlibdeps:76
@@ -7573,7 +7613,7 @@ msgstr "B<--dbg-package=>I<Paket>"
 #. type: =end
 #: dh_strip:48 dh_strip:57
 msgid "comment"
-msgstr ""
+msgstr "Kommentar"
 
 #. type: textblock
 #: dh_strip:50
@@ -7584,6 +7624,12 @@ msgid ""
 "\").  B<If you have a manual --dbg-package> that you want to migrate to the "
 "automatic ddeb, please see the B<--ddeb-migration> option."
 msgstr ""
+"B<Diese Option ist nun eine Option für besondere Zwecke, die Sie "
+"normalerweise nicht benötigen>. In den meisten Fällen sollte es nur wenige "
+"Gründe geben, diese Option für neue Quellpakete zu benutzen, da Debhelper "
+"automatisch Pakete zur Fehlersuche (»Ddebs«) erzeugt. B<Falls Sie ein "
+"manuelles --dbg-package haben>, das Sie auf ein automatisches Ddeb migrieren "
+"wollen, sehen Sie sich bitte die Option B<--ddeb-migration> an."
 
 #. type: textblock
 #: dh_strip:59
@@ -7629,6 +7675,8 @@ msgid ""
 "This option implies B<--no-ddebs> and I<cannot> be used with B<--ddeb> or "
 "B<--ddeb-migration>."
 msgstr ""
+"Diese Option impliziert B<--no-ddebs> und I<kann nicht> zusammen mit "
+"B<--ddeb> oder B<--ddeb-migration> verwendet werden."
 
 #. type: =item
 #: dh_strip:75
@@ -7651,13 +7699,13 @@ msgstr ""
 msgid ""
 "This option implies B<--no-ddebs> and I<cannot> be used with B<--ddebs>."
 msgstr ""
+"Diese Option impliziert B<--no-ddebs> und I<kann nicht> zusammen mit "
+"B<--ddeb> verwendet werden."
 
 #. type: =item
 #: dh_strip:84
-#, fuzzy
-#| msgid "B<--dbg-package=>I<package>"
 msgid "B<--ddeb-migration=>I<package-relation>"
-msgstr "B<--dbg-package=>I<Paket>"
+msgstr "B<--ddeb-migration=>I<Paketbeziehung>"
 
 #. type: textblock
 #: dh_strip:86
@@ -7668,6 +7716,11 @@ msgid ""
 "added to the ddebs to avoid file conflicts with the (now obsolete) -dbg "
 "package."
 msgstr ""
+"Diese Option wird benutzt, um von einem manuellen »-dbg«-Paket (das mit "
+"B<--dbg-package> erstellt wurde) zu dem automatischen »Ddebs« zu migrieren. "
+"Der Wert dieser Option sollte eine gültige B<Replaces>- und "
+"B<Breaks>-Beziehung beschreiben, die den Ddebs hinzugefügt wird, um "
+"Dateikonflikte mit dem (nun veralteten) -dbg-Paket zu vermeiden."
 
 #. type: textblock
 #: dh_strip:92
@@ -7675,11 +7728,13 @@ msgid ""
 "This option implies B<--ddebs> and I<cannot> be used with B<--keep-debug>, "
 "B<--dbg-package> or B<--no-ddebs>."
 msgstr ""
+"Diese Option impliziert B<--ddebs> und I<kann nicht> zusammen mit "
+"B<--keep-debug>, B<--dbg-package> oder B<--no-ddebs> verwendet werden."
 
 #. type: textblock
 #: dh_strip:95
 msgid "Examples:"
-msgstr ""
+msgstr "Beispiele:"
 
 #. type: verbatim
 #: dh_strip:97
@@ -7688,6 +7743,8 @@ msgid ""
 "  dh_strip --ddeb-migration='libfoo-dbg (<< 2.1-3~)'\n"
 "\n"
 msgstr ""
+"  dh_strip --ddeb-migration='libfoo-dbg (<< 2.1-3~)'\n"
+"\n"
 
 #. type: verbatim
 #: dh_strip:99
@@ -7696,44 +7753,49 @@ msgid ""
 "  dh_strip --ddeb-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< 2.1-3~)'\n"
 "\n"
 msgstr ""
+"  dh_strip --ddeb-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg "
+"(<< 2.1-3~)'\n"
+"\n"
 
 #. type: =item
 #: dh_strip:101
-#, fuzzy
-#| msgid "B<-i>, B<--indep>"
 msgid "B<--ddebs>, B<--no-ddebs>"
-msgstr "B<-i>, B<--indep>"
+msgstr "B<--ddebs>, B<--no-ddebs>"
 
 #. type: textblock
 #: dh_strip:103
 msgid "Control whether B<dh_strip> should be creating ddebs when possible."
-msgstr ""
+msgstr "steuert, ob B<dh_strip> Ddebs erstellen soll, wenn möglich."
 
 #. type: textblock
 #: dh_strip:105
 msgid ""
 "Once the Debian archive supports ddebs, debhelper will generate ddebs by "
-"default.  Until then, this option does nothing except allow you to pre-"
+"default.  Until then, this option does nothing except to allow you to pre-"
 "emptively disable ddebs if you know the generated ddebs will not work for "
 "your package."
 msgstr ""
+"Sobald das Debian-Archiv Ddebs unterstützt, wird Debhelper Ddebs "
+"standardmäßig erstellen. Bis es soweit ist, wird diese Option nichts tun, "
+"außer, dass ihnen ermöglicht wird, präventiv Ddebs zu deaktivieren, falls Sie "
+"wissen, dass Ddebs bei Ihrem Paket nicht funktionieren werden."
 
 #. type: textblock
 #: dh_strip:110
 msgid ""
 "If you want to test the ddebs feature, you can set the environment variable "
 "I<DH_BUILD_DDEBS> to 1.  Keep in mind that the Debian archive does B<not> "
-"accept them yet.  This variable is only a temporary safe guard and will be "
+"accept them yet.  This variable is only a temporary safeguard and will be "
 "removed once the archive is ready to accept ddebs."
 msgstr ""
+"Falls Sie die Ddebs-Funktionalität testen möchten, können Sie die "
+"Umgebungsvariable I<DH_BUILD_DDEBS> auf 1 setzen. Vergessen Sie nicht, dass "
+"das Debian-Archiv sie jetzt noch B<nicht> akzeptiert. Diese Variable ist nur "
+"ein zeitlich begrenzter Schutz und wird entfernt, sobald das Archive bereit "
+"ist, Ddebs zu akzeptieren."
 
 #. type: textblock
 #: dh_strip:119
-#, fuzzy
-#| msgid ""
-#| "If the B<DEB_BUILD_OPTIONS> environment variable contains B<nostrip>, "
-#| "nothing will be stripped, in accordance with Debian policy (section 10.1 "
-#| "\"Binaries\")."
 msgid ""
 "If the B<DEB_BUILD_OPTIONS> environment variable contains B<nostrip>, "
 "nothing will be stripped, in accordance with Debian policy (section 10.1 "
@@ -7741,7 +7803,7 @@ msgid ""
 msgstr ""
 "Falls die Umgebungsvariable B<DEB_BUILD_OPTIONS> B<nostrip> enthält, werden "
 "getreu der Debian-Richlinie (Abschnitt 10.1. »Binaries«) keine Symbole "
-"entfernt."
+"entfernt. Dies wird auch das Erstellen automatischer »Ddebs« verhindern."
 
 #. type: textblock
 #: dh_strip:123
@@ -7749,6 +7811,8 @@ msgid ""
 "The creation of automatic \"ddebs\" can also be prevented by adding "
 "B<noddebs> to the B<DEB_BUILD_OPTIONS> environment variable."
 msgstr ""
+"Das Erstellen automatischer »Ddebs« kann außerdem durch Hinzufügen der "
+"Umgebungsvariable B<noddebs> zu den B<DEB_BUILD_OPTIONS> verhindert werden."
 
 #. type: textblock
 #: dh_strip:128
@@ -7871,7 +7935,7 @@ msgstr ""
 #: dh_undocumented:5
 msgid "dh_undocumented - undocumented.7 symlink program (deprecated no-op)"
 msgstr ""
-"dh_undocumented - Programm für symbolische Verweise zu undocumented.7 "
+"dh_undocumented - Programm für symbolische Links zu undocumented.7 "
 "(missbilligt, Leerbefehl)"
 
 #. type: textblock
@@ -7882,7 +7946,7 @@ msgid ""
 "F<undocumented.7> man page, and so this program does nothing, and should not "
 "be used."
 msgstr ""
-"Dieses Programm wurde dazu verwandt, um symbolische Verweise auf die "
+"Dieses Programm wurde dazu verwandt, um symbolische Links auf die "
 "F<undocumented.7>-Handbuchseite zu erstellen für Handbuchseiten, die es "
 "nicht im Paket gibt. Die Debian-Richtlinie missbilligt nun die Benutzung der "
 "F<undocumented.7>-Handbuchseite, weswegen dieses Programm nichts tut und "
@@ -7954,332 +8018,3 @@ msgstr "Debian-Richtlinie, Version 2.2"
 #: dh_usrlocal:124
 msgid "Andrew Stribblehill <ads@debian.org>"
 msgstr "Andrew Stribblehill <ads@debian.org>"
-
-#~ msgid "B<--parallel>"
-#~ msgstr "B<--parallel>"
-
-#~ msgid ""
-#~ "  my $temp=\"set -e\\nset -- @ARGV\\n\" . << 'EOF';\n"
-#~ "  #DEBHELPER#\n"
-#~ "  EOF\n"
-#~ "  system ($temp) / 256 == 0\n"
-#~ "  \tor die \"Problem with debhelper scripts: $!\";\n"
-#~ "\n"
-#~ msgstr ""
-#~ "  my $temp=\"set -e\\nset -- @ARGV\\n\" . << 'EOF';\n"
-#~ "  #DEBHELPER#\n"
-#~ "  EOF\n"
-#~ "  system ($temp) / 256 == 0\n"
-#~ "  \tor die \"Problem mit Debhelper-Skripten: $!\";\n"
-#~ "\n"
-
-#~ msgid ""
-#~ "Packages that support multiarch are detected, and a Pre-Dependency on "
-#~ "multiarch-support is set in ${misc:Pre-Depends} ; you should make sure to "
-#~ "put that token into an appropriate place in your debian/control file for "
-#~ "packages supporting multiarch."
-#~ msgstr ""
-#~ "Pakete, die Multiarch unterstützen, werden entdeckt und eine "
-#~ "Vorabhängigkeit (»Pre-Dependency«) zur Multiarch-Unterstützung wird in "
-#~ "${misc:Pre-Depends} gesetzt; Sie sollten sicherstellen, dass diese "
-#~ "Markierung an eine geeignete Stelle in Ihrer debian/control-Datei für "
-#~ "Pakete abgelegt wird, die Multiarch unterstützen."
-
-#~ msgid "Sets the priority string of the F<rules.d> symlink. Default is 60."
-#~ msgstr ""
-#~ "setzt die Prioritätszeichenkette des symbolischen F<rules.d>-Verweises. "
-#~ "Vorgabe ist 60."
-
-#~ msgid ""
-#~ "dh_python - calculates Python dependencies and adds postinst and prerm "
-#~ "Python scripts (deprecated)"
-#~ msgstr ""
-#~ "dh_python - berechnet Python-Abhängigkeiten und fügt Postinst- und Prerm-"
-#~ "Python-Skripte hinzu (missbilligt)."
-
-#~ msgid ""
-#~ "B<dh_python> [S<I<debhelper options>>] [B<-n>] [B<-V> I<version>] "
-#~ "[S<I<module dirs> ...>]"
-#~ msgstr ""
-#~ "B<dh_python> [S<I<Debhelper-Optionen>>] [B<-n>] [B<-V> I<Version>] "
-#~ "[S<I<Modulverzeichnisse> …>]"
-
-#~ msgid ""
-#~ "Note: This program is deprecated. You should use B<dh_python2> instead.  "
-#~ "This program will do nothing if F<debian/pycompat> or a B<Python-Version> "
-#~ "F<control> file field exists."
-#~ msgstr ""
-#~ "Anmerkung: Dieses Programm ist missbilligt. Sie sollten stattdessen "
-#~ "B<dh_python2> benutzen. Dieses Programm wird nichts tun, falls ein "
-#~ "F<debian/pycompat>- oder ein B<Python-Version>-Dateifeld existiert."
-
-#~ msgid ""
-#~ "B<dh_python> is a debhelper program that is responsible for generating "
-#~ "the B<${python:Depends}> substitutions and adding them to substvars "
-#~ "files. It will also add a F<postinst> and a F<prerm> script if required."
-#~ msgstr ""
-#~ "B<dh_python> ist ein Debhelper-Programm, das für das Erzeugen der B<"
-#~ "${python:Depends}>-Ersatzung zuständig ist und um diese dann den "
-#~ "Substvars-Dateien hinzuzufügen. Es wird außerdem ein F<postinst>- und ein "
-#~ "F<prerm>-Skript hinzufügen, falls benötigt."
-
-#~ msgid ""
-#~ "The program will look at Python scripts and modules in your package, and "
-#~ "will use this information to generate a dependency on B<python>, with the "
-#~ "current major version, or on B<python>I<X>B<.>I<Y> if your scripts or "
-#~ "modules need a specific B<python> version. The dependency will be "
-#~ "substituted into your package's F<control> file wherever you place the "
-#~ "token B<${python:Depends}>."
-#~ msgstr ""
-#~ "Das Programm wird in Ihrem Paket nach Phyton-Skripten und Modulen suchen "
-#~ "und diese Informationen benutzen, um eine Abhängigkeit zu Python mit der "
-#~ "aktuellen Hauptversion oder zu B<python>I<X>B<.>I<Y> zu erzeugen, falls "
-#~ "Ihre Skripte oder Module eine bestimmte Version von B<python> benötigen. "
-#~ "Die Abhängigkeit wird in der Datei F<control> überall dort ersetzt, wo "
-#~ "Sie die Markierung B<${python:Depends}> platzieren."
-
-#~ msgid ""
-#~ "If some modules need to be byte-compiled at install time, appropriate "
-#~ "F<postinst> and F<prerm> scripts will be generated. If already byte-"
-#~ "compiled modules are found, they are removed."
-#~ msgstr ""
-#~ "Falls einige Module nötig sind, um zur Installationszeit Byte-kompiliert "
-#~ "zu werden, werden geeignete F<postinst>- und F<prerm>-Skripte erzeugt. "
-#~ "Falls bereits Byte-kompilierte Module gefunden werden, werden sie "
-#~ "entfernt."
-
-#~ msgid ""
-#~ "If you use this program, your package should build-depend on B<python>."
-#~ msgstr ""
-#~ "Falls Sie dieses Programm benutzen, sollte Ihr Paket eine Bauabhängigkeit "
-#~ "zu B<python> haben."
-
-#~ msgid "I<module dirs>"
-#~ msgstr "I<Modulverzeichnisse>"
-
-#~ msgid ""
-#~ "If your package installs Python modules in non-standard directories, you "
-#~ "can make F<dh_python> check those directories by passing their names on "
-#~ "the command line. By default, it will check F</usr/lib/site-python>, F</"
-#~ "usr/lib/$PACKAGE>, F</usr/share/$PACKAGE>, F</usr/lib/games/$PACKAGE>, F</"
-#~ "usr/share/games/$PACKAGE> and F</usr/lib/python?.?/site-packages>."
-#~ msgstr ""
-#~ "Falls Ihr Paket Python-Module in nicht vorgegebene Verzeichnisse "
-#~ "installiert, können Sie diese von F<dh_python> prüfen lassen, indem Sie "
-#~ "ihre Namen auf der Befehlszeile übergeben. Standardmäßig wird es F</usr/"
-#~ "lib/site-python,> F</usr/lib/$PACKAGE,> F</usr/share/$PACKAGE,> F</usr/"
-#~ "lib/games/$PACKAGE,> F</usr/share/games/$PACKAGE> und F</usr/lib/"
-#~ "python?.?/site-packages> prüfen."
-
-#~ msgid ""
-#~ "Note: only F</usr/lib/site-python>, F</usr/lib/python?.?/site-packages> "
-#~ "and the extra names on the command line are searched for binary (F<.so>) "
-#~ "modules."
-#~ msgstr ""
-#~ "Anmerkung: Nur F</usr/lib/site-python>, F</usr/lib/python?.?/site-"
-#~ "packages> und die zusätzlich auf der Befehlszeile eingegebenen Namen "
-#~ "werden nach binären Modulen (F<.so>) durchsucht."
-
-#~ msgid "B<-V> I<version>"
-#~ msgstr "B<-V> I<Version>"
-
-#~ msgid ""
-#~ "If the F<.py> files your package ships are meant to be used by a specific "
-#~ "B<python>I<X>B<.>I<Y> version, you can use this option to specify the "
-#~ "desired version, such as B<2.3>. Do not use if you ship modules in F</usr/"
-#~ "lib/site-python>."
-#~ msgstr ""
-#~ "Falls die F<.py>-Dateien, die Ihr Paket mitbringt, in einer bestimmten "
-#~ "B<python>I<X>B<.>I<Y>-Version benutzt werden sollen, können Sie diese "
-#~ "Option verwenden, um die gewünschte Version wie etwa B<2.3> anzugeben. "
-#~ "Setzen Sie sie nicht ein, falls Sie Module in F</usr/lib/site-python> "
-#~ "mitliefern."
-
-#~ msgid "Debian policy, version 3.5.7"
-#~ msgstr "Debian-Richtlinie, Version 3.5.7"
-
-#~ msgid "Python policy, version 0.3.7"
-#~ msgstr "Python-Richtlinie, Version 0.3.7"
-
-#~ msgid "Josselin Mouette <joss@debian.org>"
-#~ msgstr "Josselin Mouette <joss@debian.org>"
-
-#~ msgid "most ideas stolen from Brendan O'Dea <bod@debian.org>"
-#~ msgstr ""
-#~ "Die meisten Ideen wurden von Brendan O'Dea <bod@debian.org> geklaut."
-
-#~ msgid ""
-#~ "If there is an upstream F<changelog> file, it will be be installed as "
-#~ "F<usr/share/doc/package/changelog> in the package build directory. If the "
-#~ "changelog is a F<html> file (determined by file extension), it will be "
-#~ "installed as F<usr/share/doc/package/changelog.html> instead, and will be "
-#~ "converted to plain text with B<html2text> to generate F<usr/share/doc/"
-#~ "package/changelog>."
-#~ msgstr ""
-#~ "Falls es dort eine F<changelog>-Datei der Originalautoren gibt, wird sie "
-#~ "als F<usr/share/doc/Paket/changelog> in das Paketbauverzeichnis "
-#~ "installiert. Falls das Änderungsprotokoll eine F<HTML>-Datei ist (durch "
-#~ "die Dateiendung festgelegt), wird sie stattdessen als F<usr/share/doc/"
-#~ "Paket/changelog.html> installiert und mit B<html2text> in einfachen Text "
-#~ "umgewandelt, um F<usr/share/doc/Paket/changelog> zu erzeugen."
-
-#~ msgid "None yet.."
-#~ msgstr "Bisher keine …"
-
-#~ msgid ""
-#~ "A versioned Pre-Dependency on dpkg is needed to use L<dpkg-maintscript-"
-#~ "helper(1)>. An appropriate Pre-Dependency is set in ${misc:Pre-Depends} ; "
-#~ "you should make sure to put that token into an appropriate place in your "
-#~ "debian/control file."
-#~ msgstr ""
-#~ "Es wird eine »Pre-Dependency« mit Versionierung benötigt, um L<dpkg-"
-#~ "maintscript-helper(1)> zu benutzen. Eine geeignete »Pre-Dependency« wird "
-#~ "in ${misc:Pre-Depends} gesetzt; Sie sollten sicherstellen, dass diese "
-#~ "Markierung an eine geeignete Stelle in Ihre »debian/control«-Datei "
-#~ "geschrieben wird."
-
-#~ msgid "debian/I<package>.modules"
-#~ msgstr "debian/I<Paket>.modules"
-
-#~ msgid ""
-#~ "These files were installed for use by modutils, but are now not used and "
-#~ "B<dh_installmodules> will warn if these files are present."
-#~ msgstr ""
-#~ "Diese Dateien waren zur Benutzung durch Modutils installiert, werden aber "
-#~ "nicht mehr verwandt und B<dh_installmodules> wird warnen, falls diese "
-#~ "Dateien vorhanden sind."
-
-#~ msgid ""
-#~ "If your package needs to register more than one document, you need "
-#~ "multiple doc-base files, and can name them like this."
-#~ msgstr ""
-#~ "Falls Ihr Paket mehr als ein Dokument registrieren muss, benötigen Sie "
-#~ "mehrere doc-base-Dateien und können sie so benennen."
-
-#~ msgid ""
-#~ "dh_installinit - install init scripts and/or upstart jobs into package "
-#~ "build directories"
-#~ msgstr ""
-#~ "dh_installinit - installiert Init-Skripte und/oder Upstart-Jobs in "
-#~ "Paketbauverzeichnisse."
-
-#~ msgid "B<dh_installmime> [S<I<debhelper options>>] [B<-n>]"
-#~ msgstr "B<dh_installmime> [S<I<Debhelper-Optionen>>] [B<-n>]"
-
-#~ msgid ""
-#~ "It also automatically generates the F<postinst> and F<postrm> commands "
-#~ "needed to interface with the debian B<mime-support> and B<shared-mime-"
-#~ "info> packages. These commands are inserted into the maintainer scripts "
-#~ "by L<dh_installdeb(1)>."
-#~ msgstr ""
-#~ "Außerdem erzeugt es die F<postinst>- und F<postrm>-Befehl, die zum "
-#~ "Verbinden mit den Debian-Paketen B<mime-support> und B<shared-mime-info> "
-#~ "benötigt werden. Diese Befehle werden durch L<dh_installdeb(1)> in die "
-#~ "Betreuerskripte eingefügt."
-
-#~ msgid ""
-#~ "B<dh_installinit> is a debhelper program that is responsible for "
-#~ "installing upstart job files or init scripts with associated defaults "
-#~ "files into package build directories, and in the former case providing "
-#~ "compatibility handling for non-upstart systems."
-#~ msgstr ""
-#~ "B<dh_installinit> ist ein Debhelper-Programm, das für die Installation "
-#~ "von Upstart-Job-Dateien oder Init-Skripten mit zugehörigen »defaults«-"
-#~ "Dateien in Paketbauverzeichnisse zuständig ist und im erstgenannten Fall "
-#~ "die Kompatibilität für nicht Upstart-Systeme handhabt."
-
-#~ msgid ""
-#~ "Otherwise, if this exists, it is installed into etc/init.d/I<package> in "
-#~ "the package build directory."
-#~ msgstr ""
-#~ "Andernfalls, wenn dies existiert, wird es in etc/init.d/I<Paket>.conf im "
-#~ "Paketbauverzeichnis installiert."
-
-#~ msgid ""
-#~ "If no upstart job file is installed in the target directory when "
-#~ "B<dh_installinit --onlyscripts> is called, this program will assume that "
-#~ "an init script is being installed and not provide the compatibility "
-#~ "symlinks or upstart dependencies."
-#~ msgstr ""
-#~ "Falls keine Upstart-Job-Datei im Zielverzeichnis installiert ist, wenn "
-#~ "B<dh_installinit --onlyscripts> aufgerufen wird, wird dieses Programm "
-#~ "davon ausgehen, dass ein Init-Skript installiert ist und die symbolischen "
-#~ "Kompatibilitätsverweise oder Upstart-Abhängigkeiten nicht bereitstellen."
-
-#~ msgid "The inverse of B<--with>, disables using the given addon."
-#~ msgstr ""
-#~ "das Gegenteil von B<--with>, deaktiviert die Benutzung des angegebenen "
-#~ "Add-ons."
-
-#~ msgid "Build depends"
-#~ msgstr "Bauabhängigkeiten"
-
-#~ msgid "EXAMPLE"
-#~ msgstr "BEISPIEL"
-
-#~ msgid ""
-#~ "Suppose your package's upstream F<Makefile> installs a binary, a man "
-#~ "page, and a library into appropriate subdirectories of F<debian/tmp>. You "
-#~ "want to put the library into package libfoo, and the rest into package "
-#~ "foo. Your rules file will run \"B<dh_install --sourcedir=debian/tmp>\". "
-#~ "Make F<debian/foo.install> contain:"
-#~ msgstr ""
-#~ "Angenommen, das F<Makefile> der Originalautoren Ihres Pakets installiert "
-#~ "ein Binärpaket, eine Handbuchseite und eine Bibliothek in geeignete "
-#~ "Unterverzeichnisse von F<debian/tmp>. Sie möchten die Bibliothek in das "
-#~ "Paket »libfoo« und den Rest in das Paket »foo« ablegen. Ihre »rules«-"
-#~ "Datei wird »B<dh_install --sourcedir=debian/tmp>« ausführen. Geben Sie "
-#~ "F<debian/foo.install> den Inhalt:"
-
-#~ msgid ""
-#~ "  usr/bin\n"
-#~ "  usr/share/man/man1\n"
-#~ "\n"
-#~ msgstr ""
-#~ "  usr/bin\n"
-#~ "  usr/share/man/man1\n"
-#~ "\n"
-
-#~ msgid "While F<debian/libfoo.install> contains:"
-#~ msgstr "F<debian/libfoo.install> enthält indessen Folgendes:"
-
-#~ msgid ""
-#~ "  usr/lib/libfoo*.so.*\n"
-#~ "\n"
-#~ msgstr ""
-#~ "  usr/lib/libfoo*.so.*\n"
-#~ "\n"
-
-#~ msgid ""
-#~ "If you want a libfoo-dev package too, F<debian/libfoo-dev.install> might "
-#~ "contain:"
-#~ msgstr ""
-#~ "Falls Sie auch ein »libfoo-dev«-Paket wollen, könnte F<debian/libfoo-dev."
-#~ "install> Folgendes enthalten:"
-
-#~ msgid ""
-#~ "  usr/include\n"
-#~ "  usr/lib/libfoo*.so\n"
-#~ "  usr/share/man/man3\n"
-#~ "\n"
-#~ msgstr ""
-#~ "  usr/include\n"
-#~ "  usr/lib/libfoo*.so\n"
-#~ "  usr/share/man/man3\n"
-#~ "\n"
-
-#~ msgid ""
-#~ "You can also put comments in these files; lines beginning with B<#> are "
-#~ "ignored."
-#~ msgstr ""
-#~ "Sie können außerdem in diesen Dateien Kommentare verwenden; Zeilen, die "
-#~ "mit B<#> beginnen, werden ignoriert."
-
-#~ msgid ""
-#~ "\toverride_dh_installdocs:\n"
-#~ "\t\tdh_installdocs README TODO\n"
-#~ "\n"
-#~ msgstr ""
-#~ "\toverride_dh_installdocs:\n"
-#~ "\t\tdh_installdocs README TODO\n"
-#~ "\n"
