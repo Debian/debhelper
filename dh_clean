@@ -94,7 +94,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 }
 
 # Remove internal state data
-doit('rm', '-rf', 'debian/.debhelper/');
+doit('rm', '-rf', 'debian/.debhelper/') if not $dh{D_FLAG};
+
 
 # Remove all debhelper logs.
 if (! $dh{D_FLAG} && ! $dh{K_FLAG}) {
