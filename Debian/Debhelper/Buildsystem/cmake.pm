@@ -86,11 +86,11 @@ sub configure {
 	eval { 
 		$this->doit_in_builddir("cmake", $this->get_source_rel2builddir(), @flags, @_);
 	};
-	if ($@) {
+	if (my $err = $@) {
 		if (-e $this->get_buildpath("CMakeCache.txt")) {
 			$this->doit_in_builddir("tail -v -n +0 CMakeCache.txt");
 		}
-		die $@;
+		die $err;
 	}
 }
 
