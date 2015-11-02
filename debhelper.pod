@@ -298,42 +298,9 @@ These are the available compatibility levels:
 
 =over 4
 
-=item v1
-
-This is the original debhelper compatibility level, and so it is the default
-one. In this mode, debhelper will use F<debian/tmp> as the package tree
-directory for the first binary package listed in the control file, while using
-debian/I<package> for all other packages listed in the F<control> file.
-
-This mode is deprecated.
-
-=item v2
-
-In this mode, debhelper will consistently use debian/I<package>
-as the package tree directory for every package that is built.
-
-This mode is deprecated.
-
 =item v3
 
-This mode works like v2, with the following additions:
-
-=over 8
-
-=item -
-
-Debhelper config files support globbing via B<*> and B<?>, when appropriate. To
-turn this off and use those characters raw, just prefix with a backslash.
-
-=item -
-
-B<dh_makeshlibs> makes the F<postinst> and F<postrm> scripts call B<ldconfig>.
-
-=item -
-
-Every file in F<etc/> is automatically flagged as a conffile by B<dh_installdeb>.
-
-=back
+This is the lowest supported compatibility level.
 
 This mode is deprecated.
 
