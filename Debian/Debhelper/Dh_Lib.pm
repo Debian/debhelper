@@ -458,10 +458,6 @@ sub tmpdir {
 	if ($dh{TMPDIR}) {
 		return $dh{TMPDIR};
 	}
-	elsif (compat(1) && $package eq $dh{MAINPACKAGE}) {
-		# This is for back-compatibility with the debian/tmp tradition.
-		return "debian/tmp";
-	}
 	else {
 		return "debian/$package";
 	}
@@ -525,11 +521,7 @@ sub pkgfile {
 # Pass it a name of a binary package, it returns the name to prefix to files
 # in debian/ for this package.
 sub pkgext {
-	my $package=shift;
-
-	if (compat(1) and $package eq $dh{MAINPACKAGE}) {
-		return "";
-	}
+	my ($package) = @_;
 	return "$package.";
 }
 
@@ -790,12 +782,10 @@ sub filedoublearray {
 			next if /^#/ || /^$/;
 		}
 		my @line;
-		# Only do glob expansion in v3 mode.
-		#
 		# The tricky bit is that the glob expansion is done
 		# as if we were in the specified directory, so the
 		# filenames that come out are relative to it.
-		if (defined $globdir && ! compat(2) && ! $x) {
+		if (defined($globdir) && ! $x) {
 			foreach (map { glob "$globdir/$_" } split) {
 				s#^$globdir/##;
 				push @line, $_;

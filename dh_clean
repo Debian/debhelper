@@ -100,9 +100,6 @@ doit('rm', '-rf', 'debian/.debhelper/') if not $dh{D_FLAG};
 # Remove all debhelper logs.
 if (! $dh{D_FLAG} && ! $dh{K_FLAG}) {
 	complex_doit("rm","-f","debian/*.debhelper.log");
-	if (compat(1)) {
-		doit("rm","-f","debian/debhelper.log");
-	}
 }
 
 if (! $dh{D_FLAG}) {
@@ -142,7 +139,7 @@ if (! $dh{D_FLAG}) {
 		\\( -type d -a -name autom4te.cache -prune -exec rm -rf {} + \\) \\)");
 }
 
-doit('rm', '-rf', 'debian/tmp') if -x 'debian/tmp' && ! compat(1) &&
+doit('rm', '-rf', 'debian/tmp') if -x 'debian/tmp' &&
                                    ! excludefile("debian/tmp");
 
 if (!compat(6) && !$dh{K_FLAG}) {
