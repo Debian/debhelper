@@ -8,6 +8,16 @@ package Debian::Debhelper::Dh_Lib;
 use strict;
 use warnings;
 
+use constant {
+	# Lowest compat level supported
+	'MIN_COMPAT_LEVEL' => 3,
+	# Lowest compat level that does *not* cause deprecation
+	# warnings
+	'LOWEST_NON_DEPRECATED_COMPAT_LEVEL' => 5,
+	# Highest compat level permitted
+	'MAX_COMPAT_LEVEL' => 10,
+};
+
 use Exporter qw(import);
 use vars qw(@EXPORT %dh);
 @EXPORT=qw(&init &doit &doit_noerror &complex_doit &verbose_print &error
@@ -423,14 +433,17 @@ sub dirname {
 				$c=$ENV{DH_COMPAT};
 			}
 		}
+		if ($c < MIN_COMPAT_LEVEL) {
+			error("Compatibility levels before ${\MIN_COMPAT_LEVEL} are no longer supported (level $c requested)");
+		}
 
-		if ($c <= 4 && ! $warned_compat && ! $nowarn) {
-			warning("Compatibility levels before 5 are deprecated (level $c in use)");
+		if ($c < LOWEST_NON_DEPRECATED_COMPAT_LEVEL && ! $warned_compat && ! $nowarn) {
+			warning("Compatibility levels before ${\LOWEST_NON_DEPRECATED_COMPAT_LEVEL} are deprecated (level $c in use)");
 			$warned_compat=1;
 		}
 	
-		if ($c > $max_compat) {
-			error("Sorry, but $max_compat is the highest compatibility level supported by this debhelper.");
+		if ($c > MAX_COMPAT_LEVEL) {
+			error("Sorry, but ${\MAX_COMPAT_LEVEL} is the highest compatibility level supported by this debhelper.");
 		}
 
 		return ($c <= $num);
