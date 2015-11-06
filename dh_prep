@@ -55,7 +55,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		unless excludefile($tmp);
 }
 
-doit('rm', '-rf', 'debian/tmp') if -x 'debian/tmp'
+doit('rm', '-rf', 'debian/tmp') if -x 'debian/tmp' &&
                                    ! excludefile("debian/tmp");
 
 =head1 SEE ALSO
