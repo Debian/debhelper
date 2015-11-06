@@ -12,7 +12,7 @@ use Debian::Debhelper::Dh_Lib;
 
 =head1 SYNOPSIS
 
-B<dh_clean> [S<I<debhelper options>>] [B<-k>] [B<-d>] [B<-X>I<item>] [S<I<file> ...>]
+B<dh_clean> [S<I<debhelper options>>] [B<-k>] [B<-d>] [B<-X>I<item>] [S<I<path> ...>]
 
 =head1 DESCRIPTION
 
@@ -35,7 +35,10 @@ B<clean> target in F<debian/rules>.
 
 =item F<debian/clean>
 
-Can list other files to be removed.
+Can list other paths to be removed.
+
+Note directories listed in this file B<must> end with a trailing
+slash.  Any content in these directories will be removed as well.
 
 =back
 
@@ -58,9 +61,12 @@ Exclude files that contain I<item> anywhere in their filename from being
 deleted, even if they would normally be deleted. You may use this option
 multiple times to build up a list of things to exclude.
 
-=item I<file> ...
+=item I<path> ...
 
-Delete these I<file>s too.
+Delete these I<path>s too.
+
+Note directories passed as arguments B<must> end with a trailing
+slash.  Any content in these directories will be removed as well.
 
 =back
 
@@ -103,20 +109,26 @@ if (! $dh{D_FLAG} && ! $dh{K_FLAG}) {
 }
 
 if (! $dh{D_FLAG}) {
+	my (@clean_files, @clean_dirs);
 	if (@ARGV) {
-		doit("rm","-f","--",@ARGV);
+		push(@clean_files, grep { !m@/$@ } @ARGV);
+		push(@clean_dirs, grep { m@/$@ } @ARGV);
 	}
 
 	if (! $dh{K_FLAG}) {
 		if (!compat(6) && -e "debian/clean") {
 			my @clean=grep { ! excludefile($_) }
-				filearray("debian/clean", ".");
-			doit("rm","-f","--",@clean) if @clean;
+			filearray("debian/clean", ".");
+			push(@clean_files, grep { !m@/$@ } @clean);
+			push(@clean_dirs, grep { m@/$@ } @clean);
 		}
 
 		doit("rm","-f","debian/files")
 			unless excludefile("debian/files");
 	}
+
+	doit('rm', '-f', '--', @clean_files) if @clean_files;
+	doit('rm', '-fr', '--', @clean_dirs) if @clean_dirs;
 
 	# See if some files that would normally be deleted are excluded.
 	my $find_options='';
