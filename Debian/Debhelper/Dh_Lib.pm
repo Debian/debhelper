@@ -422,6 +422,11 @@ sub dirname {
 				else {
 					chomp $l;
 					$c=$l;
+					$c =~ s/^\s*+//;
+					$c =~ s/\s*+$//;
+					if ($c !~ m/^\d+$/) {
+						error("debian/compat must contain a postive number (found: \"$c\")");
+					}
 				}
 			}
 			else {
