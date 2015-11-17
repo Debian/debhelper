@@ -72,6 +72,17 @@ slash.  Any content in these directories will be removed as well.
 
 =cut
 
+if ( not -f 'debian/compat' and not $ENV{'DH_COMPAT'}) {
+	# Temporary work around - Permit a missing compat to work with
+	# cdbs's feature of auto-creating a d/compat file.
+	#  - Auto-bump to compat 5 to match cdbs (Not that it matters a lot,
+	#    since there is no compat conditions for 4 or less)
+	warning("Pretending DH_COMPAT was set to 5");
+	warning(" - this is a temporary measure to avoid FTBFS in packages");
+	warning("   relying on cdbs to set debian/compat to 5 during the build");
+	$ENV{'DH_COMPAT'} = 5;
+}
+
 init(options => {
 	"dirs-only" => \$dh{D_FLAG},
 });

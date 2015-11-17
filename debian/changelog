@@ -1,5 +1,12 @@
 debhelper (9.20151117) UNRELEASED; urgency=medium
 
+  [ Niels Thykier ]
+  * dh_clean: Temporarily interpret the absence of d/compat and
+    DH_COMPAT to mean compat 5.  This is to avoid breaking
+    packages that rely on cdbs to set debian/compat to 5 during
+    the build.  This temporary work around will live until
+    d/compat becomes mandatory.  (Closes: #805404)
+
   [ Translations ]
   * Update German translation (Chris Leick)
     (Closes: #802198)
