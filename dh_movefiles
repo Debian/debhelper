@@ -98,40 +98,22 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	my (@tomove, @tomove_expanded);
 
-        # debian/files has a different purpose, so ignore it.
+	# debian/files has a different purpose, so ignore it.
 	if ($files && $files ne "debian/files" ) {
 		@tomove=filearray($files, $sourcedir);
 	}
 	
 	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
-		if (compat(2)) {
-			# Pass through as-is and it will be expanded below
-			push(@tomove, @ARGV);
-		} else {
-			# Expand these manually as filearray already
-			push(@tomove_expanded, map { glob("$sourcedir/$_") } @ARGV);
-		}
+		# Expand these manually similar to filearray
+		push(@tomove_expanded, map { glob("$sourcedir/$_") } @ARGV);
 	}
 
 	if ((@tomove || @tomove_expanded) && $tmp eq $sourcedir) {
-		error("I was asked to move files from $sourcedir to $sourcedir. Perhaps you should set DH_COMPAT=2?");
+		error("I was asked to move files from $sourcedir to $sourcedir.");
 	}
 
-	# Now we need to expand wildcards in @tomove.
-	# This is only necessary in pre-v3 land -- as of v3, the
-	# expansion is automatically done by filearray().
-	if (@tomove && compat(2)) {
-		my @filelist=();
-		foreach (@tomove) {
-			push @filelist, glob("$sourcedir/$_");
-		}
-		@tomove=@filelist;
-	}
-	else {
-		# However, filearray() does not add the sourcedir,
-		# which we need.
-		@tomove = map { "$sourcedir/$_" } @tomove;
-	}
+	# filearray() does not add the sourcedir, which we need.
+	@tomove = map { "$sourcedir/$_" } @tomove;
 
 	push(@tomove, @tomove_expanded);
 

@@ -135,7 +135,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	# Automatic conffiles registration: If it is in /etc, it is a
 	# conffile.
-	if (! compat(2) && -d "$tmp/etc") {
+	if ( -d "$tmp/etc") {
 		complex_doit("find $tmp/etc -type f -printf '/etc/%P\n' | LC_ALL=C sort >> $tmp/DEBIAN/conffiles");
 		# Anything found?
 		if (-z "$tmp/DEBIAN/conffiles") {
