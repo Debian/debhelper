@@ -1,13 +1,12 @@
-if [ "$1" = "remove" ] || [ "$1" = "purge" ] ; then
-	_action=remove
-	if [ "$1" = "remove" ] ; then
-		# Attempt to disable but ignore failures as it is not
-		# required (and the script must be a able to handle
-		# being called while the package is removed, but not
-		# yet purged)
-		_action=disable
-	fi
-	update-rc.d #SCRIPT# ${_action} >/dev/null
+if [ "$1" = "remove" ] ; then
+	# Attempt to disable but ignore failures as it is not
+	# required (and the script must be a able to handle
+	# being called while the package is removed, but not
+	# yet purged)
+	update-rc.d #SCRIPT# disable >/dev/null || true
+fi
+if [ "$1" = "purge" ] ; then
+	update-rc.d #SCRIPT# remove >/dev/null
 fi
 
 
