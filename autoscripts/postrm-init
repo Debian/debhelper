@@ -1,17 +1,10 @@
-if [ "$1" = "remove" ] ; then
-	# Attempt to disable but ignore failures as it is not
-	# required (and the script must be a able to handle
-	# being called while the package is removed, but not
-	# yet purged)
-	update-rc.d #SCRIPT# disable >/dev/null || true
-fi
 if [ "$1" = "purge" ] ; then
 	update-rc.d #SCRIPT# remove >/dev/null
 fi
 
 
-# In case this system is running systemd, we make systemd reload the
-# unit files to pick up changes.
+# In case this system is running systemd, we make systemd reload the unit files
+# to pick up changes.
 if [ -d /run/systemd/system ] ; then
 	systemctl --system daemon-reload >/dev/null || true
 fi
