@@ -274,7 +274,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}, $tmp);
 		if (@tmpfiles > 0) {
 			autoscript($package,"postinst", "postinst-init-tmpfiles",
-				"s,#TMPFILES#," . join(" ", @tmpfiles).",");
+				"s,#TMPFILES#," . join(" ", sort @tmpfiles).",");
 		}
 	}
 
