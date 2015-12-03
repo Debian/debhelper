@@ -77,8 +77,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		foreach my $set (@ucf) {
 			my $src = $set->[0];
 			my $dest = $set->[1];
-			autoscript($package,"postinst","postinst-ucf","s:#UCFSRC#:$src:;s:#UCFDEST#:$dest:;s/#PACKAGE#/$package/",);
-			autoscript($package,"postrm","postrm-ucf","s:#UCFDEST#:$dest:;s/#PACKAGE#/$package/");
+			autoscript($package,"postinst","postinst-ucf","s:#UCFSRC#:$src:g;s:#UCFDEST#:$dest:g;s/#PACKAGE#/$package/g",);
+			autoscript($package,"postrm","postrm-ucf","s:#UCFDEST#:$dest:g;s/#PACKAGE#/$package/g");
 		}
 	}
 }

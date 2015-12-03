@@ -79,9 +79,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 
 		autoscript($package, "postinst", "postinst-xfonts",
-			"s:#CMDS#:".join(";", @cmds, @cmds_postinst).":");
+			"s:#CMDS#:".join(";", @cmds, @cmds_postinst).":g");
 		autoscript($package, "postrm", "postrm-xfonts",
-			"s:#CMDS#:".join(";", @cmds, @cmds_postrm).":");
+			"s:#CMDS#:".join(";", @cmds, @cmds_postrm).":g");
 
 		addsubstvar($package, "misc:Depends", "xfonts-utils");
 	}

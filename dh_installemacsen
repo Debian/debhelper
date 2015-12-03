@@ -131,11 +131,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if ($emacsen_install ne '' || $emacsen_remove ne '') {
 		if (! $dh{NOSCRIPTS}) {
 			autoscript($package,"preinst","preinst-emacsen",
-				"s/#PACKAGE#/$package/");
+				"s/#PACKAGE#/$package/g");
 			autoscript($package,"postinst","postinst-emacsen",
-				"s/#PACKAGE#/$package/");
+				"s/#PACKAGE#/$package/g");
 			autoscript($package,"prerm","prerm-emacsen",
-				"s/#PACKAGE#/$package/");
+				"s/#PACKAGE#/$package/g");
 		}
 	}
 }
