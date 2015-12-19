@@ -158,8 +158,6 @@ if ($dh{MIGRATE_DDEB} and not $dh{ENABLE_DDEBS}) {
 	error("--ddeb-migration and --no-ddebs are mutually exclusive");
 }
 
-$dh{ENABLE_DDEBS} = 0 if not $ENV{'DH_BUILD_DDEBS'};
-
 # This variable can be used to turn off stripping (see Policy).
 if (get_buildoption('nostrip')) {
 	exit;
