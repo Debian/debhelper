@@ -912,7 +912,8 @@ sub sourcepackage {
 #
 # As a side effect, populates %package_arches and %package_types
 # with the types of all packages (not only those returned).
-my (%package_types, %package_arches, %package_multiarches, %packages_by_type);
+my (%package_types, %package_arches, %package_multiarches, %packages_by_type,
+    %package_sections);
 sub getpackages {
 	my ($type) = @_;
 	$type //= 'both';
@@ -928,7 +929,8 @@ sub getpackages {
 
 	my $package="";
 	my $arch="";
-	my ($package_type, $multiarch, %seen, @profiles,
+	my $section="";
+	my ($package_type, $multiarch, %seen, @profiles, $source_section,
 		$included_in_build_profile);
 	if (exists $ENV{'DEB_BUILD_PROFILES'}) {
 		@profiles=split /\s+/, $ENV{'DEB_BUILD_PROFILES'};
@@ -949,6 +951,9 @@ sub getpackages {
 			}
 			$package_type="deb";
 			$included_in_build_profile=1;
+		}
+		if (/^Section:\s(.*)\s*$/i) {
+			$section = $1;
 		}
 		if (/^Architecture:\s*(.*)/i) {
 			$arch=$1;
@@ -981,6 +986,7 @@ sub getpackages {
 				$package_types{$package}=$package_type;
 				$package_arches{$package}=$arch;
 				$package_multiarches{$package} = $multiarch;
+				$package_sections{$package} = $section || $source_section;
 				if ($included_in_build_profile) {
 					if ($arch eq 'all') {
 						push(@{$packages_by_type{'indep'}}, $package);
@@ -991,9 +997,12 @@ sub getpackages {
 						push(@{$packages_by_type{'both'}}, $package);
 					}
 				}
+			} elsif ($section and not defined($source_section)) {
+				$source_section = $section;
 			}
 			$package='';
 			$arch='';
+			$section='';
 		}
 	}
 	close CONTROL;
@@ -1024,6 +1033,19 @@ sub package_multiarch {
 		return 'no';
 	}
 	return $package_multiarches{$package} // 'no';
+}
+
+# Returns the (raw) section value of a package (possibly including component).
+sub package_section {
+	my ($package) = @_;
+
+	# Test the architecture field instead, as it is common for a
+	# package to not have a multi-arch value.
+	if (! exists $package_sections{$package}) {
+		warning "package $package is not in control info";
+		return 'unknown';
+	}
+	return $package_sections{$package} // 'unknown';
 }
 
 # Return true if a given package is really a udeb.

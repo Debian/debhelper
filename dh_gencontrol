@@ -89,18 +89,27 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# extension.
 	if ( -d $ddeb_tmp and not is_udeb($package)) {
 		my $multiarch = package_multiarch($package);
+		my $section = package_section($package);
 		my $replaces = read_ddeb_migration($ddeb_info_dir);
+		my $component = '';
+		if ($section =~ m{^(.*)/[^/]+$}) {
+			$component = "${1}/";
+			# This should not happen, but lets not propogate the error
+			# if does.
+			$component = '' if $component eq 'main/';
+		}
 
 		# Remove and override more or less every standard field.
 		my @ddeb_options = (qw(
 			-UPre-Depends -URecommends -USuggests -UEnhances -UProvides -UEssential
-			-UConflicts -DPriority=extra -DSection=debug
+			-UConflicts -DPriority=extra
 			-DAuto-Built-Package=debug-symbols
 			),
 			 "-DPackage=${package}-dbgsym",
 			 "-DDepends=${package} (= \${binary:Version})",
 			 "-DDescription=Debug symbols for ${package}",
 			 "-DBuild-Ids=${build_ids}",
+			 "-DSection=${component}debug",
 		);
 		# Disable multi-arch unless the original package is an
 		# multi-arch: same package.  In all other cases, we do not
