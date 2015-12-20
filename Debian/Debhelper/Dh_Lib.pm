@@ -34,7 +34,7 @@ use vars qw(@EXPORT %dh);
 	    &install_dh_config_file &error_exitcode &package_multiarch
 	    &install_file &install_prog &install_lib &install_dir
 	    &get_source_date_epoch &is_cross_compiling
-	    &generated_file &autotrigger
+	    &generated_file &autotrigger &package_section
 );
 
 my $max_compat=10;
@@ -912,19 +912,23 @@ sub sourcepackage {
 #
 # As a side effect, populates %package_arches and %package_types
 # with the types of all packages (not only those returned).
-my (%package_types, %package_arches, %package_multiarches);
+my (%package_types, %package_arches, %package_multiarches, %packages_by_type);
 sub getpackages {
-	my $type=shift;
+	my ($type) = @_;
+	$type //= 'both';
+	error("getpackages: First argument must be one of \"arch\", \"indep\" or \"both\"")
+		if $type ne 'both' and $type ne 'indep' and $type ne 'arch';
 
-	%package_types=();
-	%package_arches=();
-	%package_multiarches=();
+	if (%packages_by_type) {
+		return @{$packages_by_type{$type}};
+	}
+
+	$packages_by_type{$_} = [] for qw(both indep arch);
 	
-	$type="" if ! defined $type;
 
 	my $package="";
 	my $arch="";
-	my ($package_type, $multiarch, @list, %seen, @profiles,
+	my ($package_type, $multiarch, %seen, @profiles,
 		$included_in_build_profile);
 	if (exists $ENV{'DEB_BUILD_PROFILES'}) {
 		@profiles=split /\s+/, $ENV{'DEB_BUILD_PROFILES'};
@@ -977,25 +981,24 @@ sub getpackages {
 				$package_types{$package}=$package_type;
 				$package_arches{$package}=$arch;
 				$package_multiarches{$package} = $multiarch;
+				if ($included_in_build_profile) {
+					if ($arch eq 'all') {
+						push(@{$packages_by_type{'indep'}}, $package);
+						push(@{$packages_by_type{'both'}}, $package);
+					} elsif ($arch eq 'any' ||
+							 ($arch ne 'all' && samearch(buildarch(), $arch))) {
+						push(@{$packages_by_type{'arch'}}, $package);
+						push(@{$packages_by_type{'both'}}, $package);
+					}
+				}
 			}
-
-			if ($package && $included_in_build_profile &&
-			    ((($type eq 'indep' || $type eq 'both') && $arch eq 'all') ||
-			     (($type eq 'arch'  || $type eq 'both') &&
-				($arch eq 'any' ||
-				  ($arch ne 'all' && samearch(buildarch(), $arch))
-			        )
-			     ) || ! $type)
-			    ) {
-				push @list, $package;
-				$package="";
-				$arch="";
-			}
+			$package='';
+			$arch='';
 		}
 	}
 	close CONTROL;
 
-	return @list;
+	return @{$packages_by_type{$type}};
 }
 
 # Returns the arch a package will build for.
