@@ -45,16 +45,12 @@ things to exclude.
 
 =item B<--dbg-package=>I<package>
 
-=begin comment
-
 B<This option is a now special purpose option that you normally do not
 need>.  In most cases, there should be little reason to use this
-option for new source packages as debhelper generates automatic debug
-packages ("ddebs").  B<If you have a manual --dbg-package> that you
-want to migrate to the automatic ddeb, please see the
-B<--ddeb-migration> option.
-
-=end comment
+option for new source packages as debhelper automatically generates
+debug packages ("ddebs").  B<If you have a manual --dbg-package> that
+you want to replace with an automatically generated debug symbol
+package, please see the B<--ddeb-migration> option.
 
 Causes B<dh_strip> to save debug symbols stripped from the packages it acts on
 as independent files in the package build directory of the specified debugging
@@ -74,6 +70,13 @@ or B<--ddeb-migration>.
 
 =item B<-k>, B<--keep-debug>
 
+B<This option is a now special purpose option that you normally do not
+need>.  In most cases, there should be little reason to use this
+option for new source packages as debhelper automatically generates
+debug packages ("ddebs").  B<If you have a manual --dbg-package> that
+you want to replace with an automatically generated debug symbol
+package, please see the B<--ddeb-migration> option.
+
 Debug symbols will be retained, but split into an independent
 file in F<usr/lib/debug/> in the package build directory. B<--dbg-package>
 is easier to use than this option, but this option is more flexible.
@@ -84,10 +87,10 @@ B<--ddebs>.
 =item B<--ddeb-migration=>I<package-relation>
 
 This option is used to migrate from a manual "-dbg" package (created
-with B<--dbg-package>) to the automatic "ddebs".  The value of this
-option should describe a valid B<Replaces>- and B<Breaks>-relation,
-which will be added to the ddebs to avoid file conflicts with the (now
-obsolete) -dbg package.
+with B<--dbg-package>) to an automatic generated debug symbol
+package. This option should describe a valid B<Replaces>- and
+B<Breaks>-relation, which will be added to the debug symbol package to
+avoid file conflicts with the (now obsolete) -dbg package.
 
 This option implies B<--ddebs> and I<cannot> be used with
 B<--keep-debug>, B<--dbg-package> or B<--no-ddebs>.
@@ -100,29 +103,22 @@ Examples:
 
 =item B<--ddebs>, B<--no-ddebs>
 
-Control whether B<dh_strip> should be creating ddebs when possible.
+Control whether B<dh_strip> should be creating debug symbol packages
+when possible.
 
-Once the Debian archive supports ddebs, debhelper will generate ddebs
-by default.  Until then, this option does nothing except to allow you to
-pre-emptively disable ddebs if you know the generated ddebs will not
-work for your package.
-
-If you want to test the ddebs feature, you can set the environment
-variable I<DH_BUILD_DDEBS> to 1.  Keep in mind that the Debian archive
-does B<not> accept them yet.  This variable is only a temporary
-safeguard and will be removed once the archive is ready to accept
-ddebs.
+The default is to create debug symbol packages.
 
 =back
 
 =head1 NOTES
 
-If the B<DEB_BUILD_OPTIONS> environment variable contains B<nostrip>, nothing
-will be stripped, in accordance with Debian policy (section 10.1
-"Binaries").  This will also inhibit the creation of automatic "ddebs".
+If the B<DEB_BUILD_OPTIONS> environment variable contains B<nostrip>,
+nothing will be stripped, in accordance with Debian policy (section
+10.1 "Binaries").  This will also inhibit the automatic creation of
+debug symbol packages.
 
-The creation of automatic "ddebs" can also be prevented by adding
-B<noddebs> to the B<DEB_BUILD_OPTIONS> environment variable.
+The automatic creation of debug symbol packages can also be prevented
+by adding B<noddebs> to the B<DEB_BUILD_OPTIONS> environment variable.
 
 =head1 CONFORMS TO
 
