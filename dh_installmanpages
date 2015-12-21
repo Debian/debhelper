@@ -136,7 +136,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	# Find all filenames that look like man pages.
 	@manpages=();
-	@allpackages=getpackages('');
+	@allpackages=getpackages() if not @allpackaes;
 	find(\&find_man,'.'); # populates @manpages
 	
 	foreach my $page (@manpages) {
