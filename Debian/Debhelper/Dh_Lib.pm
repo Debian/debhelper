@@ -916,15 +916,16 @@ my (%package_types, %package_arches, %package_multiarches, %packages_by_type,
     %package_sections);
 sub getpackages {
 	my ($type) = @_;
-	$type //= 'both';
-	error("getpackages: First argument must be one of \"arch\", \"indep\" or \"both\"")
-		if $type ne 'both' and $type ne 'indep' and $type ne 'arch';
+	error("getpackages: First argument must be one of \"arch\", \"indep\", or \"both\"")
+		if defined($type) and $type ne 'both' and $type ne 'indep' and $type ne 'arch';
+
+	$type //= 'all-listed-in-control-file';
 
 	if (%packages_by_type) {
 		return @{$packages_by_type{$type}};
 	}
 
-	$packages_by_type{$_} = [] for qw(both indep arch);
+	$packages_by_type{$_} = [] for qw(both indep arch all-listed-in-control-file);
 	
 
 	my $package="";
@@ -988,6 +989,7 @@ sub getpackages {
 				$package_multiarches{$package} = $multiarch;
 				$package_sections{$package} = $section || $source_section;
 				if ($included_in_build_profile) {
+					push(@{$packages_by_type{'all-listed-in-control-file'}}, $package);
 					if ($arch eq 'all') {
 						push(@{$packages_by_type{'indep'}}, $package);
 						push(@{$packages_by_type{'both'}}, $package);
