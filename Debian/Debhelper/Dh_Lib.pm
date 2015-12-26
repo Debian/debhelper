@@ -562,7 +562,7 @@ sub pkgfilename {
 		my $version=`dpkg-parsechangelog -l$isnative_changelog -SVersion`;
 		chomp($dh{VERSION} = $version);
 		# Did the changelog parse fail?
-		if (! defined $dh{VERSION}) {
+		if ($dh{VERSION} eq q{}) {
 			error("changelog parse failure");
 		}
 
