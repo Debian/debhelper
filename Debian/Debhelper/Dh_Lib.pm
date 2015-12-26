@@ -559,8 +559,8 @@ sub pkgfilename {
 			$isnative_changelog="debian/changelog";
 		}
 		# Get the package version.
-		my $version=`dpkg-parsechangelog -l$isnative_changelog`;
-		($dh{VERSION})=$version=~m/Version:\s*(.*)/m;
+		my $version=`dpkg-parsechangelog -l$isnative_changelog -SVersion`;
+		chomp($dh{VERSION} = $version);
 		# Did the changelog parse fail?
 		if (! defined $dh{VERSION}) {
 			error("changelog parse failure");
