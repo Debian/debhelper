@@ -177,7 +177,7 @@ foreach my $package (getpackages()) {
 				# Fall back to looking in debian/tmp.
 				if (! @found || ! (-e $found[0] || -l $found[0])) {
 					@found = glob "debian/tmp/$glob"
-						if $glob !~ m{(?:\./)?debian/tmp/};
+						if $glob !~ m{^(?:\./)?debian/tmp/};
 				}
 			}
 			push @filelist, @found;
