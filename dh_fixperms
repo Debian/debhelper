@@ -106,14 +106,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				 "${find_options} -print0 2>/dev/null",
 				 "| xargs -0r chmod 0644");
 	
-	# v4 and up
-	if (! compat(3)) {
-		# Programs in the bin and init.d dirs should be executable..
-		for my $dir (qw{usr/bin bin usr/sbin sbin usr/games etc/init.d}) {
-			if (-d "$tmp/$dir") {
-				complex_doit("find $tmp/$dir -type f $find_options -print0 2>/dev/null",
-					"| xargs -0r chmod a+x");
-			}
+	# Programs in the bin and init.d dirs should be executable..
+	for my $dir (qw{usr/bin bin usr/sbin sbin usr/games etc/init.d}) {
+		if (-d "$tmp/$dir") {
+			complex_doit("find $tmp/$dir -type f $find_options -print0 2>/dev/null",
+				"| xargs -0r chmod a+x");
 		}
 	}
 	

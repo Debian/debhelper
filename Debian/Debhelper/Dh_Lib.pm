@@ -10,7 +10,7 @@ use warnings;
 
 use constant {
 	# Lowest compat level supported
-	'MIN_COMPAT_LEVEL' => 3,
+	'MIN_COMPAT_LEVEL' => 4,
 	# Lowest compat level that does *not* cause deprecation
 	# warnings
 	'LOWEST_NON_DEPRECATED_COMPAT_LEVEL' => 5,

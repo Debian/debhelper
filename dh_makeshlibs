@@ -202,10 +202,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				my $version = $dh{VERSION};
 				# Old compatibility levels include the
 				# debian revision, while new do not.
-				if (! compat(3)) {
-					# Remove debian version, if any.
-					$version =~ s/-[^-]+$//;
-				}
+				# Remove debian version, if any.
+				$version =~ s/-[^-]+$//;
 				$deps="$package (>= $version)";
 			}
 		}

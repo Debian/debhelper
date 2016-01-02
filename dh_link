@@ -113,8 +113,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		error("parameters list a link without a destination.");
 	}
 
-	# v4 or later and only if there is a temp dir already
-	if (! compat(3) && -e $tmp) {
+	# If there is a temp dir already
+	if (-e $tmp) {
 		# Scan for existing links and add them to @links, so they
 		# are recreated policy conformant.
 		find(
