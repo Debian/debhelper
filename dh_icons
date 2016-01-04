@@ -50,8 +50,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $icondir="$tmp$baseicondir";
 	if (-d $icondir) {
 		my @dirlist;
-		opendir(DIRHANDLE, $icondir);
-		while (my $subdir = readdir(DIRHANDLE)) {
+		opendir(my $dirfd, $icondir) or error("Cannot opendir($icondir): $!");
+		while (my $subdir = readdir($dirfd)) {
 			next if $subdir =~ /^\./;
 			next if $subdir eq "gnome";
 			next if $subdir eq "hicolor";
@@ -61,6 +61,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			}, "$icondir/$subdir" ;
 			push @dirlist, "$baseicondir/$subdir" if $needs_cache;
 		}
+		closedir($dirfd);
 		if (@dirlist and ! $dh{NOSCRIPTS}) {
 			my $list=join(" ", sort @dirlist);
 			autoscript($package,"postinst","postinst-icons","s%#DIRLIST#%$list%g");
