@@ -65,13 +65,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			install_dir("$tmp/usr/share/menu");
 		}
 		install_file($menu,"$tmp/usr/share/menu/$package");
-
-		# Add the scripts if a menu-method file doesn't exist.
-		# The scripts for menu-method handle everything these do, too.
-		if ($menu_method eq "" && ! $dh{NOSCRIPTS}) {
-			autoscript($package,"postinst","postinst-menu");
-			autoscript($package,"postrm","postrm-menu")
-		}
 	}
 
 	if ($menu_method ne '') {
