@@ -136,6 +136,8 @@ my @installed;
 my $srcdir = '.';
 $srcdir = $dh{SOURCEDIR} if defined $dh{SOURCEDIR};
 
+my $missing_files = 0;
+
 # PROMISE: DH NOOP WITHOUT install
 
 foreach my $package (getpackages()) {
@@ -180,12 +182,16 @@ foreach my $package (getpackages()) {
 						if $glob !~ m{^(?:\./)?debian/tmp/};
 				}
 			}
-			push @filelist, @found;
+			if (@found && (-e $found[0] || -l $found[0])) {
+				push @filelist, @found;
+			}
 		}
 
 		if (! compat(4)) { # check added in v5
 			if (! @filelist && ! $skip_install) {
-				error("$package missing files (@$set), aborting");
+				warning("$package missing files: @$set");
+				++$missing_files;
+				next;
 			}
 		}
 
@@ -193,7 +199,7 @@ foreach my $package (getpackages()) {
 			next if excludefile($src);
 			
 			push @installed, $src;
-			next if $skip_install;
+			next if $skip_install or $missing_files;
 		
 			if (! defined $dest) {
 				# Guess at destination directory.
@@ -268,6 +274,10 @@ if ($dh{LIST_MISSING} || $dh{FAIL_MISSING}) {
 			error("missing files, aborting");
 		}
 	}
+}
+
+if ($missing_files) {
+	error("missing files, aborting");
 }
 
 =head1 LIMITATIONS
