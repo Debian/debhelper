@@ -68,7 +68,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 		# Add the scripts if a menu-method file doesn't exist.
 		# The scripts for menu-method handle everything these do, too.
-		if ($menu_method eq "" && ! $dh{NOSCRIPTS}) {
+		if (-x $menu && $menu_method eq "" && ! $dh{NOSCRIPTS}) {
 			autoscript($package,"postinst","postinst-menu");
 			autoscript($package,"postrm","postrm-menu")
 		}

@@ -8,6 +8,9 @@ debhelper (9.20151225+unreleased) UNRELEASED; urgency=medium
     does not start with debian/tmp.  This should make the
     output on failures less weird.
   * autoscripts/*-makeshlibs: Removed, no longer used.
+  * dh_installmenu: Do not add post{rm,inst} snippets for
+    /non-executable/ menu files.  The trigger in the menu package
+    can handle these correctly.  (Closes: #628564)
 
   [ Dmitry Shachnev ]
   * dh_install: Fail because of missing files only after processing
