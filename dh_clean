@@ -93,6 +93,9 @@ if ($dh{K_FLAG}) {
 	warning("dh_clean -k is deprecated; use dh_prep instead");
 }
 
+# Remove the debhelper stamp file
+doit('rm', '-f', 'debian/debhelper-build-stamp') if not $dh{D_FLAG};
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $ext=pkgext($package);

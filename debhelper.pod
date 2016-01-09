@@ -545,6 +545,50 @@ Debhelper will default to B<--parallel> for all buildsystems that
 support parallel building.  This can be disabled by using either
 B<--no-parallel> or passing B<--max-parallel> with a value of 1.
 
+=item -
+
+The B<dh> command will not accept any of the deprecated "manual
+sequence control" parameters (B<--before>, B<--after>, etc.).  Please
+migrate to use override targets instead.
+
+=item -
+
+The B<dh> command will no longer use log files to track which commands
+have been run.  The B<dh> command I<still> keeps track of whether it
+already ran the "build" sequence and skip it if it did.
+
+The main affects of this are:
+
+=over 4
+
+=item -
+
+With this, it is now easier to debug the I<install> or/and I<binary>
+sequences because they can now trivially be re-run (without having to
+do a full "clean and rebuild" cycle)
+
+=item -
+
+The main caveat is that the B<--remaining> option for B<dh_*> now only
+keeps track of what happened in a single override target.  When all
+the calls to a given B<dh_cmd> command happens in the same override
+target every thing will work as before.
+
+Example of where it can go wrong:
+
+  override_dh_foo:
+    dh_foo -pmy-pkg
+
+  override_dh_bar:
+    dh_bar
+    dh_foo --remaining
+
+In this case, the call to B<dh_foo --remaining> will I<also> include
+I<my-pkg>, since B<dh_foo -pmy-pkg> was run in a separate override
+target.  If they are run from the same override target, it will work j
+
+=back
+
 =back
 
 =back

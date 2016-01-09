@@ -249,7 +249,8 @@ option to ensure they only work on architecture dependent packages.
 =head1 DEPRECATED OPTIONS
 
 The following options are deprecated. It's much 
-better to use override targets instead.
+better to use override targets instead.  They are B<not> available
+in compat 10.
 
 =over 4
 
@@ -354,16 +355,19 @@ if ($sequence eq 'debian/rules' ||
 
 
 # Definitions of sequences.
+my $build_stamp_file = 'debian/debhelper-build-stamp';
 my %sequences;
 my @bd_minimal = qw{
 	dh_testdir
 };
-my @bd = qw{
+my @bd = (qw{
 	dh_testdir
 	dh_auto_configure
 	dh_auto_build
 	dh_auto_test
-};
+},
+	"create-stamp ${build_stamp_file}",
+);
 my @i = (qw{
 	dh_testroot
 	dh_prep
@@ -621,8 +625,25 @@ while (@ARGV_orig) {
 # Figure out at what point in the sequence to start for each package.
 my %logged;
 my %startpoint;
+my %stamp_file;
+
+if ( -f $build_stamp_file) {
+	open(my $fd, '<', $build_stamp_file) or error("open($build_stamp_file, ro) failed: $!");
+	while (my $line = <$fd>) {
+		chomp($line);
+		$stamp_file{$line} = 1;
+	}
+	close($fd);
+}
+
 foreach my $package (@packages) {
-	my @log=load_log($package, \%logged);
+	my @log;
+	if (compat(9)) {
+		@log = load_log($package, \%logged);
+	} elsif (exists($stamp_file{$package})) {
+		@log = @bd;
+		# We do not need %logged in compat 10
+	}
 	if ($dh{AFTER}) {
 		# Run commands in the sequence that come after the
 		# specified command.
@@ -689,6 +710,18 @@ foreach my $i (0..$stoppoint) {
 		delete $ENV{DH_INTERNAL_OPTIONS};
 		delete $ENV{DH_INTERNAL_OVERRIDE};
 		run("debian/rules", $rules_target);
+		next;
+	}
+	if (my $stamp_file = stamp_target($command)) {
+		my @contents;
+		open(my $fd, '+>>', $stamp_file) or error("open($stamp_file, rw) failed: $!");
+		# Seek to the beginning
+		seek($fd, 0, 0) or error("seek($stamp_file) failed: $!");
+		@contents = map { chomp } <$fd>;
+		for my $pkg (@todo) {
+			print {$fd} "$pkg\n";
+		}
+		close($fd) or error("close($stamp_file) failed: $!");
 		next;
 	}
 	
@@ -804,12 +837,13 @@ sub run_override {
 	run("debian/rules", $override);
 	delete $ENV{DH_INTERNAL_OPTIONS};
 	delete $ENV{DH_INTERNAL_OVERRIDE};
+	complex_doit("rm","-f","debian/*.debhelper.log") if not compat(9);
 
 	# Update log for overridden command now that it has
 	# finished successfully.
 	# (But avoid logging for dh_clean since it removes
 	# the log earlier.)
-	if (! $dh{NO_ACT} && $command ne 'dh_clean') {
+	if (! $dh{NO_ACT} && $command ne 'dh_clean' && compat(9)) {
 		write_log($command, @todo);
 		commit_override_log(@todo);
 	}
@@ -851,6 +885,14 @@ sub rules_target {
 	else {
 		return undef;
 	}
+}
+
+sub stamp_target {
+	my ($command) = @_;
+	if ($command =~ s/^create-stamp\s+//) {
+		return $command;
+	}
+	return;
 }
 
 sub rules {
@@ -922,7 +964,11 @@ sub rules_explicit_target {
 sub warn_deprecated {
 	foreach my $deprecated ('until', 'after', 'before', 'remaining') {
 		if (defined $dh{uc $deprecated}) {
-			warning("The --$deprecated option is deprecated. Use override targets instead.");
+			if (compat(9)) {
+				warning("The --$deprecated option is deprecated. Use override targets instead.");
+			} else {
+				error("The --$deprecated option is not supported in compat 10+. Use override targets instead.");
+			}
 		}
 	}
 }
