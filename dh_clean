@@ -113,8 +113,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		unless excludefile($tmp);
 }
 
-# Remove internal state data
-doit('rm', '-rf', 'debian/.debhelper/') if not $dh{D_FLAG};
+
+if (not $dh{D_FLAG}) {
+	# Restore all files in our bucket (before we delete said bucket)
+	restore_all_files();
+
+	# Remove internal state data
+	doit('rm', '-rf', 'debian/.debhelper/');
+}
 
 
 # Remove all debhelper logs.

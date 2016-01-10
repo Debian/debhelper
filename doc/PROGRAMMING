@@ -290,6 +290,15 @@ load_log($package, $hashref)
 write_log($cmd, $package ...)
 	Writes the log files for the specified package(s), adding
 	the cmd to the end.
+restore_file_on_clean($file)
+	Store a copy of $file, which will be restored by dh_clean.
+	The $file *must* be a relative path to the package root and
+	*must* be a real regular file.  Dirs, devices and symlinks
+	(and everything else) *cannot* be restored by this.
+	If $file is passed multiple times (e.g. from different programs)
+	only the first version is stored.
+	CAVEAT: This *cannot* undo arbitrary "rm -fr"'ing.  The dir,
+	which is/was in $file, must be present when dh_clean is called.
 make_symlink($src, $dest, $tmp)
 	Creates a Policy compliant sytem link called $dest pointing to
 	$src. If $tmp is given, then $tmp will be prefixed to $dest when

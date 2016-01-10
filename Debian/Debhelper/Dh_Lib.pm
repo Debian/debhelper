@@ -35,6 +35,7 @@ use vars qw(@EXPORT %dh);
 	    &install_file &install_prog &install_lib &install_dir
 	    &get_source_date_epoch &is_cross_compiling
 	    &generated_file &autotrigger &package_section
+	    &restore_file_on_clean &restore_all_files
 );
 
 my $max_compat=10;
@@ -1321,6 +1322,83 @@ sub install_dh_config_file {
 	}
 	return 1;
 }
+
+sub restore_file_on_clean {
+	my ($file) = @_;
+	my $bucket_index = 'debian/.debhelper/bucket/index';
+	my $bucket_dir = 'debian/.debhelper/bucket/files';
+	my $checksum;
+	if (not -d $bucket_dir) {
+		install_dir($bucket_dir);
+	}
+	if ($file =~ m{^/}) {
+		error("restore_file_on_clean requires a path relative to the package dir");
+	}
+	$file =~ s{^\./}{}g;
+	$file =~ s{//++}{}g;
+	if ($file =~ m{^\.} or $file =~ m{/CVS/} or $file =~ m{/\.svn/}) {
+		# We do not want to smash a Vcs repository by accident.
+		warning("Attempt to store $file, which looks like a VCS file or");
+		warning("a hidden package file (like quilt's \".pc\" directory");
+		error("This tool probably contains a bug.");
+	}
+	if (-l $file or not -f _) {
+		error("Cannot store $file, which is a non-file (incl. a symlink)");
+	}
+	require Digest::SHA;
+
+	$checksum = Digest::SHA->new('256')->addfile($file, 'b')->hexdigest;
+
+	if (not $dh{NO_ACT}) {
+		my ($in_index);
+		open(my $fd, '+>>', $bucket_index)
+			or error("open($bucket_index, a+) failed: $!");
+		seek($fd, 0, 0);
+		while (my $line = <$fd>) {
+			my ($cs, $stored_file);
+			chomp($line);
+			($cs, $stored_file) = split(m/ /, $line, 2);
+			next if ($stored_file ne $file);
+			$in_index = 1;
+		}
+		if (not $in_index) {
+			# Copy and then rename so we always have the full copy of
+			# the file in the correct place (if any at all).
+			doit('cp', '-an', '--reflink=auto', $file, "${bucket_dir}/${checksum}.tmp");
+			doit('mv', '-f', "${bucket_dir}/${checksum}.tmp", "${bucket_dir}/${checksum}");
+			print {$fd} "${checksum} ${file}\n";
+		}
+		close($fd) or error("close($bucket_index) failed: $!");
+	}
+
+	return 1;
+}
+
+sub restore_all_files {
+	my $bucket_index = 'debian/.debhelper/bucket/index';
+	my $bucket_dir = 'debian/.debhelper/bucket/files';
+
+	return if not -f $bucket_index;
+	open(my $fd, '<', $bucket_index)
+		or error("open($bucket_index) failed: $!");
+
+	while (my $line = <$fd>) {
+		my ($cs, $stored_file, $bucket_file);
+		chomp($line);
+		($cs, $stored_file) = split(m/ /, $line, 2);
+		$bucket_file = "${bucket_dir}/${cs}";
+		# Restore by copy and then rename.  This ensures that:
+		# 1) If dh_clean is interrupted, we can always do a full restore again
+		#    (otherwise, we would be missing some of the files and have to handle
+		#     that with scary warnings)
+		# 2) The file is always fully restored or in its "pre-restore" state.
+		doit('cp', '-an', '--reflink=auto', $bucket_file, "${bucket_file}.tmp");
+		doit('mv', '-Tf', "${bucket_file}.tmp", $stored_file);
+	}
+	close($fd);
+	return;
+}
+
 
 1
 
