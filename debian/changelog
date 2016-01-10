@@ -10,6 +10,12 @@ debhelper (9.20151225+unreleased) UNRELEASED; urgency=medium
   * autoscripts/*-makeshlibs: Removed, no longer used.
   * dh: In compat 10, drop the manual sequence control arguments
     and the sequence log files.  (Closes: #510855)
+  * dh_update_autotools_config: New helper to update config.sub
+    and config.guess.
+  * dh: Run dh_update_autotools_config before dh_auto_configure.
+    (Closes: #733045)
+  * d/control: Add dependency on autotools-dev for the new
+    dh_update_autotools_config tool.
 
   [ Dmitry Shachnev ]
   * dh_install: Fail because of missing files only after processing

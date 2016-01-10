@@ -1,0 +1,75 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_update_autotools_config
+
+=cut
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+B<dh_update_autotools_config> [S<I<debhelper options>>]
+
+=head1 DESCRIPTION
+
+B<dh_update_autotools_config replaces all occurances of B<config.sub>
+and B<config.guess> in the source tree by the up-to-date versions
+found in the autotools-dev package.  The original files are backed up
+and restored by B<dh_clean>.
+
+=cut
+
+init();
+
+for my $basename (qw(config.guess config.sub)) {
+	my $new_version = "/usr/share/misc/$basename";
+	open(my $fd, '-|', 'find', '-type', 'f', '-name', $basename)
+		or error("Cannot run find -type f -name $basename: $!");
+	while (my $filename = <$fd>) {
+		chomp($filename);
+		next if not is_autotools_config_file($filename);
+		restore_file_on_clean($filename);
+		doit('cp', '-f', $new_version, $filename);
+	}
+	close($fd);
+}
+
+sub is_autotools_config_file {
+	my ($file) = @_;
+	my ($saw_timestamp);
+	open(my $fd, '<', $file) or error("open $file for reading failed: $!");
+	while (my $line = <$fd>) {
+		chomp($line);
+		# This is the test lintian uses.
+		if ($line =~ m{^timestamp=['"]\d{4}-\d{2}-\d{2}['"]\s*$}) {
+			$saw_timestamp = 1;
+			last;
+		}
+		last if $. >= 10;
+	}
+	close($fd);
+	return $saw_timestamp;
+}
+
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Niels Thykier <niels@thykier.net>
+
+=cut
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 4
+# cperl-indent-level: 4
+# End:
