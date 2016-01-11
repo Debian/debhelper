@@ -569,10 +569,10 @@ do a full "clean and rebuild" cycle)
 
 =item -
 
-The main caveat is that the B<--remaining> option for B<dh_*> now only
-keeps track of what happened in a single override target.  When all
-the calls to a given B<dh_cmd> command happens in the same override
-target every thing will work as before.
+The main caveat is that B<dh_*> now only keeps track of what happened
+in a single override target.  When all the calls to a given B<dh_cmd>
+command happens in the same override target every thing will work as
+before.
 
 Example of where it can go wrong:
 
@@ -585,7 +585,8 @@ Example of where it can go wrong:
 
 In this case, the call to B<dh_foo --remaining> will I<also> include
 I<my-pkg>, since B<dh_foo -pmy-pkg> was run in a separate override
-target.  If they are run from the same override target, it will work j
+target.  This issue is not limited to B<--remaining>, but also includes
+B<-a>, B<-i>, etc.
 
 =back
 
