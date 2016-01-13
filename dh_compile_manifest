@@ -1,0 +1,195 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_compile_manifest - [EXPERIMENTAL] Compiles and adds manifest to deb files
+
+=cut
+
+use strict;
+use warnings;
+use constant BUFFER_SIZE => 4096 * 8;
+use Errno qw(EINTR);
+use Digest::MD5;
+use Digest::SHA;
+use File::Basename qw(dirname);
+use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+B<dh_compile_manifest> [S<I<debhelper options>>]
+
+=head1 DESCRIPTION
+
+Experimental helper - do not use.  Currently only doing something in
+compat 10 to avoid affecting too many packages.
+
+=cut
+
+init();
+
+my $INIT_DEFAULTS = 'uid=0 gid=0 uname=root gname=root type=file';
+
+# Common directories with a different default makes sense.  Note it is
+# rarely suitable for directories where the majority of all packages
+# only installs a single file in it.
+my %DIR_DEFAULT_MODE = (
+	'usr/bin'  => 0755,
+	'usr/sbin' => 0755,
+	'bin'      => 0755,
+	'sbin'     => 0755,
+);
+
+# Only enable in compat 10 while we test this thing.
+# TODO: Enable unconditionally later.
+exit 0 if compat(9);
+
+for my $package (@{$dh{DOPACKAGES}}) {
+	my $pkg_tmp=tmpdir($package);
+
+	if ( ! -d "${pkg_tmp}/DEBIAN" ) {
+		install_dir("${pkg_tmp}/DEBIAN");
+	}
+	open(my $mfd, '>', "${pkg_tmp}/DEBIAN/manifest")
+		or error("Cannot open ${pkg_tmp}/DEBIAN/manifest: $!");
+	
+	open(my $fd, '-|', 'find', $pkg_tmp,
+		 '(', '-path', "$pkg_tmp/DEBIAN", '-prune', ')',
+		 '-o', '-printf', '%P/\n'
+		) or error("find failed: $!");
+	# A little hack - unconditionally append a / to all file names
+	# before sorting them.  This ensures that "foo.bar" comes before
+	# "foo" (the dir).  Notably it means that the entire contents of
+	# a directory is grouped together.  Of course, it requires that
+	# we remove the trailin slash post sort.
+	my @entries = map { s{/$}{}; $_  } sort(map { chomp; $_ ? ($_) : () } <$fd>);
+	close($fd);
+	my $current_dir = '.';
+	# We always start with a directory and almost certainly either two
+	# dirs or /bin.
+	my $default_mode = 0755;
+	my (%uid2name, %gid2name);
+	print {$mfd} <<"EOF";
+#mtree v2.0-dh-experimental
+# Experimental mtree manifest made by dehelper
+# Known extensions: new checksums (e.g. sha512)
+EOF
+	printf {$mfd} "/set mode=0%o %s\n", $default_mode, $INIT_DEFAULTS;
+
+	for my $entry_name (@entries) {
+		my $full_path = "${pkg_tmp}/${entry_name}";
+		my @stat = (lstat($full_path)) or error("cannot stat $full_path: $!");
+		my (undef, undef, $mode_raw, undef, $uid, $gid, undef, $size) = @stat;
+		my (@values, $entry_name_escaped);
+		my $dirname = dirname($entry_name);
+		$mode_raw &= 07777;
+		$dirname =~ s{/$}{};
+
+		if (-d _) {
+			$current_dir = $entry_name;
+			push(@values, 'type=dir');
+			# Ensure it ends with a slash.  Otherwise top-level directories
+			# will be misinterpreted as a "dir + cd" instruction.
+			$entry_name .= '/';
+		} elsif ( -f _) {
+			push(@values, "size=${size}");
+			add_checksums($full_path, \@values);
+		} elsif ( -l _) {
+			my $target = escape(readlink($full_path));
+			push(@values, 'type=link', "link=${target}");
+		} else {
+			warning("Cannot map $full_path to an mtree type, skipping entry");
+			next;
+		}
+
+		if ($mode_raw != $default_mode) {
+			# If the current default does not suit this entry, check
+			# if there is a different default for this directory.
+			my $new_default_mode = $DIR_DEFAULT_MODE{$current_dir} // 0644;
+			if ($new_default_mode == $mode_raw) {
+				# The entry matches the dir's default, move to the new default.
+				my $mode_oct = sprintf('0%o', $new_default_mode);
+				print {$mfd} "/set mode=${mode_oct}\n";
+				$default_mode = $new_default_mode;
+			} else {
+				# No, the entry is a special snow flake (or just a
+				# directory).
+				my $mode = sprintf('0%o', $mode_raw);
+				push(@values, "mode=${mode}");
+			}
+		} 
+		if ($uid != 0) {
+			my $uname = $uid2name{$uid};
+			if (not defined($uname)) {
+				$uname = $uid2name{$uid} = getpwuid($uid)
+					or error("Cannot look up name of uid: $uid");
+			}
+			push(@values, "uid=${uid}", "uname=${uname}");
+		}
+		if ($gid != 0) {
+			my $gname = $gid2name{$uid};
+			if (not defined($gname)) {
+				$gname = $gid2name{$uid} = getgrgid($gid)
+					or error("Cannot look up name of gid: $gid");
+			}
+			push(@values, "gid=${gid}", "gname=${gname}");
+		}
+		$entry_name_escaped = escape($entry_name);
+		print {$mfd} "${entry_name_escaped} @values\n";
+	}
+	close($mfd) or error("close ${pkg_tmp}/DEBIAN/manifest failed: $!");
+	doit('chmod', '0644', "${pkg_tmp}/DEBIAN/control");
+	doit('chown', 'root:root', "${pkg_tmp}/DEBIAN/manifest");
+}
+
+sub escape {
+	my ($value) = @_;
+	$value =~ s/([^[:graph]]|[ \\])/sprintf('\\%03o', ord($1))/ge;
+	return $value;
+}
+
+sub add_checksums {
+	my ($path, $value_list) = @_;
+	my %checksums = (
+		'md5'    => Digest::MD5->new,
+		'sha512' => Digest::SHA->new(512),
+	);
+	my @cs = values(%checksums);
+	open(my $fd, '<', $path) or error("open($path) failed: $!");
+	while (1) {
+		my $buffer;
+		my $n = sysread($fd, $buffer, BUFFER_SIZE);
+		if ($n < 1) {
+			last if $n == 0;
+			next if $! == EINTR;
+			error("sysread($path) failed: $!");
+		}
+		for my $checksum (@cs) {
+			$checksum->add($buffer);
+		}
+	}
+	close($fd);
+	for my $name (sort(keys(%checksums))) {
+		my $checksum = $checksums{$name}->hexdigest;
+		push(@{$value_list}, "${name}=${checksum}");
+	}
+	return;
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Niels Thykier <niels@thykier.net>
+
+=cut
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 4
+# cperl-indent-level: 4
+# End:
