@@ -16,8 +16,8 @@ B<dh_builddeb> [S<I<debhelper options>>] [B<--destdir=>I<directory>] [B<--filena
 
 =head1 DESCRIPTION
 
-B<dh_builddeb> simply calls L<dpkg-deb(1)> to build a Debian package or
-packages.  It will also build packages for ddebs when L<dh_strip(1)>
+B<dh_builddeb> simply calls L<dpkg-deb(1)> to build a Debian package
+or packages.  It will also build dbgsym packages when L<dh_strip(1)>
 and L<dh_gencontrol(1)> have prepared them.
 
 It supports building multiple binary packages in parallel, when enabled by
@@ -133,7 +133,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	# child
 	my $tmp=tmpdir($package);
-	my $ddeb_tmpdir = "debian/.debhelper/${package}/ddeb-root";
+	my $dbgsym_tmpdir = "debian/.debhelper/${package}/dbgsym-root";
 	if (exists $ENV{DH_ALWAYS_EXCLUDE} && length $ENV{DH_ALWAYS_EXCLUDE}) {
 		if (! compat(5)) {
 			complex_doit("find $tmp $dh{EXCLUDE_FIND} | xargs rm -rf");
@@ -145,20 +145,20 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				foreach split(":", $ENV{DH_ALWAYS_EXCLUDE});
 		}
 	}
-	if ( -d $ddeb_tmpdir) {
-		my $ddeb_control = "${ddeb_tmpdir}/DEBIAN/control";
-		# Only build the ddeb if it has a control file.  People might
-		# have skipped dh_gencontrol.
-		if ( -f $ddeb_control ) {
+	if ( -d $dbgsym_tmpdir) {
+		my $dbgsym_control = "${dbgsym_tmpdir}/DEBIAN/control";
+		# Only build the dbgsym package if it has a control file.
+		# People might have skipped dh_gencontrol.
+		if ( -f $dbgsym_control ) {
 			# XXX: Should we blindly overrule the maintainer here?  It
 			# is not apparent that their explicit -z was intended for
-			# the ddeb.
+			# the dbgsym package.
 			my @args = default_compressor_args(["-z1", "-Zxz", "-Sextreme"],
 											   @{$dh{U_PARAMS}});
 			doit("dpkg-deb", @args,
-				 "--build", $ddeb_tmpdir, $dh{DESTDIR});
+				 "--build", $dbgsym_tmpdir, $dh{DESTDIR});
 		} elsif (not is_udeb($package)) {
-			warning("Not building ddeb for ${package} as it has no control file");
+			warning("Not building dbgsym package for ${package} as it has no control file");
 			warning("Please use dh_gencontrol to avoid this issue");
 		}
 	}

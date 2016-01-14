@@ -116,7 +116,7 @@ Historical name for B<--automatic-dbgsym> and B<--no-automatic-dbgsym>.
 
 =item B<--ddeb-migration=>I<package-relation>
 
-Historical name for B<--ddeb-migration>.
+Historical name for B<--dbgsym-migration>.
 
 =back
 
@@ -128,8 +128,8 @@ nothing will be stripped, in accordance with Debian policy (section
 debug symbol packages.
 
 The automatic creation of debug symbol packages can also be prevented
-by adding B<noautodbgsym> (or B<noddebs>) to the B<DEB_BUILD_OPTIONS>
-environment variable.
+by adding B<noautodbgsym> to the B<DEB_BUILD_OPTIONS> environment
+variable.
 
 =head1 CONFORMS TO
 
@@ -139,22 +139,22 @@ Debian policy, version 3.0.1
 
 init(options => {
 	"keep-debug"         => \$dh{K_FLAG},
-	'dbgsym-migration=s' => \$dh{MIGRATE_DDEB},
-	'automatic-dbgsym!'  => \$dh{ENABLE_DDEBS},
+	'dbgsym-migration=s' => \$dh{MIGRATE_DBGSYM},
+	'automatic-dbgsym!'  => \$dh{ENABLE_DBGSYM},
     # Deprecated variants
-	'ddeb-migration=s'   => \$dh{MIGRATE_DDEB},
-	'ddebs!'             => \$dh{ENABLE_DDEBS},
+	'ddeb-migration=s'   => \$dh{MIGRATE_DBGSYM},
+	'ddebs!'             => \$dh{ENABLE_DBGSYM},
 
 });
 
-if ($dh{K_FLAG} and $dh{MIGRATE_DDEB}) {
+if ($dh{K_FLAG} and $dh{MIGRATE_DBGSYM}) {
 	error("--keep-debug and --dbgsym-migration are mutually exclusive");
 }
-if ($dh{DEBUGPACKAGES} and $dh{MIGRATE_DDEB}) {
+if ($dh{DEBUGPACKAGES} and $dh{MIGRATE_DBGSYM}) {
 	error("--dbg-package and --dbgsym-migration are mutually exclusive");
 }
 
-if ($dh{ENABLE_DDEBS} and $dh{ENABLE_DDEBS} ne 'auto') {
+if ($dh{ENABLE_DBGSYM} and $dh{ENABLE_DBGSYM} ne 'auto') {
 	if ($dh{K_FLAG}) {
 		error("--keep-debug and explicit --automatic-dbgsym are mutually exclusive");
 	}
@@ -163,10 +163,10 @@ if ($dh{ENABLE_DDEBS} and $dh{ENABLE_DDEBS} ne 'auto') {
 	}
 }
 
-$dh{ENABLE_DDEBS} = 1 if not defined($dh{ENABLE_DDEBS});
+$dh{ENABLE_DBGSYM} = 1 if not defined($dh{ENABLE_DBGSYM});
 
-if ($dh{MIGRATE_DDEB} and not $dh{ENABLE_DDEBS}) {
-	error("--ddeb-migration and --no-automatic-dbgsym are mutually exclusive");
+if ($dh{MIGRATE_DBGSYM} and not $dh{ENABLE_DBGSYM}) {
+	error("--dbgsym-migration and --no-automatic-dbgsym are mutually exclusive");
 }
 
 # This variable can be used to turn off stripping (see Policy).
@@ -176,7 +176,7 @@ if (get_buildoption('nostrip')) {
 
 my $objcopy = cross_command("objcopy");
 my $strip = cross_command("strip");
-$dh{ENABLE_DDEBS} = 0 if get_buildoption('noautodbgsym') or get_buildoption('noddebs');
+$dh{ENABLE_DBGSYM} = 0 if get_buildoption('noautodbgsym') or get_buildoption('noddebs');
 
 # I could just use `file $_[0]`, but this is safer
 sub get_file_type {
@@ -318,11 +318,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$debugtmp=tmpdir($package."-dbg");
 		}
 	}
-	if ($dh{ENABLE_DDEBS} and not $keep_debug and package_arch($package) ne 'all') {
+	if ($dh{ENABLE_DBGSYM} and not $keep_debug and package_arch($package) ne 'all') {
 		# Avoid creating a dbgsym that would clash with a registered
 		# package or looks like a manual -dbg package.
 		if (!$all_packages{"${package}-dbgsym"} or $package =~ m/-dbg$/) {
-			$debugtmp = "debian/.debhelper/${package}/ddeb-root";
+			$debugtmp = "debian/.debhelper/${package}/dbgsym-root";
 			$keep_debug = 1;
 			$use_build_id = 2;
 		}
@@ -360,16 +360,16 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 	}
 	if ($use_build_id > 1 and -d $debugtmp) {
-		my $ddeb_docdir = "${debugtmp}/usr/share/doc";
-		my $doc_symlink = "${ddeb_docdir}/${package}-dbgsym";
+		my $dbgsym_docdir = "${debugtmp}/usr/share/doc";
+		my $doc_symlink = "${dbgsym_docdir}/${package}-dbgsym";
 		if ( not -l $doc_symlink and not -e $doc_symlink ) {
-			install_dir($ddeb_docdir) if not -d $ddeb_docdir;
+			install_dir($dbgsym_docdir) if not -d $dbgsym_docdir;
 			doit('ln', '-s', $package, $doc_symlink);
 		}
-		if ($dh{MIGRATE_DDEB}) {
-			my $path = "debian/.debhelper/${package}/ddeb-migration";
+		if ($dh{MIGRATE_DBGSYM}) {
+			my $path = "debian/.debhelper/${package}/dbgsym-migration";
 			open(my $fd, '>', $path) or error("open $path failed: $!");
-			print {$fd} "$dh{MIGRATE_DDEB}\n";
+			print {$fd} "$dh{MIGRATE_DBGSYM}\n";
 			close($fd) or error("close $path failed: $!");
 		}
 	}
@@ -381,7 +381,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			my $dbg_pkg = @{$dh{DEBUGPACKAGES}}[0];
 			$dir = "debian/.debhelper/${dbg_pkg}";
 		}
-		$path = "${dir}/ddeb-build-ids";
+		$path = "${dir}/dbgsym-build-ids";
 		install_dir($dir) if ! -d $dir;
 		open(my $fd, '>>', $path) or error("open $path failed: $!");
 		print {$fd} join(q{ }, sort(@build_ids)) . "\n";
