@@ -48,9 +48,10 @@ things to exclude.
 B<This option is a now special purpose option that you normally do not
 need>.  In most cases, there should be little reason to use this
 option for new source packages as debhelper automatically generates
-debug packages ("ddebs").  B<If you have a manual --dbg-package> that
-you want to replace with an automatically generated debug symbol
-package, please see the B<--ddeb-migration> option.
+debug packages ("dbgsym packages").  B<If you have a manual
+--dbg-package> that you want to replace with an automatically
+generated debug symbol package, please see the B<--dbgsym-migration>
+option.
 
 Causes B<dh_strip> to save debug symbols stripped from the packages it acts on
 as independent files in the package build directory of the specified debugging
@@ -65,26 +66,27 @@ package to put symbols in, it specifies a package (or packages) which
 should have separated debug symbols, and the separated symbols are placed
 in packages with B<-dbg> added to their name.
 
-This option implies B<--no-ddebs> and I<cannot> be used with B<--ddeb>
-or B<--ddeb-migration>.
+This option implies B<--no-automatic-dbgsym> and I<cannot> be used
+with B<--automatic-dbgsym> or B<--dbgsym-migration>.
 
 =item B<-k>, B<--keep-debug>
 
 B<This option is a now special purpose option that you normally do not
 need>.  In most cases, there should be little reason to use this
 option for new source packages as debhelper automatically generates
-debug packages ("ddebs").  B<If you have a manual --dbg-package> that
-you want to replace with an automatically generated debug symbol
-package, please see the B<--ddeb-migration> option.
+debug packages ("dbgsym packages").  B<If you have a manual
+--dbg-package> that you want to replace with an automatically
+generated debug symbol package, please see the B<--dbgsym-migration>
+option.
 
 Debug symbols will be retained, but split into an independent
 file in F<usr/lib/debug/> in the package build directory. B<--dbg-package>
 is easier to use than this option, but this option is more flexible.
 
-This option implies B<--no-ddebs> and I<cannot> be used with
-B<--ddebs>.
+This option implies B<--no-automatic-dbgsym> and I<cannot> be used
+with B<--automatic-dbgsym>.
 
-=item B<--ddeb-migration=>I<package-relation>
+=item B<--dbgsym-migration=>I<package-relation>
 
 This option is used to migrate from a manual "-dbg" package (created
 with B<--dbg-package>) to an automatic generated debug symbol
@@ -92,21 +94,29 @@ package. This option should describe a valid B<Replaces>- and
 B<Breaks>-relation, which will be added to the debug symbol package to
 avoid file conflicts with the (now obsolete) -dbg package.
 
-This option implies B<--ddebs> and I<cannot> be used with
-B<--keep-debug>, B<--dbg-package> or B<--no-ddebs>.
+This option implies B<--automatic-dbgsym> and I<cannot> be used with
+B<--keep-debug>, B<--dbg-package> or B<--no-automatic-dbgsym>.
 
 Examples:
 
-  dh_strip --ddeb-migration='libfoo-dbg (<< 2.1-3~)'
+  dh_strip --dbgsym-migration='libfoo-dbg (<< 2.1-3~)'
 
-  dh_strip --ddeb-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< 2.1-3~)'
+  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< 2.1-3~)'
 
-=item B<--ddebs>, B<--no-ddebs>
+=item B<--automatic-dbgsym>, B<--no-automatic-dbgsym>
 
 Control whether B<dh_strip> should be creating debug symbol packages
 when possible.
 
 The default is to create debug symbol packages.
+
+=item B<--ddebs>, B<--no-ddebs>
+
+Historical name for B<--automatic-dbgsym> and B<--no-automatic-dbgsym>.
+
+=item B<--ddeb-migration=>I<package-relation>
+
+Historical name for B<--ddeb-migration>.
 
 =back
 
@@ -118,7 +128,8 @@ nothing will be stripped, in accordance with Debian policy (section
 debug symbol packages.
 
 The automatic creation of debug symbol packages can also be prevented
-by adding B<noddebs> to the B<DEB_BUILD_OPTIONS> environment variable.
+by adding B<noautodbgsym> (or B<noddebs>) to the B<DEB_BUILD_OPTIONS>
+environment variable.
 
 =head1 CONFORMS TO
 
@@ -127,31 +138,35 @@ Debian policy, version 3.0.1
 =cut
 
 init(options => {
-	"keep-debug"       => \$dh{K_FLAG},
-	'ddeb-migration=s' => \$dh{MIGRATE_DDEB},
-	'ddebs!'           => \$dh{ENABLE_DDEBS},
+	"keep-debug"         => \$dh{K_FLAG},
+	'dbgsym-migration=s' => \$dh{MIGRATE_DDEB},
+	'automatic-dbgsym!'  => \$dh{ENABLE_DDEBS},
+    # Deprecated variants
+	'ddeb-migration=s'   => \$dh{MIGRATE_DDEB},
+	'ddebs!'             => \$dh{ENABLE_DDEBS},
+
 });
 
 if ($dh{K_FLAG} and $dh{MIGRATE_DDEB}) {
-	error("--keep-debug and --ddeb-migration are mutually exclusive");
+	error("--keep-debug and --dbgsym-migration are mutually exclusive");
 }
 if ($dh{DEBUGPACKAGES} and $dh{MIGRATE_DDEB}) {
-	error("--dbg-package and --ddeb-migration are mutually exclusive");
+	error("--dbg-package and --dbgsym-migration are mutually exclusive");
 }
 
 if ($dh{ENABLE_DDEBS} and $dh{ENABLE_DDEBS} ne 'auto') {
 	if ($dh{K_FLAG}) {
-		error("--keep-debug and explicit --ddebs are mutually exclusive");
+		error("--keep-debug and explicit --automatic-dbgsym are mutually exclusive");
 	}
 	if ($dh{DEBUGPACKAGES}) {
-		error("--dbg-package and explicit --ddebs are mutually exclusive");
+		error("--dbg-package and explicit --automatic-dbsym are mutually exclusive");
 	}
 }
 
 $dh{ENABLE_DDEBS} = 1 if not defined($dh{ENABLE_DDEBS});
 
 if ($dh{MIGRATE_DDEB} and not $dh{ENABLE_DDEBS}) {
-	error("--ddeb-migration and --no-ddebs are mutually exclusive");
+	error("--ddeb-migration and --no-automatic-dbgsym are mutually exclusive");
 }
 
 # This variable can be used to turn off stripping (see Policy).
@@ -161,7 +176,7 @@ if (get_buildoption('nostrip')) {
 
 my $objcopy = cross_command("objcopy");
 my $strip = cross_command("strip");
-$dh{ENABLE_DDEBS} = 0 if get_buildoption('noddebs');
+$dh{ENABLE_DDEBS} = 0 if get_buildoption('noautodbgsym') or get_buildoption('noddebs');
 
 # I could just use `file $_[0]`, but this is safer
 sub get_file_type {
@@ -242,7 +257,8 @@ sub make_debug {
 		$debug_build_id="${1}${2}";
 	}
 	elsif ($use_build_id > 1) {
-		# For ddebs, we need build-id (else it will not be co-installable).
+		# For dbgsyms, we need build-id (else it will not be
+		# co-installable).
 		return;
 	}
 	else {
@@ -256,7 +272,7 @@ sub make_debug {
 		doit($objcopy, "--only-keep-debug", $file, $debug_path);
 	}
 	else {
-		# Compat 9 OR a ddeb.
+		# Compat 9 OR a dbgsym package.
 		doit($objcopy, "--only-keep-debug", "--compress-debug-sections", $file, $debug_path);
 	}
 
@@ -303,8 +319,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 	}
 	if ($dh{ENABLE_DDEBS} and not $keep_debug and package_arch($package) ne 'all') {
-		# Avoid creating a ddeb that would clash with a registered package
-		# or looks like a manual -dbg package.
+		# Avoid creating a dbgsym that would clash with a registered
+		# package or looks like a manual -dbg package.
 		if (!$all_packages{"${package}-dbgsym"} or $package =~ m/-dbg$/) {
 			$debugtmp = "debian/.debhelper/${package}/ddeb-root";
 			$keep_debug = 1;
