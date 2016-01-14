@@ -46,15 +46,56 @@ exit 0 if compat(9);
 
 for my $package (@{$dh{DOPACKAGES}}) {
 	my $pkg_tmp=tmpdir($package);
+	my $dbgsym_root = "debian/.debhelper/${package}/dbgsym-root";
+	generate_manifest($pkg_tmp);
+	generate_manifest($dbgsym_root) if -d $dbgsym_root;
+}
 
-	if ( ! -d "${pkg_tmp}/DEBIAN" ) {
-		install_dir("${pkg_tmp}/DEBIAN");
+sub escape {
+	my ($value) = @_;
+	$value =~ s/([^[:graph]]|[ \\])/sprintf('\\%03o', ord($1))/ge;
+	return $value;
+}
+
+sub add_checksums {
+	my ($path, $value_list) = @_;
+	my %checksums = (
+		'md5'    => Digest::MD5->new,
+		'sha512' => Digest::SHA->new(512),
+	);
+	my @cs = values(%checksums);
+	open(my $fd, '<', $path) or error("open($path) failed: $!");
+	while (1) {
+		my $buffer;
+		my $n = sysread($fd, $buffer, BUFFER_SIZE);
+		if ($n < 1) {
+			last if $n == 0;
+			next if $! == EINTR;
+			error("sysread($path) failed: $!");
+		}
+		for my $checksum (@cs) {
+			$checksum->add($buffer);
+		}
 	}
-	open(my $mfd, '>', "${pkg_tmp}/DEBIAN/manifest")
-		or error("Cannot open ${pkg_tmp}/DEBIAN/manifest: $!");
+	close($fd);
+	for my $name (sort(keys(%checksums))) {
+		my $checksum = $checksums{$name}->hexdigest;
+		push(@{$value_list}, "${name}=${checksum}");
+	}
+	return;
+}
+
+sub generate_manifest {
+	my ($pkg_root) = @_;
+
+	if ( ! -d "${pkg_root}/DEBIAN" ) {
+		install_dir("${pkg_root}/DEBIAN");
+	}
+	open(my $mfd, '>', "${pkg_root}/DEBIAN/manifest")
+		or error("Cannot open ${pkg_root}/DEBIAN/manifest: $!");
 	
-	open(my $fd, '-|', 'find', $pkg_tmp,
-		 '(', '-path', "$pkg_tmp/DEBIAN", '-prune', ')',
+	open(my $fd, '-|', 'find', $pkg_root,
+		 '(', '-path', "$pkg_root/DEBIAN", '-prune', ')',
 		 '-o', '-printf', '%P/\n'
 		) or error("find failed: $!");
 	# A little hack - unconditionally append a / to all file names
@@ -77,7 +118,7 @@ EOF
 	printf {$mfd} "/set mode=0%o %s\n", $default_mode, $INIT_DEFAULTS;
 
 	for my $entry_name (@entries) {
-		my $full_path = "${pkg_tmp}/${entry_name}";
+		my $full_path = "${pkg_root}/${entry_name}";
 		my @stat = (lstat($full_path)) or error("cannot stat $full_path: $!");
 		my (undef, undef, $mode_raw, undef, $uid, $gid, undef, $size) = @stat;
 		my (@values, $entry_name_escaped);
@@ -137,42 +178,9 @@ EOF
 		$entry_name_escaped = escape($entry_name);
 		print {$mfd} "${entry_name_escaped} @values\n";
 	}
-	close($mfd) or error("close ${pkg_tmp}/DEBIAN/manifest failed: $!");
-	doit('chmod', '0644', "${pkg_tmp}/DEBIAN/control");
-	doit('chown', 'root:root', "${pkg_tmp}/DEBIAN/manifest");
-}
-
-sub escape {
-	my ($value) = @_;
-	$value =~ s/([^[:graph]]|[ \\])/sprintf('\\%03o', ord($1))/ge;
-	return $value;
-}
-
-sub add_checksums {
-	my ($path, $value_list) = @_;
-	my %checksums = (
-		'md5'    => Digest::MD5->new,
-		'sha512' => Digest::SHA->new(512),
-	);
-	my @cs = values(%checksums);
-	open(my $fd, '<', $path) or error("open($path) failed: $!");
-	while (1) {
-		my $buffer;
-		my $n = sysread($fd, $buffer, BUFFER_SIZE);
-		if ($n < 1) {
-			last if $n == 0;
-			next if $! == EINTR;
-			error("sysread($path) failed: $!");
-		}
-		for my $checksum (@cs) {
-			$checksum->add($buffer);
-		}
-	}
-	close($fd);
-	for my $name (sort(keys(%checksums))) {
-		my $checksum = $checksums{$name}->hexdigest;
-		push(@{$value_list}, "${name}=${checksum}");
-	}
+	close($mfd) or error("close ${pkg_root}/DEBIAN/manifest failed: $!");
+	doit('chmod', '0644', "${pkg_root}/DEBIAN/control");
+	doit('chown', 'root:root', "${pkg_root}/DEBIAN/manifest");
 	return;
 }
 
