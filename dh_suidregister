@@ -87,7 +87,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			warning("$file has odd gid $gid not in /etc/group");
 			$group=$gid;
 		}
-		# Note that I have to print mode in ocal, stripping file
+		# Note that I have to print mode in octal, stripping file
 		# type.
 		my $sedstr=sprintf("s:#FILE#:$file:;s/#PACKAGE#/$package/;s/#OWNER#/$user/;s/#GROUP#/$group/;s/#PERMS#/%#o/",
                                    $mode & 07777);

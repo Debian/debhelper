@@ -67,7 +67,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			install_prog($cron,"$tmp/etc/cron.$type/".pkgfilename($package));
 		}
 	}
-	# Seperate because this needs to be mode 644.
+	# Separate because this needs to be mode 644.
 	my $cron=pkgfile($package,"cron.d");
 	if ($cron) {
 		if (! -d "$tmp/etc/cron.d") {
