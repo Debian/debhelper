@@ -27,7 +27,9 @@ init();
 
 for my $basename (qw(config.guess config.sub)) {
 	my $new_version = "/usr/share/misc/$basename";
-	open(my $fd, '-|', 'find', '-type', 'f', '-name', $basename)
+	open(my $fd, '-|', 'find', '-mindepth', '1',
+		 '(', '-type', 'd', '-name', '.*', '-prune', ')',
+		 '-o', '-type', 'f', '-name', $basename, '-print')
 		or error("Cannot run find -type f -name $basename: $!");
 	while (my $filename = <$fd>) {
 		chomp($filename);
