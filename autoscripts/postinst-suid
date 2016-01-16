@@ -1,8 +1,0 @@
-if [ "$1" = "configure" ]; then
-	if which suidregister >/dev/null 2>&1 && [ -e /etc/suid.conf ]; then
-	        suidregister -s #PACKAGE# /#FILE# #OWNER# #GROUP# #PERMS#
-	elif [ -e /#FILE# ]; then
-	        chown #OWNER#:#GROUP# /#FILE#
-	        chmod #PERMS# /#FILE#
-	fi
-fi
