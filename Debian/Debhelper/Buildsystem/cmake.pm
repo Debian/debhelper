@@ -67,12 +67,12 @@ sub configure {
 		if ($ENV{CC}) {
 			push @flags, "-DCMAKE_C_COMPILER=" . $ENV{CC};
 		} else {
-			push @flags, "-DCMAKE_C_COMPILER=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-cc";
+			push @flags, "-DCMAKE_C_COMPILER=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-gcc";
 		}
 		if ($ENV{CXX}) {
 			push @flags, "-DCMAKE_CXX_COMPILER=" . $ENV{CXX};
 		} else {
-			push @flags, "-DCMAKE_CXX_COMPILER=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-c++";
+			push @flags, "-DCMAKE_CXX_COMPILER=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-g++";
 		}
 	}
 
