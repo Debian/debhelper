@@ -715,6 +715,7 @@ foreach my $i (0..$stoppoint) {
 	}
 	if (my $stamp_file = stamp_target($command)) {
 		my @contents;
+		next if $dh{NO_ACT};
 		open(my $fd, '+>>', $stamp_file) or error("open($stamp_file, rw) failed: $!");
 		# Seek to the beginning
 		seek($fd, 0, 0) or error("seek($stamp_file) failed: $!");
