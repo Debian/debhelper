@@ -31,11 +31,12 @@ sub configure {
 
 	# Standard set of options for configure.
 	my @opts;
+	my $prefix="/usr";
 	push @opts, "--build=" . dpkg_architecture_value("DEB_BUILD_GNU_TYPE");
-	push @opts, "--prefix=/usr";
-	push @opts, "--includedir=\${prefix}/include";
-	push @opts, "--mandir=\${prefix}/share/man";
-	push @opts, "--infodir=\${prefix}/share/info";
+	push @opts, "--prefix=$prefix";
+	push @opts, "--includedir=$prefix/include";
+	push @opts, "--mandir=$prefix/share/man";
+	push @opts, "--infodir=$prefix/share/info";
 	push @opts, "--sysconfdir=/etc";
 	push @opts, "--localstatedir=/var";
 	if (defined $ENV{DH_QUIET} && $ENV{DH_QUIET} ne "") {
@@ -46,15 +47,15 @@ sub configure {
 	my $multiarch=dpkg_architecture_value("DEB_HOST_MULTIARCH");
 	if (! compat(8)) {
 		if (defined $multiarch) {
-			push @opts, "--libdir=\${prefix}/lib/$multiarch";
-			push @opts, "--libexecdir=\${prefix}/lib/$multiarch";
+			push @opts, "--libdir=${prefix}/lib/$multiarch";
+			push @opts, "--libexecdir=${prefix}/lib/$multiarch";
 		}
 		else {
-			push @opts, "--libexecdir=\${prefix}/lib";
+			push @opts, "--libexecdir=${prefix}/lib";
 		}
 	}
 	else {
-		push @opts, "--libexecdir=\${prefix}/lib/" . sourcepackage();
+		push @opts, "--libexecdir=${prefix}/lib/" . sourcepackage();
 	}
 	push @opts, "--runstatedir=/run" if not compat(10);
 	push @opts, "--disable-maintainer-mode";
