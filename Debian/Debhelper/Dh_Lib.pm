@@ -655,7 +655,7 @@ sub autoscript_sed {
 
 		if (not exists($VALID_TRIGGER_TYPES{$trigger_type})) {
 			require Carp;
-			confess("Invalid/unknown trigger ${trigger_type}");
+			Carp::confess("Invalid/unknown trigger ${trigger_type}");
 		}
 		return if $dh{NO_ACT};
 
