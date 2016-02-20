@@ -242,7 +242,7 @@ sub testfile {
 }
 
 sub make_debug {
-	my ($file, $tmp, $desttmp, $use_build_id, $package) = @_;
+	my ($file, $tmp, $desttmp, $use_build_id) = @_;
 
 	# Don't try to copy debug symbols out if the file is already
 	# stripped.
@@ -331,7 +331,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	find(\&testfile,$tmp);
 
 	foreach (@shared_libs) {
-		my $debug_path = make_debug($_, $tmp, $debugtmp, $use_build_id, $package) if $keep_debug;
+		my $debug_path = make_debug($_, $tmp, $debugtmp, $use_build_id) if $keep_debug;
 		# Note that all calls to strip on shared libs
 		# *must* include the --strip-unneeded.
 		doit($strip,"--remove-section=.comment",
@@ -340,7 +340,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 	
 	foreach (@executables) {
-		my $debug_path = make_debug($_, $tmp, $debugtmp, $use_build_id, $package) if $keep_debug;
+		my $debug_path = make_debug($_, $tmp, $debugtmp, $use_build_id) if $keep_debug;
 		doit($strip,"--remove-section=.comment",
 			"--remove-section=.note",$_);
  		attach_debug($_, $debug_path) if defined $debug_path;
