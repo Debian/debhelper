@@ -63,6 +63,8 @@ init();
 
 # PROMISE: DH NOOP WITHOUT examples
 
+my $pwd;
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if is_udeb($package);
 
@@ -94,9 +96,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			if (-d $example && $exclude) {
 				my $basename = basename($example);
 				my $dir = ($basename eq '.') ? $example : "$example/..";
-				my $pwd=`pwd`;
-				chomp $pwd;
-				my $exclude2 = '-type f'.$exclude;
+				chomp($pwd=`pwd`) if not defined($pwd);
 				complex_doit("cd '$dir' && " .
 							 "find '$basename' -type f$exclude -print0 | LC_ALL=C sort -z | " .
 							 "xargs -0 -I {} cp --reflink=auto --parents -dp {} $pwd/$tmp/usr/share/doc/$package/examples");
