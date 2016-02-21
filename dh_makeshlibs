@@ -19,8 +19,10 @@ B<dh_makeshlibs> [S<I<debhelper options>>] [B<-m>I<major>] [B<-V>I<[dependencies
 B<dh_makeshlibs> is a debhelper program that automatically scans for shared
 libraries, and generates a shlibs file for the libraries it finds.
 
-It also adds a call to ldconfig in the F<postinst> and F<postrm> scripts (in
-v3 mode and above only) to any packages in which it finds shared libraries.
+It will also ensure that ldconfig is invoked during install and removal when
+it finds shared libraries.  Since debhelper 9.20151004, this is done via a
+dpkg trigger.  In older versions of debhelper, B<dh_makeshlibs> would
+generate a maintainer script for this purpose.
 
 =head1 FILES
 
