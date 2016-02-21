@@ -85,10 +85,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		$build_ids = read_dbgsym_build_ids($dbgsym_info_dir);
 	}
 
-	# Temporary workaround: Do not build dbgsym packages for udebs as
-	# dpkg-gencontrol and dpkg-deb does not agree on the file
-	# extension.
-	if ( -d $dbgsym_tmp and not is_udeb($package)) {
+	if ( -d $dbgsym_tmp) {
 		my $multiarch = package_multiarch($package);
 		my $section = package_section($package);
 		my $replaces = read_dbgsym_migration($dbgsym_info_dir);

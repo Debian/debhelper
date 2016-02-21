@@ -318,10 +318,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$debugtmp=tmpdir($package."-dbg");
 		}
 	}
-	if ($dh{ENABLE_DBGSYM} and not $keep_debug and package_arch($package) ne 'all') {
+	# Temporary workaround: Do not build dbgsym packages for udebs as
+	# dpkg-gencontrol and dpkg-deb does not agree on the file
+	# extension.
+	if ($dh{ENABLE_DBGSYM} and not $keep_debug and package_arch($package) ne 'all' and not is_udeb($package)) {
 		# Avoid creating a dbgsym that would clash with a registered
 		# package or looks like a manual -dbg package.
-		if (!$all_packages{"${package}-dbgsym"} or $package =~ m/-dbg$/) {
+		if (not $all_packages{"${package}-dbgsym"} or $package =~ m/-dbg$/) {
 			$debugtmp = "debian/.debhelper/${package}/dbgsym-root";
 			$keep_debug = 1;
 			$use_build_id = 2;

@@ -3,6 +3,10 @@ debhelper (9.20160116) UNRELEASED; urgency=medium
   * Remove dh_suidregister and related autoscripts.  No package
     (that can be built in unstable) invokes this tool.
   * dh: Do not create stamp files when running with --no-act.
+  * dh_strip/dh_gencontrol: Move "is_udeb" guard to dh_strip.
+    This should avoid adding build-ids to udebs without having
+    the actual debug symbols available.  Thanks to Jérémy Bobbio
+    for reporting the issue.  (Closes: #812879)
 
  -- Niels Thykier <niels@thykier.net>  Sat, 16 Jan 2016 13:23:00 +0000
 
