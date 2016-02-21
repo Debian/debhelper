@@ -714,13 +714,16 @@ foreach my $i (0..$stoppoint) {
 		next;
 	}
 	if (my $stamp_file = stamp_target($command)) {
-		my @contents;
+		my %seen;
 		next if $dh{NO_ACT};
 		open(my $fd, '+>>', $stamp_file) or error("open($stamp_file, rw) failed: $!");
 		# Seek to the beginning
 		seek($fd, 0, 0) or error("seek($stamp_file) failed: $!");
-		@contents = map { chomp } <$fd>;
-		for my $pkg (@todo) {
+		while (my $line = <$fd>) {
+			chomp($line);
+			$seen{$line} = 1;
+		}
+		for my $pkg (grep { not exists $seen{$_} } @todo) {
 			print {$fd} "$pkg\n";
 		}
 		close($fd) or error("close($stamp_file) failed: $!");
