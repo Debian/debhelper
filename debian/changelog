@@ -14,6 +14,15 @@ debhelper (9.20160116) UNRELEASED; urgency=medium
   * autoconf.pm: Apply patch from Gergely Nagy to set "VERBOSE=1"
     when running tests to make sure that the build logs are
     dumped on error with automake.  (Closes: #798648, #744380)
+  * dh_installdeb: In compat 10, properly shell escape lines
+    from the maintscript config file.  This will *not* be fixed
+    retroactively since people have begun to rely on the bug
+    in previous versions (e.g. by quoting the file names).
+    Thanks to Jakub Wilk for reporting the issue.
+    (Closes: #803341)
+  * dh_installdeb: In compat 10, avoid adding two comments per line
+    in the maintscript file.  Thanks to Didier Raboud for
+    reporting the bug.  (Closes: #615854)
 
  -- Niels Thykier <niels@thykier.net>  Sat, 16 Jan 2016 13:23:00 +0000
 

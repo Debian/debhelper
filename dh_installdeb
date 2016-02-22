@@ -57,10 +57,17 @@ there is no need to list them manually here.
 =item I<package>.maintscript
 
 Lines in this file correspond to L<dpkg-maintscript-helper(1)> commands and
-parameters.  Any shell metacharacters will be escaped, so arbitrary shell
-code cannot be inserted here.  For example, a line such as C<mv_conffile
-/etc/oldconffile /etc/newconffile> will insert maintainer script snippets
-into all maintainer scripts sufficient to move that conffile.
+parameters.
+
+In compat 10 or later, any shell metacharacters will be escaped, so
+arbitrary shell code cannot be inserted here.  For example, a line
+such as C<mv_conffile /etc/oldconffile /etc/newconffile> will insert
+maintainer script snippets into all maintainer scripts sufficient to
+move that conffile.
+
+It was also the intention to escape shell metacharacters in previous
+compat levels.  However, it did not work properly and as such it was
+possible to embed arbitrary shell code in earlier compat levels.
 
 =back
 
@@ -100,17 +107,44 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	
 	my $maintscriptfile=pkgfile($package, "maintscript");
 	if ($maintscriptfile) {
-		foreach my $line (filedoublearray($maintscriptfile)) {
-			my $cmd=$line->[0];
-			error("unknown dpkg-maintscript-helper command: $cmd")
-				unless exists $maintscript_predeps{$cmd};
-			addsubstvar($package, "misc:Pre-Depends", "dpkg",
-				    ">= $maintscript_predeps{$cmd}")
-			    	if length $maintscript_predeps{$cmd};
-			my $params=escape_shell(@$line);
+		if (compat(9)) {
+			foreach my $line (filedoublearray($maintscriptfile)) {
+				my $cmd=$line->[0];
+				error("unknown dpkg-maintscript-helper command: $cmd")
+					unless exists $maintscript_predeps{$cmd};
+				addsubstvar($package, "misc:Pre-Depends", "dpkg",
+					">= $maintscript_predeps{$cmd}")
+					if length $maintscript_predeps{$cmd};
+				my $params=escape_shell(@$line);
+				foreach my $script (qw{postinst preinst prerm postrm}) {
+					autoscript($package, $script, "maintscript-helper",
+							   "s!#PARAMS#!$params!g");
+				}
+			}
+		} else {
+			my @maintscripts = filedoublearray($maintscriptfile);
+			my @params;
+			foreach my $line (@maintscripts) {
+				my $cmd=$line->[0];
+				error("unknown dpkg-maintscript-helper command: $cmd")
+					unless exists $maintscript_predeps{$cmd};
+				addsubstvar($package, "misc:Pre-Depends", "dpkg",
+					">= $maintscript_predeps{$cmd}")
+					if length $maintscript_predeps{$cmd};
+				push(@params, escape_shell(@{$line}) );
+			}
 			foreach my $script (qw{postinst preinst prerm postrm}) {
-				autoscript($package, $script, "maintscript-helper",
-					   "s!#PARAMS#!$params!g");
+				my $subst = sub {
+					my @res;
+					chomp;
+					for my $param (@params) {
+						my $line = $_;
+						$line =~ s{#PARAMS#}{$param}g;
+						push(@res, $line);
+					}
+					$_ = join("\n", @res) . "\n";
+				};
+				autoscript($package, $script, "maintscript-helper", $subst);
 			}
 		}
 	}

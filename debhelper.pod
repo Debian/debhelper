@@ -590,6 +590,13 @@ B<-a>, B<-i>, etc.
 
 =back
 
+=item -
+
+The B<dh_installdeb> command now shell escapes the lines in the
+F<maintscript> config file.  This was the original intend but it did
+not work properly and packages have begun to rely on the incomplete
+shell escaping (e.g. quoting file names).
+
 =back
 
 =back
