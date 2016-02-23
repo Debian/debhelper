@@ -703,7 +703,7 @@ sub delsubstvar {
 	my $substvarfile="debian/${ext}substvars";
 
 	if (-e $substvarfile) {
-		complex_doit("grep -s -v '^${substvar}=' $substvarfile > $substvarfile.new || true");
+		complex_doit("grep -a -s -v '^${substvar}=' $substvarfile > $substvarfile.new || true");
 		doit("mv", "$substvarfile.new","$substvarfile");
 	}
 }
@@ -750,7 +750,7 @@ sub addsubstvar {
 	}
 
 	if (length $line) {
-		 complex_doit("(grep -s -v ${substvar} $substvarfile; echo ".escape_shell("${substvar}=$line").") > $substvarfile.new");
+		 complex_doit("(grep -a -s -v ${substvar} $substvarfile; echo ".escape_shell("${substvar}=$line").") > $substvarfile.new");
 		 doit("mv", "$substvarfile.new", $substvarfile);
 	}
 	else {
