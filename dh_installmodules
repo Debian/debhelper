@@ -90,10 +90,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $modprobe_file=pkgfile($package,"modprobe");
 
-	if (! -e $tmp) {
-		install_dir($tmp);
-	}
-
 	if ($modprobe_file) {
 		if (! -e "$tmp/etc/modprobe.d") {
 			install_dir("$tmp/etc/modprobe.d");
