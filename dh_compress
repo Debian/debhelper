@@ -191,7 +191,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# they are again.
 	foreach (keys %hardlinks) {
 		# Remove old file.
-	    	doit("rm","-f","$_");
+		doit("rm","-f","$_");
 		# Make new hardlink.
 		doit("ln","$hardlinks{$_}.gz","$_.gz");
 	}
