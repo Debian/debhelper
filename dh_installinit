@@ -84,13 +84,22 @@ call.  Example:
 =item B<-R>, B<--restart-after-upgrade>
 
 Do not stop the init script until after the package upgrade has been
-completed. This is different than the default behavior, which stops the
-script in the F<prerm>, and starts it again in the F<postinst>.
+completed.  This is the default behaviour in compat 10.
+
+In early compat levels, the default was to stop the script in the
+F<prerm>, and starts it again in the F<postinst>.
 
 This can be useful for daemons that should not have a possibly long
 downtime during upgrade. But you should make sure that the daemon will not
 get confused by the package being upgraded while it's running before using
 this option.
+
+=item B<--no-restart-after-upgrade>
+
+Undo a previous B<--restart-after-upgrade> (or the default of compat
+10).  If no other options are given, this will cause the service to be
+stopped in the F<prerm> script and started again in the F<postinst>
+script.
 
 =item B<-r>, B<--no-restart-on-upgrade>
 
@@ -155,11 +164,13 @@ instances of the same text to be added to maintainer scripts.
 
 =cut
 
+$dh{RESTART_AFTER_UPGRADE} = 1 if not compat(10);
+
 init(options => {
 	"r" => \$dh{R_FLAG},
 	"no-restart-on-upgrade" => \$dh{R_FLAG},
 	"no-start" => \$dh{NO_START},
-	"R|restart-after-upgrade" => \$dh{RESTART_AFTER_UPGRADE},
+	"R|restart-after-upgrade!" => \$dh{RESTART_AFTER_UPGRADE},
 	"init-script=s" => \$dh{INIT_SCRIPT},
 	"update-rcd-params=s", => \$dh{U_PARAMS},
 	"remove-d" => \$dh{D_FLAG},
