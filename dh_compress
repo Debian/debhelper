@@ -175,7 +175,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	# normalize file names and remove duplicates
-	my @normalized = map abs2rel(abs_path($_)), @f;
+	my @normalized = normalize_paths("${olddir}/${tmp}", $tmp, @f);
 	my %uniq_f; @uniq_f{@normalized} = ();
 	@f = sort keys %uniq_f;
 
@@ -218,6 +218,29 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			}
 		}
 	} while $changed;
+}
+
+sub normalize_paths {
+	my ($cwd, $tmp, @paths) = @_;
+	my @normalized;
+	my $prefix = qr{\Q${tmp}/};
+
+	for my $path (@paths) {
+		my $abs = abs_path($path);
+		if (not defined($abs)) {
+			my $err = $!;
+			my $alt = $path;
+			if ($alt =~ s/^$prefix//) {
+				$abs = abs_path($alt);
+			}
+			error(qq{Cannot resolve "$path": $err (relative to "${cwd}")})
+				if (not defined($abs));
+			warning(qq{Interpreted "$path" as "$alt"});
+		}
+		error("${abs} does not exist") if not -e $abs;
+		push(@normalized, abs2rel($abs, $cwd));
+	}
+	return @normalized;
 }
 
 =head1 SEE ALSO
