@@ -56,8 +56,16 @@ there is no need to list them manually here.
 
 =item I<package>.maintscript
 
-Lines in this file correspond to L<dpkg-maintscript-helper(1)> commands and
-parameters.
+Lines in this file correspond to L<dpkg-maintscript-helper(1)>
+commands and parameters.  However, the "maint-script-parameters"
+should I<not> be included as debhelper will add those automatically.
+
+Example:
+
+    # Correct
+    rm_conffile /etc/obsolete.conf 0.2~ foo
+    # INCORRECT
+    rm_conffile /etc/obsolete.conf 0.2~ foo -- "$@"
 
 In compat 10 or later, any shell metacharacters will be escaped, so
 arbitrary shell code cannot be inserted here.  For example, a line
