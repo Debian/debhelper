@@ -5,6 +5,8 @@
 # Each debhelper command in this rules file has to be run using ./run,
 # to ensure that the commands and libraries in the source tree are used,
 # rather than the installed ones.
+#
+# We use --no-parallel because the test suite is not thread safe.
 
 %:
-	./run dh $@
+	./run dh $@ --no-parallel
