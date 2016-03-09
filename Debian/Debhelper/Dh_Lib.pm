@@ -202,7 +202,6 @@ sub inhibit_log {
 # shell, escaping metacharacters and quoting arguments that contain spaces.
 sub escape_shell {
 	my @args=@_;
-	my $line="";
 	my @ret;
 	foreach my $word (@args) {
 		if ($word=~/\s/) {
