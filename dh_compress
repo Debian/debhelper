@@ -175,7 +175,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	# normalize file names and remove duplicates
-	my @normalized = normalize_paths("${olddir}/${tmp}", $tmp, @f);
+	my $norm_from_dir = $tmp;
+	if ($norm_from_dir !~ m{^/}) {
+		$norm_from_dir = "${olddir}/${tmp}";
+	}
+	my @normalized = normalize_paths($norm_from_dir, $tmp, @f);
 	my %uniq_f; @uniq_f{@normalized} = ();
 	@f = sort keys %uniq_f;
 
