@@ -408,9 +408,7 @@ my @i = (qw{
 	dh_link
 	dh_installwm
 	dh_installxfonts
-},
-	optional_command('dh_strip_nondeterminism'),
-qw{
+	dh_strip_nondeterminism
 	dh_compress
 	dh_fixperms
 });
@@ -1029,18 +1027,6 @@ sub can_skip {
 		}
 	}
 	return 1;
-}
-
-sub optional_command {
-	my ($command) = @_;
-
-	foreach my $dir (split(':', $ENV{'PATH'})) {
-		if (open(my $h, '<', "$dir/$command")) {
-			close($h);
-			return ($command);
-		}
-	}
-	return;
 }
 
 sub extract_skipinfo {
