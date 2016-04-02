@@ -1021,10 +1021,16 @@ sub can_skip {
 
 	foreach my $package (@packages) {
 		foreach my $skipinfo (@skipinfo) {
-			if ($skipinfo=~/^tmp\((.*)\)$/) {
-				my $need=$1;
-				my $tmp=tmpdir($package);
-				return 0 if -e "$tmp/$need";
+			if ($skipinfo=~/^([a-zA-Z0-9-_]+)\((.*)\)$/) {
+				my $type = $1;
+				my $need = $2;
+				if ($type eq 'tmp') {
+					my $tmp = tmpdir($package);
+					return 0 if -e "$tmp/$need";
+				} else {
+					# Unknown hint - make no assumptions
+					return 0;
+				}
 			}
 			elsif (pkgfile($package, $skipinfo) ne '') {
 				return 0;
