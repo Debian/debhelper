@@ -7,9 +7,11 @@
 # rather than the installed ones.
 #
 # We use --no-parallel because the test suite is not thread safe.
+# We disable autoreconf to avoid build-depending on it (it does
+# nothing for debhelper and it keeps the set of B-D smaller)
 
 %:
-	./run dh $@ --no-parallel
+	./run dh $@ --no-parallel --without autoreconf
 
 # Disable as they are unneeded (and we can then be sure debhelper
 # builds without needing autotools-dev, dh-strip-nondetermism etc.)

@@ -287,6 +287,11 @@ if (compat(8, 1)) {
 	# (and comes first so python-central loads later and can disable it).
 	unshift @ARGV, "--with=python-support";
 }
+if (not compat(10, 1)) {
+	# Enable autoreconf'ing by default in compat 10 or later.  Use the
+	# sequence add-on so existing --without=autoreconf
+	unshift(@ARGV, "--with=autoreconf");
+}
 		
 init(options => {
 		"until=s" => \$dh{UNTIL},
