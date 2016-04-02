@@ -11,7 +11,10 @@ open (OUT, ">", "t/tmp/debian/rules") || die "$!";
 print OUT <<EOF;
 #!/usr/bin/make -f
 %:
-	PATH=../..:\$\$PATH PERL5LIB=../.. ../../dh \$@
+	PATH=../..:\$\$PATH PERL5LIB=../.. ../../dh \$@ --without autoreconf
+
+override_dh_update_autotools_config override_dh_strip_nondeterminism:
+
 override_dh_auto_build:
 	echo "override called"
 EOF
