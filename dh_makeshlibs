@@ -145,7 +145,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	
 	my $tmp=tmpdir($package);
 
-	my %seen;
+	my (%seen, $unversioned_so);
 	my $need_ldconfig = 0;
 	my $shlibs_file = pkgfile($package, 'shlibs');
 
@@ -176,6 +176,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			# idiotic crap soname format
 			$library=$1;
 			$major=$2;
+		} elsif ($ret =~ m/\s+SONAME\s+(?:.*)\.so/) {
+			$unversioned_so = 1;
 		}
 
 		if (defined($dh{M_PARAMS}) && $dh{M_PARAMS} ne '') {
@@ -233,12 +235,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		complex_doit("echo '$_' >>$tmp/DEBIAN/shlibs");
 	}
 
-	# Historically, --noscripts would disable the creation of
-	# maintscripts for calling ldconfig.
-	if (! $dh{NOSCRIPTS} && $need_ldconfig) {
-		autotrigger($package, 'activate-noawait', 'ldconfig');
-	}
-
 	if ($shlibs_file) {
 		if (! -d "$tmp/DEBIAN") {
 			install_dir("$tmp/DEBIAN");
@@ -273,7 +269,19 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 		if (-f "$tmp/DEBIAN/symbols" and -s _ == 0) {
 			doit("rm", "-f", "$tmp/DEBIAN/symbols");
+		} elsif ($unversioned_so) {
+			# There are a few "special" libraries (e.g. nss/nspr)
+			# which do not have versined SONAMES.  However the
+			# maintainer provides a symbols file for them and we can
+			# then use that to add an ldconfig trigger.
+			$need_ldconfig = 1;
 		}
+	}
+
+	# Historically, --noscripts would disable the creation of
+	# maintscripts for calling ldconfig.
+	if (! $dh{NOSCRIPTS} && $need_ldconfig) {
+		autotrigger($package, 'activate-noawait', 'ldconfig');
 	}
 }
 
