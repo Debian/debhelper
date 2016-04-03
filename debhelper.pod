@@ -111,7 +111,7 @@ will output what it would have done.
 =item B<-a>, B<--arch>
 
 Act on architecture dependent packages that should be built for the
-build architecture.
+B<DEB_HOST_ARCH> architecture.
 
 =item B<-i>, B<--indep>
 
@@ -632,7 +632,7 @@ If none are given, debhelper programs default to acting on all packages listed
 in the control file, with the exceptions below.
 
 First, any package whose B<Architecture> field in B<debian/control> does not
-match the build architecture will be excluded
+match the B<DEB_HOST_ARCH> architecture will be excluded
 (L<Debian Policy, section 5.6.8>).
 
 Also, some additional packages may be excluded based on the contents of the
