@@ -167,12 +167,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		my ($library, $major);
 		push @lib_files, $_;
 		my $ret=`$objdump -p $_`;
-		if ($ret=~m/\s+SONAME\s+(.+)\.so\.(.+)/) {
+		if ($ret=~m/\s+SONAME\s+(.*)\.so\.(.*)/) {
 			# proper soname format
 			$library=$1;
 			$major=$2;
 		}
-		elsif ($ret=~m/\s+SONAME\s+(.+)-(.+)\.so/) {
+		elsif ($ret=~m/\s+SONAME\s+(.*)-(\d.*)\.so/) {
 			# idiotic crap soname format
 			$library=$1;
 			$major=$2;
