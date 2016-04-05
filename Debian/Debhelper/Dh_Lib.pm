@@ -427,8 +427,8 @@ sub dirname {
 					}
 				}
 			}
-			else {
-				warning("No compatibility level specified in debian/compat");
+			elsif (not $nowarn) {
+				warning("No! compatibility level specified in debian/compat");
 				warning("This package will soon FTBFS; time to fix it!");
 			}
 
@@ -436,17 +436,19 @@ sub dirname {
 				$c=$ENV{DH_COMPAT};
 			}
 		}
-		if ($c < MIN_COMPAT_LEVEL) {
-			error("Compatibility levels before ${\MIN_COMPAT_LEVEL} are no longer supported (level $c requested)");
-		}
+		if (not $nowarn) {
+			if ($c < MIN_COMPAT_LEVEL) {
+				error("Compatibility levels before ${\MIN_COMPAT_LEVEL} are no longer supported (level $c requested)");
+			}
 
-		if ($c < LOWEST_NON_DEPRECATED_COMPAT_LEVEL && ! $warned_compat && ! $nowarn) {
-			warning("Compatibility levels before ${\LOWEST_NON_DEPRECATED_COMPAT_LEVEL} are deprecated (level $c in use)");
-			$warned_compat=1;
-		}
+			if ($c < LOWEST_NON_DEPRECATED_COMPAT_LEVEL && ! $warned_compat) {
+				warning("Compatibility levels before ${\LOWEST_NON_DEPRECATED_COMPAT_LEVEL} are deprecated (level $c in use)");
+				$warned_compat=1;
+			}
 	
-		if ($c > MAX_COMPAT_LEVEL) {
-			error("Sorry, but ${\MAX_COMPAT_LEVEL} is the highest compatibility level supported by this debhelper.");
+			if ($c > MAX_COMPAT_LEVEL) {
+				error("Sorry, but ${\MAX_COMPAT_LEVEL} is the highest compatibility level supported by this debhelper.");
+			}
 		}
 
 		return ($c <= $num);
