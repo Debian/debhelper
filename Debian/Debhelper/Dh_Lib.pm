@@ -38,8 +38,6 @@ use vars qw(@EXPORT %dh);
 	    &restore_file_on_clean &restore_all_files
 );
 
-my $max_compat=10;
-
 # The Makefile changes this if debhelper is installed in a PREFIX.
 my $prefix="/usr";
 
