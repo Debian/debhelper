@@ -123,7 +123,7 @@ sub init {
 # on, if it's exiting successfully.
 my $write_log=1;
 sub END {
-	if ($? == 0 && $write_log && (compat(9) || $ENV{DH_INTERNAL_OVERRIDE})) {
+	if ($? == 0 && $write_log && (compat(9, 1) || $ENV{DH_INTERNAL_OVERRIDE})) {
 		write_log(basename($0), @{$dh{DOPACKAGES}});
 	}
 }
