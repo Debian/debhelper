@@ -292,6 +292,8 @@ if (not compat(9, 1)) {
 	# sequence add-on so existing --without=autoreconf
 	unshift(@ARGV, "--with=autoreconf");
 }
+
+inhibit_log();
 		
 init(options => {
 		"until=s" => \$dh{UNTIL},
@@ -316,7 +318,6 @@ init(options => {
 	# Bundling does not work well since there are unknown options.
 	bundling => 0,
 );
-inhibit_log();
 set_buildflags();
 warn_deprecated();
 
