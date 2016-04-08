@@ -567,7 +567,7 @@ sub pkgfilename {
 		}
 
 		# Is this a native Debian package?
-		if ($dh{VERSION}=~m/.*-/) {
+		if (index($dh{VERSION}, '-') > -1) {
 			return $isnative_cache{$package}=0;
 		}
 		else {

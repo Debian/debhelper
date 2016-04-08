@@ -209,10 +209,10 @@ sub testfile {
 	# Does its filename look like a shared library?
 	#  - *.cmxs are OCaml native code shared libraries
 	#  - *.node are also native ELF binaries (for node-js)
-	if (m/.*\.(?:so.*?|cmxs|node)$/) {
+	if (m/\.(?:so.*?|cmxs|node)$/) {
 		# Ok, do the expensive test.
 		my $type=get_file_type($_);
-		if ($type=~m/.*ELF.*shared.*/) {
+		if ($type=~m/ELF.*shared/) {
 			push @shared_libs, $fn;
 			return;
 		}
@@ -223,7 +223,7 @@ sub testfile {
 	if ($mode & 0111) {
 		# Ok, expensive test.
 		my $type=get_file_type($_);
-		if ($type=~m/.*ELF.*(executable|shared).*/) {
+		if ($type=~m/ELF.*(executable|shared)/) {
 			push @executables, $fn;
 			return;
 		}

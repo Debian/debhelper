@@ -158,13 +158,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if ($install) {
 			my $extdir="share";
 			
-			my ($section)=$basename=~m/.*\.([1-9])/;
+			my ($section)=$basename=~m/\.([1-9])/;
 			
 			my $destdir="$tmp/usr/$extdir/man/man$section/";
 			
 			# Handle translated man pages.
 			my $instname=$basename;
-			my ($langcode)=$basename=~m/.*\.([a-z][a-z])\.([1-9])/;
+			my ($langcode)=$basename=~m/\.([a-z][a-z])\.([1-9])/;
 			if (defined $langcode && $langcode ne '') {
 				$destdir="$tmp/usr/$extdir/man/$langcode/man$section/";
 				$instname=~s/\.$langcode\./\./;

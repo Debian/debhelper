@@ -140,7 +140,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		close($fd);
 		# Failing that, we can try to get it from the filename.
 		if (! $section) {
-			($section)=$basename=~m/.*\.([1-9]\S*)/;
+			($section)=$basename=~m/\.([1-9]\S*)/;
 		}
 
 		# Now get the numeric component of the section.
@@ -158,7 +158,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			# Translated man pages are typically specified by adding the
 			# language code to the filename, so detect that and
 			# redirect to appropriate directory, stripping the code.
-			($langcode)=$basename=~m/.*\.([a-z][a-z](?:_[A-Z][A-Z])?)\.(?:[1-9]|man)/;
+			($langcode)=$basename=~m/\.([a-z][a-z](?:_[A-Z][A-Z])?)\.(?:[1-9]|man)/;
 		}
 		elsif ($dh{LANGUAGE} ne 'C') {
 			$langcode=$dh{LANGUAGE};
