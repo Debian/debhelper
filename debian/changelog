@@ -1,3 +1,11 @@
+debhelper (9.20160403+unreleased) UNRELEASED; urgency=medium
+
+  * dh: Fix bug where "--help" or "--list" would not work
+    unless "debian/compat" existed and had a supported
+    compat level.  (Closes: #820508)
+
+ -- Niels Thykier <niels@thykier.net>  Sat, 09 Apr 2016 09:20:32 +0000
+
 debhelper (9.20160403) unstable; urgency=medium
 
   * d/control: Requre dh-autoreconf (>= 12) to ensure
@@ -12,9 +20,6 @@ debhelper (9.20160403) unstable; urgency=medium
   * dh_makeshlibs: Add an ldconfig trigger if there is an
     unversioned SONAME and the maintainer provides a
     symbols file.
-  * dh: Fix bug where "--help" or "--list" would not work
-    unless "debian/compat" existed and had a supported
-    compat level.
 
  -- Niels Thykier <niels@thykier.net>  Sun, 03 Apr 2016 08:56:07 +0000
 
