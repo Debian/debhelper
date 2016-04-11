@@ -179,7 +179,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if ($norm_from_dir !~ m{^/}) {
 		$norm_from_dir = "${olddir}/${tmp}";
 	}
-	my @normalized = normalize_paths($norm_from_dir, $tmp, @f);
+	my $resolved = abs_path($norm_from_dir)
+		or error("Cannot resolve $norm_from_dir: $!");
+	my @normalized = normalize_paths($norm_from_dir, $resolved, $tmp, @f);
 	my %uniq_f; @uniq_f{@normalized} = ();
 	@f = sort keys %uniq_f;
 
@@ -225,7 +227,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 }
 
 sub normalize_paths {
-	my ($cwd, $tmp, @paths) = @_;
+	my ($cwd, $cwd_resolved, $tmp, @paths) = @_;
 	my @normalized;
 	my $prefix = qr{\Q${tmp}/};
 
@@ -242,7 +244,7 @@ sub normalize_paths {
 			warning(qq{Interpreted "$path" as "$alt"});
 		}
 		error("${abs} does not exist") if not -e $abs;
-		push(@normalized, abs2rel($abs, $cwd));
+		push(@normalized, abs2rel($abs, $cwd_resolved));
 	}
 	return @normalized;
 }
