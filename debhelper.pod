@@ -265,6 +265,8 @@ includes both default and third party build systems (marked as such). Also
 shows which build system would be automatically selected, or which one
 is manually specified with the B<--buildsystem> option.
 
+This can be used without a F<debian/compat> file.
+
 =back
 
 =head1 COMPATIBILITY LEVELS
@@ -274,7 +276,8 @@ to debhelper, to keep it clean and well-designed as needs change and its
 author gains more experience. To prevent such major changes from breaking
 existing packages, the concept of debhelper compatibility levels was 
 introduced. You tell debhelper which compatibility level it should use, and
-it modifies its behavior in various ways.
+it modifies its behavior in various ways.  The compatibility level is
+specified in the F<debian/compat> file and the file must be present.
 
 Tell debhelper what compatibility level to use by writing a number to
 F<debian/compat>. For example, to turn on v9 mode:

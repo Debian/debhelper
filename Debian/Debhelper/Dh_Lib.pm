@@ -414,8 +414,8 @@ sub dirname {
 				my $l=<COMPAT_IN>;
 				close COMPAT_IN;
 				if (! defined $l || ! length $l) {
-					warning("debian/compat is empty, assuming level $c")
-						unless defined $ENV{DH_COMPAT};
+					error("debian/compat must contain a postive number (found: \"$c\")");
+
 				}
 				else {
 					chomp $l;
@@ -428,8 +428,7 @@ sub dirname {
 				}
 			}
 			elsif (not $nowarn) {
-				warning("No! compatibility level specified in debian/compat");
-				warning("This package will soon FTBFS; time to fix it!");
+				error("Please specific the compatibility level in debian/compat");
 			}
 
 			if (defined $ENV{DH_COMPAT}) {
