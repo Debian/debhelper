@@ -414,7 +414,7 @@ sub dirname {
 				my $l=<COMPAT_IN>;
 				close COMPAT_IN;
 				if (! defined $l || ! length $l) {
-					error("debian/compat must contain a postive number (found: \"$c\")");
+					error("debian/compat must contain a postive number (found an empty first line)");
 
 				}
 				else {
@@ -428,7 +428,7 @@ sub dirname {
 				}
 			}
 			elsif (not $nowarn) {
-				error("Please specific the compatibility level in debian/compat");
+				error("Please specify the compatibility level in debian/compat");
 			}
 
 			if (defined $ENV{DH_COMPAT}) {
