@@ -38,7 +38,7 @@ sub check_auto_buildable {
 sub not_our_cfg {
 	my $this=shift;
 	my $ret;
-	if (open(my $cfg, $this->get_buildpath(".pydistutils.cfg"))) {
+	if (open(my $cfg, '<', $this->get_buildpath(".pydistutils.cfg"))) {
 		$ret = not "# Created by dh_auto\n" eq <$cfg>;
 		close $cfg;
 	}
@@ -91,16 +91,16 @@ sub dbg_build_needed {
 	# built in a clean chroot.
 
 	my @dbg;
-	open (CONTROL, 'debian/control') ||
+	open (my $fd, '<', 'debian/control') ||
 		error("cannot read debian/control: $!\n");
-	foreach my $builddeps (join('', <CONTROL>) =~ 
+	foreach my $builddeps (join('', <$fd>) =~
 			/^Build-Depends[^:]*:.*\n(?:^[^\w\n].*\n)*/gmi) {
 		while ($builddeps =~ /(python[^, ]*-dbg)/g) {
 			push @dbg, $1;
 		}
 	}
 
-	close CONTROL;
+	close($fd);
 	return @dbg;
 
 }

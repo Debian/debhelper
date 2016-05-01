@@ -410,9 +410,9 @@ sub dirname {
 		if (! defined $c) {
 			$c=1;
 			if (-e 'debian/compat') {
-				open (COMPAT_IN, "debian/compat") || error "debian/compat: $!";
-				my $l=<COMPAT_IN>;
-				close COMPAT_IN;
+				open(my $compat_in, '<', "debian/compat") || error "debian/compat: $!";
+				my $l=<$compat_in>;
+				close($compat_in);
 				if (! defined $l || ! length $l) {
 					error("debian/compat must contain a postive number (found an empty first line)");
 
@@ -629,11 +629,11 @@ sub autoscript_sed {
 	my $infile = shift;
 	my $outfile = shift;
 	if (ref($sed) eq 'CODE') {
-		open(IN, $infile) or die "$infile: $!";
-		open(OUT, ">>$outfile") or die "$outfile: $!";
-		while (<IN>) { $sed->(); print OUT }
-		close(OUT) or die "$outfile: $!";
-		close(IN) or die "$infile: $!";
+		open(my $in, '<', $infile) or die "$infile: $!";
+		open(my $out, '>>', $outfile) or die "$outfile: $!";
+		while (<$in>) { $sed->(); print {$out} $_; }
+		close($out) or die "$outfile: $!";
+		close($in) or die "$infile: $!";
 	}
 	else {
 		complex_doit("sed \"$sed\" $infile >> $outfile");
@@ -725,8 +725,8 @@ sub addsubstvar {
 	my $line="";
 	if (-e $substvarfile) {
 		my %items;
-		open(SUBSTVARS_IN, "$substvarfile") || error "read $substvarfile: $!";
-		while (<SUBSTVARS_IN>) {
+		open(my $in, '<', $substvarfile) || error "read $substvarfile: $!";
+		while (<$in>) {
 			chomp;
 			if (/^\Q$substvar\E=(.*)/) {
 				%items = map { $_ => 1} split(", ", $1);
@@ -734,7 +734,7 @@ sub addsubstvar {
 				last;
 			}
 		}
-		close SUBSTVARS_IN;
+		close($in);
 		if (! $remove) {
 			$items{$str}=1;
 		}
@@ -775,7 +775,7 @@ sub filedoublearray {
 		delete $ENV{"DH_CONFIG_ACT_ON_PACKAGES"};
 	}
 	else {
-		open (DH_FARRAY_IN, $file) || error("cannot read $file: $!");
+		open (DH_FARRAY_IN, '<', $file) || error("cannot read $file: $!");
 	}
 
 	my @ret;
@@ -888,18 +888,18 @@ sub is_cross_compiling {
 
 # Returns source package name
 sub sourcepackage {
-	open (CONTROL, 'debian/control') ||
+	open (my $fd, '<', 'debian/control') ||
 	    error("cannot read debian/control: $!\n");
-	while (<CONTROL>) {
+	while (<$fd>) {
 		chomp;
 		s/\s+$//;
 		if (/^Source:\s*(.*)/i) {
-			close CONTROL;
+			close($fd);
 			return $1;
 		}
 	}
 
-	close CONTROL;
+	close($fd);
 	error("could not find Source: line in control file.");
 }
 
@@ -935,9 +935,9 @@ sub getpackages {
 	if (exists $ENV{'DEB_BUILD_PROFILES'}) {
 		@profiles=split /\s+/, $ENV{'DEB_BUILD_PROFILES'};
 	}
-	open (CONTROL, 'debian/control') ||
+	open (my $fd, '<', 'debian/control') ||
 		error("cannot read debian/control: $!\n");
-	while (<CONTROL>) {
+	while (<$fd>) {
 		chomp;
 		s/\s+$//;
 		if (/^Package:\s*(.*)/i) {
@@ -1006,7 +1006,7 @@ sub getpackages {
 			$section='';
 		}
 	}
-	close CONTROL;
+	close($fd);
 
 	return @{$packages_by_type{$type}};
 }
