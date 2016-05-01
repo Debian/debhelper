@@ -3,6 +3,8 @@
 # Debhelper is supposed to consist of small, simple, easy to understand
 # programs. Programs growing in size and complexity without bounds is a
 # bug.
+use strict;
+use warnings;
 use Test::More;
 
 my @progs=grep { -x $_ } glob("dh_*");
