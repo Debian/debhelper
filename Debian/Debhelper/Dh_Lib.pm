@@ -36,6 +36,7 @@ use vars qw(@EXPORT %dh);
 	    &get_source_date_epoch &is_cross_compiling
 	    &generated_file &autotrigger &package_section
 	    &restore_file_on_clean &restore_all_files
+	    &open_gz
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -1397,6 +1398,21 @@ sub restore_all_files {
 	return;
 }
 
+sub open_gz {
+	my ($file) = @_;
+	my $fd;
+	eval {
+		require PerlIO::gzip;
+	};
+	if ($@) {
+		open($fd, '-|', 'gzip', '-dc', $file)
+		  or die("gzip -dc $file failed: $!");
+	} else {
+		open($fd, '<:gzip', $file)
+		  or die("open $file [<:gzip] failed: $!");
+	}
+	return $fd;
+}
 
 1
 

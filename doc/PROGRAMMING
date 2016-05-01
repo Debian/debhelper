@@ -323,6 +323,12 @@ install_lib($src, $dest)
 	Installs a library at the path $src into $dest.  The parent
 	dir of $dest must exist (can be created with install_dir).
 	This is intended for installing libraries.
+open_gz($file)
+	Open $file, read from it as a gzip-compressed file and return
+	the file handle.
+	Depending on runtime features, it might be a pipe from an
+	external process (which will die with a "SIGPIPE" if you
+	do not consume all the input)
 
 Sequence Addons:
 ---------------
