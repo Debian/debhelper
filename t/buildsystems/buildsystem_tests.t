@@ -466,8 +466,9 @@ sub dh_auto_do_autoconf {
 	@extra_args = &$do_dh_auto('configure');
 	ok ( -f "$buildpath/Makefile", "$buildpath/Makefile exists" );
 	@lines=();
-	if (ok( open(FILE, "$buildpath/stamp_configure"), "$buildpath/stamp_configure exists") ) {
+	if ( ok(open(FILE, '<', "$buildpath/stamp_configure"), "$buildpath/stamp_configure exists") ) {
 		@lines = @{readlines(\*FILE)};
+		close(FILE);
 	}
 	is_deeply( \@lines, \@extra_args, "$buildpath/stamp_configure contains extra args" );
 
@@ -475,15 +476,17 @@ sub dh_auto_do_autoconf {
 	ok ( -f "$buildpath/stamp_build", "$buildpath/stamp_build exists" );
 	&$do_dh_auto('test');
 	@lines=();
-	if ( ok(open(FILE, "$buildpath/stamp_test"), "$buildpath/stamp_test exists") ) {
+	if ( ok(open(FILE, '<', "$buildpath/stamp_test"), "$buildpath/stamp_test exists") ) {
 		@lines = @{readlines(\*FILE)};
+		close(FILE);
 	}
 	is_deeply( \@lines, [ "VERBOSE=1" ],
 	    "$buildpath/stamp_test contains VERBOSE=1" );
 	&$do_dh_auto('install');
 	@lines=();
-	if ( ok(open(FILE, "$buildpath/stamp_install"), "$buildpath/stamp_install exists") ) {
+	if ( ok(open(FILE, '<', "$buildpath/stamp_install"), "$buildpath/stamp_install exists") ) {
 		@lines = @{readlines(\*FILE)};
+		close(FILE);
 	} 
 	is_deeply( \@lines, [ "DESTDIR=".Cwd::getcwd()."/debian/testpackage" ],
 	    "$buildpath/stamp_install contains DESTDIR" );
