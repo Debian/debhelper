@@ -128,7 +128,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			open (IN, "zcat $page|") or die "$page: $!";
 		}
 		else {
-			open (IN, $page) or die "$page: $!";
+			open(IN, '<', $page) or die "$page: $!";
 		}
 		while (<IN>) {
 			if (/^\.TH\s+\S+\s+"?(\d+[^"\s]*)"?/ ||
@@ -232,7 +232,7 @@ sub find_so_man {
 		open (SOTEST, "zcat $_|") or die "$_: $!";
 	}
 	else {
-		open (SOTEST,$_) || die "$_: $!";
+		open(SOTEST, '<', $_) || die "$_: $!";
 	}
 	my $l=<SOTEST>;
 	close SOTEST;

@@ -63,13 +63,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $exclude="";
 	if (! $dh{INCLUDE_CONFFILES} && -r "$tmp/DEBIAN/conffiles") {
 		# Generate exclude regexp.
-		open (CONFF,"$tmp/DEBIAN/conffiles");
-		while (<CONFF>) {
+		open(my $fd, '<', "$tmp/DEBIAN/conffiles")
+		  or die("open $tmp/DEBIAN/conffiles failed: $!");
+		while (<$fd>) {
 			chomp;
 			s/^\///;
 			$exclude.="! -path \"./$_\" ";
 		}
-		close CONFF;
+		close($fd);
 	}
 	
 	# See if we should exclude other files.

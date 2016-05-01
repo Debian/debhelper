@@ -304,8 +304,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		next if $fn=~/\.EX$/;
 		next if excludefile($fn);
 		# Parse the file to get the doc id.
-		open (IN, "debian/$fn") || die "Cannot read debian/$fn.";
-		while (<IN>) {
+		open(my $fd, '<', "debian/$fn") || die "Cannot read debian/$fn.";
+		while (<$fd>) {
 			s/\s*$//;
 			if (/^Document\s*:\s*(.*)/) {
 				$doc_ids{$fn}=$1;
@@ -315,7 +315,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (! exists $doc_ids{$fn}) {
 			warning("Could not parse $fn for doc-base Document id; skipping");
 		}
-		close IN;
+		close($fd);
 	}
 	closedir(DEB);
 	
