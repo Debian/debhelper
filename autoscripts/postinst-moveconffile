@@ -1,9 +1,0 @@
-if [ "$1" = configure ]; then
-	if [ -e "#OLD#" ]; then
-		echo "Preserving user changes to #NEW# ..."
-		if [ -e "#NEW#" ]; then
-			mv -f "#NEW#" "#NEW#.dpkg-new"
-		fi
-		mv -f "#OLD#" "#NEW#"
-	fi
-fi

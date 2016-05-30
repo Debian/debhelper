@@ -20,9 +20,6 @@ B<dh_installudev> [S<I<debhelper options>>] [B<-n>] [B<--name=>I<name>] [B<--pri
 B<dh_installudev> is a debhelper program that is responsible for
 installing B<udev> rules files.
 
-Code is added to the F<preinst> and F<postinst> to handle the upgrade from the
-old B<udev> rules file location.
-
 =head1 FILES
 
 =over 4
@@ -46,10 +43,6 @@ debian/I<package>.udev.
 =item B<--priority=>I<priority>
 
 Sets the priority the file. Default is 60.
-
-=item B<-n>, B<--noscripts>
-
-Do not modify F<preinst>/F<postinst> scripts.
 
 =back
 
@@ -103,15 +96,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 		my $rule="/lib/udev/rules.d/$dh{PRIORITY}$filename";
 		install_file($rules_file, "${tmp}${rule}");
-		if (! $dh{NOSCRIPTS}) {
-			# Remove old rule from /etc, unless it's modified,
-			# in which case we rename it to match the new
-			# file in /lib, so it will override.
-			my $old="/etc/udev/rules.d/$old_priority$oldfilename";
-			$rule=~s/^\/lib/\/etc/;
-			autoscript($package,"preinst","preinst-moveconffile","s!#OLD#!$old!g;s!#NEW#!$rule!g;s!#PACKAGE#!$package!g");
-			autoscript($package,"postinst","postinst-moveconffile","s!#OLD#!$old!g;s!#NEW#!$rule!g");
-		}
 	}
 }
 
