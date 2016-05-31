@@ -129,15 +129,6 @@ after a particular debhelper command is run.
 		dh_fixperms
 		chmod 4755 debian/foo/usr/bin/foo
 
-If your package uses autotools and you want to freshen F<config.sub> and
-F<config.guess> with newer versions from the B<autotools-dev> package
-at build time, you can use some commands provided in B<autotools-dev>
-that automate it, like this.
-
-	#!/usr/bin/make -f
-	%:
-		dh $@ --with autotools_dev
-
 Python tools are not run by dh by default, due to the continual change
 in that area. (Before compatibility level v9, dh does run B<dh_pysupport>.)
 Here is how to use B<dh_python2>.
@@ -224,15 +215,23 @@ when building only documentation.
 
 If you're curious about B<dh>'s internals, here's how it works under the hood.
 
-Each debhelper command will record when it's successfully run in
-F<debian/package.debhelper.log>. (Which B<dh_clean> deletes.) So B<dh> can tell
-which commands have already been run, for which packages, and skip running
-those commands again.
+In compat 10 (or later), B<dh> creates a stamp file
+F<debian/debhelper-build-stamp> after the build step(s) are complete
+to avoid re-running them.  Inside an override target, B<dh_*> commands
+will create a log file F<debian/package.debhelper.log> to keep track
+of which packages the command(s) have been run for.  These log files
+are then removed once the override target is complete.
 
-Each time B<dh> is run, it examines the log, and finds the last logged command
-that is in the specified sequence. It then continues with the next command
-in the sequence. The B<--until>, B<--before>, B<--after>, and B<--remaining>
-options can override this behavior.
+In compat 9 or earlier, each debhelper command will record
+when it's successfully run in F<debian/package.debhelper.log>. (Which
+B<dh_clean> deletes.) So B<dh> can tell which commands have already
+been run, for which packages, and skip running those commands again.
+
+Each time B<dh> is run (in compat 9 or earlier), it examines the log,
+and finds the last logged command that is in the specified
+sequence. It then continues with the next command in the sequence. The
+B<--until>, B<--before>, B<--after>, and B<--remaining> options can
+override this behavior (though they were removed in compat 10).
 
 A sequence can also run dependent targets in debian/rules.  For
 example, the "binary" sequence runs the "install" target.
