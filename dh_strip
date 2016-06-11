@@ -169,6 +169,10 @@ if ($dh{MIGRATE_DBGSYM} and not $dh{ENABLE_DBGSYM}) {
 	error("--dbgsym-migration and --no-automatic-dbgsym are mutually exclusive");
 }
 
+# UNCONDITIONALLY disable this as we need a new version of dpkg-dev
+# for this to work
+$dh{ENABLE_DBGSYM} = 0;
+
 # This variable can be used to turn off stripping (see Policy).
 if (get_buildoption('nostrip')) {
 	exit;
