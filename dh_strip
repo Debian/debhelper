@@ -242,13 +242,13 @@ sub make_debug {
 	# stripped.
 	return unless get_file_type($file) =~ /not stripped/;
 
-	my ($base_file)=$file=~/^\Q$tmp\E(.*)/;
 	my ($debug_path, $debug_build_id);
 
 	if ($use_build_id &&
 	    `LC_ALL=C readelf -n $file`=~ /^\s+Build ID: ([0-9a-f]{2})([0-9a-f]+)$/m) {
 		$debug_path=$desttmp."/usr/lib/debug/.build-id/$1/$2.debug";
 		$debug_build_id="${1}${2}";
+		push(@build_ids, $debug_build_id);
 	}
 	elsif ($use_build_id > 1) {
 		# For dbgsyms, we need build-id (else it will not be
@@ -256,6 +256,7 @@ sub make_debug {
 		return;
 	}
 	else {
+		my ($base_file)=$file=~/^\Q$tmp\E(.*)/;
 		$debug_path=$desttmp."/usr/lib/debug/".$base_file;
 	}
 	my $debug_dir=dirname($debug_path);
@@ -268,10 +269,6 @@ sub make_debug {
 	else {
 		# Compat 9 OR a dbgsym package.
 		doit($objcopy, "--only-keep-debug", "--compress-debug-sections", $file, $debug_path);
-	}
-
-	if ($use_build_id and defined($debug_build_id)) {
-		push(@build_ids, $debug_build_id);
 	}
 
 	# No reason for this to be executable.
