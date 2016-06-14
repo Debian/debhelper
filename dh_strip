@@ -123,7 +123,10 @@ debug symbol packages.
 
 The automatic creation of debug symbol packages can also be prevented
 by adding B<noautodbgsym> to the B<DEB_BUILD_OPTIONS> environment
-variable.
+variable.  However, B<dh_strip> will still add debuglinks to ELF
+binaries when this flag is set.  This is to ensure that the regular
+deb package will be identical with and without this flag (assuming it
+is otherwise "bit-for-bit" reproducible).
 
 =head1 CONFORMS TO
 
@@ -170,7 +173,8 @@ if (get_buildoption('nostrip')) {
 
 my $objcopy = cross_command("objcopy");
 my $strip = cross_command("strip");
-$dh{ENABLE_DBGSYM} = 0 if get_buildoption('noautodbgsym') or get_buildoption('noddebs');
+my $no_auto_dbgsym = 0;
+$no_auto_dbgsym = 1 if get_buildoption('noautodbgsym') or get_buildoption('noddebs');
 
 # I could just use `file $_[0]`, but this is safer
 sub get_file_type {
@@ -342,6 +346,16 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		foreach (@static_libs) {
 			doit($strip, @opts, $_);
 		}
+	}
+	if ($no_auto_dbgsym and $use_build_id > 1) {
+		# When DEB_BUILD_OPTIONS contains noautodbgsym, remove the
+		# dbgsym dir and clear the build-ids.
+		#
+		# Note we have to extract the dbg symbols as usual, since
+		# attach_debug (objcopy --add-gnu-debuglink) requires the dbg
+		# file to exist.
+		doit('rm', '-fr', $debugtmp);
+		@build_ids = ();
 	}
 	if ($use_build_id > 1 and -d $debugtmp) {
 		my $dbgsym_docdir = "${debugtmp}/usr/share/doc";
