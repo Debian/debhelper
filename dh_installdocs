@@ -214,17 +214,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	if (@docs) {
-		my $exclude = '';
+		my $exclude = ' -and ! -empty';
 		if ($dh{EXCLUDE_FIND}) {
 			$exclude .= ' -and ! \( '.$dh{EXCLUDE_FIND}.' \)';
 		}
-		if (! compat(4)) {
-			# ignore empty files in subdirs
-			$exclude .= ' -and ! -empty';
-		}
 		foreach my $doc (@docs) {
 			next if excludefile($doc);
-			next if -e $doc && ! -s $doc && ! compat(4); # ignore empty files
+			next if -e $doc && ! -s $doc; # ignore empty files
 			ensure_docdir($package);
 			if (-d $doc && length $exclude) {
 				my $basename = basename($doc);

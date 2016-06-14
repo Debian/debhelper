@@ -60,12 +60,6 @@ package.
 For example, if your packages are libfoo and foo and you want to include a
 I<foo-dbg> package with debugging symbols, use B<dh_strip --dbg-package=>I<foo-dbg>.
 
-Note that this option behaves significantly different in debhelper
-compatibility levels 4 and below. Instead of specifying the name of a debug
-package to put symbols in, it specifies a package (or packages) which
-should have separated debug symbols, and the separated symbols are placed
-in packages with B<-dbg> added to their name.
-
 This option implies B<--no-automatic-dbgsym> and I<cannot> be used
 with B<--automatic-dbgsym> or B<--dbgsym-migration>.
 
@@ -300,23 +294,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $keep_debug=$dh{K_FLAG};
 	my $debugtmp=$tmp;
 	my $use_build_id = compat(8) ? 0 : 1;
-	if (! compat(4)) {
-		if (ref $dh{DEBUGPACKAGES}) {
-			$keep_debug=1;
-			# Note that it's only an array for the v4 stuff;
-			# for v5 only one value is used.
-			my $debugpackage=@{$dh{DEBUGPACKAGES}}[0];
-			if (!$all_packages{$debugpackage}) {
-				error("debug package $debugpackage is not listed in the control file");
-			}
-			$debugtmp=tmpdir($debugpackage);
+	if (ref $dh{DEBUGPACKAGES}) {
+		$keep_debug=1;
+		my $debugpackage=@{$dh{DEBUGPACKAGES}}[0];
+		if (!$all_packages{$debugpackage}) {
+			error("debug package $debugpackage is not listed in the control file");
 		}
-	}
-	else {
-		if (ref $dh{DEBUGPACKAGES} && grep { $_ eq $package } @{$dh{DEBUGPACKAGES}}) {
-			$keep_debug=1;
-			$debugtmp=tmpdir($package."-dbg");
-		}
+		$debugtmp=tmpdir($debugpackage);
 	}
 	# Temporary workaround: Do not build dbgsym packages for udebs as
 	# dpkg-gencontrol and dpkg-deb does not agree on the file

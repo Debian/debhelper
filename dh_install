@@ -199,17 +199,14 @@ foreach my $package (getpackages()) {
 				} else {
 					warning("Cannot find (any matches for) \"${glob}\" (tried in \"${srcdir}\" and \"debian/tmp\")");
 				}
-				# In compat 4, a non-matching glob was not fatal...
-				++$missing_files if not compat(4) or @found;
+				++$missing_files;
 			}
 		}
 
-		if (! compat(4)) { # check added in v5
-			if (! @filelist && ! $skip_install) {
-				warning("$package missing files: @$set");
-				++$missing_files;
-				next;
-			}
+		if (! @filelist && ! $skip_install) {
+			warning("$package missing files: @$set");
+			++$missing_files;
+			next;
 		}
 
 		foreach my $src (@filelist) { 

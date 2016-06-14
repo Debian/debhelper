@@ -783,7 +783,7 @@ sub filedoublearray {
 	while (<DH_FARRAY_IN>) {
 		chomp;
 		# Only ignore comments and empty lines in v5 mode.
-		if (! compat(4) && ! $x)  {
+		if (not $x)  {
 			next if /^#/ || /^$/;
 		}
 		my @line;
