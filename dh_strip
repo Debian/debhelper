@@ -294,9 +294,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $keep_debug=$dh{K_FLAG};
 	my $debugtmp=$tmp;
 	my $use_build_id = compat(8) ? 0 : 1;
-	if (ref $dh{DEBUGPACKAGES}) {
+	if ($dh{DEBUGPACKAGE}) {
 		$keep_debug=1;
-		my $debugpackage=@{$dh{DEBUGPACKAGES}}[0];
+		my $debugpackage=$dh{DEBUGPACKAGE};
 		if (!$all_packages{$debugpackage}) {
 			error("debug package $debugpackage is not listed in the control file");
 		}
@@ -360,12 +360,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			close($fd) or error("close $path failed: $!");
 		}
 	}
-	if (@build_ids && ($use_build_id > 1 || ref($dh{DEBUGPACKAGES}))) {
+	if (@build_ids && ($use_build_id > 1 || $dh{DEBUGPACKAGE})) {
 		my ($dir, $path);
 		if ($use_build_id > 1) {
 			$dir = "debian/.debhelper/${package}";
 		} else {
-			my $dbg_pkg = @{$dh{DEBUGPACKAGES}}[0];
+			my $dbg_pkg = $dh{DEBUGPACKAGE};
 			$dir = "debian/.debhelper/${dbg_pkg}";
 		}
 		$path = "${dir}/dbgsym-build-ids";
