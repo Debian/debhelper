@@ -335,16 +335,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	if (@static_libs) {
-		my $strip_help = qx{$strip 2>&1};
-		my @opts = ('--strip-debug', '--remove-section=.comment',
-			'--remove-section=.note');
-		if (index($strip_help, '--enable-deterministic-archives') > -1) {
+		foreach (@static_libs) {
 			# NB: The short variant (-D) is broken in Jessie
 			# (binutils/2.25-3)
-			push(@opts, '--enable-deterministic-archives');
-		}
-		foreach (@static_libs) {
-			doit($strip, @opts, $_);
+			doit($strip, '--strip-debug', '--remove-section=.comment',
+				 '--remove-section=.note', '--enable-deterministic-archives',
+				 $_);
 		}
 	}
 	if ($no_auto_dbgsym and $use_build_id > 1) {
