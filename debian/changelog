@@ -41,6 +41,9 @@ debhelper (9.20160403+unreleased) UNRELEASED; urgency=medium
   * dh_strip: Unconditionally pass --enable-deterministic-archives
     to strip for static libs as the stable version of binutils
     supports it.
+  * dh_strip: Use file(1) to determine the build-id when
+    available.  This saves an readelf call for every binary in
+    the package.
 
  -- Niels Thykier <niels@thykier.net>  Sat, 09 Apr 2016 09:20:32 +0000
 

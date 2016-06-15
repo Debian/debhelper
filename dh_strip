@@ -241,25 +241,27 @@ sub testfile {
 
 sub make_debug {
 	my ($file, $tmp, $desttmp, $use_build_id) = @_;
+	my ($debug_path, $debug_build_id);
 
 	# Don't try to copy debug symbols out if the file is already
 	# stripped.
-	return unless get_file_type($file) =~ /not stripped/;
+	my $file_info = get_file_type($file);
+	return unless $file_info =~ /not stripped/;
 
-	my ($debug_path, $debug_build_id);
-
-	if ($use_build_id &&
-	    `LC_ALL=C readelf -n $file`=~ /^\s+Build ID: ([0-9a-f]{2})([0-9a-f]+)$/m) {
-		$debug_path=$desttmp."/usr/lib/debug/.build-id/$1/$2.debug";
-		$debug_build_id="${1}${2}";
-		push(@build_ids, $debug_build_id);
+	if ($use_build_id) {
+		if ($file_info =~ m/BuildID\[sha1]\s*=\s*([0-9a-f]{2})([0-9a-f]+)/ or
+			  `LC_ALL=C readelf -n $file`=~ /^\s+Build ID: ([0-9a-f]{2})([0-9a-f]+)$/m) {
+			$debug_path=$desttmp."/usr/lib/debug/.build-id/$1/$2.debug";
+			$debug_build_id="${1}${2}";
+			push(@build_ids, $debug_build_id);
+		} elsif ($use_build_id > 1) {
+			# For dbgsyms, we need build-id (else it will not be
+			# co-installable).
+			return if $use_build_id > 1;
+		}
 	}
-	elsif ($use_build_id > 1) {
-		# For dbgsyms, we need build-id (else it will not be
-		# co-installable).
-		return;
-	}
-	else {
+	if (not $debug_path) {
+		# Either not using build_id OR no build-id available
 		my ($base_file)=$file=~/^\Q$tmp\E(.*)/;
 		$debug_path=$desttmp."/usr/lib/debug/".$base_file;
 	}
