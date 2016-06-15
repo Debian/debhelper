@@ -231,11 +231,10 @@ sub testfile {
 # I could just use `file $_[0]`, but this is safer
 sub get_file_type {
 	my ($file) = @_;
-	if ($file_output{$file}) {
-		return $file_output{$file};
-	}
+	return $file_output{$file} if $file_output{$file};
 	open (FILE, '-|') # handle all filenames safely
-		|| exec('file', $file)
+		|| exec('file', '-e', 'apptype', '-e', 'ascii', '-e', 'encoding',
+				'-e', 'cdf', '-e', 'compress', '-e', 'tar', $file)
 		|| die "can't exec file: $!";
 	my $type=<FILE>;
 	close FILE;
