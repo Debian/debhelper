@@ -802,7 +802,14 @@ sub filedoublearray {
 		push @ret, [@line];
 	}
 
-	close DH_FARRAY_IN || error("problem reading $file: $!");
+	if (!close(DH_FARRAY_IN)) {
+		if ($x) {
+			error("Error closing fd/process for $file: $!") if $!;
+			error_exitcode("$file (executable config)");
+		} else {
+			error("problem reading $file: $!");
+		}
+	}
 	
 	return @ret;
 }
