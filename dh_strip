@@ -176,27 +176,16 @@ my $strip = cross_command("strip");
 my $no_auto_dbgsym = 0;
 $no_auto_dbgsym = 1 if get_buildoption('noautodbgsym') or get_buildoption('noddebs');
 
-# I could just use `file $_[0]`, but this is safer
-sub get_file_type {
-	my $file=shift;
-	open (FILE, '-|') # handle all filenames safely
-		|| exec('file', $file)
-		|| die "can't exec file: $!";
-	my $type=<FILE>;
-	close FILE;
-	return $type;
-}
-
 # Check if a file is an elf binary, shared library, or static library,
 # for use by File::Find. It'll fill the 3 first arrays with anything
 # it finds.  The @build_ids will be the collected build-ids (if any)
-my (@shared_libs, @executables, @static_libs, @build_ids);
+my (@shared_libs, @executables, @static_libs, @build_ids, %file_output);
 sub testfile {
-	return if -l $_ or -d $_; # Skip directories and symlinks always.
+	my $fn = $_;
+	return if -l $fn or -d _; # Skip directories and symlinks always.
 	
 	# See if we were asked to exclude this file.
 	# Note that we have to test on the full filename, including directory.
-	my $fn="$File::Find::dir/$_";
 	foreach my $f (@{$dh{EXCLUDE}}) {
 		return if ($fn=~m/\Q$f\E/);
 	}
@@ -207,9 +196,9 @@ sub testfile {
 	# Does its filename look like a shared library?
 	#  - *.cmxs are OCaml native code shared libraries
 	#  - *.node are also native ELF binaries (for node-js)
-	if (m/\.(?:so.*?|cmxs|node)$/) {
+	if ($fn =~ m/\.(?:so.*?|cmxs|node)$/) {
 		# Ok, do the expensive test.
-		my $type=get_file_type($_);
+		my $type=get_file_type($fn);
 		if ($type=~m/ELF.*shared/) {
 			push @shared_libs, $fn;
 			return;
@@ -220,7 +209,7 @@ sub testfile {
 	my (undef,undef,$mode,undef)=stat(_);
 	if ($mode & 0111) {
 		# Ok, expensive test.
-		my $type=get_file_type($_);
+		my $type=get_file_type($fn);
 		if ($type=~m/ELF.*(executable|shared)/) {
 			push @executables, $fn;
 			return;
@@ -228,15 +217,29 @@ sub testfile {
 	}
 	
 	# Is it a static library, and not a debug library?
-	if (m/\/lib[^\/]*\.a$/ && ! m/.*_g\.a$/) {
+	if ($fn =~ m/\/lib[^\/]*\.a$/ && $fn !~ m/.*_g\.a$/) {
 		# Is it a binary file, or something else (maybe a linker
 		# script on Hurd, for example? I don't use file, because
 		# file returns a variety of things on static libraries.
-		if (-B $_) {
+		if (-B $fn) {
 			push @static_libs, $fn;
 			return;
 		}
 	}
+}
+
+# I could just use `file $_[0]`, but this is safer
+sub get_file_type {
+	my ($file) = @_;
+	if ($file_output{$file}) {
+		return $file_output{$file};
+	}
+	open (FILE, '-|') # handle all filenames safely
+		|| exec('file', $file)
+		|| die "can't exec file: $!";
+	my $type=<FILE>;
+	close FILE;
+	return $file_output{$file} = $type;
 }
 
 sub make_debug {
@@ -317,8 +320,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$use_build_id = 2;
 		}
 	}
-	@shared_libs=@executables=@static_libs=@build_ids=();
-	find(\&testfile,$tmp);
+	%file_output=@shared_libs=@executables=@static_libs=@build_ids=();
+	find({
+		wanted => \&testfile,
+		no_chdir => 1,
+	}, $tmp);
 
 	foreach (@shared_libs) {
 		my $debug_path = make_debug($_, $tmp, $debugtmp, $use_build_id) if $keep_debug;
