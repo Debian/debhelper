@@ -1308,7 +1308,7 @@ sub install_dh_config_file {
 	$mode = 0644 if not defined($mode);
 
 	if (!compat(8) and -x $source) {
-		my @sstat = stat($source) || error("cannot stat $source: $!");
+		my @sstat = stat(_) || error("cannot stat $source: $!");
 		open(my $tfd, '>', $target) || error("cannot open $target: $!");
 		chmod($mode, $tfd) || error("cannot chmod $target: $!");
 		open(my $sfd, '-|', $source) || error("cannot run $source: $!");
