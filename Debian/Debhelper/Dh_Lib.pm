@@ -15,7 +15,7 @@ use constant {
 	# warnings
 	'LOWEST_NON_DEPRECATED_COMPAT_LEVEL' => 5,
 	# Highest compat level permitted
-	'MAX_COMPAT_LEVEL' => 10,
+	'MAX_COMPAT_LEVEL' => 11,
 };
 
 use Exporter qw(import);
