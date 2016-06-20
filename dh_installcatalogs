@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Debian::Debhelper::Dh_Lib;
 
-my $sgmlbasever = "1.28";
+my $sgmlbasever = "1.26+nmu2";
 
 =head1 SYNOPSIS
 
@@ -26,10 +26,9 @@ F</etc/sgml/I<package>.cat>.
 
 This command automatically adds maintainer script snippets for
 registering and unregistering the catalogs and supercatalogs (unless
-B<-n> is used). These snippets are inserted into the maintainer
-scripts and the B<triggers> file by B<dh_installdeb>; see
-L<dh_installdeb(1)> for an explanation of Debhelper maintainer script
-snippets.
+B<-n> is used). These snippets are inserted into the maintainer scripts
+by B<dh_installdeb>; see L<dh_installdeb(1)> for an explanation of
+Debhelper maintainer script snippets.
 
 A dependency on B<sgml-base> will be added to B<${misc:Depends}>, so be
 sure your package uses that variable in F<debian/control>.
@@ -54,8 +53,7 @@ start with F</usr/share/sgml/>.
 
 =item B<-n>, B<--noscripts>
 
-Do not modify F<postinst>/F<postrm>/F<prerm> scripts nor add an
-activation trigger.
+Do not modify F<postinst>/F<postrm>/F<prerm> scripts.
 
 =back
 
@@ -110,7 +108,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		close CENTRALCAT;
 
 		if (! $dh{NOSCRIPTS}) {
-			autotrigger($package, "activate", "update-sgmlcatalog");
+			autoscript($package, "preinst", "preinst-sgmlcatalog",
+				   "s%#CENTRALCAT#%$centralcat%g;");
 			autoscript($package, "postrm", "postrm-sgmlcatalog",
 				   "s%#CENTRALCAT#%$centralcat%g;");
 		}
