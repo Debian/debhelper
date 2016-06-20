@@ -110,13 +110,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	find sub {
 		return unless -f and (-x or /\.pl$/);
 		return if $File::Find::dir=~/\/usr\/share\/doc\//;
-		
-		local *F;
-		return unless open F, $_;
-		if (read F, local $_, 32 and m%^#!\s*(/usr/bin/perl|/usr/bin/env\s+perl)\s%) {
+
+		return unless open(my $fd, '<', $_);
+		if (read($fd, local $_, 32) and m%^#!\s*(/usr/bin/perl|/usr/bin/env\s+perl)\s%) {
 			$deps |= PROGRAM;
 		}
-		close F;
+		close($fd);
 	}, $tmp;
 
 	if ($deps) {

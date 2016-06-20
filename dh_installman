@@ -121,26 +121,26 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$gz=$2;
 		}
 
-		my $section;
+		my ($fd, $section);
 		# See if there is a .TH or .Dt entry in the man page. If so,
 		# we'll pull the section field from that.
 		if ($gz) {
-			open (IN, "zcat $page|") or die "$page: $!";
+			$fd = open_gz($page) or die "$page: $!";
 		}
 		else {
-			open (IN, $page) or die "$page: $!";
+			open($fd, '<', $page) or die "$page: $!";
 		}
-		while (<IN>) {
+		while (<$fd>) {
 			if (/^\.TH\s+\S+\s+"?(\d+[^"\s]*)"?/ ||
 			    /^\.Dt\s+\S+\s+(\d+[^\s]*)/) {
 				$section=$1;
 				last;
 			}
 		}
-		close(IN);
+		close($fd);
 		# Failing that, we can try to get it from the filename.
 		if (! $section) {
-			($section)=$basename=~m/.*\.([1-9]\S*)/;
+			($section)=$basename=~m/\.([1-9]\S*)/;
 		}
 
 		# Now get the numeric component of the section.
@@ -158,7 +158,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			# Translated man pages are typically specified by adding the
 			# language code to the filename, so detect that and
 			# redirect to appropriate directory, stripping the code.
-			($langcode)=$basename=~m/.*\.([a-z][a-z](?:_[A-Z][A-Z])?)\.(?:[1-9]|man)/;
+			($langcode)=$basename=~m/\.([a-z][a-z](?:_[A-Z][A-Z])?)\.(?:[1-9]|man)/;
 		}
 		elsif ($dh{LANGUAGE} ne 'C') {
 			$langcode=$dh{LANGUAGE};
@@ -228,14 +228,15 @@ sub find_so_man {
 	}
 
 	# Test first line of file for the .so thing.
+	my $fd;
 	if (/\.gz$/) {
-		open (SOTEST, "zcat $_|") or die "$_: $!";
+		$fd = open_gz($_) or die "$_: $!";
 	}
 	else {
-		open (SOTEST,$_) || die "$_: $!";
+		open($fd, '<', $_) || die "$_: $!";
 	}
-	my $l=<SOTEST>;
-	close SOTEST;
+	my $l = <$fd>;
+	close($fd);
 
 	if (! defined $l) {
 		error("failed to read $_");

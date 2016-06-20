@@ -1,3 +1,68 @@
+debhelper (9.20160618.1) unstable; urgency=medium
+
+  * Dh_Lib.pm: Reject requests for compat 4 instead of
+    silently accepting it (while all helpers no longer
+    check for it).
+
+ -- Niels Thykier <niels@thykier.net>  Sat, 18 Jun 2016 20:52:29 +0000
+
+debhelper (9.20160618) unstable; urgency=medium
+
+  * dh: Fix bug where "--help" or "--list" would not work
+    unless "debian/compat" existed and had a supported
+    compat level.  (Closes: #820508)
+  * dh_compress: Gracefully handle debian (or any other
+    path segment in the package "tmpdir") being a symlink
+    pointing outside the same directory.  Thanks to
+    Bernhard Miklautz for the report.  (Closes: #820711)
+  * Dh_Lib.pm: Compat files are now mandatory.
+  * dh_clean: Remove work around for missing compat file.
+    This removes a confusing warning when the package is
+    not built by CDBS.  (Closes: #811059)
+  * debhelper.pod: Add a line stating that debian/compat
+    is mandatory.  (Closes: #805405)
+  * dh_strip: Apply patch from Peter Pentchev to only strip
+    static libraries with a basename matching "lib.*\.a".
+    (Closes: #820446)
+  * ant.pm: Apply patch from Emmanuel Bourg to pass a
+    normalised "user.name" parameter to ant.
+    (Closes: #824490)
+  * dh_installudev/dh_installmodules: Drop maintainer
+    script snippets for migrating conffiles.
+    - Side effect, avoids portability issue with certain
+      shell implementations.  (Closes: #815158)
+  * autoscripts/*inst-moveconffile: Remove unused files.
+  * dh: Update documentation to reflect the current
+    implementation.
+  * Remove support for compat 4.
+  * dh_strip: Add debuglinks to ELF binaries even with
+    DEB_BUILD_OPTIONS=noautodbgsym to make the regular deb
+    bit-for-bit reproducible with vs. without this flag.
+    Thanks to Helmut Grohne for the report.
+  * dh_installcatalogs: Apply patch from Helmut Grohne to
+    explicitly trigger a new update-sgmlcatalog trigger,
+    since dpkg does not triger conffiles on package removal.
+    (Closes: #825005)
+  * dh_installcatalos: Apply patch from Helmut Grohne to
+    remove autoscript for a transition that completed in
+    Wheezy.
+  * dh_strip: Unconditionally pass --enable-deterministic-archives
+    to strip for static libs as the stable version of binutils
+    supports it.
+  * dh_strip: Use file(1) to determine the build-id when
+    available.  This saves an readelf call for every binary in
+    the package.
+  * dh_strip: Cache file(1) output to avoid calling file(1)
+    twice on all ELF binaries in the package.
+  * Dh_Lib.pm: Add better error messages when a debhelper program
+    fails due to an executable config file not terminating with
+    success.  (Closes: #818933)
+  * dh_strip: Pass -e to file(1) to skip tests for file formats
+    that dh_strip does not care about.
+  * Bump standards-version to 3.9.8 - no changes required.
+
+ -- Niels Thykier <niels@thykier.net>  Sat, 18 Jun 2016 14:41:05 +0000
+
 debhelper (9.20160403~bpo8+1) jessie-backports; urgency=medium
 
   * Rebuild for jessie-backports.
@@ -293,7 +358,7 @@ debhelper (9.20151004) unstable; urgency=medium
     when "-V" is passed to dpkg-gencontrol.  This relies on
     dpkg-deb getting everything but the extension correct
     (see #575059, #452273 for why it does not produce the
-     correct extesion).
+     correct extension).
     (Closes: #516721, #677353, #672282)
   * Dh_Lib.pm: Drop now unused "udeb_filename" subroutine.
   * dh_strip.1: Correct the documentation about ddebs to

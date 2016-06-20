@@ -10,7 +10,7 @@ use warnings;
 
 use constant {
 	# Lowest compat level supported
-	'MIN_COMPAT_LEVEL' => 4,
+	'MIN_COMPAT_LEVEL' => 5,
 	# Lowest compat level that does *not* cause deprecation
 	# warnings
 	'LOWEST_NON_DEPRECATED_COMPAT_LEVEL' => 5,
@@ -36,9 +36,8 @@ use vars qw(@EXPORT %dh);
 	    &get_source_date_epoch &is_cross_compiling
 	    &generated_file &autotrigger &package_section
 	    &restore_file_on_clean &restore_all_files
+	    &open_gz
 );
-
-my $max_compat=10;
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
 my $prefix="/usr";
@@ -125,7 +124,7 @@ sub init {
 # on, if it's exiting successfully.
 my $write_log=1;
 sub END {
-	if ($? == 0 && $write_log && (compat(9) || $ENV{DH_INTERNAL_OVERRIDE})) {
+	if ($? == 0 && $write_log && (compat(9, 1) || $ENV{DH_INTERNAL_OVERRIDE})) {
 		write_log(basename($0), @{$dh{DOPACKAGES}});
 	}
 }
@@ -412,12 +411,12 @@ sub dirname {
 		if (! defined $c) {
 			$c=1;
 			if (-e 'debian/compat') {
-				open (COMPAT_IN, "debian/compat") || error "debian/compat: $!";
-				my $l=<COMPAT_IN>;
-				close COMPAT_IN;
+				open(my $compat_in, '<', "debian/compat") || error "debian/compat: $!";
+				my $l=<$compat_in>;
+				close($compat_in);
 				if (! defined $l || ! length $l) {
-					warning("debian/compat is empty, assuming level $c")
-						unless defined $ENV{DH_COMPAT};
+					error("debian/compat must contain a postive number (found an empty first line)");
+
 				}
 				else {
 					chomp $l;
@@ -429,26 +428,27 @@ sub dirname {
 					}
 				}
 			}
-			else {
-				warning("No compatibility level specified in debian/compat");
-				warning("This package will soon FTBFS; time to fix it!");
+			elsif (not $nowarn) {
+				error("Please specify the compatibility level in debian/compat");
 			}
 
 			if (defined $ENV{DH_COMPAT}) {
 				$c=$ENV{DH_COMPAT};
 			}
 		}
-		if ($c < MIN_COMPAT_LEVEL) {
-			error("Compatibility levels before ${\MIN_COMPAT_LEVEL} are no longer supported (level $c requested)");
-		}
+		if (not $nowarn) {
+			if ($c < MIN_COMPAT_LEVEL) {
+				error("Compatibility levels before ${\MIN_COMPAT_LEVEL} are no longer supported (level $c requested)");
+			}
 
-		if ($c < LOWEST_NON_DEPRECATED_COMPAT_LEVEL && ! $warned_compat && ! $nowarn) {
-			warning("Compatibility levels before ${\LOWEST_NON_DEPRECATED_COMPAT_LEVEL} are deprecated (level $c in use)");
-			$warned_compat=1;
-		}
+			if ($c < LOWEST_NON_DEPRECATED_COMPAT_LEVEL && ! $warned_compat) {
+				warning("Compatibility levels before ${\LOWEST_NON_DEPRECATED_COMPAT_LEVEL} are deprecated (level $c in use)");
+				$warned_compat=1;
+			}
 	
-		if ($c > MAX_COMPAT_LEVEL) {
-			error("Sorry, but ${\MAX_COMPAT_LEVEL} is the highest compatibility level supported by this debhelper.");
+			if ($c > MAX_COMPAT_LEVEL) {
+				error("Sorry, but ${\MAX_COMPAT_LEVEL} is the highest compatibility level supported by this debhelper.");
+			}
 		}
 
 		return ($c <= $num);
@@ -567,7 +567,7 @@ sub pkgfilename {
 		}
 
 		# Is this a native Debian package?
-		if ($dh{VERSION}=~m/.*-/) {
+		if (index($dh{VERSION}, '-') > -1) {
 			return $isnative_cache{$package}=0;
 		}
 		else {
@@ -630,11 +630,11 @@ sub autoscript_sed {
 	my $infile = shift;
 	my $outfile = shift;
 	if (ref($sed) eq 'CODE') {
-		open(IN, $infile) or die "$infile: $!";
-		open(OUT, ">>$outfile") or die "$outfile: $!";
-		while (<IN>) { $sed->(); print OUT }
-		close(OUT) or die "$outfile: $!";
-		close(IN) or die "$infile: $!";
+		open(my $in, '<', $infile) or die "$infile: $!";
+		open(my $out, '>>', $outfile) or die "$outfile: $!";
+		while (<$in>) { $sed->(); print {$out} $_; }
+		close($out) or die "$outfile: $!";
+		close($in) or die "$infile: $!";
 	}
 	else {
 		complex_doit("sed \"$sed\" $infile >> $outfile");
@@ -726,8 +726,8 @@ sub addsubstvar {
 	my $line="";
 	if (-e $substvarfile) {
 		my %items;
-		open(SUBSTVARS_IN, "$substvarfile") || error "read $substvarfile: $!";
-		while (<SUBSTVARS_IN>) {
+		open(my $in, '<', $substvarfile) || error "read $substvarfile: $!";
+		while (<$in>) {
 			chomp;
 			if (/^\Q$substvar\E=(.*)/) {
 				%items = map { $_ => 1} split(", ", $1);
@@ -735,7 +735,7 @@ sub addsubstvar {
 				last;
 			}
 		}
-		close SUBSTVARS_IN;
+		close($in);
 		if (! $remove) {
 			$items{$str}=1;
 		}
@@ -776,14 +776,14 @@ sub filedoublearray {
 		delete $ENV{"DH_CONFIG_ACT_ON_PACKAGES"};
 	}
 	else {
-		open (DH_FARRAY_IN, $file) || error("cannot read $file: $!");
+		open (DH_FARRAY_IN, '<', $file) || error("cannot read $file: $!");
 	}
 
 	my @ret;
 	while (<DH_FARRAY_IN>) {
 		chomp;
 		# Only ignore comments and empty lines in v5 mode.
-		if (! compat(4) && ! $x)  {
+		if (not $x)  {
 			next if /^#/ || /^$/;
 		}
 		my @line;
@@ -802,7 +802,14 @@ sub filedoublearray {
 		push @ret, [@line];
 	}
 
-	close DH_FARRAY_IN || error("problem reading $file: $!");
+	if (!close(DH_FARRAY_IN)) {
+		if ($x) {
+			error("Error closing fd/process for $file: $!") if $!;
+			error_exitcode("$file (executable config)");
+		} else {
+			error("problem reading $file: $!");
+		}
+	}
 	
 	return @ret;
 }
@@ -889,18 +896,18 @@ sub is_cross_compiling {
 
 # Returns source package name
 sub sourcepackage {
-	open (CONTROL, 'debian/control') ||
+	open (my $fd, '<', 'debian/control') ||
 	    error("cannot read debian/control: $!\n");
-	while (<CONTROL>) {
+	while (<$fd>) {
 		chomp;
 		s/\s+$//;
 		if (/^Source:\s*(.*)/i) {
-			close CONTROL;
+			close($fd);
 			return $1;
 		}
 	}
 
-	close CONTROL;
+	close($fd);
 	error("could not find Source: line in control file.");
 }
 
@@ -936,9 +943,9 @@ sub getpackages {
 	if (exists $ENV{'DEB_BUILD_PROFILES'}) {
 		@profiles=split /\s+/, $ENV{'DEB_BUILD_PROFILES'};
 	}
-	open (CONTROL, 'debian/control') ||
+	open (my $fd, '<', 'debian/control') ||
 		error("cannot read debian/control: $!\n");
-	while (<CONTROL>) {
+	while (<$fd>) {
 		chomp;
 		s/\s+$//;
 		if (/^Package:\s*(.*)/i) {
@@ -1007,7 +1014,7 @@ sub getpackages {
 			$section='';
 		}
 	}
-	close CONTROL;
+	close($fd);
 
 	return @{$packages_by_type{$type}};
 }
@@ -1398,6 +1405,21 @@ sub restore_all_files {
 	return;
 }
 
+sub open_gz {
+	my ($file) = @_;
+	my $fd;
+	eval {
+		require PerlIO::gzip;
+	};
+	if ($@) {
+		open($fd, '-|', 'gzip', '-dc', $file)
+		  or die("gzip -dc $file failed: $!");
+	} else {
+		open($fd, '<:gzip', $file)
+		  or die("open $file [<:gzip] failed: $!");
+	}
+	return $fd;
+}
 
 1
 

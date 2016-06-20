@@ -42,9 +42,11 @@ sub AddPackage { my($option,$value)=@_;
 	}
 }
 
-# Adds packages to the list of debug packages.
-sub AddDebugPackage { my($option,$value)=@_;
-	push @{$dh{DEBUGPACKAGES}}, $value;
+# Sets a package as the debug package.
+sub SetDebugPackage { my($option,$value)=@_;
+	$dh{DEBUGPACKAGE} = $value;
+	# For backwards compatibility
+	$dh{DEBUGPACKAGES} = [$value];
 }
 
 # Add a package to a list of packages that should not be acted on.
@@ -96,7 +98,7 @@ sub getoptions {
 	
 		"remaining-packages" => \$dh{EXCLUDE_LOGGED},
 	
-		"dbg-package=s" => \&AddDebugPackage,
+		"dbg-package=s" => \&SetDebugPackage,
 		
 		"s" => \&AddPackage,
 		"same-arch" => \&AddPackage,

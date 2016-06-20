@@ -273,11 +273,12 @@ From time to time, major non-backwards-compatible changes need to be made
 to debhelper, to keep it clean and well-designed as needs change and its
 author gains more experience. To prevent such major changes from breaking
 existing packages, the concept of debhelper compatibility levels was 
-introduced. You tell debhelper which compatibility level it should use, and
-it modifies its behavior in various ways.
+introduced. You must tell debhelper which compatibility level it should use, and
+it modifies its behavior in various ways.  The compatibility level is
+specified in the F<debian/compat> file and the file must be present.
 
 Tell debhelper what compatibility level to use by writing a number to
-F<debian/compat>. For example, to turn on v9 mode:
+F<debian/compat>. For example, to use v9 mode:
 
   % echo 9 > debian/compat
 
@@ -298,65 +299,9 @@ These are the available compatibility levels:
 
 =over 4
 
-=item v3
-
-This is the lowest supported compatibility level.
-
-This mode is deprecated.
-
-=item v4
-
-Changes from v3 are:
-
-=over 8
-
-=item -
-
-B<dh_makeshlibs -V> will not include the Debian part of the version number in
-the generated dependency line in the shlibs file.
-
-=item -
-
-You are encouraged to put the new B<${misc:Depends}> into F<debian/control> to
-supplement the B<${shlibs:Depends}> field.
-
-=item -
-
-B<dh_fixperms> will make all files in F<bin/> directories and in F<etc/init.d>
-executable.
-
-=item -
-
-B<dh_link> will correct existing links to conform with policy.
-
-=back
-
-This mode is deprecated.
-
 =item v5
 
-Changes from v4 are:
-
-=over 8
-
-=item -
-
-Comments are ignored in debhelper config files.
-
-=item -
-
-B<dh_strip --dbg-package> now specifies the name of a package to put debugging
-symbols in, not the packages to take the symbols from.
-
-=item -
-
-B<dh_installdocs> skips installing empty files.
-
-=item -
-
-B<dh_install> errors out if wildcards expand to nothing.
-
-=back
+This is the lowest supported compatibility level.
 
 =item v6
 

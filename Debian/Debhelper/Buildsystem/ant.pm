@@ -32,6 +32,10 @@ sub build {
 	if ( -f $d_ant_prop ) {
 		push(@args, '-propertyfile', $d_ant_prop);
 	}
+
+	# Set the username to improve the reproducibility
+	push(@args, "-Duser.name", "debian");
+
 	$this->doit_in_sourcedir("ant", @args, @_);
 }
 

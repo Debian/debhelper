@@ -214,17 +214,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	if (@docs) {
-		my $exclude = '';
+		my $exclude = ' -and ! -empty';
 		if ($dh{EXCLUDE_FIND}) {
 			$exclude .= ' -and ! \( '.$dh{EXCLUDE_FIND}.' \)';
 		}
-		if (! compat(4)) {
-			# ignore empty files in subdirs
-			$exclude .= ' -and ! -empty';
-		}
 		foreach my $doc (@docs) {
 			next if excludefile($doc);
-			next if -e $doc && ! -s $doc && ! compat(4); # ignore empty files
+			next if -e $doc && ! -s $doc; # ignore empty files
 			ensure_docdir($package);
 			if (-d $doc && length $exclude) {
 				my $basename = basename($doc);
@@ -304,8 +300,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		next if $fn=~/\.EX$/;
 		next if excludefile($fn);
 		# Parse the file to get the doc id.
-		open (IN, "debian/$fn") || die "Cannot read debian/$fn.";
-		while (<IN>) {
+		open(my $fd, '<', "debian/$fn") || die "Cannot read debian/$fn.";
+		while (<$fd>) {
 			s/\s*$//;
 			if (/^Document\s*:\s*(.*)/) {
 				$doc_ids{$fn}=$1;
@@ -315,7 +311,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (! exists $doc_ids{$fn}) {
 			warning("Could not parse $fn for doc-base Document id; skipping");
 		}
-		close IN;
+		close($fd);
 	}
 	closedir(DEB);
 	

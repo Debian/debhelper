@@ -60,12 +60,6 @@ package.
 For example, if your packages are libfoo and foo and you want to include a
 I<foo-dbg> package with debugging symbols, use B<dh_strip --dbg-package=>I<foo-dbg>.
 
-Note that this option behaves significantly different in debhelper
-compatibility levels 4 and below. Instead of specifying the name of a debug
-package to put symbols in, it specifies a package (or packages) which
-should have separated debug symbols, and the separated symbols are placed
-in packages with B<-dbg> added to their name.
-
 This option implies B<--no-automatic-dbgsym> and I<cannot> be used
 with B<--automatic-dbgsym> or B<--dbgsym-migration>.
 
@@ -129,7 +123,10 @@ debug symbol packages.
 
 The automatic creation of debug symbol packages can also be prevented
 by adding B<noautodbgsym> to the B<DEB_BUILD_OPTIONS> environment
-variable.
+variable.  However, B<dh_strip> will still add debuglinks to ELF
+binaries when this flag is set.  This is to ensure that the regular
+deb package will be identical with and without this flag (assuming it
+is otherwise "bit-for-bit" reproducible).
 
 =head1 CONFORMS TO
 
@@ -180,29 +177,19 @@ if (get_buildoption('nostrip')) {
 
 my $objcopy = cross_command("objcopy");
 my $strip = cross_command("strip");
-$dh{ENABLE_DBGSYM} = 0 if get_buildoption('noautodbgsym') or get_buildoption('noddebs');
-
-# I could just use `file $_[0]`, but this is safer
-sub get_file_type {
-	my $file=shift;
-	open (FILE, '-|') # handle all filenames safely
-		|| exec('file', $file)
-		|| die "can't exec file: $!";
-	my $type=<FILE>;
-	close FILE;
-	return $type;
-}
+my $no_auto_dbgsym = 0;
+$no_auto_dbgsym = 1 if get_buildoption('noautodbgsym') or get_buildoption('noddebs');
 
 # Check if a file is an elf binary, shared library, or static library,
 # for use by File::Find. It'll fill the 3 first arrays with anything
 # it finds.  The @build_ids will be the collected build-ids (if any)
-my (@shared_libs, @executables, @static_libs, @build_ids);
+my (@shared_libs, @executables, @static_libs, @build_ids, %file_output);
 sub testfile {
-	return if -l $_ or -d $_; # Skip directories and symlinks always.
+	my $fn = $_;
+	return if -l $fn or -d _; # Skip directories and symlinks always.
 	
 	# See if we were asked to exclude this file.
 	# Note that we have to test on the full filename, including directory.
-	my $fn="$File::Find::dir/$_";
 	foreach my $f (@{$dh{EXCLUDE}}) {
 		return if ($fn=~m/\Q$f\E/);
 	}
@@ -213,10 +200,10 @@ sub testfile {
 	# Does its filename look like a shared library?
 	#  - *.cmxs are OCaml native code shared libraries
 	#  - *.node are also native ELF binaries (for node-js)
-	if (m/.*\.(?:so.*?|cmxs|node)$/) {
+	if ($fn =~ m/\.(?:so.*?|cmxs|node)$/) {
 		# Ok, do the expensive test.
-		my $type=get_file_type($_);
-		if ($type=~m/.*ELF.*shared.*/) {
+		my $type=get_file_type($fn);
+		if ($type=~m/ELF.*shared/) {
 			push @shared_libs, $fn;
 			return;
 		}
@@ -226,46 +213,62 @@ sub testfile {
 	my (undef,undef,$mode,undef)=stat(_);
 	if ($mode & 0111) {
 		# Ok, expensive test.
-		my $type=get_file_type($_);
-		if ($type=~m/.*ELF.*(executable|shared).*/) {
+		my $type=get_file_type($fn);
+		if ($type=~m/ELF.*(executable|shared)/) {
 			push @executables, $fn;
 			return;
 		}
 	}
 	
 	# Is it a static library, and not a debug library?
-	if (m/lib.*\.a$/ && ! m/.*_g\.a$/) {
+	if ($fn =~ m/\/lib[^\/]*\.a$/ && $fn !~ m/.*_g\.a$/) {
 		# Is it a binary file, or something else (maybe a linker
 		# script on Hurd, for example? I don't use file, because
 		# file returns a variety of things on static libraries.
-		if (-B $_) {
+		if (-B $fn) {
 			push @static_libs, $fn;
 			return;
 		}
 	}
 }
 
+# I could just use `file $_[0]`, but this is safer
+sub get_file_type {
+	my ($file) = @_;
+	return $file_output{$file} if $file_output{$file};
+	open (FILE, '-|') # handle all filenames safely
+		|| exec('file', '-e', 'apptype', '-e', 'ascii', '-e', 'encoding',
+				'-e', 'cdf', '-e', 'compress', '-e', 'tar', $file)
+		|| die "can't exec file: $!";
+	my $type=<FILE>;
+	close FILE;
+	return $file_output{$file} = $type;
+}
+
 sub make_debug {
 	my ($file, $tmp, $desttmp, $use_build_id) = @_;
+	my ($debug_path, $debug_build_id);
 
 	# Don't try to copy debug symbols out if the file is already
 	# stripped.
-	return unless get_file_type($file) =~ /not stripped/;
+	my $file_info = get_file_type($file);
+	return unless $file_info =~ /not stripped/;
 
-	my ($base_file)=$file=~/^\Q$tmp\E(.*)/;
-	my ($debug_path, $debug_build_id);
-
-	if ($use_build_id &&
-	    `LC_ALL=C readelf -n $file`=~ /^\s+Build ID: ([0-9a-f]{2})([0-9a-f]+)$/m) {
-		$debug_path=$desttmp."/usr/lib/debug/.build-id/$1/$2.debug";
-		$debug_build_id="${1}${2}";
+	if ($use_build_id) {
+		if ($file_info =~ m/BuildID\[sha1]\s*=\s*([0-9a-f]{2})([0-9a-f]+)/ or
+			  `LC_ALL=C readelf -n $file`=~ /^\s+Build ID: ([0-9a-f]{2})([0-9a-f]+)$/m) {
+			$debug_path=$desttmp."/usr/lib/debug/.build-id/$1/$2.debug";
+			$debug_build_id="${1}${2}";
+			push(@build_ids, $debug_build_id);
+		} elsif ($use_build_id > 1) {
+			# For dbgsyms, we need build-id (else it will not be
+			# co-installable).
+			return if $use_build_id > 1;
+		}
 	}
-	elsif ($use_build_id > 1) {
-		# For dbgsyms, we need build-id (else it will not be
-		# co-installable).
-		return;
-	}
-	else {
+	if (not $debug_path) {
+		# Either not using build_id OR no build-id available
+		my ($base_file)=$file=~/^\Q$tmp\E(.*)/;
 		$debug_path=$desttmp."/usr/lib/debug/".$base_file;
 	}
 	my $debug_dir=dirname($debug_path);
@@ -278,10 +281,6 @@ sub make_debug {
 	else {
 		# Compat 9 OR a dbgsym package.
 		doit($objcopy, "--only-keep-debug", "--compress-debug-sections", $file, $debug_path);
-	}
-
-	if ($use_build_id and defined($debug_build_id)) {
-		push(@build_ids, $debug_build_id);
 	}
 
 	# No reason for this to be executable.
@@ -304,23 +303,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $keep_debug=$dh{K_FLAG};
 	my $debugtmp=$tmp;
 	my $use_build_id = compat(8) ? 0 : 1;
-	if (! compat(4)) {
-		if (ref $dh{DEBUGPACKAGES}) {
-			$keep_debug=1;
-			# Note that it's only an array for the v4 stuff;
-			# for v5 only one value is used.
-			my $debugpackage=@{$dh{DEBUGPACKAGES}}[0];
-			if (!$all_packages{$debugpackage}) {
-				error("debug package $debugpackage is not listed in the control file");
-			}
-			$debugtmp=tmpdir($debugpackage);
+	if ($dh{DEBUGPACKAGE}) {
+		$keep_debug=1;
+		my $debugpackage=$dh{DEBUGPACKAGE};
+		if (!$all_packages{$debugpackage}) {
+			error("debug package $debugpackage is not listed in the control file");
 		}
-	}
-	else {
-		if (ref $dh{DEBUGPACKAGES} && grep { $_ eq $package } @{$dh{DEBUGPACKAGES}}) {
-			$keep_debug=1;
-			$debugtmp=tmpdir($package."-dbg");
-		}
+		$debugtmp=tmpdir($debugpackage);
 	}
 	# Temporary workaround: Do not build dbgsym packages for udebs as
 	# dpkg-gencontrol and dpkg-deb does not agree on the file
@@ -334,8 +323,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$use_build_id = 2;
 		}
 	}
-	@shared_libs=@executables=@static_libs=@build_ids=();
-	find(\&testfile,$tmp);
+	%file_output=@shared_libs=@executables=@static_libs=@build_ids=();
+	find({
+		wanted => \&testfile,
+		no_chdir => 1,
+	}, $tmp);
 
 	foreach (@shared_libs) {
 		my $debug_path = make_debug($_, $tmp, $debugtmp, $use_build_id) if $keep_debug;
@@ -354,17 +346,23 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	if (@static_libs) {
-		my $strip_help = qx{$strip 2>&1};
-		my @opts = ('--strip-debug', '--remove-section=.comment',
-			'--remove-section=.note');
-		if (index($strip_help, '--enable-deterministic-archives') > -1) {
+		foreach (@static_libs) {
 			# NB: The short variant (-D) is broken in Jessie
 			# (binutils/2.25-3)
-			push(@opts, '--enable-deterministic-archives');
+			doit($strip, '--strip-debug', '--remove-section=.comment',
+				 '--remove-section=.note', '--enable-deterministic-archives',
+				 $_);
 		}
-		foreach (@static_libs) {
-			doit($strip, @opts, $_);
-		}
+	}
+	if ($no_auto_dbgsym and $use_build_id > 1) {
+		# When DEB_BUILD_OPTIONS contains noautodbgsym, remove the
+		# dbgsym dir and clear the build-ids.
+		#
+		# Note we have to extract the dbg symbols as usual, since
+		# attach_debug (objcopy --add-gnu-debuglink) requires the dbg
+		# file to exist.
+		doit('rm', '-fr', $debugtmp);
+		@build_ids = ();
 	}
 	if ($use_build_id > 1 and -d $debugtmp) {
 		my $dbgsym_docdir = "${debugtmp}/usr/share/doc";
@@ -380,12 +378,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			close($fd) or error("close $path failed: $!");
 		}
 	}
-	if (@build_ids && ($use_build_id > 1 || ref($dh{DEBUGPACKAGES}))) {
+	if (@build_ids && ($use_build_id > 1 || $dh{DEBUGPACKAGE})) {
 		my ($dir, $path);
 		if ($use_build_id > 1) {
 			$dir = "debian/.debhelper/${package}";
 		} else {
-			my $dbg_pkg = @{$dh{DEBUGPACKAGES}}[0];
+			my $dbg_pkg = $dh{DEBUGPACKAGE};
 			$dir = "debian/.debhelper/${dbg_pkg}";
 		}
 		$path = "${dir}/dbgsym-build-ids";

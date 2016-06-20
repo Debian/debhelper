@@ -110,9 +110,9 @@ sub find_so_man {
 	}
 
 	# Test first line of file for the .so thing.
-	open (SOTEST,$_);
-	my $l=<SOTEST>;
-	close SOTEST;
+	open(my $fd, '<', $_);
+	my $l = <$fd>;
+	close($fd);
 	if ($l=~m/\.so\s+(.*)/) {
 		my $solink=$1;
 		# This test is here to prevent links like ... man8/../man8/foo.8
@@ -158,13 +158,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if ($install) {
 			my $extdir="share";
 			
-			my ($section)=$basename=~m/.*\.([1-9])/;
+			my ($section)=$basename=~m/\.([1-9])/;
 			
 			my $destdir="$tmp/usr/$extdir/man/man$section/";
 			
 			# Handle translated man pages.
 			my $instname=$basename;
-			my ($langcode)=$basename=~m/.*\.([a-z][a-z])\.([1-9])/;
+			my ($langcode)=$basename=~m/\.([a-z][a-z])\.([1-9])/;
 			if (defined $langcode && $langcode ne '') {
 				$destdir="$tmp/usr/$extdir/man/$langcode/man$section/";
 				$instname=~s/\.$langcode\./\./;
