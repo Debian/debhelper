@@ -276,7 +276,8 @@ sub make_debug {
 	}
 	else {
 		# Compat 9 OR a dbgsym package.
-		doit($objcopy, "--only-keep-debug", "--compress-debug-sections", $file, $debug_path);
+		doit($objcopy, "--only-keep-debug", "--compress-debug-sections", $file, $debug_path)
+			unless -e $debug_path;
 	}
 
 	# No reason for this to be executable.
