@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 299;
+use Test::More tests => 300;
 
 use strict;
 use warnings;
@@ -509,37 +509,41 @@ ok ( ! -e 'bld', "bld got deleted too" );
 
 # Test clean_jobserver_makeflags.
 
-$ENV{MAKEFLAGS} = "--jobserver-fds=103,104 -j";
-clean_jobserver_makeflags();
-ok(! exists $ENV{MAKEFLAGS}, "unset makeflags");
+test_clean_jobserver_makeflags('--jobserver-fds=103,104 -j',
+                               undef,
+                               'unset makeflags');
 
-$ENV{MAKEFLAGS} = "-a --jobserver-fds=103,104 -j -b";
-clean_jobserver_makeflags();
-is($ENV{MAKEFLAGS}, "-a -b", "clean makeflags");
+test_clean_jobserver_makeflags('-a --jobserver-fds=103,104 -j -b',
+                               '-a -b',
+                               'clean makeflags');
 
-$ENV{MAKEFLAGS} = " --jobserver-fds=1,2 -j  ";
-clean_jobserver_makeflags();
-ok(! exists $ENV{MAKEFLAGS}, "unset makeflags");
+test_clean_jobserver_makeflags(' --jobserver-fds=1,2 -j  ',
+                               undef,
+                               'unset makeflags');
 
-$ENV{MAKEFLAGS} = "-a -j -b";
-clean_jobserver_makeflags();
-is($ENV{MAKEFLAGS}, "-a -j -b", "clean makeflags does not remove -j");
+test_clean_jobserver_makeflags('-a -j -b',
+                               '-a -j -b',
+                               'clean makeflags does not remove -j');
 
-$ENV{MAKEFLAGS} = "-a --jobs -b";
-clean_jobserver_makeflags();
-is($ENV{MAKEFLAGS}, "-a --jobs -b", "clean makeflags does not remove --jobs");
+test_clean_jobserver_makeflags('-a --jobs -b',
+                               '-a --jobs -b',
+                               'clean makeflags does not remove --jobs');
 
-$ENV{MAKEFLAGS} = "-j6";
-clean_jobserver_makeflags();
-is($ENV{MAKEFLAGS}, "-j6", "clean makeflags does not remove -j6");
+test_clean_jobserver_makeflags('-j6',
+                               '-j6',
+                               'clean makeflags does not remove -j6');
 
-$ENV{MAKEFLAGS} = "-a -j6 --jobs=7";
-clean_jobserver_makeflags();
-is($ENV{MAKEFLAGS}, "-a -j6 --jobs=7", "clean makeflags does not remove -j or --jobs");
+test_clean_jobserver_makeflags('-a -j6 --jobs=7',
+                               '-a -j6 --jobs=7',
+                               'clean makeflags does not remove -j or --jobs');
 
-$ENV{MAKEFLAGS} = "-j6 --jobserver-fds=103,104 --jobs=8";
-clean_jobserver_makeflags();
-is($ENV{MAKEFLAGS}, "-j6 --jobs=8", "jobserver options removed");
+test_clean_jobserver_makeflags('-j6 --jobserver-fds=103,104 --jobs=8',
+                               '-j6 --jobs=8',
+                               'jobserver options removed');
+
+test_clean_jobserver_makeflags('-j6 --jobserver-auth=103,104 --jobs=8',
+                               '-j6 --jobs=8',
+                               'jobserver options removed');
 
 # Test parallel building with makefile build system.
 $ENV{MAKEFLAGS} = "";
@@ -568,6 +572,14 @@ sub test_is_parallel {
 	my ($got, $desc) = @_;
 	is_deeply( $got, [] , $desc );
 	is( $?, 0, "(exit status=0) $desc");
+}
+
+sub test_clean_jobserver_makeflags {
+    my ($orig, $expected, $test) = @_;
+
+    local $ENV{MAKEFLAGS} = $orig;
+    clean_jobserver_makeflags();
+    is($ENV{MAKEFLAGS}, $expected, $test);
 }
 
 test_isnt_parallel( do_parallel_mk(),

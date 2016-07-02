@@ -1193,7 +1193,7 @@ sub _expand_path {
 # the FD used to communicate with it is actually not available.
 sub is_make_jobserver_unavailable {
 	if (exists $ENV{MAKEFLAGS} && 
-	    $ENV{MAKEFLAGS} =~ /(?:^|\s)--jobserver-fds=(\d+)/) {
+	    $ENV{MAKEFLAGS} =~ /(?:^|\s)--jobserver-(?:fds|auth)=(\d+)/) {
 		if (!open(my $in, "<&$1")) {
 			return 1; # unavailable
 		}
@@ -1209,8 +1209,8 @@ sub is_make_jobserver_unavailable {
 # Cleans out jobserver options from MAKEFLAGS.
 sub clean_jobserver_makeflags {
 	if (exists $ENV{MAKEFLAGS}) {
-		if ($ENV{MAKEFLAGS} =~ /(?:^|\s)--jobserver-fds=(\d+)/) {
-			$ENV{MAKEFLAGS} =~ s/(?:^|\s)--jobserver-fds=\S+//g;
+		if ($ENV{MAKEFLAGS} =~ /(?:^|\s)--jobserver-(?:fds|auth)=\d+/) {
+			$ENV{MAKEFLAGS} =~ s/(?:^|\s)--jobserver-(?:fds|auth)=\S+//g;
 			$ENV{MAKEFLAGS} =~ s/(?:^|\s)-j\b//g;
 		}
 		delete $ENV{MAKEFLAGS} if $ENV{MAKEFLAGS} =~ /^\s*$/;
