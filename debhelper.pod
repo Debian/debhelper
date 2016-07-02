@@ -577,6 +577,18 @@ The B<-s> (B<--same-arch>) option is removed.
 Invoking B<dh_clean -k> now causes an error instead of a deprecation
 warning.
 
+=item -
+
+B<dh_installdocs> now installs user-supplied documentation
+(e.g. debian/I<package>.docs) into F</usr/share/doc/mainpackage>
+rather than F</usr/share/doc/package> by default as recommended by
+Debian Policy 3.9.7.
+
+If you need the old behaviour, it can be emulated by using the
+B<--mainpackage> option.
+
+Please remember to check/update your doc-base files.
+
 =back
 
 =back
