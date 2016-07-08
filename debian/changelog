@@ -1,3 +1,15 @@
+debhelper (9.20160702+unreleased) UNRELEASED; urgency=medium
+
+  * Explicitly Build-Depends on perl:any for pod2man instead
+    of relying on it implicitly via libdpkg-perl.
+  * dh_shlibdeps: Clarify that -L is also useful for packages
+    using debian/shlibs.local for private libraries.
+  * dh_installdocs: Apply patch from Sven Joachim to fix a
+    regression with --link-doc and installing extra
+    documentation.  (Closes: #830309)
+
+ -- Niels Thykier <niels@thykier.net>  Fri, 08 Jul 2016 09:44:48 +0000
+
 debhelper (9.20160702) unstable; urgency=medium
 
   * Start on compat 11.
@@ -19,13 +31,6 @@ debhelper (9.20160702) unstable; urgency=medium
     contains perl programs (but no modules of any kind).
     Thanks to Javier Serrano Polo and Niko Tyni for the
     report and feedback.  (Closes: #824696)
-  * Explicitly Build-Depends on perl:any for pod2man instead
-    of relying on it implicitly via libdpkg-perl.
-  * dh_shlibdeps: Clarify that -L is also useful for packages
-    using debian/shlibs.local for private libraries.
-  * dh_installdocs: Apply patch from Sven Joachim to fix a
-    regression with --link-doc and installing extra
-    documentation.  (Closes: #830309)
 
   [ Translations ]
   * Update German translation (Chris Leick + Eduard Bloch)
