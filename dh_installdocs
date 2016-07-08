@@ -227,7 +227,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$target_package = $dh{MAINPACKAGE};
 		}
 		my $target_dir = "$tmp/usr/share/doc/$target_package";
-		install_dir($target_dir);
+		ensure_docdir($target_package);
 		foreach my $doc (@docs) {
 			next if excludefile($doc);
 			next if -e $doc && ! -s $doc; # ignore empty files
