@@ -293,6 +293,10 @@ if (not compat(9, 1)) {
 	# sequence add-on so existing --without=autoreconf
 	unshift(@ARGV, "--with=autoreconf");
 }
+if (not compat(10, 1)) {
+	# Enable systemd support by default in compat 11 or later.
+	unshift(@ARGV, "--with=systemd");
+}
 
 inhibit_log();
 		
