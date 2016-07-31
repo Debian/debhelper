@@ -58,8 +58,10 @@ will automatically guess the destination to use, the same as if the
 =item debian/not-installed
 
 List the files that are deliberately not installed in I<any> binary
-package.  Paths listed in this file are ignored by the check done via
-B<--list-missing> (or B<--fail-missing>).
+package.  Paths listed in this file are (I<only>) ignored by the check
+done via B<--list-missing> (or B<--fail-missing>).  However, it is
+B<not> a method to exclude files from being installed.  Please use
+B<--exclude> for that.
 
 Please keep in mind that dh_install will B<not> expand wildcards in
 this file.
