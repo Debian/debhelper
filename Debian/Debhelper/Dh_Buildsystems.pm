@@ -190,7 +190,8 @@ sub buildsystems_list {
 	my $step=shift;
 
 	my @buildsystems = load_all_buildsystems();
-	my $auto = autoselect_buildsystem($step, grep { ! $_->{thirdparty} } @buildsystems);
+	my %auto_selectable = map { $_ => 1 } @THIRD_PARTY_BUILDSYSTEMS;
+	my $auto = autoselect_buildsystem($step, grep { ! $_->{thirdparty} || $auto_selectable{$_->NAME} } @buildsystems);
 	my $specified;
 
 	# List build systems (including auto and specified status)
