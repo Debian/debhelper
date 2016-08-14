@@ -134,8 +134,16 @@ sub load_all_buildsystems {
 		delete $buildsystems{$name};
 	}
 
+	foreach my $name (@THIRD_PARTY_BUILDSYSTEMS) {
+		next if not exists $buildsystems{$name};
+		my $inst = $buildsystems{$name};
+		$inst->{thirdparty} = 1;
+		push(@buildsystems, $inst);
+		delete($buildsystems{$name});
+	}
+
 	# The rest are 3rd party build systems
-	foreach my $name (keys %buildsystems) {
+	foreach my $name (sort(keys(%buildsystems))) {
 		my $inst = $buildsystems{$name};
 		$inst->{thirdparty} = 1;
 		push @buildsystems, $inst;
