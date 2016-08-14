@@ -31,6 +31,11 @@ our @BUILDSYSTEMS = (
 	"qmake_qt4",
 );
 
+our @THIRD_PARTY_BUILDSYSTEMS = (
+	'maven',
+	'gradle',
+);
+
 my $opt_buildsys;
 my $opt_sourcedir;
 my $opt_builddir;
@@ -97,6 +102,9 @@ sub load_buildsystem {
 		my @buildsystems;
 		foreach $system (@BUILDSYSTEMS) {
 			push @buildsystems, create_buildsystem_instance($system, 1, @_);
+		}
+		foreach $system (@THIRD_PARTY_BUILDSYSTEMS) {
+			push @buildsystems, create_buildsystem_instance($system, 0, @_);
 		}
 		return autoselect_buildsystem($step, @buildsystems);
 	}
