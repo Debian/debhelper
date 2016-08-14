@@ -38,12 +38,12 @@ my $opt_list;
 my $opt_parallel;
 
 sub create_buildsystem_instance {
-	my $system=shift;
-	my %bsopts=@_;
+	my ($system, $required, %bsopts) = @_;
 	my $module = "Debian::Debhelper::Buildsystem::$system";
 
 	eval "use $module";
 	if ($@) {
+		return if not $required;
 		error("unable to load build system class '$system': $@");
 	}
 
@@ -89,14 +89,14 @@ sub load_buildsystem {
 	my $system=shift;
 	my $step=shift;
 	if (defined $system) {
-		my $inst = create_buildsystem_instance($system, @_);
+		my $inst = create_buildsystem_instance($system, 1, @_);
 		return $inst;
 	}
 	else {
 		# Try to determine build system automatically
 		my @buildsystems;
 		foreach $system (@BUILDSYSTEMS) {
-			push @buildsystems, create_buildsystem_instance($system, @_);
+			push @buildsystems, create_buildsystem_instance($system, 1, @_);
 		}
 		return autoselect_buildsystem($step, @buildsystems);
 	}
@@ -113,7 +113,7 @@ sub load_all_buildsystems {
 				my $name = basename($module_path);
 				$name =~ s/\.pm$//;
 				next if exists $buildsystems{$name};
-				$buildsystems{$name} = create_buildsystem_instance($name, @_);
+				$buildsystems{$name} = create_buildsystem_instance($name, 1, @_);
 			}
 		}
 	}
