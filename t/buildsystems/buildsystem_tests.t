@@ -295,7 +295,7 @@ sub test_autoselection {
 	my $expected=shift;
 	my %args=@_;
 	for my $step (@STEPS) {
-		my $bs = load_buildsystem(undef, $step, @_);
+		my $bs = load_buildsystem({'enable-thirdparty' => 0}, $step, @_);
 		my $e = $expected;
 		$e = $expected->{$step} if ref $expected;
 		if (defined $bs) {

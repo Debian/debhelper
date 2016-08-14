@@ -93,6 +93,11 @@ sub autoselect_buildsystem {
 sub load_buildsystem {
 	my $system=shift;
 	my $step=shift;
+	my $system_options;
+	if (defined($system) && ref($system) eq 'HASH') {
+		$system_options = $system;
+		$system = $system_options->{'system'};
+	}
 	if (defined $system) {
 		my $inst = create_buildsystem_instance($system, 1, @_);
 		return $inst;
@@ -103,8 +108,10 @@ sub load_buildsystem {
 		foreach $system (@BUILDSYSTEMS) {
 			push @buildsystems, create_buildsystem_instance($system, 1, @_);
 		}
-		foreach $system (@THIRD_PARTY_BUILDSYSTEMS) {
-			push @buildsystems, create_buildsystem_instance($system, 0, @_);
+		if (!$system_options || $system_options->{'enable-thirdparty'}) {
+			foreach $system (@THIRD_PARTY_BUILDSYSTEMS) {
+				push @buildsystems, create_buildsystem_instance($system, 0, @_);
+			}
 		}
 		return autoselect_buildsystem($step, @buildsystems);
 	}
