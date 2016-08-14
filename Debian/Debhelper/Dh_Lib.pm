@@ -14,9 +14,22 @@ use constant {
 	# Lowest compat level that does *not* cause deprecation
 	# warnings
 	'LOWEST_NON_DEPRECATED_COMPAT_LEVEL' => 5,
+	# Highest "open-beta" compat level.  Remember to notify
+	# debian-devel@l.d.o before bumping this.
+	'BETA_TESTER_COMPAT' => 10,
 	# Highest compat level permitted
 	'MAX_COMPAT_LEVEL' => 11,
 };
+
+my %NAMED_COMPAT_LEVELS = (
+	# The bleeding-edge compat level is deliberately not documented.
+	# You are welcome to use it, but please subscribe to the git
+	# commit mails if you do.  There is no heads up on changes for
+	# bleeding-edge testers as it is mainly intended for debhelper
+	# developers.
+	'bleeding-edge-tester' => MAX_COMPAT_LEVEL,
+	'beta-tester'          => BETA_TESTER_COMPAT,
+);
 
 use Exporter qw(import);
 use vars qw(@EXPORT %dh);
@@ -423,7 +436,9 @@ sub dirname {
 					$c=$l;
 					$c =~ s/^\s*+//;
 					$c =~ s/\s*+$//;
-					if ($c !~ m/^\d+$/) {
+					if (exists($NAMED_COMPAT_LEVELS{$c})) {
+						$c = $NAMED_COMPAT_LEVELS{$c};
+					} elsif ($c !~ m/^\d+$/) {
 						error("debian/compat must contain a postive number (found: \"$c\")");
 					}
 				}
