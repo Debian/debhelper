@@ -684,7 +684,7 @@ sub autoscript_sed {
 		open(my $ofd, '>', "${triggers_file}.new")
 			or error("open ${triggers_file}.new failed: $!");
 		while (my $line = <$ifd>) {
-			next if $line =~ m{\A  \Q${triggers_type}\E  \s+
+			next if $line =~ m{\A  \Q${trigger_type}\E  \s+
                                    \Q${trigger_target}\E (?:\s|\Z)
                               }x;
 			print {$ofd} $line;
