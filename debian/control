@@ -2,15 +2,29 @@ Source: debhelper
 Section: devel
 Priority: optional
 Maintainer: Debhelper Maintainers <debhelper-devel@lists.alioth.debian.org>
-Uploaders: Niels Thykier <niels@thykier.net>, Bernhard R. Link <brlink@debian.org>
-Build-Depends: po4a (>= 0.24), dpkg-dev (>= 1.18.0~), perl:any
+Uploaders: Niels Thykier <niels@thykier.net>,
+           Bernhard R. Link <brlink@debian.org>
+Build-Depends: dpkg-dev (>= 1.18.0~),
+               perl:any,
+               po4a (>= 0.24)
 Standards-Version: 3.9.8
 Vcs-Git: https://anonscm.debian.org/git/debhelper/debhelper.git
 Vcs-Browser: https://anonscm.debian.org/git/debhelper/debhelper.git
 
 Package: debhelper
 Architecture: all
-Depends: ${perl:Depends}, ${misc:Depends}, file (>= 3.23), dpkg (>= 1.16.2), dpkg-dev (>= 1.18.2~), binutils, po-debconf, man-db (>= 2.5.1-1), libdpkg-perl (>= 1.17.14), dh-strip-nondeterminism, autotools-dev, dh-autoreconf (>= 12~)
+Depends: autotools-dev,
+         binutils,
+         dh-autoreconf (>= 12~),
+         dh-strip-nondeterminism,
+         dpkg (>= 1.16.2),
+         dpkg-dev (>= 1.18.2~),
+         file (>= 3.23),
+         libdpkg-perl (>= 1.17.14),
+         man-db (>= 2.5.1-1),
+         po-debconf,
+         ${misc:Depends},
+         ${perl:Depends}
 Breaks: dh-systemd (<< 1.38)
 Replaces: dh-systemd (<< 1.38)
 Suggests: dh-make
@@ -19,7 +33,7 @@ Multi-Arch: foreign
 Description: helper programs for debian/rules
  A collection of programs that can be used in a debian/rules file to
  automate common tasks related to building Debian packages. Programs
- are included to install various files into your package, compress 
- files, fix file permissions, integrate your package with the Debian 
+ are included to install various files into your package, compress
+ files, fix file permissions, integrate your package with the Debian
  menu system, debconf, doc-base, etc. Most Debian packages use debhelper
  as part of their build process.
