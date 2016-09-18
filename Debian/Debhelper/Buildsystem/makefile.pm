@@ -8,8 +8,13 @@ package Debian::Debhelper::Buildsystem::makefile;
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(escape_shell clean_jobserver_makeflags);
+use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value escape_shell clean_jobserver_makeflags is_cross_compiling);
 use parent qw(Debian::Debhelper::Buildsystem);
+
+my %DEB_DEFAULT_TOOLS = (
+	'CC'	=> 'gcc',
+	'CXX'	=> 'g++',
+);
 
 # make makes things difficult by not providing a simple way to test
 # whether a Makefile target exists. Using -n and checking for a nonzero
@@ -127,6 +132,15 @@ sub check_auto_buildable {
 
 sub build {
 	my $this=shift;
+	if (ref($this) eq 'Debian::Debhelper::Buildsystem::makefile' and is_cross_compiling()) {
+		while (my ($var, $tool) = each %DEB_DEFAULT_TOOLS) {
+			if ($ENV{$var}) {
+				unshift @_, $var . "=" . $ENV{$var};
+			} else {
+				unshift @_, $var . "=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-" . $tool;
+			}
+		}
+	}
 	$this->do_make(@_);
 }
 
