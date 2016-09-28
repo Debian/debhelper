@@ -260,7 +260,7 @@ sub make_debug {
 			$debug_path=$desttmp."/usr/lib/debug/.build-id/$1/$2.debug";
 			$debug_build_id="${1}${2}";
 			push(@build_ids, $debug_build_id);
-		} elsif ($use_build_id > 1) {
+		} else {
 			# For dbgsyms, we need build-id (else it will not be
 			# co-installable).
 			return if $use_build_id > 1;
