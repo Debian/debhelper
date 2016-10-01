@@ -61,11 +61,11 @@ by systemd.)
 
 =over 4
 
-=item B<-n>, B<--noscripts>
+=item B<-n>, B<--no-scripts>
 
 Do not modify F<postinst>/F<postrm>/F<prerm> scripts.
 
-=item B<-o>, B<--onlyscripts>
+=item B<-o>, B<--only-scripts>
 
 Only modify F<postinst>/F<postrm>/F<prerm> scripts, do not actually install
 any init script, default files, upstart job or systemd service file. May be
@@ -78,7 +78,7 @@ to use this with B<-p> to limit, which packages are affected by the
 call.  Example:
 
  override_dh_installinit:
-	dh_installinit -pfoo --onlyscripts
+	dh_installinit -pfoo --only-scripts
 	dh_installinit --remaining
 
 =item B<-R>, B<--restart-after-upgrade>

@@ -112,8 +112,10 @@ sub getoptions {
 	
 		"n" => \$dh{NOSCRIPTS},
 		"noscripts" => \$dh{NOSCRIPTS},
+		"no-scripts" => \$dh{NOSCRIPTS},
 		"o" => \$dh{ONLYSCRIPTS},
 		"onlyscripts" => \$dh{ONLYSCRIPTS},
+		"only-scripts" => \$dh{ONLYSCRIPTS},
 
 		"X=s" => \&AddExclude,
 		"exclude=s" => \&AddExclude,
