@@ -49,7 +49,7 @@ else
 LANGS=
 endif
 
-build: version debhelper.7
+build: version debhelper.7 debhelper-obsolete-compat.7
 	find . -maxdepth 1 -type f -perm /100 -name "dh*" \
 		-exec $(POD2MAN) {} {}.1 \;
 ifneq ($(USE_NLS),no)
@@ -66,6 +66,9 @@ ifneq ($(USE_NLS),no)
 				$(MAKEMANLIST) `find $$dir -type f -maxdepth 1 -name "dh_*.pod" | LC_ALL=C sort` | \
 				$(POD2MAN) --name="debhelper" --section=7 > debhelper.$$lang.7; \
 		fi; \
+		if [ -e $$dir/debhelper-obsolete-compat.pod ]; then \
+			$(POD2MAN) --name="debhelper" --section=7 $$dir/debhelper-obsolete-compat.pod > debhelper-obsolete-compat.$$lang.7; \
+		fi; \
 	done
 endif
 
@@ -76,7 +79,10 @@ version:
 debhelper.7: debhelper.pod
 	cat debhelper.pod | \
 		$(MAKEMANLIST) $(COMMANDS) | \
-		$(POD2MAN) --name="debhelper" --section=7  > debhelper.7
+		$(POD2MAN) --name="debhelper" --section=7  > $@
+
+debhelper-obsolete-compat.7: debhelper-obsolete-compat.pod
+	$(POD2MAN) --name="debhelper" --section=7 $^ > $@
 
 clean:
 	rm -f *.1 *.7 Debian/Debhelper/Dh_Version.pm
