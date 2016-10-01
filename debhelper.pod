@@ -503,7 +503,7 @@ The B<dh> command will no longer use log files to track which commands
 have been run.  The B<dh> command I<still> keeps track of whether it
 already ran the "build" sequence and skip it if it did.
 
-The main affects of this are:
+The main effects of this are:
 
 =over 4
 
@@ -517,7 +517,7 @@ do a full "clean and rebuild" cycle)
 
 The main caveat is that B<dh_*> now only keeps track of what happened
 in a single override target.  When all the calls to a given B<dh_cmd>
-command happens in the same override target every thing will work as
+command happens in the same override target everything will work as
 before.
 
 Example of where it can go wrong:
@@ -538,7 +538,7 @@ B<-a>, B<-i>, etc.
 
 =item -
 
-The B<dh_installdeb> command now shell escapes the lines in the
+The B<dh_installdeb> command now shell-escapes the lines in the
 F<maintscript> config file.  This was the original intent but it did
 not work properly and packages have begun to rely on the incomplete
 shell escaping (e.g. quoting file names).
