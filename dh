@@ -842,6 +842,9 @@ sub run_override {
 		push @options, $opt unless grep { $_ eq $opt } @options;
 	}
 
+	# Discard any override log files before calling the override
+	# target
+	complex_doit("rm","-f","debian/*.debhelper.log") if not compat(9);
 	# This passes the options through to commands called
 	# inside the target.
 	$ENV{DH_INTERNAL_OPTIONS}=join("\x1e", @options);
@@ -849,7 +852,6 @@ sub run_override {
 	run("debian/rules", $override);
 	delete $ENV{DH_INTERNAL_OPTIONS};
 	delete $ENV{DH_INTERNAL_OVERRIDE};
-	complex_doit("rm","-f","debian/*.debhelper.log") if not compat(9);
 
 	# Update log for overridden command now that it has
 	# finished successfully.
