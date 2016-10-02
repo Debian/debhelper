@@ -110,7 +110,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# complete list of such extensions: ".gz", ".z", ".taz", 
 		# ".tgz", "-gz", "-z", "_z"
 		push @files, split(/\n/,`
-			find usr/info usr/share/info usr/man usr/share/man usr/X11*/man -type f ! -iname "*.gz" \\
+			find usr/share/info usr/share/man -type f ! -iname "*.gz" \\
 				! -iname "*.gif" ! -iname "*.png" ! -iname "*.jpg" \\
 				! -iname "*.jpeg" \\
 				2>/dev/null || true;

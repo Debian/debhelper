@@ -86,7 +86,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		"| xargs -0r chmod 0755");
 
 	# Executable man pages are a bad thing..
-	complex_doit("find $tmp/usr/share/man $tmp/usr/man/ $tmp/usr/X11*/man/ -type f",
+	complex_doit("find $tmp/usr/share/man -type f",
 		"$find_options -print0 2>/dev/null | xargs -0r chmod 0644");
 
 	# ..and header files ..
