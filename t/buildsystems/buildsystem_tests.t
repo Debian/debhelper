@@ -634,7 +634,7 @@ override_dh_auto_build:
 	$(MAKE)
 %:
 	@dh_clean > /dev/null 2>&1
-	@+dh --buildsystem=makefile --after=dh_auto_configure --until=dh_auto_build $@ 2>/dev/null
+	@+dh $@ --buildsystem=makefile 2>/dev/null
 	@dh_clean > /dev/null 2>&1
 EOF
 test_is_parallel( do_rules_for_parallel("build", "include debian/rules"),
