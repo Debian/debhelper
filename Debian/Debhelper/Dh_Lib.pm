@@ -13,7 +13,7 @@ use constant {
 	'MIN_COMPAT_LEVEL' => 5,
 	# Lowest compat level that does *not* cause deprecation
 	# warnings
-	'LOWEST_NON_DEPRECATED_COMPAT_LEVEL' => 5,
+	'LOWEST_NON_DEPRECATED_COMPAT_LEVEL' => 9,
 	# Highest "open-beta" compat level.  Remember to notify
 	# debian-devel@l.d.o before bumping this.
 	'BETA_TESTER_COMPAT' => 10,
