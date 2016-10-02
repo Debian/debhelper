@@ -219,37 +219,26 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $service=pkgfile($package,"service");
 	if ($service ne '' && ! $dh{ONLYSCRIPTS}) {
 		my $path="$tmp/lib/systemd/system";
-		if (! -d $path) {
-			install_dir($path);
-		}
-
+		install_dir($path);
 		install_file($service, "$path/$script.service");
 	}
 
 	my $tmpfile=pkgfile($package,"tmpfile");
 	if ($tmpfile ne '' && ! $dh{ONLYSCRIPTS}) {
 		my $path="$tmp/usr/lib/tmpfiles.d";
-		if (! -d $path) {
-			install_dir($path);
-		}
-
+		install_dir($path);
 		install_file($tmpfile, "$path/$script.conf");
 	}
 
 	my $job=pkgfile($package,"upstart");
 	if ($job ne '' && ! $dh{ONLYSCRIPTS}) {
-		if (! -d "$tmp/etc/init") {
-			install_dir("$tmp/etc/init");
-		}
-		
+		install_dir("$tmp/etc/init");
 		install_file($job, "$tmp/etc/init/$jobfile.conf");
 	}
 
 	my $default=pkgfile($package,'default');
 	if ($default ne '' && ! $dh{ONLYSCRIPTS}) {
-		if (! -d "$tmp/etc/default") {
-			install_dir("$tmp/etc/default");
-		}
+		install_dir("$tmp/etc/default");
 		install_file($default, "$tmp/etc/default/$script");
 	}
 
@@ -257,10 +246,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		pkgfile($package,"init.d");
 
 	if ($init ne '' && ! $dh{ONLYSCRIPTS}) {
-		if (! -d "$tmp/etc/init.d") {
-			install_dir("$tmp/etc/init.d");
-		}
-		
+		install_dir("$tmp/etc/init.d");
 		install_prog($init,"$tmp/etc/init.d/$script");
 	}
 

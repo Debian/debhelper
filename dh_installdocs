@@ -325,9 +325,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	closedir(DEB);
 	
 	if (%doc_ids) {
-		if (! -d "$tmp/usr/share/doc-base/") {
-			install_dir("$tmp/usr/share/doc-base/");
-		}
+		install_dir("$tmp/usr/share/doc-base/");
 	}
 	# check for duplicate document ids
 	my %used_doc_ids;

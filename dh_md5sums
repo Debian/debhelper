@@ -55,9 +55,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $dbgsym_tmp = "debian/.debhelper/${package}/dbgsym-root";
 	my $tmp=tmpdir($package);
 
-	if (! -d "$tmp/DEBIAN") {
-		install_dir("$tmp/DEBIAN");
-	}
+	install_dir("$tmp/DEBIAN");
 
 	# Check if we should exclude conffiles.
 	my $exclude="";
@@ -89,9 +87,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("chown", "0:0", "$tmp/DEBIAN/md5sums");
 	}
 	if ( -d $dbgsym_tmp) {
-		if (! -d "${dbgsym_tmp}/DEBIAN") {
-			install_dir("${dbgsym_tmp}/DEBIAN");
-		}
+		install_dir("${dbgsym_tmp}/DEBIAN");
 
 		$find = "find . -type f ! -regex './DEBIAN/.*' -printf '%P\\0'";
 		complex_doit("(cd $dbgsym_tmp >/dev/null ; $find | LC_ALL=C sort -z | xargs -r0 md5sum > DEBIAN/md5sums) >/dev/null");

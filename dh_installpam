@@ -52,9 +52,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $pam=pkgfile($package,"pam");
 
 	if ($pam ne '') {
-		if (! -d "$tmp/etc/pam.d") {
-			install_dir("$tmp/etc/pam.d");
-		}
+		install_dir("$tmp/etc/pam.d");
 		install_file($pam,"$tmp/etc/pam.d/".pkgfilename($package));
 	}
 }

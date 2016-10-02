@@ -272,9 +272,7 @@ sub make_debug {
 		$debug_path=$desttmp."/usr/lib/debug/".$base_file;
 	}
 	my $debug_dir=dirname($debug_path);
-	if (! -d $debug_dir) {
-		install_dir($debug_dir);
-	}
+	install_dir($debug_dir);
 	if (compat(8) && $use_build_id < 2) {
 		doit($objcopy, "--only-keep-debug", $file, $debug_path);
 	}
@@ -369,7 +367,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		my $dbgsym_docdir = "${debugtmp}/usr/share/doc";
 		my $doc_symlink = "${dbgsym_docdir}/${package}-dbgsym";
 		if ( not -l $doc_symlink and not -e $doc_symlink ) {
-			install_dir($dbgsym_docdir) if not -d $dbgsym_docdir;
+			install_dir($dbgsym_docdir);
 			doit('ln', '-s', $package, $doc_symlink);
 		}
 		if ($dh{MIGRATE_DBGSYM}) {
@@ -388,7 +386,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$dir = "debian/.debhelper/${dbg_pkg}";
 		}
 		$path = "${dir}/dbgsym-build-ids";
-		install_dir($dir) if ! -d $dir;
+		install_dir($dir);
 		open(my $fd, '>>', $path) or error("open $path failed: $!");
 		print {$fd} join(q{ }, sort(@build_ids)) . "\n";
 		close($fd) or error("close $path failed: $!");

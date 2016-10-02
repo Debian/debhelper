@@ -227,10 +227,8 @@ foreach my $package (getpackages()) {
 			}
 
 			# Make sure the destination directory exists.
-			if (! -e "$tmp/$dest") {
-				install_dir("$tmp/$dest");
-			}
-			
+			install_dir("$tmp/$dest");
+
 			if (-d $src && $exclude) {
 				my $basename = basename($src);
 				my $dir = ($basename eq '.') ? $src : "$src/..";

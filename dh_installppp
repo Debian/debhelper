@@ -57,9 +57,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	foreach my $script (qw(up down)) {
 		my $file=pkgfile($package, "ppp.ip-$script");
 		if ($file ne '') {
-			if (! -d "$tmp/etc/ppp/ip-$script.d") {
-				install_dir("$tmp/etc/ppp/ip-$script.d");
-			}
+			install_dir("$tmp/etc/ppp/ip-$script.d");
 			install_prog($file,"$tmp/etc/ppp/ip-$script.d/".pkgfilename($package));
 		}
 	}

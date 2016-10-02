@@ -184,9 +184,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$major=$dh{M_PARAMS};
 		}
 		
-		if (! -d "$tmp/DEBIAN") {
-			install_dir("$tmp/DEBIAN");
-		}
+		install_dir("$tmp/DEBIAN");
 		my $deps=$package;
 		if ($dh{V_FLAG_SET}) {
 			if ($shlibs_file) {
@@ -236,9 +234,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	if ($shlibs_file) {
-		if (! -d "$tmp/DEBIAN") {
-			install_dir("$tmp/DEBIAN");
-		}
+		install_dir("$tmp/DEBIAN");
 		install_file($shlibs_file, "$tmp/DEBIAN/shlibs");
 	}
 

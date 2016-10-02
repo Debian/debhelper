@@ -321,7 +321,8 @@ sub install_lib {
 	doit('install', '-p', '-m0644', @_);
 }
 sub install_dir {
-	doit('install', '-d', @_);
+	my @to_create = grep { not -d $_ } @_;
+	doit('install', '-d', @to_create) if @to_create;
 }
 
 # Run a command that may have a huge number of arguments, like xargs does.
@@ -702,9 +703,7 @@ sub generated_file {
 	my $dir = "debian/.debhelper/generated/${package}";
 	my $path = "${dir}/${filename}";
 	$mkdirs //= 1;
-	if ($mkdirs and not -d $dir) {
-		install_dir($dir);
-	}
+	install_dir($dir) if $mkdirs;
 	return $path;
 }
 
@@ -1132,9 +1131,7 @@ sub make_symlink{
 
 	# Make sure the directory the link will be in exists.
 	my $basedir=dirname("$tmp/$dest");
-	if (! -e $basedir) {
-		install_dir($basedir);
-	}
+	install_dir($basedir);
 
 	# Policy says that if the link is all within one toplevel
 	# directory, it should be relative. If it's between
@@ -1354,9 +1351,7 @@ sub restore_file_on_clean {
 	my $bucket_index = 'debian/.debhelper/bucket/index';
 	my $bucket_dir = 'debian/.debhelper/bucket/files';
 	my $checksum;
-	if (not -d $bucket_dir) {
-		install_dir($bucket_dir);
-	}
+	install_dir($bucket_dir);
 	if ($file =~ m{^/}) {
 		error("restore_file_on_clean requires a path relative to the package dir");
 	}

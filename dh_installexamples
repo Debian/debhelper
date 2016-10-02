@@ -82,10 +82,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 	
 	if (@examples) {
-		if (! -d "$tmp/usr/share/doc/$package/examples") {
-			install_dir("$tmp/usr/share/doc/$package/examples");
-		}
-		
+		install_dir("$tmp/usr/share/doc/$package/examples");
+
 		my $exclude = '';
 		if ($dh{EXCLUDE_FIND}) {
 			$exclude .= ' -and ! \( '.$dh{EXCLUDE_FIND}.' \)';

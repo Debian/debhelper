@@ -178,9 +178,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		next if -l $instpage;
 		next if compat(5) && -e $instpage;
 
-		if (! -d $destdir) {
-			install_dir($destdir);
-		}
+		install_dir($destdir);
 		if ($gz) {
 			complex_doit "zcat \Q$page\E > \Q$instpage\E";
 		}

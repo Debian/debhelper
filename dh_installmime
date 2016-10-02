@@ -46,17 +46,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	my $mime=pkgfile($package,"mime");
 	if ($mime ne '') {
-		if (! -d "$tmp/usr/lib/mime/packages") {
-			install_dir("$tmp/usr/lib/mime/packages");
-		}
+		install_dir("$tmp/usr/lib/mime/packages");
 		install_file($mime, "$tmp/usr/lib/mime/packages/$package");
 	}
 	
 	my $sharedmimeinfo=pkgfile($package,"sharedmimeinfo");
 	if ($sharedmimeinfo ne '') {
-		if (! -d "$tmp/usr/share/mime/packages") {
-			install_dir("$tmp/usr/share/mime/packages");
-		}
+		install_dir("$tmp/usr/share/mime/packages");
 		install_file($sharedmimeinfo,
 					 "$tmp/usr/share/mime/packages/$package.xml");
 	}

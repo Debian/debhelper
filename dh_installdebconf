@@ -89,9 +89,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $config=pkgfile($package,"config");
 	my $templates=pkgfile($package,"templates");
 
-	if (! -d "$tmp/DEBIAN") {
-		install_dir("$tmp/DEBIAN");
-	}
+	install_dir("$tmp/DEBIAN");
 
 	if (! is_udeb($package)) {
 		debhelper_script_subst($package, "config");

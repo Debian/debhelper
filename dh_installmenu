@@ -65,9 +65,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	
 	if ($menu ne '') {
 		if (compat(10)) {
-			if (! -d "$tmp/usr/share/menu") {
-				install_dir("$tmp/usr/share/menu");
-			}
+			install_dir("$tmp/usr/share/menu");
 			install_file($menu,"$tmp/usr/share/menu/$package");
 
 			# Add the scripts if a menu-method file doesn't exist.
@@ -83,9 +81,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	if ($menu_method ne '') {
-		if (!-d "$tmp/etc/menu-methods") {
-			install_dir("$tmp/etc/menu-methods");
-		}
+		install_dir("$tmp/etc/menu-methods");
 		install_file($menu_method,"$tmp/etc/menu-methods/$package");
 
 		if (! $dh{NOSCRIPTS}) {

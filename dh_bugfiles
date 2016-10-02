@@ -107,7 +107,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			install_dir($dir);
 			doit("mv", "${dir}.tmp", "$dir/script");
 		}
-		elsif (! -d $dir) {
+		else {
 			install_dir($dir);
 		}
 		while (my ($type, $srcfile) = each(%bugfiles)) {

@@ -61,18 +61,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	foreach my $type (qw{hourly daily weekly monthly}) {
 		my $cron=pkgfile($package,"cron.$type");
 		if ($cron) {
-			if (! -d "$tmp/etc/cron.$type") {
-				install_dir("$tmp/etc/cron.$type");
-			}
+			install_dir("$tmp/etc/cron.$type");
 			install_prog($cron,"$tmp/etc/cron.$type/".pkgfilename($package));
 		}
 	}
 	# Separate because this needs to be mode 644.
 	my $cron=pkgfile($package,"cron.d");
 	if ($cron) {
-		if (! -d "$tmp/etc/cron.d") {
-			install_dir("$tmp/etc/cron.d");
-		}
+		install_dir("$tmp/etc/cron.d");
 		install_file($cron,"$tmp/etc/cron.d/".pkgfilename($package));
 	}
 }

@@ -67,9 +67,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		$changelog='debian/changelog';
 	}
 
-	if ( ! -d "$tmp/DEBIAN" ) {
-		install_dir("$tmp/DEBIAN");
-	}
+	install_dir("$tmp/DEBIAN");
 
 	# avoid gratuitous warning
 	if (! -e $substvars || system("grep -q '^misc:Depends=' $substvars") != 0) {
@@ -124,9 +122,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		} else {
 			push(@dbgsym_options, '-UReplaces', '-UBreaks');
 		}
-		if ( ! -d "${dbgsym_tmp}/DEBIAN" ) {
-			install_dir("${dbgsym_tmp}/DEBIAN");
-		}
+		install_dir("${dbgsym_tmp}/DEBIAN");
 		doit("dpkg-gencontrol", "-p${package}", "-l$changelog", "-T$substvars",
 			"-P${dbgsym_tmp}",@{$dh{U_PARAMS}}, @dbgsym_options);
 
