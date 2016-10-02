@@ -101,7 +101,7 @@ Undo a previous B<--restart-after-upgrade> (or the default of compat
 stopped in the F<prerm> script and started again in the F<postinst>
 script.
 
-=item B<-r>, B<--no-restart-on-upgrade>
+=item B<-r>, B<--no-stop-on-upgrade>, B<--no-restart-on-upgrade>
 
 Do not stop init script on upgrade.
 
@@ -168,6 +168,7 @@ $dh{RESTART_AFTER_UPGRADE} = 1 if not compat(9);
 
 init(options => {
 	"r" => \$dh{R_FLAG},
+	'no-stop-on-upgrade' => \$dh{R_FLAG},
 	"no-restart-on-upgrade" => \$dh{R_FLAG},
 	"no-start" => \$dh{NO_START},
 	"R|restart-after-upgrade!" => \$dh{RESTART_AFTER_UPGRADE},

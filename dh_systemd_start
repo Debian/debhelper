@@ -13,7 +13,7 @@ use Cwd qw(getcwd abs_path);
 
 =head1 SYNOPSIS
 
-B<dh_systemd_start> [S<I<debhelper options>>] [B<--restart-after-upgrade>] [B<--no-restart-on-upgrade>] [S<I<unit file> ...>]
+B<dh_systemd_start> [S<I<debhelper options>>] [B<--restart-after-upgrade>] [B<--no-stop-on-upgrade>] [S<I<unit file> ...>]
 
 =head1 DESCRIPTION
 
@@ -51,7 +51,7 @@ Undo a previous B<--restart-after-upgrade> (or the default of compat
 stopped in the F<prerm> script and started again in the F<postinst>
 script.
 
-=item B<-r>, B<--no-restart-on-upgrade>
+=item B<-r>, B<--no-stop-on-upgrade>, B<--no-restart-on-upgrade>
 
 Do not stop service on upgrade.
 
@@ -80,6 +80,7 @@ $dh{RESTART_AFTER_UPGRADE} = 1 if not compat(9);
 
 init(options => {
 	"r" => \$dh{R_FLAG},
+	'no-stop-on-upgrade' => \$dh{R_FLAG},
 	"no-restart-on-upgrade" => \$dh{R_FLAG},
 	"no-start" => \$dh{NO_START},
 	"R|restart-after-upgrade!" => \$dh{RESTART_AFTER_UPGRADE},
