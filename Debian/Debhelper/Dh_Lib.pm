@@ -49,7 +49,7 @@ use vars qw(@EXPORT %dh);
 	    &get_source_date_epoch &is_cross_compiling
 	    &generated_file &autotrigger &package_section
 	    &restore_file_on_clean &restore_all_files
-	    &open_gz
+	    &open_gz &reset_perm_and_owner
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -323,6 +323,11 @@ sub install_lib {
 sub install_dir {
 	my @to_create = grep { not -d $_ } @_;
 	doit('install', '-d', @to_create) if @to_create;
+}
+sub reset_perm_and_owner {
+	my ($mode, @paths) = @_;
+	doit('chmod', $mode, '--', @paths);
+	doit('chown', '0:0', '--', @paths);
 }
 
 # Run a command that may have a huge number of arguments, like xargs does.
@@ -1101,14 +1106,12 @@ sub debhelper_script_subst {
 			# Just get rid of any #DEBHELPER# in the script.
 			complex_doit("sed s/#DEBHELPER#// < $file > $tmp/DEBIAN/$script");
 		}
-		doit("chown","0:0","$tmp/DEBIAN/$script");
-		doit("chmod","0755","$tmp/DEBIAN/$script");
+		reset_perm_and_owner('0755', "$tmp/DEBIAN/$script");
 	}
 	elsif ( -f "debian/$ext$script.debhelper" ) {
 		complex_doit("printf '#!/bin/sh\nset -e\n' > $tmp/DEBIAN/$script");
 		complex_doit("cat debian/$ext$script.debhelper >> $tmp/DEBIAN/$script");
-		doit("chown","0:0","$tmp/DEBIAN/$script");
-		doit("chmod","0755","$tmp/DEBIAN/$script");
+		reset_perm_and_owner('0755', "$tmp/DEBIAN/$script");
 	}
 }
 

@@ -324,6 +324,16 @@ install_lib($src, $dest)
 	Installs a library at the path $src into $dest.  The parent
 	dir of $dest must exist (can be created with install_dir).
 	This is intended for installing libraries.
+reset_perm_and_owner($mode, $path...)
+	Resets the ownership and mode (POSIX permissions) of $path
+	This is useful for files created directly by the script, but
+	it not necessary for files installed via the install_*
+	functions.
+	The file owner and group is set to "root:root".  The change
+	is only done on the exact paths listed (i.e. it is *not*
+	recursive).
+	To avoid issue, please pass mode as a string (i.e. '0755'
+	rather than 0755).
 open_gz($file)
 	Open $file, read from it as a gzip-compressed file and return
 	the file handle.

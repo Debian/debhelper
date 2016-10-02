@@ -283,7 +283,7 @@ sub make_debug {
 	}
 
 	# No reason for this to be executable.
-	doit("chmod", "0644", $debug_path);
+	reset_perm_and_owner('0644', $debug_path);
 	return $debug_path;
 }
 

@@ -182,7 +182,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			doit("rm","-f","$tmp/DEBIAN/conffiles");
 		}
 		else {
-			doit("chmod","0644","$tmp/DEBIAN/conffiles");
+			reset_perm_and_owner('0644', "$tmp/DEBIAN/conffiles");
 		}
 	}
 }

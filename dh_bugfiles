@@ -121,10 +121,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	
 	# Ensure that the bug script is executable
 	if (-f $dir) {
-		chmod 0755, $dir;
+		reset_perm_and_owner('0755', $dir);
 	}
 	elsif (-f "$dir/script") {
-		chmod 0755, "$dir/script";
+		reset_perm_and_owner('0755', "$dir/script");
 	}
 }
 
