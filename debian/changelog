@@ -8,6 +8,11 @@ debhelper (10.2.2) UNRELEASED; urgency=medium
   * dh_compress,dh_fixperms: Remove references to long
     obsolete directories such as usr/info, usr/man and
     usr/X11*/man.
+  * autoreconf.pm: Apply patch from Helmut Grohne to fix
+    autoconf/cross regression from #836988.  The autoreconf
+    build-system is now also used directly for "clean" and
+    "build" (while still usin the "make" build-system for the
+    heavy lifting).  (Closes: #839681)
 
  -- Niels Thykier <niels@thykier.net>  Sun, 02 Oct 2016 09:52:08 +0000
 
