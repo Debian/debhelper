@@ -13,6 +13,11 @@ debhelper (10.2.2) UNRELEASED; urgency=medium
     build-system is now also used directly for "clean" and
     "build" (while still usin the "make" build-system for the
     heavy lifting).  (Closes: #839681)
+  * dh_installdirs: In compat 11, avoid creating debian/<pkg>
+    directories except when required to do so.  This fixes a
+    corner case, where an arch:all build would behave
+    differently than an arch:all+arch:any when dh_installdir is
+    optimised out only for the arch:all build.
 
  -- Niels Thykier <niels@thykier.net>  Sun, 02 Oct 2016 09:52:08 +0000
 
