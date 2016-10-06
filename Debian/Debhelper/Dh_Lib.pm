@@ -434,7 +434,7 @@ sub dirname {
 				my $l=<$compat_in>;
 				close($compat_in);
 				if (! defined $l || ! length $l) {
-					error("debian/compat must contain a postive number (found an empty first line)");
+					error("debian/compat must contain a positive number (found an empty first line)");
 
 				}
 				else {
@@ -445,7 +445,7 @@ sub dirname {
 					if (exists($NAMED_COMPAT_LEVELS{$c})) {
 						$c = $NAMED_COMPAT_LEVELS{$c};
 					} elsif ($c !~ m/^\d+$/) {
-						error("debian/compat must contain a postive number (found: \"$c\")");
+						error("debian/compat must contain a positive number (found: \"$c\")");
 					}
 				}
 			}
