@@ -253,7 +253,7 @@ for $bs (@bs) {
 }
 
 touch "$tmpdir/configure", 0755;
-test_check_auto_buildable($bs{autoconf}, "configure", { configure => 1 });
+test_check_auto_buildable($bs{autoconf}, "configure", { configure => 1, clean => 1 });
 
 touch "$tmpdir/CMakeLists.txt";
 test_check_auto_buildable($bs{cmake}, "CMakeLists.txt", { configure => 1, clean => 1 });
@@ -264,7 +264,7 @@ test_check_auto_buildable($bs{perl_makemaker}, "Makefile.PL", { configure => 1 }
 # With Makefile
 touch "$builddir/Makefile";
 test_check_auto_buildable($bs{makefile}, "Makefile", 1);
-test_check_auto_buildable($bs{autoconf}, "configure+Makefile", { configure => 1, test => 1 });
+test_check_auto_buildable($bs{autoconf}, "configure+Makefile", { configure => 1, test => 1, build => 1, install => 1, clean => 1 });
 test_check_auto_buildable($bs{cmake}, "CMakeLists.txt+Makefile", 1);
 touch "$builddir/CMakeCache.txt"; # strong evidence that cmake was run
 test_check_auto_buildable($bs{cmake}, "CMakeCache.txt+Makefile", 2);
@@ -316,8 +316,8 @@ test_autoselection("auto-selects nothing", undef, %tmp);
 touch "$tmpdir/configure", 0755;
 touch "$builddir/Makefile";
 test_autoselection("autoconf",
-    { configure => "autoconf", build => "makefile",
-      test => "autoconf", install => "makefile", clean => "makefile" }, %tmp);
+    { configure => "autoconf", build => "autoconf",
+      test => "autoconf", install => "autoconf", clean => "autoconf" }, %tmp);
 cleandir $tmpdir;
 
 # Perl Makemaker (build, test, clean fail with builddir set [not supported])
