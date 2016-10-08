@@ -8,7 +8,8 @@ plan(tests => (@progs + @libs));
 
 foreach my $file (@progs, @libs) {
 	print "# Testing $file\n";
-	ok(system("perl -c $file >/dev/null 2>&1"), 0);
+	ok(system("perl -c $file >/dev/null 2>&1"), 0)
+	  or print STDERR "# Testing $file is broken\n";
 }
 
 # Local Variables:
