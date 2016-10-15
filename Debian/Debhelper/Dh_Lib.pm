@@ -13,10 +13,23 @@ use constant {
 	'MIN_COMPAT_LEVEL' => 5,
 	# Lowest compat level that does *not* cause deprecation
 	# warnings
-	'LOWEST_NON_DEPRECATED_COMPAT_LEVEL' => 5,
+	'LOWEST_NON_DEPRECATED_COMPAT_LEVEL' => 9,
+	# Highest "open-beta" compat level.  Remember to notify
+	# debian-devel@l.d.o before bumping this.
+	'BETA_TESTER_COMPAT' => 10,
 	# Highest compat level permitted
-	'MAX_COMPAT_LEVEL' => 10,
+	'MAX_COMPAT_LEVEL' => 11,
 };
+
+my %NAMED_COMPAT_LEVELS = (
+	# The bleeding-edge compat level is deliberately not documented.
+	# You are welcome to use it, but please subscribe to the git
+	# commit mails if you do.  There is no heads up on changes for
+	# bleeding-edge testers as it is mainly intended for debhelper
+	# developers.
+	'bleeding-edge-tester' => MAX_COMPAT_LEVEL,
+	'beta-tester'          => BETA_TESTER_COMPAT,
+);
 
 use Exporter qw(import);
 use vars qw(@EXPORT %dh);
@@ -36,7 +49,7 @@ use vars qw(@EXPORT %dh);
 	    &get_source_date_epoch &is_cross_compiling
 	    &generated_file &autotrigger &package_section
 	    &restore_file_on_clean &restore_all_files
-	    &open_gz
+	    &open_gz &reset_perm_and_owner
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -308,7 +321,13 @@ sub install_lib {
 	doit('install', '-p', '-m0644', @_);
 }
 sub install_dir {
-	doit('install', '-d', @_);
+	my @to_create = grep { not -d $_ } @_;
+	doit('install', '-d', @to_create) if @to_create;
+}
+sub reset_perm_and_owner {
+	my ($mode, @paths) = @_;
+	doit('chmod', $mode, '--', @paths);
+	doit('chown', '0:0', '--', @paths);
 }
 
 # Run a command that may have a huge number of arguments, like xargs does.
@@ -415,7 +434,7 @@ sub dirname {
 				my $l=<$compat_in>;
 				close($compat_in);
 				if (! defined $l || ! length $l) {
-					error("debian/compat must contain a postive number (found an empty first line)");
+					error("debian/compat must contain a positive number (found an empty first line)");
 
 				}
 				else {
@@ -423,8 +442,10 @@ sub dirname {
 					$c=$l;
 					$c =~ s/^\s*+//;
 					$c =~ s/\s*+$//;
-					if ($c !~ m/^\d+$/) {
-						error("debian/compat must contain a postive number (found: \"$c\")");
+					if (exists($NAMED_COMPAT_LEVELS{$c})) {
+						$c = $NAMED_COMPAT_LEVELS{$c};
+					} elsif ($c !~ m/^\d+$/) {
+						error("debian/compat must contain a positive number (found: \"$c\")");
 					}
 				}
 			}
@@ -669,7 +690,7 @@ sub autoscript_sed {
 		open(my $ofd, '>', "${triggers_file}.new")
 			or error("open ${triggers_file}.new failed: $!");
 		while (my $line = <$ifd>) {
-			next if $line =~ m{\A  \Q${triggers_file}\E  \s+
+			next if $line =~ m{\A  \Q${trigger_type}\E  \s+
                                    \Q${trigger_target}\E (?:\s|\Z)
                               }x;
 			print {$ofd} $line;
@@ -687,9 +708,7 @@ sub generated_file {
 	my $dir = "debian/.debhelper/generated/${package}";
 	my $path = "${dir}/${filename}";
 	$mkdirs //= 1;
-	if ($mkdirs and not -d $dir) {
-		install_dir($dir);
-	}
+	install_dir($dir) if $mkdirs;
 	return $path;
 }
 
@@ -782,7 +801,6 @@ sub filedoublearray {
 	my @ret;
 	while (<DH_FARRAY_IN>) {
 		chomp;
-		# Only ignore comments and empty lines in v5 mode.
 		if (not $x)  {
 			next if /^#/ || /^$/;
 		}
@@ -1087,14 +1105,12 @@ sub debhelper_script_subst {
 			# Just get rid of any #DEBHELPER# in the script.
 			complex_doit("sed s/#DEBHELPER#// < $file > $tmp/DEBIAN/$script");
 		}
-		doit("chown","0:0","$tmp/DEBIAN/$script");
-		doit("chmod","0755","$tmp/DEBIAN/$script");
+		reset_perm_and_owner('0755', "$tmp/DEBIAN/$script");
 	}
 	elsif ( -f "debian/$ext$script.debhelper" ) {
 		complex_doit("printf '#!/bin/sh\nset -e\n' > $tmp/DEBIAN/$script");
 		complex_doit("cat debian/$ext$script.debhelper >> $tmp/DEBIAN/$script");
-		doit("chown","0:0","$tmp/DEBIAN/$script");
-		doit("chmod","0755","$tmp/DEBIAN/$script");
+		reset_perm_and_owner('0755', "$tmp/DEBIAN/$script");
 	}
 }
 
@@ -1117,9 +1133,7 @@ sub make_symlink{
 
 	# Make sure the directory the link will be in exists.
 	my $basedir=dirname("$tmp/$dest");
-	if (! -e $basedir) {
-		install_dir($basedir);
-	}
+	install_dir($basedir);
 
 	# Policy says that if the link is all within one toplevel
 	# directory, it should be relative. If it's between
@@ -1193,7 +1207,7 @@ sub _expand_path {
 # the FD used to communicate with it is actually not available.
 sub is_make_jobserver_unavailable {
 	if (exists $ENV{MAKEFLAGS} && 
-	    $ENV{MAKEFLAGS} =~ /(?:^|\s)--jobserver-fds=(\d+)/) {
+	    $ENV{MAKEFLAGS} =~ /(?:^|\s)--jobserver-(?:fds|auth)=(\d+)/) {
 		if (!open(my $in, "<&$1")) {
 			return 1; # unavailable
 		}
@@ -1209,8 +1223,8 @@ sub is_make_jobserver_unavailable {
 # Cleans out jobserver options from MAKEFLAGS.
 sub clean_jobserver_makeflags {
 	if (exists $ENV{MAKEFLAGS}) {
-		if ($ENV{MAKEFLAGS} =~ /(?:^|\s)--jobserver-fds=(\d+)/) {
-			$ENV{MAKEFLAGS} =~ s/(?:^|\s)--jobserver-fds=\S+//g;
+		if ($ENV{MAKEFLAGS} =~ /(?:^|\s)--jobserver-(?:fds|auth)=\d+/) {
+			$ENV{MAKEFLAGS} =~ s/(?:^|\s)--jobserver-(?:fds|auth)=\S+//g;
 			$ENV{MAKEFLAGS} =~ s/(?:^|\s)-j\b//g;
 		}
 		delete $ENV{MAKEFLAGS} if $ENV{MAKEFLAGS} =~ /^\s*$/;
@@ -1265,6 +1279,11 @@ sub set_buildflags {
 
 	return if compat(8);
 
+	# Export PERL_USE_UNSAFE_INC as a transitional step to allow us
+	# to remove . from @INC by default without breaking packages which
+	# rely on this [CVE-2016-1238]
+	$ENV{PERL_USE_UNSAFE_INC}=1;
+
 	eval "use Dpkg::BuildFlags";
 	if ($@) {
 		warning "unable to load build flags: $@";
@@ -1308,7 +1327,7 @@ sub install_dh_config_file {
 	$mode = 0644 if not defined($mode);
 
 	if (!compat(8) and -x $source) {
-		my @sstat = stat($source) || error("cannot stat $source: $!");
+		my @sstat = stat(_) || error("cannot stat $source: $!");
 		open(my $tfd, '>', $target) || error("cannot open $target: $!");
 		chmod($mode, $tfd) || error("cannot chmod $target: $!");
 		open(my $sfd, '-|', $source) || error("cannot run $source: $!");
@@ -1334,9 +1353,7 @@ sub restore_file_on_clean {
 	my $bucket_index = 'debian/.debhelper/bucket/index';
 	my $bucket_dir = 'debian/.debhelper/bucket/files';
 	my $checksum;
-	if (not -d $bucket_dir) {
-		install_dir($bucket_dir);
-	}
+	install_dir($bucket_dir);
 	if ($file =~ m{^/}) {
 		error("restore_file_on_clean requires a path relative to the package dir");
 	}

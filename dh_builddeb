@@ -97,9 +97,7 @@ sub build_and_rename_deb {
 	my ($package, $destdir, $cmd, $rename_sub) = @_;
 	my $build_dir = "debian/.debhelper/scratch-space/build-${package}";
 	my ($dpkg_filename, $desired_filename);
-	if ( ! -d $build_dir) {
-		install_dir($build_dir);
-	}
+	install_dir($build_dir);
 	doit(@${cmd}, $build_dir);
 	opendir(my $fd, $build_dir);
 	for my $name (readdir($fd)) {

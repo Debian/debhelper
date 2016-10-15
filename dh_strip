@@ -202,7 +202,7 @@ sub testfile {
 	#  - *.node are also native ELF binaries (for node-js)
 	if ($fn =~ m/\.(?:so.*?|cmxs|node)$/) {
 		# Ok, do the expensive test.
-		my $type=get_file_type($fn);
+		my $type=get_file_type($fn, 1);
 		if ($type=~m/ELF.*shared/) {
 			push @shared_libs, $fn;
 			return;
@@ -213,7 +213,7 @@ sub testfile {
 	my (undef,undef,$mode,undef)=stat(_);
 	if ($mode & 0111) {
 		# Ok, expensive test.
-		my $type=get_file_type($fn);
+		my $type=get_file_type($fn, 1);
 		if ($type=~m/ELF.*(executable|shared)/) {
 			push @executables, $fn;
 			return;
@@ -234,8 +234,8 @@ sub testfile {
 
 # I could just use `file $_[0]`, but this is safer
 sub get_file_type {
-	my ($file) = @_;
-	return $file_output{$file} if $file_output{$file};
+	my ($file, $cache_ok) = @_;
+	return $file_output{$file} if $cache_ok && $file_output{$file};
 	open (FILE, '-|') # handle all filenames safely
 		|| exec('file', '-e', 'apptype', '-e', 'ascii', '-e', 'encoding',
 				'-e', 'cdf', '-e', 'compress', '-e', 'tar', $file)
@@ -251,7 +251,11 @@ sub make_debug {
 
 	# Don't try to copy debug symbols out if the file is already
 	# stripped.
-	my $file_info = get_file_type($file);
+	#
+	# Disable caching for non-build-id based extractions.
+	# Unfortunately, it breaks when there are hardlinks to the same
+	# ELF files.
+	my $file_info = get_file_type($file, $use_build_id ? 1 : 0);
 	return unless $file_info =~ /not stripped/;
 
 	if ($use_build_id) {
@@ -260,7 +264,7 @@ sub make_debug {
 			$debug_path=$desttmp."/usr/lib/debug/.build-id/$1/$2.debug";
 			$debug_build_id="${1}${2}";
 			push(@build_ids, $debug_build_id);
-		} elsif ($use_build_id > 1) {
+		} else {
 			# For dbgsyms, we need build-id (else it will not be
 			# co-installable).
 			return if $use_build_id > 1;
@@ -272,19 +276,18 @@ sub make_debug {
 		$debug_path=$desttmp."/usr/lib/debug/".$base_file;
 	}
 	my $debug_dir=dirname($debug_path);
-	if (! -d $debug_dir) {
-		install_dir($debug_dir);
-	}
+	install_dir($debug_dir);
 	if (compat(8) && $use_build_id < 2) {
 		doit($objcopy, "--only-keep-debug", $file, $debug_path);
 	}
 	else {
 		# Compat 9 OR a dbgsym package.
-		doit($objcopy, "--only-keep-debug", "--compress-debug-sections", $file, $debug_path);
+		doit($objcopy, "--only-keep-debug", "--compress-debug-sections", $file, $debug_path)
+			unless -e $debug_path;
 	}
 
 	# No reason for this to be executable.
-	doit("chmod", "0644", $debug_path);
+	reset_perm_and_owner('0644', $debug_path);
 	return $debug_path;
 }
 
@@ -368,7 +371,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		my $dbgsym_docdir = "${debugtmp}/usr/share/doc";
 		my $doc_symlink = "${dbgsym_docdir}/${package}-dbgsym";
 		if ( not -l $doc_symlink and not -e $doc_symlink ) {
-			install_dir($dbgsym_docdir) if not -d $dbgsym_docdir;
+			install_dir($dbgsym_docdir);
 			doit('ln', '-s', $package, $doc_symlink);
 		}
 		if ($dh{MIGRATE_DBGSYM}) {
@@ -387,7 +390,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$dir = "debian/.debhelper/${dbg_pkg}";
 		}
 		$path = "${dir}/dbgsym-build-ids";
-		install_dir($dir) if ! -d $dir;
+		install_dir($dir);
 		open(my $fd, '>>', $path) or error("open $path failed: $!");
 		print {$fd} join(q{ }, sort(@build_ids)) . "\n";
 		close($fd) or error("close $path failed: $!");

@@ -63,9 +63,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $file=pkgfile($package,"dirs");
 
-	if (! -e $tmp) {
-		install_dir($tmp);
-	}
+	install_dir($tmp) if compat(10);
 
 	my @dirs;
 

@@ -1,0 +1,4 @@
+if [ -d /run/systemd/system ]; then
+	systemctl --system daemon-reload >/dev/null || true
+	deb-systemd-invoke start #UNITFILES# >/dev/null || true
+fi

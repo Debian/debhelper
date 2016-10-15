@@ -178,9 +178,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		next if -l $instpage;
 		next if compat(5) && -e $instpage;
 
-		if (! -d $destdir) {
-			install_dir($destdir);
-		}
+		install_dir($destdir);
 		if ($gz) {
 			complex_doit "zcat \Q$page\E > \Q$instpage\E";
 		}
@@ -212,7 +210,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				complex_doit "man --recode UTF-8 ./\Q$orig\E > \Q$tmp\E";
 				# recode uncompresses compressed pages
 				doit "rm", "-f", $orig if s/\.(gz|Z)$//;
-				doit "chmod", 644, $tmp;
+				reset_perm_and_owner('0755', $tmp);
 				doit "mv", "-f", $tmp, $_;
 			}, "$tmp/$dir");
 		}

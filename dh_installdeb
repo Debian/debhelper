@@ -95,9 +95,7 @@ my %maintscript_predeps = (
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 
-	if (! -d "$tmp/DEBIAN") {
-		install_dir("$tmp/DEBIAN");
-	}
+	install_dir("$tmp/DEBIAN");
 
 	if (is_udeb($package)) {
 		# For udebs, only do the postinst, and no #DEBHELPER#.
@@ -184,7 +182,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			doit("rm","-f","$tmp/DEBIAN/conffiles");
 		}
 		else {
-			doit("chmod","0644","$tmp/DEBIAN/conffiles");
+			reset_perm_and_owner('0644', "$tmp/DEBIAN/conffiles");
 		}
 	}
 }

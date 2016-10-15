@@ -16,3 +16,6 @@
 # Disable as they are unneeded (and we can then be sure debhelper
 # builds without needing autotools-dev, dh-strip-nondetermism etc.)
 override_dh_update_autotools_config override_dh_strip_nondeterminism:
+
+override_dh_auto_install:
+	./run dh_auto_install --destdir=debian/debhelper

@@ -108,7 +108,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	# find scripts
 	find sub {
-		return unless -f and (-x or /\.pl$/);
+		return unless -f and (-x _ or /\.pl$/);
 		return if $File::Find::dir=~/\/usr\/share\/doc\//;
 
 		return unless open(my $fd, '<', $_);
@@ -125,10 +125,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				unless $version;
 			$version = ">= $version";
 		}
-		
+
+		my $perlarch = $perl;
+		$perlarch .= ':any' if $deps == PROGRAM and not $dh{V_FLAG_SET};
+
 		# no need to depend on an un-versioned perl-base -- it's
 		# essential
-		addsubstvar($package, "perl:Depends", $perl, $version)
+		addsubstvar($package, "perl:Depends", $perlarch, $version)
 			unless $perl eq 'perl-base' && ! length($version);
 
 		# add perlapi-<ver> for XS modules and other modules

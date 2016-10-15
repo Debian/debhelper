@@ -311,6 +311,7 @@ install_dh_config_file($src, $dest[, $mode])
 install_dir($dir)
 	Create the directory denoted by the path $dir and all parent
 	entries as well (as needed).
+        If the directory already exists, the function does not.
 install_file($src, $dest)
 	Installs $src into $dest with mode 0644.  The parent dir of
 	$dest must exist (can be created with install_dir).
@@ -323,6 +324,16 @@ install_lib($src, $dest)
 	Installs a library at the path $src into $dest.  The parent
 	dir of $dest must exist (can be created with install_dir).
 	This is intended for installing libraries.
+reset_perm_and_owner($mode, $path...)
+	Resets the ownership and mode (POSIX permissions) of $path
+	This is useful for files created directly by the script, but
+	it not necessary for files installed via the install_*
+	functions.
+	The file owner and group is set to "root:root".  The change
+	is only done on the exact paths listed (i.e. it is *not*
+	recursive).
+	To avoid issue, please pass mode as a string (i.e. '0755'
+	rather than 0755).
 open_gz($file)
 	Open $file, read from it as a gzip-compressed file and return
 	the file handle.
@@ -378,7 +389,10 @@ check_auto_buildable, configure, build, test, install, clean. See the comments
 inside Debian::Debhelper::Buildsystem for details. Note that this interface
 is still subject to change.
 
-Note that third-party buildsystems will not automatically be used by default,
-but can be forced to be used via the --buildsystem parameter.
+Note that third-party buildsystems will not automatically be used by
+default.  The package maintainer will either have to explicitly enable
+it via the --buildsystem parameter OR the build system should be
+registered in debhelper.  The latter is currently needed to ensure a
+stable and well-defined ordering of the build systems.
 
 -- Joey Hess <joeyh@debian.org>

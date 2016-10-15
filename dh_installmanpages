@@ -173,9 +173,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$destdir=~tr:/:/:s; # just for looks
 
 			if (! -e "$destdir/$basename" && !-l "$destdir/$basename") {
-				if (! -d $destdir) {
-					install_dir($destdir);
-				}
+				install_dir($destdir);
 				install_file($page,$destdir.$instname);
 			}
 		}

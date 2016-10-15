@@ -118,9 +118,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	push(@tomove, @tomove_expanded);
 
 	if (@tomove) {
-		if (! -d $tmp) {
-			install_dir($tmp);
-		}
+		install_dir($tmp);
 
 		doit("rm","-f","debian/movelist");
 		foreach (@tomove) {

@@ -55,7 +55,7 @@ build directory. Use B<--priority> to use a different priority than 50.
 
 =over 4
 
-=item B<-n>, B<--noscripts>
+=item B<-n>, B<--no-scripts>
 
 Do not modify F<postinst>/F<prerm> scripts.
 
@@ -100,31 +100,23 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $emacsen_startup=pkgfile($package,"emacsen-startup");
 
 	if ($emacsen_compat ne '') {
-		if (! -d "$tmp/usr/lib/emacsen-common/packages/compat") {
-			install_dir("$tmp/usr/lib/emacsen-common/packages/compat");
-		}
+		install_dir("$tmp/usr/lib/emacsen-common/packages/compat");
 		install_file($emacsen_compat,
 					 "$tmp/usr/lib/emacsen-common/packages/compat/$package");
 	}
 
 	if ($emacsen_install ne '') {
-		if (! -d "$tmp/usr/lib/emacsen-common/packages/install") {
-			install_dir("$tmp/usr/lib/emacsen-common/packages/install");
-		}
+		install_dir("$tmp/usr/lib/emacsen-common/packages/install");
 		install_prog($emacsen_install,"$tmp/usr/lib/emacsen-common/packages/install/$package");
 	}
 
 	if ($emacsen_remove ne '') {
-		if (! -d "$tmp/usr/lib/emacsen-common/packages/remove") {
-			install_dir("$tmp/usr/lib/emacsen-common/packages/remove");
-		}
+		install_dir("$tmp/usr/lib/emacsen-common/packages/remove");
 		install_prog("$emacsen_remove","$tmp/usr/lib/emacsen-common/packages/remove/$package");
 	}
 
 	if ($emacsen_startup ne '') {
-		if (! -d "$tmp/etc/$dh{FLAVOR}/site-start.d/") {
-			install_dir("$tmp/etc/$dh{FLAVOR}/site-start.d/");
-		}
+		install_dir("$tmp/etc/$dh{FLAVOR}/site-start.d/");
 		install_file($emacsen_startup,"$tmp/etc/$dh{FLAVOR}/site-start.d/$dh{PRIORITY}$package.el");
 	}
 

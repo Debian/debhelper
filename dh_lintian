@@ -50,9 +50,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $overrides=pkgfile($package,"lintian-overrides");
 
 	if ($overrides ne '') {
-		if (! -d $or_dir) {
-			 install_dir($or_dir);
-		}
+		install_dir($or_dir);
 		install_dh_config_file($overrides, "$or_dir/$package");
 	}
 }

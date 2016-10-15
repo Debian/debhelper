@@ -81,10 +81,10 @@ maintainer screws up then they won't break. The flip side is that packages
 might end up with dependencies that are too tight and so find it harder to
 be upgraded.
 
-=item B<-n>, B<--noscripts>
+=item B<-n>, B<--no-scripts>
 
 Do not add the "ldconfig" trigger even if it seems like the package
-might need it.  The option is called B<--noscripts> for historical
+might need it.  The option is called B<--no-scripts> for historical
 reasons as B<dh_makeshlibs> would previously generate maintainer
 scripts that called B<ldconfig>.
 
@@ -184,9 +184,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$major=$dh{M_PARAMS};
 		}
 		
-		if (! -d "$tmp/DEBIAN") {
-			install_dir("$tmp/DEBIAN");
-		}
+		install_dir("$tmp/DEBIAN");
 		my $deps=$package;
 		if ($dh{V_FLAG_SET}) {
 			if ($shlibs_file) {
@@ -236,15 +234,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	if ($shlibs_file) {
-		if (! -d "$tmp/DEBIAN") {
-			install_dir("$tmp/DEBIAN");
-		}
+		install_dir("$tmp/DEBIAN");
 		install_file($shlibs_file, "$tmp/DEBIAN/shlibs");
 	}
 
 	if (-e "$tmp/DEBIAN/shlibs") {
-		doit("chmod","0644","$tmp/DEBIAN/shlibs");
-		doit("chown","0:0","$tmp/DEBIAN/shlibs");
+		reset_perm_and_owner('0644', "$tmp/DEBIAN/shlibs");
 	}
 
 	# dpkg-gensymbols files
@@ -278,7 +273,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 	}
 
-	# Historically, --noscripts would disable the creation of
+	# Historically, --no-scripts would disable the creation of
 	# maintscripts for calling ldconfig.
 	if (! $dh{NOSCRIPTS} && $need_ldconfig) {
 		autotrigger($package, 'activate-noawait', 'ldconfig');

@@ -50,6 +50,8 @@ slash.  Any content in these directories will be removed as well.
 
 This is deprecated, use L<dh_prep(1)> instead.
 
+The option is removed in compat 11.
+
 =item B<-d>, B<--dirs-only>
 
 Only clean the package build directories, do not clean up any other files
@@ -79,6 +81,9 @@ inhibit_log();
 
 if ($dh{K_FLAG}) {
 	# dh_prep will be emulated (mostly) by the code below.
+	if (not compat(10)) {
+		error("The -k option is not supported in compat 11; use dh_prep instead");
+	}
 	warning("dh_clean -k is deprecated; use dh_prep instead");
 }
 

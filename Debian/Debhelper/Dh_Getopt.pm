@@ -33,6 +33,13 @@ sub AddPackage { my($option,$value)=@_;
 	       $option eq 's' or $option eq 'same-arch') {
 		push @{$dh{DOPACKAGES}}, getpackages('arch');
 		$dh{DOARCH}=1;
+		if ($option eq 's' or $option eq 'same-arch') {
+			if (compat(10)) {
+				warning('-s/--same-arch is deprecated; please use -a/--arch instead');
+			} else {
+				error('-s/--same-arch is removed in compat 11; please use -a/--arch instead');
+			}
+		}
 	}
 	elsif ($option eq 'p' or $option eq 'package') {
 		push @{$dh{DOPACKAGES}}, $value;
@@ -105,8 +112,10 @@ sub getoptions {
 	
 		"n" => \$dh{NOSCRIPTS},
 		"noscripts" => \$dh{NOSCRIPTS},
+		"no-scripts" => \$dh{NOSCRIPTS},
 		"o" => \$dh{ONLYSCRIPTS},
 		"onlyscripts" => \$dh{ONLYSCRIPTS},
+		"only-scripts" => \$dh{ONLYSCRIPTS},
 
 		"X=s" => \&AddExclude,
 		"exclude=s" => \&AddExclude,

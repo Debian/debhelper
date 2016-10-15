@@ -61,11 +61,11 @@ by systemd.)
 
 =over 4
 
-=item B<-n>, B<--noscripts>
+=item B<-n>, B<--no-scripts>
 
 Do not modify F<postinst>/F<postrm>/F<prerm> scripts.
 
-=item B<-o>, B<--onlyscripts>
+=item B<-o>, B<--only-scripts>
 
 Only modify F<postinst>/F<postrm>/F<prerm> scripts, do not actually install
 any init script, default files, upstart job or systemd service file. May be
@@ -78,7 +78,7 @@ to use this with B<-p> to limit, which packages are affected by the
 call.  Example:
 
  override_dh_installinit:
-	dh_installinit -pfoo --onlyscripts
+	dh_installinit -pfoo --only-scripts
 	dh_installinit --remaining
 
 =item B<-R>, B<--restart-after-upgrade>
@@ -101,7 +101,7 @@ Undo a previous B<--restart-after-upgrade> (or the default of compat
 stopped in the F<prerm> script and started again in the F<postinst>
 script.
 
-=item B<-r>, B<--no-restart-on-upgrade>
+=item B<-r>, B<--no-stop-on-upgrade>, B<--no-restart-on-upgrade>
 
 Do not stop init script on upgrade.
 
@@ -164,10 +164,11 @@ instances of the same text to be added to maintainer scripts.
 
 =cut
 
-$dh{RESTART_AFTER_UPGRADE} = 1 if not compat(10);
+$dh{RESTART_AFTER_UPGRADE} = 1 if not compat(9);
 
 init(options => {
 	"r" => \$dh{R_FLAG},
+	'no-stop-on-upgrade' => \$dh{R_FLAG},
 	"no-restart-on-upgrade" => \$dh{R_FLAG},
 	"no-start" => \$dh{NO_START},
 	"R|restart-after-upgrade!" => \$dh{RESTART_AFTER_UPGRADE},
@@ -218,37 +219,26 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $service=pkgfile($package,"service");
 	if ($service ne '' && ! $dh{ONLYSCRIPTS}) {
 		my $path="$tmp/lib/systemd/system";
-		if (! -d $path) {
-			install_dir($path);
-		}
-
+		install_dir($path);
 		install_file($service, "$path/$script.service");
 	}
 
 	my $tmpfile=pkgfile($package,"tmpfile");
 	if ($tmpfile ne '' && ! $dh{ONLYSCRIPTS}) {
 		my $path="$tmp/usr/lib/tmpfiles.d";
-		if (! -d $path) {
-			install_dir($path);
-		}
-
+		install_dir($path);
 		install_file($tmpfile, "$path/$script.conf");
 	}
 
 	my $job=pkgfile($package,"upstart");
 	if ($job ne '' && ! $dh{ONLYSCRIPTS}) {
-		if (! -d "$tmp/etc/init") {
-			install_dir("$tmp/etc/init");
-		}
-		
+		install_dir("$tmp/etc/init");
 		install_file($job, "$tmp/etc/init/$jobfile.conf");
 	}
 
 	my $default=pkgfile($package,'default');
 	if ($default ne '' && ! $dh{ONLYSCRIPTS}) {
-		if (! -d "$tmp/etc/default") {
-			install_dir("$tmp/etc/default");
-		}
+		install_dir("$tmp/etc/default");
 		install_file($default, "$tmp/etc/default/$script");
 	}
 
@@ -256,10 +246,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		pkgfile($package,"init.d");
 
 	if ($init ne '' && ! $dh{ONLYSCRIPTS}) {
-		if (! -d "$tmp/etc/init.d") {
-			install_dir("$tmp/etc/init.d");
-		}
-		
+		install_dir("$tmp/etc/init.d");
 		install_prog($init,"$tmp/etc/init.d/$script");
 	}
 

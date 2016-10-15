@@ -49,7 +49,7 @@ sub configure {
 	if ($ENV{LDFLAGS} && ! compat(8)) {
 		push @flags, "--config", "ld=$Config{ld} $ENV{CFLAGS} $ENV{LDFLAGS}";
 	}
-	$this->do_perl("Build.PL", "--installdirs", "vendor", @flags, @_);
+	$this->do_perl("-I.", "Build.PL", "--installdirs", "vendor", @flags, @_);
 }
 
 sub build {

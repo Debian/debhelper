@@ -67,9 +67,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		$changelog='debian/changelog';
 	}
 
-	if ( ! -d "$tmp/DEBIAN" ) {
-		install_dir("$tmp/DEBIAN");
-	}
+	install_dir("$tmp/DEBIAN");
 
 	# avoid gratuitous warning
 	if (! -e $substvars || system("grep -q '^misc:Depends=' $substvars") != 0) {
@@ -124,14 +122,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		} else {
 			push(@dbgsym_options, '-UReplaces', '-UBreaks');
 		}
-		if ( ! -d "${dbgsym_tmp}/DEBIAN" ) {
-			install_dir("${dbgsym_tmp}/DEBIAN");
-		}
+		install_dir("${dbgsym_tmp}/DEBIAN");
 		doit("dpkg-gencontrol", "-p${package}", "-l$changelog", "-T$substvars",
 			"-P${dbgsym_tmp}",@{$dh{U_PARAMS}}, @dbgsym_options);
 
-		doit("chmod","0644","${dbgsym_tmp}/DEBIAN/control");
-		doit("chown","0:0","${dbgsym_tmp}/DEBIAN/control");
+		reset_perm_and_owner('0644', "${dbgsym_tmp}/DEBIAN/control");
 	} elsif ($build_ids) {
 		# Only include the build-id if there is no dbgsym package (if
 		# there is a dbgsym package, the build-ids into the control
@@ -145,9 +140,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	# This chmod is only necessary if the user sets the umask to
 	# something odd.
-	doit("chmod","0644","$tmp/DEBIAN/control");
-	
-	doit("chown","0:0","$tmp/DEBIAN/control");
+	reset_perm_and_owner('0644', "${tmp}/DEBIAN/control");
 }
 
 sub read_dbgsym_file {

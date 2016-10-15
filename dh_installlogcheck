@@ -68,11 +68,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		$typenod=~s/\.d//;
 		my $logcheck=pkgfile($package,"logcheck.$typenod");
 		if ($logcheck) {
-			if (! -d "$tmp/etc/logcheck/$type") {
-				install_dir("$tmp/etc/logcheck/$type");
-			}
 			my $packagenodot=pkgfilename($package); # run-parts..
 			$packagenodot=~s/\./_/g;
+			install_dir("$tmp/etc/logcheck/$type");
 			install_file($logcheck, "$tmp/etc/logcheck/$type/$packagenodot");
 		}
 	}

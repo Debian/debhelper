@@ -19,7 +19,7 @@ B<dh_md5sums> [S<I<debhelper options>>] [B<-x>] [B<-X>I<item>] [B<--include-conf
 
 B<dh_md5sums> is a debhelper program that is responsible for generating
 a F<DEBIAN/md5sums> file, which lists the md5sums of each file in the package.
-These files are used by the B<debsums> package.
+These files are used by B<dpkg --verify> or the L<debsums(1)> program.
 
 All files in F<DEBIAN/> are omitted from the F<md5sums> file, as are all
 conffiles (unless you use the B<--include-conffiles> switch).
@@ -55,9 +55,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $dbgsym_tmp = "debian/.debhelper/${package}/dbgsym-root";
 	my $tmp=tmpdir($package);
 
-	if (! -d "$tmp/DEBIAN") {
-		install_dir("$tmp/DEBIAN");
-	}
+	install_dir("$tmp/DEBIAN");
 
 	# Check if we should exclude conffiles.
 	my $exclude="";
@@ -85,13 +83,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		doit("rm","-f","$tmp/DEBIAN/md5sums");
 	}
 	else {
-		doit("chmod", "0644", "$tmp/DEBIAN/md5sums");
-		doit("chown", "0:0", "$tmp/DEBIAN/md5sums");
+		reset_perm_and_owner('0644', "$tmp/DEBIAN/md5sums");
 	}
 	if ( -d $dbgsym_tmp) {
-		if (! -d "${dbgsym_tmp}/DEBIAN") {
-			install_dir("${dbgsym_tmp}/DEBIAN");
-		}
+		install_dir("${dbgsym_tmp}/DEBIAN");
 
 		$find = "find . -type f ! -regex './DEBIAN/.*' -printf '%P\\0'";
 		complex_doit("(cd $dbgsym_tmp >/dev/null ; $find | LC_ALL=C sort -z | xargs -r0 md5sum > DEBIAN/md5sums) >/dev/null");
@@ -100,8 +95,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			doit('rm', '-f', "${dbgsym_tmp}/DEBIAN/md5sums");
 		}
 		else {
-			doit('chmod', '0644', "${dbgsym_tmp}/DEBIAN/md5sums");
-			doit('chown', '0:0', "${dbgsym_tmp}/DEBIAN/md5sums");
+			reset_perm_and_owner('0644', "${dbgsym_tmp}/DEBIAN/md5sums");
 		}
 	}
 }

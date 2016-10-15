@@ -63,7 +63,7 @@ For this to work, your package should build-depend on F<po-debconf>.
 
 =over 4
 
-=item B<-n>, B<--noscripts>
+=item B<-n>, B<--no-scripts>
 
 Do not modify F<postrm> script.
 
@@ -89,9 +89,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $config=pkgfile($package,"config");
 	my $templates=pkgfile($package,"templates");
 
-	if (! -d "$tmp/DEBIAN") {
-		install_dir("$tmp/DEBIAN");
-	}
+	install_dir("$tmp/DEBIAN");
 
 	if (! is_udeb($package)) {
 		debhelper_script_subst($package, "config");

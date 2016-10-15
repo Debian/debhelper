@@ -29,6 +29,9 @@ the maintainer scripts by L<dh_installdeb(1)>.
 
 =item debian/I<package>.menu
 
+In compat 11, this file is no longer installed the format has been
+deprecated.  Please migrate to a desktop file instead.
+
 Debian menu files, installed into usr/share/menu/I<package> in the package
 build directory. See L<menufile(5)> for its format.
 
@@ -43,7 +46,7 @@ in the package build directory.
 
 =over 4
 
-=item B<-n>, B<--noscripts>
+=item B<-n>, B<--no-scripts>
 
 Do not modify F<postinst>/F<postrm> scripts.
 
@@ -61,23 +64,24 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $menu_method=pkgfile($package,"menu-method");
 	
 	if ($menu ne '') {
-		if (! -d "$tmp/usr/share/menu") {
+		if (compat(10)) {
 			install_dir("$tmp/usr/share/menu");
-		}
-		install_file($menu,"$tmp/usr/share/menu/$package");
+			install_file($menu,"$tmp/usr/share/menu/$package");
 
-		# Add the scripts if a menu-method file doesn't exist.
-		# The scripts for menu-method handle everything these do, too.
-		if ($menu_method eq "" && ! $dh{NOSCRIPTS}) {
-			autoscript($package,"postinst","postinst-menu");
-			autoscript($package,"postrm","postrm-menu")
+			# Add the scripts if a menu-method file doesn't exist.
+			# The scripts for menu-method handle everything these do, too.
+			if ($menu_method eq "" && ! $dh{NOSCRIPTS}) {
+				autoscript($package,"postinst","postinst-menu");
+				autoscript($package,"postrm","postrm-menu")
+			}
+		} else {
+			warning("menu files are *not* installed in compat 11");
+			warning("Please remove the menu file");
 		}
 	}
 
 	if ($menu_method ne '') {
-		if (!-d "$tmp/etc/menu-methods") {
-			install_dir("$tmp/etc/menu-methods");
-		}
+		install_dir("$tmp/etc/menu-methods");
 		install_file($menu_method,"$tmp/etc/menu-methods/$package");
 
 		if (! $dh{NOSCRIPTS}) {

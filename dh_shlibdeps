@@ -60,7 +60,8 @@ path.
 =item B<-L>I<package>, B<--libpackage=>I<package>
 
 With recent versions of B<dpkg-shlibdeps>, this option is generally not
-needed, unless your package builds multiple flavors of the same library.
+needed, unless your package builds multiple flavors of the same library
+or is relying on F<debian/shlibs.local> for an internal library.
 
 It tells B<dpkg-shlibdeps> (via its B<-S> parameter) to look first in the package
 build directory for the specified package, when searching for libraries,
@@ -106,14 +107,10 @@ if (defined $dh{V_FLAG}) {
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $ext=pkgext($package);
+	my (@filelist, $ff);
 
 	# dpkg-shlibdeps expects this directory to exist
-	if (! -d "$tmp/DEBIAN") {
-		install_dir("$tmp/DEBIAN");
-	}
-
-	my @filelist;
-	my $ff;
+	install_dir("$tmp/DEBIAN");
 
 	# Generate a list of ELF binaries in the package, ignoring any
 	# we were told to exclude.

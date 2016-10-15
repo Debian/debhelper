@@ -19,15 +19,11 @@ sub check_auto_buildable {
 	my $this=shift;
 	my ($step)=@_;
 
-	# Handle configure; the rest - next class (compat with 7.0.x code path)
-	if ($step eq "configure") {
-		return 1 if -x $this->get_sourcepath("configure");
-	}
-	if ($step eq "test") {
-		return 1 if (-e $this->get_buildpath("Makefile") &&
-			     -x $this->get_sourcepath("configure"));
-	}
-	return 0;
+	return 0 unless -x $this->get_sourcepath("configure");
+
+	# Handle configure explicitly; inherit the rest
+	return 1 if $step eq "configure";
+	return $this->SUPER::check_auto_buildable(@_);
 }
 
 sub configure {

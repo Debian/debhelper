@@ -61,9 +61,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	foreach my $script (qw(pre-up up down post-down)) {
 		my $file=pkgfile($package, "if-$script");
 		if ($file ne '') {
-			if (! -d "$tmp/etc/network/if-$script.d") {
-				install_dir("$tmp/etc/network/if-$script.d");
-			}
+			install_dir("$tmp/etc/network/if-$script.d");
 			install_prog($file,"$tmp/etc/network/if-$script.d/".pkgfilename($package));
 		}
 	}

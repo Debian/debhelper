@@ -107,7 +107,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			install_dir($dir);
 			doit("mv", "${dir}.tmp", "$dir/script");
 		}
-		elsif (! -d $dir) {
+		else {
 			install_dir($dir);
 		}
 		while (my ($type, $srcfile) = each(%bugfiles)) {
@@ -121,10 +121,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	
 	# Ensure that the bug script is executable
 	if (-f $dir) {
-		chmod 0755, $dir;
+		reset_perm_and_owner('0755', $dir);
 	}
 	elsif (-f "$dir/script") {
-		chmod 0755, "$dir/script";
+		reset_perm_and_owner('0755', "$dir/script");
 	}
 }
 

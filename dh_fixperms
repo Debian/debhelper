@@ -86,7 +86,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		"| xargs -0r chmod 0755");
 
 	# Executable man pages are a bad thing..
-	complex_doit("find $tmp/usr/share/man $tmp/usr/man/ $tmp/usr/X11*/man/ -type f",
+	complex_doit("find $tmp/usr/share/man -type f",
 		"$find_options -print0 2>/dev/null | xargs -0r chmod 0644");
 
 	# ..and header files ..
@@ -124,10 +124,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			"! -name 'script' $find_options -print0",
 			"2>/dev/null | xargs -0r chmod 644");
 		if ( -f "$tmp/usr/share/bug/$package/script" ) {
-			doit('chmod', '0755', "$tmp/usr/share/bug/$package/script");
+			reset_perm_and_owner('0755', "$tmp/usr/share/bug/$package/script");
 		}
 	} elsif ( -f "$tmp/usr/share/bug/$package" ) {
-		doit('chmod', '0755', "$tmp/usr/share/bug/$package");
+		reset_perm_and_owner('0755', "$tmp/usr/share/bug/$package");
 	}
 
 	# Lintian overrides should never be executable, too.

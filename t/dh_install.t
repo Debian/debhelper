@@ -14,14 +14,14 @@ system("rm -rf debian/debhelper debian/tmp");
 
 # debian/tmp explicitly specified in filenames in older compat level
 system("mkdir -p debian/tmp/usr/bin; touch debian/tmp/usr/bin/foo; touch debian/tmp/usr/bin/bar");
-system("DH_COMPAT=6 ./dh_install debian/tmp/usr/bin/foo");
+system("DH_COMPAT=6 ./dh_install debian/tmp/usr/bin/foo 2>/dev/null");
 ok(-e "debian/debhelper/usr/bin/foo");
 ok(! -e "debian/debhelper/usr/bin/bar");
 system("rm -rf debian/debhelper debian/tmp");
 
 # --sourcedir=debian/tmp in older compat level
 system("mkdir -p debian/tmp/usr/bin; touch debian/tmp/usr/bin/foo; touch debian/tmp/usr/bin/bar");
-system("DH_COMPAT=6 ./dh_install --sourcedir=debian/tmp usr/bin/foo");
+system("DH_COMPAT=6 ./dh_install --sourcedir=debian/tmp usr/bin/foo 2>/dev/null");
 ok(-e "debian/debhelper/usr/bin/foo");
 ok(! -e "debian/debhelper/usr/bin/bar");
 system("rm -rf debian/debhelper debian/tmp");

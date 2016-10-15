@@ -1,3 +1,179 @@
+debhelper (10.2.2) unstable; urgency=medium
+
+  * Fix typo in changelog entry for release 10.2.  Thanks to
+    Peter Pentchev for reporting it.
+  * Deprecate all compat levels lower than 9.
+  * dh: Discard override log files before running the override
+    rather than after.
+  * dh_compress,dh_fixperms: Remove references to long
+    obsolete directories such as usr/info, usr/man and
+    usr/X11*/man.
+  * autoreconf.pm: Apply patch from Helmut Grohne to fix
+    autoconf/cross regression from #836988.  The autoreconf
+    build-system is now also used directly for "clean" and
+    "build" (while still usin the "make" build-system for the
+    heavy lifting).  (Closes: #839681)
+  * dh_installdirs: In compat 11, avoid creating debian/<pkg>
+    directories except when required to do so.  This fixes a
+    corner case, where an arch:all build would behave
+    differently than an arch:all+arch:any when dh_installdir is
+    optimised out only for the arch:all build.
+  * Dh_Lib.pm: Fix typo of positive.  Thanks to Matthias Klose
+    for spotting it.
+
+ -- Niels Thykier <niels@thykier.net>  Sat, 08 Oct 2016 10:16:23 +0000
+
+debhelper (10.2.1) unstable; urgency=medium
+
+  * d/rules: Add a ./run in front of dh_auto_install.  It is
+    technically not needed, but it prevents lintian from assuming
+    that we need to Build-Depend debhelper.
+
+ -- Niels Thykier <niels@thykier.net>  Sun, 02 Oct 2016 06:51:49 +0000
+
+debhelper (10.2) unstable; urgency=medium
+
+  * Apply patch from Peter Pentchev to fix some typos.
+  * Apply patch from Michael Biebl to undo a major
+    regression where all of debhelpers functionality was
+    missing (introduced in 10.1).  (Closes: #839557)
+  * dh_installinit,dh_systemd_start: Introduce a new
+    --no-stop-on-upgrade as an alternative to
+    --no-restart-on-upgrade.  This new option should
+    reduce the confusion of what it does.  Thanks to
+    Michael Biebl for the suggestion.
+
+ -- Niels Thykier <niels@thykier.net>  Sun, 02 Oct 2016 06:20:56 +0000
+
+debhelper (10.1) unstable; urgency=medium
+
+  * Apply patch from Michael Biebl to take over dh-systemd
+    package to ease backporting to jessie-backports.
+    (Closes: #837585)
+  * Apply patch from Helmut Grohne and Julian Andres Klode
+    to improve cross-building support in the cmake build
+    system.  (Closes: #833789)
+  * Make the makefile.pm buildsystem (but not subclasses thereof)
+    pass the CC and CXX variables set to the host compilers when
+    cross-building.  Thanks to Helmut Grohne for the idea and
+    the initial patch.  (Closes: #836988)
+  * dh_md5sums.1: Mention dpkg --verify as a consumer of the
+    output file.  Thanks to Guillem Jover for reporting it.
+  * debhelper-obsolete-compat.pod: Add a manpage for the
+    upgrade checklist for all obsolete/removed compat levels.
+    Thanks to Jakub Wilk for the suggestion.
+  * Dh_Getopt,dh_*: Rename --onlyscripts to --only-scripts and
+    --noscripts to --no-scripts for consistency with other
+    options.  The old variants are accepted for compatibility.
+    Thanks to Raphaël Hertzog for the suggestion.
+    (Closes: #838446)
+  * cmake.pm: If cmake fails, also dump CMakeFiles/CMakeOutput.log
+    and CMakeFiles/CMakeError.log if they are present.  Thanks to
+    Michael Banck for the suggestion.  (Closes: #839389)
+  * d/copyright: Correct copyright and license of dh_systemd*
+    tools.
+
+ -- Niels Thykier <niels@thykier.net>  Sat, 01 Oct 2016 20:45:27 +0000
+
+debhelper (10) unstable; urgency=medium
+
+  [ Niels Thykier ]
+  * Dh_Lib.pm: Support a new named "beta-tester" compat level.
+    If you want to participate in beta testing of new compat
+    levels, please review "man 7 debhelper" for more
+    information.
+  * Dh_Lib.pm: Fix bug in detection of existing auto-trigger.
+
+  [ Axel Beckert ]
+  * Apply patch by Jens Reyer to fix typo in dh_installdocs man page.
+    (Closes: #836344)
+  * Use uppercase "Debian" in package description when the project is
+    meant. Fixes lintian warning capitalization-error-in-description.
+  * Apply "wrap-and-sort -a"
+  * Add a .mailmap file for making "git shortlog" work properly.
+
+  [ Translations ]
+  * Update German translation (Chris Leick) (Closes: #835593)
+  * Update Portuguese translation (Américo Monteiro)
+    (Closes: #835403)
+  * Update French translation (Baptiste Jammet) (Closes: #836693)
+
+ -- Niels Thykier <niels@thykier.net>  Sun, 11 Sep 2016 09:00:23 +0000
+
+debhelper (9.20160814) unstable; urgency=medium
+
+  * dh_installdocs: Apply patch from Sven Joachim to make
+    --link-doc work again in compat 11 (See: #830309)
+  * t: Apply patch from Sven Joachim to add some test cases
+    to dh_installdocs's --link-doc behaviour.
+    (Closes: #831465)
+  * dh_installinit,dh_systemd_start: Apply patches from
+    Peter Pentchev to make -R default in compat 10 (as
+    documented, but not as implemented).
+  * perl_{build,makemaker}.pm: Apply patch from Dominic
+    Hargreaves to explicitly pass -I. to perl.  This is to
+    assist with the fix for CVE-2016-1238.  (Closes: #832436)
+  * dh_install: Clarify that "debian/not-installed" is not
+    related to the --exclude parameter.
+  * dh_install: Apply patch from Sven Joachim to support
+    the "debian/tmp" prefix being optional in
+    "debian/not-installed".  (Closes: #815506)
+  * Dh_Lib.pm: Apply patch from Dominic Hargreaves to set
+    PERL_USE_UNSAFE_INC to fix a further set of packages
+    which fail to build with . removed from @INC.
+    (Closes: #832436)
+  * Dh_Buildsystems.pm: Enable auto-detection of the maven
+    and gradle buildsystems (provided they are installed).
+    Thanks to Emmanuel Bourg for the suggestion.
+    (Closes: #801732)
+
+ -- Niels Thykier <niels@thykier.net>  Sun, 14 Aug 2016 09:19:35 +0000
+
+debhelper (9.20160709) unstable; urgency=medium
+
+  * Explicitly Build-Depends on perl:any for pod2man instead
+    of relying on it implicitly via libdpkg-perl.
+  * dh_shlibdeps: Clarify that -L is also useful for packages
+    using debian/shlibs.local for private libraries.
+  * dh_installdocs: Apply patch from Sven Joachim to fix a
+    regression with --link-doc and installing extra
+    documentation.  (Closes: #830309)
+  * Apply patches from Michael Biebl to merge dh_systemd_enable
+    and dh_systemd_start from the dh-systemd package.
+    (Closes: #822670)
+  * dh: Enable the systemd helpers by default in compat 10 and
+    later.
+
+ -- Niels Thykier <niels@thykier.net>  Sat, 09 Jul 2016 09:53:02 +0000
+
+debhelper (9.20160702) unstable; urgency=medium
+
+  * Start on compat 11.
+  * dh_installmenu: Stop installing menu files in compat 11
+    (menu-methods are still installed).
+  * dh_*: Deprecate -s in favor of -a.  The -s option is
+    removed in compat 11.
+  * dh_strip: Fix regression in 9.20160618, which caused
+    issues when there were hardlinked ELF binaries in a
+    package.  Thanks to Sven Joachim for the report, the
+    analysis/testing and for providing a patch for the
+    most common case.  (Closes: #829142)
+  * Dh_Lib.pm: Cope with the parallel options in make 4.2.
+    Thanks to Martin Dorey for the report.  (Closes: #827132)
+  * dh_installdocs: In compat 11, install documentation into
+    /usr/share/doc/mainpackage as requested by policy 3.9.7.
+    Thanks to Sandro Knauß for the report.  (Closes: #824221)
+  * dh_perl: Emit perl:any dependencies when a package only
+    contains perl programs (but no modules of any kind).
+    Thanks to Javier Serrano Polo and Niko Tyni for the
+    report and feedback.  (Closes: #824696)
+
+  [ Translations ]
+  * Update German translation (Chris Leick + Eduard Bloch)
+    (Closes: #827699)
+
+ -- Niels Thykier <niels@thykier.net>  Sat, 02 Jul 2016 13:24:21 +0000
+
 debhelper (9.20160618.1~bpo8+1) jessie-backports; urgency=medium
 
   * Rebuild for jessie-backports.

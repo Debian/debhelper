@@ -1,0 +1,272 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dh_systemd_enable - enable/disable systemd unit files
+
+=cut
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+use File::Find;
+
+=head1 SYNOPSIS
+
+B<dh_systemd_enable> [S<I<debhelper options>>] [B<--no-enable>] [B<--name=>I<name>] [S<I<unit file> ...>]
+
+=head1 DESCRIPTION
+
+B<dh_systemd_enable> is a debhelper program that is responsible for enabling
+and disabling systemd unit files.
+
+In the simple case, it finds all unit files installed by a package (e.g.
+bacula-fd.service) and enables them. It is not necessary that the machine
+actually runs systemd during package installation time, enabling happens on all
+machines in order to be able to switch from sysvinit to systemd and back.
+
+In the complex case, you can call B<dh_systemd_enable> and B<dh_systemd_start>
+manually (by overwriting the debian/rules targets) and specify flags per unit
+file. An example is colord, which ships colord.service, a dbus-activated
+service without an [Install] section. This service file cannot be enabled or
+disabled (a state called "static" by systemd) because it has no
+[Install] section. Therefore, running dh_systemd_enable does not make sense.
+
+For only generating blocks for specific service files, you need to pass them as
+arguments, e.g. B<dh_systemd_enable quota.service> and B<dh_systemd_enable
+--name=quotarpc quotarpc.service>.
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.service
+
+If this exists, it is installed into lib/systemd/system/I<package>.service in
+the package build directory.
+
+=item debian/I<package>.tmpfile
+
+If this exists, it is installed into usr/lib/tmpfiles.d/I<package>.conf in the
+package build directory. (The tmpfiles.d mechanism is currently only used
+by systemd.)
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--no-enable>
+
+Just disable the service(s) on purge, but do not enable them by default.
+
+=item B<--name=>I<name>
+
+Install the service file as I<name.service> instead of the default filename,
+which is the I<package.service>. When this parameter is used,
+B<dh_systemd_enable> looks for and installs files named
+F<debian/package.name.service> instead of the usual F<debian/package.service>.
+
+=back
+
+=head1 NOTES
+
+Note that this command is not idempotent. L<dh_prep(1)> should be called
+between invocations of this command (with the same arguments). Otherwise, it
+may cause multiple instances of the same text to be added to maintainer
+scripts.
+
+Note that B<dh_systemd_enable> should be run before B<dh_installinit>.
+The default sequence in B<dh> does the right thing, this note is only relevant
+when you are calling B<dh_systemd_enable> manually.
+
+=cut
+
+init(options => {
+	"no-enable" => \$dh{NO_ENABLE},
+});
+
+sub contains_install_section {
+	my ($unit_path) = @_;
+	my $fh;
+	if (!open($fh, '<', $unit_path)) {
+		warning("Cannot open($unit_path) for extracting the Also= line(s)");
+		return;
+	}
+	while (my $line = <$fh>) {
+		chomp($line);
+		return 1 if $line =~ /^\s*\[Install\]$/i;
+	}
+	close($fh);
+	return 0;
+}
+
+# PROMISE: DH NOOP WITHOUT tmp(lib/systemd/system) mount path service socket target tmpfile
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmpdir = tmpdir($package);
+	my @installed_units;
+	my @units;
+
+	# XXX: This is duplicated in dh_installinit, which is unfortunate.
+	# We do need the service files before running dh_installinit though,
+	# every other solution makes things much worse for all the maintainers.
+
+	# Figure out what filename to install it as.
+	my $script;
+	my $jobfile=$package;
+	if (defined $dh{NAME}) {
+		$jobfile=$script=$dh{NAME};
+	}
+	elsif ($dh{D_FLAG}) {
+		# -d on the command line sets D_FLAG. We will
+		# remove a trailing 'd' from the package name and
+		# use that as the name.
+		$script=$package;
+		if ($script=~m/(.*)d$/) {
+			$jobfile=$script=$1;
+		}
+		else {
+			warning("\"$package\" has no final d' in its name, but -d was specified.");
+		}
+	}
+	elsif ($dh{INIT_SCRIPT}) {
+		$script=$dh{INIT_SCRIPT};
+	}
+	else {
+		$script=$package;
+	}
+
+	my $service=pkgfile($package,"service");
+	if ($service ne '') {
+		my $path="$tmpdir/lib/systemd/system";
+		install_dir($path);
+
+		install_file($service, "$path/$script.service");
+	}
+
+	my $template=pkgfile("$package@","service");
+	if ($template ne '') {
+		my $path="$tmpdir/lib/systemd/system";
+		install_dir($path);
+		install_file($template, "$path/$script@.service");
+	}
+
+	my $target=pkgfile($package,"target");
+	if ($target ne '') {
+		my $path="$tmpdir/lib/systemd/system";
+		install_dir($path);
+		install_file($target, "$path/$script.target");
+	}
+
+	my $socket=pkgfile($package,"socket");
+	if ($socket ne '') {
+		my $path="$tmpdir/lib/systemd/system";
+		install_dir($path);
+		install_file($socket, "$path/$script.socket");
+	}
+
+	my $tmpfile=pkgfile($package,"tmpfile");
+	if ($tmpfile ne '') {
+		my $path="$tmpdir/usr/lib/tmpfiles.d";
+		install_dir($path);
+		install_file($tmpfile, "$path/$script.conf");
+	}
+
+	my $mount=pkgfile($package,"mount");
+	if ($mount ne '') {
+		my $path="$tmpdir/usr/lib/system";
+		install_dir($path);
+		install_file($mount, "$path/$script.mount");
+	}
+
+	my $pathunit=pkgfile($package,"path");
+	if ($pathunit ne '') {
+		my $path="$tmpdir/lib/systemd/system";
+		install_dir($path);
+		install_file($pathunit, "$path/$script.path");
+	}
+
+	find({
+		wanted => sub {
+			my $name = $File::Find::name;
+			return unless -f $name;
+			# Skip symbolic links, their only legitimate use is for
+			# adding an alias, e.g. linking smartmontools.service
+			# -> smartd.service.
+			return if -l $name;
+			return unless $name =~ m,^$tmpdir/lib/systemd/system/[^/]+$,;
+			push @installed_units, $name;
+		},
+		no_chdir => 1,
+	}, "${tmpdir}/lib/systemd/system") if -d "${tmpdir}/lib/systemd/system";
+
+	# Handle either only the unit files which were passed as arguments or
+	# all unit files that are installed in this package.
+	my @args = @ARGV > 0 ? @ARGV : @installed_units;
+
+	# support excluding units via -X
+	foreach my $x (@{$dh{EXCLUDE}}) {
+		@args = grep !/(^|\/)$x$/, @args;
+	}
+
+	for my $name (@args) {
+		my $base = basename($name);
+
+		# Try to make the path absolute, so that the user can call
+		# dh_installsystemd bacula-fd.service
+		if ($base eq $name) {
+			# NB: This works because @installed_units contains
+			# files from precisely one directory.
+			my ($full) = grep { basename($_) eq $base } @installed_units;
+			if (defined($full)) {
+				$name = $full;
+			} else {
+				warning(qq|Could not find "$name" in the /lib/systemd/system directory of $package. | .
+					qq|This could be a typo, or using Also= with a service file from another package. | .
+					qq|Please check carefully that this message is harmless.|);
+			}
+		}
+
+		# Skip template service files like e.g. getty@.service.
+		# Enabling, disabling, starting or stopping those services
+		# without specifying the instance (e.g. getty@ttyS0.service) is
+		# not useful.
+		if ($name =~ /\@/) {
+			next;
+		}
+
+		# Skip unit files that don’t have an [Install] section.
+		next unless contains_install_section($name);
+
+		push @units, $name;
+	}
+
+	next if @units == 0;
+
+	my $unitargs = join(" ", sort map { basename($_) } @units);
+	for my $unit (sort @units) {
+		my $base = basename($unit);
+		if ($dh{NO_ENABLE}) {
+			autoscript($package, "postinst", "postinst-systemd-dont-enable", "s/#UNITFILE#/$base/");
+		} else {
+			autoscript($package, "postinst", "postinst-systemd-enable", "s/#UNITFILE#/$base/");
+		}
+	}
+	autoscript($package, "postrm", "postrm-systemd", "s/#UNITFILES#/$unitargs/");
+
+	# init-system-helpers ships deb-systemd-helper which we use in our
+	# autoscripts
+	addsubstvar($package, "misc:Depends", "init-system-helpers (>= 1.18~)");
+}
+
+=head1 SEE ALSO
+
+L<dh_systemd_start(1)>, L<debhelper(7)>
+
+=head1 AUTHORS
+
+pkg-systemd-maintainers@lists.alioth.debian.org
+
+=cut

@@ -40,7 +40,7 @@ Installed to etc/modprobe.d/I<package>.conf in the package build directory.
 
 =over 4
 
-=item B<-n>, B<--noscripts>
+=item B<-n>, B<--no-scripts>
 
 Do not modify F<preinst>/F<postinst>/F<postrm> scripts.
 
@@ -91,10 +91,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $modprobe_file=pkgfile($package,"modprobe");
 
 	if ($modprobe_file) {
-		if (! -e "$tmp/etc/modprobe.d") {
-			install_dir("$tmp/etc/modprobe.d");
-		}
 		my $path = '/etc/modprobe.d/' . pkgfilename($package) . '.conf';
+		install_dir("$tmp/etc/modprobe.d");
 		install_file($modprobe_file, "$tmp/$path");
 	}
 	

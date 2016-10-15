@@ -199,9 +199,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		next unless -d "$tmp/usr/share/doc/$package";
 	}
 
-	if (! -d "$tmp/usr/share/doc/$package") {
-		install_dir("$tmp/usr/share/doc/$package");
-	}
+	install_dir("$tmp/usr/share/doc/$package");
 
 	if (! $dh{NO_ACT}) {
 		if (! install_binNMU_changelog($package, $changelog, $changelog_name)) {
@@ -226,8 +224,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$link_to='changelog.html';
 			if (! defined $upstream_text) {
 				complex_doit("echo 'See changelog.html.gz' > $base/changelog");
-				doit("chmod","644","$base/changelog");
-				doit("chown","0:0","$base/changelog");
+				reset_perm_and_owner('0644',"$base/changelog");
 			}
 		}
 		if ($dh{K_FLAG}) {

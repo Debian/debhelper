@@ -31,6 +31,11 @@ our @BUILDSYSTEMS = (
 	"qmake_qt4",
 );
 
+our @THIRD_PARTY_BUILDSYSTEMS = (
+	'maven',
+	'gradle',
+);
+
 my $opt_buildsys;
 my $opt_sourcedir;
 my $opt_builddir;
@@ -38,12 +43,12 @@ my $opt_list;
 my $opt_parallel;
 
 sub create_buildsystem_instance {
-	my $system=shift;
-	my %bsopts=@_;
+	my ($system, $required, %bsopts) = @_;
 	my $module = "Debian::Debhelper::Buildsystem::$system";
 
 	eval "use $module";
 	if ($@) {
+		return if not $required;
 		error("unable to load build system class '$system': $@");
 	}
 
@@ -88,15 +93,25 @@ sub autoselect_buildsystem {
 sub load_buildsystem {
 	my $system=shift;
 	my $step=shift;
+	my $system_options;
+	if (defined($system) && ref($system) eq 'HASH') {
+		$system_options = $system;
+		$system = $system_options->{'system'};
+	}
 	if (defined $system) {
-		my $inst = create_buildsystem_instance($system, @_);
+		my $inst = create_buildsystem_instance($system, 1, @_);
 		return $inst;
 	}
 	else {
 		# Try to determine build system automatically
 		my @buildsystems;
 		foreach $system (@BUILDSYSTEMS) {
-			push @buildsystems, create_buildsystem_instance($system, @_);
+			push @buildsystems, create_buildsystem_instance($system, 1, @_);
+		}
+		if (!$system_options || $system_options->{'enable-thirdparty'}) {
+			foreach $system (@THIRD_PARTY_BUILDSYSTEMS) {
+				push @buildsystems, create_buildsystem_instance($system, 0, @_);
+			}
 		}
 		return autoselect_buildsystem($step, @buildsystems);
 	}
@@ -113,7 +128,7 @@ sub load_all_buildsystems {
 				my $name = basename($module_path);
 				$name =~ s/\.pm$//;
 				next if exists $buildsystems{$name};
-				$buildsystems{$name} = create_buildsystem_instance($name, @_);
+				$buildsystems{$name} = create_buildsystem_instance($name, 1, @_);
 			}
 		}
 	}
@@ -126,8 +141,16 @@ sub load_all_buildsystems {
 		delete $buildsystems{$name};
 	}
 
+	foreach my $name (@THIRD_PARTY_BUILDSYSTEMS) {
+		next if not exists $buildsystems{$name};
+		my $inst = $buildsystems{$name};
+		$inst->{thirdparty} = 1;
+		push(@buildsystems, $inst);
+		delete($buildsystems{$name});
+	}
+
 	# The rest are 3rd party build systems
-	foreach my $name (keys %buildsystems) {
+	foreach my $name (sort(keys(%buildsystems))) {
 		my $inst = $buildsystems{$name};
 		$inst->{thirdparty} = 1;
 		push @buildsystems, $inst;
@@ -182,7 +205,8 @@ sub buildsystems_list {
 	my $step=shift;
 
 	my @buildsystems = load_all_buildsystems();
-	my $auto = autoselect_buildsystem($step, grep { ! $_->{thirdparty} } @buildsystems);
+	my %auto_selectable = map { $_ => 1 } @THIRD_PARTY_BUILDSYSTEMS;
+	my $auto = autoselect_buildsystem($step, grep { ! $_->{thirdparty} || $auto_selectable{$_->NAME} } @buildsystems);
 	my $specified;
 
 	# List build systems (including auto and specified status)

@@ -1,0 +1,128 @@
+=head1 NAME
+
+debhelper-obsolete-compat - List of no longer supported compat levels
+
+=head1 SYNOPSIS
+
+This document contains the upgrade guidelines from all compat levels
+which are no longer supported.  Accordingly it is mostly for
+historical purposes and to assist people upgrading from a
+non-supported compat level to a supported level.
+
+For upgrades from supported compat levels, please see L<debhelper(7)>.
+
+=head1 UPGRADE LIST FOR COMPAT LEVELS
+
+The following is the list of now obsolete compat levels and their
+changes.
+
+=over 4
+
+=item v1
+
+This is the original debhelper compatibility level, and so it is the default
+one. In this mode, debhelper will use F<debian/tmp> as the package tree
+directory for the first binary package listed in the control file, while using
+debian/I<package> for all other packages listed in the F<control> file.
+
+This mode is deprecated.
+
+=item v2
+
+In this mode, debhelper will consistently use debian/I<package>
+as the package tree directory for every package that is built.
+
+This mode is deprecated.
+
+=item v3
+
+This mode works like v2, with the following additions:
+
+=over 8
+
+=item -
+
+Debhelper config files support globbing via B<*> and B<?>, when appropriate. To
+turn this off and use those characters raw, just prefix with a backslash.
+
+=item -
+
+B<dh_makeshlibs> makes the F<postinst> and F<postrm> scripts call B<ldconfig>.
+
+=item -
+
+Every file in F<etc/> is automatically flagged as a conffile by B<dh_installdeb>.
+
+=back
+
+This mode is deprecated.
+
+=item v4
+
+Changes from v3 are:
+
+=over 8
+
+=item -
+
+B<dh_makeshlibs -V> will not include the Debian part of the version number in
+the generated dependency line in the shlibs file.
+
+=item -
+
+You are encouraged to put the new B<${misc:Depends}> into F<debian/control> to
+supplement the B<${shlibs:Depends}> field.
+
+=item -
+
+B<dh_fixperms> will make all files in F<bin/> directories and in F<etc/init.d>
+executable.
+
+=item -
+
+B<dh_link> will correct existing links to conform with policy.
+
+=back
+
+This mode is deprecated.
+
+=item v5
+
+This is the lowest supported compatibility level.
+
+Changes from v4 are:
+
+=over 8
+
+=item -
+
+Comments are ignored in debhelper config files.
+
+=item -
+
+B<dh_strip --dbg-package> now specifies the name of a package to put debugging
+symbols in, not the packages to take the symbols from.
+
+=item -
+
+B<dh_installdocs> skips installing empty files.
+
+=item -
+
+B<dh_install> errors out if wildcards expand to nothing.
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+=head1 AUTHORS
+
+Niels Thykier <niels@thykier.net>
+
+Joey Hess
+
+=cut
