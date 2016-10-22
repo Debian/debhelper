@@ -467,9 +467,7 @@ my %command_opts;
 
 # sequence addon interface
 sub _insert {
-	my $offset=shift;
-	my $existing=shift;
-	my $new=shift;
+	my ($offset, $existing, $new) = @_;
 	foreach my $sequence (keys %sequences) {
 		my @list=@{$sequences{$sequence}};
 		next unless grep $existing, @list;
@@ -494,15 +492,14 @@ sub insert_after {
 	_insert(1, @_);
 }
 sub remove_command {
-	my $command=shift;
+	my ($command) = @_;
 	foreach my $sequence (keys %sequences) {
 		$sequences{$sequence}=[grep { $_ ne $command } @{$sequences{$sequence}}];
 	}
 	
 }
 sub add_command {
-	my $command=shift;
-	my $sequence=shift;
+	my ($command, $sequence) = @_;
 	unshift @{$sequences{$sequence}}, $command;
 }
 sub add_command_options {
@@ -510,11 +507,11 @@ sub add_command_options {
 	push @{$command_opts{$command}}, @_;
 }
 sub remove_command_options {
-	my $command=shift;
-	if (@_) {
+	my ($command, @cmd_options) = @_;
+	if (@cmd_options) {
 		# Remove only specified options
 		if (my $opts = $command_opts{$command}) {
-			foreach my $opt (@_) {
+			foreach my $opt (@cmd_options) {
 				$opts = [ grep { $_ ne $opt } @$opts ];
 			}
 			$command_opts{$command} = $opts;
@@ -775,8 +772,7 @@ foreach my $i (0..$stoppoint) {
 }
 
 sub run {
-	my $command=shift;
-	my @options=@_;
+	my ($command, @options) = @_;
 
 	# Include additional command options if any
 	unshift @options, @{$command_opts{$command}}
@@ -802,10 +798,7 @@ sub run {
 # Tries to run an override target for a command. Returns the list of
 # packages that it was unable to run an override target for.
 sub run_override {
-	my $override_type=shift; # arch, indep, or undef
-	my $command=shift;
-	my @packages=@{shift()};
-	my @options=@_;
+	my ($override_type, $command, $packages, @options) = @_;
 
 	my $override="override_$command".
 		(defined $override_type ? "-".$override_type : "");
@@ -814,7 +807,7 @@ sub run_override {
 	# override_type.
 	my (@todo, @rest);
 	if (defined $override_type) {
-		foreach my $package (@packages) {
+		foreach my $package (@{$packages}) {
 			my $isall=package_arch($package) eq 'all';
 			if (($override_type eq 'indep' && $isall) ||
 			    ($override_type eq 'arch' && !$isall)) {
@@ -827,11 +820,11 @@ sub run_override {
 		}
 	}
 	else {
-		@todo=@packages;
+		@todo=@{$packages};
 	}
 
 	my $has_explicit_target = rules_explicit_target($override);
-	return @packages unless defined $has_explicit_target; # no such override
+	return @{$packages} unless defined $has_explicit_target; # no such override
 	return @rest if ! $has_explicit_target; # has empty override
 	return @rest unless @todo; # has override, but no packages to act on
 
@@ -866,8 +859,8 @@ sub run_override {
 }
 
 sub optimize_sequence {
-	my @sequence;
-	my %seen;
+	my (@commands) = @_;
+	my (@sequence, %seen);
 	my $add=sub {
 		# commands can appear multiple times when sequences are
 		# inlined together; only the first should be needed
@@ -877,7 +870,7 @@ sub optimize_sequence {
 			push @sequence, $command;
 		}
 	};
-	foreach my $command (@_) {
+	foreach my $command (@commands) {
 		my $rules_target=rules_target($command);
 		if (defined $rules_target &&
 		    ! defined rules_explicit_target($rules_target)) {
@@ -892,7 +885,7 @@ sub optimize_sequence {
 }
 
 sub rules_target {
-	my $command=shift;
+	my ($command) = @_;
 	if ($command =~ /^debian\/rules\s+(.*)/) {
 		return $1
 	}
@@ -922,7 +915,7 @@ sub rules_explicit_target {
 	# in debian/rules.
 	# undef is returned if target does not exist, 0 if target is noop
 	# and 1 if target has dependencies or executes commands.
-	my $target=shift;
+	my ($target) = @_;
 
 	if (! $rules_parsed) {
 		my $processing_targets = 0;
@@ -988,8 +981,7 @@ sub warn_deprecated {
 }
 
 sub command_pos {
-	my $command=shift;
-	my @sequence=@_;
+	my ($command, @sequence) = @_;
 
 	foreach my $i (0..$#sequence) {
 		if ($command eq $sequence[$i]) {
@@ -1013,8 +1005,7 @@ sub command_pos {
 
 my %skipinfo;
 sub can_skip {
-	my $command=shift;
-	my @packages=@_;
+	my ($command, @packages) = @_;
 
 	return 0 if $user_specified_options ||
 		(exists $ENV{DH_OPTIONS} && length $ENV{DH_OPTIONS});
@@ -1047,7 +1038,7 @@ sub can_skip {
 }
 
 sub extract_skipinfo {
-	my $command=shift;
+	my ($command) = @_;
 
 	foreach my $dir (split (':', $ENV{PATH})) {
 		if (open (my $h, "<", "$dir/$command")) {
