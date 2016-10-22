@@ -295,6 +295,10 @@ if (not compat(9, 1)) {
 	# Enable systemd support by default in compat 10 or later.
 	unshift(@ARGV, "--with=systemd");
 }
+if (compat(10, 1)) {
+	unshift(@ARGV, "--with=build-stamp");
+}
+
 
 inhibit_log();
 		
@@ -375,9 +379,7 @@ my @bd = (qw{
 	dh_auto_configure
 	dh_auto_build
 	dh_auto_test
-},
-	"create-stamp ${build_stamp_file}",
-);
+});
 my @i = (qw{
 	dh_testroot
 	dh_prep
@@ -501,6 +503,10 @@ sub remove_command {
 sub add_command {
 	my ($command, $sequence) = @_;
 	unshift @{$sequences{$sequence}}, $command;
+}
+sub add_command_at_end {
+	my ($command, $sequence) = @_;
+	push(@{$sequences{$sequence}}, $command);
 }
 sub add_command_options {
 	my $command=shift;

@@ -613,6 +613,18 @@ it).
 
 The vast majority of all packages will be unaffected by this change.
 
+=item -
+
+B<dh> no longer creates a stamp (or log) file to record whether the
+build already ran or not.  This means that unless upstream's build
+system correctly tracks this, the build will be run twice (once for
+the "build" target and once for the "binary" target).
+
+On the other hand, this means that rebuild without cleaning
+(e.g. B<dpkg-buildpackage -nc>) will behave as much people expect.
+
+The previous behaviour can restored by using B<--with build-stamp>
+
 =back
 
 =back
