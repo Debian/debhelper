@@ -117,7 +117,7 @@ sub install_unit {
 	install_file($unit, "${path}/${script}.${installsuffix}");
 }
 
-# PROMISE: DH NOOP WITHOUT tmp(lib/systemd/system) mount path service socket target tmpfile
+# PROMISE: DH NOOP WITHOUT tmp(lib/systemd/system) mount path service socket target tmpfile timer
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmpdir = tmpdir($package);
@@ -160,6 +160,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		install_unit("$package$suffix", $script, 'mount', "$tmpdir/lib/systemd/system") if $suffix eq '';
 		install_unit("$package$suffix", $script, 'path', "$tmpdir/lib/systemd/system");
 		install_unit("$package$suffix", $script, 'tmpfile', "$tmpdir/usr/lib/tmpfiles.d", 'conf') if $suffix eq '';
+		install_unit("$package$suffix", $script, 'timer', "$tmpdir/lib/systemd/system");
 	}
 
 	find({
