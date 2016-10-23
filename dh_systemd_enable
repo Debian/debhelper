@@ -108,6 +108,15 @@ sub contains_install_section {
 	return 0;
 }
 
+sub install_unit {
+	my ($package, $script, $pkgsuffix, $path, $installsuffix) = @_;
+	$installsuffix = $installsuffix || $pkgsuffix;
+	my $unit = pkgfile($package, $pkgsuffix);
+	return if $unit eq '';
+	install_dir($path);
+	install_file($unit, "${path}/${script}.${installsuffix}");
+}
+
 # PROMISE: DH NOOP WITHOUT tmp(lib/systemd/system) mount path service socket target tmpfile
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -144,54 +153,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		$script=$package;
 	}
 
-	my $service=pkgfile($package,"service");
-	if ($service ne '') {
-		my $path="$tmpdir/lib/systemd/system";
-		install_dir($path);
-
-		install_file($service, "$path/$script.service");
-	}
-
-	my $template=pkgfile("$package@","service");
-	if ($template ne '') {
-		my $path="$tmpdir/lib/systemd/system";
-		install_dir($path);
-		install_file($template, "$path/$script@.service");
-	}
-
-	my $target=pkgfile($package,"target");
-	if ($target ne '') {
-		my $path="$tmpdir/lib/systemd/system";
-		install_dir($path);
-		install_file($target, "$path/$script.target");
-	}
-
-	my $socket=pkgfile($package,"socket");
-	if ($socket ne '') {
-		my $path="$tmpdir/lib/systemd/system";
-		install_dir($path);
-		install_file($socket, "$path/$script.socket");
-	}
-
-	my $tmpfile=pkgfile($package,"tmpfile");
-	if ($tmpfile ne '') {
-		my $path="$tmpdir/usr/lib/tmpfiles.d";
-		install_dir($path);
-		install_file($tmpfile, "$path/$script.conf");
-	}
-
-	my $mount=pkgfile($package,"mount");
-	if ($mount ne '') {
-		my $path="$tmpdir/lib/systemd/system";
-		install_dir($path);
-		install_file($mount, "$path/$script.mount");
-	}
-
-	my $pathunit=pkgfile($package,"path");
-	if ($pathunit ne '') {
-		my $path="$tmpdir/lib/systemd/system";
-		install_dir($path);
-		install_file($pathunit, "$path/$script.path");
+	foreach my $suffix ('', '@') {
+		install_unit("$package$suffix", $script, 'service', "$tmpdir/lib/systemd/system");
+		install_unit("$package$suffix", $script, 'target', "$tmpdir/lib/systemd/system");
+		install_unit("$package$suffix", $script, 'socket', "$tmpdir/lib/systemd/system");
+		install_unit("$package$suffix", $script, 'mount', "$tmpdir/lib/systemd/system") if $suffix eq '';
+		install_unit("$package$suffix", $script, 'path', "$tmpdir/lib/systemd/system");
+		install_unit("$package$suffix", $script, 'tmpfile', "$tmpdir/usr/lib/tmpfiles.d", 'conf') if $suffix eq '';
 	}
 
 	find({
