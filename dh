@@ -725,6 +725,8 @@ foreach my $i (0..$stoppoint) {
 	}
 	if (my $stamp_file = stamp_target($command)) {
 		my %seen;
+		print "   create-stamp ".escape_shell($stamp_file)."\n";
+
 		next if $dh{NO_ACT};
 		open(my $fd, '+>>', $stamp_file) or error("open($stamp_file, rw) failed: $!");
 		# Seek to the beginning
