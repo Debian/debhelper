@@ -1,3 +1,10 @@
+debhelper (10.2.4) UNRELEASED; urgency=medium
+
+  * d/changelog: Add missing changelog entry in 10.2.3 for a
+    compat 11 change.
+
+ -- Niels Thykier <niels@thykier.net>  Thu, 12 Jan 2017 07:00:19 +0000
+
 debhelper (10.2.3) unstable; urgency=medium
 
   [ Axel Beckert ]
@@ -15,6 +22,8 @@ debhelper (10.2.3) unstable; urgency=medium
   * Massage md5sum output to avoid GNU-specific escaping extension
     while we wait for dpkg-gendigests for a more compatible tool.
     Thanks to Bernd Zeimetz for the report.  (Closes: #843163)
+  * In compat 11, dh will now skip creating a stamp file unless the
+    package explicitly requests it with "--with build-stamp".
 
   [ Felipe Sateler ]
   * dh_systemd_start: Fix a bug where --restart-after-upgrade with
