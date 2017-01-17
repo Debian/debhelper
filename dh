@@ -647,12 +647,23 @@ if ( -f $build_stamp_file) {
 	close($fd);
 }
 
+# Lazy cache of the result of optimize_sequence on the "build"
+# sequence
+my $optimized_build_seq;
 foreach my $package (@packages) {
 	my @log;
 	if (compat(9)) {
 		@log = load_log($package, \%logged);
 	} elsif (exists($stamp_file{$package})) {
-		@log = @bd;
+		if (not defined($optimized_build_seq)) {
+			# Expand "build" so we can accurately filter out
+			# everything (admittedly, it is bit of an over
+			# approximation)
+			# Related bug: #851071
+			my @seq = optimize_sequence(@{$sequences{'build'}});
+			$optimized_build_seq = \@seq;
+		}
+		@log = @{$optimized_build_seq};
 		# We do not need %logged in compat 10
 	}
 	if ($dh{AFTER}) {
