@@ -2,15 +2,15 @@
 # Copyright (C) 2014 The debhelper's copyright holder.
 # This file is distributed under the same license as the debhelper package.
 #
-# Américo Monteiro <a_monteiro@gmx.com>, 2014 - 2016.
+# Américo Monteiro <a_monteiro@gmx.com>, 2014 - 2017.
 msgid ""
 msgstr ""
-"Project-Id-Version: debhelper 9.20160814+unreleased\n"
+"Project-Id-Version: debhelper 10.2.3\n"
 "Report-Msgid-Bugs-To: debhelper@packages.debian.org\n"
 "POT-Creation-Date: 2016-12-31 21:29+0000\n"
-"PO-Revision-Date: 2016-08-25 11:59+0100\n"
+"PO-Revision-Date: 2017-01-12 22:28+0000\n"
 "Last-Translator: Américo Monteiro <a_monteiro@gmx.com>\n"
-"Language-Team: Portuguese <traduz@debianpt.org>\n"
+"Language-Team: Portuguese <>\n"
 "Language: pt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -837,6 +837,8 @@ msgid ""
 "If you are upgrading from an earlier compatibility level, please review "
 "L<debhelper-obsolete-compat(7)>."
 msgstr ""
+"Se você está a actualizar a partir de um nível de compatibilidade anterior, "
+"por favor reveja L<debhelper-obsolete-compat(7)>."
 
 #. type: textblock
 #: debhelper.pod:308 debhelper.pod:340 debhelper.pod:370 debhelper.pod:401
@@ -1357,6 +1359,9 @@ msgid ""
 "generates maintainer scripts for those files. Use B<dh_systemd_enable> and "
 "B<dh_systemd_start> instead."
 msgstr ""
+"B<dh_installinit> já não instala ficheiros F<service> ou F<tmpfile>, nem "
+"gera scripts do mantenedor para esses ficheiros, Use B<dh_systemd_enable> "
+"e B<dh_systemd_start> em vez deste."
 
 #. type: textblock
 #: debhelper.pod:595
@@ -1403,11 +1408,13 @@ msgid ""
 "B<dh_installdirs> no longer creates debian/I<package> directories unless "
 "explicitly requested (or it has to create a subdirectory in it)."
 msgstr ""
+"B<dh_installdirs> já não cria directórios debian/I<pacote> a menos que "
+"tal seja explicitamente pedido (ou se tiver de criar um sub-directório nele)."
 
 #. type: textblock
 #: debhelper.pod:620
 msgid "The vast majority of all packages will be unaffected by this change."
-msgstr ""
+msgstr "A grande maioria dos pacotes não serão afectados por esta alteração."
 
 #. type: textblock
 #: debhelper.pod:624
@@ -1417,6 +1424,10 @@ msgid ""
 "correctly tracks this, the build will be run twice (once for the \"build\" "
 "target and once for the \"binary\" target)."
 msgstr ""
+"B<dh> já não cria um ficheiro stamp (ou log) para gravar se a compilação "
+"já correu ou não. Isto significa que a menos que o sistema de compilação "
+"do autor (upstream) actual acompanhe isto, a compilação irá correr duas "
+"vezes (uma vez para o alvo \"build\" e outra para o alvo \"binary\")."
 
 #. type: textblock
 #: debhelper.pod:629
@@ -1424,11 +1435,15 @@ msgid ""
 "On the other hand, this means that rebuild without cleaning (e.g. B<dpkg-"
 "buildpackage -nc>) will behave as most people would expect."
 msgstr ""
+"Por outro lado, isto significa que recompilar sem limpar (ex. B<dpkg-"
+"buildpackage -nc>) irá ter o comportamento que a maioria das pessoas iriam "
+"esperar."
 
 #. type: textblock
 #: debhelper.pod:633
 msgid "The previous behaviour can restored by using B<--with build-stamp>"
 msgstr ""
+"O comportamento anterior pode ser restaurado ao usar B<--with build-stamp>"
 
 #. type: =head2
 #: debhelper.pod:639
@@ -2050,6 +2065,8 @@ msgstr "Joey Hess <joeyh@debian.org>"
 #: debhelper-obsolete-compat.pod:3
 msgid "debhelper-obsolete-compat - List of no longer supported compat levels"
 msgstr ""
+"debhelper-obsolete-compat - Lista dos níveis de compatibilidade não mais "
+"suportados"
 
 #. type: textblock
 #: debhelper-obsolete-compat.pod:7
@@ -2059,35 +2076,40 @@ msgid ""
 "and to assist people upgrading from a non-supported compat level to a "
 "supported level."
 msgstr ""
+"Este documento contém o guião de actualização a partir de todos os níveis "
+"de compatibilidade que já não são suportados. Consequentemente é "
+"principalmente para objectivos históricos e para ajudar pessoas a "
+"actualizarem a partir de um nível de compatibilidade não suportado para "
+"um nível suportado."
 
 #. type: textblock
 #: debhelper-obsolete-compat.pod:12
-#, fuzzy
 #| msgid ""
 #| "* The package must be using compatibility level 9 or later (see "
 #| "L<debhelper(7)>)"
 msgid "For upgrades from supported compat levels, please see L<debhelper(7)>."
 msgstr ""
-"* O pacote tem se usar nível de compatibilidade 9 ou superior veja "
-"L<debhelper(7)>)"
+"Para actualizações a partir de níveis de compatibilidade suportados, por "
+"favor veja L<debhelper(7)>."
 
 #. type: =head1
 #: debhelper-obsolete-compat.pod:14
 msgid "UPGRADE LIST FOR COMPAT LEVELS"
-msgstr ""
+msgstr "ACTUALIZAÇÃO DE LISTA PARA NÍVEIS DE COMPATIBILIDADE"
 
 #. type: textblock
 #: debhelper-obsolete-compat.pod:16
 msgid ""
 "The following is the list of now obsolete compat levels and their changes."
 msgstr ""
+"O seguinte é a lista dos níveis de compatibilidade agora obsoletos e as "
+"suas alterações."
 
 #. type: =item
 #: debhelper-obsolete-compat.pod:21
-#, fuzzy
 #| msgid "v10"
 msgid "v1"
-msgstr "v10"
+msgstr "v1"
 
 #. type: textblock
 #: debhelper-obsolete-compat.pod:23
@@ -2162,10 +2184,9 @@ msgstr "v4"
 
 #. type: textblock
 #: debhelper-obsolete-compat.pod:62
-#, fuzzy
 #| msgid "Changes from v5 are:"
 msgid "Changes from v3 are:"
-msgstr "As alterações a partir de v5 são:"
+msgstr "As alterações a partir de v3 são:"
 
 #. type: textblock
 #: debhelper-obsolete-compat.pod:68
@@ -2258,17 +2279,17 @@ msgstr "AUTORES"
 #. type: textblock
 #: debhelper-obsolete-compat.pod:124
 msgid "Niels Thykier <niels@thykier.net>"
-msgstr ""
+msgstr "Niels Thykier <niels@thykier.net>"
 
 #. type: textblock
 #: debhelper-obsolete-compat.pod:126
 msgid "Joey Hess"
-msgstr ""
+msgstr "Joey Hess"
 
 #. type: textblock
 #: dh:5
 msgid "dh - debhelper command sequencer"
-msgstr "dh - sequênciador de comandos do debhelper"
+msgstr "dh - sequenciador de comandos do debhelper"
 
 #. type: textblock
 #: dh:15
@@ -3567,7 +3588,8 @@ msgstr ""
 #: dh_clean:19
 #, no-wrap
 msgid ""
-"B<dh_clean> is a debhelper program that is responsible for cleaning up after a\n"
+"B<dh_clean> is a debhelper program that is responsible for cleaning up after "
+"a\n"
 "package is built. It removes the package build directories, and removes some\n"
 "other files including F<debian/files>, and any detritus left behind by other\n"
 "debhelper commands. It also removes common files that should not appear in a\n"
@@ -5774,7 +5796,6 @@ msgstr "debian/I<pacote>.service"
 
 #. type: textblock
 #: dh_installinit:49
-#, fuzzy
 #| msgid ""
 #| "If this exists, it is installed into lib/systemd/system/I<package>."
 #| "service in the package build directory."
@@ -5783,7 +5804,8 @@ msgid ""
 "in the package build directory. Only used in compat levels 10 and below."
 msgstr ""
 "Se isto existir, é instalado em lib/systemd/system/I<pacote>.service no "
-"directório de compilação do pacote."
+"directório de compilação do pacote. Apenas usado nos níveis de "
+"compatibilidade 10 e inferiores."
 
 #. type: =item
 #: dh_installinit:52 dh_systemd_enable:48
@@ -5792,7 +5814,6 @@ msgstr "debian/I<pacote>.tmpfile"
 
 #. type: textblock
 #: dh_installinit:54
-#, fuzzy
 #| msgid ""
 #| "If this exists, it is installed into usr/lib/tmpfiles.d/I<package>.conf "
 #| "in the package build directory. (The tmpfiles.d mechanism is currently "
@@ -5804,7 +5825,8 @@ msgid ""
 msgstr ""
 "Se isto existir, é instalado em usr/lib/tmpfiles.d/I<pacote>.conf no "
 "directório de compilação do pacote. (Actualmente o mecanismo tmpfiles.d é "
-"usado apenas pelo systemd.)"
+"usado apenas pelo systemd.) Apenas usado nos níveis de compatibilidade "
+"10 e inferiores."
 
 #. type: textblock
 #: dh_installinit:66
@@ -7441,7 +7463,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_md5sums:20
-#, fuzzy
 #| msgid ""
 #| "B<dh_md5sums> is a debhelper program that is responsible for generating a "
 #| "F<DEBIAN/md5sums> file, which lists the md5sums of each file in the "
@@ -7454,7 +7475,8 @@ msgid ""
 msgstr ""
 "B<dh_md5sums> é um programa debhelper que é responsável por gerar um "
 "ficheiro F<DEBIAN/md5sums> o qual lista os md5sums de cada ficheiro no "
-"pacote. Estes ficheiros são usados pelo pacote B<debsums>."
+"pacote. Estes ficheiros são usados por B<dpkg --verify> ou pelo programa "
+"L<debsums(1)>."
 
 #. type: textblock
 #: dh_md5sums:24
@@ -8176,10 +8198,12 @@ msgstr ""
 #: dh_strip:98
 #, no-wrap
 msgid ""
-"  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< 2.1-3~)'\n"
+"  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< "
+"2.1-3~)'\n"
 "\n"
 msgstr ""
-"  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< 2.1-3~)'\n"
+"  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< "
+"2.1-3~)'\n"
 "\n"
 
 #. type: =item
