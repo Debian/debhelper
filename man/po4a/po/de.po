@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: debhelper 9.20160814\n"
 "Report-Msgid-Bugs-To: debhelper@packages.debian.org\n"
 "POT-Creation-Date: 2016-12-31 21:29+0000\n"
-"PO-Revision-Date: 2016-08-27 11:57+0100\n"
+"PO-Revision-Date: 2017-01-18 20:01+0100\n"
 "Last-Translator: Chris Leick <c.leick@vollbio.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
 "Language: de\n"
@@ -846,15 +846,15 @@ msgid ""
 "If you are upgrading from an earlier compatibility level, please review "
 "L<debhelper-obsolete-compat(7)>."
 msgstr ""
+"Falls Sie ein Upgrade von einer vorhergehenden Kompatibilitätsstufe "
+"durchführen, überprüfen Sie bitte L<debhelper-obsolete-compat(7)>."
 
 #. type: textblock
 #: debhelper.pod:308 debhelper.pod:340 debhelper.pod:370 debhelper.pod:401
 #: debhelper-obsolete-compat.pod:28 debhelper-obsolete-compat.pod:35
 #: debhelper-obsolete-compat.pod:58 debhelper-obsolete-compat.pod:87
-#, fuzzy
-#| msgid "These files are deprecated."
 msgid "This mode is deprecated."
-msgstr "Diese Dateien sind veraltet."
+msgstr "Dieser Modus ist missbilligt."
 
 #. type: =item
 #: debhelper.pod:310
@@ -1373,6 +1373,9 @@ msgid ""
 "generates maintainer scripts for those files. Use B<dh_systemd_enable> and "
 "B<dh_systemd_start> instead."
 msgstr ""
+"B<dh_installinit> installiert keine F<service>- oder F<tmpfile>-Dateien mehr. "
+"Es erstellt auch keine Betreuerskripte dafür. Verwenden Sie stattdessen "
+"B<dh_systemd_enable> und B<dh_systemd_start>."
 
 #. type: textblock
 #: debhelper.pod:595
@@ -1419,11 +1422,15 @@ msgid ""
 "B<dh_installdirs> no longer creates debian/I<package> directories unless "
 "explicitly requested (or it has to create a subdirectory in it)."
 msgstr ""
+"B<dh_installdirs> erstellt keine debian/I<Paket>-Verzeichnisse mehr, es sei "
+"denn, dies wird ausdrücklich verlangt (oder es muss ein Unterverzeichnis "
+"darin erstellt werden)."
 
 #. type: textblock
 #: debhelper.pod:620
 msgid "The vast majority of all packages will be unaffected by this change."
 msgstr ""
+"Die große Mehrheit aller Pakete wird von dieser Änderung nicht betroffen sein."
 
 #. type: textblock
 #: debhelper.pod:624
@@ -1433,6 +1440,11 @@ msgid ""
 "correctly tracks this, the build will be run twice (once for the \"build\" "
 "target and once for the \"binary\" target)."
 msgstr ""
+"B<dh> erstellt keine Stempel- (oder Protokoll-) Dateien mehr, um "
+"aufzuzeichnen, ob das Bauen bereits lief oder nicht. Falls das Bausystem der "
+"Ursprungsautoren dies nicht korrekt verfolgt, bedeutet dies, dass das Bauen "
+"zweimal laufen wird (einmal für das Ziel »build« und einmal für das Ziel "
+"»binary«)."
 
 #. type: textblock
 #: debhelper.pod:629
@@ -1440,11 +1452,17 @@ msgid ""
 "On the other hand, this means that rebuild without cleaning (e.g. B<dpkg-"
 "buildpackage -nc>) will behave as most people would expect."
 msgstr ""
+"Andererseits bedeutet dies, dass sich erneutes Bauen ohne aufzuräumen (z.B. "
+"B<dpkg-buildpackage -nc>) so verhält, wie es die meisten Leute erwarten "
+"würden."
 
 #. type: textblock
 #: debhelper.pod:633
+# FIXME s/can restored/can be restored/
 msgid "The previous behaviour can restored by using B<--with build-stamp>"
 msgstr ""
+"Das vorherige Verhalten kann mittels B<--with build-stamp> wieder hergestellt "
+"werden."
 
 #. type: =head2
 #: debhelper.pod:639
@@ -2079,6 +2097,8 @@ msgstr "Joey Hess <joeyh@debian.org>"
 #: debhelper-obsolete-compat.pod:3
 msgid "debhelper-obsolete-compat - List of no longer supported compat levels"
 msgstr ""
+"debhelper-obsolete-compat - Liste nicht mehr unterstützter "
+"Kompatibilitätsstufen"
 
 #. type: textblock
 #: debhelper-obsolete-compat.pod:7
@@ -2088,28 +2108,30 @@ msgid ""
 "and to assist people upgrading from a non-supported compat level to a "
 "supported level."
 msgstr ""
+"Dieses Dokument enthält die Upgrade-Richtlinien aller Kompatibilitätsstufen, "
+"die nicht mehr unterstützt werden. Dementsprechend dient es meistens "
+"historischen Zwecken und hilft Leuten beim Upgrade von einer nicht "
+"unterstützten Kompatibilitätsstufe auf eine unterstützte Stufe."
 
 #. type: textblock
 #: debhelper-obsolete-compat.pod:12
-#, fuzzy
-#| msgid ""
-#| "* The package must be using compatibility level 9 or later (see "
-#| "L<debhelper(7)>)"
 msgid "For upgrades from supported compat levels, please see L<debhelper(7)>."
 msgstr ""
-"* Das Paket muss Kompatibilitätsstufe 9 oder höher verwenden (siehe "
-"L<debhelper(7)>)."
+"Für Upgrades von unterstützten Kompatibilitätsstufen lesen Sie bitte "
+"L<debhelper(7)>."
 
 #. type: =head1
 #: debhelper-obsolete-compat.pod:14
 msgid "UPGRADE LIST FOR COMPAT LEVELS"
-msgstr ""
+msgstr "UPGRADE-LISTE FÜR KOMPATIBILITÄTSSTUFEN"
 
 #. type: textblock
 #: debhelper-obsolete-compat.pod:16
 msgid ""
 "The following is the list of now obsolete compat levels and their changes."
 msgstr ""
+"Es folgt die Liste der nun überflüssigen Kompatibilitätsstufen und ihrer "
+"Änderungen."
 
 #. type: =item
 #: debhelper-obsolete-compat.pod:21
@@ -2249,10 +2271,8 @@ msgstr ""
 
 #. type: textblock
 #: debhelper-obsolete-compat.pod:108
-#, fuzzy
-#| msgid "dh_installinfo - install info files"
 msgid "B<dh_installdocs> skips installing empty files."
-msgstr "dh_installinfo - installiert Info-Dateien"
+msgstr "B<dh_installdocs> überspringt die Installation leerer Dateien"
 
 #. type: textblock
 #: debhelper-obsolete-compat.pod:112
@@ -5830,16 +5850,13 @@ msgstr "debian/I<Paket>.service"
 
 #. type: textblock
 #: dh_installinit:49
-#, fuzzy
-#| msgid ""
-#| "If this exists, it is installed into lib/systemd/system/I<package>."
-#| "service in the package build directory."
 msgid ""
 "If this exists, it is installed into lib/systemd/system/I<package>.service "
 "in the package build directory. Only used in compat levels 10 and below."
 msgstr ""
 "Falls dies existiert, wird es in lib/systemd/system/I<Paket>.service im "
-"Paketbauverzeichnis installiert."
+"Paketbauverzeichnis installiert. Nur in Kompatibilitätsstufen 10 und darunter "
+"benutzt."
 
 #. type: =item
 #: dh_installinit:52 dh_systemd_enable:48
@@ -5848,11 +5865,6 @@ msgstr "debian/I<Paket>.tmpfile"
 
 #. type: textblock
 #: dh_installinit:54
-#, fuzzy
-#| msgid ""
-#| "If this exists, it is installed into usr/lib/tmpfiles.d/I<package>.conf "
-#| "in the package build directory. (The tmpfiles.d mechanism is currently "
-#| "only used by systemd.)"
 msgid ""
 "If this exists, it is installed into usr/lib/tmpfiles.d/I<package>.conf in "
 "the package build directory. (The tmpfiles.d mechanism is currently only "
@@ -5860,7 +5872,7 @@ msgid ""
 msgstr ""
 "Falls dies existiert, wird es in usr/lib/tmpfiles.d/I<Paket>.conf im "
 "Paketbauverzeichnis installiert. (Der »tmpfiles.d«-Mechanismus wird derzeit "
-"nur von Systemd benutzt.)"
+"nur von Systemd benutzt.) Nur in Kompatibilitätsstufe 10 und darunter."
 
 #. type: textblock
 #: dh_installinit:66
@@ -7496,11 +7508,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_md5sums:20
-#, fuzzy
-#| msgid ""
-#| "B<dh_md5sums> is a debhelper program that is responsible for generating a "
-#| "F<DEBIAN/md5sums> file, which lists the md5sums of each file in the "
-#| "package.  These files are used by the B<debsums> package."
 msgid ""
 "B<dh_md5sums> is a debhelper program that is responsible for generating a "
 "F<DEBIAN/md5sums> file, which lists the md5sums of each file in the "
@@ -7509,7 +7516,8 @@ msgid ""
 msgstr ""
 "B<dh_md5sums> ist ein Debhelper-Programm, das für das Erzeugen einer "
 "F<DEBIAN/md5sums>-Datei zuständig ist, die die Md5-Prüfsummen jeder Datei im "
-"Paket auflistet. Diese Dateien werden vom Paket B<debsums> benutzt."
+"Paket auflistet. Diese Dateien werden von B<dpkg --verify> oder dem Programm "
+"L<debsums(1)> benutzt."
 
 #. type: textblock
 #: dh_md5sums:24
