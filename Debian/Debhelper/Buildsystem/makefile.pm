@@ -12,8 +12,9 @@ use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value escape_shell clean_jobs
 use parent qw(Debian::Debhelper::Buildsystem);
 
 my %DEB_DEFAULT_TOOLS = (
-	'CC'	=> 'gcc',
-	'CXX'	=> 'g++',
+	'CC'		=> 'gcc',
+	'CXX'		=> 'g++',
+	'PKG_CONFIG'	=> 'pkg-config',
 );
 
 # make makes things difficult by not providing a simple way to test
