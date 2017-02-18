@@ -855,15 +855,18 @@ sub excludefile {
 			return $ENV{$var};
 		}
 		elsif (! exists($dpkg_arch_output{$var})) {
-			local $_;
-			open(PIPE, '-|', 'dpkg-architecture')
+			# Return here if we already consulted dpkg-architecture
+			# (saves a fork+exec on unknown variables)
+			return if %dpkg_arch_output;
+
+			open(my $fd, '-|', 'dpkg-architecture')
 				or error("dpkg-architecture failed");
-			while (<PIPE>) {
-				chomp;
-				my ($k, $v) = split(/=/, $_, 2);
+			while (my $line = <$fd>) {
+				chomp($line);
+				my ($k, $v) = split(/=/, $line, 2);
 				$dpkg_arch_output{$k} = $v;
 			}
-			close(PIPE);
+			close($fd);
 		}
 		return $dpkg_arch_output{$var};
 	}
