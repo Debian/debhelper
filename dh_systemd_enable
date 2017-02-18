@@ -176,7 +176,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	my $mount=pkgfile($package,"mount");
 	if ($mount ne '') {
-		my $path="$tmpdir/usr/lib/system";
+		my $path="$tmpdir/lib/systemd/system";
 		install_dir($path);
 		install_file($mount, "$path/$script.mount");
 	}

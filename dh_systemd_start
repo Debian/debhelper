@@ -225,7 +225,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	};
 
 	if ($dh{RESTART_AFTER_UPGRADE}) {
-		$sd_autoscript->("postinst", "postinst-systemd-restart");
+		my $snippet = "postinst-systemd-restart" . ($dh{NO_START} ? "nostart" : "");
+		$sd_autoscript->("postinst", $snippet);
 	} elsif (!$dh{NO_START}) {
 		# We need to stop/start before/after the upgrade.
 		$sd_autoscript->("postinst", "postinst-systemd-start");

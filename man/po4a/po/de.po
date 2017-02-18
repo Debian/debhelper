@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: debhelper 9.20160814\n"
 "Report-Msgid-Bugs-To: debhelper@packages.debian.org\n"
-"POT-Creation-Date: 2016-10-15 11:45+0200\n"
-"PO-Revision-Date: 2016-08-27 11:57+0100\n"
+"POT-Creation-Date: 2016-12-31 21:29+0000\n"
+"PO-Revision-Date: 2017-01-18 20:01+0100\n"
 "Last-Translator: Chris Leick <c.leick@vollbio.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
 "Language: de\n"
@@ -846,15 +846,15 @@ msgid ""
 "If you are upgrading from an earlier compatibility level, please review "
 "L<debhelper-obsolete-compat(7)>."
 msgstr ""
+"Falls Sie ein Upgrade von einer vorhergehenden Kompatibilitätsstufe "
+"durchführen, überprüfen Sie bitte L<debhelper-obsolete-compat(7)>."
 
 #. type: textblock
 #: debhelper.pod:308 debhelper.pod:340 debhelper.pod:370 debhelper.pod:401
 #: debhelper-obsolete-compat.pod:28 debhelper-obsolete-compat.pod:35
 #: debhelper-obsolete-compat.pod:58 debhelper-obsolete-compat.pod:87
-#, fuzzy
-#| msgid "These files are deprecated."
 msgid "This mode is deprecated."
-msgstr "Diese Dateien sind veraltet."
+msgstr "Dieser Modus ist missbilligt."
 
 #. type: =item
 #: debhelper.pod:310
@@ -876,13 +876,13 @@ msgstr "Änderungen gegenüber v5 sind:"
 #: debhelper.pod:485 debhelper.pod:491 debhelper.pod:496 debhelper.pod:502
 #: debhelper.pod:508 debhelper.pod:518 debhelper.pod:524 debhelper.pod:547
 #: debhelper.pod:554 debhelper.pod:560 debhelper.pod:566 debhelper.pod:582
-#: debhelper.pod:587 debhelper.pod:591 debhelper.pod:596 debhelper.pod:608
-#: debhelper-obsolete-compat.pod:43 debhelper-obsolete-compat.pod:48
-#: debhelper-obsolete-compat.pod:52 debhelper-obsolete-compat.pod:66
-#: debhelper-obsolete-compat.pod:71 debhelper-obsolete-compat.pod:76
-#: debhelper-obsolete-compat.pod:81 debhelper-obsolete-compat.pod:97
-#: debhelper-obsolete-compat.pod:101 debhelper-obsolete-compat.pod:106
-#: debhelper-obsolete-compat.pod:110
+#: debhelper.pod:587 debhelper.pod:593 debhelper.pod:597 debhelper.pod:602
+#: debhelper.pod:614 debhelper.pod:622 debhelper-obsolete-compat.pod:43
+#: debhelper-obsolete-compat.pod:48 debhelper-obsolete-compat.pod:52
+#: debhelper-obsolete-compat.pod:66 debhelper-obsolete-compat.pod:71
+#: debhelper-obsolete-compat.pod:76 debhelper-obsolete-compat.pod:81
+#: debhelper-obsolete-compat.pod:97 debhelper-obsolete-compat.pod:101
+#: debhelper-obsolete-compat.pod:106 debhelper-obsolete-compat.pod:110
 msgid "-"
 msgstr "-"
 
@@ -1368,11 +1368,22 @@ msgstr ""
 
 #. type: textblock
 #: debhelper.pod:589
+msgid ""
+"B<dh_installinit> no longer installs F<service> or F<tmpfile> files, nor "
+"generates maintainer scripts for those files. Use B<dh_systemd_enable> and "
+"B<dh_systemd_start> instead."
+msgstr ""
+"B<dh_installinit> installiert keine F<service>- oder F<tmpfile>-Dateien mehr. "
+"Es erstellt auch keine Betreuerskripte dafür. Verwenden Sie stattdessen "
+"B<dh_systemd_enable> und B<dh_systemd_start>."
+
+#. type: textblock
+#: debhelper.pod:595
 msgid "The B<-s> (B<--same-arch>) option is removed."
 msgstr "Die Option B<-s> (B<--same-arch>) wurde entfernt."
 
 #. type: textblock
-#: debhelper.pod:593
+#: debhelper.pod:599
 msgid ""
 "Invoking B<dh_clean -k> now causes an error instead of a deprecation warning."
 msgstr ""
@@ -1380,7 +1391,7 @@ msgstr ""
 "Warnung, es sei missbilligt."
 
 #. type: textblock
-#: debhelper.pod:598
+#: debhelper.pod:604
 msgid ""
 "B<dh_installdocs> now installs user-supplied documentation (e.g. debian/"
 "I<package>.docs) into F</usr/share/doc/mainpackage> rather than F</usr/share/"
@@ -1392,7 +1403,7 @@ msgstr ""
 "empfohlen."
 
 #. type: textblock
-#: debhelper.pod:603
+#: debhelper.pod:609
 msgid ""
 "If you need the old behaviour, it can be emulated by using the B<--"
 "mainpackage> option."
@@ -1401,29 +1412,65 @@ msgstr ""
 "mainpackage> emuliert werden."
 
 #. type: textblock
-#: debhelper.pod:606
+#: debhelper.pod:612
 msgid "Please remember to check/update your doc-base files."
 msgstr "Bitte denken Sie daran, Ihre Doc-Base-Dateien zu prüfen/aktualisieren."
 
 #. type: textblock
-#: debhelper.pod:610
+#: debhelper.pod:616
 msgid ""
 "B<dh_installdirs> no longer creates debian/I<package> directories unless "
 "explicitly requested (or it has to create a subdirectory in it)."
 msgstr ""
+"B<dh_installdirs> erstellt keine debian/I<Paket>-Verzeichnisse mehr, es sei "
+"denn, dies wird ausdrücklich verlangt (oder es muss ein Unterverzeichnis "
+"darin erstellt werden)."
 
 #. type: textblock
-#: debhelper.pod:614
+#: debhelper.pod:620
 msgid "The vast majority of all packages will be unaffected by this change."
 msgstr ""
+"Die große Mehrheit aller Pakete wird von dieser Änderung nicht betroffen sein."
+
+#. type: textblock
+#: debhelper.pod:624
+msgid ""
+"B<dh> no longer creates a stamp (or log) file to record whether the build "
+"already ran or not.  This means that unless upstream's build system "
+"correctly tracks this, the build will be run twice (once for the \"build\" "
+"target and once for the \"binary\" target)."
+msgstr ""
+"B<dh> erstellt keine Stempel- (oder Protokoll-) Dateien mehr, um "
+"aufzuzeichnen, ob das Bauen bereits lief oder nicht. Falls das Bausystem der "
+"Ursprungsautoren dies nicht korrekt verfolgt, bedeutet dies, dass das Bauen "
+"zweimal laufen wird (einmal für das Ziel »build« und einmal für das Ziel "
+"»binary«)."
+
+#. type: textblock
+#: debhelper.pod:629
+msgid ""
+"On the other hand, this means that rebuild without cleaning (e.g. B<dpkg-"
+"buildpackage -nc>) will behave as most people would expect."
+msgstr ""
+"Andererseits bedeutet dies, dass sich erneutes Bauen ohne aufzuräumen (z.B. "
+"B<dpkg-buildpackage -nc>) so verhält, wie es die meisten Leute erwarten "
+"würden."
+
+#. type: textblock
+#: debhelper.pod:633
+# FIXME s/can restored/can be restored/
+msgid "The previous behaviour can restored by using B<--with build-stamp>"
+msgstr ""
+"Das vorherige Verhalten kann mittels B<--with build-stamp> wieder hergestellt "
+"werden."
 
 #. type: =head2
-#: debhelper.pod:620
+#: debhelper.pod:639
 msgid "Participating in the open beta testing of new compat levels"
 msgstr "Teilnahme an offenen Beta-Tests neuer Kompatibilitätsstufen"
 
 #. type: textblock
-#: debhelper.pod:622
+#: debhelper.pod:641
 msgid ""
 "It is possible to opt-in to the open beta testing of new compat levels.  "
 "This is done by setting the compat level to the string \"beta-tester\"."
@@ -1433,7 +1480,7 @@ msgstr ""
 "Kompatibilitätsstufe auf die Zeichenkette »beta-tester« erledigt."
 
 #. type: textblock
-#: debhelper.pod:626
+#: debhelper.pod:645
 msgid ""
 "Packages using this compat level will automatically be upgraded to the "
 "highest compatibility level in open beta.  In periods without any open beta "
@@ -1445,18 +1492,18 @@ msgstr ""
 "die Kompatibilitätsstufe die höchste stabile Kompatibilitätsstufe sein."
 
 #. type: textblock
-#: debhelper.pod:631
+#: debhelper.pod:650
 msgid "Please consider the following before opting in:"
 msgstr "Bitte bedenken Sie vor der Teilnahme Folgendes:"
 
 #. type: =item
-#: debhelper.pod:635 debhelper.pod:640 debhelper.pod:647 debhelper.pod:653
-#: debhelper.pod:659
+#: debhelper.pod:654 debhelper.pod:659 debhelper.pod:666 debhelper.pod:672
+#: debhelper.pod:678
 msgid "*"
 msgstr "*"
 
 #. type: textblock
-#: debhelper.pod:637
+#: debhelper.pod:656
 msgid ""
 "The automatic upgrade in compatibility level may cause the package (or a "
 "feature in it) to stop functioning."
@@ -1465,7 +1512,7 @@ msgstr ""
 "Paket (oder eine enthaltene Funktionalität) nicht mehr funktioniert."
 
 #. type: textblock
-#: debhelper.pod:642
+#: debhelper.pod:661
 msgid ""
 "Compatibility levels in open beta are still subject to change.  We will try "
 "to keep the changes to a minimal once the beta starts.  However, there are "
@@ -1477,7 +1524,7 @@ msgstr ""
 "nicht während der Beta-Phase ändert."
 
 #. type: textblock
-#: debhelper.pod:649
+#: debhelper.pod:668
 msgid ""
 "We will notify you via debian-devel@lists.debian.org before we start a new "
 "open beta compat level.  However, once the beta starts we expect that you "
@@ -1489,7 +1536,7 @@ msgstr ""
 "Laufenden halten."
 
 #. type: textblock
-#: debhelper.pod:655
+#: debhelper.pod:674
 msgid ""
 "The \"beta-tester\" compatibility version in unstable and testing will often "
 "be different than the one in stable-backports.  Accordingly, it is not "
@@ -1500,7 +1547,7 @@ msgstr ""
 "nicht für Pakete empfohlen, die regulär zurückportiert werden."
 
 #. type: textblock
-#: debhelper.pod:661
+#: debhelper.pod:680
 msgid ""
 "You can always opt-out of the beta by resetting the compatibility level of "
 "your package to a stable version."
@@ -1510,14 +1557,14 @@ msgstr ""
 
 # CHECKME (english text correct?)
 #. type: textblock
-#: debhelper.pod:666
+#: debhelper.pod:685
 msgid "Should you still be interested in the open beta testing, please run:"
 msgstr ""
 "Sollten Sie immer noch am offenen Beta-Test interessiert sein, führen Sie "
 "Folgendes aus:"
 
 #. type: verbatim
-#: debhelper.pod:668
+#: debhelper.pod:687
 #, no-wrap
 msgid ""
 "  % echo beta-tester > debian/compat\n"
@@ -1528,12 +1575,12 @@ msgstr ""
 
 # CHECKME (english text correct?)
 #. type: textblock
-#: debhelper.pod:670
+#: debhelper.pod:689
 msgid "You will also need to ensure that debian/control contains:"
 msgstr "Außerdem müssen Sie sicherstellen, dass debian/control dies enthält:"
 
 #. type: verbatim
-#: debhelper.pod:672
+#: debhelper.pod:691
 #, no-wrap
 msgid ""
 "  Build-Depends: debhelper (>= 9.20160815~)\n"
@@ -1543,14 +1590,14 @@ msgstr ""
 "\n"
 
 #. type: textblock
-#: debhelper.pod:674
+#: debhelper.pod:693
 msgid "To ensure that debhelper knows about the \"beta-tester\" compat level."
 msgstr ""
 "Dadurch wird sichergestellt, dass Debhelper von der Kompatibilitätsstufe "
 "»beta-tester« weiß."
 
 #. type: =head1
-#: debhelper.pod:676 dh_auto_test:46 dh_installcatalogs:60 dh_installdocs:136
+#: debhelper.pod:695 dh_auto_test:46 dh_installcatalogs:62 dh_installdocs:136
 #: dh_installemacsen:73 dh_installexamples:54 dh_installinit:159
 #: dh_installman:83 dh_installmodules:55 dh_installudev:49 dh_installwm:55
 #: dh_installxfonts:38 dh_movefiles:65 dh_strip:117 dh_usrlocal:49
@@ -1559,12 +1606,12 @@ msgid "NOTES"
 msgstr "ANMERKUNGEN"
 
 #. type: =head2
-#: debhelper.pod:678
+#: debhelper.pod:697
 msgid "Multiple binary package support"
 msgstr "Unterstützung mehrerer Binärpakete"
 
 #. type: textblock
-#: debhelper.pod:680
+#: debhelper.pod:699
 msgid ""
 "If your source package generates more than one binary package, debhelper "
 "programs will default to acting on all binary packages when run. If your "
@@ -1583,7 +1630,7 @@ msgstr ""
 "Ziel »binary-indep«."
 
 #. type: textblock
-#: debhelper.pod:688
+#: debhelper.pod:707
 msgid ""
 "To facilitate this, as well as give you more control over which packages are "
 "acted on by debhelper programs, all debhelper programs accept the B<-a>, B<-"
@@ -1599,7 +1646,7 @@ msgstr ""
 "sind, mit nachfolgenden Ausnahmen."
 
 #. type: textblock
-#: debhelper.pod:694
+#: debhelper.pod:713
 msgid ""
 "First, any package whose B<Architecture> field in B<debian/control> does not "
 "match the B<DEB_HOST_ARCH> architecture will be excluded (L<Debian Policy, "
@@ -1610,7 +1657,7 @@ msgstr ""
 "(L<Debian Policy, Abschnitt 5.6.8>)."
 
 #. type: textblock
-#: debhelper.pod:698
+#: debhelper.pod:717
 msgid ""
 "Also, some additional packages may be excluded based on the contents of the "
 "B<DEB_BUILD_PROFILES> environment variable and B<Build-Profiles> fields in "
@@ -1624,12 +1671,12 @@ msgstr ""
 "BuildProfileSpec>."
 
 #. type: =head2
-#: debhelper.pod:703
+#: debhelper.pod:722
 msgid "Automatic generation of Debian install scripts"
 msgstr "Automatisches Erzeugen von Debian-Installationsskripten"
 
 #. type: textblock
-#: debhelper.pod:705
+#: debhelper.pod:724
 msgid ""
 "Some debhelper commands will automatically generate parts of Debian "
 "maintainer scripts. If you want these automatically generated things "
@@ -1646,7 +1693,7 @@ msgstr ""
 "erzeugten Kode ersetzt."
 
 #. type: textblock
-#: debhelper.pod:712
+#: debhelper.pod:731
 msgid ""
 "If a script does not exist at all and debhelper needs to add something to "
 "it, then debhelper will create the complete script."
@@ -1655,7 +1702,7 @@ msgstr ""
 "hinzufügen muss, dann wird Debhelper das komplette Skript erstellen."
 
 #. type: textblock
-#: debhelper.pod:715
+#: debhelper.pod:734
 msgid ""
 "All debhelper commands that automatically generate code in this way let it "
 "be disabled by the -n parameter (see above)."
@@ -1664,7 +1711,7 @@ msgstr ""
 "dies durch den Parameter -n deaktiviert (siehe oben)."
 
 #. type: textblock
-#: debhelper.pod:718
+#: debhelper.pod:737
 msgid ""
 "Note that the inserted code will be shell code, so you cannot directly use "
 "it in a Perl script. If you would like to embed it into a Perl script, here "
@@ -1678,7 +1725,7 @@ msgstr ""
 "etc. gesetzt sind):"
 
 #. type: verbatim
-#: debhelper.pod:723
+#: debhelper.pod:742
 #, no-wrap
 msgid ""
 "  my $temp=\"set -e\\nset -- @ARGV\\n\" . << 'EOF';\n"
@@ -1710,12 +1757,12 @@ msgstr ""
 "\n"
 
 #. type: =head2
-#: debhelper.pod:736
+#: debhelper.pod:755
 msgid "Automatic generation of miscellaneous dependencies."
 msgstr "Automatisches Erzeugen verschiedener Abhängigkeiten"
 
 #. type: textblock
-#: debhelper.pod:738
+#: debhelper.pod:757
 msgid ""
 "Some debhelper commands may make the generated package need to depend on "
 "some other packages. For example, if you use L<dh_installdebconf(1)>, your "
@@ -1735,7 +1782,7 @@ msgstr ""
 "bietet, sie zu automatisieren."
 
 #. type: textblock
-#: debhelper.pod:746
+#: debhelper.pod:765
 msgid ""
 "All commands of this type, besides documenting what dependencies may be "
 "needed on their man pages, will automatically generate a substvar called B<"
@@ -1749,7 +1796,7 @@ msgstr ""
 "Debhelper findet, dass Sie sie benötigen."
 
 #. type: textblock
-#: debhelper.pod:751
+#: debhelper.pod:770
 msgid ""
 "This is entirely independent of the standard B<${shlibs:Depends}> generated "
 "by L<dh_makeshlibs(1)>, and the B<${perl:Depends}> generated by "
@@ -1763,12 +1810,12 @@ msgstr ""
 "entspricht."
 
 #. type: =head2
-#: debhelper.pod:756
+#: debhelper.pod:775
 msgid "Package build directories"
 msgstr "Paketbauverzeichnisse"
 
 #. type: textblock
-#: debhelper.pod:758
+#: debhelper.pod:777
 msgid ""
 "By default, all debhelper programs assume that the temporary directory used "
 "for assembling the tree of files in a package is debian/I<package>."
@@ -1778,7 +1825,7 @@ msgstr ""
 "debian/I<Paket> ist."
 
 #. type: textblock
-#: debhelper.pod:761
+#: debhelper.pod:780
 msgid ""
 "Sometimes, you might want to use some other temporary directory. This is "
 "supported by the B<-P> flag. For example, \"B<dh_installdocs -Pdebian/tmp>"
@@ -1798,12 +1845,12 @@ msgstr ""
 "Debhelper-Programm auswirkt."
 
 #. type: =head2
-#: debhelper.pod:769
+#: debhelper.pod:788
 msgid "udebs"
 msgstr "Udebs"
 
 #. type: textblock
-#: debhelper.pod:771
+#: debhelper.pod:790
 msgid ""
 "Debhelper includes support for udebs. To create a udeb with debhelper, add "
 "\"B<Package-Type: udeb>\" to the package's stanza in F<debian/control>.  "
@@ -1821,12 +1868,12 @@ msgstr ""
 "übersprungen werden."
 
 #. type: =head1
-#: debhelper.pod:778
+#: debhelper.pod:797
 msgid "ENVIRONMENT"
 msgstr "UMGEBUNGSVARIABLEN"
 
 #. type: textblock
-#: debhelper.pod:780
+#: debhelper.pod:799
 msgid ""
 "The following environment variables can influence the behavior of "
 "debhelper.  It is important to note that these must be actual environment "
@@ -1842,12 +1889,12 @@ msgstr ""
 "Beispiel »B<export DH_VERBOSE>«."
 
 #. type: =item
-#: debhelper.pod:788
+#: debhelper.pod:807
 msgid "B<DH_VERBOSE>"
 msgstr "B<DH_VERBOSE>"
 
 #. type: textblock
-#: debhelper.pod:790
+#: debhelper.pod:809
 msgid ""
 "Set to B<1> to enable verbose mode. Debhelper will output every command it "
 "runs. Also enables verbose build logs for some build systems like autoconf."
@@ -1858,12 +1905,12 @@ msgstr ""
 "aktiviert."
 
 #. type: =item
-#: debhelper.pod:793
+#: debhelper.pod:812
 msgid "B<DH_QUIET>"
 msgstr "B<DH_QUIET>"
 
 #. type: textblock
-#: debhelper.pod:795
+#: debhelper.pod:814
 msgid ""
 "Set to B<1> to enable quiet mode. Debhelper will not output commands calling "
 "the upstream build system nor will dh print which subcommands are called and "
@@ -1880,12 +1927,12 @@ msgstr ""
 "wird diese Einstellung ignoriert."
 
 #. type: =item
-#: debhelper.pod:802
+#: debhelper.pod:821
 msgid "B<DH_COMPAT>"
 msgstr "B<DH_COMPAT>"
 
 #. type: textblock
-#: debhelper.pod:804
+#: debhelper.pod:823
 msgid ""
 "Temporarily specifies what compatibility level debhelper should run at, "
 "overriding any value in F<debian/compat>."
@@ -1894,22 +1941,22 @@ msgstr ""
 "werden sollte und setzt dabei jeden Wert in F<debian/compat> außer Kraft."
 
 #. type: =item
-#: debhelper.pod:807
+#: debhelper.pod:826
 msgid "B<DH_NO_ACT>"
 msgstr "B<DH_NO_ACT>"
 
 #. type: textblock
-#: debhelper.pod:809
+#: debhelper.pod:828
 msgid "Set to B<1> to enable no-act mode."
 msgstr "auf B<1> gesetzt, um Modus ohne Aktion zu aktivieren."
 
 #. type: =item
-#: debhelper.pod:811
+#: debhelper.pod:830
 msgid "B<DH_OPTIONS>"
 msgstr "B<DH_OPTIONS>"
 
 #. type: textblock
-#: debhelper.pod:813
+#: debhelper.pod:832
 msgid ""
 "Anything in this variable will be prepended to the command line arguments of "
 "all debhelper commands."
@@ -1918,7 +1965,7 @@ msgstr ""
 "Befehle vorangestellt."
 
 #. type: textblock
-#: debhelper.pod:816
+#: debhelper.pod:835
 msgid ""
 "When using L<dh(1)>, it can be passed options that will be passed on to each "
 "debhelper command, which is generally better than using DH_OPTIONS."
@@ -1928,12 +1975,12 @@ msgstr ""
 "DH_OPTIONS zu verwenden."
 
 #. type: =item
-#: debhelper.pod:819
+#: debhelper.pod:838
 msgid "B<DH_ALWAYS_EXCLUDE>"
 msgstr "B<DH_ALWAYS_EXCLUDE>"
 
 #. type: textblock
-#: debhelper.pod:821
+#: debhelper.pod:840
 msgid ""
 "If set, this adds the value the variable is set to to the B<-X> options of "
 "all commands that support the B<-X> option. Moreover, B<dh_builddeb> will "
@@ -1945,7 +1992,7 @@ msgstr ""
 "entspricht, B<rm -rf> ausführen."
 
 #. type: textblock
-#: debhelper.pod:825
+#: debhelper.pod:844
 msgid ""
 "This can be useful if you are doing a build from a CVS source tree, in which "
 "case setting B<DH_ALWAYS_EXCLUDE=CVS> will prevent any CVS directories from "
@@ -1963,7 +2010,7 @@ msgstr ""
 "ist, wo auch immer Ihr Paket gebaut wird."
 
 #. type: textblock
-#: debhelper.pod:832
+#: debhelper.pod:851
 msgid ""
 "Multiple things to exclude can be separated with colons, as in "
 "B<DH_ALWAYS_EXCLUDE=CVS:.svn>"
@@ -1972,51 +2019,51 @@ msgstr ""
 "getrennt werden, wie in B<DH_ALWAYS_EXCLUDE=CVS:.svn>."
 
 #. type: =head1
-#: debhelper.pod:837 debhelper-obsolete-compat.pod:118 dh:1066 dh_auto_build:48
-#: dh_auto_clean:51 dh_auto_configure:53 dh_auto_install:93 dh_auto_test:63
+#: debhelper.pod:856 debhelper-obsolete-compat.pod:118 dh:1063 dh_auto_build:48
+#: dh_auto_clean:51 dh_auto_configure:53 dh_auto_install:93 dh_auto_test:60
 #: dh_bugfiles:131 dh_builddeb:192 dh_clean:175 dh_compress:252 dh_fixperms:148
 #: dh_gconf:98 dh_gencontrol:167 dh_icons:73 dh_install:326
-#: dh_installcatalogs:122 dh_installchangelogs:238 dh_installcron:76
+#: dh_installcatalogs:123 dh_installchangelogs:238 dh_installcron:76
 #: dh_installdeb:215 dh_installdebconf:126 dh_installdirs:95 dh_installdocs:357
 #: dh_installemacsen:135 dh_installexamples:110 dh_installifupdown:70
-#: dh_installinfo:76 dh_installinit:329 dh_installlogcheck:79
+#: dh_installinfo:76 dh_installinit:331 dh_installlogcheck:79
 #: dh_installlogrotate:51 dh_installman:264 dh_installmanpages:196
 #: dh_installmenu:94 dh_installmime:61 dh_installmodules:107 dh_installpam:60
 #: dh_installppp:66 dh_installudev:99 dh_installwm:115 dh_installxfonts:90
 #: dh_link:146 dh_lintian:58 dh_listpackages:31 dh_makeshlibs:287
-#: dh_md5sums:103 dh_movefiles:159 dh_perl:154 dh_prep:61 dh_shlibdeps:153
-#: dh_strip:400 dh_testdir:54 dh_testroot:28 dh_usrlocal:116
-#: dh_systemd_enable:264 dh_systemd_start:245
+#: dh_md5sums:105 dh_movefiles:159 dh_perl:154 dh_prep:61 dh_shlibdeps:153
+#: dh_strip:396 dh_testdir:54 dh_testroot:28 dh_usrlocal:116
+#: dh_systemd_enable:264 dh_systemd_start:246
 msgid "SEE ALSO"
 msgstr "SIEHE AUCH"
 
 #. type: =item
-#: debhelper.pod:841
+#: debhelper.pod:860
 msgid "F</usr/share/doc/debhelper/examples/>"
 msgstr "F</usr/share/doc/debhelper/examples/>"
 
 #. type: textblock
-#: debhelper.pod:843
+#: debhelper.pod:862
 msgid "A set of example F<debian/rules> files that use debhelper."
 msgstr ""
 "eine Zusammenstellung von F<debian/rules>-Beispieldateien, die Debhelper "
 "benutzen"
 
 #. type: =item
-#: debhelper.pod:845
+#: debhelper.pod:864
 msgid "L<http://joeyh.name/code/debhelper/>"
 msgstr "L<http://joeyh.name/code/debhelper/>"
 
 #. type: textblock
-#: debhelper.pod:847
+#: debhelper.pod:866
 msgid "Debhelper web site."
 msgstr "Debhelper-Website"
 
 #. type: =head1
-#: debhelper.pod:851 dh:1072 dh_auto_build:54 dh_auto_clean:57
-#: dh_auto_configure:59 dh_auto_install:99 dh_auto_test:69 dh_bugfiles:139
+#: debhelper.pod:870 dh:1069 dh_auto_build:54 dh_auto_clean:57
+#: dh_auto_configure:59 dh_auto_install:99 dh_auto_test:66 dh_bugfiles:139
 #: dh_builddeb:198 dh_clean:181 dh_compress:258 dh_fixperms:154 dh_gconf:104
-#: dh_gencontrol:173 dh_icons:79 dh_install:332 dh_installcatalogs:128
+#: dh_gencontrol:173 dh_icons:79 dh_install:332 dh_installcatalogs:129
 #: dh_installchangelogs:244 dh_installcron:82 dh_installdeb:221
 #: dh_installdebconf:132 dh_installdirs:101 dh_installdocs:363
 #: dh_installemacsen:142 dh_installexamples:116 dh_installifupdown:76
@@ -2024,25 +2071,25 @@ msgstr "Debhelper-Website"
 #: dh_installman:270 dh_installmanpages:202 dh_installmenu:102
 #: dh_installmime:67 dh_installmodules:113 dh_installpam:66 dh_installppp:72
 #: dh_installudev:105 dh_installwm:121 dh_installxfonts:96 dh_link:152
-#: dh_lintian:66 dh_listpackages:37 dh_makeshlibs:293 dh_md5sums:109
-#: dh_movefiles:165 dh_perl:160 dh_prep:67 dh_shlibdeps:159 dh_strip:406
+#: dh_lintian:66 dh_listpackages:37 dh_makeshlibs:293 dh_md5sums:111
+#: dh_movefiles:165 dh_perl:160 dh_prep:67 dh_shlibdeps:159 dh_strip:402
 #: dh_testdir:60 dh_testroot:34 dh_usrlocal:122
 msgid "AUTHOR"
 msgstr "AUTOR"
 
 #. type: textblock
-#: debhelper.pod:853 dh:1074 dh_auto_build:56 dh_auto_clean:59
-#: dh_auto_configure:61 dh_auto_install:101 dh_auto_test:71 dh_builddeb:200
+#: debhelper.pod:872 dh:1071 dh_auto_build:56 dh_auto_clean:59
+#: dh_auto_configure:61 dh_auto_install:101 dh_auto_test:68 dh_builddeb:200
 #: dh_clean:183 dh_compress:260 dh_fixperms:156 dh_gencontrol:175
 #: dh_install:334 dh_installchangelogs:246 dh_installcron:84 dh_installdeb:223
 #: dh_installdebconf:134 dh_installdirs:103 dh_installdocs:365
 #: dh_installemacsen:144 dh_installexamples:118 dh_installifupdown:78
-#: dh_installinfo:84 dh_installinit:337 dh_installlogrotate:59
+#: dh_installinfo:84 dh_installinit:339 dh_installlogrotate:59
 #: dh_installman:272 dh_installmanpages:204 dh_installmenu:104
 #: dh_installmime:69 dh_installmodules:115 dh_installpam:68 dh_installppp:74
 #: dh_installudev:107 dh_installwm:123 dh_installxfonts:98 dh_link:154
-#: dh_listpackages:39 dh_makeshlibs:295 dh_md5sums:111 dh_movefiles:167
-#: dh_prep:69 dh_shlibdeps:161 dh_strip:408 dh_testdir:62 dh_testroot:36
+#: dh_listpackages:39 dh_makeshlibs:295 dh_md5sums:113 dh_movefiles:167
+#: dh_prep:69 dh_shlibdeps:161 dh_strip:404 dh_testdir:62 dh_testroot:36
 msgid "Joey Hess <joeyh@debian.org>"
 msgstr "Joey Hess <joeyh@debian.org>"
 
@@ -2050,6 +2097,8 @@ msgstr "Joey Hess <joeyh@debian.org>"
 #: debhelper-obsolete-compat.pod:3
 msgid "debhelper-obsolete-compat - List of no longer supported compat levels"
 msgstr ""
+"debhelper-obsolete-compat - Liste nicht mehr unterstützter "
+"Kompatibilitätsstufen"
 
 #. type: textblock
 #: debhelper-obsolete-compat.pod:7
@@ -2059,28 +2108,30 @@ msgid ""
 "and to assist people upgrading from a non-supported compat level to a "
 "supported level."
 msgstr ""
+"Dieses Dokument enthält die Upgrade-Richtlinien aller Kompatibilitätsstufen, "
+"die nicht mehr unterstützt werden. Dementsprechend dient es meistens "
+"historischen Zwecken und hilft Leuten beim Upgrade von einer nicht "
+"unterstützten Kompatibilitätsstufe auf eine unterstützte Stufe."
 
 #. type: textblock
 #: debhelper-obsolete-compat.pod:12
-#, fuzzy
-#| msgid ""
-#| "* The package must be using compatibility level 9 or later (see "
-#| "L<debhelper(7)>)"
 msgid "For upgrades from supported compat levels, please see L<debhelper(7)>."
 msgstr ""
-"* Das Paket muss Kompatibilitätsstufe 9 oder höher verwenden (siehe "
-"L<debhelper(7)>)."
+"Für Upgrades von unterstützten Kompatibilitätsstufen lesen Sie bitte "
+"L<debhelper(7)>."
 
 #. type: =head1
 #: debhelper-obsolete-compat.pod:14
 msgid "UPGRADE LIST FOR COMPAT LEVELS"
-msgstr ""
+msgstr "UPGRADE-LISTE FÜR KOMPATIBILITÄTSSTUFEN"
 
 #. type: textblock
 #: debhelper-obsolete-compat.pod:16
 msgid ""
 "The following is the list of now obsolete compat levels and their changes."
 msgstr ""
+"Es folgt die Liste der nun überflüssigen Kompatibilitätsstufen und ihrer "
+"Änderungen."
 
 #. type: =item
 #: debhelper-obsolete-compat.pod:21
@@ -2220,10 +2271,8 @@ msgstr ""
 
 #. type: textblock
 #: debhelper-obsolete-compat.pod:108
-#, fuzzy
-#| msgid "dh_installinfo - install info files"
 msgid "B<dh_installdocs> skips installing empty files."
-msgstr "dh_installinfo - installiert Info-Dateien"
+msgstr "B<dh_installdocs> überspringt die Installation leerer Dateien"
 
 #. type: textblock
 #: debhelper-obsolete-compat.pod:112
@@ -2233,25 +2282,25 @@ msgstr ""
 "expandieren."
 
 #. type: textblock
-#: debhelper-obsolete-compat.pod:120 dh:1068 dh_auto_build:50 dh_auto_clean:53
-#: dh_auto_configure:55 dh_auto_install:95 dh_auto_test:65 dh_builddeb:194
+#: debhelper-obsolete-compat.pod:120 dh:1065 dh_auto_build:50 dh_auto_clean:53
+#: dh_auto_configure:55 dh_auto_install:95 dh_auto_test:62 dh_builddeb:194
 #: dh_clean:177 dh_compress:254 dh_fixperms:150 dh_gconf:100 dh_gencontrol:169
-#: dh_install:328 dh_installcatalogs:124 dh_installchangelogs:240
+#: dh_install:328 dh_installcatalogs:125 dh_installchangelogs:240
 #: dh_installcron:78 dh_installdeb:217 dh_installdebconf:128 dh_installdirs:97
 #: dh_installdocs:359 dh_installexamples:112 dh_installifupdown:72
-#: dh_installinfo:78 dh_installinit:331 dh_installlogcheck:81
+#: dh_installinfo:78 dh_installinit:333 dh_installlogcheck:81
 #: dh_installlogrotate:53 dh_installman:266 dh_installmanpages:198
 #: dh_installmime:63 dh_installmodules:109 dh_installpam:62 dh_installppp:68
 #: dh_installudev:101 dh_installwm:117 dh_installxfonts:92 dh_link:148
-#: dh_listpackages:33 dh_makeshlibs:289 dh_md5sums:105 dh_movefiles:161
-#: dh_perl:156 dh_prep:63 dh_strip:402 dh_testdir:56 dh_testroot:30
-#: dh_usrlocal:118 dh_systemd_start:247
+#: dh_listpackages:33 dh_makeshlibs:289 dh_md5sums:107 dh_movefiles:161
+#: dh_perl:156 dh_prep:63 dh_strip:398 dh_testdir:56 dh_testroot:30
+#: dh_usrlocal:118 dh_systemd_start:248
 msgid "L<debhelper(7)>"
 msgstr "L<debhelper(7)>"
 
 #. type: =head1
-#: debhelper-obsolete-compat.pod:122 dh_installinit:335 dh_systemd_enable:268
-#: dh_systemd_start:249
+#: debhelper-obsolete-compat.pod:122 dh_installinit:337 dh_systemd_enable:268
+#: dh_systemd_start:250
 msgid "AUTHORS"
 msgstr "AUTOREN"
 
@@ -2342,7 +2391,7 @@ msgstr ""
 #: dh:42 dh_auto_build:29 dh_auto_clean:31 dh_auto_configure:32
 #: dh_auto_install:44 dh_auto_test:32 dh_bugfiles:51 dh_builddeb:26 dh_clean:45
 #: dh_compress:50 dh_fixperms:33 dh_gconf:40 dh_gencontrol:35 dh_icons:31
-#: dh_install:71 dh_installcatalogs:50 dh_installchangelogs:60
+#: dh_install:71 dh_installcatalogs:51 dh_installchangelogs:60
 #: dh_installcron:41 dh_installdebconf:62 dh_installdirs:40 dh_installdocs:76
 #: dh_installemacsen:54 dh_installexamples:33 dh_installifupdown:40
 #: dh_installinfo:32 dh_installinit:60 dh_installlogcheck:43
@@ -2998,18 +3047,18 @@ msgstr ""
 "der letzte in der Sequenz benutzt."
 
 #. type: textblock
-#: dh:1070 dh_auto_build:52 dh_auto_clean:55 dh_auto_configure:57
-#: dh_auto_install:97 dh_auto_test:67 dh_bugfiles:137 dh_builddeb:196
+#: dh:1067 dh_auto_build:52 dh_auto_clean:55 dh_auto_configure:57
+#: dh_auto_install:97 dh_auto_test:64 dh_bugfiles:137 dh_builddeb:196
 #: dh_clean:179 dh_compress:256 dh_fixperms:152 dh_gconf:102 dh_gencontrol:171
 #: dh_icons:77 dh_install:330 dh_installchangelogs:242 dh_installcron:80
 #: dh_installdeb:219 dh_installdebconf:130 dh_installdirs:99 dh_installdocs:361
 #: dh_installemacsen:140 dh_installexamples:114 dh_installifupdown:74
-#: dh_installinfo:80 dh_installinit:333 dh_installlogrotate:55
+#: dh_installinfo:80 dh_installinit:335 dh_installlogrotate:55
 #: dh_installman:268 dh_installmanpages:200 dh_installmenu:100
 #: dh_installmime:65 dh_installmodules:111 dh_installpam:64 dh_installppp:70
 #: dh_installudev:103 dh_installwm:119 dh_installxfonts:94 dh_link:150
-#: dh_lintian:62 dh_listpackages:35 dh_makeshlibs:291 dh_md5sums:107
-#: dh_movefiles:163 dh_perl:158 dh_prep:65 dh_shlibdeps:157 dh_strip:404
+#: dh_lintian:62 dh_listpackages:35 dh_makeshlibs:291 dh_md5sums:109
+#: dh_movefiles:163 dh_perl:158 dh_prep:65 dh_shlibdeps:157 dh_strip:400
 #: dh_testdir:58 dh_testroot:32 dh_usrlocal:120
 msgid "This program is a part of debhelper."
 msgstr "Dieses Programm ist Teil von Debhelper."
@@ -3369,15 +3418,6 @@ msgstr ""
 "keine Tests durchgeführt."
 
 #. type: textblock
-#: dh_auto_test:51
-msgid ""
-"dh_auto_test does not run the test suite when a package is being cross "
-"compiled."
-msgstr ""
-"dh_auto_test führt die Testsuite nicht aus, wenn das Paket cross-kompiliert "
-"wird."
-
-#. type: textblock
 #: dh_bugfiles:5
 msgid ""
 "dh_bugfiles - install bug reporting customization files into package build "
@@ -3405,7 +3445,7 @@ msgstr ""
 
 #. type: =head1
 #: dh_bugfiles:23 dh_clean:32 dh_compress:33 dh_gconf:24 dh_install:39
-#: dh_installcatalogs:36 dh_installchangelogs:36 dh_installcron:22
+#: dh_installcatalogs:37 dh_installchangelogs:36 dh_installcron:22
 #: dh_installdeb:23 dh_installdebconf:35 dh_installdirs:26 dh_installdocs:22
 #: dh_installemacsen:28 dh_installexamples:23 dh_installifupdown:23
 #: dh_installinfo:22 dh_installinit:28 dh_installlogcheck:22 dh_installman:52
@@ -4085,7 +4125,7 @@ msgstr ""
 "Befehle werden durch L<dh_installdeb(1)> in die Betreuerskripte eingefügt."
 
 #. type: =item
-#: dh_icons:35 dh_installcatalogs:54 dh_installdebconf:66 dh_installemacsen:58
+#: dh_icons:35 dh_installcatalogs:55 dh_installdebconf:66 dh_installemacsen:58
 #: dh_installinit:64 dh_installmenu:49 dh_installmodules:43 dh_installwm:45
 #: dh_makeshlibs:84 dh_usrlocal:43
 msgid "B<-n>, B<--no-scripts>"
@@ -4471,19 +4511,12 @@ msgstr ""
 
 #. type: textblock
 #: dh_installcatalogs:27
-#, fuzzy
-#| msgid ""
-#| "This command automatically adds maintainer script snippets for "
-#| "registering and unregistering the catalogs and supercatalogs (unless B<-"
-#| "n> is used). These snippets are inserted into the maintainer scripts and "
-#| "the B<triggers> file by B<dh_installdeb>; see L<dh_installdeb(1)> for an "
-#| "explanation of Debhelper maintainer script snippets."
 msgid ""
 "This command automatically adds maintainer script snippets for registering "
 "and unregistering the catalogs and supercatalogs (unless B<-n> is used). "
-"These snippets are inserted into the maintainer scripts by B<dh_installdeb>; "
-"see L<dh_installdeb(1)> for an explanation of Debhelper maintainer script "
-"snippets."
+"These snippets are inserted into the maintainer scripts and the B<triggers> "
+"file by B<dh_installdeb>; see L<dh_installdeb(1)> for an explanation of "
+"Debhelper maintainer script snippets."
 msgstr ""
 "Dieser Befehl fügt Schnipsel von Betreuerskripten zur Registrierung und "
 "Austragung der Kataloge und Superkataloge hinzu (außer wenn B<-n> benutzt "
@@ -4492,7 +4525,7 @@ msgstr ""
 "Betreuerskriptschnipsel finden Sie in L<dh_installdeb(1)>."
 
 #. type: textblock
-#: dh_installcatalogs:33
+#: dh_installcatalogs:34
 msgid ""
 "A dependency on B<sgml-base> will be added to B<${misc:Depends}>, so be sure "
 "your package uses that variable in F<debian/control>."
@@ -4502,12 +4535,12 @@ msgstr ""
 "benutzt."
 
 #. type: =item
-#: dh_installcatalogs:40
+#: dh_installcatalogs:41
 msgid "debian/I<package>.sgmlcatalogs"
 msgstr "debian/I<Paket>.sgmlcatalogs"
 
 #. type: textblock
-#: dh_installcatalogs:42
+#: dh_installcatalogs:43
 msgid ""
 "Lists the catalogs to be installed per package. Each line in that file "
 "should be of the form C<I<source> I<dest>>, where I<source> indicates where "
@@ -4522,12 +4555,16 @@ msgstr ""
 "anzeigt. I<Ziel> sollte mit F</usr/share/sgml/> beginnen."
 
 #. type: textblock
-#: dh_installcatalogs:56 dh_installinit:66
-msgid "Do not modify F<postinst>/F<postrm>/F<prerm> scripts."
-msgstr "ändert keine F<postinst>-/F<postrm>/F<prerm>-Skripte."
+#: dh_installcatalogs:57
+msgid ""
+"Do not modify F<postinst>/F<postrm>/F<prerm> scripts nor add an activation "
+"trigger."
+msgstr ""
+"ändert weder F<postinst>-/F<postrm>/F<prerm>-Skripte, noch wird ein "
+"Aktivierungsauslöser hinzugefügt."
 
 #. type: textblock
-#: dh_installcatalogs:62 dh_installemacsen:75 dh_installinit:161
+#: dh_installcatalogs:64 dh_installemacsen:75 dh_installinit:161
 #: dh_installmodules:57 dh_installudev:51 dh_installwm:57 dh_usrlocal:51
 msgid ""
 "Note that this command is not idempotent. L<dh_prep(1)> should be called "
@@ -4540,12 +4577,12 @@ msgstr ""
 "Textes hinzugefügt werden."
 
 #. type: textblock
-#: dh_installcatalogs:126
+#: dh_installcatalogs:127
 msgid "F</usr/share/doc/sgml-base-doc/>"
 msgstr "F</usr/share/doc/sgml-base-doc/>"
 
 #. type: textblock
-#: dh_installcatalogs:130
+#: dh_installcatalogs:131
 msgid "Adam Di Carlo <aph@debian.org>"
 msgstr "Adam Di Carlo <aph@debian.org>"
 
@@ -5812,13 +5849,14 @@ msgid "debian/I<package>.service"
 msgstr "debian/I<Paket>.service"
 
 #. type: textblock
-#: dh_installinit:49 dh_systemd_enable:45
+#: dh_installinit:49
 msgid ""
 "If this exists, it is installed into lib/systemd/system/I<package>.service "
-"in the package build directory."
+"in the package build directory. Only used in compat levels 10 and below."
 msgstr ""
 "Falls dies existiert, wird es in lib/systemd/system/I<Paket>.service im "
-"Paketbauverzeichnis installiert."
+"Paketbauverzeichnis installiert. Nur in Kompatibilitätsstufen 10 und darunter "
+"benutzt."
 
 #. type: =item
 #: dh_installinit:52 dh_systemd_enable:48
@@ -5826,15 +5864,20 @@ msgid "debian/I<package>.tmpfile"
 msgstr "debian/I<Paket>.tmpfile"
 
 #. type: textblock
-#: dh_installinit:54 dh_systemd_enable:50
+#: dh_installinit:54
 msgid ""
 "If this exists, it is installed into usr/lib/tmpfiles.d/I<package>.conf in "
 "the package build directory. (The tmpfiles.d mechanism is currently only "
-"used by systemd.)"
+"used by systemd.) Only used in compat levels 10 and below."
 msgstr ""
 "Falls dies existiert, wird es in usr/lib/tmpfiles.d/I<Paket>.conf im "
 "Paketbauverzeichnis installiert. (Der »tmpfiles.d«-Mechanismus wird derzeit "
-"nur von Systemd benutzt.)"
+"nur von Systemd benutzt.) Nur in Kompatibilitätsstufe 10 und darunter."
+
+#. type: textblock
+#: dh_installinit:66
+msgid "Do not modify F<postinst>/F<postrm>/F<prerm> scripts."
+msgstr "ändert keine F<postinst>-/F<postrm>/F<prerm>-Skripte."
 
 #. type: =item
 #: dh_installinit:68
@@ -6066,12 +6109,12 @@ msgstr ""
 "F<postinst>-Skripten vor der Markierung B<#DEBHELPER#> bereitgestellt werden."
 
 #. type: textblock
-#: dh_installinit:339
+#: dh_installinit:341
 msgid "Steve Langasek <steve.langasek@canonical.com>"
 msgstr "Steve Langasek <steve.langasek@canonical.com>"
 
 #. type: textblock
-#: dh_installinit:341
+#: dh_installinit:343
 msgid "Michael Stapelberg <stapelberg@debian.org>"
 msgstr "Michael Stapelberg <stapelberg@debian.org>"
 
@@ -7465,11 +7508,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_md5sums:20
-#, fuzzy
-#| msgid ""
-#| "B<dh_md5sums> is a debhelper program that is responsible for generating a "
-#| "F<DEBIAN/md5sums> file, which lists the md5sums of each file in the "
-#| "package.  These files are used by the B<debsums> package."
 msgid ""
 "B<dh_md5sums> is a debhelper program that is responsible for generating a "
 "F<DEBIAN/md5sums> file, which lists the md5sums of each file in the "
@@ -7478,7 +7516,8 @@ msgid ""
 msgstr ""
 "B<dh_md5sums> ist ein Debhelper-Programm, das für das Erzeugen einer "
 "F<DEBIAN/md5sums>-Datei zuständig ist, die die Md5-Prüfsummen jeder Datei im "
-"Paket auflistet. Diese Dateien werden vom Paket B<debsums> benutzt."
+"Paket auflistet. Diese Dateien werden von B<dpkg --verify> oder dem Programm "
+"L<debsums(1)> benutzt."
 
 #. type: textblock
 #: dh_md5sums:24
@@ -8477,6 +8516,26 @@ msgstr ""
 "Argumente übergeben, z.B. B<dh_systemd_enable quota.service> und "
 "B<dh_systemd_enable --name=quotarpc quotarpc.service>."
 
+#. type: textblock
+#: dh_systemd_enable:45
+msgid ""
+"If this exists, it is installed into lib/systemd/system/I<package>.service "
+"in the package build directory."
+msgstr ""
+"Falls dies existiert, wird es in lib/systemd/system/I<Paket>.service im "
+"Paketbauverzeichnis installiert."
+
+#. type: textblock
+#: dh_systemd_enable:50
+msgid ""
+"If this exists, it is installed into usr/lib/tmpfiles.d/I<package>.conf in "
+"the package build directory. (The tmpfiles.d mechanism is currently only "
+"used by systemd.)"
+msgstr ""
+"Falls dies existiert, wird es in usr/lib/tmpfiles.d/I<Paket>.conf im "
+"Paketbauverzeichnis installiert. (Der »tmpfiles.d«-Mechanismus wird derzeit "
+"nur von Systemd benutzt.)"
+
 #. type: =item
 #: dh_systemd_enable:60
 msgid "B<--no-enable>"
@@ -8533,7 +8592,7 @@ msgid "L<dh_systemd_start(1)>, L<debhelper(7)>"
 msgstr "L<dh_systemd_start(1)>, L<debhelper(7)>"
 
 #. type: textblock
-#: dh_systemd_enable:270 dh_systemd_start:251
+#: dh_systemd_enable:270 dh_systemd_start:252
 msgid "pkg-systemd-maintainers@lists.alioth.debian.org"
 msgstr "pkg-systemd-maintainers@lists.alioth.debian.org"
 
@@ -8613,8 +8672,8 @@ msgid ""
 "(the latter is only relevant for services without a corresponding init "
 "script)."
 msgstr ""
-"startet die Unit-Datei nach Upgrades und nach anfänglicher Installation "
-"(letzteres ist nur für Dienste ohne zugehöriges Init-Skript relevant)."
+"die Unit-Datei nach Upgrades oder nach anfänglicher Installation nicht "
+"starten(letzteres ist nur für Dienste ohne zugehöriges Init-Skript relevant)."
 
 #. type: textblock
 #: dh_systemd_start:73
@@ -8635,8 +8694,8 @@ msgid "This compatibility level is open for beta testing; changes may occur."
 msgstr "Diese Kompatibilitätsstufe ist im Beta-Test; Änderungen sind möglich."
 
 #~ msgid ""
-#~ "Do not modify F<postinst>/F<postrm>/F<prerm> scripts nor add an "
-#~ "activation trigger."
+#~ "dh_auto_test does not run the test suite when a package is being cross "
+#~ "compiled."
 #~ msgstr ""
-#~ "ändert weder F<postinst>-/F<postrm>/F<prerm>-Skripte, noch wird ein "
-#~ "Aktivierungsauslöser hinzugefügt."
+#~ "dh_auto_test führt die Testsuite nicht aus, wenn das Paket cross-"
+#~ "kompiliert wird."

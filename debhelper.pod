@@ -586,6 +586,12 @@ F<menu-method> files are still installed.
 
 =item -
 
+B<dh_installinit> no longer installs F<service> or F<tmpfile> files, nor
+generates maintainer scripts for those files. Use B<dh_systemd_enable> and
+B<dh_systemd_start> instead.
+
+=item -
+
 The B<-s> (B<--same-arch>) option is removed.
 
 =item -
@@ -612,6 +618,19 @@ unless explicitly requested (or it has to create a subdirectory in
 it).
 
 The vast majority of all packages will be unaffected by this change.
+
+=item -
+
+B<dh> no longer creates a stamp (or log) file to record whether the
+build already ran or not.  This means that unless upstream's build
+system correctly tracks this, the build will be run twice (once for
+the "build" target and once for the "binary" target).
+
+On the other hand, this means that rebuild without cleaning
+(e.g. B<dpkg-buildpackage -nc>) will behave as most people would
+expect.
+
+The previous behaviour can restored by using B<--with build-stamp>
 
 =back
 

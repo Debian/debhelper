@@ -1,3 +1,61 @@
+debhelper (10.2.5) unstable; urgency=medium
+
+  [ Translations ]
+  * Add Japanese translation (Hideki Yamane)  (Closes: #852520)
+
+ -- Niels Thykier <niels@thykier.net>  Wed, 25 Jan 2017 20:47:27 +0000
+
+debhelper (10.2.4) unstable; urgency=medium
+
+  [ Niels Thykier ]
+  * d/changelog: Add missing changelog entry in 10.2.3 for a
+    compat 11 change.
+  * dh: Show when the "create-stamp" "command" is being run.
+  * dh: Fix a bug where dh would repeat part of the build sequence
+    when an add-on modified the build sequence after "dh_auto_test".
+    Thanks to Sean Whitton for reporting the issue.
+    (Closes: #851071)
+
+  [ Luca Boccassi ]
+  * dh_systemd_enable: Correct installation for "mount" units.
+    (Closes: #851744)
+
+  [ Translations ]
+  * Update Portuguese translation (Américo Monteiro)
+    (Closes: #851207)
+  * Update French translation (Baptiste Jammet)  (Closes: #852211)
+  * Update German translation (Chris Leick)  (Closes: #851962)
+
+ -- Niels Thykier <niels@thykier.net>  Mon, 23 Jan 2017 20:28:37 +0000
+
+debhelper (10.2.3) unstable; urgency=medium
+
+  [ Axel Beckert ]
+  * Fix wrong German translation of dh_systemd_start man page. Thanks to
+    Thorsten Alteholz for spotting the mistake! (Closes: #839655)
+
+  [ Mattia Rizzolo ]
+  * dh_auto_test: Apply patch from Mattia Rizzolo to update
+    documentation about running tests during cross-building.
+
+  [ Niels Thykier ]
+  * Bump dependency on dh-strip-nondeterminism to ensure
+    stable-backports uses a functional version.  Thanks to Christoph
+    Biedl for the report. (Closes: #843813)
+  * Massage md5sum output to avoid GNU-specific escaping extension
+    while we wait for dpkg-gendigests for a more compatible tool.
+    Thanks to Bernd Zeimetz for the report.  (Closes: #843163)
+  * In compat 11, dh will now skip creating a stamp file unless the
+    package explicitly requests it with "--with build-stamp".
+
+  [ Felipe Sateler ]
+  * dh_systemd_start: Fix a bug where --restart-after-upgrade with
+    --no-start would still start the service.  (Closes: #805878)
+  * dh_installinit: Leave the handling of debian/pkg.service and
+    debian/pkg.tmpfiles to dh_systemd_*.  (Closes: #830208)
+
+ -- Niels Thykier <niels@thykier.net>  Sat, 31 Dec 2016 21:27:54 +0000
+
 debhelper (10.2.2~bpo8+1) jessie-backports; urgency=medium
 
   * Rebuild for jessie-backports.

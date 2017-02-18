@@ -47,13 +47,13 @@ build directory.
 =item debian/I<package>.service
 
 If this exists, it is installed into lib/systemd/system/I<package>.service in
-the package build directory.
+the package build directory. Only used in compat levels 10 and below.
 
 =item debian/I<package>.tmpfile
 
 If this exists, it is installed into usr/lib/tmpfiles.d/I<package>.conf in the
 package build directory. (The tmpfiles.d mechanism is currently only used
-by systemd.)
+by systemd.) Only used in compat levels 10 and below.
 
 =back
 
@@ -216,14 +216,16 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 	}       
 
-	my $service=pkgfile($package,"service");
+	my $service='';
+	$service=pkgfile($package,"service") if compat(10);
 	if ($service ne '' && ! $dh{ONLYSCRIPTS}) {
 		my $path="$tmp/lib/systemd/system";
 		install_dir($path);
 		install_file($service, "$path/$script.service");
 	}
 
-	my $tmpfile=pkgfile($package,"tmpfile");
+	my $tmpfile='';
+	$tmpfile=pkgfile($package,"tmpfile") if compat(10);
 	if ($tmpfile ne '' && ! $dh{ONLYSCRIPTS}) {
 		my $path="$tmp/usr/lib/tmpfiles.d";
 		install_dir($path);
@@ -254,7 +256,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		error("Can't use --init-script with an upstart job");
 	}
 
-	if (!$dh{NOSCRIPTS}) {
+	if (compat(10) && !$dh{NOSCRIPTS}) {
 		# Include postinst-init-tmpfiles if the package ships any files
 		# in /usr/lib/tmpfiles.d or /etc/tmpfiles.d
 		my @tmpfiles;
