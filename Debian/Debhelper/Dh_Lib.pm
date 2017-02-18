@@ -975,7 +975,6 @@ sub getpackages {
 			else {
 				error("debian/control has a duplicate entry for $package");
 			}
-			$package_type="deb";
 			$included_in_build_profile=1;
 		}
 		if (/^Section:\s(.*)\s*$/i) {
@@ -1009,7 +1008,7 @@ sub getpackages {
 
 		if (!$_ or eof) { # end of stanza.
 			if ($package) {
-				$package_types{$package}=$package_type;
+				$package_types{$package}=$package_type // 'deb';
 				$package_arches{$package}=$arch;
 				$package_multiarches{$package} = $multiarch;
 				$package_sections{$package} = $section || $source_section;
@@ -1028,6 +1027,7 @@ sub getpackages {
 				$source_section = $section;
 			}
 			$package='';
+			$package_type=undef;
 			$arch='';
 			$section='';
 		}
