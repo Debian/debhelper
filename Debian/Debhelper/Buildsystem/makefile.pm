@@ -8,7 +8,7 @@ package Debian::Debhelper::Buildsystem::makefile;
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value escape_shell clean_jobserver_makeflags is_cross_compiling);
+use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value escape_shell clean_jobserver_makeflags is_cross_compiling compat);
 use parent qw(Debian::Debhelper::Buildsystem);
 
 my %DEB_DEFAULT_TOOLS = (
@@ -142,6 +142,9 @@ sub build {
 			}
 		}
 	}
+	if (ref($this) eq 'Debian::Debhelper::Buildsystem::makefile' and not compat(10)) {
+		unshift @_, "INSTALL=install --strip-program=true";
+	}
 	$this->do_make(@_);
 }
 
@@ -153,6 +156,9 @@ sub test {
 sub install {
 	my $this=shift;
 	my $destdir=shift;
+	if (ref($this) eq 'Debian::Debhelper::Buildsystem::makefile' and not compat(10)) {
+		unshift @_, "INSTALL=install --strip-program=true";
+	}
 	$this->make_first_existing_target(['install'],
 		"DESTDIR=$destdir",
 		"AM_UPDATE_INFO_DIR=no", @_);
