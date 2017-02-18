@@ -986,7 +986,7 @@ sub getpackages {
 		if (/^(?:X[BC]*-)?Package-Type:\s*(.*)/i) {
 			$package_type=$1;
 		}
-		if (/^Multi-Arch: \s*(.*)\s*/i) {
+		if (/^Multi-Arch:\s*(.*)\s*/i) {
 			$multiarch = $1;
 		}
 		# rely on libdpkg-perl providing the parsing functions because
