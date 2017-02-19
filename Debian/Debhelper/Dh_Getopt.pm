@@ -34,7 +34,10 @@ sub AddPackage { my($option,$value)=@_;
 		push @{$dh{DOPACKAGES}}, getpackages('arch');
 		$dh{DOARCH}=1;
 		if ($option eq 's' or $option eq 'same-arch') {
-			deprecated_functionality('-s/--same-arch is deprecated; please use -a/--arch instead', 11);
+			deprecated_functionality('-s/--same-arch is deprecated; please use -a/--arch instead',
+									 11,
+									 '-s/--same-arch has been removed; please use -a/--arch instead'
+			);
 		}
 	}
 	elsif ($option eq 'p' or $option eq 'package') {
