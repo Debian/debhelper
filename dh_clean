@@ -80,11 +80,9 @@ init(options => {
 inhibit_log();
 
 if ($dh{K_FLAG}) {
-	# dh_prep will be emulated (mostly) by the code below.
-	if (not compat(10)) {
-		error("The -k option is not supported in compat 11; use dh_prep instead");
-	}
-	warning("dh_clean -k is deprecated; use dh_prep instead");
+	deprecated_functionality('dh_clean -k is deprecated; use dh_prep instead',
+							 11,
+							 'The -k option is not supported in compat 11; use dh_prep instead');
 }
 
 # Remove the debhelper stamp file

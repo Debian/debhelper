@@ -49,7 +49,7 @@ use vars qw(@EXPORT %dh);
 	    &get_source_date_epoch &is_cross_compiling
 	    &generated_file &autotrigger &package_section
 	    &restore_file_on_clean &restore_all_files
-	    &open_gz &reset_perm_and_owner
+	    &open_gz &reset_perm_and_owner &deprecated_functionality
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -1439,6 +1439,20 @@ sub open_gz {
 		  or die("open $file [<:gzip] failed: $!");
 	}
 	return $fd;
+}
+
+sub deprecated_functionality {
+	my ($warning_msg, $compat_removal, $removal_msg) = @_;
+	if (defined($compat_removal) and not compat($compat_removal - 1)) {
+		my $msg = $removal_msg // $warning_msg;
+		warning($msg);
+		error("This feature was removed in compat ${compat_removal}.");
+	} else {
+		warning($warning_msg);
+		warning("This feature will be removed in compat ${compat_removal}.")
+		  if defined($compat_removal);
+	}
+	return 1;
 }
 
 1

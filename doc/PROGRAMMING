@@ -340,6 +340,14 @@ open_gz($file)
 	Depending on runtime features, it might be a pipe from an
 	external process (which will die with a "SIGPIPE" if you
 	do not consume all the input)
+deprecated_functionality($warn_msg[, $rm_compat[, $rm_msg]])
+	Emit $warn_msg as a deprecation warning, or error out if $rm_compat
+	is provided and equal to (or greater than) the active compat level.
+	The $rm_msg parameter can be used to provide a custom error message
+	in the latter case (if omitted, $warn_msg will be used in both cases).
+	The function will provide a separate diagnotic about which compat
+	level that will remove/removed the functionality if $rm_compat is
+	given.
 
 Sequence Addons:
 ---------------
