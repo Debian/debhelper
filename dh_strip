@@ -147,7 +147,7 @@ init(options => {
 if ($dh{K_FLAG} and $dh{MIGRATE_DBGSYM}) {
 	error("--keep-debug and --dbgsym-migration are mutually exclusive");
 }
-if ($dh{DEBUGPACKAGES} and $dh{MIGRATE_DBGSYM}) {
+if ($dh{DEBUGPACKAGE} and $dh{MIGRATE_DBGSYM}) {
 	error("--dbg-package and --dbgsym-migration are mutually exclusive");
 }
 
@@ -155,7 +155,7 @@ if ($dh{ENABLE_DBGSYM} and $dh{ENABLE_DBGSYM} ne 'auto') {
 	if ($dh{K_FLAG}) {
 		error("--keep-debug and explicit --automatic-dbgsym are mutually exclusive");
 	}
-	if ($dh{DEBUGPACKAGES}) {
+	if ($dh{DEBUGPACKAGE}) {
 		error("--dbg-package and explicit --automatic-dbgsym are mutually exclusive");
 	}
 }
