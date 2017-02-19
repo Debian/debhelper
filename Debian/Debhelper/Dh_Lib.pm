@@ -1365,11 +1365,11 @@ sub restore_file_on_clean {
 	if ($file =~ m{^\.} or $file =~ m{/CVS/} or $file =~ m{/\.svn/}) {
 		# We do not want to smash a Vcs repository by accident.
 		warning("Attempt to store $file, which looks like a VCS file or");
-		warning("a hidden package file (like quilt's \".pc\" directory");
+		warning("a hidden package file (like quilt's \".pc\" directory)");
 		error("This tool probably contains a bug.");
 	}
 	if (-l $file or not -f _) {
-		error("Cannot store $file, which is a non-file (incl. a symlink)");
+		error("Cannot store $file: Can only store regular files (no symlinks, etc.)");
 	}
 	require Digest::SHA;
 
