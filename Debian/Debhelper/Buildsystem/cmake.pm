@@ -21,7 +21,7 @@ my @STANDARD_CMAKE_FLAGS = qw(
 
 my %DEB_HOST2CMAKE_SYSTEM = (
 	'linux'    => 'Linux',
-	'kfreebsd' => 'FreeBSD',
+	'kfreebsd' => 'kFreeBSD',
 	'hurd'     => 'GNU',
 );
 
