@@ -1,0 +1,148 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_missing - check for missing files
+
+=cut
+
+use strict;
+use warnings;
+use File::Find;
+use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+B<dh_missing> [B<-X>I<item>] [B<--sourcedir=>I<dir>] [S<I<debhelper options>>]
+
+=head1 DESCRIPTION
+
+B<dh_missing> compares the list of installed files with the files in
+the source directory. If any of the files (and symlinks) in the source
+directory were not installed to somewhere, it will warn on stderr
+about that (B<--list-missing>) or fail (B<--fail-missing>).
+
+This may be useful if you have a large package and want to make sure that
+you don't miss installing newly added files in new upstream releases.
+
+=head1 FILES
+
+=over 4
+
+=item debian/not-installed
+
+List the files that are deliberately not installed in I<any> binary
+package.  Paths listed in this file are ignored by B<dh_missing>.
+However, it is B<not> a method to exclude files from being installed
+by B<dh_install>. Please use the B<--exclude> B<dh_install> option for
+that.
+
+Please keep in mind that B<dh_missing> will B<not> expand wildcards in
+this file.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--list-missing>
+
+Warn on stderr about source files not installed to somewhere.
+
+Note that files that are excluded from being moved via the B<-X> option are not
+warned about.
+
+=item B<--fail-missing>
+
+This option is like B<--list-missing>, except if a file was missed, it will
+not only list the missing files, but also fail with a nonzero exit code.
+
+=back
+
+=cut
+
+init(options => {
+	"list-missing" => \$dh{LIST_MISSING},
+	"fail-missing" => \$dh{FAIL_MISSING},
+});
+
+my @installed;
+
+my $srcdir = '.';
+$srcdir = $dh{SOURCEDIR} if defined $dh{SOURCEDIR};
+
+my $missing_files = 0;
+
+if (!$dh{LIST_MISSING} && !$dh{FAIL_MISSING}) {
+	exit 0;
+}
+
+# . as srcdir makes no sense, so this is a special case.
+if ($srcdir eq '.') {
+	$srcdir='debian/tmp';
+}
+
+for my $file (<debian/.debhelper/generated/*/installed-by-*>) {
+	local $/ = undef;
+	open(my $fh, '<', $file) or die "could not open $file: $!";
+	for my $line (split(/\n/, <$fh>)) {
+		push(@installed, $line);
+	}
+	close($fh);
+}
+
+my @missing;
+if ( -f 'debian/not-installed') {
+	my @not_installed = filearray('debian/not-installed');
+	foreach (@not_installed) {
+		s:^\s*:debian/tmp/: unless m:^\s*debian/tmp/:;
+	}
+	# Pretend that these are also installed.
+	push(@installed, @not_installed);
+}
+my $installed=join("|", map {
+	# Kill any extra slashes, for robustness.
+	y:/:/:s;
+	s:/+$::;
+	s:^(\./)*::;
+	"\Q$_\E\/.*|\Q$_\E";
+} @installed);
+$installed=qr{^($installed)$};
+find(sub {
+	-f || -l || return;
+	$_="$File::Find::dir/$_";
+	if (! /$installed/ && ! excludefile($_)) {
+		my $file=$_;
+		$file=~s/^\Q$srcdir\E\///;
+		push @missing, $file;
+	}
+}, $srcdir);
+if (@missing) {
+	warning "$_ exists in $srcdir but is not installed to anywhere" foreach @missing;
+	if ($dh{FAIL_MISSING}) {
+		error("missing files, aborting");
+	}
+}
+
+if ($missing_files) {
+	error("missing files, aborting");
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Michael Stapelberg <stapelberg@debian.org>
+
+=cut
+
+# Local Variables:
+# indent-tabs-mode: t
+# tab-width: 4
+# cperl-indent-level: 4
+# End:

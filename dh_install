@@ -133,8 +133,6 @@ init(options => {
 	"sourcedir=s" => \$dh{SOURCEDIR},	
 });
 
-my @installed;
-
 my $srcdir = '.';
 $srcdir = $dh{SOURCEDIR} if defined $dh{SOURCEDIR};
 
@@ -143,6 +141,8 @@ my $missing_files = 0;
 # PROMISE: DH NOOP WITHOUT install
 
 foreach my $package (getpackages()) {
+	my @installed;
+
 	# Look at the install files for all packages to handle
 	# list-missing/fail-missing, but skip really installing for
 	# packages that are not being acted on.
@@ -252,50 +252,18 @@ foreach my $package (getpackages()) {
 			}
 		}
 	}
+
+	log_installed_files('dh_install', $package, @installed);
 }
 
-if ($dh{LIST_MISSING} || $dh{FAIL_MISSING}) {
-	# . as srcdir makes no sense, so this is a special case.
-	if ($srcdir eq '.') {
-		$srcdir='debian/tmp';
-	}
-	
-	my @missing;
-	if ( -f 'debian/not-installed') {
-		my @not_installed = filearray('debian/not-installed');
-		foreach (@not_installed) {
-		  s:^\s*:debian/tmp/: unless m:^\s*debian/tmp/:;
-		}
-		# Pretend that these are also installed.
-		push(@installed, @not_installed);
-	}
-	my $installed=join("|", map {
-		# Kill any extra slashes, for robustness.
-		y:/:/:s;
-		s:/+$::;
-		s:^(\./)*::;
-		"\Q$_\E\/.*|\Q$_\E";
-	} @installed);
-	$installed=qr{^($installed)$};
-	find(sub {
-		-f || -l || return;
-		$_="$File::Find::dir/$_";
-		if (! /$installed/ && ! excludefile($_)) {
-			my $file=$_;
-			$file=~s/^\Q$srcdir\E\///;
-			push @missing, $file;
-		}
-	}, $srcdir);
-	if (@missing) {
-		warning "$_ exists in $srcdir but is not installed to anywhere" foreach @missing;
-		if ($dh{FAIL_MISSING}) {
-			error("missing files, aborting");
-		}
-	}
-}
-
-if ($missing_files) {
-	error("missing files, aborting");
+my @options;
+push @options, "--list-missing" if $dh{LIST_MISSING};
+push @options, "--fail-missing" if $dh{FAIL_MISSING};
+my $ret = system("dh_missing", @options);
+if ($ret >> 8 != 0) {
+	exit $ret >> 8;
+} elsif ($ret) {
+	exit 1;
 }
 
 =head1 LIMITATIONS

@@ -50,6 +50,7 @@ use vars qw(@EXPORT %dh);
 	    &generated_file &autotrigger &package_section
 	    &restore_file_on_clean &restore_all_files
 	    &open_gz &reset_perm_and_owner &deprecated_functionality
+	    &log_installed_files
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -1452,6 +1453,19 @@ sub deprecated_functionality {
 		warning("This feature will be removed in compat ${compat_removal}.")
 		  if defined($compat_removal);
 	}
+	return 1;
+}
+
+sub log_installed_files {
+	my ($name, $package, @patterns) = @_;
+
+	my $log = generated_file($package, 'installed-by-' . $name);
+	open(my $fh, '>', $log);
+	for my $src (@patterns) {
+		print $fh "$src\n";
+	}
+	close($fh);
+
 	return 1;
 }
 
