@@ -69,7 +69,7 @@ init(options => {
 	"fail-missing" => \$dh{FAIL_MISSING},
 });
 
-my @installed;
+my (@installed, %helpers);
 
 my $srcdir = '.';
 $srcdir = $dh{SOURCEDIR} if defined $dh{SOURCEDIR};
@@ -100,6 +100,8 @@ if (! -d $srcdir) {
 
 for my $file (<debian/.debhelper/generated/*/installed-by-*>) {
 	local $/ = undef;
+	my $helper = $file =~ s@.*/installed-by-@@r;
+	$helpers{$helper} = 1;
 	open(my $fh, '<', $file) or die "could not open $file: $!";
 	for my $line (split(/\n/, <$fh>)) {
 		push(@installed, $line);
@@ -135,6 +137,12 @@ find(sub {
 }, $srcdir);
 if (@missing) {
 	warning "$_ exists in $srcdir but is not installed to anywhere" foreach @missing;
+	nonquiet_print("The following debhelper tools have reported what they installed");
+	for my $helper (sort(keys(%helpers))) {
+		nonquiet_print(" * ${helper}");
+	}
+	nonquiet_print("If the missing files are installed by another tool, please file a bug against it");
+	nonquiet_print("For a short-term work-around: Add the files to debian/not-installed");
 	if ($dh{FAIL_MISSING}) {
 		error("missing files, aborting");
 	}
