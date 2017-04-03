@@ -98,11 +98,12 @@ my @sodests;
 
 # PROMISE: DH NOOP WITHOUT manpages tmp(usr/share/man)
 
-foreach my $package (@{$dh{DOPACKAGES}}) {
+foreach my $package (getpackages()) {
 	next if is_udeb($package);
 
 	my $tmp=tmpdir($package);
 	my $file=pkgfile($package,"manpages");
+	my $skip_install=! grep { $_ eq $package } @{$dh{DOPACKAGES}};
 	my @manpages;
 
 	@manpages=filearray($file, ".") if $file;
@@ -110,6 +111,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
 		push @manpages, @ARGV;
 	}
+
+	log_installed_files($package, @manpages);
+
+	next if $skip_install;
 
 	foreach my $page (@manpages) {
 		my $basename=basename($page);
@@ -186,8 +191,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			install_file($page, $instpage);
 		}
 	}
-
-	log_installed_files($package, @manpages);
 
 	# Now the .so conversion.
 	@sofiles=@sodests=();
