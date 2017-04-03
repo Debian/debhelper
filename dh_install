@@ -74,6 +74,8 @@ this file.
 
 =item B<--list-missing>
 
+B<Deprecated>: Please use B<dh_missing --list-missing> instead.
+
 This option makes B<dh_install> keep track of the files it installs, and then at
 the end, compare that list with the files in the source directory. If any of
 the files (and symlinks) in the source directory were not installed to
@@ -86,6 +88,8 @@ Note that files that are excluded from being moved via the B<-X> option are not
 warned about.
 
 =item B<--fail-missing>
+
+B<Deprecated>: Please use B<dh_missing --fail-missing> instead.
 
 This option is like B<--list-missing>, except if a file was missed, it will
 not only list the missing files, but also fail with a nonzero exit code. 
@@ -137,6 +141,10 @@ my $srcdir = '.';
 $srcdir = $dh{SOURCEDIR} if defined $dh{SOURCEDIR};
 
 my $missing_files = 0;
+
+if ($dh{LIST_MISSING} || $dh{FAIL_MISSING}) {
+	deprecated_functionality('Please use dh_missing --list-missing/--fail-missing instead', 11);
+}
 
 # PROMISE: DH NOOP WITHOUT install
 
