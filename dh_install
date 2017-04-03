@@ -256,6 +256,11 @@ foreach my $package (getpackages()) {
 	log_installed_files('dh_install', $package, @installed);
 }
 
+if ($missing_files) {
+	# There were files we could not install (e.g. patterns that matched nothing)
+	error("missing files, aborting");
+}
+
 my @options;
 push @options, "--list-missing" if $dh{LIST_MISSING};
 push @options, "--fail-missing" if $dh{FAIL_MISSING};

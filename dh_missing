@@ -72,8 +72,6 @@ my @installed;
 my $srcdir = '.';
 $srcdir = $dh{SOURCEDIR} if defined $dh{SOURCEDIR};
 
-my $missing_files = 0;
-
 if (!$dh{LIST_MISSING} && !$dh{FAIL_MISSING}) {
 	exit 0;
 }
@@ -123,10 +121,6 @@ if (@missing) {
 	if ($dh{FAIL_MISSING}) {
 		error("missing files, aborting");
 	}
-}
-
-if ($missing_files) {
-	error("missing files, aborting");
 }
 
 =head1 SEE ALSO
