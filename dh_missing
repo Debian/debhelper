@@ -81,6 +81,21 @@ if ($srcdir eq '.') {
 	$srcdir='debian/tmp';
 }
 
+if (! -d $srcdir) {
+	if (scalar(getpackages()) == 1 && not defined($dh{SOURCEDIR})) {
+		warning("$srcdir does not exist and there is only binary package.");
+		warning("Assuming everything is installed directly into the package directory.");
+		exit(0);
+	}
+	if (compat(10)) {
+		# Prevent "dh $@ --list-missing --destdir=..." from failing in compat 10.
+		warning("Cannot check if installation is missing files: $srcdir does not exist");
+		exit(0);
+	} else {
+		error("Cannot check if installation is missing files: $srcdir does not exist");
+	}
+}
+
 for my $file (<debian/.debhelper/generated/*/installed-by-*>) {
 	local $/ = undef;
 	open(my $fh, '<', $file) or die "could not open $file: $!";
