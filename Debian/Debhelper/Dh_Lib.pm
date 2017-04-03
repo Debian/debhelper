@@ -1460,7 +1460,7 @@ sub log_installed_files {
 	my ($package, @patterns) = @_;
 
 	my $log = generated_file($package, 'installed-by-' . basename($0));
-	open(my $fh, '>', $log);
+	open(my $fh, '>>', $log);
 	for my $src (@patterns) {
 		print $fh "$src\n";
 	}
