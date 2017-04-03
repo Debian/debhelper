@@ -187,6 +187,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 	}
 
+	log_installed_files($package, @manpages);
+
 	# Now the .so conversion.
 	@sofiles=@sodests=();
 	foreach my $dir (qw{usr/share/man}) {
