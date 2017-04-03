@@ -35,7 +35,7 @@ is(system("$rootcmd $TOPDIR/dh_missing --fail-missing"), 0, 'dh_missing failed')
 system("$rootcmd $TOPDIR/dh_clean");
 system("$rootcmd make installmore");
 system("PATH=$TOPDIR:\$PATH $rootcmd $TOPDIR/dh_install");
-system("$rootcmd $TOPDIR/dh_missing --fail-missing");
+system("$rootcmd $TOPDIR/dh_missing --fail-missing >/dev/null 2>&1");
 isnt($?, -1, 'dh_missing was executed');
 ok(! ($? & 127), 'dh_missing did not die due to a signal');
 my $exitcode = ($? >> 8);
