@@ -348,10 +348,15 @@ deprecated_functionality($warn_msg[, $rm_compat[, $rm_msg]])
 	The function will provide a separate diagnostic about which compat
 	level that will remove/removed the functionality if $rm_compat is
 	given.
-log_installed_files($package, @patterns)
+log_installed_files($package, @paths)
 	Creates a logfile (in debian/.debhelper/generated) for the helper's
 	processing of $package, which installed the files listed in
-	@patterns. This logfile will later be used by the dh_missing helper.
+	@paths. This logfile will later be used by the dh_missing helper.
+	Paths should be relative to the package root (i.e. the directory
+	containing "debian/") and should not have superflouos segments
+	(e.g. avoid "foo/../bar" or "foo/./bar")
+	If a directory is listed, it and all paths recursively beneath is
+	also considered installed.
 
 Sequence Addons:
 ---------------
