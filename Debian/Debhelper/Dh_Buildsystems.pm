@@ -30,6 +30,7 @@ our @BUILDSYSTEMS = (
 	"qmake",
 	"qmake_qt4",
 	"meson",
+	"ninja",
 );
 
 our @THIRD_PARTY_BUILDSYSTEMS = (
