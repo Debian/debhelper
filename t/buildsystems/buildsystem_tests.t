@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 310;
+use Test::More tests => 325;
 
 use strict;
 use warnings;
@@ -260,6 +260,15 @@ test_check_auto_buildable($bs{cmake}, "CMakeLists.txt", { configure => 1, clean 
 
 touch "$tmpdir/Makefile.PL";
 test_check_auto_buildable($bs{perl_makemaker}, "Makefile.PL", { configure => 1 });
+
+touch "$tmpdir/meson.build";
+test_check_auto_buildable($bs{meson}, "meson.build", { configure => 1, clean => 1 });
+
+touch "$tmpdir/builddir/build.ninja";
+test_check_auto_buildable($bs{ninja}, "build.ninja", { configure => 1, build => 1, clean => 1, install => 1, test => 1 });
+
+# Meson + ninja
+test_check_auto_buildable($bs{meson}, "meson.build+build.ninja", { configure => 1, build => 1, clean => 1, install => 1, test => 1 });
 
 # With Makefile
 touch "$builddir/Makefile";
