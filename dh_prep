@@ -50,7 +50,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# These are all debhelper temp files, and so it is safe to 
 	# wildcard them.
 	complex_doit("rm -f debian/$ext*.debhelper");
-	
+	doit('rm', '-rf', "debian/.debhelper/generated/${package}/");
 	doit ("rm","-rf",$tmp."/")
 		unless excludefile($tmp);
 }

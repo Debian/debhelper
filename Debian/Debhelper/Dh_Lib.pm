@@ -704,6 +704,7 @@ sub autoscript_sed {
 	}
 }
 
+# Generated files are cleaned by dh_clean AND dh_prep
 sub generated_file {
 	my ($package, $filename, $mkdirs) = @_;
 	my $dir = "debian/.debhelper/generated/${package}";
