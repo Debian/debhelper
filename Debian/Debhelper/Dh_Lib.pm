@@ -1459,6 +1459,8 @@ sub deprecated_functionality {
 sub log_installed_files {
 	my ($package, @patterns) = @_;
 
+	return if $dh{NO_ACT};
+
 	my $log = generated_file($package, 'installed-by-' . basename($0));
 	open(my $fh, '>>', $log);
 	for my $src (@patterns) {
