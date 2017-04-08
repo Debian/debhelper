@@ -99,11 +99,11 @@ if (! -d $srcdir) {
 }
 
 for my $file (<debian/.debhelper/generated/*/installed-by-*>) {
-	local $/ = undef;
 	my $helper = $file =~ s@.*/installed-by-@@r;
 	$helpers{$helper} = 1;
 	open(my $fh, '<', $file) or die "could not open $file: $!";
-	for my $line (split(/\n/, <$fh>)) {
+	while (my $line = <$fh>) {
+		chomp($line);
 		push(@installed, $line);
 	}
 	close($fh);
