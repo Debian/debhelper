@@ -1,4 +1,4 @@
-debhelper (10.2.6) UNRELEASED; urgency=medium
+debhelper (10.3) UNRELEASED; urgency=medium
 
   [ Helmut Grohne ]
   * Supply PKG_CONFIG for cross compilation with the makefile buildsystem.
@@ -12,6 +12,11 @@ debhelper (10.2.6) UNRELEASED; urgency=medium
   * Dh_Lib.pm: Make getpackages() produce the correct result independently
     of the order of the fields in a given paragraph of debian/control.
     (Closes: #847138)
+  * dh_installman: Report installed manpages so the new dh_missing tool
+    is informed about them.
+  * dh_install: Deprecate --list-missing/--fail-missing in favor of the
+    new dh_missing tool.  The options will be removed in compat 11.
+  * dh: Run dh_missing by default (in no op mode).
 
   [ Steven Chamberlain ]
   * When cross-compiling for GNU/kFreeBSD host systems, set
@@ -21,6 +26,15 @@ debhelper (10.2.6) UNRELEASED; urgency=medium
   [ Felipe Sateler ]
   * dh_systemd_enable.1: Improve the wording of the documentation for
     the --no-enable option.  (Closes: #844602)
+
+  [ Michael Biebl ]
+  * Add support for meson + ninja build systems.  (Closes: #795253)
+
+  [ Michael Stapelberg ]
+  * dh_missing: New tool to handle --list-missing/--fail-missing.
+    (Closes: #415396)
+  * Dh_Lib.pm: Introduce a log_installed_files sub that can be used
+    to inform dh_missing that a given file has been installed.
 
  -- Helmut Grohne <helmut@subdivi.de>  Sat, 18 Feb 2017 17:49:08 +0000
 
