@@ -27,6 +27,10 @@ do nothing.
 This may be useful if you have a large package and want to make sure that
 you don't miss installing newly added files in new upstream releases.
 
+Remember to test different kinds of builds (dpkg-buildpackage -A/-B/...) as
+you may experience varying results when only a subset of the packages are
+built.
+
 =head1 FILES
 
 =over 4
@@ -99,13 +103,22 @@ if (! -d $srcdir) {
 }
 
 for my $file (<debian/.debhelper/generated/*/installed-by-*>) {
-	my $helper = $file =~ s@.*/installed-by-@@r;
-	$helpers{$helper} = 1;
+	my ($target_pkg, $helper) = ('unknown', 'unknown');
+	my $had_files = 0;
+	my %seen;
+	if ($file =~ m@.*/([^/]+)/installed-by-(.*)@) {
+		($target_pkg, $helper) = ($1, $2);
+	}
+
 	open(my $fh, '<', $file) or die "could not open $file: $!";
 	while (my $line = <$fh>) {
 		chomp($line);
+		next if $line =~ m/^\s*$/;
+		next if $seen{$line}++; # Ignore duplicates
+		$had_files++;
 		push(@installed, $line);
 	}
+	$helpers{$helper}{$target_pkg} = $had_files;
 	close($fh);
 }
 
@@ -137,11 +150,18 @@ find(sub {
 }, $srcdir);
 if (@missing) {
 	warning "$_ exists in $srcdir but is not installed to anywhere" foreach @missing;
-	nonquiet_print("The following debhelper tools have reported what they installed");
+	nonquiet_print("The following debhelper tools have reported what they installed (with files per package)");
 	for my $helper (sort(keys(%helpers))) {
-		nonquiet_print(" * ${helper}");
+		my $pkg_info = $helpers{$helper};
+		my @results;
+		for my $pkg (sort(keys(%{$pkg_info}))) {
+			my $no = $pkg_info->{$pkg};
+			push(@results, "${pkg} (${no})")
+		}
+		nonquiet_print(" * ${helper}: " . join(', ', @results));
 	}
-	nonquiet_print("If the missing files are installed by another tool, please file a bug against it");
+	nonquiet_print("If the missing files are installed by another tool, please file a bug against it.");
+	nonquiet_print("Be sure to test with dpkg-buildpackage -A/-B as the results may vary when only a subset is built");
 	nonquiet_print("For a short-term work-around: Add the files to debian/not-installed");
 	if ($dh{FAIL_MISSING}) {
 		error("missing files, aborting");
