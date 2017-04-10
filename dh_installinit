@@ -25,6 +25,12 @@ It also automatically generates the F<postinst> and F<postrm> and F<prerm>
 commands needed to set up the symlinks in F</etc/rc*.d/> to start and stop
 the init scripts.
 
+In compat 10 or earlier: If a package only ships a systemd service
+file and no sysvinit script is provided, you may want to exclude the
+call to dh_installinit for that package (e.g. via B<-N>).  Otherwise,
+you may get warnings from lintian about init.d scripts not being
+included in the package.
+
 =head1 FILES
 
 =over 4
