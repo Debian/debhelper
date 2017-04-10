@@ -1043,21 +1043,22 @@ sub can_skip {
 	my @skipinfo=@{$skipinfo{$command}};
 	return 0 unless @skipinfo;
 
-	foreach my $package (@packages) {
-		foreach my $skipinfo (@skipinfo) {
-			if ($skipinfo=~/^([a-zA-Z0-9-_]+)\((.*)\)$/) {
-				my $type = $1;
-				my $need = $2;
-				if ($type eq 'tmp') {
+	foreach my $skipinfo (@skipinfo) {
+		if ($skipinfo=~/^([a-zA-Z0-9-_]+)\((.*)\)$/) {
+			my $type = $1;
+			my $need = $2;
+			if ($type eq 'tmp') {
+				foreach my $package (@packages) {
 					my $tmp = tmpdir($package);
 					return 0 if -e "$tmp/$need";
-				} else {
-					# Unknown hint - make no assumptions
-					return 0;
 				}
-			}
-			elsif (pkgfile($package, $skipinfo) ne '') {
+			} else {
+				# Unknown hint - make no assumptions
 				return 0;
+			}
+		} else {
+			foreach my $package (@packages) {
+				return 0 if pkgfile($package, $skipinfo) ne '';
 			}
 		}
 	}
