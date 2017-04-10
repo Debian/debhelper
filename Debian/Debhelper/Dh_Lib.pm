@@ -981,24 +981,21 @@ sub getpackages {
 				error("debian/control has a duplicate entry for $package");
 			}
 			$included_in_build_profile=1;
-		}
-		if (/^Section:\s(.*)\s*$/i) {
+		} elsif (/^Section:\s(.*)$/i) {
 			$section = $1;
-		}
-		if (/^Architecture:\s*(.*)/i) {
+		} elsif (/^Architecture:\s*(.*)/i) {
 			$arch=$1;
-		}
-		if (/^(?:X[BC]*-)?Package-Type:\s*(.*)/i) {
+		} elsif (/^(?:X[BC]*-)?Package-Type:\s*(.*)/i) {
 			$package_type=$1;
-		}
-		if (/^Multi-Arch:\s*(.*)\s*/i) {
+		} elsif (/^Multi-Arch:\s*(.*)/i) {
 			$multiarch = $1;
-		}
-		# rely on libdpkg-perl providing the parsing functions because
-		# if we work on a package with a Build-Profiles field, then a
-		# high enough version of dpkg-dev is needed anyways
-		if (/^Build-Profiles:\s*(.*)/i) {
-		        my $build_profiles=$1;
+
+		} elsif (/^Build-Profiles:\s*(.*)/i) {
+			# rely on libdpkg-perl providing the parsing functions
+			# because if we work on a package with a Build-Profiles
+			# field, then a high enough version of dpkg-dev is needed
+			# anyways
+			my $build_profiles=$1;
 			eval {
 				require Dpkg::BuildProfiles;
 				my @restrictions=Dpkg::BuildProfiles::parse_build_profiles($build_profiles);
