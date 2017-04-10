@@ -59,6 +59,24 @@ my $prefix="/usr";
 sub init {
 	my %params=@_;
 
+	# Check if we can by-pass the expensive Getopt::Long by optimising for the
+	# common case of "-a" or "-i"
+	if (scalar(@ARGV) == 1 && ($ARGV[0] eq '-a' || $ARGV[0] eq '-i') &&
+		! (defined $ENV{DH_OPTIONS} && length $ENV{DH_OPTIONS}) &&
+		! (defined $ENV{DH_INTERNAL_OPTIONS} && length $ENV{DH_INTERNAL_OPTIONS})) {
+
+		# Single -i or -a as dh does it.
+		if ($ARGV[0] eq '-i') {
+			push(@{$dh{DOPACKAGES}}, getpackages('indep'));
+			$dh{DOINDEP} = 1;
+		} else {
+			push(@{$dh{DOPACKAGES}}, getpackages('arch'));
+			$dh{DOARCH} = 1;
+		}
+		# Clear @ARGV so we do not hit the expensive case below
+		@ARGV = ();
+	}
+
 	# Check to see if an option line starts with a dash,
 	# or DH_OPTIONS is set.
 	# If so, we need to pass this off to the resource intensive 
