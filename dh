@@ -826,16 +826,19 @@ sub run_override {
 	# Check which packages are of the right architecture for the
 	# override_type.
 	my (@todo, @rest);
+	my $has_explicit_target = rules_explicit_target($override);
+
 	if (defined $override_type) {
-		foreach my $package (@{$packages}) {
-			my $isall=package_arch($package) eq 'all';
-			if (($override_type eq 'indep' && $isall) ||
-			    ($override_type eq 'arch' && !$isall)) {
-				push @todo, $package;
-			}
-			else {
-				push @rest, $package;
-				push @options, "-N$package";
+		if ($has_explicit_target) {
+			foreach my $package (@{$packages}) {
+				my $isall=package_arch($package) eq 'all';
+				if (($override_type eq 'indep' && $isall) ||
+					($override_type eq 'arch' && !$isall)) {
+					push @todo, $package;
+				} else {
+					push @rest, $package;
+					push @options, "-N$package";
+				}
 			}
 		}
 	}
@@ -843,7 +846,6 @@ sub run_override {
 		@todo=@{$packages};
 	}
 
-	my $has_explicit_target = rules_explicit_target($override);
 	return @{$packages} unless defined $has_explicit_target; # no such override
 	return @rest if ! $has_explicit_target; # has empty override
 	return @rest unless @todo; # has override, but no packages to act on
