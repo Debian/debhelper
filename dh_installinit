@@ -109,7 +109,18 @@ script.
 
 =item B<-r>, B<--no-stop-on-upgrade>, B<--no-restart-on-upgrade>
 
-Do not stop init script on upgrade.
+Do not stop init script on upgrade.  This has the side-effect of not
+restarting the service as a part of the upgrade.
+
+If you want to restart the service with minimal downtime, please use
+B<--restart-after-upgrade> (default in compat 10 or later).  If you want
+the service to be restarted but be stopped during the upgrade, then please
+use B<--no-restart-after-upgrade> (note the "after-upgrade").
+
+Note that the B<--no-restart-on-upgrade> alias is deprecated and will
+be removed in compat 11.  This is to avoid confusion with the
+B<--no-restart-after-upgrade> option.  The B<--no-stop-on-upgrade>
+variant was introduced in debhelper 10.2 (included in Debian stretch).
 
 =item B<--no-start>
 
@@ -175,7 +186,11 @@ $dh{RESTART_AFTER_UPGRADE} = 1 if not compat(9);
 init(options => {
 	"r" => \$dh{R_FLAG},
 	'no-stop-on-upgrade' => \$dh{R_FLAG},
-	"no-restart-on-upgrade" => \$dh{R_FLAG},
+	"no-restart-on-upgrade" => sub {
+		$dh{R_FLAG} = 1;
+		deprecated_functionality("--no-restart-on-upgrade has been renamed to --no-stop-on-upgrade",
+								 11);
+	},
 	"no-start" => \$dh{NO_START},
 	"R|restart-after-upgrade!" => \$dh{RESTART_AFTER_UPGRADE},
 	"init-script=s" => \$dh{INIT_SCRIPT},

@@ -22,6 +22,11 @@ debhelper (10.3) UNRELEASED; urgency=medium
   * dh_installinit: Clarify that it might make sense to skip dh_installinit
     for a package if it provides a systemd service but no sysvinit file.
     (Closes: #800043)
+  * dh_installinit: Deprecate --no-restart-on-upgrade in favor of the new
+    name --no-stop-on-upgrade, which does the same thing but is less
+    likely to be confused with --no-restart-after-upgrade and is more
+    descriptive of what it actually does.  Thanks to  Simon McVittie and
+    Michael Biebl for the help.  (Closes: #837528)
 
   [ Steven Chamberlain ]
   * When cross-compiling for GNU/kFreeBSD host systems, set
