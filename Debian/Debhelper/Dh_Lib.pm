@@ -546,19 +546,34 @@ sub tmpdir {
 		} else {
 			$check_expensive = $_check_expensive{$filename};
 		}
-		# Avoid checking for buildarch+buildos unless we have reason
-		# to believe that they exist.
-		if ($check_expensive) {
-			push(@try,
-				 "debian/${package}.${filename}.".buildarch(),
-				 "debian/${package}.${filename}.".buildos(),
-			);
+		if (ref($package) eq 'ARRAY') {
+			# !!NOT A PART OF THE PUBLIC API!!
+			# Bulk test used by dh to speed up the can_skip check.   It
+			# is NOT useful for finding the most precise pkgfile.
+			push(@try, "debian/$filename");
+			for my $pkg (@{$package}) {
+				push(@try, "debian/$package.$filename");
+				if ($check_expensive) {
+					push(@try,
+						 "debian/${package}.${filename}.".buildarch(),
+						 "debian/${package}.${filename}.".buildos(),
+					);
+				}
+			}
+		} else {
+			# Avoid checking for buildarch+buildos unless we have reason
+			# to believe that they exist.
+			if ($check_expensive) {
+				push(@try,
+					 "debian/${package}.${filename}.".buildarch(),
+					 "debian/${package}.${filename}.".buildos(),
+					);
+			}
+			push(@try, "debian/$package.$filename");
+			if ($package eq $dh{MAINPACKAGE}) {
+				push @try, "debian/$filename";
+			}
 		}
-		push(@try, "debian/$package.$filename");
-		if ($package eq $dh{MAINPACKAGE}) {
-			push @try, "debian/$filename";
-		}
-
 		foreach my $file (@try) {
 			if (-f $file &&
 				(! $dh{IGNORE} || ! exists $dh{IGNORE}->{$file})) {

@@ -1057,9 +1057,8 @@ sub can_skip {
 				return 0;
 			}
 		} else {
-			foreach my $package (@packages) {
-				return 0 if pkgfile($package, $skipinfo) ne '';
-			}
+			# Use the secret bulk check call
+			return 0 if pkgfile(\@packages, $skipinfo) ne '';
 		}
 	}
 	return 1;
