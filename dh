@@ -875,6 +875,11 @@ sub run_override {
 		commit_override_log(@todo);
 	}
 
+	# Override targets may introduce new helper files.  Strictly
+	# speaking this *shouldn't* be necessary, but lets make no
+	# assumptions.
+	Debian::Debhelper::Dh_Lib::dh_clear_unsafe_cache();
+
 	return @rest;
 }
 

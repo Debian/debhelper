@@ -504,45 +504,59 @@ sub tmpdir {
 #   * debian/package.name.filename.buildos
 #   * debian/package.name.filename
 #   * debian/name.filename (if the package is the main package)
-sub pkgfile {
-	my $package=shift;
-	my $filename=shift;
 
-	if (defined $dh{NAME}) {
-		$filename="$dh{NAME}.$filename";
-	}
+{
+	my %_check_expensive;
+
+	sub pkgfile {
+		my ($package, $filename) = @_;
+
+		if (defined $dh{NAME}) {
+			$filename="$dh{NAME}.$filename";
+		}
 	
-	# First, check for files ending in buildarch and buildos.
-	my $match;
-	foreach my $file (glob("debian/$package.$filename.*")) {
-		next if ! -f $file;
-		next if $dh{IGNORE} && exists $dh{IGNORE}->{$file};
-		if ($file eq "debian/$package.$filename.".buildarch()) {
-			$match=$file;
-			# buildarch files are used in preference to buildos files.
-			last;
+		my (@try, $check_expensive);
+
+		if (not exists($_check_expensive{$filename})) {
+			my @f = glob("debian/*.$filename.*");
+			if (not @f or (@f == 1 and $f[0] eq "debian/*.$filename.*")) {
+				$check_expensive = 0;
+			} else {
+				$check_expensive = 1;
+			}
+			$_check_expensive{$filename} = $check_expensive;
+		} else {
+			$check_expensive = $_check_expensive{$filename};
 		}
-		elsif ($file eq "debian/$package.$filename.".buildos()) {
-			$match=$file;
+		# Avoid checking for buildarch+buildos unless we have reason
+		# to believe that they exist.
+		if ($check_expensive) {
+			push(@try,
+				 "debian/${package}.${filename}.".buildarch(),
+				 "debian/${package}.${filename}.".buildos(),
+			);
 		}
-	}
-	return $match if defined $match;
-
-	my @try=("debian/$package.$filename");
-	if ($package eq $dh{MAINPACKAGE}) {
-		push @try, "debian/$filename";
-	}
-	
-	foreach my $file (@try) {
-		if (-f $file &&
-		    (! $dh{IGNORE} || ! exists $dh{IGNORE}->{$file})) {
-			return $file;
+		push(@try, "debian/$package.$filename");
+		if ($package eq $dh{MAINPACKAGE}) {
+			push @try, "debian/$filename";
 		}
 
+		foreach my $file (@try) {
+			if (-f $file &&
+				(! $dh{IGNORE} || ! exists $dh{IGNORE}->{$file})) {
+				return $file;
+			}
+
+		}
+
+		return "";
 	}
 
-	return "";
-
+	# Used by dh to ditch some caches that makes assumptions about
+	# dh_-tools can do, which does not hold for override targets.
+	sub dh_clear_unsafe_cache {
+		%_check_expensive = ();
+	}
 }
 
 # Pass it a name of a binary package, it returns the name to prefix to files
