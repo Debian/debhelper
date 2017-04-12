@@ -45,7 +45,7 @@ sub configure {
 	}
 	my $multiarch=dpkg_architecture_value("DEB_HOST_MULTIARCH");
 	if (! compat(8)) {
-	       if (defined $multiarch) {
+		if (defined $multiarch) {
 			push @opts, "--libdir=\${prefix}/lib/$multiarch";
 			push @opts, "--libexecdir=\${prefix}/lib/$multiarch";
 		}
@@ -56,6 +56,7 @@ sub configure {
 	else {
 		push @opts, "--libexecdir=\${prefix}/lib/" . sourcepackage();
 	}
+	push @opts, "--runstatedir=/run" if not compat(10);
 	push @opts, "--disable-maintainer-mode";
 	push @opts, "--disable-dependency-tracking";
 	# Provide --host only if different from --build, as recommended in
