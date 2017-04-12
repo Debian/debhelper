@@ -20,14 +20,16 @@ B<dh_link> [S<I<debhelper options>>] [B<-A>] [B<-X>I<item>] [S<I<source destinat
 B<dh_link> is a debhelper program that creates symlinks in package build
 directories.
 
-B<dh_link> accepts a list of pairs of source and destination files. The source
-files are the already existing files that will be symlinked from. The
-destination files are the symlinks that will be created. There B<must> be
-an equal number of source and destination files specified.
+B<dh_link> accepts a list of pairs of source and destination
+files. The source files are the already existing files that will be
+symlinked from (called B<target> by L<ln(1)>). The destination files
+are the symlinks that will be created (called B<link name> by
+L<ln(1)>). There B<must> be an equal number of source and destination
+files specified.
 
-Be sure you B<do> specify the full filename to both the source and
-destination files (unlike you would do if you were using something like
-L<ln(1)>).
+Be sure you B<do> specify the absolute path (without leading slash) to
+both the source and destination files (unlike you would do if you were
+using something like L<ln(1)>).
 
 B<dh_link> will generate symlinks that comply with Debian policy - absolute
 when policy says they should be absolute, and relative links with as short
@@ -48,6 +50,14 @@ conform to Debian policy, and corrects them (v4 or later).
 Lists pairs of source and destination files to be symlinked. Each pair
 should be put on its own line, with the source and destination separated by
 whitespace.
+
+In each pair the source file (called B<target> by L<ln(1)>) comes
+first and is followed by the destination file (called B<link name> by
+L<ln(1)>). Thus the pairs of source and destination files in each line
+are give in the same order as they would be given to L<ln(1)>.
+
+In contrast to L<ln(1)>, source and destination paths must be absolute
+without a leading slash.
 
 =back
 
@@ -84,6 +94,11 @@ Make F<bar.1> be a symlink to F<foo.1>
 
 Make F</usr/lib/foo/> be a link to F</var/lib/foo/>, and F<bar.1> be a symlink to
 the F<foo.1>
+
+ var/lib/foo usr/lib/foo
+ usr/share/man/man1/foo.1 usr/share/man/man1/bar.1
+
+Same as above but as content for a debian/I<package>.links file.
 
 =cut
 
