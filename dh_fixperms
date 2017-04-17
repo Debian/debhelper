@@ -50,6 +50,7 @@ sub patterns2find_expr {
 	return sprintf('\\( -name %s \\)', join(' -o -name ', map { "'$_'" } @_));
 }
 
+
 my $vendorlib = substr $Config{vendorlib}, 1;
 my $vendorarch = substr $Config{vendorarch}, 1;
 my @mode_0644_patterns = (
@@ -65,65 +66,69 @@ my @mode_0644_patterns = (
 # Turn the patterns in to a find pattern
 my $mode_0644_find_pattern = patterns2find_expr(@mode_0644_patterns);
 
+my $find_exclude_options='';
+if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
+	$find_exclude_options="! \\( $dh{EXCLUDE_FIND} \\)";
+}
+
+sub find_and_reset_perm {
+	my ($in_dirs, $mode, $raw_find_expr, $raw_find_expr_late) = @_;
+	my (@dirs, $dir_string);
+	if (ref ($in_dirs) ) {
+		@dirs = grep { -d } @{$in_dirs};
+		return if not @dirs;
+	} else {
+		return if not -d $in_dirs;
+		@dirs = ($in_dirs);
+	}
+	$dir_string = escape_shell(@dirs);
+	$raw_find_expr //= '';
+	$raw_find_expr_late //= '';
+	complex_doit("find ${dir_string} ${raw_find_expr} -a ${find_exclude_options} -a ${raw_find_expr_late} -print0",
+		"2>/dev/null | xargs -0r chmod ${mode}");
+}
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 
-	my $find_options='';
-	if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
-		$find_options="! \\( $dh{EXCLUDE_FIND} \\)";
-	}
-
 	# General permissions fixing.
-	complex_doit("find $tmp $find_options -print0",
+	complex_doit("find $tmp ${find_exclude_options} -print0",
 		"2>/dev/null | xargs -0r chown --no-dereference 0:0");
-	complex_doit("find $tmp ! -type l $find_options -print0",
-		"2>/dev/null | xargs -0r chmod go=rX,u+rw,a-s");
+	find_and_reset_perm($tmp, 'go=rX,u+rw,a-s', '! -type l');
 	
 	# Fix up permissions in usr/share/doc, setting everything to not
 	# executable by default, but leave examples directories alone.
-	complex_doit("find $tmp/usr/share/doc -type f $find_options ! -regex '$tmp/usr/share/doc/[^/]*/examples/.*' -print0 2>/dev/null",
-		"| xargs -0r chmod 0644");
-	complex_doit("find $tmp/usr/share/doc -type d $find_options -print0 2>/dev/null",
-		"| xargs -0r chmod 0755");
+	find_and_reset_perm("${tmp}/usr/share/doc", '0644', '-type f', "! -regex '$tmp/usr/share/doc/[^/]*/examples/.*'");
+	find_and_reset_perm("${tmp}/usr/share/doc", '0755', '-type d');
 
-	# Executable man pages are a bad thing..
-	complex_doit("find $tmp/usr/share/man -type f",
-		"$find_options -print0 2>/dev/null | xargs -0r chmod 0644");
+	# Manpages, include file, desktop files, etc., shouldn't be executable
+	find_and_reset_perm([
+				"${tmp}/usr/share/man",
+				"${tmp}/usr/include",
+				"${tmp}/usr/share/applications",
+				"${tmp}/usr/share/lintian/overrides",
+			], '0644', '-type f');
 
-	# ..and header files ..
-	complex_doit("find $tmp/usr/include -type f $find_options -print0",
-		"2>/dev/null | xargs -0r chmod 0644");
-	
-	# ..and desktop files ..
-	complex_doit("find $tmp/usr/share/applications -type f $find_options -print0",
-		"2>/dev/null | xargs -0r chmod 0644");
-	
-	# .. and perl modules.
-	complex_doit("find $tmp/$vendorarch $tmp/$vendorlib -type f",
-		"-perm -5 -name '*.pm' $find_options -print0",
-		"2>/dev/null | xargs -0r chmod a-X");
+	# nor should perl modules.
+	find_and_reset_perm(["${tmp}/${vendorarch}", "${tmp}/${vendorlib}"],
+			'a-X', "-type f -perm -5 -name '*.pm'");
 
-	complex_doit("find $tmp -type f ${mode_0644_find_pattern}",
-				 "${find_options} -print0 2>/dev/null",
-				 "| xargs -0r chmod 0644");
+	find_and_reset_perm($tmp, '0644', "-type f ${mode_0644_find_pattern}");
 	
 	# Programs in the bin and init.d dirs should be executable..
 	for my $dir (qw{usr/bin bin usr/sbin sbin usr/games etc/init.d}) {
 		if (-d "$tmp/$dir") {
-			complex_doit("find $tmp/$dir -type f $find_options -print0 2>/dev/null",
+			complex_doit("find ${tmp}/${dir} -type f ${find_exclude_options} -print0 2>/dev/null",
 				"| xargs -0r chmod a+x");
 		}
 	}
 	
 	# ADA ali files should be mode 444 to avoid recompilation
-	complex_doit("find $tmp/usr/lib -type f",
-		"-name '*.ali' $find_options -print0",
-		"2>/dev/null | xargs -0r chmod uga-w");
+	find_and_reset_perm("${tmp}/usr/lib", 'uga-w', "-type f -name '*.ali'");
 
 	if ( -d "$tmp/usr/share/bug/$package") {
 		complex_doit("find $tmp/usr/share/bug/$package -type f",
-			"! -name 'script' $find_options -print0",
+			"! -name 'script' ${find_exclude_options} -print0",
 			"2>/dev/null | xargs -0r chmod 644");
 		if ( -f "$tmp/usr/share/bug/$package/script" ) {
 			reset_perm_and_owner('0755', "$tmp/usr/share/bug/$package/script");
@@ -132,19 +137,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		reset_perm_and_owner('0755', "$tmp/usr/share/bug/$package");
 	}
 
-	# Lintian overrides should never be executable, too.
-	if (-d "$tmp/usr/share/lintian") {
-		complex_doit("find $tmp/usr/share/lintian/overrides",
-			"-type f $find_options -print0",
-			"2>/dev/null | xargs -0r chmod 0644");
-	}
-
 	# Files in $tmp/etc/sudoers.d/ must be mode 0440.
-	if (-d "$tmp/etc/sudoers.d") {
-		complex_doit("find $tmp/etc/sudoers.d",
-			"-type f ! -perm 440 $find_options -print0",
-			"2>/dev/null | xargs -0r chmod 0440");
-	}
+	find_and_reset_perm("${tmp}/etc/sudoers.d", '0440', "-type f ! -perm 440");
 }
 
 =head1 SEE ALSO
