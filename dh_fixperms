@@ -46,6 +46,10 @@ up a list of things to exclude.
 
 init();
 
+sub patterns2find_expr {
+	return sprintf('\\( -name %s \\)', join(' -o -name ', map { "'$_'" } @_));
+}
+
 my $vendorlib = substr $Config{vendorlib}, 1;
 my $vendorarch = substr $Config{vendorarch}, 1;
 my @mode_0644_patterns = (
@@ -59,9 +63,7 @@ my @mode_0644_patterns = (
 	'*.cmxs',
 );
 # Turn the patterns in to a find pattern
-my $mode_0644_find_pattern = sprintf('\\( -name %s \\)',
-									 join(' -o -name ',
-										  map { "'$_'" } @mode_0644_patterns));
+my $mode_0644_find_pattern = patterns2find_expr(@mode_0644_patterns);
 
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
