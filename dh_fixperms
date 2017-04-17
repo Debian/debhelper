@@ -104,7 +104,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		"-perm -5 -name '*.pm' $find_options -print0",
 		"2>/dev/null | xargs -0r chmod a-X");
 
-	complex_doit("find $tmp -perm -5 -type f ${mode_0644_find_pattern}",
+	complex_doit("find $tmp -type f ${mode_0644_find_pattern}",
 				 "${find_options} -print0 2>/dev/null",
 				 "| xargs -0r chmod 0644");
 	
