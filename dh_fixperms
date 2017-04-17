@@ -53,6 +53,9 @@ sub patterns2find_expr {
 
 my $vendorlib = substr $Config{vendorlib}, 1;
 my $vendorarch = substr $Config{vendorarch}, 1;
+my @executable_files_dirs = (
+	qw{usr/bin bin usr/sbin sbin usr/games etc/init.d},
+);
 my @mode_0644_patterns = (
 	# Libraries and related files
 	'*.so.*', '*.so', '*.la', '*.a',
@@ -116,12 +119,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	find_and_reset_perm($tmp, '0644', "-type f ${mode_0644_find_pattern}");
 	
 	# Programs in the bin and init.d dirs should be executable..
-	for my $dir (qw{usr/bin bin usr/sbin sbin usr/games etc/init.d}) {
-		if (-d "$tmp/$dir") {
-			complex_doit("find ${tmp}/${dir} -type f ${find_exclude_options} -print0 2>/dev/null",
-				"| xargs -0r chmod a+x");
-		}
-	}
+	find_and_reset_perm([map { "${tmp}/$_"} @executable_files_dirs], 'a+x', '-type f');
 	
 	# ADA ali files should be mode 444 to avoid recompilation
 	find_and_reset_perm("${tmp}/usr/lib", 'uga-w', "-type f -name '*.ali'");
