@@ -66,9 +66,9 @@ my @mode_0644_patterns = (
 	# OCaml native-code shared objects
 	'*.cmxs',
 );
-# Turn the patterns in to a find pattern
-my $mode_0644_find_pattern = patterns2find_expr(@mode_0644_patterns);
-
+my @mode_0755_patterns = (
+	# None for Debian
+);
 my $find_exclude_options='';
 if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
 	$find_exclude_options="! \\( $dh{EXCLUDE_FIND} \\)";
@@ -116,7 +116,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	find_and_reset_perm(["${tmp}/${vendorarch}", "${tmp}/${vendorlib}"],
 			'a-X', "-type f -perm -5 -name '*.pm'");
 
-	find_and_reset_perm($tmp, '0644', "-type f ${mode_0644_find_pattern}");
+	find_and_reset_perm($tmp, '0644', '-type f ' . patterns2find_expr(@mode_0644_patterns)) if @mode_0644_patterns;
+	find_and_reset_perm($tmp, '0755', '-type f ' . patterns2find_expr(@mode_0755_patterns)) if @mode_0755_patterns;
 	
 	# Programs in the bin and init.d dirs should be executable..
 	find_and_reset_perm([map { "${tmp}/$_"} @executable_files_dirs], 'a+x', '-type f');
