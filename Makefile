@@ -1,5 +1,9 @@
+PERL ?= perl
+PO4A ?= po4a
+POD2MAN ?= pod2man
+
 # List of files of dh_* commands. Sorted for debhelper man page.
-COMMANDS=$(shell find . -maxdepth 1 -type f -perm /100 -name "dh_*" -printf "%f\n" | LC_ALL=C sort)
+COMMANDS=$(shell find . -maxdepth 1 -type f -perm /100 -name "dh_*" -printf "%f\n" | grep -v '~$$' | LC_ALL=C sort)
 
 # Find deprecated commands by looking at their synopsis.
 DEPRECATED=$(shell egrep -l '^dh_.* - .*deprecated' $(COMMANDS))
@@ -9,7 +13,7 @@ DEPRECATED=$(shell egrep -l '^dh_.* - .*deprecated' $(COMMANDS))
 # parameters of all the executables or pod files to get the synopses from.
 # For correct conversion of pod tags (like S< >) #LIST# must be substituted in
 # the pod file and not in the troff file.
-MAKEMANLIST=perl -e ' \
+MAKEMANLIST=$(PERL) -e ' \
 		undef $$/; \
 		foreach (@ARGV) { \
 		        open (IN, $$_) or die "$$_: $$!"; \
@@ -36,11 +40,11 @@ MAKEMANLIST=perl -e ' \
 # Figure out the `current debhelper version.
 VERSION=$(shell expr "`dpkg-parsechangelog |grep Version:`" : '.*Version: \(.*\)')
 
-PERLLIBDIR=$(shell perl -MConfig -e 'print $$Config{vendorlib}')/Debian/Debhelper
+PERLLIBDIR=$(shell $(PERL) -MConfig -e 'print $$Config{vendorlib}')/Debian/Debhelper
 
 PREFIX=/usr
 
-POD2MAN=pod2man --utf8 -c Debhelper -r "$(VERSION)"
+POD2MAN_FLAGS=--utf8 -c Debhelper -r "$(VERSION)"
 
 ifneq ($(USE_NLS),no)
 # l10n to be built is determined from .po files
@@ -51,7 +55,7 @@ endif
 
 build: version debhelper.7 debhelper-obsolete-compat.7
 	find . -maxdepth 1 -type f -perm /100 -name "dh*" \
-		-exec $(POD2MAN) {} {}.1 \;
+		-exec $(POD2MAN) $(POD2MAN_FLAGS) {} {}.1 \;
 ifneq ($(USE_NLS),no)
 	po4a --previous -L UTF-8 man/po4a/po4a.cfg 
 	set -e; \
@@ -59,15 +63,15 @@ ifneq ($(USE_NLS),no)
 		dir=man/$$lang; \
 		for file in $$dir/dh*.pod; do \
 			prog=`basename $$file | sed 's/.pod//'`; \
-			$(POD2MAN) $$file $$prog.$$lang.1; \
+			$(POD2MAN) $(POD2MAN_FLAGS) $$file $$prog.$$lang.1; \
 		done; \
 		if [ -e $$dir/debhelper.pod ]; then \
 			cat $$dir/debhelper.pod | \
 				$(MAKEMANLIST) `find $$dir -type f -maxdepth 1 -name "dh_*.pod" | LC_ALL=C sort` | \
-				$(POD2MAN) --name="debhelper" --section=7 > debhelper.$$lang.7; \
+				$(POD2MAN) $(POD2MAN_FLAGS) --name="debhelper" --section=7 > debhelper.$$lang.7; \
 		fi; \
 		if [ -e $$dir/debhelper-obsolete-compat.pod ]; then \
-			$(POD2MAN) --name="debhelper" --section=7 $$dir/debhelper-obsolete-compat.pod > debhelper-obsolete-compat.$$lang.7; \
+			$(POD2MAN) $(POD2MAN_FLAGS) --name="debhelper" --section=7 $$dir/debhelper-obsolete-compat.pod > debhelper-obsolete-compat.$$lang.7; \
 		fi; \
 	done
 endif
@@ -79,15 +83,15 @@ version:
 debhelper.7: debhelper.pod
 	cat debhelper.pod | \
 		$(MAKEMANLIST) $(COMMANDS) | \
-		$(POD2MAN) --name="debhelper" --section=7  > $@
+		$(POD2MAN) $(POD2MAN_FLAGS) --name="debhelper" --section=7  > $@
 
 debhelper-obsolete-compat.7: debhelper-obsolete-compat.pod
-	$(POD2MAN) --name="debhelper" --section=7 $^ > $@
+	$(POD2MAN) $(POD2MAN_FLAGS) --name="debhelper" --section=7 $^ > $@
 
 clean:
 	rm -f *.1 *.7 Debian/Debhelper/Dh_Version.pm
 ifneq ($(USE_NLS),no)
-	po4a --previous --rm-translations --rm-backups man/po4a/po4a.cfg
+	$(PO4A) --previous --rm-translations --rm-backups man/po4a/po4a.cfg
 endif
 	for lang in $(LANGS); do \
 		if [ -e man/$$lang ]; then rmdir man/$$lang; fi; \
