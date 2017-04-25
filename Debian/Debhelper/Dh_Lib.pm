@@ -528,11 +528,6 @@ sub tmpdir {
 
 	sub pkgfile {
 		my ($package, $filename) = @_;
-
-		if (defined $dh{NAME}) {
-			$filename="$dh{NAME}.$filename";
-		}
-	
 		my (@try, $check_expensive);
 
 		if (not exists($_check_expensive{$filename})) {
@@ -546,6 +541,19 @@ sub tmpdir {
 		} else {
 			$check_expensive = $_check_expensive{$filename};
 		}
+
+		# Rewrite $filename after the check_expensive globbing above
+		# as $dh{NAME} is used as a prefix (so the glob above will
+		# cover it).
+		#
+		# In practise, it should not matter as NAME is ether set
+		# globally or not.  But if someone is being "clever" then the
+		# cache is reusable and for the general/normal case, it has no
+		# adverse effects.
+		if (defined $dh{NAME}) {
+			$filename="$dh{NAME}.$filename";
+		}
+
 		if (ref($package) eq 'ARRAY') {
 			# !!NOT A PART OF THE PUBLIC API!!
 			# Bulk test used by dh to speed up the can_skip check.   It
