@@ -40,6 +40,9 @@ debhelper (10.3) UNRELEASED; urgency=medium
   * dh_installdocs: Document that --link-doc has limitations on source and
     target package plus that compat 10 will reject unsupported
     combinations.
+  * dh_gencontrol: Avoid adding Homepage fields to dbgsym packages.  Avoids
+    non-overridable warnings from lintian when there is an issue in the
+    homepage field of the original binary.  (Closes: #812248)
 
   [ Steven Chamberlain ]
   * When cross-compiling for GNU/kFreeBSD host systems, set
