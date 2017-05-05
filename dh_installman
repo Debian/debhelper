@@ -17,15 +17,26 @@ B<dh_installman> [S<I<debhelper options>>] [S<I<manpage> ...>]
 
 =head1 DESCRIPTION
 
-B<dh_installman> is a debhelper program that handles installing
-man pages into the correct locations in package build directories. You tell
-it what man pages go in your packages, and it figures out where to install
-them based on the section field in their B<.TH> or B<.Dt> line. If you have
-a properly formatted B<.TH> or B<.Dt> line, your man page will be installed
-into the right directory, with the right name (this includes proper handling
-of pages with a subsection, like B<3perl>, which are placed in F<man3>, and
-given an extension of F<.3perl>). If your B<.TH> or B<.Dt> line is incorrect
-or missing, the program may guess wrong based on the file extension.
+B<dh_installman> is a debhelper program that handles installing man
+pages into the correct locations in package build directories for when
+upstream's build system does not properly install them as a part of
+its install step (or it does not have an install step).
+
+If upstream's installs the manpages in the proper directories,
+L<dh_install(1)> may be easier to use for deciding which package
+should ship the manpages.  In this case, B<dh_installman> can still be
+useful for converting the manpage encoding to UTF-8 and for converting
+F<.so> links (as described below).  However, that part happens
+automatically without any explicit configuration.
+
+You tell it what man pages go in your packages, and it figures out
+where to install them based on the section field in their B<.TH> or
+B<.Dt> line. If you have a properly formatted B<.TH> or B<.Dt> line,
+your man page will be installed into the right directory, with the
+right name (this includes proper handling of pages with a subsection,
+like B<3perl>, which are placed in F<man3>, and given an extension of
+F<.3perl>). If your B<.TH> or B<.Dt> line is incorrect or missing, the
+program may guess wrong based on the file extension.
 
 It also supports translated man pages, by looking for extensions
 like F<.ll.8> and F<.ll_LL.8>, or by use of the B<--language> switch.
@@ -79,6 +90,20 @@ Install these man pages into the first package acted on. (Or in all
 packages if B<-A> is specified).
 
 =back
+
+=head1 EXAMPLES
+
+An example F<debian/manpages> file could look like this:
+
+  doc/man/foo.1
+  # Translations
+  doc/man/foo.da.1
+  doc/man/foo.de.1
+  doc/man/foo.fr.1
+  # NB: The following line is considered a polish translation
+  # of "foo.1" (and not a manpage written in perl called "foo.pl")
+  doc/man/foo.pl.1
+  # ...
 
 =head1 NOTES
 
