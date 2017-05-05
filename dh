@@ -130,8 +130,7 @@ after a particular debhelper command is run.
 		chmod 4755 debian/foo/usr/bin/foo
 
 Python tools are not run by dh by default, due to the continual change
-in that area. (Before compatibility level v9, dh does run B<dh_pysupport>.)
-Here is how to use B<dh_python2>.
+in that area. Here is how to use B<dh_python2>.
 
 	#!/usr/bin/make -f
 	%:
@@ -283,11 +282,6 @@ matches, the last one in the sequence will be used.
 # Stash this away before init modifies it.
 my @ARGV_orig=@ARGV;
 
-if (compat(8, 1)) {
-	# python-support was enabled by default before v9.
-	# (and comes first so python-central loads later and can disable it).
-	unshift @ARGV, "--with=python-support";
-}
 if (not compat(9, 1)) {
 	# Enable autoreconf'ing by default in compat 10 or later.  Use the
 	# sequence add-on so existing --without=autoreconf
