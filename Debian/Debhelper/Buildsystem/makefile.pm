@@ -159,6 +159,10 @@ sub install {
 	if (ref($this) eq 'Debian::Debhelper::Buildsystem::makefile' and not compat(10)) {
 		unshift @_, "INSTALL=install --strip-program=true";
 	}
+	if ( -f $this->get_buildpath('libtool')) {
+		$this->disable_parallel();
+	}
+
 	$this->make_first_existing_target(['install'],
 		"DESTDIR=$destdir",
 		"AM_UPDATE_INFO_DIR=no", @_);

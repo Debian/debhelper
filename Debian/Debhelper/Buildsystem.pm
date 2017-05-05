@@ -259,6 +259,12 @@ sub get_parallel {
 	return $this->{parallel};
 }
 
+# This parallel support for the given step
+sub disable_parallel {
+	my ($this) = @_;
+	$this->{parallel} = 1;
+}
+
 # When given a relative path to the build directory, converts it
 # to the path that is relative to the source directory. If $path is
 # not given, returns a path to the build directory that is relative
