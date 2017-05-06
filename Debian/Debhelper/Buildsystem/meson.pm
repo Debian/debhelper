@@ -39,7 +39,9 @@ sub configure {
 	# https://github.com/mesonbuild/meson/wiki/Cross-compilation
 
 	# Standard set of options for meson.
-	my @opts;
+	my @opts = (
+		'--wrap-mode=nodownload',
+	);
 	push @opts, "--buildtype=plain";
 	push @opts, "--prefix=/usr";
 	push @opts, "--sysconfdir=/etc";
