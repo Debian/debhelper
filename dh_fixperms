@@ -69,7 +69,7 @@ my @mode_0644_patterns = (
 my @mode_0755_patterns = (
 	# None for Debian
 );
-my $find_exclude_options='';
+my $find_exclude_options='-true';
 if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
 	$find_exclude_options="! \\( $dh{EXCLUDE_FIND} \\)";
 }
@@ -86,7 +86,7 @@ sub find_and_reset_perm {
 	}
 	$dir_string = escape_shell(@dirs);
 	$raw_find_expr //= '';
-	$raw_find_expr_late //= '';
+	$raw_find_expr_late //= '-true';
 	complex_doit("find ${dir_string} ${raw_find_expr} -a ${find_exclude_options} -a ${raw_find_expr_late} -print0",
 		"2>/dev/null | xargs -0r chmod ${mode}");
 }
