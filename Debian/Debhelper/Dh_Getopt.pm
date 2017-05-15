@@ -277,7 +277,11 @@ sub parseopts {
 
 	if (! defined $dh{DOPACKAGES} || ! @{$dh{DOPACKAGES}}) {
 		if (! $dh{BLOCK_NOOP_WARNINGS}) {
-			warning("No packages to build.");
+			my %archs;
+			for my $pkg (getpackages()) {
+				$archs{package_declared_arch($pkg)} = 1;
+			}
+			warning("No packages to build. Architecture mismatch: " . buildarch() . ", want: " . join(" ", keys %archs));
 		}
 		exit(0);
 	}

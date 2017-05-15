@@ -192,7 +192,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if ($link_doc) {
 		getpackages('both') unless $called_getpackages++;
 
-		if (package_arch($package) ne package_arch($dh{LINK_DOC})) {
+		if (package_binary_arch($package) ne package_binary_arch($dh{LINK_DOC})) {
 			if (compat(9)) {
 				warning("WARNING: --link-doc between architecture all and not all packages breaks binNMUs");
 			} else {

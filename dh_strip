@@ -313,7 +313,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# Temporary workaround: Do not build dbgsym packages for udebs as
 	# dpkg-gencontrol and dpkg-deb does not agree on the file
 	# extension.
-	if ($dh{ENABLE_DBGSYM} and not $keep_debug and package_arch($package) ne 'all' and not is_udeb($package)) {
+	if ($dh{ENABLE_DBGSYM} and not $keep_debug and not package_is_arch_all($package) and not is_udeb($package)) {
 		# Avoid creating a dbgsym that would clash with a registered
 		# package or looks like a manual -dbg package.
 		if (not $all_packages{"${package}-dbgsym"} and $package !~ m/-dbg(?:sym)?$/) {

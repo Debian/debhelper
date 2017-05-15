@@ -97,7 +97,7 @@ sub install_binNMU_changelog {
 		my $output_fn="$tmp/usr/share/doc/$package/$changelog_name";
 		open my $output, ">", $output_fn
 			or error("could not open $output_fn for writing: $!");
-		my $arch=package_arch($package);
+		my $arch=package_binary_arch($package);
 		my $output_fn_binary="$output_fn.$arch";
 		open my $output_binary, ">", $output_fn_binary
 			or error("could not open $output_fn_binary for writing: $!");

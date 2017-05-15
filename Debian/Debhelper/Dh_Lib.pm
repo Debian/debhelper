@@ -39,6 +39,7 @@ use vars qw(@EXPORT %dh);
 	    &autoscript &filearray &filedoublearray
 	    &getpackages &basename &dirname &xargs %dh
 	    &compat &addsubstvar &delsubstvar &excludefile &package_arch
+	    &package_is_arch_all &package_binary_arch &package_declared_arch
 	    &is_udeb &debhelper_script_subst &escape_shell
 	    &inhibit_log &load_log &write_log &commit_override_log
 	    &dpkg_architecture_value &sourcepackage &make_symlink
@@ -50,7 +51,7 @@ use vars qw(@EXPORT %dh);
 	    &generated_file &autotrigger &package_section
 	    &restore_file_on_clean &restore_all_files
 	    &open_gz &reset_perm_and_owner &deprecated_functionality
-	    &log_installed_files
+	    &log_installed_files &buildarch
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -1102,14 +1103,46 @@ sub getpackages {
 }
 
 # Returns the arch a package will build for.
+#
+# Deprecated: please switch to the more descriptive
+# package_binary_arch function instead.
 sub package_arch {
 	my $package=shift;
-	
+	return package_binary_arch($package);
+}
+
+# Returns the architecture going into the resulting .deb, i.e. the
+# host architecture or "all".
+sub package_binary_arch {
+	my $package=shift;
+
 	if (! exists $package_arches{$package}) {
 		warning "package $package is not in control info";
 		return buildarch();
 	}
 	return $package_arches{$package} eq 'all' ? "all" : buildarch();
+}
+
+# Returns the Architecture: value which the package declared.
+sub package_declared_arch {
+	my $package=shift;
+
+	if (! exists $package_arches{$package}) {
+		warning "package $package is not in control info";
+		return buildarch();
+	}
+	return $package_arches{$package};
+}
+
+# Returns whether the package specified Architecture: all
+sub package_is_arch_all {
+	my $package=shift;
+
+	if (! exists $package_arches{$package}) {
+		warning "package $package is not in control info";
+		return buildarch();
+	}
+	return $package_arches{$package} eq 'all';
 }
 
 # Returns the multiarch value of a package.
