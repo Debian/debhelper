@@ -560,11 +560,11 @@ sub tmpdir {
 			# is NOT useful for finding the most precise pkgfile.
 			push(@try, "debian/$filename");
 			for my $pkg (@{$package}) {
-				push(@try, "debian/$package.$filename");
+				push(@try, "debian/${pkg}.${filename}");
 				if ($check_expensive) {
 					push(@try,
-						 "debian/${package}.${filename}.".buildarch(),
-						 "debian/${package}.${filename}.".buildos(),
+						 "debian/${pkg}.${filename}.".buildarch(),
+						 "debian/${pkg}.${filename}.".buildos(),
 					);
 				}
 			}
