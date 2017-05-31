@@ -22,7 +22,7 @@ if (not defined($rootcmd)) {
 	plan skip_all => 'fakeroot required';
 }
 else {
-	plan(tests => 4);
+	plan(tests => 5);
 }
 
 # Verify dh_missing does not fail when all files are installed.
@@ -40,6 +40,13 @@ isnt($?, -1, 'dh_missing was executed');
 ok(! ($? & 127), 'dh_missing did not die due to a signal');
 my $exitcode = ($? >> 8);
 is($exitcode, 2, 'dh_missing exited with exit code 2');
+
+# Verify that dh_install -X --fail-missing is passed through to dh_missing (#863447)
+# dh_install -Xfile makes file-for-foo not be installed. Then we shouldn't
+# complain about it not being missing.
+system("$rootcmd $TOPDIR/dh_clean");
+system("$rootcmd make install");
+is(system("PATH=$TOPDIR:\$PATH $rootcmd $TOPDIR/dh_install -X more --exclude lots --fail-missing"),0, 'dh_install -X... --fail-missing failed');
 
 system("$rootcmd $TOPDIR/dh_clean");
 

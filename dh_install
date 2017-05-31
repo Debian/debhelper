@@ -271,6 +271,9 @@ if ($missing_files) {
 
 if ($dh{LIST_MISSING} || $dh{FAIL_MISSING}) {
 	my @options;
+	foreach (@{$dh{EXCLUDE}}) {
+		push(@options, '--exclude', $_);
+	}
 	push(@options, '--sourcedir', $dh{SOURCEDIR}) if defined($dh{SOURCEDIR});
 	push @options, "--list-missing" if $dh{LIST_MISSING};
 	push @options, "--fail-missing" if $dh{FAIL_MISSING};
