@@ -73,6 +73,13 @@ sub init {
 			push(@{$dh{DOPACKAGES}}, getpackages('arch'));
 			$dh{DOARCH} = 1;
 		}
+
+		if (! @{$dh{DOPACKAGES}}) {
+			if (! $dh{BLOCK_NOOP_WARNINGS}) {
+				warning("You asked that all arch in(dep) packages be built, but there are none of that type.");
+			}
+			exit(0);
+		}
 		# Clear @ARGV so we do not hit the expensive case below
 		@ARGV = ();
 	}

@@ -1,11 +1,16 @@
 debhelper (10.5) UNRELEASED; urgency=medium
 
+  [ Niels Thykier ]
   * dh_installman: Remove unncessary "chown" call that made things a
     lot slower.  Thanks to Kurt Roeckx for reporting it.
   * dh_installman: Fix wrong permission of man pages (set 0755 instead
     of 0644).  Regression introduced in 10.2.2.
   * dh_installman: Batch chmod calls to reduce the overhead for
     packages with many manpages.
+
+  [ Iain Lane ]
+  * Dh_Lib: Re-add warning + exit 0 for the -i/-a shortcut that was
+    added in 10.3.  (Closes: #863961)
 
  -- Niels Thykier <niels@thykier.net>  Sun, 04 Jun 2017 11:09:56 +0000
 
