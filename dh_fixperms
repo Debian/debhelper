@@ -91,54 +91,56 @@ sub find_and_reset_perm {
 		"2>/dev/null | xargs -0r chmod ${mode}");
 }
 
-foreach my $package (@{$dh{DOPACKAGES}}) {
-	my $tmp=tmpdir($package);
+on_pkgs_in_parallel {
+	foreach my $package (@_) {
+		my $tmp=tmpdir($package);
 
-	# General permissions fixing.
-	complex_doit("find $tmp ${find_exclude_options} -print0",
-		"2>/dev/null | xargs -0r chown --no-dereference 0:0");
-	find_and_reset_perm($tmp, 'go=rX,u+rw,a-s', '! -type l');
+		# General permissions fixing.
+		complex_doit("find $tmp ${find_exclude_options} -print0",
+					 "2>/dev/null | xargs -0r chown --no-dereference 0:0");
+		find_and_reset_perm($tmp, 'go=rX,u+rw,a-s', '! -type l');
 	
-	# Fix up permissions in usr/share/doc, setting everything to not
-	# executable by default, but leave examples directories alone.
-	find_and_reset_perm("${tmp}/usr/share/doc", '0644', '-type f', "! -regex '$tmp/usr/share/doc/[^/]*/examples/.*'");
-	find_and_reset_perm("${tmp}/usr/share/doc", '0755', '-type d');
+		# Fix up permissions in usr/share/doc, setting everything to not
+		# executable by default, but leave examples directories alone.
+		find_and_reset_perm("${tmp}/usr/share/doc", '0644', '-type f', "! -regex '$tmp/usr/share/doc/[^/]*/examples/.*'");
+		find_and_reset_perm("${tmp}/usr/share/doc", '0755', '-type d');
 
-	# Manpages, include file, desktop files, etc., shouldn't be executable
-	find_and_reset_perm([
-				"${tmp}/usr/share/man",
-				"${tmp}/usr/include",
-				"${tmp}/usr/share/applications",
-				"${tmp}/usr/share/lintian/overrides",
-			], '0644', '-type f');
+		# Manpages, include file, desktop files, etc., shouldn't be executable
+		find_and_reset_perm([
+					"${tmp}/usr/share/man",
+					"${tmp}/usr/include",
+					"${tmp}/usr/share/applications",
+					"${tmp}/usr/share/lintian/overrides",
+				], '0644', '-type f');
 
-	# nor should perl modules.
-	find_and_reset_perm(["${tmp}/${vendorarch}", "${tmp}/${vendorlib}"],
-			'a-X', "-type f -perm -5 -name '*.pm'");
+		# nor should perl modules.
+		find_and_reset_perm(["${tmp}/${vendorarch}", "${tmp}/${vendorlib}"],
+							'a-X', "-type f -perm -5 -name '*.pm'");
 
-	find_and_reset_perm($tmp, '0644', '-type f ' . patterns2find_expr(@mode_0644_patterns)) if @mode_0644_patterns;
-	find_and_reset_perm($tmp, '0755', '-type f ' . patterns2find_expr(@mode_0755_patterns)) if @mode_0755_patterns;
+		find_and_reset_perm($tmp, '0644', '-type f ' . patterns2find_expr(@mode_0644_patterns)) if @mode_0644_patterns;
+		find_and_reset_perm($tmp, '0755', '-type f ' . patterns2find_expr(@mode_0755_patterns)) if @mode_0755_patterns;
+
+		# Programs in the bin and init.d dirs should be executable..
+		find_and_reset_perm([map { "${tmp}/$_"} @executable_files_dirs], 'a+x', '-type f');
 	
-	# Programs in the bin and init.d dirs should be executable..
-	find_and_reset_perm([map { "${tmp}/$_"} @executable_files_dirs], 'a+x', '-type f');
-	
-	# ADA ali files should be mode 444 to avoid recompilation
-	find_and_reset_perm("${tmp}/usr/lib", 'uga-w', "-type f -name '*.ali'");
+		# ADA ali files should be mode 444 to avoid recompilation
+		find_and_reset_perm("${tmp}/usr/lib", 'uga-w', "-type f -name '*.ali'");
 
-	if ( -d "$tmp/usr/share/bug/$package") {
-		complex_doit("find $tmp/usr/share/bug/$package -type f",
-			"! -name 'script' ${find_exclude_options} -print0",
-			"2>/dev/null | xargs -0r chmod 644");
-		if ( -f "$tmp/usr/share/bug/$package/script" ) {
-			reset_perm_and_owner('0755', "$tmp/usr/share/bug/$package/script");
+		if ( -d "$tmp/usr/share/bug/$package") {
+			complex_doit("find $tmp/usr/share/bug/$package -type f",
+						 "! -name 'script' ${find_exclude_options} -print0",
+						 "2>/dev/null | xargs -0r chmod 644");
+			if ( -f "$tmp/usr/share/bug/$package/script" ) {
+				reset_perm_and_owner('0755', "$tmp/usr/share/bug/$package/script");
+			}
+		} elsif ( -f "$tmp/usr/share/bug/$package" ) {
+			reset_perm_and_owner('0755', "$tmp/usr/share/bug/$package");
 		}
-	} elsif ( -f "$tmp/usr/share/bug/$package" ) {
-		reset_perm_and_owner('0755', "$tmp/usr/share/bug/$package");
-	}
 
-	# Files in $tmp/etc/sudoers.d/ must be mode 0440.
-	find_and_reset_perm("${tmp}/etc/sudoers.d", '0440', "-type f ! -perm 440");
-}
+		# Files in $tmp/etc/sudoers.d/ must be mode 0440.
+		find_and_reset_perm("${tmp}/etc/sudoers.d", '0440', "-type f ! -perm 440");
+	}
+};
 
 =head1 SEE ALSO
 
