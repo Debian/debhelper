@@ -52,10 +52,13 @@ use vars qw(@EXPORT %dh);
 	    &restore_file_on_clean &restore_all_files
 	    &open_gz &reset_perm_and_owner &deprecated_functionality
 	    &log_installed_files &buildarch &rename_path
+	    &on_each_pkg_in_parallel
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
 my $prefix="/usr";
+
+my $MAX_PROCS = get_buildoption("parallel") || 1;
 
 sub init {
 	my %params=@_;
@@ -1597,6 +1600,58 @@ sub log_installed_files {
 	close($fh);
 
 	return 1;
+}
+
+sub on_pkgs_in_parallel(&) {
+	my ($code) = @_;
+	my @pkgs = @{$dh{DOPACKAGES}};
+	my %pids;
+	my $parallel = $MAX_PROCS;
+	my $count_per_proc = int(scalar(@pkgs) / $parallel);
+	my $exit = 0;
+	if ($count_per_proc < 1) {
+		$count_per_proc = 1;
+		if (@pkgs > 3) {
+			# Forking has a considerable overhead, so bulk the number
+			# a bit.  We do not do this unconditionally, because we
+			# want parallel issues (if any) to appear already with 2
+			# packages and two procs (because people are lazy when
+			# testing).
+			#
+			# Same reason for also unconditionally forking with 1 pkg
+			# in 1 proc.
+			$count_per_proc = 2;
+		}
+	}
+	# Assertion, $count_per_proc * $parallel >= scalar(@pkgs)
+	while (@pkgs) {
+		my @batch = splice(@pkgs, 0, $count_per_proc);
+		my $pid = fork() // error("fork: $!");
+		if (not $pid) {
+			eval {
+				$code->(@batch);
+			};
+			if (my $err = $@) {
+				$err =~ s/\n$//;
+				print STDERR "$err\n";
+				exit(2);
+			}
+			exit(0);
+		}
+		$pids{$pid} = 1;
+	}
+	while (%pids) {
+		my $pid = wait;
+		error("wait() failed: $!") if $pid == -1;
+		delete($pids{$pid});
+		if ($? != 0) {
+			$exit = 1;
+		}
+	}
+	if ($exit) {
+		error("Aborting due to earlier error");
+	}
+	return;
 }
 
 1
