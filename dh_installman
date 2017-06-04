@@ -246,7 +246,7 @@ foreach my $package (getpackages()) {
 				push(@files, "${File::Find::dir}/${_}");
 			}, "$tmp/$dir");
 			# Bulk reset permissions of all re-encoded files
-			xargs(\@files, 'chmod', '0644') if @files;
+			xargs(\@files, 'chmod', '0644', '--') if @files;
 		}
 	}
 }
