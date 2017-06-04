@@ -234,15 +234,19 @@ foreach my $package (getpackages()) {
 	if (defined `man --version`) {
 		foreach my $dir (qw{usr/share/man}) {
 			next unless -e "$tmp/$dir";
+			my @files;
 			find(sub {
 				return if ! -f $_ || -l $_;
 				my ($tmp, $orig)=($_.".new", $_);
 				complex_doit "man --recode UTF-8 ./\Q$orig\E > \Q$tmp\E";
 				# recode uncompresses compressed pages
 				doit "rm", "-f", $orig if s/\.(gz|Z)$//;
-				doit('chmod', '0644', $tmp);
 				doit "mv", "-f", $tmp, $_;
+				# Schedule a permission reset
+				push(@files, "${File::Find::dir}/${_}");
 			}, "$tmp/$dir");
+			# Bulk reset permissions of all re-encoded files
+			xargs(\@files, 'chmod', '0644') if @files;
 		}
 	}
 }
