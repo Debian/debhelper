@@ -40,23 +40,29 @@ multiple times to build up a list of things to exclude.
 
 init();
 
+my (@clean_files, @clean_dirs);
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $ext=pkgext($package);
 
-	doit("rm","-f","debian/${ext}substvars")
+	push(@clean_files, "debian/${ext}substvars")
 		unless excludefile("debian/${ext}substvars");
 		
 	# These are all debhelper temp files, and so it is safe to 
 	# wildcard them.
 	complex_doit("rm -f debian/$ext*.debhelper");
-	doit('rm', '-rf', "debian/.debhelper/generated/${package}/");
-	doit ("rm","-rf",$tmp."/")
+	push(@clean_dirs, "debian/.debhelper/generated/${package}/");
+	push(@clean_dirs , "${tmp}/")
 		unless excludefile($tmp);
 }
 
-doit('rm', '-rf', 'debian/tmp') if -x 'debian/tmp' &&
+push(@clean_dirs, 'debian/tmp') if -x 'debian/tmp' &&
                                    ! excludefile("debian/tmp");
+
+
+xargs(\@clean_files, 'rm', '-f', '--') if @clean_files;
+xargs(\@clean_dirs, 'rm', '-fr', '--') if @clean_dirs;
 
 =head1 SEE ALSO
 
