@@ -240,7 +240,7 @@ foreach my $package (getpackages()) {
 				complex_doit "man --recode UTF-8 ./\Q$orig\E > \Q$tmp\E";
 				# recode uncompresses compressed pages
 				doit "rm", "-f", $orig if s/\.(gz|Z)$//;
-				reset_perm_and_owner('0755', $tmp);
+				doit('chmod', '0644', $tmp);
 				doit "mv", "-f", $tmp, $_;
 			}, "$tmp/$dir");
 		}
