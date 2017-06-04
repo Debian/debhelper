@@ -281,7 +281,7 @@ sub parseopts {
 			for my $pkg (getpackages()) {
 				$archs{package_declared_arch($pkg)} = 1;
 			}
-			warning("No packages to build. Architecture mismatch: " . buildarch() . ", want: " . join(" ", keys %archs));
+			warning("No packages to build. Architecture mismatch: " . buildarch() . ", want: " . join(" ", sort keys %archs));
 		}
 		exit(0);
 	}
