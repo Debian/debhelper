@@ -7,6 +7,10 @@ debhelper (10.5) UNRELEASED; urgency=medium
     of 0644).  Regression introduced in 10.2.2.
   * dh_installman: Batch chmod calls to reduce the overhead for
     packages with many manpages.
+  * dh: Undo an unsafe optimisation that caused "-indep" and "-arch"
+    override targets to be ignored.  Thanks to Gianfranco Costamagna
+    for reporting it and Iain Lane for tracing it to the commit
+    that introduced the issue.  (Closes: #863887)
 
   [ Iain Lane ]
   * Dh_Lib: Re-add warning + exit 0 for the -i/-a shortcut that was

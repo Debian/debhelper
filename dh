@@ -823,16 +823,14 @@ sub run_override {
 	my $has_explicit_target = rules_explicit_target($override);
 
 	if (defined $override_type) {
-		if ($has_explicit_target) {
-			foreach my $package (@{$packages}) {
-				my $isall=package_is_arch_all($package);
-				if (($override_type eq 'indep' && $isall) ||
-					($override_type eq 'arch' && !$isall)) {
-					push @todo, $package;
-				} else {
-					push @rest, $package;
-					push @options, "-N$package";
-				}
+		foreach my $package (@{$packages}) {
+			my $isall=package_is_arch_all($package);
+			if (($override_type eq 'indep' && $isall) ||
+				($override_type eq 'arch' && !$isall)) {
+				push @todo, $package;
+			} else {
+				push @rest, $package;
+				push @options, "-N$package";
 			}
 		}
 	}
