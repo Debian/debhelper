@@ -166,74 +166,76 @@ elsif ($upstream=~m/\.html?$/i) {
 	$upstream_text=shift;
 }
 
-foreach my $package (@{$dh{DOPACKAGES}}) {
-	next if is_udeb($package);
+on_pkgs_in_parallel {
+	foreach my $package (@_) {
+		next if is_udeb($package);
 	
-	my $tmp=tmpdir($package);
-	my $changelog=pkgfile($package,"changelog");
-	my $news=pkgfile($package,"NEWS");
+		my $tmp=tmpdir($package);
+		my $changelog=pkgfile($package,"changelog");
+		my $news=pkgfile($package,"NEWS");
 
-	if (!$changelog) {
-		$changelog="debian/changelog";
-	}
-	if (!$news) {
-		$news="debian/NEWS";
-	}
-
-	if (! -e $changelog) {
-		error("could not find changelog $changelog");
-	}
-
-	# If it is a symlink to a documentation directory from the same
-	# source package, then don't do anything. Think multi-binary
-	# packages that depend on each other and want to link doc dirs.
-	if (-l "$tmp/usr/share/doc/$package") {
-		my $linkval=readlink("$tmp/usr/share/doc/$package");
-		my %allpackages=map { $_ => 1 } getpackages();
-		if ($allpackages{basename($linkval)}) {
-			next;
+		if (!$changelog) {
+			$changelog="debian/changelog";
 		}
-		# Even if the target doesn't seem to be a doc dir from the
-		# same source package, don't do anything if it's a dangling
-		# symlink.
-		next unless -d "$tmp/usr/share/doc/$package";
-	}
-
-	install_dir("$tmp/usr/share/doc/$package");
-
-	if (! $dh{NO_ACT}) {
-		if (! install_binNMU_changelog($package, $changelog, $changelog_name)) {
-			install_file($changelog,
-						 "$tmp/usr/share/doc/$package/$changelog_name");
+		if (!$news) {
+			$news="debian/NEWS";
 		}
-	}
 
-	if (-e $news) {
-		install_file($news, "$tmp/usr/share/doc/$package/$news_name");
-	}
-
-	if (defined $upstream) {
-		my $link_to;
-		my $base="$tmp/usr/share/doc/$package";
-		if (defined $upstream_text) {
-			install_file($upstream_text, "$base/changelog");
-			$link_to='changelog';
+		if (! -e $changelog) {
+			error("could not find changelog $changelog");
 		}
-		if (defined $upstream_html) {
-			install_file($upstream_html,"$base/changelog.html");
-			$link_to='changelog.html';
-			if (! defined $upstream_text) {
-				complex_doit("echo 'See changelog.html.gz' > $base/changelog");
-				reset_perm_and_owner('0644',"$base/changelog");
+
+		# If it is a symlink to a documentation directory from the same
+		# source package, then don't do anything. Think multi-binary
+		# packages that depend on each other and want to link doc dirs.
+		if (-l "$tmp/usr/share/doc/$package") {
+			my $linkval=readlink("$tmp/usr/share/doc/$package");
+			my %allpackages=map { $_ => 1 } getpackages();
+			if ($allpackages{basename($linkval)}) {
+				next;
+			}
+			# Even if the target doesn't seem to be a doc dir from the
+			# same source package, don't do anything if it's a dangling
+			# symlink.
+			next unless -d "$tmp/usr/share/doc/$package";
+		}
+
+		install_dir("$tmp/usr/share/doc/$package");
+
+		if (! $dh{NO_ACT}) {
+			if (! install_binNMU_changelog($package, $changelog, $changelog_name)) {
+				install_file($changelog,
+							 "$tmp/usr/share/doc/$package/$changelog_name");
 			}
 		}
-		if ($dh{K_FLAG}) {
-			# Install symlink to original name of the upstream changelog file.
-			# Use basename in case original file was in a subdirectory or something.
-			doit("ln","-sf",$link_to,"$tmp/usr/share/doc/$package/".basename($upstream));
+
+		if (-e $news) {
+			install_file($news, "$tmp/usr/share/doc/$package/$news_name");
+		}
+
+		if (defined $upstream) {
+			my $link_to;
+			my $base="$tmp/usr/share/doc/$package";
+			if (defined $upstream_text) {
+				install_file($upstream_text, "$base/changelog");
+				$link_to='changelog';
+			}
+			if (defined $upstream_html) {
+				install_file($upstream_html,"$base/changelog.html");
+				$link_to='changelog.html';
+				if (! defined $upstream_text) {
+					complex_doit("echo 'See changelog.html.gz' > $base/changelog");
+					reset_perm_and_owner('0644',"$base/changelog");
+				}
+			}
+			if ($dh{K_FLAG}) {
+				# Install symlink to original name of the upstream changelog file.
+				# Use basename in case original file was in a subdirectory or something.
+				doit("ln","-sf",$link_to,"$tmp/usr/share/doc/$package/".basename($upstream));
+			}
 		}
 	}
-}
+};
 
 =head1 SEE ALSO
 
