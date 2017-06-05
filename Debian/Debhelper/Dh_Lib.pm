@@ -338,15 +338,41 @@ sub error_exitcode {
 # install_prog - installs an executable
 # install_lib  - installs a shared library (some systems may need x-bit, others don't)
 # install_dir  - installs a directory
-sub install_file {
-	doit('install', '-p', '-m0644', @_);
+{
+	my $_loaded = 0;
+	sub install_file {
+		unshift(@_, 0644);
+		goto \&_install_file_to_path;
+	}
+
+	sub install_prog {
+		unshift(@_, 0755);
+		goto \&_install_file_to_path;
+	}
+	sub install_lib {
+		unshift(@_, 0644);
+		goto \&_install_file_to_path;
+	}
+
+	sub _install_file_to_path {
+		my ($mode, $source, $dest) = @_;
+		if (not $_loaded) {
+			$_loaded++;
+			require File::Copy;
+		}
+		verbose_print(sprintf('install -p -m%04o %s', $mode, escape_shell($source, $dest)))
+			if $dh{VERBOSE};
+		return 1 if $dh{NO_ACT};
+		File::Copy::copy($source, $dest) or error("copy($source, $dest): $!");
+		chmod($mode, $dest) or error("chmod($mode, $dest): $!");
+		my (@stat) = stat($source);
+		error("stat($source): $!") if not @stat;
+		utime($stat[8], $stat[9], $dest)
+			or error(sprintf("utime(%d, %d, %s): $!", $stat[8] , $stat[9], $dest));
+		return 1;
+	}
 }
-sub install_prog {
-	doit('install', '-p', '-m0755', @_);
-}
-sub install_lib {
-	doit('install', '-p', '-m0644', @_);
-}
+
 sub install_dir {
 	my @to_create = grep { not -d $_ } @_;
 	doit('install', '-d', @to_create) if @to_create;
