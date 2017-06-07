@@ -317,7 +317,7 @@ sub complex_doit {
 sub error_exitcode {
 	my $command=shift;
 	if ($? == -1) {
-		error("$command failed to to execute: $!");
+		error("$command failed to execute: $!");
 	}
 	elsif ($? & 127) {
 		error("$command died with signal ".($? & 127));

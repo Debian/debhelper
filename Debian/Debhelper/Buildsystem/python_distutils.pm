@@ -109,7 +109,7 @@ sub setup_py {
 	my $this=shift;
 	my $act=shift;
 
-	# We need to to run setup.py with the default python last
+	# We need to run setup.py with the default python last
 	# as distutils/setuptools modifies the shebang lines of scripts.
 	# This ensures that #!/usr/bin/python is installed last and
 	# not pythonX.Y
