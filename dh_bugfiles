@@ -103,9 +103,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	elsif (scalar(keys(%bugfiles)) > 0) {
 		if (-f $dir) {
 			# Move usr/share/bug/$package to usr/share/bug/$package/script
-			doit("mv", $dir, "${dir}.tmp");
+			rename_path($dir, "${dir}.tmp");
 			install_dir($dir);
-			doit("mv", "${dir}.tmp", "$dir/script");
+			rename_path("${dir}.tmp", "$dir/script");
 		}
 		else {
 			install_dir($dir);

@@ -114,8 +114,8 @@ sub build_and_rename_deb {
 	if ($desired_filename ne $dpkg_filename) {
 		print "\tRenaming $dpkg_filename to $desired_filename\n";
 	}
-	doit('mv', '-f', "${build_dir}/${dpkg_filename}",
-		 "${destdir}/${desired_filename}");
+	rename_path("${build_dir}/${dpkg_filename}",
+		"${destdir}/${desired_filename}");
 }
 
 foreach my $package (@{$dh{DOPACKAGES}}) {

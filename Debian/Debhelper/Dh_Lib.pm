@@ -51,7 +51,7 @@ use vars qw(@EXPORT %dh);
 	    &generated_file &autotrigger &package_section
 	    &restore_file_on_clean &restore_all_files
 	    &open_gz &reset_perm_and_owner &deprecated_functionality
-	    &log_installed_files &buildarch
+	    &log_installed_files &buildarch &rename_path
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -377,6 +377,16 @@ sub install_dir {
 	my @to_create = grep { not -d $_ } @_;
 	doit('install', '-d', @to_create) if @to_create;
 }
+
+sub rename_path {
+	my ($source, $dest) = @_;
+	if (not rename($source, $dest)) {
+		my $files = escape_shell($source, $dest);
+		error("mv $files: $!")
+	}
+	return 1;
+}
+
 sub reset_perm_and_owner {
 	my ($mode, @paths) = @_;
 	doit('chmod', $mode, '--', @paths);
@@ -727,7 +737,7 @@ sub autoscript {
 		autoscript_sed($sed, $infile, "$outfile.new");
 		complex_doit("echo '# End automatically added section' >> $outfile.new");
 		complex_doit("cat $outfile >> $outfile.new");
-		complex_doit("mv $outfile.new $outfile");
+		rename_path("${outfile}.new", $outfile);
 	}
 	else {
 		complex_doit("echo \"# Automatically added by ".basename($0)."\">> $outfile");
@@ -789,7 +799,7 @@ sub autoscript_sed {
 		print {$ofd} "${trigger_type} ${trigger_target}\n";
 		close($ofd) or error("closing ${triggers_file}.new failed: $!");
 		close($ifd);
-		doit('mv', '-f', "${triggers_file}.new", $triggers_file);
+		rename_path("${triggers_file}.new", $triggers_file);
 	}
 }
 
@@ -813,7 +823,7 @@ sub delsubstvar {
 
 	if (-e $substvarfile) {
 		complex_doit("grep -a -s -v '^${substvar}=' $substvarfile > $substvarfile.new || true");
-		doit("mv", "$substvarfile.new","$substvarfile");
+		rename_path("${substvarfile}.new", $substvarfile);
 	}
 }
 				
@@ -859,8 +869,8 @@ sub addsubstvar {
 	}
 
 	if (length $line) {
-		 complex_doit("(grep -a -s -v ${substvar} $substvarfile; echo ".escape_shell("${substvar}=$line").") > $substvarfile.new");
-		 doit("mv", "$substvarfile.new", $substvarfile);
+		complex_doit("(grep -a -s -v ${substvar} $substvarfile; echo ".escape_shell("${substvar}=$line").") > $substvarfile.new");
+		rename_path("$substvarfile.new", $substvarfile);
 	}
 	else {
 		delsubstvar($package,$substvar);
@@ -1510,7 +1520,7 @@ sub restore_file_on_clean {
 			# Copy and then rename so we always have the full copy of
 			# the file in the correct place (if any at all).
 			doit('cp', '-an', '--reflink=auto', $file, "${bucket_dir}/${checksum}.tmp");
-			doit('mv', '-f', "${bucket_dir}/${checksum}.tmp", "${bucket_dir}/${checksum}");
+			rename_path("${bucket_dir}/${checksum}.tmp", "${bucket_dir}/${checksum}");
 			print {$fd} "${checksum} ${file}\n";
 		}
 		close($fd) or error("close($bucket_index) failed: $!");
@@ -1538,7 +1548,7 @@ sub restore_all_files {
 		#     that with scary warnings)
 		# 2) The file is always fully restored or in its "pre-restore" state.
 		doit('cp', '-an', '--reflink=auto', $bucket_file, "${bucket_file}.tmp");
-		doit('mv', '-Tf', "${bucket_file}.tmp", $stored_file);
+		rename_path("${bucket_file}.tmp", $stored_file);
 	}
 	close($fd);
 	return;
