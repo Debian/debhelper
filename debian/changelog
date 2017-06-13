@@ -17,6 +17,17 @@ debhelper (10.5) UNRELEASED; urgency=medium
   * dh_shlibdeps: Avoid creating debian/<pkg>/DEBIAN directory if it
     is not needed.
   * Dh_Lib.pm: Fix typo in error message.
+  * Dh_Lib.pm: Rewrite install_* to use File::Copy to avoid the
+    overhead of a fork+exec per file.
+  * Dh_Lib.pm: Replace most of the fork+exec calls to mv for simple
+    file renames.
+  * Dh_Lib.pm: Add sub to make common dh_* tools do their thing in
+    parallel with very little coding effort.  This parallel support
+    accounts for DEB_BUILD_OPTIONS to set the upper limit.
+  * dh_fixperms: Run package updates in parallel if DEB_BUILD_OPTIONS
+    permits it.
+  * dh_installchangelogs: Ditto.
+  * dh_compress: Ditto
 
   [ Iain Lane ]
   * Dh_Lib: Re-add warning + exit 0 for the -i/-a shortcut that was
