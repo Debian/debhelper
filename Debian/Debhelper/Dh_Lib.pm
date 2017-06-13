@@ -1465,8 +1465,7 @@ sub install_dh_config_file {
 		# Set the mtime (and atime) to ensure reproducibility.
 		utime($sstat[9], $sstat[9], $target);
 	} else {
-		my $str_mode = sprintf('%#4o', $mode);
-		doit('install', '-p', "-m${str_mode}", $source, $target);
+		_install_file_to_path($mode, $source, $target);
 	}
 	return 1;
 }
