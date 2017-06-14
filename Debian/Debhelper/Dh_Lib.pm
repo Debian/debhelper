@@ -383,6 +383,12 @@ sub install_dir {
 
 sub rename_path {
 	my ($source, $dest) = @_;
+
+	if ($dh{VERBOSE}) {
+		my $files = escape_shell($source, $dest);
+		verbose_print("mv $files");
+	}
+	return 1 if $dh{NO_ACT};
 	if (not rename($source, $dest)) {
 		my $files = escape_shell($source, $dest);
 		error("mv $files: $!")
