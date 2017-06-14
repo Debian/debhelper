@@ -52,7 +52,7 @@ use vars qw(@EXPORT %dh);
 	    &restore_file_on_clean &restore_all_files
 	    &open_gz &reset_perm_and_owner &deprecated_functionality
 	    &log_installed_files &buildarch &rename_path
-	    &on_each_pkg_in_parallel
+	    &on_pkgs_in_parallel
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
