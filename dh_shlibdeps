@@ -104,7 +104,8 @@ if (defined $dh{V_FLAG}) {
 	warning("You probably wanted to pass -V to dh_makeshlibs, it has no effect on dh_shlibdeps");
 }
 
-foreach my $package (@{$dh{DOPACKAGES}}) {
+on_pkgs_in_parallel {
+foreach my $package (@_) {
 	my $tmp=tmpdir($package);
 	my $ext=pkgext($package);
 	my (@filelist, $ff);
@@ -150,6 +151,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			@opts,@{$dh{U_PARAMS}},@filelist);
 	}
 }
+};
 
 =head1 SEE ALSO
 
