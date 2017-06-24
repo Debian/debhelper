@@ -146,7 +146,7 @@ if (! defined $upstream) {
 			foreach my $suffix ('', qw(.txt .md .rst)) {
 				foreach my $name (qw{changelog changes history}) {
 					my @matches=grep {
-						lc basename($_) eq "$name$suffix" && -s $_ && ! excludefile($_)
+						lc basename($_) eq "$name$suffix" && -f $_ && -s _ && ! excludefile($_)
 					} @files;
 					if (@matches) {
 						$upstream=shift @matches;
