@@ -68,20 +68,6 @@ else {
 	$dh{FILENAME}="/$dh{FILENAME}";
 }
 
-my $max_procs=get_buildoption("parallel") || 1;
-
-my $processes=1;
-my $exit=0;
-sub reap {
-	if (wait == -1) {
-		$processes=0;
-	}
-	else {
-		$processes--;
-		$exit=1 if $? != 0;
-	}
-}
-
 sub default_compressor_args {
 	my ($default_comp, @args) = @_;
 
@@ -118,17 +104,8 @@ sub build_and_rename_deb {
 		"${destdir}/${desired_filename}");
 }
 
-foreach my $package (@{$dh{DOPACKAGES}}) {
-	my $pid=fork();
-	if (! defined $pid) {
-		error("fork failed! $!");
-	}
-	if ($pid) { # parent
-		$processes++;
-		reap while $processes > $max_procs;
-		next;
-	}
-
+on_pkgs_in_parallel {
+foreach my $package (@_) {
 	# child
 	my $tmp=tmpdir($package);
 	my $dbgsym_tmpdir = "debian/.debhelper/${package}/dbgsym-root";
@@ -183,11 +160,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			doit(@cmd, $dh{DESTDIR}.$filename);
 		}
 	}
-	exit 0;
 }
-
-reap while $processes;
-exit $exit;
+};
 
 =head1 SEE ALSO
 
