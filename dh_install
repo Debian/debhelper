@@ -277,12 +277,7 @@ if ($dh{LIST_MISSING} || $dh{FAIL_MISSING}) {
 	push(@options, '--sourcedir', $dh{SOURCEDIR}) if defined($dh{SOURCEDIR});
 	push @options, "--list-missing" if $dh{LIST_MISSING};
 	push @options, "--fail-missing" if $dh{FAIL_MISSING};
-	my $ret = system("dh_missing", @options);
-	if ($ret >> 8 != 0) {
-		exit $ret >> 8;
-	} elsif ($ret) {
-		exit 1;
-	}
+	doit("dh_missing", @options);
 }
 
 =head1 LIMITATIONS
