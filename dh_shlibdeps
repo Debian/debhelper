@@ -105,52 +105,52 @@ if (defined $dh{V_FLAG}) {
 }
 
 on_pkgs_in_parallel {
-foreach my $package (@_) {
-	my $tmp=tmpdir($package);
-	my $ext=pkgext($package);
-	my (@filelist, $ff);
+	foreach my $package (@_) {
+		my $tmp=tmpdir($package);
+		my $ext=pkgext($package);
+		my (@filelist, $ff);
 
-	# Generate a list of ELF binaries in the package, ignoring any
-	# we were told to exclude.
-	my $find_options='';
-	if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
-		$find_options="! \\( $dh{EXCLUDE_FIND} \\)";
-	}
-	foreach my $file (split(/\n/,`find $tmp -type f \\( -perm /111 -or -name "*.so*" -or -name "*.cmxs" -or -name "*.node" \\) $find_options -print`)) {
-		# Prune directories that contain separated debug symbols.
-		next if $file=~m!^\Q$tmp\E/usr/lib/debug/!;
-		# TODO this is slow, optimize. Ie, file can run once on
-		# multiple files..
-		$ff=`file "$file"`;
-		if ($ff=~m/ELF/ && $ff!~/statically linked/) {
-			push @filelist,$file;
+		# Generate a list of ELF binaries in the package, ignoring any
+		# we were told to exclude.
+		my $find_options='';
+		if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
+			$find_options="! \\( $dh{EXCLUDE_FIND} \\)";
 		}
-	}
-
-	if (@filelist) {
-		my @opts;
-
-		# dpkg-shlibdeps expects this directory to exist
-		install_dir("$tmp/DEBIAN");
-
-		if (defined($dh{LIBPACKAGE})) {
-			@opts = map { '-S' . tmpdir($_) } @{$dh{LIBPACKAGE}};
-		}
-		
-		push @opts, "-tudeb" if is_udeb($package);
-		
-		if ($dh{L_PARAMS}) {
-			foreach (split(/:/, $dh{L_PARAMS})) {
-				# Force the path absolute.
-				my $libdir = m:^/: ? $_ : "/$_";
-				push @opts, "-l$libdir";
+		foreach my $file (split(/\n/,`find $tmp -type f \\( -perm /111 -or -name "*.so*" -or -name "*.cmxs" -or -name "*.node" \\) $find_options -print`)) {
+			# Prune directories that contain separated debug symbols.
+			next if $file=~m!^\Q$tmp\E/usr/lib/debug/!;
+			# TODO this is slow, optimize. Ie, file can run once on
+			# multiple files..
+			$ff=`file "$file"`;
+			if ($ff=~m/ELF/ && $ff!~/statically linked/) {
+				push @filelist,$file;
 			}
 		}
-		
-		doit("dpkg-shlibdeps","-Tdebian/${ext}substvars",
-			@opts,@{$dh{U_PARAMS}},@filelist);
+
+		if (@filelist) {
+			my @opts;
+
+			# dpkg-shlibdeps expects this directory to exist
+			install_dir("$tmp/DEBIAN");
+
+			if (defined($dh{LIBPACKAGE})) {
+				@opts = map { '-S' . tmpdir($_) } @{$dh{LIBPACKAGE}};
+			}
+
+			push @opts, "-tudeb" if is_udeb($package);
+
+			if ($dh{L_PARAMS}) {
+				foreach (split(/:/, $dh{L_PARAMS})) {
+					# Force the path absolute.
+					my $libdir = m:^/: ? $_ : "/$_";
+					push @opts, "-l$libdir";
+				}
+			}
+
+			doit("dpkg-shlibdeps","-Tdebian/${ext}substvars",
+				@opts,@{$dh{U_PARAMS}},@filelist);
+		}
 	}
-}
 };
 
 =head1 SEE ALSO
