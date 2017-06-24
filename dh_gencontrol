@@ -53,8 +53,8 @@ init(options => {
 	"dpkg-gencontrol-params=s", => \$dh{U_PARAMS},
 });
 
-
-foreach my $package (@{$dh{DOPACKAGES}}) {
+on_pkgs_in_parallel {
+foreach my $package (@_) {
 	my $tmp=tmpdir($package);
 	my $ext=pkgext($package);
 	my $dbgsym_info_dir = "debian/.debhelper/${package}";
@@ -147,6 +147,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# something odd.
 	reset_perm_and_owner('0644', "${tmp}/DEBIAN/control");
 }
+};
 
 sub read_dbgsym_file {
 	my ($dbgsym_info_file, $dbgsym_info_dir) = @_;
