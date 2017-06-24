@@ -105,62 +105,62 @@ sub build_and_rename_deb {
 }
 
 on_pkgs_in_parallel {
-foreach my $package (@_) {
-	# child
-	my $tmp=tmpdir($package);
-	my $dbgsym_tmpdir = "debian/.debhelper/${package}/dbgsym-root";
-	if (exists $ENV{DH_ALWAYS_EXCLUDE} && length $ENV{DH_ALWAYS_EXCLUDE}) {
-		if (! compat(5)) {
-			complex_doit("find $tmp $dh{EXCLUDE_FIND} | xargs rm -rf");
+	foreach my $package (@_) {
+		# child
+		my $tmp=tmpdir($package);
+		my $dbgsym_tmpdir = "debian/.debhelper/${package}/dbgsym-root";
+		if (exists $ENV{DH_ALWAYS_EXCLUDE} && length $ENV{DH_ALWAYS_EXCLUDE}) {
+			if (! compat(5)) {
+				complex_doit("find $tmp $dh{EXCLUDE_FIND} | xargs rm -rf");
+			}
+			else {
+				# Old broken code here for compatibility. Does not
+				# remove everything.
+				complex_doit("find $tmp -name $_ | xargs rm -rf")
+					foreach split(":", $ENV{DH_ALWAYS_EXCLUDE});
+			}
+		}
+		if ( -d $dbgsym_tmpdir) {
+			my $dbgsym_control = "${dbgsym_tmpdir}/DEBIAN/control";
+			# Only build the dbgsym package if it has a control file.
+			# People might have skipped dh_gencontrol.
+			if ( -f $dbgsym_control ) {
+				# XXX: Should we blindly overrule the maintainer here?  It
+				# is not apparent that their explicit -z was intended for
+				# the dbgsym package.
+				my @args = default_compressor_args(["-z1", "-Zxz", "-Sextreme"],
+					@{$dh{U_PARAMS}});
+				doit("dpkg-deb", @args,
+					"--build", $dbgsym_tmpdir, $dh{DESTDIR});
+			} elsif (not is_udeb($package)) {
+				warning("Not building dbgsym package for ${package} as it has no control file");
+				warning("Please use dh_gencontrol to avoid this issue");
+			}
+		}
+		if (! is_udeb($package)) {
+			doit("dpkg-deb", @{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$dh{FILENAME});
 		}
 		else {
-			# Old broken code here for compatibility. Does not
-			# remove everything.
-			complex_doit("find $tmp -name $_ | xargs rm -rf")
-				foreach split(":", $ENV{DH_ALWAYS_EXCLUDE});
+			my $filename=$dh{FILENAME};
+			my @cmd = qw(dpkg-deb -z1 -Zxz -Sextreme);
+			push(@cmd, @{$dh{U_PARAMS}}) if $dh{U_PARAMS};
+			push(@cmd, '--build', $tmp);
+			if (! $filename) {
+				# dpkg-gencontrol does not include "Package-Type" in the
+				# control file (see #575059, #452273) for political
+				# reasons.
+				#
+				# dh_builddeb used to guess the "correct" filename, but it
+				# fell short when dpkg-gencontrol -V was used.  The best
+				# solution so far: Let dpkg-deb build the deb and
+				# have dh_builddeb fix the extension.
+				build_and_rename_deb($package, $dh{DESTDIR}, \@cmd,
+					sub { s/\.deb$/\.udeb/g });
+			} else {
+				doit(@cmd, $dh{DESTDIR}.$filename);
+			}
 		}
 	}
-	if ( -d $dbgsym_tmpdir) {
-		my $dbgsym_control = "${dbgsym_tmpdir}/DEBIAN/control";
-		# Only build the dbgsym package if it has a control file.
-		# People might have skipped dh_gencontrol.
-		if ( -f $dbgsym_control ) {
-			# XXX: Should we blindly overrule the maintainer here?  It
-			# is not apparent that their explicit -z was intended for
-			# the dbgsym package.
-			my @args = default_compressor_args(["-z1", "-Zxz", "-Sextreme"],
-											   @{$dh{U_PARAMS}});
-			doit("dpkg-deb", @args,
-				 "--build", $dbgsym_tmpdir, $dh{DESTDIR});
-		} elsif (not is_udeb($package)) {
-			warning("Not building dbgsym package for ${package} as it has no control file");
-			warning("Please use dh_gencontrol to avoid this issue");
-		}
-	}
-	if (! is_udeb($package)) {
-		doit("dpkg-deb", @{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$dh{FILENAME});
-	}
-	else {
-		my $filename=$dh{FILENAME};
-		my @cmd = qw(dpkg-deb -z1 -Zxz -Sextreme);
-		push(@cmd, @{$dh{U_PARAMS}}) if $dh{U_PARAMS};
-		push(@cmd, '--build', $tmp);
-		if (! $filename) {
-			# dpkg-gencontrol does not include "Package-Type" in the
-			# control file (see #575059, #452273) for political
-			# reasons.
-			#
-			# dh_builddeb used to guess the "correct" filename, but it
-			# fell short when dpkg-gencontrol -V was used.  The best
-			# solution so far: Let dpkg-deb build the deb and
-			# have dh_builddeb fix the extension.
-			build_and_rename_deb($package, $dh{DESTDIR}, \@cmd,
-								 sub { s/\.deb$/\.udeb/g });
-		} else {
-			doit(@cmd, $dh{DESTDIR}.$filename);
-		}
-	}
-}
 };
 
 =head1 SEE ALSO
