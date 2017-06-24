@@ -358,20 +358,24 @@ log_installed_files($package, @paths)
 	If a directory is listed, it and all paths recursively beneath is
 	also considered installed.
 on_pkgs_in_parallel($code) - prototype: (&)
-	Splits all the packages in $dh{DOPACKAGES} into a number of groups
+	Short hand for on_selected_pkgs_in_parallel with $dh{DOPACKAGES} as
+	as list of packages.
+on_selected_pkgs_in_parallel($pkg_list_ref, $code)
+	Splits all the packages in $pkg_list_ref into a number of groups
 	based on the max parallel (as decided by DEB_BUILD_OPTIONS)
 	A subprocess is forked for each group (minimum 1 process will be
 	forked) and each subprocess will be added a group of packages
 	to process.  Each group is passed to the $code sub, which will
 	then process it and return normally on success.
 	Example:
-		on_pkgs_in_parallel {
+		my @all_packages = getpackages();
+		on_selected_pkgs_in_parallel(\@all_packages, sub {
 			for my $package (@_) {
 				my $tmp=tmpdir($package);
 				my $pkgfile = pkgfile($package, 'foo');
 				...;
 			}
-		 }
+		 });
 
 	Keep in mind that the sub will always be run in a subprocess,
 	so it cannot update global state.

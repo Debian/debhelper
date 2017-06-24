@@ -52,7 +52,7 @@ use vars qw(@EXPORT %dh);
 	    &restore_file_on_clean &restore_all_files
 	    &open_gz &reset_perm_and_owner &deprecated_functionality
 	    &log_installed_files &buildarch &rename_path
-	    &on_pkgs_in_parallel
+	    &on_pkgs_in_parallel &on_selected_pkgs_in_parallel
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -1608,9 +1608,15 @@ sub log_installed_files {
 	return 1;
 }
 
+
 sub on_pkgs_in_parallel(&) {
-	my ($code) = @_;
-	my @pkgs = @{$dh{DOPACKAGES}};
+	unshift(@_, $dh{DOPACKAGES});
+	goto \&on_selected_pkgs_in_parallel;
+}
+
+sub on_selected_pkgs_in_parallel {
+	my ($pkgs_ref, $code) = @_;
+	my @pkgs = @{$pkgs_ref};
 	my %pids;
 	my $parallel = $MAX_PROCS;
 	my $count_per_proc = int(scalar(@pkgs) / $parallel);
