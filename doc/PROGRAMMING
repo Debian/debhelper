@@ -377,6 +377,10 @@ on_selected_pkgs_in_parallel($pkg_list_ref, $code)
 			}
 		 });
 
+	If there is an error, which should stop the build, please invoke
+	either "error()" or "error_exitcode".  Alternatively, a trappable
+	error (e.g. "die($msg)") can also be used.
+
 	Keep in mind that the sub will always be run in a subprocess,
 	so it cannot update global state.
 
