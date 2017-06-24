@@ -19,8 +19,9 @@ B<dh_installwm> [S<I<debhelper options>>] [B<-n>] [B<--priority=>I<n>] [S<I<wm> 
 B<dh_installwm> is a debhelper program that is responsible for
 generating the F<postinst> and F<prerm> commands that register a window manager
 with L<update-alternatives(8)>. The window manager's man page is also 
-registered as a slave symlink (in v6 mode and up), if it is found in 
-F<usr/share/man/man1/> in the package build directory.
+registered as a slave symlink (in v6 mode and up).  It must be installed in
+F<usr/share/man/man1/> in the package build directory prior to calling
+B<dh_installwm>.  In compat 9 and earlier, the manpage was optional.
 
 =head1 FILES
 
