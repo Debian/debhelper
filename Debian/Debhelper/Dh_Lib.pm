@@ -962,9 +962,12 @@ sub excludefile {
 	sub dpkg_architecture_value {
 		my $var = shift;
 		if (exists($ENV{$var})) {
-			return $ENV{$var};
+			my $value = $ENV{$var};
+			return $value if $value ne q{};
+			warning("ENV[$var] is set to the empty string.  It has been ignored to avoid bugs like #862842");
+			delete($ENV{$var});
 		}
-		elsif (! exists($dpkg_arch_output{$var})) {
+		if (! exists($dpkg_arch_output{$var})) {
 			# Return here if we already consulted dpkg-architecture
 			# (saves a fork+exec on unknown variables)
 			return if %dpkg_arch_output;
