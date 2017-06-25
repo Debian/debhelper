@@ -60,6 +60,9 @@ debhelper (10.5) UNRELEASED; urgency=medium
   * Dh_Lib.pm: Emulate "install -d" with File::Path to avoid a fork+exec
     for creating directories.  For simplicity, the verbose output still
     claim debhelper uses "install -d" for this.
+  * dh_auto_install: In compat 11, do noot create package build
+    directories (except if one of them happens to be the default
+    "destdir" for dh_auto_install).
 
   [ Iain Lane ]
   * Dh_Lib: Re-add warning + exit 0 for the -i/-a shortcut that was

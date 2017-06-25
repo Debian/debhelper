@@ -663,6 +663,14 @@ F<./configure>.
 The B<dh_installman> helper will now prefer detecting the language from the
 path name rather than the extension.
 
+=item -
+
+The B<dh_auto_install> helper will now only create the destination
+directory it needs.  Previously, it would create the package build
+directory for all packages.  This will not affect packages that only
+build with debhelper commands, but it may expose bugs in commands not
+included in debhelper.
+
 =back
 
 =back

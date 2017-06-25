@@ -81,8 +81,12 @@ if (!$destdir) {
 }
 $destdir = File::Spec->rel2abs($destdir, cwd());
 
-# Ensure that all debian/<pkg> directories exist
-install_dir(map { tmpdir($_) } @{$dh{DOPACKAGES}});
+if (compat(10)) {
+	# Ensure that all debian/<pkg> directories exist
+	install_dir(map { tmpdir($_) } @{$dh{DOPACKAGES}});
+} else {
+	install_dir($destdir);
+}
 
 buildsystems_do("install", $destdir);
 
