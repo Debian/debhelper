@@ -49,7 +49,8 @@ init(options => {
 	"include-conffiles" => \$dh{INCLUDE_CONFFILES},
 });
 
-foreach my $package (@{$dh{DOPACKAGES}}) {
+on_pkgs_in_parallel {
+		foreach my $package (@_) {
 	next if is_udeb($package);
 
 	my $dbgsym_tmp = "debian/.debhelper/${package}/dbgsym-root";
@@ -101,6 +102,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 	}
 }
+
+};
 
 =head1 SEE ALSO
 
