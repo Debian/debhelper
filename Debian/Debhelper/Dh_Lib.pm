@@ -376,9 +376,30 @@ sub error_exitcode {
 	}
 }
 
-sub install_dir {
-	my @to_create = grep { not -d $_ } @_;
-	doit('install', '-d', @to_create) if @to_create;
+{
+	my $_loaded = 0;
+	sub install_dir {
+		my @to_create = grep { not -d $_ } @_;
+		return if not @to_create;
+		if (not $_loaded) {
+			$_loaded++;
+			require File::Path;
+		}
+		verbose_print(sprintf('install -d %s', escape_shell(@to_create)))
+			if $dh{VERBOSE};
+		return 1 if $dh{NO_ACT};
+		eval {
+			File::Path::make_path(@to_create, {
+				# install -d uses 0755 (no umask), make_path uses 0777 (& umask) by default.
+				# Since we claim to run install -d, then ensure the mode is correct.
+				'chmod' => 0755,
+			});
+		};
+		if (my $err = "$@") {
+			$err =~ s/\s+at\s+\S+\s+line\s+\d+\.?\n//;
+			error($err);
+		}
+	}
 }
 
 sub rename_path {

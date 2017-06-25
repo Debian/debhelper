@@ -18,7 +18,8 @@ debhelper (10.5) UNRELEASED; urgency=medium
     is not needed.
   * Dh_Lib.pm: Fix typo in error message.
   * Dh_Lib.pm: Rewrite install_* to use File::Copy to avoid the
-    overhead of a fork+exec per file.
+    overhead of a fork+exec per file.  For simplicity, the verbose
+    output still claim debhelper uses "install -p -m <mode>" for this.
   * Dh_Lib.pm: Replace most of the fork+exec calls to mv for simple
     file renames.
   * Dh_Lib.pm: Add sub to make common dh_* tools do their thing in
@@ -55,6 +56,9 @@ debhelper (10.5) UNRELEASED; urgency=medium
     (Closes: #761024)
   * dh_installcatalogs: Check the return code of close when generating
     a catalog for sgml-base.
+  * Dh_Lib.pm: Emulate "install -d" with File::Path to avoid a fork+exec
+    for creating directories.  For simplicity, the verbose output still
+    claim debhelper uses "install -d" for this.
 
   [ Iain Lane ]
   * Dh_Lib: Re-add warning + exit 0 for the -i/-a shortcut that was
