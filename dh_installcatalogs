@@ -102,11 +102,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 		my $centralcat = "/etc/sgml/$package.cat";
 
-		open(CENTRALCAT, ">", "$tmpdir$centralcat") || error("failed to write to $tmpdir$centralcat");
+		open(my $fd, ">", "$tmpdir$centralcat") || error("failed to write to $tmpdir$centralcat");
 		foreach my $sgmldest (@sgmlinstalled) {
-			print CENTRALCAT "CATALOG " . $sgmldest . "\n";
+			print {$fd} "CATALOG " . $sgmldest . "\n";
 		}
-		close CENTRALCAT;
+		close($fd) or error("close $tmpdir$centralcat: $!");
 
 		if (! $dh{NOSCRIPTS}) {
 			autotrigger($package, "activate-await", "update-sgmlcatalog");
