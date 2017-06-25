@@ -1646,7 +1646,7 @@ sub on_selected_pkgs_in_parallel {
 	my @pkgs = @{$pkgs_ref};
 	my %pids;
 	my $parallel = $MAX_PROCS;
-	my $count_per_proc = int(scalar(@pkgs) / $parallel);
+	my $count_per_proc = int( (scalar(@pkgs) + $parallel - 1)/ $parallel);
 	my $exit = 0;
 	if ($count_per_proc < 1) {
 		$count_per_proc = 1;
