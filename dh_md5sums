@@ -50,59 +50,58 @@ init(options => {
 });
 
 on_pkgs_in_parallel {
-		foreach my $package (@_) {
-	next if is_udeb($package);
+	foreach my $package (@_) {
+		next if is_udeb($package);
 
-	my $dbgsym_tmp = "debian/.debhelper/${package}/dbgsym-root";
-	my $tmp=tmpdir($package);
+		my $dbgsym_tmp = "debian/.debhelper/${package}/dbgsym-root";
+		my $tmp=tmpdir($package);
 
-	install_dir("$tmp/DEBIAN");
+		install_dir("$tmp/DEBIAN");
 
-	# Check if we should exclude conffiles.
-	my $exclude="";
-	if (! $dh{INCLUDE_CONFFILES} && -r "$tmp/DEBIAN/conffiles") {
-		# Generate exclude regexp.
-		open(my $fd, '<', "$tmp/DEBIAN/conffiles")
-		  or die("open $tmp/DEBIAN/conffiles failed: $!");
-		while (<$fd>) {
-			chomp;
-			s/^\///;
-			$exclude.="! -path \"./$_\" ";
+		# Check if we should exclude conffiles.
+		my $exclude="";
+		if (! $dh{INCLUDE_CONFFILES} && -r "$tmp/DEBIAN/conffiles") {
+			# Generate exclude regexp.
+			open(my $fd, '<', "$tmp/DEBIAN/conffiles")
+				or die("open $tmp/DEBIAN/conffiles failed: $!");
+			while (<$fd>) {
+				chomp;
+				s/^\///;
+				$exclude.="! -path \"./$_\" ";
+			}
+			close($fd);
 		}
-		close($fd);
-	}
-	
-	# See if we should exclude other files.
-	if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
-		$exclude.="! \\( $dh{EXCLUDE_FIND} \\) ";
-	}
-	
-	my $find="find . -type f $exclude ! -regex './DEBIAN/.*' -printf '%P\\0'";
-	complex_doit("(cd $tmp >/dev/null ; $find | LC_ALL=C sort -z | xargs -r0 md5sum | " .
-                  q{perl -pe 'if (s@^\\\\@@) { s/\\\\\\\\/\\\\/g; }' > DEBIAN/md5sums) >/dev/null});
-	# If the file's empty, no reason to waste inodes on it.
-	if (-z "$tmp/DEBIAN/md5sums") {
-		doit("rm","-f","$tmp/DEBIAN/md5sums");
-	}
-	else {
-		reset_perm_and_owner('0644', "$tmp/DEBIAN/md5sums");
-	}
-	if ( -d $dbgsym_tmp) {
-		install_dir("${dbgsym_tmp}/DEBIAN");
 
-		$find = "find . -type f ! -regex './DEBIAN/.*' -printf '%P\\0'";
-		complex_doit("(cd $dbgsym_tmp >/dev/null ; $find | LC_ALL=C sort -z | xargs -r0 md5sum | " .
-					 q{perl -pe 'if (s@^\\\\@@) { s/\\\\\\\\/\\\\/g; }' > DEBIAN/md5sums) >/dev/null});
+		# See if we should exclude other files.
+		if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
+			$exclude.="! \\( $dh{EXCLUDE_FIND} \\) ";
+		}
+
+		my $find="find . -type f $exclude ! -regex './DEBIAN/.*' -printf '%P\\0'";
+		complex_doit("(cd $tmp >/dev/null ; $find | LC_ALL=C sort -z | xargs -r0 md5sum | " .
+			q{perl -pe 'if (s@^\\\\@@) { s/\\\\\\\\/\\\\/g; }' > DEBIAN/md5sums) >/dev/null});
 		# If the file's empty, no reason to waste inodes on it.
-		if (-z "${dbgsym_tmp}/DEBIAN/md5sums") {
-			doit('rm', '-f', "${dbgsym_tmp}/DEBIAN/md5sums");
+		if (-z "$tmp/DEBIAN/md5sums") {
+			doit("rm","-f","$tmp/DEBIAN/md5sums");
 		}
 		else {
-			reset_perm_and_owner('0644', "${dbgsym_tmp}/DEBIAN/md5sums");
+			reset_perm_and_owner('0644', "$tmp/DEBIAN/md5sums");
+		}
+		if ( -d $dbgsym_tmp) {
+			install_dir("${dbgsym_tmp}/DEBIAN");
+
+			$find = "find . -type f ! -regex './DEBIAN/.*' -printf '%P\\0'";
+			complex_doit("(cd $dbgsym_tmp >/dev/null ; $find | LC_ALL=C sort -z | xargs -r0 md5sum | " .
+				q{perl -pe 'if (s@^\\\\@@) { s/\\\\\\\\/\\\\/g; }' > DEBIAN/md5sums) >/dev/null});
+			# If the file's empty, no reason to waste inodes on it.
+			if (-z "${dbgsym_tmp}/DEBIAN/md5sums") {
+				doit('rm', '-f', "${dbgsym_tmp}/DEBIAN/md5sums");
+			}
+			else {
+				reset_perm_and_owner('0644', "${dbgsym_tmp}/DEBIAN/md5sums");
+			}
 		}
 	}
-}
-
 };
 
 =head1 SEE ALSO
