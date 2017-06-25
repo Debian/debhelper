@@ -1626,11 +1626,11 @@ sub log_installed_files {
 	return if $dh{NO_ACT};
 
 	my $log = generated_file($package, 'installed-by-' . basename($0));
-	open(my $fh, '>>', $log);
+	open(my $fh, '>>', $log) or error("open $log: $!");
 	for my $src (@patterns) {
 		print $fh "$src\n";
 	}
-	close($fh);
+	close($fh) or error("close $log: $!");
 
 	return 1;
 }
