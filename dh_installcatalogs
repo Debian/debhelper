@@ -109,7 +109,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		close CENTRALCAT;
 
 		if (! $dh{NOSCRIPTS}) {
-			autotrigger($package, "activate", "update-sgmlcatalog");
+			autotrigger($package, "activate-await", "update-sgmlcatalog");
 			autoscript($package, "postrm", "postrm-sgmlcatalog",
 				   "s%#CENTRALCAT#%$centralcat%g;");
 		}
