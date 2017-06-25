@@ -48,6 +48,11 @@ debhelper (10.5) UNRELEASED; urgency=medium
     (Closes: #865708)
   * dh_installcatalogs: Use explicit await triggers to avoid trigger
     a lintian warning.
+  * dh_installman: In compat 11, attempt to detect the language of the
+    manpage based on the directory (/man/<LANG>/manX/) before using the
+    extention.  This is more reliably for packages using dh_installman
+    to install manpages from the temporary install dir.
+    (Closes: #761024)
 
   [ Iain Lane ]
   * Dh_Lib: Re-add warning + exit 0 for the -i/-a shortcut that was

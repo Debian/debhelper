@@ -191,8 +191,9 @@ on_selected_pkgs_in_parallel(\@all_packages, sub {
 				# language code to the filename, so detect that and
 				# redirect to appropriate directory, stripping the code.
 				($langcode) = $basename =~ m/\.([a-z][a-z](?:_[A-Z][A-Z])?)\.(?:[1-9]|man)/;
-			}
-			elsif ($dh{LANGUAGE} ne 'C') {
+			} elsif (not compat(10) and $page =~ m{/man/([a-z][a-z](?:_[A-Z][A-Z])?)(?:\.[^/]+)?/man[1-9]/}) {
+				$langcode = $1;
+			} elsif ($dh{LANGUAGE} ne 'C') {
 				$langcode = $dh{LANGUAGE};
 			}
 
