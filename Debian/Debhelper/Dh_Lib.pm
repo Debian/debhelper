@@ -1667,6 +1667,8 @@ sub on_selected_pkgs_in_parallel {
 		my @batch = splice(@pkgs, 0, $count_per_proc);
 		my $pid = fork() // error("fork: $!");
 		if (not $pid) {
+			# Child processes should not write to the log file
+			inhibit_log();
 			eval {
 				$code->(@batch);
 			};
