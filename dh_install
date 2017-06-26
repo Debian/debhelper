@@ -178,13 +178,12 @@ foreach my $package (getpackages()) {
 	@install = map { [$_] } map { @$_ } @install if $dh{AUTODEST};
 
 	foreach my $set (@install) {
-		my $dest;
-		
+		my ($dest, @filelist);
+
 		if (@$set > 1) {
 			$dest=pop @$set;
 		}
 
-		my @filelist;
 		foreach my $glob (@$set) {
 			my @found = glob "$srcdir/$glob";
 			my $matched = 0;
@@ -226,15 +225,37 @@ foreach my $package (getpackages()) {
 		# ... because then we can short-curcit here.
 		next if $skip_install or $missing_files;
 
+		if (not $exclude) {
+			# Without $exclude and if everything is installed in the same directory, it is trivial
+			# to bulk them cp calls via xargs.
+			if (not $dest and @filelist > 1) {
+				my $same = 1;
+				my $common_dest;
+				for my $src (@filelist) {
+					my $target_dest = compute_dest($src);
+					if (not defined($common_dest)) {
+						$common_dest = $target_dest;
+					} elsif ($common_dest ne $target_dest) {
+						$same = 0;
+						last;
+					}
+				}
+				$dest = $common_dest if ($same and $common_dest);
+			}
+			if ($dest and @filelist > 1) {
+				# Make sure the destination directory exists.
+				install_dir("$tmp/$dest");
+				xargs(\@filelist, "cp", '--reflink=auto', "-a", XARGS_INSERT_PARAMS_HERE, "$tmp/$dest/");
+				next;
+			}
+		}
+
 		foreach my $src (@filelist) {
 
 			my $target_dest = $dest;
 			if (! defined $target_dest) {
 				# Guess at destination directory.
-				$target_dest = $src;
-				$target_dest =~ s/^(.*\/)?\Q$srcdir\E\///;
-				$target_dest =~ s/^(.*\/)?debian\/tmp\///;
-				$target_dest = dirname("/".$target_dest);
+				$target_dest = compute_dest($src);
 			}
 
 			# Make sure the destination directory exists.
@@ -277,6 +298,16 @@ if ($dh{LIST_MISSING} || $dh{FAIL_MISSING}) {
 	push @options, "--list-missing" if $dh{LIST_MISSING};
 	push @options, "--fail-missing" if $dh{FAIL_MISSING};
 	doit("dh_missing", @options);
+}
+
+sub compute_dest {
+	my ($dest) = @_;
+
+	$dest =~ s/^(.*\/)?\Q$srcdir\E\///;
+	$dest =~ s/^(.*\/)?debian\/tmp\///;
+	$dest = dirname("/".$dest);
+
+	return $dest;
 }
 
 =head1 LIMITATIONS
