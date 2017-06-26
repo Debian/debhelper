@@ -1322,9 +1322,7 @@ sub make_symlink{
 		return;
 	}
 
-	# Make sure the directory the link will be in exists.
-	my $basedir=dirname("$tmp/$dest");
-	install_dir($basedir);
+
 
 	# Policy says that if the link is all within one toplevel
 	# directory, it should be relative. If it's between
@@ -1354,11 +1352,19 @@ sub make_symlink{
 		$src="/$src";
 	}
 
-	if (-d "$tmp/$dest" && ! -l "$tmp/$dest") {
-		error("link destination $tmp/$dest is a directory");
+	my $full_dest = "$tmp/$dest";
+	if ( -l $full_dest ) {
+		# All ok - we can always replace a link, and target directory must exists
+	} elsif (-d _) {
+		# We cannot replace a directory though
+		error("link destination $full_dest is a directory");
+	} else {
+		# Make sure the directory the link will be in exists.
+		my $basedir=dirname($full_dest);
+		install_dir($basedir);
 	}
-	rm_files("$tmp/$dest");
-	make_symlink_raw_target($src, "$tmp/$dest");
+	rm_files($full_dest);
+	make_symlink_raw_target($src, $full_dest);
 }
 
 # _expand_path expands all path "." and ".." components, but doesn't
