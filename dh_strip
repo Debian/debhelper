@@ -296,103 +296,103 @@ sub attach_debug {
 my %all_packages = map { $_ => 1 } getpackages();
 
 on_pkgs_in_parallel {
-foreach my $package (@_) {
-	my $tmp=tmpdir($package);
+	foreach my $package (@_) {
+		my $tmp=tmpdir($package);
 
-	# Support for keeping the debugging symbols in a detached file.
-	my $keep_debug=$dh{K_FLAG};
-	my $debugtmp=$tmp;
-	my $use_build_id = compat(8) ? 0 : 1;
-	if ($dh{DEBUGPACKAGE}) {
-		$keep_debug=1;
-		my $debugpackage=$dh{DEBUGPACKAGE};
-		if (!$all_packages{$debugpackage}) {
-			error("debug package $debugpackage is not listed in the control file");
+		# Support for keeping the debugging symbols in a detached file.
+		my $keep_debug=$dh{K_FLAG};
+		my $debugtmp=$tmp;
+		my $use_build_id = compat(8) ? 0 : 1;
+		if ($dh{DEBUGPACKAGE}) {
+			$keep_debug=1;
+			my $debugpackage=$dh{DEBUGPACKAGE};
+			if (!$all_packages{$debugpackage}) {
+				error("debug package $debugpackage is not listed in the control file");
+			}
+			$debugtmp=tmpdir($debugpackage);
 		}
-		$debugtmp=tmpdir($debugpackage);
-	}
-	# Temporary workaround: Do not build dbgsym packages for udebs as
-	# dpkg-gencontrol and dpkg-deb does not agree on the file
-	# extension.
-	if ($dh{ENABLE_DBGSYM} and not $keep_debug and not package_is_arch_all($package) and not is_udeb($package)) {
-		# Avoid creating a dbgsym that would clash with a registered
-		# package or looks like a manual -dbg package.
-		if (not $all_packages{"${package}-dbgsym"} and $package !~ m/-dbg(?:sym)?$/) {
-			$debugtmp = "debian/.debhelper/${package}/dbgsym-root";
-			$keep_debug = 1;
-			$use_build_id = 2;
+		# Temporary workaround: Do not build dbgsym packages for udebs as
+		# dpkg-gencontrol and dpkg-deb does not agree on the file
+		# extension.
+		if ($dh{ENABLE_DBGSYM} and not $keep_debug and not package_is_arch_all($package) and not is_udeb($package)) {
+			# Avoid creating a dbgsym that would clash with a registered
+			# package or looks like a manual -dbg package.
+			if (not $all_packages{"${package}-dbgsym"} and $package !~ m/-dbg(?:sym)?$/) {
+				$debugtmp = "debian/.debhelper/${package}/dbgsym-root";
+				$keep_debug = 1;
+				$use_build_id = 2;
+			}
 		}
-	}
-	%file_output=@shared_libs=@executables=@static_libs=@build_ids=();
-	find({
-		wanted => \&testfile,
-		no_chdir => 1,
-	}, $tmp);
+		%file_output=@shared_libs=@executables=@static_libs=@build_ids=();
+		find({
+			wanted => \&testfile,
+			no_chdir => 1,
+		}, $tmp);
 
-	foreach (@shared_libs) {
-		my $debug_path = make_debug($_, $tmp, $debugtmp, $use_build_id) if $keep_debug;
-		# Note that all calls to strip on shared libs
-		# *must* include the --strip-unneeded.
-		doit($strip,"--remove-section=.comment",
-			"--remove-section=.note","--strip-unneeded",$_);
-		attach_debug($_, $debug_path) if defined $debug_path;
-	}
-	
-	foreach (@executables) {
-		my $debug_path = make_debug($_, $tmp, $debugtmp, $use_build_id) if $keep_debug;
-		doit($strip,"--remove-section=.comment",
-			"--remove-section=.note",$_);
- 		attach_debug($_, $debug_path) if defined $debug_path;
-	}
+		foreach (@shared_libs) {
+			my $debug_path = make_debug($_, $tmp, $debugtmp, $use_build_id) if $keep_debug;
+			# Note that all calls to strip on shared libs
+			# *must* include the --strip-unneeded.
+			doit($strip,"--remove-section=.comment",
+				"--remove-section=.note","--strip-unneeded",$_);
+			attach_debug($_, $debug_path) if defined $debug_path;
+		}
 
-	if (@static_libs) {
-		foreach (@static_libs) {
-			# NB: The short variant (-D) is broken in Jessie
-			# (binutils/2.25-3)
-			doit($strip, '--strip-debug', '--remove-section=.comment',
-				 '--remove-section=.note', '--enable-deterministic-archives',
-				 $_);
+		foreach (@executables) {
+			my $debug_path = make_debug($_, $tmp, $debugtmp, $use_build_id) if $keep_debug;
+			doit($strip,"--remove-section=.comment",
+				"--remove-section=.note",$_);
+			attach_debug($_, $debug_path) if defined $debug_path;
 		}
-	}
-	if ($no_auto_dbgsym and $use_build_id > 1) {
-		# When DEB_BUILD_OPTIONS contains noautodbgsym, remove the
-		# dbgsym dir and clear the build-ids.
-		#
-		# Note we have to extract the dbg symbols as usual, since
-		# attach_debug (objcopy --add-gnu-debuglink) requires the dbg
-		# file to exist.
-		doit('rm', '-fr', $debugtmp);
-		@build_ids = ();
-	}
-	if ($use_build_id > 1 and -d $debugtmp) {
-		my $dbgsym_docdir = "${debugtmp}/usr/share/doc";
-		my $doc_symlink = "${dbgsym_docdir}/${package}-dbgsym";
-		if ( not -l $doc_symlink and not -e _ ) {
-			install_dir($dbgsym_docdir);
-			make_symlink_raw_target($package, $doc_symlink);
+
+		if (@static_libs) {
+			foreach (@static_libs) {
+				# NB: The short variant (-D) is broken in Jessie
+				# (binutils/2.25-3)
+				doit($strip, '--strip-debug', '--remove-section=.comment',
+					 '--remove-section=.note', '--enable-deterministic-archives',
+					 $_);
+			}
 		}
-		if ($dh{MIGRATE_DBGSYM}) {
-			my $path = "debian/.debhelper/${package}/dbgsym-migration";
-			open(my $fd, '>', $path) or error("open $path failed: $!");
-			print {$fd} "$dh{MIGRATE_DBGSYM}\n";
+		if ($no_auto_dbgsym and $use_build_id > 1) {
+			# When DEB_BUILD_OPTIONS contains noautodbgsym, remove the
+			# dbgsym dir and clear the build-ids.
+			#
+			# Note we have to extract the dbg symbols as usual, since
+			# attach_debug (objcopy --add-gnu-debuglink) requires the dbg
+			# file to exist.
+			doit('rm', '-fr', $debugtmp);
+			@build_ids = ();
+		}
+		if ($use_build_id > 1 and -d $debugtmp) {
+			my $dbgsym_docdir = "${debugtmp}/usr/share/doc";
+			my $doc_symlink = "${dbgsym_docdir}/${package}-dbgsym";
+			if ( not -l $doc_symlink and not -e _ ) {
+				install_dir($dbgsym_docdir);
+				make_symlink_raw_target($package, $doc_symlink);
+			}
+			if ($dh{MIGRATE_DBGSYM}) {
+				my $path = "debian/.debhelper/${package}/dbgsym-migration";
+				open(my $fd, '>', $path) or error("open $path failed: $!");
+				print {$fd} "$dh{MIGRATE_DBGSYM}\n";
+				close($fd) or error("close $path failed: $!");
+			}
+		}
+		if (@build_ids && ($use_build_id > 1 || $dh{DEBUGPACKAGE})) {
+			my ($dir, $path);
+			if ($use_build_id > 1) {
+				$dir = "debian/.debhelper/${package}";
+			} else {
+				my $dbg_pkg = $dh{DEBUGPACKAGE};
+				$dir = "debian/.debhelper/${dbg_pkg}";
+			}
+			$path = "${dir}/dbgsym-build-ids";
+			install_dir($dir);
+			open(my $fd, '>>', $path) or error("open $path failed: $!");
+			print {$fd} join(q{ }, sort(@build_ids)) . "\n";
 			close($fd) or error("close $path failed: $!");
 		}
 	}
-	if (@build_ids && ($use_build_id > 1 || $dh{DEBUGPACKAGE})) {
-		my ($dir, $path);
-		if ($use_build_id > 1) {
-			$dir = "debian/.debhelper/${package}";
-		} else {
-			my $dbg_pkg = $dh{DEBUGPACKAGE};
-			$dir = "debian/.debhelper/${dbg_pkg}";
-		}
-		$path = "${dir}/dbgsym-build-ids";
-		install_dir($dir);
-		open(my $fd, '>>', $path) or error("open $path failed: $!");
-		print {$fd} join(q{ }, sort(@build_ids)) . "\n";
-		close($fd) or error("close $path failed: $!");
-	}
-}
 };
 
 =head1 SEE ALSO
