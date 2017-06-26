@@ -173,11 +173,14 @@ foreach my $package (getpackages()) {
 	if ($dh{EXCLUDE_FIND}) {
 		$exclude = '! \( '.$dh{EXCLUDE_FIND}.' \)';
 	}
-	
+
+	# With autodest, we can just pretend every pattern was on its own line
+	@install = map { [$_] } map { @$_ } @install if $dh{AUTODEST};
+
 	foreach my $set (@install) {
 		my $dest;
 		
-		if (! defined $dh{AUTODEST} && @$set > 1) {
+		if (@$set > 1) {
 			$dest=pop @$set;
 		}
 
