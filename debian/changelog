@@ -5,6 +5,17 @@ debhelper (10.5.1) UNRELEASED; urgency=medium
     process than permitted by DEB_BUILD_OPTIONS.
   * Dh_Lib.pm: Check return value of open+close when creating a log of
     installed files.
+  * Dh_Lib.pm: Implement subroutines to facility file removal and
+    symlink creation without a fork+exec.
+  * Dh_Lib: Avoid a fork+exec for rm -f and ln -s.
+  * dh_compress: Ditto.
+  * dh_installman: Ditto.
+  * dh_clean: Avoid a fork+exec for rm -f.
+  * dh_installdeb: Ditto.
+  * dh_makeshlibs: Ditto.
+  * dh_md5sums: Ditto.
+  * dh_installdocs: Avoid a fork+exec for ln -s.
+  * dh_strip: Ditto.
 
  -- Niels Thykier <niels@thykier.net>  Sun, 25 Jun 2017 18:02:30 +0000
 
