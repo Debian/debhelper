@@ -360,11 +360,11 @@ log_installed_files($package, @paths)
 on_pkgs_in_parallel($code) - prototype: (&)
 	Short hand for on_items_in_parallel with $dh{DOPACKAGES} as
 	as list of packages.
-on_items_in_parallel($pkg_list_ref, $code)
-	Splits all the packages in $pkg_list_ref into a number of groups
+on_items_in_parallel($item_list_ref, $code)
+	Splits all the items in $item_list_ref into a number of groups
 	based on the max parallel (as decided by DEB_BUILD_OPTIONS)
 	A subprocess is forked for each group (minimum 1 process will be
-	forked) and each subprocess will be added a group of packages
+	forked) and each subprocess will be given a group of items
 	to process.  Each group is passed to the $code sub, which will
 	then process it and return normally on success.
 	Example:
