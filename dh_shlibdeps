@@ -118,7 +118,9 @@ on_pkgs_in_parallel {
 		}
 		foreach my $file (split(/\n/,`find $tmp -type f \\( -perm /111 -or -name "*.so*" -or -name "*.cmxs" -or -name "*.node" \\) $find_options -print`)) {
 			# Prune directories that contain separated debug symbols.
-			next if $file=~m!^\Q$tmp\E/usr/lib/debug/(lib|lib64|usr|bin|sbin|opt|dev|emul)/!;
+			# CAVEAT: There are files in /usr/lib/debug that are not detached debug symbols,
+			# which should be processed.  (see #865982)
+			next if $file=~m!^\Q$tmp\E/usr/lib/debug/(lib|lib64|usr|bin|sbin|opt|dev|emul|\.build-id)/!;
 			# TODO this is slow, optimize. Ie, file can run once on
 			# multiple files..
 			$ff=`file "$file"`;
