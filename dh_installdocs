@@ -241,7 +241,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		install_dir($target_dir) unless -l $target_dir;
 		foreach my $doc (@docs) {
 			next if excludefile($doc);
-			next if -e $doc && ! -s $doc; # ignore empty files
+			next if -f $doc && ! -s _; # ignore empty files
 			ensure_docdir($package);
 			if (-d $doc && length $exclude) {
 				my $basename = basename($doc);

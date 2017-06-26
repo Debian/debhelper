@@ -209,7 +209,7 @@ on_selected_pkgs_in_parallel(\@all_packages, sub {
 			my $instpage = "$destdir$instname.$section";
 
 			next if -l $instpage;
-			next if compat(5) && -e $instpage;
+			next if compat(5) && -e _;
 
 			install_dir($destdir);
 			if ($gz) {
@@ -239,7 +239,7 @@ on_selected_pkgs_in_parallel(\@all_packages, sub {
 				next unless -e "$tmp/$dir";
 				my @files;
 				find(sub {
-						return if !-f $_ || -l $_;
+						return if -l $_ || ! -f _;
 						my ($tmp, $orig) = ($_.".new", $_);
 						complex_doit "man --recode UTF-8 ./\Q$orig\E > \Q$tmp\E";
 						# recode uncompresses compressed pages
@@ -260,7 +260,7 @@ on_selected_pkgs_in_parallel(\@all_packages, sub {
 sub find_so_man {
 	# The -s test is because a .so file tends to be small. We don't want
 	# to open every man page. 1024 is arbitrary.
-	if (! -f $_ || -s $_ > 1024 || -s == 0) {
+	if (! -f $_ || -s _ > 1024 || -s _ == 0) {
 		return;
 	}
 

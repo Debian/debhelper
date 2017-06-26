@@ -366,7 +366,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if ($use_build_id > 1 and -d $debugtmp) {
 		my $dbgsym_docdir = "${debugtmp}/usr/share/doc";
 		my $doc_symlink = "${dbgsym_docdir}/${package}-dbgsym";
-		if ( not -l $doc_symlink and not -e $doc_symlink ) {
+		if ( not -l $doc_symlink and not -e _ ) {
 			install_dir($dbgsym_docdir);
 			make_symlink_raw_target($package, $doc_symlink);
 		}
