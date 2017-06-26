@@ -19,6 +19,8 @@ use constant {
 	'BETA_TESTER_COMPAT' => 10,
 	# Highest compat level permitted
 	'MAX_COMPAT_LEVEL' => 11,
+	# Magic value for xargs
+	'XARGS_INSERT_PARAMS_HERE' => \'<INSERT-HERE>',
 };
 
 my %NAMED_COMPAT_LEVELS = (
@@ -55,6 +57,7 @@ use vars qw(@EXPORT %dh);
 	    &log_installed_files &buildarch &rename_path
 	    &on_pkgs_in_parallel &on_selected_pkgs_in_parallel
 	    &rm_files &make_symlink_raw_target &on_items_in_parallel
+	    XARGS_INSERT_PARAMS_HERE
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -430,7 +433,7 @@ sub reset_perm_and_owner {
 # parameters that are the command and any parameters that should be passed to
 # it each time.
 sub xargs {
-	my $args=shift;
+	my ($args, @static_args) = @_;
 
         # The kernel can accept command lines up to 20k worth of characters.
 	my $command_max=20000; # LINUX SPECIFIC!!
@@ -439,8 +442,15 @@ sub xargs {
 
 	# Figure out length of static portion of command.
 	my $static_length=0;
-	foreach (@_) {
-		$static_length+=length($_)+1;
+	my $subst_index = -1;
+	for my $i (0..$#static_args) {
+		my $arg = $static_args[$i];
+		if ($arg eq XARGS_INSERT_PARAMS_HERE) {
+			error("Only one insertion place supported in xargs, got command: @static_args") if $subst_index > -1;
+			$subst_index = $i;
+			next;
+		}
+		$static_length+=length($arg)+1;
 	}
 	
 	my @collect=();
@@ -454,12 +464,28 @@ sub xargs {
 			push @collect, $_;
 		}
 		else {
-			doit(@_,@collect) if $#collect > -1;
+			if ($#collect > -1) {
+				if ($subst_index < 0) {
+					doit(@static_args, @collect);
+				} else {
+					my @cmd = @static_args;
+					splice(@cmd, $subst_index, 1, @collect);
+					doit(@cmd);
+				}
+			}
 			@collect=($_);
 			$length=$static_length + length($_) + 1;
 		}
 	}
-	doit(@_,@collect) if $#collect > -1;
+	if ($#collect > -1) {
+		if ($subst_index < 0) {
+			doit(@static_args, @collect);
+		} else {
+			my @cmd = @static_args;
+			splice(@cmd, $subst_index, 1, @collect);
+			doit(@cmd);
+		}
+	}
 }
 
 # Print something if the verbose flag is on.
