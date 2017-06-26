@@ -184,14 +184,12 @@ foreach my $package (getpackages()) {
 		my @filelist;
 		foreach my $glob (@$set) {
 			my @found = glob "$srcdir/$glob";
-			my $glob_sd = $srcdir;
 			my $matched = 0;
 			if (! compat(6)) {
 				# Fall back to looking in debian/tmp.
 				if (! @found || ! (-e $found[0] || -l $found[0])) {
 					if ($glob !~ m{^(?:\./)?debian/tmp/}) {
 						@found = glob "debian/tmp/$glob";
-						$glob_sd = 'debian/tmp';
 					}
 				}
 			}
