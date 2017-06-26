@@ -219,11 +219,14 @@ foreach my $package (getpackages()) {
 			next;
 		}
 
-		foreach my $src (@filelist) { 
-			next if excludefile($src);
-			
-			push @installed, $src;
-			next if $skip_install or $missing_files;
+		# Do a quick bulk handling of excluded files and update @installed.
+		@filelist = grep { not excludefile($_) } @filelist if $exclude;
+		push(@installed, @filelist);
+
+		# ... because then we can short-curcit here.
+		next if $skip_install or $missing_files;
+
+		foreach my $src (@filelist) {
 		
 			if (! defined $dest) {
 				# Guess at destination directory.
