@@ -295,7 +295,8 @@ sub attach_debug {
 
 my %all_packages = map { $_ => 1 } getpackages();
 
-foreach my $package (@{$dh{DOPACKAGES}}) {
+on_pkgs_in_parallel {
+foreach my $package (@_) {
 	my $tmp=tmpdir($package);
 
 	# Support for keeping the debugging symbols in a detached file.
@@ -392,6 +393,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		close($fd) or error("close $path failed: $!");
 	}
 }
+};
 
 =head1 SEE ALSO
 
