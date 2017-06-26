@@ -244,7 +244,7 @@ on_selected_pkgs_in_parallel(\@all_packages, sub {
 						complex_doit "man --recode UTF-8 ./\Q$orig\E > \Q$tmp\E";
 						# recode uncompresses compressed pages
 						rm_files($orig) if s/\.(gz|Z)$//;
-						doit "mv", "-f", $tmp, $_;
+						rename_path($tmp, $_);
 						# Schedule a permission reset
 						push(@files, "${File::Find::dir}/${_}");
 					}, "$tmp/$dir");
