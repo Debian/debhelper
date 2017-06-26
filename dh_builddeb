@@ -104,11 +104,40 @@ sub build_and_rename_deb {
 		"${destdir}/${desired_filename}");
 }
 
-on_pkgs_in_parallel {
-	foreach my $package (@_) {
-		# child
-		my $tmp=tmpdir($package);
+my @items;
+
+for my $package (@{$dh{DOPACKAGES}}) {
+	push(@items, [$package, 0]);
+	if (not is_udeb($package)) {
 		my $dbgsym_tmpdir = "debian/.debhelper/${package}/dbgsym-root";
+		my $dbgsym_control = "${dbgsym_tmpdir}/DEBIAN/control";
+		if ( -f $dbgsym_control) {
+			# Only build the dbgsym package if it has a control file.
+			# People might have skipped dh_gencontrol.
+			push(@items, [$package, 1]);
+		} elsif (-d $dbgsym_tmpdir) {
+			warning("Not building dbgsym package for ${package} as it has no control file");
+			warning("Please use dh_gencontrol to avoid this issue");
+		}
+	}
+}
+
+on_items_in_parallel(\@items, sub {
+	foreach my $item (@_) {
+		my ($package, $dbgsym) = @{$item};
+		my $tmp=tmpdir($package);
+
+		if ($dbgsym) {
+			my $dbgsym_tmpdir = "debian/.debhelper/${package}/dbgsym-root";
+			# XXX: Should we blindly overrule the maintainer here?  It
+			# is not apparent that their explicit -z was intended for
+			# the dbgsym package.
+			my @args = default_compressor_args(["-z1", "-Zxz", "-Sextreme"],
+				@{$dh{U_PARAMS}});
+			doit("dpkg-deb", @args,
+				"--build", $dbgsym_tmpdir, $dh{DESTDIR});
+			next;
+		}
 		if (exists $ENV{DH_ALWAYS_EXCLUDE} && length $ENV{DH_ALWAYS_EXCLUDE}) {
 			if (! compat(5)) {
 				complex_doit("find $tmp $dh{EXCLUDE_FIND} | xargs rm -rf");
@@ -118,23 +147,6 @@ on_pkgs_in_parallel {
 				# remove everything.
 				complex_doit("find $tmp -name $_ | xargs rm -rf")
 					foreach split(":", $ENV{DH_ALWAYS_EXCLUDE});
-			}
-		}
-		if ( -d $dbgsym_tmpdir) {
-			my $dbgsym_control = "${dbgsym_tmpdir}/DEBIAN/control";
-			# Only build the dbgsym package if it has a control file.
-			# People might have skipped dh_gencontrol.
-			if ( -f $dbgsym_control ) {
-				# XXX: Should we blindly overrule the maintainer here?  It
-				# is not apparent that their explicit -z was intended for
-				# the dbgsym package.
-				my @args = default_compressor_args(["-z1", "-Zxz", "-Sextreme"],
-					@{$dh{U_PARAMS}});
-				doit("dpkg-deb", @args,
-					"--build", $dbgsym_tmpdir, $dh{DESTDIR});
-			} elsif (not is_udeb($package)) {
-				warning("Not building dbgsym package for ${package} as it has no control file");
-				warning("Please use dh_gencontrol to avoid this issue");
 			}
 		}
 		if (! is_udeb($package)) {
@@ -161,7 +173,7 @@ on_pkgs_in_parallel {
 			}
 		}
 	}
-};
+});
 
 =head1 SEE ALSO
 
