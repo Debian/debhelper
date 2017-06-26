@@ -232,29 +232,51 @@ on_items_in_parallel(\@all_packages, sub {
 			rm_files($sofile);
 			make_symlink_raw_target($sodest, $sofile);
 		}
-
-		# Now utf-8 conversion.
-		if (defined `man --version`) {
-			foreach my $dir (qw{usr/share/man}) {
-				next unless -e "$tmp/$dir";
-				my @files;
-				find(sub {
-						return if -l $_ || ! -f _;
-						my ($tmp, $orig) = ($_.".new", $_);
-						complex_doit "man --recode UTF-8 ./\Q$orig\E > \Q$tmp\E";
-						# recode uncompresses compressed pages
-						rm_files($orig) if s/\.(gz|Z)$//;
-						rename_path($tmp, $_);
-						# Schedule a permission reset
-						push(@files, "${File::Find::dir}/${_}");
-					}, "$tmp/$dir");
-				# Bulk reset permissions of all re-encoded files
-				xargs(\@files, 'chmod', '0644', '--') if @files;
-			}
-		}
 	}
 
 });
+
+# Now utf-8 conversion.
+if (defined `man --version`) {
+	my (@manpages_to_reencode, @issues);
+	for my $package (@{$dh{DOPACKAGES}}) {
+		next if is_udeb($package);
+		my $tmp = tmpdir($package);
+		foreach my $dir (qw{usr/share/man}) {
+			next unless -e "$tmp/$dir";
+			find(sub {
+					return if -l $_ || !-f _;
+					if ($_ =~ m/\.dh-new$/) {
+						push(@issues, "${File::Find::dir}/${_}");
+						return;
+					}
+					push(@manpages_to_reencode, "${File::Find::dir}/${_}");
+				}, "$tmp/$dir");
+		}
+		if (@issues) {
+			warning("Removing temporary manpages from another dh_installman instance");
+			rm_files(@issues);
+			warning("Possibly race-condition detected or left-overs from an interrupted dh_installman (e.g. with ^C)");
+			error("Please ensure there are no parallel dh_installman's running (for this pkg) and then re-run dh_installman");
+		}
+	}
+	if (@manpages_to_reencode) {
+		on_items_in_parallel(\@manpages_to_reencode, sub {
+			for my $manpage (@_) {
+				my $manpage_tmp = "${manpage}.dh-new";
+				complex_doit "man --recode UTF-8 ./\Q$manpage\E > \Q$manpage_tmp\E";
+				# recode uncompresses compressed pages
+				rm_files($manpage) if $manpage =~ s/\.(gz|Z)$//;
+				rename_path($manpage_tmp, $manpage);
+			}
+			# Bulk reset permissions of all re-encoded files
+			xargs(\@_, 'chmod', '0644', '--');
+		});
+	}
+} else {
+	# Should only occur during debhelper building itself (to avoid a B-D on man-db).
+	warning("man is not available.  Skipping re-encode of UTF-8 manpages")
+}
 
 # Check if a file is a .so man page, for use by File::Find.
 sub find_so_man {

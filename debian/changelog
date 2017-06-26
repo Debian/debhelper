@@ -25,6 +25,9 @@ debhelper (10.5.1) UNRELEASED; urgency=medium
   * dh_shlibdeps: Fix a regression where non-detached debug symbol files
     where not properly processed.  Thanks to Sven Joachim for reporting
     the issue.  (Closes: #865982)
+  * dh_installman: When re-encoding manpages, use the actual manpages as
+    tasks to split rather than packages.  This provides a much better
+    performance if the manpages are unevenly split between the packages.
 
  -- Niels Thykier <niels@thykier.net>  Sun, 25 Jun 2017 18:02:30 +0000
 
