@@ -31,6 +31,7 @@ my %NAMED_COMPAT_LEVELS = (
 	'beta-tester'          => BETA_TESTER_COMPAT,
 );
 
+use Errno qw(ENOENT);
 use Exporter qw(import);
 use vars qw(@EXPORT %dh);
 @EXPORT=qw(&init &doit &doit_noerror &complex_doit &verbose_print &error
@@ -53,6 +54,7 @@ use vars qw(@EXPORT %dh);
 	    &open_gz &reset_perm_and_owner &deprecated_functionality
 	    &log_installed_files &buildarch &rename_path
 	    &on_pkgs_in_parallel &on_selected_pkgs_in_parallel
+	    &rm_files &make_symlink_raw_target
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -1280,6 +1282,29 @@ sub debhelper_script_subst {
 	}
 }
 
+sub rm_files {
+	my @files = @_;
+	verbose_print('rm -f ' . escape_shell(@files))
+		if $dh{VERBOSE};
+	return 1 if $dh{NO_ACT};
+	for my $file (@files) {
+		if (not unlink($file) and $! != ENOENT) {
+			error("unlink $file failed: $!");
+		}
+	}
+	return 1;
+}
+
+sub make_symlink_raw_target {
+	my ($src, $dest) = @_;
+	verbose_print('ln -s ' . escape_shell($src, $dest))
+		if $dh{VERBOSE};
+	return 1 if $dh{NO_ACT};
+	if (not symlink($src, $dest)) {
+		error("symlink($src, $dest) failed: $!");
+	}
+	return 1;
+}
 
 # make_symlink($dest, $src[, $tmp]) creates a symlink from  $dest -> $src.
 # if $tmp is given, $dest will be created within it.
