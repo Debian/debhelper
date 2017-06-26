@@ -176,7 +176,6 @@ foreach my $package (getpackages()) {
 	
 	foreach my $set (@install) {
 		my $dest;
-		my $tmpdest=0;
 		
 		if (! defined $dh{AUTODEST} && @$set > 1) {
 			$dest=pop @$set;
@@ -227,18 +226,18 @@ foreach my $package (getpackages()) {
 		next if $skip_install or $missing_files;
 
 		foreach my $src (@filelist) {
-		
-			if (! defined $dest) {
+
+			my $target_dest = $dest;
+			if (! defined $$target_dest) {
 				# Guess at destination directory.
-				$dest=$src;
-				$dest=~s/^(.*\/)?\Q$srcdir\E\///;
-				$dest=~s/^(.*\/)?debian\/tmp\///;
-				$dest=dirname("/".$dest);
-				$tmpdest=1;
+				$target_dest = $src;
+				$target_dest =~ s/^(.*\/)?\Q$srcdir\E\///;
+				$target_dest =~ s/^(.*\/)?debian\/tmp\///;
+				$target_dest = dirname("/".$target_dest);
 			}
 
 			# Make sure the destination directory exists.
-			install_dir("$tmp/$dest");
+			install_dir("$tmp/$target_dest");
 
 			if (-d $src && $exclude) {
 				my $basename = basename($src);
@@ -247,19 +246,15 @@ foreach my $package (getpackages()) {
 				chomp $pwd;
 				complex_doit("cd '$dir' && " .
 							 "find '$basename' $exclude \\( -type f -or -type l \\) -print0 | LC_ALL=C sort -z | " .
-							 "xargs -0 -I {} cp --reflink=auto --parents -dp {} $pwd/$tmp/$dest/");
+							 "xargs -0 -I {} cp --reflink=auto --parents -dp {} $pwd/$tmp/$target_dest/");
 				# cp is annoying so I need a separate pass
 				# just for empty directories
 				complex_doit("cd '$dir' && " .
 							 "find '$basename' $exclude \\( -type d -and -empty \\) -print0 | LC_ALL=C sort -z | " .
-							 "xargs -0 -I {} cp --reflink=auto --parents -a {} $pwd/$tmp/$dest/");
+							 "xargs -0 -I {} cp --reflink=auto --parents -a {} $pwd/$tmp/$target_dest/");
 			}
 			else {
-				doit("cp", '--reflink=auto', "-a", $src, "$tmp/$dest/");
-			}
-
-			if ($tmpdest) {
-				$dest=undef;
+				doit("cp", '--reflink=auto', "-a", $src, "$tmp/$target_dest/");
 			}
 		}
 	}
