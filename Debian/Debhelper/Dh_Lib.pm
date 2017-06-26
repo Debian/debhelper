@@ -1357,8 +1357,8 @@ sub make_symlink{
 	if (-d "$tmp/$dest" && ! -l "$tmp/$dest") {
 		error("link destination $tmp/$dest is a directory");
 	}
-	doit("rm", "-f", "$tmp/$dest");
-	doit("ln","-sf", $src, "$tmp/$dest");
+	rm_files("$tmp/$dest");
+	make_symlink_raw_target($src, "$tmp/$dest");
 }
 
 # _expand_path expands all path "." and ".." components, but doesn't

@@ -86,7 +86,7 @@ if ($dh{K_FLAG}) {
 }
 
 # Remove the debhelper stamp file
-doit('rm', '-f', 'debian/debhelper-build-stamp') if not $dh{D_FLAG};
+rm_files('debian/debhelper-build-stamp') if not $dh{D_FLAG};
 
 my (@clean_files, @clean_dirs);
 
@@ -120,7 +120,8 @@ if (not $dh{D_FLAG}) {
 
 # Remove all debhelper logs.
 if (! $dh{D_FLAG} && ! $dh{K_FLAG}) {
-	complex_doit("rm","-f","debian/*.debhelper.log");
+	my @logs = glob('debian/*.debhelper.log');
+	rm_files(@logs) if @logs;
 }
 
 if (! $dh{D_FLAG}) {
@@ -171,7 +172,8 @@ doit('rm', '-rf', 'debian/tmp') if -x 'debian/tmp' &&
                                    ! excludefile("debian/tmp");
 
 if (!compat(6) && !$dh{K_FLAG}) {
-	complex_doit('rm -f *-stamp');
+	my @stamp_files = glob('*-stamp');
+	rm_files(@stamp_files) if @stamp_files;
 }
 
 =head1 SEE ALSO

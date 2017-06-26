@@ -179,7 +179,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		complex_doit("find $tmp/etc -type f -printf '/etc/%P\n' | LC_ALL=C sort >> $tmp/DEBIAN/conffiles");
 		# Anything found?
 		if (-z "$tmp/DEBIAN/conffiles") {
-			doit("rm","-f","$tmp/DEBIAN/conffiles");
+			rm_files("$tmp/DEBIAN/conffiles");
 		}
 		else {
 			reset_perm_and_owner('0644', "$tmp/DEBIAN/conffiles");

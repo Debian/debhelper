@@ -851,7 +851,10 @@ sub run_override {
 
 	# Discard any override log files before calling the override
 	# target
-	complex_doit("rm","-f","debian/*.debhelper.log") if not compat(9);
+	if (not compat(9)) {
+		my @files = glob('debian/*.debhelper.log');
+		rm_files(@files) if @files;
+	}
 	# This passes the options through to commands called
 	# inside the target.
 	$ENV{DH_INTERNAL_OPTIONS}=join("\x1e", @options);

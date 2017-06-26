@@ -82,7 +82,7 @@ on_pkgs_in_parallel {
 			q{perl -pe 'if (s@^\\\\@@) { s/\\\\\\\\/\\\\/g; }' > DEBIAN/md5sums) >/dev/null});
 		# If the file's empty, no reason to waste inodes on it.
 		if (-z "$tmp/DEBIAN/md5sums") {
-			doit("rm","-f","$tmp/DEBIAN/md5sums");
+			rm_files("$tmp/DEBIAN/md5sums");
 		}
 		else {
 			reset_perm_and_owner('0644', "$tmp/DEBIAN/md5sums");
@@ -95,7 +95,7 @@ on_pkgs_in_parallel {
 				q{perl -pe 'if (s@^\\\\@@) { s/\\\\\\\\/\\\\/g; }' > DEBIAN/md5sums) >/dev/null});
 			# If the file's empty, no reason to waste inodes on it.
 			if (-z "${dbgsym_tmp}/DEBIAN/md5sums") {
-				doit('rm', '-f', "${dbgsym_tmp}/DEBIAN/md5sums");
+				rm_files("${dbgsym_tmp}/DEBIAN/md5sums");
 			}
 			else {
 				reset_perm_and_owner('0644', "${dbgsym_tmp}/DEBIAN/md5sums");

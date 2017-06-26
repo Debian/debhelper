@@ -368,7 +368,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		my $doc_symlink = "${dbgsym_docdir}/${package}-dbgsym";
 		if ( not -l $doc_symlink and not -e $doc_symlink ) {
 			install_dir($dbgsym_docdir);
-			doit('ln', '-s', $package, $doc_symlink);
+			make_symlink_raw_target($package, $doc_symlink);
 		}
 		if ($dh{MIGRATE_DBGSYM}) {
 			my $path = "debian/.debhelper/${package}/dbgsym-migration";

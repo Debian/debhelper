@@ -192,7 +192,7 @@ on_pkgs_in_parallel {
 		# they are again.
 		foreach (keys %hardlinks) {
 			# Remove old file.
-			doit("rm","-f","$_");
+			rm_files($_);
 			# Make new hardlink.
 			doit("ln","$hardlinks{$_}.gz","$_.gz");
 		}
@@ -212,8 +212,8 @@ on_pkgs_in_parallel {
 				my ($directory) = $link =~ m:(.*)/:;
 				my $linkval = readlink($link);
 				if (! -e "$directory/$linkval" && -e "$directory/$linkval.gz") {
-					doit("rm","-f",$link);
-					doit("ln","-sf","$linkval.gz","$link.gz");
+					rm_files($link);
+					make_symlink_raw_target("$linkval.gz","$link.gz");
 					delete $links{$link};
 					$changed++;
 				}

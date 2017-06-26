@@ -149,7 +149,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $need_ldconfig = 0;
 	my $shlibs_file = pkgfile($package, 'shlibs');
 
-	doit("rm", "-f", "$tmp/DEBIAN/shlibs");
+	rm_files("$tmp/DEBIAN/shlibs");
 
 	# So, we look for files or links to existing files with names that
 	# match "*.so.*". And we only look at real files not
@@ -263,7 +263,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			) && $ok;
 
 		if (-f "$tmp/DEBIAN/symbols" and -s _ == 0) {
-			doit("rm", "-f", "$tmp/DEBIAN/symbols");
+			rm_files("$tmp/DEBIAN/symbols");
 		} elsif ($unversioned_so) {
 			# There are a few "special" libraries (e.g. nss/nspr)
 			# which do not have versioned SONAMES.  However the

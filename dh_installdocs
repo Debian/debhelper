@@ -207,7 +207,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# necessary.
 		if (! -d "$tmp/usr/share/doc/$package" &&
 		    ! -l "$tmp/usr/share/doc/$package") {
-			doit("ln", "-sf", $dh{LINK_DOC}, "$tmp/usr/share/doc/$package");
+			make_symlink_raw_target($dh{LINK_DOC}, "$tmp/usr/share/doc/$package");
 			# Policy says that if you make your documentation
 			# directory a symlink, then you have to depend on
 			# the target.
