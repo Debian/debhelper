@@ -985,8 +985,7 @@ sub glob_expand {
 # expansion is done in the directory specified by the parameter ("." is
 # frequently a good choice).
 sub filedoublearray {
-	my $file=shift;
-	my $globdir=shift;
+	my ($file, $globdir, $error_handler) = @_;
 
 	# executable config files are a v9 thing.
 	my $x=! compat(8) && -x $file;
@@ -1008,13 +1007,21 @@ sub filedoublearray {
 			next if /^#/ || /^$/;
 		}
 		my @line;
-		# The tricky bit is that the glob expansion is done
-		# as if we were in the specified directory, so the
-		# filenames that come out are relative to it.
+
 		if (defined($globdir) && ! $x) {
-			foreach (map { glob "$globdir/$_" } split) {
-				s#^$globdir/##;
-				push @line, $_;
+			if (ref($globdir)) {
+				my @patterns = split;
+				push(@line, glob_expand($globdir, $error_handler, @patterns));
+			} else {
+				# Legacy call - Silently discards globs that match nothing.
+				#
+				# The tricky bit is that the glob expansion is done
+				# as if we were in the specified directory, so the
+				# filenames that come out are relative to it.
+				foreach (map { glob "$globdir/$_" } split) {
+					s#^$globdir/##;
+					push @line, $_;
+				}
 			}
 		}
 		else {
