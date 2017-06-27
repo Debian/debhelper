@@ -39,7 +39,7 @@ use vars qw(@EXPORT %dh);
 @EXPORT=qw(&init &doit &doit_noerror &complex_doit &verbose_print &error
             &nonquiet_print &print_and_doit &print_and_doit_noerror
             &warning &tmpdir &pkgfile &pkgext &pkgfilename &isnative
-	    &autoscript &filearray &filedoublearray
+	    &autoscript &filearray &filedoublearray &is_build_profile_active
 	    &getpackages &basename &dirname &xargs %dh
 	    &compat &addsubstvar &delsubstvar &excludefile &package_arch
 	    &package_is_arch_all &package_binary_arch &package_declared_arch
