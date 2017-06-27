@@ -20,7 +20,7 @@ use constant {
 	# Highest compat level permitted
 	'MAX_COMPAT_LEVEL' => 11,
 	# Magic value for xargs
-	'XARGS_INSERT_PARAMS_HERE' => \'<INSERT-HERE>',
+	'XARGS_INSERT_PARAMS_HERE' => \'<INSERT-HERE>', #'# Hi emacs.
 };
 
 my %NAMED_COMPAT_LEVELS = (
