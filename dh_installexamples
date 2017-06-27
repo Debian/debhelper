@@ -64,6 +64,8 @@ init();
 # PROMISE: DH NOOP WITHOUT examples
 
 my $pwd;
+my @search_dirs = ('.');
+my $error_handler = compat(10) ? \&glob_expand_error_handler_warn_and_discard : \&glob_expand_error_handler_reject;
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if is_udeb($package);
@@ -74,7 +76,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my @examples;
 	
 	if ($file) {
-		@examples=filearray($file, ".");
+		@examples = filearray($file, \@search_dirs, $error_handler) if $file;
 	}	
 
 	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
