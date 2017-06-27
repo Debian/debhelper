@@ -51,6 +51,8 @@ init();
 
 # PROMISE: DH NOOP WITHOUT info
 
+my $error_handler = compat(10) ? \&glob_expand_error_handler_warn_and_discard : \&glob_expand_error_handler_reject;
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $file=pkgfile($package,"info");
@@ -58,7 +60,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my @info;
 	
 	if ($file) {
-		@info=filearray($file, ".");
+		@info = filearray($file, ['.'], $error_handler) if $file;
 	}
 
 	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
