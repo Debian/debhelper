@@ -146,6 +146,12 @@ if ($dh{LIST_MISSING} || $dh{FAIL_MISSING}) {
 	deprecated_functionality('Please use dh_missing --list-missing/--fail-missing instead', 11);
 }
 
+# Support for -X flag.
+my $exclude = '';
+if ($dh{EXCLUDE_FIND}) {
+	$exclude = '! \( '.$dh{EXCLUDE_FIND}.' \)';
+}
+
 # PROMISE: DH NOOP WITHOUT install
 
 foreach my $package (getpackages()) {
@@ -166,12 +172,6 @@ foreach my $package (getpackages()) {
 	
 	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
 		push @install, [@ARGV];
-	}
-
-	# Support for -X flag.
-	my $exclude = '';
-	if ($dh{EXCLUDE_FIND}) {
-		$exclude = '! \( '.$dh{EXCLUDE_FIND}.' \)';
 	}
 
 	# With autodest, we can just pretend every pattern was on its own line
