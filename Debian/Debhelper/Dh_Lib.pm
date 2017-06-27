@@ -35,6 +35,7 @@ my %NAMED_COMPAT_LEVELS = (
 
 use Errno qw(ENOENT);
 use Exporter qw(import);
+use File::Glob qw(bsd_glob GLOB_CSH GLOB_NOMAGIC GLOB_TILDE);
 use vars qw(@EXPORT %dh);
 @EXPORT=qw(&init &doit &doit_noerror &complex_doit &verbose_print &error
             &nonquiet_print &print_and_doit &print_and_doit_noerror
@@ -57,7 +58,9 @@ use vars qw(@EXPORT %dh);
 	    &log_installed_files &buildarch &rename_path
 	    &on_pkgs_in_parallel &on_selected_pkgs_in_parallel
 	    &rm_files &make_symlink_raw_target &on_items_in_parallel
-	    XARGS_INSERT_PARAMS_HERE
+	    XARGS_INSERT_PARAMS_HERE &glob_expand_error_handler_reject
+	    &glob_expand_error_handler_warn_and_discard &glob_expand
+	    &glob_expand_error_handler_silently_ignore
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -933,6 +936,47 @@ sub addsubstvar {
 	else {
 		delsubstvar($package,$substvar);
 	}
+}
+
+sub _glob_expand_error_default_msg {
+	my ($pattern, $dir_ref) = @_;
+	my $dir_list = join(', ', map { escape_shell($_) } @{$dir_ref});
+	return "Cannot find (any matches for) \"${pattern}\" (tried in $dir_list)";
+}
+
+sub glob_expand_error_handler_reject {
+	my $msg = _glob_expand_error_default_msg(@_);
+	error("$msg\n");
+	return;
+}
+
+sub glob_expand_error_handler_warn_and_discard {
+	my $msg = _glob_expand_error_default_msg(@_);
+	warning("$msg\n");
+	return;
+}
+
+sub glob_expand_error_handler_silently_ignore {
+	return;
+}
+
+sub glob_expand {
+	my ($dir_ref, $error_handler, @patterns) = @_;
+	my @dirs = @{$dir_ref};
+	my @result;
+	for my $pattern (@patterns) {
+		my @m;
+		for my $dir (@dirs) {
+			@m = bsd_glob("$dir/$pattern", GLOB_CSH & ~(GLOB_NOMAGIC|GLOB_TILDE));
+			last if @m;# > 1 or (@m and (-l $m[0] or -e _));
+		}
+		if (not @m) {
+			$error_handler //= \&glob_expand_error_handler_reject;
+			$error_handler->($pattern, $dir_ref);
+		}
+		push(@result, @m);
+	}
+	return @result;
 }
 
 # Reads in the specified file, one line at a time. splits on words, 
