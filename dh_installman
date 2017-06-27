@@ -123,6 +123,9 @@ init(options => {
 
 my (@sofiles, @sodests);
 my @all_packages = getpackages();
+my @search_dirs = ('.');
+my $error_handler = compat(10) ? \&glob_expand_error_handler_warn_and_discard : \&glob_expand_error_handler_reject;
+
 on_items_in_parallel(\@all_packages, sub {
 
 	foreach my $package (@_) {
@@ -132,7 +135,7 @@ on_items_in_parallel(\@all_packages, sub {
 		my $file = pkgfile($package, "manpages");
 		my @manpages;
 
-		@manpages = filearray($file, ".") if $file;
+		@manpages = filearray($file, \@search_dirs, $error_handler) if $file;
 
 		if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
 			push @manpages, @ARGV;
