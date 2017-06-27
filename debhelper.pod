@@ -671,6 +671,23 @@ directory for all packages.  This will not affect packages that only
 build with debhelper commands, but it may expose bugs in commands not
 included in debhelper.
 
+=item -
+
+The helpers B<dh_installdocs>, B<dh_installexamples>, B<dh_installinfo>,
+and B<dh_installman> now error out if their config has a pattern that
+does not match anything or reference a path that does not exist.
+
+Known exceptions include building with the B<nodoc> profile, where the
+above tools will silently permit failed matches where the patterns
+are used to specify documentation.
+
+=item -
+
+The helpers B<dh_installdocs>, B<dh_installexamples>, B<dh_installinfo>,
+and B<dh_installman> now accept the parameter B<--sourcedir> with same
+meaning as B<dh_install>. Furthermore, they now also fall back to
+F<debian/tmp> like B<dh_install>.
+
 =back
 
 =back
