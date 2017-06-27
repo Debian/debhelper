@@ -1538,6 +1538,7 @@ sub get_buildoption {
 			return 1;
 		}
 	}
+	return undef;
 }
 
 # install a dh config file (e.g. debian/<pkg>.lintian-overrides) into
