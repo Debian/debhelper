@@ -181,8 +181,9 @@ init(options => {
 });
 
 my $called_getpackages = 0;
-my $nodocs = 0;
-$nodocs = 1 if is_build_profile_active('nodoc');
+my @search_dirs = ('.');
+my $error_handler = compat(10) ? \&glob_expand_error_handler_warn_and_discard : \&glob_expand_error_handler_reject;
+my $nodocs = is_build_profile_active('nodoc') ? 1 : 0;
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if is_udeb($package);
@@ -224,7 +225,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	if (not $nodocs) {
 		if ($file) {
-			@docs = filearray($file, ".");
+			@docs=filearray($file, \@search_dirs, $error_handler);
 		}
 
 		if (($package eq $dh{FIRSTPACKAGE} || ($dh{PARAMS_ALL} && !$link_doc)) && @ARGV) {
