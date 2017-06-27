@@ -1541,6 +1541,16 @@ sub get_buildoption {
 	return undef;
 }
 
+# Returns true if DEB_BUILD_PROFILES lists the given profile.
+sub is_build_profile_active {
+	my ($wanted) = @_;
+	return 0 if not exists($ENV{DEB_BUILD_PROFILES});
+	for my $prof (split(m/\s+/, $ENV{DEB_BUILD_PROFILES})) {
+		return 1 if $prof eq $wanted;
+	}
+	return 0;
+}
+
 # install a dh config file (e.g. debian/<pkg>.lintian-overrides) into
 # the package.  Under compat 9+ it may execute the file and use its
 # output instead.
