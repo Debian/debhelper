@@ -152,6 +152,9 @@ if ($dh{EXCLUDE_FIND}) {
 	$exclude = '! \( '.$dh{EXCLUDE_FIND}.' \)';
 }
 
+my @search_dirs = ($srcdir);
+push(@search_dirs, 'debian/tmp') if not compat(6);
+
 # PROMISE: DH NOOP WITHOUT install
 
 foreach my $package (getpackages()) {
@@ -177,6 +180,15 @@ foreach my $package (getpackages()) {
 	# With autodest, we can just pretend every pattern was on its own line
 	@install = map { [$_] } map { @$_ } @install if $dh{AUTODEST};
 
+	my $glob_error_handler = sub {
+		# Do not require a match for packages that not acted on
+		# (directly).  After all, the files might not have been
+		# generated/compiled.
+		return if $skip_install;
+		++$missing_files;
+		goto \&glob_expand_error_handler_warn_and_discard;
+	};
+
 	foreach my $set (@install) {
 		my ($dest, @filelist);
 
@@ -185,31 +197,8 @@ foreach my $package (getpackages()) {
 		}
 
 		foreach my $glob (@$set) {
-			my @found = glob "$srcdir/$glob";
-			my $matched = 0;
-			if (! compat(6)) {
-				# Fall back to looking in debian/tmp.
-				if (! @found || ! (-e $found[0] || -l $found[0])) {
-					if ($glob !~ m{^(?:\./)?debian/tmp/}) {
-						@found = glob "debian/tmp/$glob";
-					}
-				}
-			}
-			if (@found && (-e $found[0] || -l $found[0])) {
-				push @filelist, @found;
-				$matched = 1;
-			}
-			# Do not require a match for packages that not acted on
-			# (directly).  After all, the files might not have been
-			# generated/compiled.
-			if (not $matched and not $skip_install) {
-				if (compat(6)) {
-					warning("Cannot find (any matches for) \"${glob}\" (tried in \"${srcdir}\")");
-				} else {
-					warning("Cannot find (any matches for) \"${glob}\" (tried in \"${srcdir}\" and \"debian/tmp\")");
-				}
-				++$missing_files;
-			}
+			my @found = glob_expand(\@search_dirs, $glob_error_handler, $glob);
+			push(@filelist, @found);
 		}
 
 		if (! @filelist && ! $skip_install) {
