@@ -67,7 +67,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	if (@info) {
 		install_dir("$tmp/usr/share/info");
-		doit("cp", '--reflink=auto', @info, "$tmp/usr/share/info");
+		xargs(\@info, "cp", '--reflink=auto', XARGS_INSERT_PARAMS_HERE, "$tmp/usr/share/info");
 		doit("chmod","-R", "go=rX","$tmp/usr/share/info/");
 		doit("chmod","-R", "u+rw","$tmp/usr/share/info/");
 	}
