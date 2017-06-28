@@ -185,55 +185,59 @@ my @search_dirs = ('.');
 my $error_handler = compat(10) ? \&glob_expand_error_handler_warn_and_discard : \&glob_expand_error_handler_reject;
 my $nodocs = is_build_profile_active('nodoc') ? 1 : 0;
 
-foreach my $package (@{$dh{DOPACKAGES}}) {
+foreach my $package (getpackages()) {
 	next if is_udeb($package);
 	
 	my $tmp=tmpdir($package);
 	my $file=pkgfile($package,"docs");
 	my $link_doc=($dh{LINK_DOC} && $dh{LINK_DOC} ne $package);
+	my $skip_install = process_pkg($package) ? 0 : 1;
 
-	if ($link_doc) {
-		getpackages('both') unless $called_getpackages++;
+	if (not $skip_install) {
+		if ($link_doc) {
+			getpackages('both') unless $called_getpackages++;
 
-		if (package_binary_arch($package) ne package_binary_arch($dh{LINK_DOC})) {
-			if (compat(9)) {
-				warning("WARNING: --link-doc between architecture all and not all packages breaks binNMUs");
-			} else {
-				error("--link-doc not allowed between ${package} and $dh{LINK_DOC} (one is arch:all and the other not)");
+			if (package_binary_arch($package) ne package_binary_arch($dh{LINK_DOC})) {
+				if (compat(9)) {
+					warning("WARNING: --link-doc between architecture all and not all packages breaks binNMUs");
+				} else {
+					error("--link-doc not allowed between ${package} and $dh{LINK_DOC} (one is arch:all and the other not)");
+				}
 			}
+			# Make sure that the parent directory exists.
+			if (!-d "$tmp/usr/share/doc" && !-l "$tmp/usr/share/doc") {
+				install_dir("$tmp/usr/share/doc");
+			}
+			# Create symlink to another documentation directory if
+			# necessary.
+			if (!-d "$tmp/usr/share/doc/$package" &&
+				!-l "$tmp/usr/share/doc/$package") {
+				make_symlink_raw_target($dh{LINK_DOC}, "$tmp/usr/share/doc/$package");
+				# Policy says that if you make your documentation
+				# directory a symlink, then you have to depend on
+				# the target.
+				addsubstvar($package, 'misc:Depends', "$dh{LINK_DOC} (= \${binary:Version})");
+			}
+		} else {
+			ensure_docdir($package);
 		}
-		# Make sure that the parent directory exists.
-		if (! -d "$tmp/usr/share/doc" && ! -l "$tmp/usr/share/doc") {
-			install_dir("$tmp/usr/share/doc");
-		}
-		# Create symlink to another documentation directory if
-		# necessary.
-		if (! -d "$tmp/usr/share/doc/$package" &&
-		    ! -l "$tmp/usr/share/doc/$package") {
-			make_symlink_raw_target($dh{LINK_DOC}, "$tmp/usr/share/doc/$package");
-			# Policy says that if you make your documentation
-			# directory a symlink, then you have to depend on
-			# the target.
-			addsubstvar($package, 'misc:Depends', "$dh{LINK_DOC} (= \${binary:Version})");
-		}
-	}
-	else {
-		ensure_docdir($package);
 	}
 
 	my @docs;
 
-	if (not $nodocs) {
-		if ($file) {
-			@docs=filearray($file, \@search_dirs, $error_handler);
-		}
-
-		if (($package eq $dh{FIRSTPACKAGE} || ($dh{PARAMS_ALL} && !$link_doc)) && @ARGV) {
-			push @docs, @ARGV;
-		}
+	if ($file) {
+		@docs = filearray($file, \@search_dirs, $error_handler);
 	}
 
-	if (@docs) {
+	if (($package eq $dh{FIRSTPACKAGE} || ($dh{PARAMS_ALL} && !$link_doc)) && @ARGV) {
+		push @docs, @ARGV;
+	}
+
+	log_installed_files($package, @docs);
+
+	next if $skip_install;
+
+	if (not $nodocs and @docs) {
 		my $target_package = $package;
 		my $exclude = ' -and ! -empty';
 		if ($dh{EXCLUDE_FIND}) {
