@@ -57,7 +57,7 @@ my $nodocs = is_build_profile_active('nodoc') ? 1 : 0;
 # or dh_missing might make noise.
 $error_handler = \&glob_expand_error_handler_silently_ignore if $nodocs;
 
-foreach my $package (@{$dh{DOPACKAGES}}) {
+foreach my $package (getpackages()) {
 	my $tmp=tmpdir($package);
 	my $file=pkgfile($package,"info");
 
@@ -71,7 +71,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		push @info, @ARGV;
 	}
 
-	next if $nodocs;
+	next if not process_pkg($package) or $nodocs;
 
 	if (@info) {
 		install_dir("$tmp/usr/share/info");
