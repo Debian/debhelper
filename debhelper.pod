@@ -676,6 +676,18 @@ and B<dh_installman> now accept the parameter B<--sourcedir> with same
 meaning as B<dh_install>. Furthermore, they now also fall back to
 F<debian/tmp> like B<dh_install>.
 
+=item -
+
+The B<PERL_USE_UNSAFE_INC> environment variable is no longer set by
+B<dh> or any of the B<dh_auto_*> tools.  It was added as a temporary
+work around to avoid a lot of packages failing to build at the same
+time.
+
+Note this item will eventually become obsolete as upstream intends
+to drop support for the B<PERL_USE_UNSAFE_INC> environment variable.
+When perl drops support for it, then this variable will be removed
+retroactively from existing compat levels as well.
+
 =back
 
 =back

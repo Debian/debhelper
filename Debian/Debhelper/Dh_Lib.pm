@@ -1570,7 +1570,7 @@ sub set_buildflags {
 	# Export PERL_USE_UNSAFE_INC as a transitional step to allow us
 	# to remove . from @INC by default without breaking packages which
 	# rely on this [CVE-2016-1238]
-	$ENV{PERL_USE_UNSAFE_INC}=1;
+	$ENV{PERL_USE_UNSAFE_INC} = 1 if compat(10);
 
 	eval "use Dpkg::BuildFlags";
 	if ($@) {
