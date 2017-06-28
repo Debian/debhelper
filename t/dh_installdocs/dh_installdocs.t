@@ -22,8 +22,12 @@ if (not defined($rootcmd)) {
 	plan skip_all => 'fakeroot required';
 }
 else {
-	plan(tests => 17);
+	plan(tests => 22);
 }
+
+# Drop DEB_BUILD_PROFILES and DEB_BUILD_OPTIONS so they don't interfere
+delete($ENV{DEB_BUILD_PROFILES});
+delete($ENV{DEB_BUILD_OPTIONS});
 
 system("rm -rf debian/foo debian/bar debian/baz");
 
@@ -67,6 +71,21 @@ system("DH_COMPAT=11 $rootcmd $TOPDIR/dh_installdocs -pfoo --link-doc=bar $doc")
 ok(-l "debian/foo/usr/share/doc/foo");
 ok(readlink("debian/foo/usr/share/doc/foo") eq 'bar');
 ok(-e "debian/foo/usr/share/doc/bar/docfile");
+system("rm -rf debian/foo debian/bar debian/baz");
+
+# ... and with nodoc
+
+# docs are ignored, but copyright file is still there
+system("DEB_BUILD_PROFILES=nodoc $rootcmd $TOPDIR/dh_installdocs -pbar $doc");
+ok(!-e "debian/bar/usr/share/doc/bar/docfile");
+ok(!-e "debian/bar/usr/share/doc/bar/copyright");
+system("rm -rf debian/foo debian/bar debian/baz");
+
+# docs are ignored, but symlinked doc dir is still there
+system("DEB_BUILD_PROFILES=nodoc DH_COMPAT=11 $rootcmd $TOPDIR/dh_installdocs -pfoo --link-doc=bar $doc");
+ok(-l "debian/foo/usr/share/doc/foo");
+ok(readlink("debian/foo/usr/share/doc/foo") eq 'bar');
+ok(!-e "debian/foo/usr/share/doc/bar/docfile");
 system("rm -rf debian/foo debian/bar debian/baz");
 
 system("$TOPDIR/dh_clean");

@@ -4,6 +4,11 @@ debhelper (10.6) UNRELEASED; urgency=medium
     "a lot" of info files.
   * Dh_Lib: Introduce a is_build_profile_active function, which
     can be used to check if a given Build-Profile was specified.
+  * dh_installdocs: Ignore given documentation files when the
+    "nodoc" build profile is specified in DEB_BUILD_PROFILES.
+    Note that dh_installdocs is not a complete noop in this case
+    as it still ensures the package has a copyright file (or a
+    symlinked doc directory).  (Closes: #865869)
 
  -- Niels Thykier <niels@thykier.net>  Tue, 27 Jun 2017 17:29:32 +0000
 

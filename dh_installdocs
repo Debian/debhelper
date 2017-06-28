@@ -181,6 +181,8 @@ init(options => {
 });
 
 my $called_getpackages = 0;
+my $nodocs = 0;
+$nodocs = 1 if is_build_profile_active('nodoc');
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if is_udeb($package);
@@ -220,12 +222,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	my @docs;
 
-	if ($file) {
-		@docs=filearray($file, ".");
-	}
+	if (not $nodocs) {
+		if ($file) {
+			@docs = filearray($file, ".");
+		}
 
-	if (($package eq $dh{FIRSTPACKAGE} || ($dh{PARAMS_ALL} && ! $link_doc)) && @ARGV) {
-		push @docs, @ARGV;
+		if (($package eq $dh{FIRSTPACKAGE} || ($dh{PARAMS_ALL} && !$link_doc)) && @ARGV) {
+			push @docs, @ARGV;
+		}
 	}
 
 	if (@docs) {
