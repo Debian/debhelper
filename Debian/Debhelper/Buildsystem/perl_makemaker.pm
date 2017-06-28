@@ -41,7 +41,7 @@ sub new {
 
 sub configure {
 	my $this=shift;
-	my @flags;
+	my (@flags, @perl_flags);
 	# If set to a true value then MakeMaker's prompt function will
 	# # always return the default without waiting for user input.
 	$ENV{PERL_MM_USE_DEFAULT}=1;
@@ -55,7 +55,9 @@ sub configure {
 		push @flags, "LD=$Config{ld} $ENV{CFLAGS} $ENV{LDFLAGS}";
 	}
 
-	$this->doit_in_sourcedir("perl", "-I.", "Makefile.PL", "INSTALLDIRS=vendor",
+	push(@perl_flags, '-I.') if compat(10);
+
+	$this->doit_in_sourcedir("perl", @perl_flags, "Makefile.PL", "INSTALLDIRS=vendor",
 		# if perl_build is not tested first, need to pass packlist
 		# option to handle fallthrough case
 		(compat(7) ? "create_packlist=0" : ()),

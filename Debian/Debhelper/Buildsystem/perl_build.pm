@@ -41,7 +41,7 @@ sub new {
 
 sub configure {
 	my $this=shift;
-	my @flags;
+	my (@flags, @perl_flags);
 	$ENV{PERL_MM_USE_DEFAULT}=1;
 	if ($ENV{CFLAGS} && ! compat(8)) {
 		push @flags, "--config", "optimize=$ENV{CFLAGS} $ENV{CPPFLAGS}";
@@ -49,7 +49,8 @@ sub configure {
 	if ($ENV{LDFLAGS} && ! compat(8)) {
 		push @flags, "--config", "ld=$Config{ld} $ENV{CFLAGS} $ENV{LDFLAGS}";
 	}
-	$this->do_perl("-I.", "Build.PL", "--installdirs", "vendor", @flags, @_);
+	push(@perl_flags, '-I.') if compat(10);
+	$this->do_perl(@perl_flags, "Build.PL", "--installdirs", "vendor", @flags, @_);
 }
 
 sub build {
