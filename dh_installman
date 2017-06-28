@@ -125,6 +125,10 @@ my (@sofiles, @sodests);
 my @all_packages = getpackages();
 my @search_dirs = ('.');
 my $error_handler = compat(10) ? \&glob_expand_error_handler_warn_and_discard : \&glob_expand_error_handler_reject;
+my $nodocs = is_build_profile_active('nodoc') ? 1 : 0;
+# We cannot assume documentation is built under nodoc, but if it is we must flag it as handled
+# or dh_missing might make noise.
+$error_handler = \&glob_expand_error_handler_silently_ignore if $nodocs;
 
 on_items_in_parallel(\@all_packages, sub {
 
@@ -143,7 +147,7 @@ on_items_in_parallel(\@all_packages, sub {
 
 		log_installed_files($package, @manpages);
 
-		next if not process_pkg($package);
+		next if not process_pkg($package) or $nodocs;
 
 		foreach my $page (@manpages) {
 			my $basename = basename($page);
