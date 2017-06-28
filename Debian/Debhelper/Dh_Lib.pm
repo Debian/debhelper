@@ -40,7 +40,7 @@ use vars qw(@EXPORT %dh);
             &nonquiet_print &print_and_doit &print_and_doit_noerror
             &warning &tmpdir &pkgfile &pkgext &pkgfilename &isnative
 	    &autoscript &filearray &filedoublearray &is_build_profile_active
-	    &getpackages &basename &dirname &xargs %dh
+	    &getpackages &basename &dirname &xargs %dh &process_pkg
 	    &compat &addsubstvar &delsubstvar &excludefile &package_arch
 	    &package_is_arch_all &package_binary_arch &package_declared_arch
 	    &is_udeb &debhelper_script_subst &escape_shell
@@ -1278,6 +1278,18 @@ sub is_udeb {
 		return 0;
 	}
 	return $package_types{$package} eq 'udeb';
+}
+
+{
+	my %packages_to_process;
+
+	sub process_pkg {
+		my ($package) = @_;
+		if (not %packages_to_process) {
+			%packages_to_process = map { $_ => 1 } @{$dh{DOPACKAGES}};
+		}
+		return $packages_to_process{$package} // 0;
+	}
 }
 
 # Handles #DEBHELPER# substitution in a script; also can generate a new

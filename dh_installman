@@ -130,7 +130,6 @@ on_items_in_parallel(\@all_packages, sub {
 
 		my $tmp = tmpdir($package);
 		my $file = pkgfile($package, "manpages");
-		my $skip_install = !grep { $_ eq $package } @{$dh{DOPACKAGES}};
 		my @manpages;
 
 		@manpages = filearray($file, ".") if $file;
@@ -141,7 +140,7 @@ on_items_in_parallel(\@all_packages, sub {
 
 		log_installed_files($package, @manpages);
 
-		next if $skip_install;
+		next if not process_pkg($package);
 
 		foreach my $page (@manpages) {
 			my $basename = basename($page);

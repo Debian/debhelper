@@ -160,7 +160,7 @@ foreach my $package (getpackages()) {
 	# Look at the install files for all packages to handle
 	# list-missing/fail-missing, but skip really installing for
 	# packages that are not being acted on.
-	my $skip_install=! grep { $_ eq $package } @{$dh{DOPACKAGES}};
+	my $skip_install = process_pkg($package) ? 0 : 1;
 
 	my $tmp=tmpdir($package);
 	my $file=pkgfile($package,"install");
