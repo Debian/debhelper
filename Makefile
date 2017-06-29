@@ -50,16 +50,20 @@ POD2MAN_FLAGS=--utf8 -c Debhelper -r "$(VERSION)"
 ifneq ($(USE_NLS),no)
 # l10n to be built is determined from .po files
 LANGS?=$(notdir $(basename $(wildcard man/po4a/po/*.po)))
+LANG_TARGETS = po4a-stamp translations
 else
 LANGS=
+LANG_TARGETS =
 endif
 
-build: version debhelper.7 debhelper-obsolete-compat.7 translations $(MANPAGES)
+build: $(LANG_TARGETS) version debhelper.7 debhelper-obsolete-compat.7 $(MANPAGES)
 
 
-translations:
+po4a-stamp:
+	po4a --previous -L UTF-8 man/po4a/po4a.cfg
+
+translations: po4a-stamp
 ifneq ($(USE_NLS),no)
-	po4a --previous -L UTF-8 man/po4a/po4a.cfg 
 	set -e; \
 	for lang in $(LANGS); do \
 		dir=man/$$lang; \
