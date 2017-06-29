@@ -19,10 +19,15 @@ B<dh_installdocs> [S<I<debhelper options>>] [B<-A>] [B<-X>I<item>] [S<I<file> ..
 B<dh_installdocs> is a debhelper program that is responsible for installing
 documentation into F<usr/share/doc/package> in package build directories.
 
-When upstream's own build system installs all the desired documentation
-correctly, then B<dh_install> may be a better tool for handling the upstream
-documentation.  In this case, B<dh_installdocs> is still useful for installing
+In compat 10 and earlier, L<dh_install(1)> may be a better tool for handling
+the upstream documentation, when upstream's own build system installs all the desired documentation
+correctly.  In this case, B<dh_installdocs> is still useful for installing
 packaging related documentation (e.g. the F<debian/copyright> file).
+
+In compat 11 and later, B<dh_installdocs> offers many of the features that
+L<dh_install(1)> also have.  Futhermore, B<dh_installdocs> also supports
+the B<nodoc> build profile to exclude documentation (regardless of compat
+level).
 
 =head1 FILES
 
@@ -178,12 +183,14 @@ sub ensure_docdir {
 
 init(options => {
 	"link-doc=s" => \$dh{LINK_DOC},
+	"sourcedir=s" => \$dh{SOURCEDIR},
 });
 
 my $called_getpackages = 0;
 my @search_dirs = ('.');
 my $error_handler = compat(10) ? \&glob_expand_error_handler_warn_and_discard : \&glob_expand_error_handler_reject;
 my $nodocs = is_build_profile_active('nodoc') ? 1 : 0;
+@search_dirs = ($dh{SOURCEDIR} // '.', 'debian/tmp') if not compat(10);
 
 foreach my $package (getpackages()) {
 	next if is_udeb($package);
