@@ -4,6 +4,7 @@ POD2MAN ?= pod2man
 
 # List of files of dh_* commands. Sorted for debhelper man page.
 COMMANDS=$(shell find . -maxdepth 1 -type f -perm /100 -name "dh_*" -printf "%f\n" | grep -v '~$$' | LC_ALL=C sort)
+MANPAGES=$(COMMANDS:=.1) dh.1
 
 # Find deprecated commands by looking at their synopsis.
 DEPRECATED=$(shell egrep -l '^dh_.* - .*deprecated' $(COMMANDS))
@@ -53,9 +54,10 @@ else
 LANGS=
 endif
 
-build: version debhelper.7 debhelper-obsolete-compat.7
-	find . -maxdepth 1 -type f -perm /100 -name "dh*" \
-		-exec $(POD2MAN) $(POD2MAN_FLAGS) {} {}.1 \;
+build: version debhelper.7 debhelper-obsolete-compat.7 translations $(MANPAGES)
+
+
+translations:
 ifneq ($(USE_NLS),no)
 	po4a --previous -L UTF-8 man/po4a/po4a.cfg 
 	set -e; \
@@ -79,6 +81,12 @@ endif
 version:
 	printf "package Debian::Debhelper::Dh_Version;\n\$$version='$(VERSION)';\n1" > \
 		Debian/Debhelper/Dh_Version.pm
+
+dh_%.1: dh_%
+	$(POD2MAN) $(POD2MAN_FLAGS) $^ $@
+
+dh.1: dh
+	$(POD2MAN) $(POD2MAN_FLAGS) $^ $@
 
 debhelper.7: debhelper.pod
 	cat debhelper.pod | \
