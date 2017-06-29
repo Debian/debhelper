@@ -18,18 +18,22 @@ B<dh_installman> [S<I<debhelper options>>] [S<I<manpage> ...>]
 =head1 DESCRIPTION
 
 B<dh_installman> is a debhelper program that handles installing man
-pages into the correct locations in package build directories for when
+pages into the correct locations in package build directories.
+
+In compat 10 and earlier, this program was primarily for when
 upstream's build system does not properly install them as a part of
-its install step (or it does not have an install step).
+its install step (or it does not have an install step).  In compat 11
+and later, it supports the same features of L<dh_install(1)> and
+has the advantage that it respects the B<nodoc> build profile (unlike
+L<dh_install(1)>).
 
-If upstream's installs the manpages in the proper directories,
-L<dh_install(1)> may be easier to use for deciding which package
-should ship the manpages.  In this case, B<dh_installman> can still be
-useful for converting the manpage encoding to UTF-8 and for converting
-F<.so> links (as described below).  However, that part happens
-automatically without any explicit configuration.
+Even if you prefer to use L<dh_install(1)> for installing the manpages,
+B<dh_installman> can still be useful for converting the manpage encoding
+to UTF-8 and for converting F<.so> links (as described below).  However,
+that part happens automatically without any explicit configuration.
 
-You tell it what man pages go in your packages, and it figures out
+
+You tell B<dh_installman> what man pages go in your packages, and it figures out
 where to install them based on the section field in their B<.TH> or
 B<.Dt> line. If you have a properly formatted B<.TH> or B<.Dt> line,
 your man page will be installed into the right directory, with the
@@ -84,6 +88,16 @@ acted on.
 Use this to specify that the man pages being acted on are written in the
 specified language.
 
+=item B<--sourcedir=>I<dir>
+
+Look in the specified directory for files to be installed.  This option
+requires compat 11 or later (it is silently ignored in compat 10 or earlier).
+
+Note that this is not the same as the B<--sourcedirectory> option used
+by the B<dh_auto_>I<*> commands. You rarely need to use this option, since
+B<dh_installman> automatically looks for files in F<debian/tmp> in debhelper
+compatibility level 11 and above.
+
 =item I<manpage> ...
 
 Install these man pages into the first package acted on. (Or in all
@@ -116,6 +130,7 @@ interface. Use this program instead.
 
 init(options => {
 	"language=s" => \$dh{LANGUAGE},
+	"sourcedir=s" => \$dh{SOURCEDIR},
 });
 
 
@@ -129,6 +144,8 @@ my $nodocs = is_build_profile_active('nodoc') ? 1 : 0;
 # We cannot assume documentation is built under nodoc, but if it is we must flag it as handled
 # or dh_missing might make noise.
 $error_handler = \&glob_expand_error_handler_silently_ignore if $nodocs;
+
+@search_dirs = ($dh{SOURCEDIR} // '.', 'debian/tmp') if not compat(10);
 
 on_items_in_parallel(\@all_packages, sub {
 
