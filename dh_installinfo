@@ -38,6 +38,16 @@ List info files to be installed.
 Install all files specified by command line parameters in ALL packages
 acted on.
 
+=item B<--sourcedir=>I<dir>
+
+Look in the specified directory for files to be installed.  This option
+requires compat 11 or later (it is silently ignored in compat 10 or earlier).
+
+Note that this is not the same as the B<--sourcedirectory> option used
+by the B<dh_auto_>I<*> commands. You rarely need to use this option, since
+B<dh_installinfo> automatically looks for files in F<debian/tmp> in debhelper
+compatibility level 11 and above.
+
 =item I<file> ...
 
 Install these info files into the first package acted on. (Or in
@@ -51,11 +61,14 @@ init();
 
 # PROMISE: DH NOOP WITHOUT info
 
+my @search_dirs = ('.');
 my $error_handler = compat(10) ? \&glob_expand_error_handler_warn_and_discard : \&glob_expand_error_handler_reject;
 my $nodocs = is_build_profile_active('nodoc') ? 1 : 0;
 # We cannot assume documentation is built under nodoc, but if it is we must flag it as handled
 # or dh_missing might make noise.
 $error_handler = \&glob_expand_error_handler_silently_ignore if $nodocs;
+
+@search_dirs = ($dh{SOURCEDIR} // '.', 'debian/tmp') if not compat(10);
 
 foreach my $package (getpackages()) {
 	my $tmp=tmpdir($package);
@@ -64,7 +77,7 @@ foreach my $package (getpackages()) {
 	my @info;
 	
 	if ($file) {
-		@info = filearray($file, ['.'], $error_handler) if $file;
+		@info = filearray($file, \@search_dirs, $error_handler) if $file;
 	}
 
 	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
