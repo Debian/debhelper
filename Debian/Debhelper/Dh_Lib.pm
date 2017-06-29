@@ -967,7 +967,9 @@ sub glob_expand {
 	for my $pattern (@patterns) {
 		my @m;
 		for my $dir (@dirs) {
-			@m = bsd_glob("$dir/$pattern", GLOB_CSH & ~(GLOB_NOMAGIC|GLOB_TILDE));
+			# Special-case "." because it looks nicer that way.
+			my $full_pattern = ($dir eq '.' ? $pattern : "$dir/$pattern");
+			@m = bsd_glob($full_pattern, GLOB_CSH & ~(GLOB_NOMAGIC|GLOB_TILDE));
 			last if @m;# > 1 or (@m and (-l $m[0] or -e _));
 		}
 		if (not @m) {
