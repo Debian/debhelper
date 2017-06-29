@@ -22,7 +22,7 @@ if (not defined($rootcmd)) {
 	plan skip_all => 'fakeroot required';
 }
 else {
-	plan(tests => 22);
+	plan(tests => 18);
 }
 
 # Drop DEB_BUILD_PROFILES and DEB_BUILD_OPTIONS so they don't interfere
@@ -37,11 +37,6 @@ system("$rootcmd $TOPDIR/dh_installdocs -pbar $doc");
 ok(-e "debian/bar/usr/share/doc/bar/docfile");
 system("rm -rf debian/foo debian/bar debian/baz");
 
-#regression in debhelper 9.20160709 (#830309)
-system("DH_COMPAT=11 $rootcmd $TOPDIR/dh_installdocs -pbar $doc");
-ok(-e "debian/bar/usr/share/doc/foo/docfile");
-system("rm -rf debian/foo debian/bar debian/baz");
-
 #regression in debhelper 9.20160702 (#830309)
 system("$rootcmd $TOPDIR/dh_installdocs -pbaz --link-doc=foo $doc");
 ok(-l "debian/baz/usr/share/doc/baz");
@@ -52,12 +47,6 @@ system("rm -rf debian/foo debian/bar debian/baz");
 system("DH_COMPAT=11 $rootcmd $TOPDIR/dh_installdocs -pbaz --link-doc=foo $doc");
 ok(-l "debian/baz/usr/share/doc/baz");
 ok(readlink("debian/baz/usr/share/doc/baz") eq 'foo');
-ok(-e "debian/baz/usr/share/doc/foo/docfile");
-system("rm -rf debian/foo debian/bar debian/baz");
-
-system("DH_COMPAT=11 $rootcmd $TOPDIR/dh_installdocs -pbaz --link-doc=bar $doc");
-ok(-l "debian/baz/usr/share/doc/baz");
-ok(readlink("debian/baz/usr/share/doc/baz") eq 'bar');
 ok(-e "debian/baz/usr/share/doc/foo/docfile");
 system("rm -rf debian/foo debian/bar debian/baz");
 
