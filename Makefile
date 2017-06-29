@@ -50,7 +50,7 @@ POD2MAN_FLAGS=--utf8 -c Debhelper -r "$(VERSION)"
 ifneq ($(USE_NLS),no)
 # l10n to be built is determined from .po files
 LANGS?=$(notdir $(basename $(wildcard man/po4a/po/*.po)))
-LANG_TARGETS = po4a-stamp translations
+LANG_TARGETS = $(foreach L,$(LANGS),translated-$(L)-stamp)
 else
 LANGS=
 LANG_TARGETS =
@@ -61,26 +61,25 @@ build: $(LANG_TARGETS) version debhelper.7 debhelper-obsolete-compat.7 $(MANPAGE
 
 po4a-stamp:
 	po4a --previous -L UTF-8 man/po4a/po4a.cfg
+	touch $@
 
-translations: po4a-stamp
-ifneq ($(USE_NLS),no)
+translated-%-stamp: po4a-stamp
 	set -e; \
-	for lang in $(LANGS); do \
-		dir=man/$$lang; \
-		for file in $$dir/dh*.pod; do \
-			prog=`basename $$file | sed 's/.pod//'`; \
-			$(POD2MAN) $(POD2MAN_FLAGS) $$file $$prog.$$lang.1; \
-		done; \
-		if [ -e $$dir/debhelper.pod ]; then \
-			cat $$dir/debhelper.pod | \
-				$(MAKEMANLIST) `find $$dir -type f -maxdepth 1 -name "dh_*.pod" | LC_ALL=C sort` | \
-				$(POD2MAN) $(POD2MAN_FLAGS) --name="debhelper" --section=7 > debhelper.$$lang.7; \
-		fi; \
-		if [ -e $$dir/debhelper-obsolete-compat.pod ]; then \
-			$(POD2MAN) $(POD2MAN_FLAGS) --name="debhelper" --section=7 $$dir/debhelper-obsolete-compat.pod > debhelper-obsolete-compat.$$lang.7; \
-		fi; \
-	done
-endif
+	lang=$* ; \
+	dir=man/$$lang; \
+	for file in $$dir/dh*.pod; do \
+		prog=`basename $$file | sed 's/.pod//'`; \
+		$(POD2MAN) $(POD2MAN_FLAGS) $$file $$prog.$$lang.1; \
+	done; \
+	if [ -e $$dir/debhelper.pod ]; then \
+		cat $$dir/debhelper.pod | \
+			$(MAKEMANLIST) `find $$dir -type f -maxdepth 1 -name "dh_*.pod" | LC_ALL=C sort` | \
+			$(POD2MAN) $(POD2MAN_FLAGS) --name="debhelper" --section=7 > debhelper.$$lang.7; \
+	fi; \
+	if [ -e $$dir/debhelper-obsolete-compat.pod ]; then \
+		$(POD2MAN) $(POD2MAN_FLAGS) --name="debhelper" --section=7 $$dir/debhelper-obsolete-compat.pod > debhelper-obsolete-compat.$$lang.7; \
+	fi
+	touch $@
 
 version:
 	printf "package Debian::Debhelper::Dh_Version;\n\$$version='$(VERSION)';\n1" > \
@@ -101,7 +100,7 @@ debhelper-obsolete-compat.7: debhelper-obsolete-compat.pod
 	$(POD2MAN) $(POD2MAN_FLAGS) --name="debhelper" --section=7 $^ > $@
 
 clean:
-	rm -f *.1 *.7 Debian/Debhelper/Dh_Version.pm
+	rm -f *-stamp *.1 *.7 Debian/Debhelper/Dh_Version.pm
 ifneq ($(USE_NLS),no)
 	$(PO4A) --previous --rm-translations --rm-backups man/po4a/po4a.cfg
 endif
