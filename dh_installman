@@ -210,12 +210,16 @@ on_items_in_parallel(\@all_packages, sub {
 			my $destdir = "$tmp/usr/share/man/man$realsection/";
 			my $langcode;
 			if (!defined $dh{LANGUAGE} || !exists $dh{LANGUAGE}) {
-				# Translated man pages are typically specified by adding the
-				# language code to the filename, so detect that and
-				# redirect to appropriate directory, stripping the code.
-				($langcode) = $basename =~ m/\.([a-z][a-z](?:_[A-Z][A-Z])?)\.(?:[1-9]|man)/;
-			} elsif (not compat(10) and $page =~ m{/man/(?:([a-z][a-z](?:_[A-Z][A-Z])?)(?:\.[^/]+)?)?/man[1-9]/}) {
-				$langcode = $1;
+				if (not compat(10) and $page =~ m{/man/(?:([a-z][a-z](?:_[A-Z][A-Z])?)(?:\.[^/]+)?)?/man[1-9]/}) {
+					# If it looks like it was installed in a proper man dir, assume the language
+					# from that is correct.
+					$langcode = $1;
+				} else {
+					# Translated man pages are typically specified by adding the
+					# language code to the filename, so detect that and
+					# redirect to appropriate directory, stripping the code.
+					($langcode) = $basename =~ m/\.([a-z][a-z](?:_[A-Z][A-Z])?)\.(?:[1-9]|man)/;
+				}
 			} elsif ($dh{LANGUAGE} ne 'C') {
 				$langcode = $dh{LANGUAGE};
 			}
