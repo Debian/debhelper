@@ -66,6 +66,10 @@ init();
 my $pwd;
 my @search_dirs = ('.');
 my $error_handler = compat(10) ? \&glob_expand_error_handler_warn_and_discard : \&glob_expand_error_handler_reject;
+my $nodocs = is_build_profile_active('nodoc') ? 1 : 0;
+# We cannot assume documentation is built under nodoc, but if it is we must flag it as handled
+# or dh_missing might make noise.
+$error_handler = \&glob_expand_error_handler_silently_ignore if $nodocs;
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if is_udeb($package);
@@ -82,7 +86,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
 		push @examples, @ARGV;
 	}
-	
+
+	next if $nodocs;
+
 	if (@examples) {
 		install_dir("$tmp/usr/share/doc/$package/examples");
 
