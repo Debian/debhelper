@@ -11,6 +11,27 @@ debhelper (10.6) UNRELEASED; urgency=medium
     symlinked doc directory).  (Closes: #865869)
   * dh_installman: Fix regression in compat 5 that could make it
     ignore one manpage per invocation.
+  * dh_installdocs: Warn if a pattern in the config file matches
+    nothing.  In compat 11, this becomes a hard error.
+  * dh_installexamples: Ditto.
+  * dh_installinfo: Ditto.
+  * dh_installman: Ditto.
+  * dh_installexamples: Support missing documentation under the nodoc
+    profile.
+  * dh_installinfo: Ditto.
+  * dh_installman: Ditto.
+  * dh_installwm: Ditto.  (Closes: #865707)
+  * dh_installdocs: Log installed files so dh_missing can see them.
+  * dh_installexamples: Ditto.  (Closes: #863456)
+  * dh_installinfo: Ditto.
+  * dh_installdocs: In compat 11, automatically fall back to debian/tmp
+    if the files are not found in ".".  Furthermore, accept the option
+    --sourcedir with the same meaning as dh_install.
+  * dh_installexamples: Ditto.
+  * dh_installinfo: Ditto.
+  * dh_installman: Ditto.
+  * dh_installman: Fix bug in how it handled language auto-detection in
+    compat 11.  Previously, it did not work as intended.
 
  -- Niels Thykier <niels@thykier.net>  Tue, 27 Jun 2017 17:29:32 +0000
 
