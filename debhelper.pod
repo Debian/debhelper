@@ -695,6 +695,13 @@ to drop support for the B<PERL_USE_UNSAFE_INC> environment variable.
 When perl drops support for it, then this variable will be removed
 retroactively from existing compat levels as well.
 
+=item -
+
+B<dh_install> now attempts to optimize installations by bulking files
+together.  Generally, this should just silently make things faster.
+However, it can cause issues if multiple patterns expand to the same
+target file.
+
 =back
 
 =back

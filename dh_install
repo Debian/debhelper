@@ -232,10 +232,12 @@ foreach my $package (getpackages()) {
 				$dest = $common_dest if ($same and $common_dest);
 			}
 			if ($dest and @filelist > 1) {
-				# Make sure the destination directory exists.
-				install_dir("$tmp/$dest");
-				xargs(\@filelist, "cp", '--reflink=auto', "-a", XARGS_INSERT_PARAMS_HERE, "$tmp/$dest/");
-				next;
+				if (not compat(10)) {
+					# Make sure the destination directory exists.
+					install_dir("$tmp/$dest");
+					xargs(\@filelist, "cp", '--reflink=auto', "-a", XARGS_INSERT_PARAMS_HERE, "$tmp/$dest/");
+					next;
+				}
 			}
 		}
 
