@@ -25,8 +25,32 @@ use Debian::Debhelper::Dh_Lib;
 
 our @EXPORT = qw(
     each_compat_up_to_and_incl_subtest each_compat_subtest
-    each_compat_from_and_above_subtest
+    each_compat_from_and_above_subtest run_dh_tool
 );
+
+our $TEST_DH_COMPAT;
+
+sub run_dh_tool {
+    my (@cmd) = @_;
+    my $compat = $TEST_DH_COMPAT;
+    my $options = ref($cmd[0]) ? shift(@cmd) : {};
+    my $pid = fork() // BAIL_OUT("fork failed: $!");
+    if (not $pid) {
+        $ENV{DH_COMPAT} = $compat;
+        $ENV{DH_INTERNAL_TESTSUITE_SILENT_WARNINGS} = 1;
+        if ($options->{quiet}) {
+            open(STDOUT, '>', '/dev/null') or error("Reopen stdout: $!");
+            open(STDERR, '>', '/dev/null') or error("Reopen stderr: $!");
+        } else {
+            # If run under prove/TAP, we don't want to confuse the test runner.
+            open(STDOUT, '>&', *STDERR) or error("Redirect stdout to stderr: $!");
+        }
+        exec(@cmd);
+    }
+    waitpid($pid, 0) == $pid or BAIL_OUT("waitpid($pid) failed: $!");
+    return 1 if not $?;
+    return 0;
+}
 
 sub each_compat_up_to_and_incl_subtest($&) {
     my ($compat, $code) = @_;
@@ -35,6 +59,7 @@ sub each_compat_up_to_and_incl_subtest($&) {
         if $compat < $low;
     subtest '' => sub {
         while ($low <= $compat) {
+            local $TEST_DH_COMPAT = $compat;
             $code->($low);
             ++$low;
         }
@@ -54,6 +79,7 @@ sub each_compat_from_and_above_subtest($&) {
         if $compat > $end;
     subtest '' => sub {
         while ($compat <= $end) {
+            local $TEST_DH_COMPAT = $compat;
             $code->($compat);
             ++$compat;
         }

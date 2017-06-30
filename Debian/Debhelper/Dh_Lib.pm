@@ -544,7 +544,7 @@ sub dirname {
 # Pass in a number, will return true iff the current compatibility level
 # is less than or equal to that number.
 {
-	my $warned_compat=0;
+	my $warned_compat = $ENV{DH_INTERNAL_TESTSUITE_SILENT_WARNINGS} ? 1 : 0;
 	my $c;
 
 	sub compat {
