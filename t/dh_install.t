@@ -7,7 +7,7 @@ use File::Basename qw(dirname);
 use lib dirname(__FILE__);
 use Test::DH;
 
-plan(tests => 12);
+plan(tests => 13);
 
 system("rm -rf debian/debhelper debian/tmp");
 
@@ -128,6 +128,16 @@ each_compat_subtest {
     system("DH_COMPAT=${compat} dh_install bar/usr/bin/foo 2>/dev/null");
     ok(-e "debian/debhelper/bar/usr/bin/foo");
     system("rm -rf debian/debhelper bar");
+};
+
+each_compat_subtest {
+    my ($compat) = @_;
+    # #866570 - leading slashes must *not* pull things from the root FS.
+    system("mkdir -p bin; touch bin/grep-i-licious");
+    system("DH_COMPAT=${compat} dh_install '/bin/grep*' 2>/dev/null");
+    ok(-e "debian/debhelper/bin/grep-i-licious", "#866570 [${compat}]");
+    ok(!-e "debian/debhelper/bin/grep", "#866570 [${compat}]");
+    system("rm -rf debian/debhelper bin");
 };
 
 # Local Variables:
