@@ -5,14 +5,19 @@ use warnings;
 
 use Test::More;
 
+use Cwd qw(cwd realpath);
+use Errno qw(EEXIST);
 use Exporter qw(import);
 
+use File::Temp qw(tempdir);
+use File::Path qw(remove_tree make_path);
 use File::Basename qw(dirname);
 
 my $ROOT_DIR;
 
 BEGIN {
-    $ROOT_DIR = dirname(dirname(dirname(__FILE__)));
+    my $res = realpath(__FILE__) or error('Cannot resolve ' . __FILE__ . ": $!");
+    $ROOT_DIR = dirname(dirname(dirname($res)));
 };
 
 use lib "$ROOT_DIR/lib";
@@ -29,6 +34,8 @@ our @EXPORT = qw(
 );
 
 our $TEST_DH_COMPAT;
+
+my $START_DIR = cwd();
 
 sub run_dh_tool {
     my (@cmd) = @_;
@@ -52,17 +59,40 @@ sub run_dh_tool {
     return 0;
 }
 
+sub _prepare_test_root {
+    my $dir = tempdir(CLEANUP => 1);
+    if (not mkdir("$dir/debian", 0777)) {
+        error("mkdir $dir/debian failed: $!")
+            if $! != EEXIST;
+    } else {
+        # auto seed it
+        my @files = qw(
+            debian/control
+            debian/compat
+            debian/changelog
+        );
+        for my $file (@files) {
+            install_file($file, "${dir}/${file}");
+        }
+    }
+    return $dir;
+}
+
 sub each_compat_up_to_and_incl_subtest($&) {
     my ($compat, $code) = @_;
     my $low = Debian::Debhelper::Dh_Lib::MIN_COMPAT_LEVEL;
     error("compat $compat is no longer support! Min compat $low")
         if $compat < $low;
     subtest '' => sub {
+        # Keep $dir alive until the test is over
+        my $dir = _prepare_test_root;
+        chdir($dir) or error("chdir($dir): $!");
         while ($low <= $compat) {
             local $TEST_DH_COMPAT = $compat;
             $code->($low);
             ++$low;
         }
+        chdir($START_DIR) or error("chdir($START_DIR): $!");
     };
     return;
 }
@@ -78,11 +108,15 @@ sub each_compat_from_and_above_subtest($&) {
     error("$compat is from the future! Max known is $end")
         if $compat > $end;
     subtest '' => sub {
+        # Keep $dir alive until the test is over
+        my $dir = _prepare_test_root;
+        chdir($dir) or error("chdir($dir): $!");
         while ($compat <= $end) {
             local $TEST_DH_COMPAT = $compat;
             $code->($compat);
             ++$compat;
         }
+        chdir($START_DIR) or error("chdir($START_DIR): $!");
     };
     return;
 }

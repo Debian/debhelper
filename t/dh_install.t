@@ -108,6 +108,7 @@ each_compat_from_and_above_subtest(7, sub {
 each_compat_subtest {
     my ($compat) = @_;
     # regular specification of file not in debian/tmp
+    system('touch dh_install');
     ok(run_dh_tool('dh_install', 'dh_install', 'usr/bin'));
     ok(-e "debian/debhelper/usr/bin/dh_install");
     system("rm -rf debian/debhelper debian/tmp");
