@@ -212,7 +212,7 @@ on_pkgs_in_parallel {
 				my ($directory) = $link =~ m:(.*)/:;
 				my $linkval = readlink($link);
 				if (! -e "$directory/$linkval" && -e "$directory/$linkval.gz") {
-					rm_files($link);
+					rm_files($link, "$link.gz");
 					make_symlink_raw_target("$linkval.gz","$link.gz");
 					delete $links{$link};
 					$changed++;
