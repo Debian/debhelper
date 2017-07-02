@@ -42,6 +42,7 @@ our @EXPORT = qw(
 our ($TEST_DH_COMPAT, $ROOT_OK, $ROOT_CMD);
 
 my $START_DIR = cwd();
+my $TEST_DIR;
 
 sub run_dh_tool {
     my (@cmd) = @_;
@@ -103,6 +104,14 @@ sub _prepare_test_root {
         );
         for my $file (@files) {
             install_file($file, "${dir}/${file}");
+        }
+        if (@::TEST_DH_EXTRA_TEMPLATE_FILES) {
+            my $test_dir = ($TEST_DIR //= dirname($0));
+            for my $file (@::TEST_DH_EXTRA_TEMPLATE_FILES) {
+                my $install_dir = dirname($file);
+                install_dir($install_dir);
+                install_file("${test_dir}/${file}", "${dir}/${file}");
+            }
         }
     }
     return $dir;
