@@ -1,25 +1,42 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-use Test;
-plan(tests => 8);
+use Test::More;
 
-system("mkdir -p t/tmp/debian");
-system("cp debian/control t/tmp/debian");
-open(OUT, ">", "t/tmp/debian/maintscript") || die "$!";
-print OUT <<EOF;
+use File::Path qw(remove_tree);
+use File::Basename qw(dirname);
+use lib dirname(__FILE__);
+use Test::DH;
+use Debian::Debhelper::Dh_Lib;
+
+if (uid_0_test_is_ok()) {
+	plan(tests => 1);
+} else {
+	plan skip_all => 'fakeroot required';
+}
+
+each_compat_up_to_and_incl_subtest(10, sub {
+	my @scripts = qw{postinst preinst prerm postrm};
+	my $file = 'debian/maintscript';
+
+	remove_tree('debian/debhelper', 'debian/tmp');
+	rm_files(@scripts, $file);
+
+	open(my $fd, ">", $file) || die("open($file): $!");
+	print {$fd} <<EOF;
 rm_conffile /etc/1
 mv_conffile /etc/2 /etc/3 1.0-1
 EOF
-close OUT;
-system("echo 10 >> t/tmp/debian/compat");
-system("cd t/tmp && fakeroot ../../dh_installdeb");
-for my $script (qw{postinst preinst prerm postrm}) {
-	my @output=`cat t/tmp/debian/debhelper.$script.debhelper`;
-	ok(grep { m{^dpkg-maintscript-helper rm_conffile /etc/1 -- "\$\@"$} } @output);
-	ok(grep { m{^dpkg-maintscript-helper mv_conffile /etc/2 /etc/3 1\.0-1 -- "\$\@"$} } @output);
-}
-system("rm -rf t/tmp");
+	close($fd) or die("close($file): $!\n");
+
+	run_dh_tool( { 'needs_root' => 1 }, 'dh_installdeb');
+
+	for my $script (@scripts) {
+		my @output=`cat debian/debhelper.$script.debhelper`;
+		ok(grep { m{^dpkg-maintscript-helper rm_conffile /etc/1 -- "\$\@"$} } @output);
+		ok(grep { m{^dpkg-maintscript-helper mv_conffile /etc/2 /etc/3 1\.0-1 -- "\$\@"$} } @output);
+	}
+});
 
 # Local Variables:
 # indent-tabs-mode: t
