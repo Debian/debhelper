@@ -27,6 +27,10 @@ $ENV{PERL5LIB} = join(':', "${ROOT_DIR}/lib", (grep { defined } $ENV{PERL5LIB}))
     if not $ENV{PERL5LIB} or $ENV{PERL5LIB} !~ m{\Q$ROOT_DIR\E(?:/lib)?/?:};
 $ENV{DH_AUTOSCRIPTDIR} = "$ROOT_DIR/autoscripts";
 
+# Drop DEB_BUILD_PROFILES and DEB_BUILD_OPTIONS so they don't interfere
+delete($ENV{DEB_BUILD_PROFILES});
+delete($ENV{DEB_BUILD_OPTIONS});
+
 use Debian::Debhelper::Dh_Lib;
 
 our @EXPORT = qw(
