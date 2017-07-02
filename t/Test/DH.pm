@@ -13,7 +13,7 @@ use File::Temp qw(tempdir);
 use File::Path qw(remove_tree make_path);
 use File::Basename qw(dirname);
 
-my $ROOT_DIR;
+our $ROOT_DIR;
 
 BEGIN {
     my $res = realpath(__FILE__) or error('Cannot resolve ' . __FILE__ . ": $!");
