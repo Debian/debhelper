@@ -1,54 +1,48 @@
 #!/usr/bin/perl
 use strict;
 use Test::More;
-use File::Basename ();
 
-# Let the tests be run from anywhere, but current directory
-# is expected to be the one where this test lives in.
-chdir File::Basename::dirname($0) or die "Unable to chdir to ".File::Basename::dirname($0);
+use File::Basename qw(dirname);
+use lib dirname(dirname(__FILE__));
+use Test::DH;
+use File::Path qw(remove_tree make_path);
+use Debian::Debhelper::Dh_Lib;
 
-my $TOPDIR = "../..";
-my $rootcmd;
+our @TEST_DH_EXTRA_TEMPLATE_FILES = (qw(
+    debian/changelog
+    debian/control
+    debian/foo.service
+));
 
-if ($< == 0) {
-	$rootcmd = '';
-}
-else {
-	system("fakeroot true 2>/dev/null");
-	$rootcmd = $? ? undef : 'fakeroot';
-}
-
-if (not defined($rootcmd)) {
+if (uid_0_test_is_ok()) {
+	plan(tests => 2);
+} else {
 	plan skip_all => 'fakeroot required';
 }
-else {
-	plan(tests => 5);
-}
 
-system("$TOPDIR/dh_clean");
+each_compat_up_to_and_incl_subtest(10, sub {
+	make_path(qw(debian/foo debian/bar debian/baz));
+	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installinit'));
+	ok(-e "debian/foo/lib/systemd/system/foo.service");
+	ok(-e "debian/foo.postinst.debhelper");
+	ok(run_dh_tool('dh_clean'));
 
-my $service = "debian/foo.service";
+});
 
-system("mkdir -p debian/foo debian/bar debian/baz");
-system("$rootcmd $TOPDIR/dh_installinit");
-ok(-e "debian/foo/lib/systemd/system/foo.service");
-ok(-e "debian/foo.postinst.debhelper");
-system("$TOPDIR/dh_clean");
+each_compat_from_and_above_subtest(11, sub {
+	make_path(qw(debian/foo debian/bar debian/baz));
 
-system("mkdir -p debian/foo debian/bar debian/baz");
-system("DH_COMPAT=11 $rootcmd $TOPDIR/dh_installinit");
-ok(! -e "debian/foo/lib/systemd/system/foo.service");
-ok(! -e "debian/foo.postinst.debhelper");
-system("$TOPDIR/dh_clean");
+	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installinit'));
+	ok(! -e "debian/foo/lib/systemd/system/foo.service");
+	ok(! -e "debian/foo.postinst.debhelper");
+	ok(run_dh_tool('dh_clean'));
 
-system("mkdir -p debian/foo debian/bar debian/baz");
-system("mkdir -p debian/foo/lib/systemd/system/");
-system("cp debian/foo.service debian/foo/lib/systemd/system/");
-system("DH_COMPAT=11 $rootcmd $TOPDIR/dh_installinit");
-ok(! -e "debian/foo.postinst.debhelper");
-system("$TOPDIR/dh_clean");
-
-system("$TOPDIR/dh_clean");
+	make_path(qw(debian/foo/lib/systemd/system/ debian/bar debian/baz));
+	install_file('debian/foo.service', 'debian/foo/lib/systemd/system/foo.service');
+	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installinit'));
+	ok(! -e "debian/foo.postinst.debhelper");
+	ok(run_dh_tool('dh_clean'));
+});
 
 # Local Variables:
 # indent-tabs-mode: t
