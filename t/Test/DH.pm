@@ -32,9 +32,10 @@ use Debian::Debhelper::Dh_Lib;
 our @EXPORT = qw(
     each_compat_up_to_and_incl_subtest each_compat_subtest
     each_compat_from_and_above_subtest run_dh_tool
+    uid_0_test_is_ok
 );
 
-our $TEST_DH_COMPAT;
+our ($TEST_DH_COMPAT, $ROOT_OK, $ROOT_CMD);
 
 my $START_DIR = cwd();
 
@@ -42,7 +43,15 @@ sub run_dh_tool {
     my (@cmd) = @_;
     my $compat = $TEST_DH_COMPAT;
     my $options = ref($cmd[0]) ? shift(@cmd) : {};
-    my $pid = fork() // BAIL_OUT("fork failed: $!");
+    my $pid;
+
+    if ($options->{'needs_root'}) {
+        BAIL_OUT('BROKEN TEST - Attempt to run "needs_root" test when not possible')
+            if not uid_0_test_is_ok();
+        unshift(@cmd, $ROOT_CMD) if defined($ROOT_CMD);
+    }
+
+    $pid = fork() // BAIL_OUT("fork failed: $!");
     if (not $pid) {
         $ENV{DH_COMPAT} = $compat;
         $ENV{DH_INTERNAL_TESTSUITE_SILENT_WARNINGS} = 1;
@@ -58,6 +67,22 @@ sub run_dh_tool {
     waitpid($pid, 0) == $pid or BAIL_OUT("waitpid($pid) failed: $!");
     return 1 if not $?;
     return 0;
+}
+
+sub uid_0_test_is_ok {
+    return $ROOT_OK if defined($ROOT_OK);
+    my $ok = 0;
+    if ($< == 0) {
+        $ok = 1;
+    } else {
+        system('fakeroot true 2>/dev/null');
+        if ($? == 0) {
+            $ROOT_CMD = 'fakeroot';
+            $ok = 1;
+        }
+    }
+    $ROOT_OK = $ok;
+    return $ok;
 }
 
 sub _prepare_test_root {
