@@ -116,12 +116,14 @@ sub _prepare_test_root {
         }
         if (@::TEST_DH_EXTRA_TEMPLATE_FILES) {
             my $test_dir = ($TEST_DIR //= dirname($0));
+            my $fixture_dir = $::TEST_DH_FIXTURE_DIR // '.';
+            my $actual_dir = "$test_dir/$fixture_dir";
             for my $file (@::TEST_DH_EXTRA_TEMPLATE_FILES) {
                 if (index($file, '/') > -1) {
                     my $install_dir = dirname($file);
                     install_dir($install_dir);
                 }
-                install_file("${test_dir}/${file}", "${dir}/${file}");
+                install_file("${actual_dir}/${file}", "${dir}/${file}");
             }
         }
     }
