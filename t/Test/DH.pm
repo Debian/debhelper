@@ -36,7 +36,7 @@ use Debian::Debhelper::Dh_Lib;
 our @EXPORT = qw(
     each_compat_up_to_and_incl_subtest each_compat_subtest
     each_compat_from_and_above_subtest run_dh_tool
-    uid_0_test_is_ok
+    uid_0_test_is_ok create_empty_file
 );
 
 our ($TEST_DH_COMPAT, $ROOT_OK, $ROOT_CMD);
@@ -174,6 +174,17 @@ sub each_compat_from_and_above_subtest($&) {
 sub each_compat_subtest(&) {
     unshift(@_, Debian::Debhelper::Dh_Lib::MIN_COMPAT_LEVEL);
     goto \&each_compat_from_and_above_subtest;
+}
+
+sub create_empty_file {
+    my ($file, $chmod) = @_;
+    open(my $fd, '>', $file) or die("open($file): $!\n");
+    close($fd) or die("close($file): $!\n");
+    if (defined($chmod)) {
+        chmod($chmod, $file)
+            or die(sprintf('chmod(%04o, %s): %s', $chmod, $file, $!));
+    }
+    return 1;
 }
 
 1;
