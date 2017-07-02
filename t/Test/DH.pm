@@ -60,6 +60,15 @@ sub run_dh_tool {
     if (not $pid) {
         $ENV{DH_COMPAT} = $compat;
         $ENV{DH_INTERNAL_TESTSUITE_SILENT_WARNINGS} = 1;
+        if (defined(my $env = $options->{env})) {
+            for my $k (sort(keys(%{$env}))) {
+                if (defined($env->{$k})) {
+                    $ENV{$k} = $env->{$k};
+                } else {
+                    delete($ENV{$k});
+                }
+            }
+        }
         if ($options->{quiet}) {
             open(STDOUT, '>', '/dev/null') or error("Reopen stdout: $!");
             open(STDERR, '>', '/dev/null') or error("Reopen stderr: $!");
