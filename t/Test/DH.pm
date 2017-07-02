@@ -36,7 +36,7 @@ use Debian::Debhelper::Dh_Lib;
 our @EXPORT = qw(
     each_compat_up_to_and_incl_subtest each_compat_subtest
     each_compat_from_and_above_subtest run_dh_tool
-    uid_0_test_is_ok create_empty_file
+    uid_0_test_is_ok create_empty_file readlines
 );
 
 our ($TEST_DH_COMPAT, $ROOT_OK, $ROOT_CMD);
@@ -187,6 +187,14 @@ sub create_empty_file {
             or die(sprintf('chmod(%04o, %s): %s', $chmod, $file, $!));
     }
     return 1;
+}
+
+sub readlines {
+    my ($h) = @_;
+    my @lines = <$h>;
+    close $h;
+    chop @lines;
+    return \@lines;
 }
 
 1;
