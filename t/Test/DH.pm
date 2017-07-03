@@ -31,7 +31,7 @@ $ENV{DH_AUTOSCRIPTDIR} = "$ROOT_DIR/autoscripts";
 delete($ENV{DEB_BUILD_PROFILES});
 delete($ENV{DEB_BUILD_OPTIONS});
 
-use Debian::Debhelper::Dh_Lib;
+use Debian::Debhelper::Dh_Lib qw(!dirname);
 
 our @EXPORT = qw(
     each_compat_up_to_and_incl_subtest each_compat_subtest

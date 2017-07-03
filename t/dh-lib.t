@@ -8,7 +8,7 @@ use File::Basename qw(dirname);
 use lib dirname(__FILE__);
 use Test::DH;
 
-use Debian::Debhelper::Dh_Lib;
+use Debian::Debhelper::Dh_Lib qw(!dirname);
 
 plan(tests => 1);
 

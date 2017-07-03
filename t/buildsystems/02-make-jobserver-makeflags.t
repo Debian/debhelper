@@ -7,7 +7,7 @@ use Test::More tests => 9;
 use File::Basename qw(dirname);
 use lib dirname(dirname(__FILE__));
 use Test::DH;
-use Debian::Debhelper::Dh_Lib;
+use Debian::Debhelper::Dh_Lib qw(!dirname);
 
 # Test clean_jobserver_makeflags.
 

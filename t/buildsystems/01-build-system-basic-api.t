@@ -7,7 +7,7 @@ use Test::More tests => 12;
 use File::Basename qw(dirname);
 use lib dirname(dirname(__FILE__));
 use Test::DH;
-use Debian::Debhelper::Dh_Lib;
+use Debian::Debhelper::Dh_Lib qw(!dirname);
 use Debian::Debhelper::Buildsystem;
 
 my $BS_CLASS = 'Debian::Debhelper::Buildsystem';

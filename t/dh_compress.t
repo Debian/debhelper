@@ -9,7 +9,7 @@ use Test::DH;
 
 use File::Path qw(make_path remove_tree);
 use Test::More;
-use Debian::Debhelper::Dh_Lib;
+use Debian::Debhelper::Dh_Lib qw(!dirname);
 
 my $PREFIX = 'debian/debhelper/usr/share/doc/debhelper';
 

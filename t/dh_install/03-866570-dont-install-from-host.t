@@ -7,7 +7,7 @@ use File::Basename qw(dirname);
 use lib dirname(dirname(__FILE__));
 use Test::DH;
 use File::Path qw(remove_tree make_path);
-use Debian::Debhelper::Dh_Lib;
+use Debian::Debhelper::Dh_Lib qw(!dirname);
 
 plan(tests => 1);
 
