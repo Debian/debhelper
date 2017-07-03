@@ -41,9 +41,3 @@ sub build_system_path_apis {
         "/tmp/relative/path", "_rel2rel abs no7");
 }
 
-
-# Local Variables:
-# indent-tabs-mode: t
-# tab-width: 4
-# cperl-indent-level: 4
-# End:

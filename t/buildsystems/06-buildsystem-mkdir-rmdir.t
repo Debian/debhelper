@@ -49,8 +49,3 @@ sub do_rmdir_builddir {
 	$system->rmdir_builddir();
 }
 
-# Local Variables:
-# indent-tabs-mode: t
-# tab-width: 4
-# cperl-indent-level: 4
-# End:

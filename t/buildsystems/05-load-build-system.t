@@ -53,8 +53,3 @@ sub try_load_bs {
     return \@lines;
 }
 
-# Local Variables:
-# indent-tabs-mode: t
-# tab-width: 4
-# cperl-indent-level: 4
-# End:

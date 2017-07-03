@@ -22,8 +22,3 @@ each_compat_subtest {
     remove_tree('debian/debhelper', 'debian/tmp');
 };
 
-# Local Variables:
-# indent-tabs-mode: t
-# tab-width: 4
-# cperl-indent-level: 4
-# End:

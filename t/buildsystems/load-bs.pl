@@ -14,8 +14,3 @@ if (defined $bs) {
 	    foreach (sort keys %$bs);
 }
 
-# Local Variables:
-# indent-tabs-mode: t
-# tab-width: 4
-# cperl-indent-level: 4
-# End:

@@ -29,9 +29,3 @@ foreach my $file (@progs) {
 	ok($lines < 200, $file);
 	ok($maxlength < 160, $file);
 }
-
-# Local Variables:
-# indent-tabs-mode: t
-# tab-width: 4
-# cperl-indent-level: 4
-# End:

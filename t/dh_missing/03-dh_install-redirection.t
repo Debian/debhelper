@@ -28,8 +28,3 @@ each_compat_up_to_and_incl_subtest(10, sub {
 				   '-X', 'more', '--exclude', 'lots', '--fail-missing'));
 });
 
-# Local Variables:
-# indent-tabs-mode: t
-# tab-width: 4
-# cperl-indent-level: 4
-# End:

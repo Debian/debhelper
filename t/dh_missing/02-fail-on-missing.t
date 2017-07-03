@@ -31,8 +31,3 @@ each_compat_subtest {
 	is($exitcode, 2, 'dh_missing exited with exit code 2');
 };
 
-# Local Variables:
-# indent-tabs-mode: t
-# tab-width: 4
-# cperl-indent-level: 4
-# End:

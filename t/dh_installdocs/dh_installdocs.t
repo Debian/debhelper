@@ -78,8 +78,3 @@ each_compat_subtest {
 	remove_tree(qw(debian/foo debian/bar debian/baz));
 };
 
-# Local Variables:
-# indent-tabs-mode: t
-# tab-width: 4
-# cperl-indent-level: 4
-# End:

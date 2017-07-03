@@ -22,8 +22,3 @@ foreach my $file (@targets) {
 	  or diag("$file failed syntax check");
 }
 
-# Local Variables:
-# indent-tabs-mode: t
-# tab-width: 4
-# cperl-indent-level: 4
-# End:

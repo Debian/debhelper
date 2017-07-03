@@ -44,8 +44,3 @@ each_compat_from_and_above_subtest(11, sub {
 	ok(run_dh_tool('dh_clean'));
 });
 
-# Local Variables:
-# indent-tabs-mode: t
-# tab-width: 4
-# cperl-indent-level: 4
-# End:

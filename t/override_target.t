@@ -23,9 +23,3 @@ system("chmod +x t/tmp/debian/rules");
 my @output=`cd t/tmp && debian/rules build 2>&1`;
 ok(grep { m/override called/ } @output);
 system("rm -rf t/tmp");
-
-# Local Variables:
-# indent-tabs-mode: t
-# tab-width: 4
-# cperl-indent-level: 4
-# End:

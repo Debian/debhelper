@@ -26,8 +26,3 @@ each_compat_subtest {
 	ok(run_dh_tool('dh_missing', '--fail-missing'), 'dh_missing failed');
 };
 
-# Local Variables:
-# indent-tabs-mode: t
-# tab-width: 4
-# cperl-indent-level: 4
-# End:

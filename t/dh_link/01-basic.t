@@ -48,8 +48,3 @@ each_compat_subtest {
 	ok(readlink("debian/debhelper/usr/bin/2"),"../lib/1");
 };
 
-# Local Variables:
-# indent-tabs-mode: t
-# tab-width: 4
-# cperl-indent-level: 4
-# End:

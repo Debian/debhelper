@@ -86,8 +86,3 @@ dh_auto_do_autoconf('autoconf');
 dh_auto_do_autoconf('autoconf', 'bld/dir', configure_args => [ "--extra-autoconf-configure-arg" ]);
 ok ( ! -e 'bld', "bld got deleted too" );
 
-# Local Variables:
-# indent-tabs-mode: t
-# tab-width: 4
-# cperl-indent-level: 4
-# End:

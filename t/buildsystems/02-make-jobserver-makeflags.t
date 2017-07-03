@@ -55,9 +55,3 @@ sub test_clean_jobserver_makeflags {
     is($ENV{MAKEFLAGS}, $expected, $test);
 }
 
-
-# Local Variables:
-# indent-tabs-mode: t
-# tab-width: 4
-# cperl-indent-level: 4
-# End:

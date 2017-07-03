@@ -37,8 +37,3 @@ each_compat_subtest {
 	ok(rm_files('debian/testpackage.postinst.debhelper'));
 }
 
-# Local Variables:
-# indent-tabs-mode: t
-# tab-width: 4
-# cperl-indent-level: 4
-# End:

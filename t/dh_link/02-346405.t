@@ -27,8 +27,3 @@ each_compat_subtest {
 	ok(readlink("debian/debhelper/usr/lib/geant4/d"), "/");
 };
 
-# Local Variables:
-# indent-tabs-mode: t
-# tab-width: 4
-# cperl-indent-level: 4
-# End:
