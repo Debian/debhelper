@@ -9,6 +9,12 @@ MANPAGES=$(COMMANDS:=.1) dh.1
 # Find deprecated commands by looking at their synopsis.
 DEPRECATED=$(shell egrep -l '^dh_.* - .*deprecated' $(COMMANDS))
 
+ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+    TEST_JOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+else
+    TEST_JOBS = 1
+endif
+
 # This generates a list of synopses of debhelper commands, and substitutes
 # it in to the #LIST# line on the man page fed to it on stdin. Must be passed
 # parameters of all the executables or pod files to get the synopses from.
@@ -122,4 +128,4 @@ install:
 	install -m 0644 Debian/Debhelper/Buildsystem/*.pm $(DESTDIR)$(PERLLIBDIR)/Buildsystem
 
 test: version
-	./run perl -MTest::Harness -e 'runtests grep { ! /CVS/ && ! /\.svn/ && -f && -x && m/\.t$$/ } @ARGV' t/* t/*/*
+	HARNESS_OPTIONS=j$(TEST_JOBS) ./run perl -MTest::Harness -e 'runtests grep { ! /CVS/ && ! /\.svn/ && -f && -x && m/\.t$$/ } @ARGV' t/* t/*/*
