@@ -160,7 +160,7 @@ push(@search_dirs, 'debian/tmp') if not compat(6);
 # PROMISE: DH NOOP WITHOUT install
 
 foreach my $package (getpackages()) {
-	my @installed;
+	my (@installed, %dest2sources);
 
 	# Look at the install files for all packages to handle
 	# list-missing/fail-missing, but skip really installing for
@@ -200,7 +200,7 @@ foreach my $package (getpackages()) {
 
 		foreach my $glob (@$set) {
 			my @found = glob_expand(\@search_dirs, $glob_error_handler, $glob);
-			push(@filelist, @found);
+			push(@filelist, map { tr{/}{/}s; $_ } @found);
 		}
 
 		if (! @filelist && ! $skip_install) {
@@ -217,30 +217,24 @@ foreach my $package (getpackages()) {
 		next if $skip_install or $missing_files;
 
 		if (not $exclude) {
-			# Without $exclude and if everything is installed in the same directory, it is trivial
-			# to bulk them cp calls via xargs.
-			if (not $dest and @filelist > 1) {
-				my $same = 1;
-				my $common_dest;
-				for my $src (@filelist) {
-					my $target_dest = compute_dest($src);
-					if (not defined($common_dest)) {
-						$common_dest = $target_dest;
-					} elsif ($common_dest ne $target_dest) {
-						$same = 0;
-						last;
-					}
+			for my $src (@filelist) {
+				my $d = $dest // compute_dest($src);
+				my $basename = basename($src);
+				if (exists($dest2sources{$d}{$basename})) {
+					my $replaced = $dest2sources{$d}{$basename};
+					# warn if the sources differ, but permit
+					# duplicates of the same source (as that is
+					# well-defined).
+					warning("$src overwrites $replaced (both installed as: $d/$basename)")
+						if $src ne $replaced;
+					# Historical behaviour is to use the last
+					# specified version where there was duplicates (as
+					# cp was called once per file in order).  Keep
+					# that for compatibility.
 				}
-				$dest = $common_dest if ($same and $common_dest);
+				$dest2sources{$d}{$basename} = $src;
 			}
-			if ($dest and @filelist > 1) {
-				if (not compat(10)) {
-					# Make sure the destination directory exists.
-					install_dir("$tmp/$dest");
-					xargs(\@filelist, "cp", '--reflink=auto', "-a", XARGS_INSERT_PARAMS_HERE, "$tmp/$dest/");
-					next;
-				}
-			}
+			next;
 		}
 
 		foreach my $src (@filelist) {
@@ -274,6 +268,12 @@ foreach my $package (getpackages()) {
 		}
 	}
 
+	for my $dest (sort(keys(%dest2sources))) {
+		my @srcs = sort(values(%{$dest2sources{$dest}}));
+		# Make sure the destination directory exists.
+		install_dir("$tmp/$dest");
+		xargs(\@srcs, "cp", '--reflink=auto', "-a", XARGS_INSERT_PARAMS_HERE, "$tmp/$dest/");
+	}
 	log_installed_files($package, @installed);
 }
 
