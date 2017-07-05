@@ -15,6 +15,9 @@ else
     TEST_JOBS = 1
 endif
 
+# Figure out the `current debhelper version.
+VERSION=$(shell dpkg-parsechangelog -SVersion)
+
 # This generates a list of synopses of debhelper commands, and substitutes
 # it in to the #LIST# line on the man page fed to it on stdin. Must be passed
 # parameters of all the executables or pod files to get the synopses from.
@@ -37,15 +40,15 @@ MAKEMANLIST=$(PERL) -e ' \
 		        } \
 		} \
 		END { \
+			my $$recommended_compat = $(VERSION); \
+			$$recommended_compat =~ s{\..*}{}; \
 			while (<STDIN>) { \
 		        	s/\#LIST\#/$$list/; \
 		        	s/\#LIST_DEPRECATED\#/$$list_deprecated/; \
+		        	s/\#RECOMMEDED_COMPAT\#/$$recommeded_compat/; \
 				print; \
 			}; \
 		}'
-
-# Figure out the `current debhelper version.
-VERSION=$(shell dpkg-parsechangelog -SVersion)
 
 PERLLIBDIR=$(shell $(PERL) -MConfig -e 'print $$Config{vendorlib}')/Debian/Debhelper
 

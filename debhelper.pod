@@ -277,15 +277,15 @@ it modifies its behavior in various ways.  The compatibility level is
 specified in the F<debian/compat> file and the file must be present.
 
 Tell debhelper what compatibility level to use by writing a number to
-F<debian/compat>. For example, to use v9 mode:
+F<debian/compat>. For example, to use v#RECOMMEDED_COMPAT# mode:
 
-  % echo 9 > debian/compat
+  % echo #RECOMMEDED_COMPAT# > debian/compat
 
 Your package will also need a versioned build dependency on a version of
 debhelper equal to (or greater than) the compatibility level your package
-uses. So for compatibility level 9, ensure debian/control has:
+uses. So for compatibility level #RECOMMEDED_COMPAT#, ensure debian/control has:
 
-  Build-Depends: debhelper (>= 9)
+  Build-Depends: debhelper (>= #RECOMMEDED_COMPAT#)
 
 Unless otherwise indicated, all debhelper documentation assumes that you
 are using the most recent compatibility level, and in most cases does not
