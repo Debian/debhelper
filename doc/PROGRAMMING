@@ -210,7 +210,12 @@ pkgfile($package, $basename)
 	skip running it. This is done by inserting a special comment,
 	of the form:
 
-	# PROMISE: DH NOOP WITHOUT pkgfilea pkgfileb tmp(need/this)
+	# PROMISE: DH NOOP WITHOUT pkgfilea pkgfile-logged(pkgfileb) tmp(need/this)
+
+	The "pkgfile-logged" hint notifies dh that the helper logs these files
+	via "log_intalled_files".  This means dh will sometimes need to run it
+	even when it is a NO OP because it has to log what it would have
+	installed to avoid dh_missing complaining about missing files.
 
 pkgext($package)
 	Pass this command the name of a binary package, and it will return

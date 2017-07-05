@@ -9,6 +9,12 @@ debhelper (10.6.3) UNRELEASED; urgency=medium
     feature should set "$main::VERSION" to the version of the tool.
   * dh_install: Rewrite and re-enable optimization so it
     deterministically and gracefully handles cases like #866405.
+  * dh: Support new "pkgfile-logged" hint, which can be used by
+    helpers that log what files they install.  It enables dh to
+    see that it may need to run a helper that would install no
+    files, but log what it would have done to avoid making
+    dh_missing complain.  Thanks to Michael Stapelberg for
+    reporting the issue and testing the fix.  (Closes: #867246)
 
  -- Niels Thykier <niels@thykier.net>  Wed, 05 Jul 2017 15:51:48 +0000
 
