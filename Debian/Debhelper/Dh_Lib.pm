@@ -21,6 +21,8 @@ use constant {
 	'MAX_COMPAT_LEVEL' => 11,
 	# Magic value for xargs
 	'XARGS_INSERT_PARAMS_HERE' => \'<INSERT-HERE>', #'# Hi emacs.
+	# Magic value for debhelper tools to request "current version"
+	'DH_BUILTIN_VERSION' => \'<DH_LIB_VERSION>', #'# Hi emacs.
 };
 
 my %NAMED_COMPAT_LEVELS = (
@@ -60,13 +62,14 @@ use vars qw(@EXPORT %dh);
 	    &rm_files &make_symlink_raw_target &on_items_in_parallel
 	    XARGS_INSERT_PARAMS_HERE &glob_expand_error_handler_reject
 	    &glob_expand_error_handler_warn_and_discard &glob_expand
-	    &glob_expand_error_handler_silently_ignore
+	    &glob_expand_error_handler_silently_ignore DH_BUILTIN_VERSION
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
 my $prefix="/usr";
 
 my $MAX_PROCS = get_buildoption("parallel") || 1;
+my $DH_TOOL_VERSION;
 
 sub init {
 	my %params=@_;
@@ -758,6 +761,24 @@ sub pkgfilename {
 	}
 }
 
+sub _tool_version {
+	return $DH_TOOL_VERSION if defined($DH_TOOL_VERSION);
+	if (defined($main::VERSION)) {
+		$DH_TOOL_VERSION = $main::VERSION;
+	}
+	if (defined($DH_TOOL_VERSION) and $DH_TOOL_VERSION eq DH_BUILTIN_VERSION) {
+		my $version = "UNRELEASED-${\MAX_COMPAT_LEVEL}";
+		eval {
+			require Debian::Debhelper::Dh_Version;
+			$version = $Debian::Debhelper::Dh_Version::version;
+		};
+		$DH_TOOL_VERSION = $version;
+	} else {
+		$DH_TOOL_VERSION //= 'UNDECLARED';
+	}
+	return $DH_TOOL_VERSION;
+}
+
 # Automatically add a shell script snippet to a debian script.
 # Only works if the script has #DEBHELPER# in it.
 #
@@ -773,6 +794,7 @@ sub autoscript {
 	my $filename=shift;
 	my $sed=shift || "";
 
+	my $tool_version = _tool_version();
 	# This is the file we will modify.
 	my $outfile="debian/".pkgext($package)."$script.debhelper";
 
@@ -794,14 +816,14 @@ sub autoscript {
 	if (-e $outfile && ($script eq 'postrm' || $script eq 'prerm')
 	   && !compat(5)) {
 		# Add fragments to top so they run in reverse order when removing.
-		complex_doit("echo \"# Automatically added by ".basename($0)."\"> $outfile.new");
+		complex_doit("echo \"# Automatically added by ".basename($0)."/${tool_version}\"> $outfile.new");
 		autoscript_sed($sed, $infile, "$outfile.new");
 		complex_doit("echo '# End automatically added section' >> $outfile.new");
 		complex_doit("cat $outfile >> $outfile.new");
 		rename_path("${outfile}.new", $outfile);
 	}
 	else {
-		complex_doit("echo \"# Automatically added by ".basename($0)."\">> $outfile");
+		complex_doit("echo \"# Automatically added by ".basename($0)."/${tool_version}\">> $outfile");
 		autoscript_sed($sed, $infile, $outfile);
 		complex_doit("echo '# End automatically added section' >> $outfile");
 	}
@@ -832,7 +854,7 @@ sub autoscript_sed {
 
 	sub autotrigger {
 		my ($package, $trigger_type, $trigger_target) = @_;
-		my ($triggers_file, $ifd);
+		my ($triggers_file, $ifd, $tool_version);
 
 		if (not exists($VALID_TRIGGER_TYPES{$trigger_type})) {
 			require Carp;
@@ -840,6 +862,7 @@ sub autoscript_sed {
 		}
 		return if $dh{NO_ACT};
 
+		$tool_version = _tool_version();
 		$triggers_file = generated_file($package, 'triggers');
 		if ( -f $triggers_file ) {
 			open($ifd, '<', $triggers_file)
@@ -856,7 +879,7 @@ sub autoscript_sed {
                               }x;
 			print {$ofd} $line;
 		}
-		print {$ofd} '# Triggers added by ' . basename($0) . "\n";
+		print {$ofd} '# Triggers added by ' . basename($0) . "/${tool_version}\n";
 		print {$ofd} "${trigger_type} ${trigger_target}\n";
 		close($ofd) or error("closing ${triggers_file}.new failed: $!");
 		close($ifd);

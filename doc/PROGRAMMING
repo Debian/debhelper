@@ -62,11 +62,14 @@ with the rest of debhelper if it does, so this is highly encouraged.
 
 Use Dh_Lib like this:
 
-use Debian::Debhelper::Dh_Lib
+use Debian::Debhelper::Dh_Lib;
+our $VERSION = '1.0';
 init();
 
-The init() function causes Dh_lib to parse the command line and do some other
-initialization tasks.
+The init() function causes Dh_lib to parse the command line and do
+some other initialization tasks.  If present, $main::VERSION will be
+used to determine the version of the tool (e.g. embedded into
+autoscript snippets).
 
 Argument processing:
 -------------------
