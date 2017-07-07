@@ -38,7 +38,7 @@ my %NAMED_COMPAT_LEVELS = (
 use Errno qw(ENOENT);
 use Exporter qw(import);
 use File::Glob qw(bsd_glob GLOB_CSH GLOB_NOMAGIC GLOB_TILDE);
-use vars qw(@EXPORT %dh);
+our (@EXPORT, %dh);
 @EXPORT=qw(&init &doit &doit_noerror &complex_doit &verbose_print &error
             &nonquiet_print &print_and_doit &print_and_doit_noerror
             &warning &tmpdir &pkgfile &pkgext &pkgfilename &isnative
