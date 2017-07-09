@@ -218,10 +218,16 @@ If you're curious about B<dh>'s internals, here's how it works under the hood.
 
 In compat 10 (or later), B<dh> creates a stamp file
 F<debian/debhelper-build-stamp> after the build step(s) are complete
-to avoid re-running them.  Inside an override target, B<dh_*> commands
-will create a log file F<debian/package.debhelper.log> to keep track
-of which packages the command(s) have been run for.  These log files
-are then removed once the override target is complete.
+to avoid re-running them.  It is possible to avoid the stamp file by
+passing B<--without=build-stamp> to B<dh>.  This makes "no clean"
+builds behave more like what some people expect at the expense of
+possibly running the build and test twice (the second time as root or
+under L<fakeroot(1)>).
+
+Inside an override target, B<dh_*> commands will create a log file
+F<debian/package.debhelper.log> to keep track of which packages the
+command(s) have been run for.  These log files are then removed once
+the override target is complete.
 
 In compat 9 or earlier, each debhelper command will record
 when it's successfully run in F<debian/package.debhelper.log>. (Which
@@ -291,9 +297,7 @@ if (not compat(9, 1)) {
 	# Enable systemd support by default in compat 10 or later.
 	unshift(@ARGV, "--with=systemd");
 }
-if (compat(10, 1)) {
-	unshift(@ARGV, "--with=build-stamp");
-}
+unshift(@ARGV, "--with=build-stamp");
 
 
 inhibit_log();
