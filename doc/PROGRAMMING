@@ -433,6 +433,63 @@ remove_command_options($command, $opt1, $opt2, ...)
 	Remove $opt1, $opt2 etc. from the list of additional options which
 	dh passes when running the specified $command.
 
+Logging helpers and dh_missing:
+-------------------------------
+
+Since debhelper 10.3, debhelper has had a helper called "dh_missing".  It
+takes over the "--list-missing" and "--fail-missing" options from dh_install
+and as the advantage that it can "see" what other helpers have installed.
+
+Under the hood, this works by the helpers logging the source files
+they (would) install to a hidden log file.  When dh_missing is called,
+it reads all these log files to determine which files have would been
+installed and compare them to what is present.
+
+If you are writing a helper that need to integrate with dh_missing,
+here is what you do:
+
+Dh_Lib-based helpers:
+~~~~~~~~~~~~~~~~~~~~~
+
+ * Replace "@{$dh{DOPACKAGES}}" with "getpackages()" and use
+   "process_pkg($package)" to determine if the helper should actually
+   install anything.
+ * Call "log_installed_files" once per package (even once that are not to
+   be acted on) with a list of source files that would be installed.
+   - You can list entire directories even if there are files under
+     it that are ignored.
+   - Please call "log_installed_files" /even if/ the list is empty for that
+     packages.  This enables dh_missing to see that the helper has been run
+     and nothing should be installed for that package.
+ * If your helper has a PROMISE, it must use "pkgfile-logged(<file>)"
+   for its config files.  (See #867246)
+   - CAVEAT: This requires a dependency on "debhelper (>= 10.2.5)".  Prior
+     to that version, debhelper will wrongly optimize your helper out.
+ * Consider using dh_installman or dh_installexamples as examples.
+
+Other helpers:
+~~~~~~~~~~~~~~
+
+ * The helper must compile a list of files it would have installed for
+   each package (even packages that are not acted on).  The file list
+   should be relative to the source package root (e.g.
+   "debian/tmp/usr/bin/bar").
+    - This list can also contain directories.  They will be flagged as
+      installed along with their content (recursively).
+ * The helper must append to the file (create it if missing):
+     debian/.debhelper/generated/${package}/installed-by-${HELPER_NAME}
+   - Example: debian/.debhelper/generated/lintian/installed-by-dh_install
+   - The file should be created even if it is empty.  This enables dh_missing
+     to see that the helper has been run and nothing would be installed for
+     that package.
+ * Please append to the file if it exists as the helper may be called multiple
+   times (once with -a and once with -i).  It is completely fine if this leaves
+   duplicate entries as dh_missing will deduplicate these.
+ * If your helper has a PROMISE, it must use "pkgfile-logged(<file>)"
+   for its config files.  (See #867246)
+   - CAVEAT: This requires a dependency on "debhelper (>= 10.2.5)".  Prior
+     to that version, debhelper will wrongly optimize your helper out.
+
 Buildsystem Classes:
 -------------------
 
