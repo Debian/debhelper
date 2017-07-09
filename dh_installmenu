@@ -31,9 +31,6 @@ the maintainer scripts by L<dh_installdeb(1)>.
 
 =item debian/I<package>.menu
 
-In compat 11, this file is no longer installed the format has been
-deprecated.  Please migrate to a desktop file instead.
-
 Debian menu files, installed into usr/share/menu/I<package> in the package
 build directory. See L<menufile(5)> for its format.
 
@@ -66,19 +63,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $menu_method=pkgfile($package,"menu-method");
 	
 	if ($menu ne '') {
-		if (compat(10)) {
-			install_dir("$tmp/usr/share/menu");
-			install_file($menu,"$tmp/usr/share/menu/$package");
+		install_dir("$tmp/usr/share/menu");
+		install_file($menu,"$tmp/usr/share/menu/$package");
 
-			# Add the scripts if a menu-method file doesn't exist.
-			# The scripts for menu-method handle everything these do, too.
-			if ($menu_method eq "" && ! $dh{NOSCRIPTS}) {
-				autoscript($package,"postinst","postinst-menu");
-				autoscript($package,"postrm","postrm-menu")
-			}
-		} else {
-			warning("menu files are *not* installed in compat 11");
-			warning("Please remove the menu file");
+		# Add the scripts if a menu-method file doesn't exist.
+		# The scripts for menu-method handle everything these do, too.
+		if ($menu_method eq "" && ! $dh{NOSCRIPTS}) {
+			autoscript($package,"postinst","postinst-menu");
+			autoscript($package,"postrm","postrm-menu")
 		}
 	}
 
