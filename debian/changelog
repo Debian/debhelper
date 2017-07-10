@@ -5,6 +5,10 @@ debhelper (10.6.4) UNRELEASED; urgency=medium
   * dh: Revert "--without=build-stamp by default in compat 11".  Keep
     the compat 10 behaviour while enable packages to opt-in by
     explicitly passing --without=build-stamp themselves.
+  * dh_installman: Apply patch from Sven Joachim to fix regression,
+    where dh_installman would fail to remove the compressed manpage.
+    With hardlinks involved, this could make dh_compress fail later.
+    (Closes: #867846)
 
  -- Niels Thykier <niels@thykier.net>  Sun, 09 Jul 2017 12:30:20 +0000
 

@@ -296,7 +296,8 @@ if (defined `man --version`) {
 				my $manpage_cmd = ($manpage =~ m{^/}) ? $manpage : "./${manpage}";
 				complex_doit "man --recode UTF-8 \Q${manpage_cmd}\E > \Q$manpage_tmp\E";
 				# recode uncompresses compressed pages
-				rm_files($manpage) if $manpage =~ s/\.(gz|Z)$//;
+				my $orig = $manpage;
+				rm_files($orig) if $manpage =~ s/\.(gz|Z)$//;
 				rename_path($manpage_tmp, $manpage);
 			}
 			# Bulk reset permissions of all re-encoded files
