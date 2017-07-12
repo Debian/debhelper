@@ -133,10 +133,10 @@ on_pkgs_in_parallel {
 						 "! -name 'script' ${find_exclude_options} -print0",
 						 "2>/dev/null | xargs -0r chmod 644");
 			if ( -f "$tmp/usr/share/bug/$package/script" ) {
-				reset_perm_and_owner('0755', "$tmp/usr/share/bug/$package/script");
+				reset_perm_and_owner(0755, "$tmp/usr/share/bug/$package/script");
 			}
 		} elsif ( -f "$tmp/usr/share/bug/$package" ) {
-			reset_perm_and_owner('0755', "$tmp/usr/share/bug/$package");
+			reset_perm_and_owner(0755, "$tmp/usr/share/bug/$package");
 		}
 
 		# Files in $tmp/etc/sudoers.d/ must be mode 0440.

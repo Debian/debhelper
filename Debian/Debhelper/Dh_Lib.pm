@@ -430,8 +430,24 @@ sub rename_path {
 
 sub reset_perm_and_owner {
 	my ($mode, @paths) = @_;
-	doit('chmod', $mode, '--', @paths);
-	doit('chown', '0:0', '--', @paths);
+	my $_mode;
+	# Dark goat blood to tell 0755 from "0755"
+	if (length( do { no warnings "numeric"; $mode & "" } ) ) {
+		# 0755, leave it alone.
+		$_mode = $mode;
+	} else {
+		# "0755" -> convert to 0755
+		$_mode = oct($mode);
+	}
+	if ($dh{VERBOSE}) {
+		verbose_print(sprintf('chmod %#o -- %s', $_mode, escape_shell(@paths)));
+		verbose_print(sprintf('chown 0:0 -- %s', escape_shell(@paths)));
+	}
+	return if $dh{NO_ACT};
+	for my $path (@paths) {
+		chmod($_mode, $path) or error(sprintf('chmod(%#o, %s): %s', $mode, $path, $!));
+		chown(0, 0, $path) or error("chown(0, 0, $path): $!");
+	}
 }
 
 # Run a command that may have a huge number of arguments, like xargs does.
