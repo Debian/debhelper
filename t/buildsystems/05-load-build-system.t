@@ -15,7 +15,7 @@ use Debian::Debhelper::Buildsystem;
 
 my $DIR = dirname($0);
 my $SCRIPT = './load-bs.pl'; # relative to $DIR
-my $BS_CWD = Cwd::cwd() . "/${DIR}";
+my $BS_CWD = Cwd::realpath($DIR) or error("cannot resolve ${DIR}: $!");
 my $BS_CLASS = 'Debian::Debhelper::Buildsystem';
 my $bs = $BS_CLASS->new();
 my $default_builddir = $bs->DEFAULT_BUILD_DIRECTORY();
