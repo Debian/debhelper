@@ -196,7 +196,7 @@ on_pkgs_in_parallel {
 			# Remove old file.
 			rm_files($_);
 			# Make new hardlink.
-			doit("ln","$hardlinks{$_}.gz","$_.gz");
+			doit("ln","-f","$hardlinks{$_}.gz","$_.gz");
 		}
 
 		verbose_print("cd '$olddir'");

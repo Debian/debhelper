@@ -11,6 +11,9 @@ debhelper (10.6.4) UNRELEASED; urgency=medium
     (Closes: #867846)
   * Dh_lib.pm: Rewrite reset_perm_and_owner to it does chmod + chown
     using perl built-ins rather than forking+exec.
+  * dh_compress: Apply patch from Sven Joachim to make dh_compress
+    gracefully handle hardlinks, where the target files already
+    exists.  (Closes: #867881)
 
  -- Niels Thykier <niels@thykier.net>  Sun, 09 Jul 2017 12:30:20 +0000
 
