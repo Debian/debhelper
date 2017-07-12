@@ -174,13 +174,29 @@ foreach my $package (getpackages()) {
 	if ($file) {
 		@install=filedoublearray($file); # no globbing here; done below
 	}
-	
-	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
-		push @install, [@ARGV];
-	}
+
 
 	# With autodest, we can just pretend every pattern was on its own line
 	@install = map { [$_] } map { @$_ } @install if $dh{AUTODEST};
+	
+	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+		if ($dh{AUTODEST}) {
+			# Same as above, with autodest, we can just isolate each entry
+			# - the split is for bug-backwards compatibility (#867866).
+			push(@install, map { [$_] } map { split } @ARGV);
+		} else {
+			# Bug backwards compatibility (#867866).  The new "glob_expand"
+			# interface is smart enough to not split on spaces, but dh_install
+			# used to do that... *except* for the "DEST" since it was never
+			# passed to the glob function.
+			my @a = @ARGV;
+			my $dest = pop(@a) if @a > 1;
+			my @srcs = map { split } @a;
+			push(@srcs, $dest) if defined($dest);
+			push(@install, \@srcs);
+		}
+	}
+
 
 	my $glob_error_handler = sub {
 		# Do not require a match for packages that not acted on
@@ -197,7 +213,6 @@ foreach my $package (getpackages()) {
 		if (@$set > 1) {
 			$dest=pop @$set;
 		}
-
 		foreach my $glob (@$set) {
 			my @found = glob_expand(\@search_dirs, $glob_error_handler, $glob);
 			push(@filelist, map { tr{/}{/}s; $_ } @found);

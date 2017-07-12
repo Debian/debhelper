@@ -161,7 +161,8 @@ on_items_in_parallel(\@all_packages, sub {
 		@manpages = filearray($file, \@search_dirs, $error_handler) if $file;
 
 		if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
-			push @manpages, @ARGV;
+			# The split is for bug-backwards compatibility (#867866).
+			push(@manpages, map { split } @ARGV);
 		}
 
 		log_installed_files($package, @manpages);
