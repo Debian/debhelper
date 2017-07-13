@@ -232,32 +232,44 @@ foreach my $package (getpackages()) {
 		next if $skip_install or $missing_files;
 
 		if (not $exclude) {
+			my @unoptimized;
 			for my $src (@filelist) {
 				my $d = $dest // compute_dest($src);
 				my $basename = basename($src);
 				if (exists($dest2sources{$d}{$basename})) {
-					my $replaced = $dest2sources{$d}{$basename};
-					# warn if the sources differ, but permit
-					# duplicates of the same source (as that is
-					# well-defined).
-					warning("$src overwrites $replaced (both installed as: $d/$basename)")
-						if $src ne $replaced;
-					# Historical behaviour is to use the last
-					# specified version where there was duplicates (as
-					# cp was called once per file in order).  Keep
-					# that for compatibility.
+					# If there is a clash, silently undo the optimizations.
+					# See #866405 and #868169.
+					my $replaced = delete($dest2sources{$d}{$basename});
+					# Associate the $replaced the destination
+					# directory.  We cannot be sure that compute_dest will
+					# get it right nor can we blindly set $dest.
+					#
+					# It is technically unnecessary for $src, but we
+					# might as well do it to possibly save a
+					# compute_dest call.
+					push(@unoptimized, [$replaced, $d], [$src, $d]);
+					next;
 				}
 				$dest2sources{$d}{$basename} = $src;
 			}
-			next;
+			next if not @unoptimized;
+			@filelist = @unoptimized;
 		}
 
 		foreach my $src (@filelist) {
 
-			my $target_dest = $dest;
-			if (! defined $target_dest) {
-				# Guess at destination directory.
-				$target_dest = compute_dest($src);
+			my $target_dest;
+
+			if (ref($src)) {
+				# On a failed optimization, we will have the
+				# destination directory.
+				($src, $target_dest) = @{$src};
+			} else {
+				$target_dest = $dest;
+				if (! defined $target_dest) {
+					# Guess at destination directory.
+					$target_dest = compute_dest($src);
+				}
 			}
 
 			# Make sure the destination directory exists.
