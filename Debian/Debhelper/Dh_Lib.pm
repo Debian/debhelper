@@ -377,6 +377,12 @@ sub error_exitcode {
 		verbose_print(sprintf('install -p -m%04o %s', $mode, escape_shell($source, $dest)))
 			if $dh{VERBOSE};
 		return 1 if $dh{NO_ACT};
+		# "install -p -mXXXX foo bar" silently discards broken
+		# symlinks to install the file in place.  File::Copy does not,
+		# so emulate it manually.  (#868204)
+		if ( -l $dest and not -e $dest and not unlink($dest) and $! != ENOENT) {
+			error("unlink $dest failed: $!");
+		}
 		File::Copy::copy($source, $dest) or error("copy($source, $dest): $!");
 		chmod($mode, $dest) or error("chmod($mode, $dest): $!");
 		my (@stat) = stat($source);
