@@ -661,7 +661,9 @@ sub tmpdir {
 		my (@try, $check_expensive);
 
 		if (not exists($_check_expensive{$filename})) {
-			my @f = bsd_glob("debian/*.$filename.*", GLOB_CSH & ~(GLOB_NOMAGIC|GLOB_TILDE));
+			my @f = grep {
+				!/\.debhelper$/
+			} bsd_glob("debian/*.$filename.*", GLOB_CSH & ~(GLOB_NOMAGIC|GLOB_TILDE));
 			if (not @f) {
 				$check_expensive = 0;
 			} else {
