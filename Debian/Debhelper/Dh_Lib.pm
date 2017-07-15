@@ -852,10 +852,7 @@ sub _tool_version {
 # 4: either text: shell-quoted sed to run on the snippet. Ie, 's/#PACKAGE#/$PACKAGE/'
 #    or a sub to run on each line of the snippet. Ie sub { s/#PACKAGE#/$PACKAGE/ }
 sub autoscript {
-	my $package=shift;
-	my $script=shift;
-	my $filename=shift;
-	my $sed=shift || "";
+	my ($package, $script, $filename, $sed) = @_;
 
 	my $tool_version = _tool_version();
 	# This is the file we will modify.
@@ -879,13 +876,33 @@ sub autoscript {
 	if (-e $outfile && ($script eq 'postrm' || $script eq 'prerm')
 	   && !compat(5)) {
 		# Add fragments to top so they run in reverse order when removing.
-		complex_doit("echo \"# Automatically added by ".basename($0)."/${tool_version}\"> $outfile.new");
-		autoscript_sed($sed, $infile, "$outfile.new");
-		complex_doit("echo '# End automatically added section' >> $outfile.new");
-		complex_doit("cat $outfile >> $outfile.new");
+		if (not defined($sed) or ref($sed)) {
+			verbose_print("[META] Prepend autosnippet \"$filename\" to $script [${outfile}.new]");
+			open(my $out_fd, '>', "${outfile}.new") or error("open(${outfile}.new): $!");
+			print {$out_fd} '# Automatically added by ' . basename($0) . "/${tool_version}\n";
+			autoscript_sed($sed, $infile, undef, $out_fd);
+			print {$out_fd} "# End automatically added section\n";
+			open(my $in_fd, '<', $outfile) or error("open($outfile): $!");
+			while (my $line = <$in_fd>) {
+				print {$out_fd} $line;
+			}
+			close($in_fd);
+			close($out_fd) or error("close(${outfile}.new): $!");
+		} else {
+			complex_doit("echo \"# Automatically added by ".basename($0)."/${tool_version}\"> $outfile.new");
+			autoscript_sed($sed, $infile, "$outfile.new");
+			complex_doit("echo '# End automatically added section' >> $outfile.new");
+			complex_doit("cat $outfile >> $outfile.new");
+		}
 		rename_path("${outfile}.new", $outfile);
-	}
-	else {
+	} elsif (not defined($sed) or ref($sed)) {
+		verbose_print("[META] Append autosnippet \"$filename\" to $script [${outfile}]");
+		open(my $out_fd, '>>', $outfile) or error("open(${outfile}): $!");
+		print {$out_fd} '# Automatically added by ' . basename($0) . "/${tool_version}\n";
+		autoscript_sed($sed, $infile, undef, $out_fd);
+		print {$out_fd} "# End automatically added section\n";
+		close($out_fd) or error("close(${outfile}): $!");
+	} else {
 		complex_doit("echo \"# Automatically added by ".basename($0)."/${tool_version}\">> $outfile");
 		autoscript_sed($sed, $infile, $outfile);
 		complex_doit("echo '# End automatically added section' >> $outfile");
@@ -893,17 +910,21 @@ sub autoscript {
 }
 
 sub autoscript_sed {
-	my $sed = shift;
-	my $infile = shift;
-	my $outfile = shift;
-	if (ref($sed) eq 'CODE') {
+	my ($sed, $infile, $outfile, $out_fd) = @_;
+	if (not defined($sed) or ref($sed)) {
+		my $out = $out_fd;
 		open(my $in, '<', $infile) or die "$infile: $!";
-		open(my $out, '>>', $outfile) or die "$outfile: $!";
-		while (<$in>) { $sed->(); print {$out} $_; }
-		close($out) or die "$outfile: $!";
+		if (not defined($out_fd)) {
+			open($out, '>>', $outfile) or error("open($outfile): $!");
+		}
+		while (<$in>) { $sed->() if $sed; print {$out} $_; }
+		if (not defined($out_fd)) {
+			close($out) or error("close($outfile): $!");
+		}
 		close($in) or die "$infile: $!";
 	}
 	else {
+		error("Internal error - passed open handle for legacy method") if defined($out_fd);
 		complex_doit("sed \"$sed\" $infile >> $outfile");
 	}
 }
