@@ -73,7 +73,7 @@ sub configure {
 	};
 	if ($@) {
 		if (-e $this->get_buildpath("config.log")) {
-			$this->doit_in_builddir("tail -v -n +0 config.log");
+			$this->doit_in_builddir('tail', '-v', '-n', '+0', 'config.log');
 		}
 		die $@;
 	}

@@ -56,7 +56,7 @@ sub configure {
 	};
 	if ($@) {
 		if (-e $this->get_buildpath("meson-logs/meson-log.txt")) {
-			$this->doit_in_builddir("tail -v -n +0 meson-logs/meson-log.txt");
+			$this->doit_in_builddir('tail', '-v', '-n', '+0', 'meson-logs/meson-log.txt');
 		}
 		die $@;
 	}

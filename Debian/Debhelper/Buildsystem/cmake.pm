@@ -90,13 +90,13 @@ sub configure {
 	};
 	if (my $err = $@) {
 		if (-e $this->get_buildpath("CMakeCache.txt")) {
-			$this->doit_in_builddir("tail -v -n +0 CMakeCache.txt");
+			$this->doit_in_builddir('tail', '-v', '-n', '+0', 'CMakeCache.txt');
 		}
 		if (-e $this->get_buildpath('CMakeFiles/CMakeOutput.log')) {
-			$this->doit_in_builddir('tail -v -n +0 CMakeFiles/CMakeOutput.log');
+			$this->doit_in_builddir('tail', '-v', '-n', '+0', 'CMakeFiles/CMakeOutput.log');
 		}
 		if (-e $this->get_buildpath('CMakeFiles/CMakeError.log')) {
-			$this->doit_in_builddir('tail -v -n +0 CMakeFiles/CMakeError.log');
+			$this->doit_in_builddir('tail', '-v', '-n', '+0', 'CMakeFiles/CMakeError.log');
 		}
 		die $err;
 	}
