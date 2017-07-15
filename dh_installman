@@ -295,7 +295,7 @@ if (defined `man --version`) {
 			for my $manpage (@_) {
 				my $manpage_tmp = "${manpage}.dh-new";
 				my $manpage_cmd = ($manpage =~ m{^/}) ? $manpage : "./${manpage}";
-				doit({ stdout => $manpage_tmp }, 'man', '--recode', 'UTF-8', $manpage_cmd);
+				doit({ stdout => $manpage_tmp }, 'man', '-l', '--recode', 'UTF-8', $manpage_cmd);
 				# recode uncompresses compressed pages
 				my $orig = $manpage;
 				rm_files($orig) if $manpage =~ s/\.(gz|Z)$//;
