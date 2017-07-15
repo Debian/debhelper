@@ -679,6 +679,16 @@ to drop support for the B<PERL_USE_UNSAFE_INC> environment variable.
 When perl drops support for it, then this variable will be removed
 retroactively from existing compat levels as well.
 
+=item -
+
+There was a bug in the B<doit> (and similar) functions from
+L<Debian::Debhelper::Dh_Lib> that made them spawn a shell in one
+particular circumstance.  This bug is now removed and will cause
+helpers that rely on the bug to fail with an error.
+
+In compatibility 11, there is still a detection for this case.  This
+detection will be removed in compatibility level 12.
+
 =back
 
 =back

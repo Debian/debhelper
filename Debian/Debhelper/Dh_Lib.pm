@@ -287,33 +287,57 @@ sub escape_shell {
 # Note that this cannot handle complex commands, especially anything
 # involving redirection. Use complex_doit instead.
 sub doit {
-	doit_noerror(@_) || error_exitcode(join(" ", @_));
+	doit_noerror(@_) || error_exitcode(_format_cmdline(@_));
 }
 
 sub doit_noerror {
-	verbose_print(escape_shell(@_));
+	verbose_print(_format_cmdline(@_)) if $dh{VERBOSE};
 
-	if (! $dh{NO_ACT}) {
-		return (system(@_) == 0)
-	}
-	else {
-		return 1;
-	}
+	goto \&_doit;
 }
 
 sub print_and_doit {
-	print_and_doit_noerror(@_) || error_exitcode(join(" ", @_));
+	print_and_doit_noerror(@_) || error_exitcode(_format_cmdline(@_));
 }
 
 sub print_and_doit_noerror {
-	nonquiet_print(escape_shell(@_));
+	nonquiet_print(_format_cmdline(@_));
 
-	if (! $dh{NO_ACT}) {
-		return (system(@_) == 0)
+	goto \&_doit;
+}
+
+sub _doit {
+	my (@cmd) = @_;
+	my $options = ref($cmd[0]) ? shift(@cmd) : undef;
+	# In compat <= 10, we warn, compat 11 we detect and error, in
+	# compat 12 we assume peolpe know what they are doing.
+	if (not defined($options) and @cmd == 1 and not compat(11) and $cmd[0] =~ m/[\s<&>|;]/) {
+		deprecated_functionality('doit() + doit_*() calls will no longer spawn a shell in compat 11 for single string arguments (please use complex_doit instead)',
+								 11);
+		return 1 if $dh{NO_ACT};
+		return system(@cmd) == 0;
 	}
-	else {
-		return 1;
+	return 1 if $dh{NO_ACT};
+	my $pid = fork() // error("fork(): $!");
+	if (not $pid) {
+		if (defined($options)) {
+			if (defined(my $output = $options->{stdout})) {
+				open(STDOUT, '>', $output) or error("redirect STDOUT failed: $!");
+			}
+		}
+		exec(@cmd);
 	}
+	return waitpid($pid, 0) == $pid && $? == 0;
+}
+
+sub _format_cmdline {
+	my (@cmd) = @_;
+	my $options = ref($cmd[0]) ? shift(@cmd) : {};
+	my $cmd_line = escape_shell(@cmd);
+	if (defined(my $output = $options->{stdout})) {
+		$cmd_line .= ' > ' . escape_shell($output);
+	}
+	return $cmd_line;
 }
 
 # Run a command and display the command to stdout if verbose mode is on.

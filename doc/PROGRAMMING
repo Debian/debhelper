@@ -155,13 +155,25 @@ Functions:
 
 Dh_Lib.pm also contains a number of functions you may find useful.
 
-doit(@command)
-	Pass this function an array that is a 
-	shell command. It will run the command (unless $dh{NO_ACT} is set), and
+doit([$options, ]@command)
+	Pass this function an array that is a command with arguments.
+	It will run the command (unless $dh{NO_ACT} is set), and
 	if $dh{VERBOSE} is set, it will also output the command to stdout. You
 	should use this function for almost all commands your program performs
 	that manipulate files in the package build directories.
-print_and_doit(@command)
+
+	The $options argument (if passed) must be a hashref (added in debhelper 10.7).
+	The following key-value pairs can be used:
+	  * stdout => A file name.  The child process will have its STDOUT redirected
+	    to that file.  [debhelper (>= 10.7)]
+
+	This will *not* invoke a shell, so meta characters will not have any special
+	meaning.  Use complex_doit for that.
+	NB: In compat 10 and below, there was a bug that would make doit fork a shell
+	in one special case.  This is deprecated and will be removed in compat 11.
+	The detection code for this can be disabled by passing an empty hashref for
+	as $options.  This will make doit unconditionally avoid forking a shell.
+print_and_doit([$options, ]@command)
         Like doit but will print unless $dh{QUIET} is set. See "Standardization"
         above for when this is allowed to be called.
 complex_doit($command)

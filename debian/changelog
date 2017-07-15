@@ -10,6 +10,13 @@ debhelper (10.7) UNRELEASED; urgency=medium
   * Dh_Lib: Introduce a print_and_complex_doit.
   * Buildsystem: Introduce a complex_doit_in_builddir, which is needed
     by gradle-debian-helper.
+  * Dh_Lib: Fix bug in doit + doit_* that made them fork a shell in
+    some cases.  For backwards compatibility, there is detection code
+    that should make warn for this case.  This can cause a weird
+    "Please specify the compatibility level in debian/compat" error if
+    the tools have chdir to a different directory.
+  * Dh_Lib: Support an optional hashref in doit + doit_* to enable some
+    trivial operations in the child process (e.g. redirect stdout).
 
  -- Niels Thykier <niels@thykier.net>  Sat, 15 Jul 2017 09:42:32 +0000
 
