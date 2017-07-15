@@ -8,11 +8,15 @@ use lib dirname(dirname(__FILE__));
 # Need Test::More to set PERL5LIB
 use Test::DH;
 
+use Config;
+my $binpath = $ENV{AUTOPKGTEST_TMP} ? '/usr/bin' : '.';
+my $libpath = $ENV{AUTOPKGTEST_TMP} ? $Config{vendorlib} : '.';
+
 my @targets;
 if ($0 =~ m{syntax-progs\.t$}) {
-	@targets = grep { -x $_ } glob("dh_*"), "dh";
+	@targets = grep { -x $_ } glob("$binpath/dh_*"), "$binpath/dh";
 } else {
-	@targets = (glob("Debian/Debhelper/*.pm"), glob("Debian/Debhelper/*/*.pm"));
+	@targets = (glob("$libpath/Debian/Debhelper/*.pm"), glob("$libpath/Debian/Debhelper/*/*.pm"));
 }
 
 plan(tests => scalar(@targets));

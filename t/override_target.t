@@ -8,10 +8,11 @@ plan(tests => 1);
 system("mkdir -p t/tmp/debian");
 system("cp debian/control debian/compat debian/changelog t/tmp/debian");
 open (OUT, ">", "t/tmp/debian/rules") || die "$!";
+my $binpath = $ENV{AUTOPKGTEST_TMP} ? '/usr/bin' : '../..';
 print OUT <<EOF;
 #!/usr/bin/make -f
 %:
-	PATH=../..:\$\$PATH PERL5LIB=../.. ../../dh \$@ --without autoreconf
+	PATH=../..:\$\$PATH PERL5LIB=../.. $binpath/dh \$@ --without autoreconf
 
 override_dh_update_autotools_config override_dh_strip_nondeterminism:
 

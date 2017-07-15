@@ -17,7 +17,7 @@ use_ok( 'Debian::Debhelper::Dh_Lib' );
 use_ok( 'Debian::Debhelper::Buildsystem' );
 use_ok( 'Debian::Debhelper::Dh_Buildsystems' );
 
-my $TOPDIR = "../..";
+my $TOPDIR = $ENV{AUTOPKGTEST_TMP} ? '/usr/bin' : '../..';
 my @STEPS = qw(configure build test install clean);
 my $BS_CLASS = 'Debian::Debhelper::Buildsystem';
 

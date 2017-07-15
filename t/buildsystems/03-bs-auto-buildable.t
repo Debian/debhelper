@@ -59,7 +59,9 @@ my %options = (
 	'sourcedir' => $sourcedir,
 );
 make_path($sourcedir, $builddir);
-my @bs = load_all_buildsystems([ $Test::DH::ROOT_DIR ], %options);
+use Config;
+my $libpath = $ENV{AUTOPKGTEST_TMP} ? $Config{vendorlib} : $Test::DH::ROOT_DIR;
+my @bs = load_all_buildsystems([ $libpath ], %options);
 my %bs;
 my @names = map { $_->NAME() } @bs;
 
