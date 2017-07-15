@@ -91,13 +91,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				unshift @dirs, "$fn $mode $user $group";
 				# ...whereas @justdirs is depth-first for removal.
 				push @justdirs, $fn;
-				doit("rmdir $_");
+				doit('rmdir', $_);
 			}
 			else {
 				warning("$fn is not a directory");
 			}
 		      }}, "$tmp/usr/local");
-		doit("rmdir $tmp/usr/local");
+		doit('rmdir', "$tmp/usr/local");
 	
 		my $bs = "\\";     # A single plain backslash
 		my $ebs = $bs x 2; # Escape the backslash from the shell
