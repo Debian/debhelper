@@ -287,7 +287,7 @@ sub get_build_rel2sourcedir {
 sub mkdir_builddir {
 	my $this=shift;
 	if ($this->get_builddir()) {
-		doit("mkdir", "-p", $this->get_builddir());
+		install_dir($this->get_builddir());
 	}
 }
 
