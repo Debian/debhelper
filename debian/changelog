@@ -21,6 +21,10 @@ debhelper (10.7) UNRELEASED; urgency=medium
     is sufficient.
   * Dh_Lib: Avoid forking 2 to 7 subprocesses for adding an autosnippet
     when helper tools use a subroutine rather then a sed snippet.
+  * Dh_Lib: Extend autoscript to accept a hashref and use that for
+    substituting into the snippet.  This variant (like the subroutine
+    variant) avoids forking a lot of subprocesses and need not worry
+    about a shell possible interpreting metacharacters.
 
  -- Niels Thykier <niels@thykier.net>  Sat, 15 Jul 2017 09:42:32 +0000
 

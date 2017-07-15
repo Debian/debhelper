@@ -917,7 +917,16 @@ sub autoscript_sed {
 		if (not defined($out_fd)) {
 			open($out, '>>', $outfile) or error("open($outfile): $!");
 		}
-		while (<$in>) { $sed->() if $sed; print {$out} $_; }
+		if (not defined($sed) or ref($sed) eq 'CODE') {
+			while (<$in>) { $sed->() if $sed; print {$out} $_; }
+		} else {
+			my $rstr = sprintf('#(%s)#', join('|', reverse(sort(keys(%$sed)))));
+			my $regex = qr/$rstr/;
+			while (my $line = <$in>) {
+				$line =~ s/$regex/$sed->{$1}/eg;
+				print {$out} $line;
+			}
+		}
 		if (not defined($out_fd)) {
 			close($out) or error("close($outfile): $!");
 		}

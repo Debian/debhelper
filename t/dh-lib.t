@@ -35,5 +35,11 @@ each_compat_subtest {
 	ok_autoscript_result;
 
 	ok(rm_files('debian/testpackage.postinst.debhelper'));
+
+	ok(autoscript('testpackage', 'postinst', 'postinst-init',
+				  { 'SCRIPT' => 'test-script', 'INITPARMS' => 'test parms with"quote' } ));
+	ok_autoscript_result;
+
+	ok(rm_files('debian/testpackage.postinst.debhelper'));
 }
 
