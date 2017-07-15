@@ -1472,17 +1472,30 @@ sub debhelper_script_subst {
 	if ($file ne '') {
 		if (-f "debian/$ext$script.debhelper") {
 			# Add this into the script, where it has #DEBHELPER#
-			complex_doit("perl -pe 's~#DEBHELPER#~qx{cat debian/$ext$script.debhelper}~eg' < $file > $tmp/DEBIAN/$script");
+			doit({ stdout => "$tmp/DEBIAN/$script" }, 'perl', '-pe',
+				 "s~#DEBHELPER#~qx{cat debian/$ext$script.debhelper}~eg", $file);
 		}
 		else {
 			# Just get rid of any #DEBHELPER# in the script.
-			complex_doit("sed s/#DEBHELPER#// < $file > $tmp/DEBIAN/$script");
+			doit({ stdout => "$tmp/DEBIAN/$script" }, 'sed', 's/#DEBHELPER#//', $file);
 		}
 		reset_perm_and_owner('0755', "$tmp/DEBIAN/$script");
 	}
 	elsif ( -f "debian/$ext$script.debhelper" ) {
-		complex_doit("printf '#!/bin/sh\nset -e\n' > $tmp/DEBIAN/$script");
-		complex_doit("cat debian/$ext$script.debhelper >> $tmp/DEBIAN/$script");
+		if ($dh{VERBOSE}) {
+			verbose_print(q{printf '#!/bin/sh\nset -e\n' > } . "$tmp/DEBIAN/$script");
+			verbose_print("cat debian/$ext$script.debhelper >> $tmp/DEBIAN/$script");
+		}
+		open(my $out_fd, '>', "$tmp/DEBIAN/$script") or error("open($tmp/DEBIAN/$script): $!");
+		print {$out_fd} "#!/bin/sh\n";
+		print {$out_fd} "set -e\n";
+		open(my $in_fd, '<', "debian/$ext$script.debhelper")
+			or error("open(debian/$ext$script.debhelper): $!");
+		while (my $line = <$in_fd>) {
+			print {$out_fd} $line;
+		}
+		close($in_fd);
+		close($out_fd) or error("close($tmp/DEBIAN/$script): $!");
 		reset_perm_and_owner('0755', "$tmp/DEBIAN/$script");
 	}
 }
