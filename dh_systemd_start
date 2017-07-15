@@ -223,7 +223,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $sd_autoscript = sub {
 		my ($script, $filename) = @_;
 		my $unitargs = join(" ", sort map { basename($_) } @units);
-		autoscript($package, $script, $filename, "s/#UNITFILES#/$unitargs/");
+		autoscript($package, $script, $filename, { 'UNITFILES' => $unitargs });
 	};
 
 	if ($dh{RESTART_AFTER_UPGRADE}) {

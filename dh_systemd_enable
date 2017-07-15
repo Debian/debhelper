@@ -255,12 +255,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	for my $unit (sort @units) {
 		my $base = basename($unit);
 		if ($dh{NO_ENABLE}) {
-			autoscript($package, "postinst", "postinst-systemd-dont-enable", "s/#UNITFILE#/$base/");
+			autoscript($package, 'postinst', 'postinst-systemd-dont-enable', { 'UNITFILE' => $base });
 		} else {
-			autoscript($package, "postinst", "postinst-systemd-enable", "s/#UNITFILE#/$base/");
+			autoscript($package, 'postinst', 'postinst-systemd-enable', { 'UNITFILE' => $base });
 		}
 	}
-	autoscript($package, "postrm", "postrm-systemd", "s/#UNITFILES#/$unitargs/");
+	autoscript($package, 'postrm', 'postrm-systemd', {'UNITFILES' => $unitargs });
 
 	# init-system-helpers ships deb-systemd-helper which we use in our
 	# autoscripts

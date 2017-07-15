@@ -79,8 +79,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		install_file($menu_method,"$tmp/etc/menu-methods/$package");
 
 		if (! $dh{NOSCRIPTS}) {
-			autoscript($package,"postinst","postinst-menu-method","s/#PACKAGE#/$package/g");
-			autoscript($package,"postrm","postrm-menu-method","s/#PACKAGE#/$package/g");
+			autoscript($package, 'postinst', 'postinst-menu-method', { 'PACKAGE' => $package });
+			autoscript($package, 'postrm', 'postrm-menu-method', { 'PACKAGE' => $package });
 		}
 	}
 }

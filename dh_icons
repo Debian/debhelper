@@ -66,8 +66,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		closedir($dirfd);
 		if (@dirlist and ! $dh{NOSCRIPTS}) {
 			my $list=join(" ", sort @dirlist);
-			autoscript($package,"postinst","postinst-icons","s%#DIRLIST#%$list%g");
-			autoscript($package,"postrm","postrm-icons","s%#DIRLIST#%$list%g");
+			autoscript($package, 'postinst', 'postinst-icons', { 'DIRLIST' => $list });
+			autoscript($package, 'postrm', 'postrm-icons', { 'DIRLIST' => $list });
 		}
 	}
 }

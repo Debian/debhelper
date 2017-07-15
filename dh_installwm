@@ -96,14 +96,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	if (! $dh{NOSCRIPTS}) {
 WM:		foreach my $wm (@wm) {
-			autoscript($package,"prerm","prerm-wm","s:#WM#:$wm:g");
+			autoscript($package,"prerm","prerm-wm", { 'WM' => $wm });
 
 			my $wmman;
 			if (! compat(5)) {
 				foreach my $ext (".1", ".1x") {
 					$wmman="/usr/share/man/man1/".basename($wm).$ext;
 					if (-e "$tmp$wmman" || -e "$tmp$wmman.gz") {
-						autoscript($package,"postinst","postinst-wm","s:#WM#:$wm:g;s:#WMMAN#:$wmman.gz:g;s/#PRIORITY#/$dh{PRIORITY}/g",);
+						autoscript($package,"postinst","postinst-wm", { 'WM' => $wm, 'WMMAN' => "${wmman}.gz" , 'PRIORITY' => $dh{PRIORITY} });
 						next WM;
 					}
 				}
@@ -114,7 +114,7 @@ WM:		foreach my $wm (@wm) {
 				warning("no manpage found (creating an x-window-manager alternative requires a slave symlink for the manpage)");
 			}
 			# Reaching this code means a broken package will be produced.
-			autoscript($package,"postinst","postinst-wm-noman","s:#WM#:$wm:g;s/#PRIORITY#/$dh{PRIORITY}/g",);
+			autoscript($package,"postinst","postinst-wm-noman", { 'WM' => $wm, 'PRIORITY' => $dh{PRIORITY} });
 		}
 	}
 }
