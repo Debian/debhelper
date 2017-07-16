@@ -42,11 +42,12 @@ multiple times to build up a list of things to exclude.
 
 init();
 
-my (@clean_files, @clean_dirs);
+my (@clean_files, @clean_dirs, %seen);
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $ext=pkgext($package);
+	my $source_dir = default_sourcedir($package);
 
 	push(@clean_files, "debian/${ext}substvars")
 		unless excludefile("debian/${ext}substvars");
@@ -58,11 +59,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	push(@clean_dirs, "debian/.debhelper/generated/${package}/");
 	push(@clean_dirs , "${tmp}/")
 		unless excludefile($tmp);
+
+	push(@clean_dirs, "${source_dir}/")
+		if (not $seen{$source_dir}++ and not excludefile($source_dir));
 }
-
-push(@clean_dirs, 'debian/tmp') if -x 'debian/tmp' &&
-                                   ! excludefile("debian/tmp");
-
 
 xargs(\@clean_files, 'rm', '-f', '--') if @clean_files;
 xargs(\@clean_dirs, 'rm', '-fr', '--') if @clean_dirs;

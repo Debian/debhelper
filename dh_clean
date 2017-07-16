@@ -90,11 +90,12 @@ if ($dh{K_FLAG}) {
 # Remove the debhelper stamp file
 rm_files('debian/debhelper-build-stamp') if not $dh{D_FLAG};
 
-my (@clean_files, @clean_dirs);
+my (@clean_files, @clean_dirs, %seen);
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $ext=pkgext($package);
+	my $source_dir = default_sourcedir($package);
 
 	if (! $dh{D_FLAG}) {
 		push(@clean_files, "debian/${ext}substvars")
@@ -108,6 +109,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	
 	push(@clean_dirs , "${tmp}/")
 		unless excludefile($tmp);
+	push(@clean_dirs, "${source_dir}/")
+	    if (not $seen{$source_dir}++ and not excludefile($source_dir));
 }
 
 
@@ -172,9 +175,6 @@ if (! $dh{D_FLAG}) {
 		\\) -exec rm -f {} + \\) -o \\
 		\\( -type d -a -name autom4te.cache -prune -exec rm -rf {} + \\) \\)");
 }
-
-doit('rm', '-rf', 'debian/tmp') if -x 'debian/tmp' &&
-                                   ! excludefile("debian/tmp");
 
 if (!compat(6) && !$dh{K_FLAG}) {
 	my @stamp_files = glob('*-stamp');
