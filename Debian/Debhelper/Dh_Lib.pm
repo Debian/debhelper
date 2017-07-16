@@ -1341,8 +1341,8 @@ sub getpackages {
 				$package_arches{$package}=$arch;
 				$package_multiarches{$package} = $multiarch;
 				$package_sections{$package} = $section || $source_section;
+				push(@{$packages_by_type{'all-listed-in-control-file'}}, $package);
 				if ($included_in_build_profile) {
-					push(@{$packages_by_type{'all-listed-in-control-file'}}, $package);
 					if ($arch eq 'all') {
 						push(@{$packages_by_type{'indep'}}, $package);
 						push(@{$packages_by_type{'both'}}, $package);
