@@ -681,10 +681,18 @@ sub tmpdir {
 # use, for that package.  (Usually debian/tmp)
 sub default_sourcedir {
 	my ($package) = @_;
-	my $label = package_dh_option($package, 'buildlabel');
-	if (defined($label)) {
-		return "debian/tmp-${label}";
+	my $label = package_dh_option($package, 'buildlabel') // 'default';
+	my $label_file = "debian/.debhelper/buildlabels/${label}/install-dir";
+	if (-f $label_file) {
+		my $dest_dir;
+		open(my $fd, '<', $label_file) or error("open($label_file): $!");
+		$dest_dir = <$fd>;
+		close($fd);
+		error("Internal error: No install path for ${label} !?") if not defined($dest_dir);
+		chomp($dest_dir);
+		return $dest_dir;
 	}
+	return "debian/tmp-${label}" if $label ne 'default';
 
 	return 'debian/tmp';
 }
