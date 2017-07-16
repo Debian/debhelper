@@ -232,6 +232,7 @@ sub buildsystems_list {
 
 sub buildsystems_do {
 	my $step=shift;
+	my $label_match = -1;
 
 	if (!defined $step) {
 		$step = basename($0);
@@ -244,6 +245,41 @@ sub buildsystems_do {
 
 	if ($opt_list) {
 		buildsystems_list($step);
+		exit 0;
+	}
+	for my $pkg (getpackages()) {
+		my $pkg_label = package_dh_option($pkg, 'buildlabel') // 'default';
+		next if $pkg_label ne $dh{BUILDLABEL};
+		$label_match = 0;
+		next if not process_pkg($pkg);
+		$label_match = 1;
+		last;
+	}
+
+	if ($label_match == -1) {
+		warning("No packages defined match \"$dh{BUILDLABEL}\": Please verify the parameter is correct");
+		if (not $dh{VERBOSE}) {
+			nonquiet_print("More help available with --verbose");
+		} else {
+			verbose_print("The following labels are defined");
+			my %labels;
+			for my $pkg (getpackages()) {
+				my $pkg_label = package_dh_option($pkg, 'buildlabel') // 'default';
+				push(@{$labels{$pkg_label}}, $pkg);
+			}
+			for my $label (sort(keys(%labels))) {
+				verbose_print(" * ${label}: " . join(' ', @{$labels{$label}}));
+			}
+		}
+		error("Aborting...");
+	} elsif ($label_match < 1) {
+		nonquiet_print("No packages to be processed for build label \"$dh{BUILDLABEL}\"");
+		if ($dh{VERBOSE}) {
+			my @relevant_pkgs = grep {
+				(package_dh_option($_, 'buildlabel') // 'default') eq $dh{BUILDLABEL}
+			} getpackages();
+			verbose_print("The buildlabel \"$dh{BUILDLABEL}\" affects: @relevant_pkgs")
+		}
 		exit 0;
 	}
 
