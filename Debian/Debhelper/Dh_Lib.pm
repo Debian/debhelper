@@ -63,7 +63,7 @@ our (@EXPORT, %dh);
 	    XARGS_INSERT_PARAMS_HERE &glob_expand_error_handler_reject
 	    &glob_expand_error_handler_warn_and_discard &glob_expand
 	    &glob_expand_error_handler_silently_ignore DH_BUILTIN_VERSION
-	    &print_and_complex_doit
+	    &print_and_complex_doit &default_sourcedir
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -675,6 +675,14 @@ sub tmpdir {
 	else {
 		return "debian/$package";
 	}
+}
+
+# Pass it a name of a binary package, it returns the name of the staging dir to
+# use, for that package.  (Usually debian/tmp)
+sub default_sourcedir {
+	my ($package) = @_;
+
+	return 'debian/tmp';
 }
 
 # Pass this the name of a binary package, and the name of the file wanted

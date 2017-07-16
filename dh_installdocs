@@ -185,10 +185,8 @@ init(options => {
 });
 
 my $called_getpackages = 0;
-my @search_dirs = ('.');
 my $error_handler = compat(10) ? \&glob_expand_error_handler_warn_and_discard : \&glob_expand_error_handler_reject;
 my $nodocs = is_build_profile_active('nodoc') ? 1 : 0;
-@search_dirs = ($dh{SOURCEDIR} // '.', 'debian/tmp') if not compat(10);
 
 foreach my $package (getpackages()) {
 	next if is_udeb($package);
@@ -197,6 +195,8 @@ foreach my $package (getpackages()) {
 	my $file=pkgfile($package,"docs");
 	my $link_doc=($dh{LINK_DOC} && $dh{LINK_DOC} ne $package);
 	my $skip_install = process_pkg($package) ? 0 : 1;
+	my @search_dirs = ('.');
+	@search_dirs = ($dh{SOURCEDIR} // '.', default_sourcedir($package)) if not compat(10);
 
 	if (not $skip_install) {
 		if ($link_doc) {

@@ -154,13 +154,12 @@ if ($dh{EXCLUDE_FIND}) {
 	$exclude = '! \( '.$dh{EXCLUDE_FIND}.' \)';
 }
 
-my @search_dirs = ($srcdir);
-push(@search_dirs, 'debian/tmp') if not compat(6);
-
 # PROMISE: DH NOOP WITHOUT pkgfile-logged(install)
 
 foreach my $package (getpackages()) {
 	my (@installed, %dest2sources);
+	my @search_dirs = ($srcdir);
+	push(@search_dirs, default_sourcedir($package)) if not compat(6);
 
 	# Look at the install files for all packages to handle
 	# list-missing/fail-missing, but skip really installing for
