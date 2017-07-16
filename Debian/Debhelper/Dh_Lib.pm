@@ -63,7 +63,7 @@ our (@EXPORT, %dh);
 	    XARGS_INSERT_PARAMS_HERE &glob_expand_error_handler_reject
 	    &glob_expand_error_handler_warn_and_discard &glob_expand
 	    &glob_expand_error_handler_silently_ignore DH_BUILTIN_VERSION
-	    &print_and_complex_doit &default_sourcedir
+	    &print_and_complex_doit &default_sourcedir &package_dh_option
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -681,6 +681,10 @@ sub tmpdir {
 # use, for that package.  (Usually debian/tmp)
 sub default_sourcedir {
 	my ($package) = @_;
+	my $label = package_dh_option($package, 'buildlabel');
+	if (defined($label)) {
+		return "debian/tmp-${label}";
+	}
 
 	return 'debian/tmp';
 }
@@ -1278,7 +1282,7 @@ sub sourcepackage {
 # As a side effect, populates %package_arches and %package_types
 # with the types of all packages (not only those returned).
 my (%package_types, %package_arches, %package_multiarches, %packages_by_type,
-    %package_sections);
+    %package_sections, %packages_dh_opts);
 sub getpackages {
 	my ($type) = @_;
 	error("getpackages: First argument must be one of \"arch\", \"indep\", or \"both\"")
@@ -1294,6 +1298,7 @@ sub getpackages {
 	my $package="";
 	my $arch="";
 	my $section="";
+	my $dh_opts = {};
 	my ($package_type, $multiarch, %seen, @profiles, $source_section,
 		$included_in_build_profile);
 	if (exists $ENV{'DEB_BUILD_PROFILES'}) {
@@ -1328,7 +1333,8 @@ sub getpackages {
 			$package_type=$1;
 		} elsif (/^Multi-Arch:\s*(.*)/i) {
 			$multiarch = $1;
-
+		} elsif (/^X-DH-([^:\s]+):\s*(.*)/i) {
+			$dh_opts->{lc($1)} = $2;
 		} elsif (/^Build-Profiles:\s*(.*)/i) {
 			# rely on libdpkg-perl providing the parsing functions
 			# because if we work on a package with a Build-Profiles
@@ -1354,6 +1360,7 @@ sub getpackages {
 				$package_multiarches{$package} = $multiarch;
 				$package_sections{$package} = $section || $source_section;
 				push(@{$packages_by_type{'all-listed-in-control-file'}}, $package);
+				$packages_dh_opts{$package} = $dh_opts;
 				if ($included_in_build_profile) {
 					if ($arch eq 'all') {
 						push(@{$packages_by_type{'indep'}}, $package);
@@ -1371,6 +1378,7 @@ sub getpackages {
 			$package_type=undef;
 			$arch='';
 			$section='';
+			$dh_opts = {};
 		}
 	}
 	close($fd);
@@ -1446,6 +1454,19 @@ sub package_section {
 		return 'unknown';
 	}
 	return $package_sections{$package} // 'unknown';
+}
+
+# Returns the value of a "X-DH-${field}" field from d/control when given $package + $field.
+# - undef is returned if the field is not set
+# - Dh_Lib normalizes field names to all lowercase, so $field should always be in all lowercase.
+sub package_dh_option {
+	my ($package, $field) = @_;
+
+	if (! exists $packages_dh_opts{$package}) {
+		warning "package $package is not in control info";
+		return;
+	}
+	return $packages_dh_opts{$package}{$field};
 }
 
 # Return true if a given package is really a udeb.
