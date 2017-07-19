@@ -133,7 +133,7 @@ my %missing_by_sourcedir;
 if ( -f 'debian/not-installed') {
 	my @not_installed = filearray('debian/not-installed');
 	foreach (@not_installed) {
-		s:^\s*:debian/tmp/: unless m:^\s*debian/tmp/:;
+		s:^\s*:debian/tmp/: if not m:^\s*debian/:;
 	}
 	# Pretend that these are also installed.
 	push(@installed, @not_installed);
