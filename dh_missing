@@ -76,34 +76,34 @@ init(options => {
 	"sourcedir=s" => \$dh{SOURCEDIR},
 });
 
-my (@installed, %helpers);
+my (@installed, %helpers, @source_dirs);
 
-my $srcdir = '.';
-$srcdir = $dh{SOURCEDIR} if defined $dh{SOURCEDIR};
 
 if (!$dh{LIST_MISSING} && !$dh{FAIL_MISSING}) {
 	exit 0;
-}
-
-# . as srcdir makes no sense, so this is a special case.
-if ($srcdir eq '.') {
-	$srcdir='debian/tmp';
 }
 
 if (not defined($dh{SOURCEDIR}) and scalar(getpackages()) == 1) {
 	# Special-case where every thing is installed directly into the
 	# package directory.
 	exit(0);
-} elsif (defined($dh{SOURCEDIR}) and not -d $dh{SOURCEDIR}) {
-	if (compat(10)) {
-		# Prevent "dh $@ --list-missing --destdir=..." from failing in compat 10.
-		warning("Cannot check if installation is missing files: $srcdir does not exist");
-		exit(0);
-	} else {
-		error("Cannot check if installation is missing files: $srcdir does not exist");
+} elsif (defined($dh{SOURCEDIR})) {
+	my $srcdir = $dh{SOURCEDIR};
+	# . as srcdir makes no sense, so this is a special case.
+	$srcdir = 'debian/tmp' if $srcdir eq '.';
+	if (not -d $srcdir) {
+		if (compat(10)) {
+			# Prevent "dh $@ --list-missing --destdir=..." from failing in compat 10.
+			warning("Cannot check if installation is missing files: $srcdir does not exist");
+			exit(0);
+		} else {
+			error("Cannot check if installation is missing files: $srcdir does not exist");
+		}
 	}
-} elsif (not -d $srcdir) {
-	exit(0);
+	push(@source_dirs, $srcdir);
+} else {
+	exit 0 if not -d 'debian/tmp';
+	push(@source_dirs, 'debian/tmp');
 }
 
 
@@ -127,7 +127,9 @@ for my $file (<debian/.debhelper/generated/*/installed-by-*>) {
 	close($fh);
 }
 
-my @missing;
+
+
+my %missing_by_sourcedir;
 if ( -f 'debian/not-installed') {
 	my @not_installed = filearray('debian/not-installed');
 	foreach (@not_installed) {
@@ -144,17 +146,23 @@ my $installed=join("|", map {
 	"\Q$_\E\/.*|\Q$_\E";
 } @installed);
 $installed=qr{^($installed)$};
-find(sub {
-	-f || -l || return;
-	$_="$File::Find::dir/$_";
-	if (! /$installed/ && ! excludefile($_)) {
-		my $file=$_;
-		$file=~s/^\Q$srcdir\E\///;
-		push @missing, $file;
+for my $srcdir (@source_dirs) {
+	find(sub {
+		-f || -l || return;
+		$_="$File::Find::dir/$_";
+		if (! /$installed/ && ! excludefile($_)) {
+			my $file=$_;
+			$file=~s{^\Q$srcdir\E/}{};
+			push(@{$missing_by_sourcedir{$srcdir}}, $file);
+		}
+	}, $srcdir);
+}
+if (%missing_by_sourcedir) {
+	for my $sdir (sort(keys(%missing_by_sourcedir))) {
+		for my $file (@{$missing_by_sourcedir{$sdir}}) {
+			warning("$file exists in $sdir but is not installed to anywhere");
+		}
 	}
-}, $srcdir);
-if (@missing) {
-	warning "$_ exists in $srcdir but is not installed to anywhere" foreach @missing;
 	nonquiet_print("The following debhelper tools have reported what they installed (with files per package)");
 	for my $helper (sort(keys(%helpers))) {
 		my $pkg_info = $helpers{$helper};
