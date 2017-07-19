@@ -102,8 +102,12 @@ if (not defined($dh{SOURCEDIR}) and scalar(getpackages()) == 1) {
 	}
 	push(@source_dirs, $srcdir);
 } else {
-	exit 0 if not -d 'debian/tmp';
-	push(@source_dirs, 'debian/tmp');
+	my %seen;
+	for my $package (@{$dh{DOPACKAGES}}) {
+		my $srcdir = default_sourcedir($package);
+		next if $seen{$srcdir}++;
+		push(@source_dirs, $srcdir) if -d $srcdir;
+	}
 }
 
 
