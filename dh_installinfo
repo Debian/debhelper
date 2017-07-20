@@ -82,8 +82,7 @@ foreach my $package (getpackages()) {
 	}
 
 	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
-		# The split is for bug-backwards compatibility (#867866).
-		push(@info, map { split } @ARGV);
+		push @info, @ARGV;
 	}
 
 	next if not process_pkg($package) or $nodocs;

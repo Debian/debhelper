@@ -235,8 +235,7 @@ foreach my $package (getpackages()) {
 	}
 
 	if (($package eq $dh{FIRSTPACKAGE} || ($dh{PARAMS_ALL} && !$link_doc)) && @ARGV) {
-		# The split is for bug-backwards compatibility (#867866).
-		push(@docs, map { split } @ARGV);
+		push @docs, @ARGV;
 	}
 
 	log_installed_files($package, @docs);
