@@ -158,8 +158,9 @@ if ($dh{EXCLUDE_FIND}) {
 
 foreach my $package (getpackages()) {
 	my (@installed, %dest2sources);
+	my $default_source_dir = default_sourcedir($package);
 	my @search_dirs = ($srcdir);
-	push(@search_dirs, default_sourcedir($package)) if not compat(6);
+	push(@search_dirs, $default_source_dir) if not compat(6);
 
 	# Look at the install files for all packages to handle
 	# list-missing/fail-missing, but skip really installing for
@@ -233,7 +234,7 @@ foreach my $package (getpackages()) {
 		if (not $exclude) {
 			my @unoptimized;
 			for my $src (@filelist) {
-				my $d = $dest // compute_dest($src);
+				my $d = $dest // compute_dest($default_source_dir, $src);
 				my $basename = basename($src);
 				if (exists($dest2sources{$d}{$basename})) {
 					# If there is a clash, silently undo the optimizations.
@@ -267,7 +268,7 @@ foreach my $package (getpackages()) {
 				$target_dest = $dest;
 				if (! defined $target_dest) {
 					# Guess at destination directory.
-					$target_dest = compute_dest($src);
+					$target_dest = compute_dest($default_source_dir, $src);
 				}
 			}
 
@@ -320,10 +321,10 @@ if ($dh{LIST_MISSING} || $dh{FAIL_MISSING}) {
 }
 
 sub compute_dest {
-	my ($dest) = @_;
+	my ($source_dir, $dest) = @_;
 
 	$dest =~ s/^(.*\/)?\Q$srcdir\E\///;
-	$dest =~ s/^(.*\/)?debian\/tmp\///;
+	$dest =~ s/^(.*\/)?\Q$source_dir\E\///;
 	$dest = dirname("/".$dest);
 
 	return $dest;
