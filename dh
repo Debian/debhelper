@@ -370,11 +370,10 @@ if ($sequence eq 'debian/rules' ||
 # Definitions of sequences.
 my $build_stamp_file = 'debian/debhelper-build-stamp';
 my %sequences;
-my @bd_minimal = qw{
+my @bd_minimal = compat(10) ? qw{
 	dh_testdir
-};
-my @bd = (qw{
-	dh_testdir
+} : ();
+my @bd = (@bd_minimal, qw{
 	dh_update_autotools_config
 	dh_auto_configure
 	dh_auto_build
@@ -438,8 +437,7 @@ my @b=qw{
 	dh_md5sums
 	dh_builddeb
 };
-$sequences{clean} = [qw{
-	dh_testdir
+$sequences{clean} = [@bd_minimal, qw{
 	dh_auto_clean
 	dh_clean
 }];
