@@ -349,6 +349,11 @@ sub doit_in_builddir_noerror {
 	return $this->_in_dir($this->get_buildpath, \&print_and_doit_noerror, @args);
 }
 
+sub complex_doit_in_builddir {
+	my ($this, @args) = @_;
+	return $this->_in_dir($this->get_buildpath, \&print_and_complex_doit, @args);
+}
+
 # In case of out of source tree building, whole build directory
 # gets wiped (if it exists) and 1 is returned. If build directory
 # had 2 or more levels, empty parent directories are also deleted.

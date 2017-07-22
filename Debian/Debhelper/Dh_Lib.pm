@@ -63,6 +63,7 @@ our (@EXPORT, %dh);
 	    XARGS_INSERT_PARAMS_HERE &glob_expand_error_handler_reject
 	    &glob_expand_error_handler_warn_and_discard &glob_expand
 	    &glob_expand_error_handler_silently_ignore DH_BUILTIN_VERSION
+	    &print_and_complex_doit
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -327,6 +328,20 @@ sub complex_doit {
 		system(join(" ", @_)) == 0 || error_exitcode(join(" ", @_))
 	}			
 }
+
+# Run a command and display the command to stdout except when quiet
+# Use print_and_doit() if you can, instead of this function, because
+# this function forks a shell. However, this function can handle more
+# complicated stuff like redirection.
+sub print_and_complex_doit {
+	nonquiet_print(join(" ",@_));
+
+	if (! $dh{NO_ACT}) {
+		# The join makes system get a scalar so it forks off a shell.
+		system(join(" ", @_)) == 0 || error_exitcode(join(" ", @_))
+	}
+}
+
 
 sub error_exitcode {
 	my $command=shift;
