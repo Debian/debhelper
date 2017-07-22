@@ -1290,9 +1290,7 @@ sub getpackages {
 		return @{$packages_by_type{$type}};
 	}
 
-	$packages_by_type{$_} = [] for qw(both indep arch all-listed-in-control-file);
-	
-
+	my $fd;
 	my $package="";
 	my $arch="";
 	my $section="";
@@ -1301,8 +1299,14 @@ sub getpackages {
 	if (exists $ENV{'DEB_BUILD_PROFILES'}) {
 		@profiles=split /\s+/, $ENV{'DEB_BUILD_PROFILES'};
 	}
-	open (my $fd, '<', 'debian/control') ||
+	if (not open($fd, '<', 'debian/control')) {
+		error("\"debian/control\" not found. Are you sure you are in the correct directory?")
+			if $! == ENOENT;
 		error("cannot read debian/control: $!\n");
+	};
+
+	$packages_by_type{$_} = [] for qw(both indep arch all-listed-in-control-file);
+
 	while (<$fd>) {
 		chomp;
 		s/\s+$//;

@@ -40,6 +40,9 @@ debhelper (10.7) UNRELEASED; urgency=medium
   * Dh_Lib: Make getpackages without any arguments return all
     packages as the documentation promises it should.  Previously,
     it would hide packages not built (e.g. due to Build-Profiles).
+  * Dh_Lib: Provide a better error message when getpackages() is called
+    by a helper in the wrong directory.  Unfortunately, dh cannot rely
+    on dh_testdir to do this as dh_testdir is called too late.
 
  -- Niels Thykier <niels@thykier.net>  Sat, 15 Jul 2017 09:42:32 +0000
 
