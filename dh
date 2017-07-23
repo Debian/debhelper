@@ -1081,7 +1081,7 @@ sub extract_skipinfo {
 	foreach my $dir (split (':', $ENV{PATH})) {
 		if (open (my $h, "<", "$dir/$command")) {
 			while (<$h>) {
-				if (m/PROMISE: DH NOOP( WITHOUT\s+(.*))?/) {
+				if (m/PROMISE: DH NOOP( WITHOUT\s+(.*))?\s*$/) {
 					close $h;
 					return split(' ', $2) if defined($2);
 					return ('always-skip');
