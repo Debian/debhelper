@@ -370,9 +370,9 @@ if ($sequence eq 'debian/rules' ||
 # Definitions of sequences.
 my $build_stamp_file = 'debian/debhelper-build-stamp';
 my %sequences;
-my @bd_minimal = compat(10) ? qw{
+my @bd_minimal = qw{
 	dh_testdir
-} : ();
+};
 my @bd = (@bd_minimal, qw{
 	dh_update_autotools_config
 	dh_auto_configure
@@ -1041,6 +1041,7 @@ sub can_skip {
 	}
 	my @skipinfo=@{$skipinfo{$command}};
 	return 0 unless @skipinfo;
+	return 1 if scalar(@skipinfo) == 1 and $skipinfo[0] eq 'always-skip';
 	my $all_pkgs;
 
 	foreach my $skipinfo (@skipinfo) {
@@ -1080,9 +1081,10 @@ sub extract_skipinfo {
 	foreach my $dir (split (':', $ENV{PATH})) {
 		if (open (my $h, "<", "$dir/$command")) {
 			while (<$h>) {
-				if (m/PROMISE: DH NOOP WITHOUT\s+(.*)/) {
+				if (m/PROMISE: DH NOOP( WITHOUT\s+(.*))?/) {
 					close $h;
-					return split(' ', $1);
+					return split(' ', $2) if defined($2);
+					return ('always-skip');
 				}
 			}
 			close $h;

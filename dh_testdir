@@ -35,6 +35,13 @@ Test for the existence of these files too.
 
 =cut
 
+# This command is completely useless when called from dh(1) as dh will
+# have attempted to read d/control before it even constructs the
+# command sequences.  Accordingly, there is no doubt that the
+# following is unconditionally true:
+#
+# PROMISE: DH NOOP
+
 # Run before init because init will try to read debian/control and
 # we want a nicer error message.
 checkfile('debian/control');
