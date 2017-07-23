@@ -1,13 +1,19 @@
 debhelper (10.10.6) UNRELEASED; urgency=medium
 
+  [ Axel Beckert ]
   * Cleanup trailing whitespace in ancient debian/changelog entries and
     debian/rules.
   * Fix typo "belive" in debian/copyright and ancient debian/changelog
     entries.
   * Use HTTPS in debian/copyright format URL.
+
+  [ Niels Thykier ]
   * Remove support for named compat levels.
   * dh_perl: Make dh_perl faster on packages with large doc
     directories by pruning the entire doc directory.
+  * dh,dh_auto_*: Support skipping all of the dh_auto_* helpers if the
+    package does not seem to have a build system (and there are no build
+    system related options passed to dh).
 
  -- Axel Beckert <abe@debian.org>  Fri, 27 Oct 2017 23:48:44 +0200
 

@@ -582,6 +582,7 @@ my @packages=@{$dh{DOPACKAGES}};
 # Filter out options intended only for this program.
 my @options;
 my $user_specified_options=0;
+my $build_system_options = 0;
 if ($sequence eq 'build-arch' ||
     $sequence eq 'install-arch' ||
     $sequence eq 'binary-arch') {
@@ -623,6 +624,7 @@ while (@ARGV_orig) {
 			next if $max_parallel == 1;
 		}
 		push @options, "-O".$opt;
+		$build_system_options = 1 if $opt ne '--no-parallel' and $opt ne '--parallel';
 		$user_specified_options=1
 			unless $opt =~ /^--((?:no-)?parallel|buildsystem|sourcedirectory|builddirectory|)/;
 	}
@@ -1071,6 +1073,13 @@ sub can_skip {
 				}
 				# Use the secret bulk check call
 				return 0 if pkgfile($pkgs, $need) ne '';
+			} elsif ($type eq 'buildsystem') {
+				# If there are any buildsystem options, we assume that
+				# the build needs a buildsystem.
+				return 0 if $build_system_options;
+				require Debian::Debhelper::Dh_Buildsystems;
+				my $system = Debian::Debhelper::Dh_Buildsystems::load_buildsystem(undef, $need);
+				return 0 if defined($system);
 			} else {
 				# Unknown hint - make no assumptions
 				return 0;
