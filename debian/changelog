@@ -1,5 +1,6 @@
 debhelper (10.7) UNRELEASED; urgency=medium
 
+  [ Niels Thykier ]
   * dh_usrlocal: Fix call to doit to avoid making it fork a shell.
   * autoconf.pm: Ditto.
   * cmake.pm: Ditto.
@@ -54,6 +55,12 @@ debhelper (10.7) UNRELEASED; urgency=medium
   * dh_gencontrol: Rewrite code that ensures that misc:Depends and
     misc:Pre-Depends are present to avoid relying external processes
     for this.
+
+  [ Colin Watson ]
+  * Quote assignment to $recommended_compat in case it isn't a valid Perl
+    version string (e.g. for Debian derivatives).  Fix typos that caused it
+    not to be used correctly.  Use the /g flag so that all instances of the
+    substitution variable are handled.  (Closes: #869780)
 
  -- Niels Thykier <niels@thykier.net>  Sat, 15 Jul 2017 09:42:32 +0000
 
