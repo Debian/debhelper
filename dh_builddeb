@@ -134,7 +134,7 @@ on_items_in_parallel(\@items, sub {
 			# XXX: Should we blindly overrule the maintainer's choice
 			# of compressor arguments here?  It is not apparent that
 			# their explicit -z was intended for the dbgsym package.
-			doit("dpkg-deb", @{$dh{U_PARAMS}}
+			doit("dpkg-deb", @{$dh{U_PARAMS}},
 				"--build", $dbgsym_tmpdir, $dh{DESTDIR});
 			next;
 		}
