@@ -1,3 +1,25 @@
+debhelper (10.7+exp.buildlabels) UNRELEASED; urgency=medium
+
+  PROTOTYPE: Buildlabels - Experimental feature for making
+  different feature builds easier to manage.
+
+  * Dh_Lib: Support tagging packages with "X-DH-Buildlabel" to
+    associate builds with buildlabel.
+  * dh_auto_*: Support new --buildlabel option to group builds.
+    Skips builds if all packages associated with the buildlabel
+    are skipped.
+  * dh_auto_install: Choose a distinct destdir per buildlabel by
+    default.
+  * dh_install: Automatically determine the default sourcedir for
+    a package based on its buildlabel (disabled by --sourcedir).
+  * dh_installman: Ditto.
+  * dh_installdocs: Ditto.
+  * dh_installexamples: Ditto.
+  * dh_missing: Check all source directories for missing files by
+    default.
+
+ -- Niels Thykier <niels@thykier.net>  Sat, 29 Jul 2017 18:10:48 +0000
+
 debhelper (10.7) unstable; urgency=medium
 
   [ Niels Thykier ]
