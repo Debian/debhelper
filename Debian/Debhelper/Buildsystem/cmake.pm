@@ -56,6 +56,10 @@ sub configure {
 	# Standard set of cmake flags
 	my @flags = @STANDARD_CMAKE_FLAGS;
 
+	if (not compat(10)) {
+		push(@flags, '-DCMAKE_INSTALL_RUNSTATEDIR=/run');
+	}
+
 	if (is_cross_compiling()) {
 		my $deb_host = dpkg_architecture_value("DEB_HOST_ARCH_OS");
 		if (my $cmake_system = $DEB_HOST2CMAKE_SYSTEM{$deb_host}) {
