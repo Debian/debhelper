@@ -325,7 +325,9 @@ sub _doit {
 				open(STDOUT, '>', $output) or error("redirect STDOUT failed: $!");
 			}
 		}
-		exec(@cmd);
+		# Force execvp call to avoid shell.  Apparently, even exec can
+		# involve a shell if you don't do this.
+		exec { $cmd[0] } @cmd;
 	}
 	return waitpid($pid, 0) == $pid && $? == 0;
 }

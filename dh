@@ -803,8 +803,8 @@ sub run {
 	}
 
 	return if $dh{NO_ACT};
-			
-	my $ret=system($command, @options);
+
+	my $ret=system { $command } $command, @options;
 	if ($ret >> 8 != 0) {
 		exit $ret >> 8;
 	}

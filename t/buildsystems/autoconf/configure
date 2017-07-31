@@ -8,13 +8,13 @@ use warnings;
 my @OPTIONS=qw(
    ^--build=.*$
    ^--prefix=/usr$
-   ^--includedir=/usr/include$
-   ^--mandir=/usr/share/man$
-   ^--infodir=/usr/share/info$
+   ^--includedir=\$\{prefix\}/include$
+   ^--mandir=\$\{prefix\}/share/man$
+   ^--infodir=\$\{prefix\}/share/info$
    ^--sysconfdir=/etc$
    ^--localstatedir=/var$
-   ^--libexecdir=/usr/lib/.*$
-   ^--libdir=/usr/lib/.*$
+   ^--libexecdir=\$\{prefix\}/lib/.*$
+   ^--libdir=\$\{prefix\}/lib/.*$
    ^--disable-silent-rules$
    ^--disable-maintainer-mode$
    ^--disable-dependency-tracking$
