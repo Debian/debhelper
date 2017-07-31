@@ -4,6 +4,10 @@ debhelper (10.7.1) UNRELEASED; urgency=medium
     (like the documentation promises).
   * dh: Ensure that we do not fork a shell for running a simple
     command.
+  * autoconf: Revert expansion of ${var} variables passed to
+    configure as several packages implicitly assume that are not
+    expanded.  E.g. liblockfile relies on ${prefix} being
+    unexpanded for DESTDIR to work.  Reopens: #813266
 
  -- Niels Thykier <niels@thykier.net>  Sun, 30 Jul 2017 10:27:46 +0000
 
