@@ -310,7 +310,7 @@ sub _doit {
 	my (@cmd) = @_;
 	my $options = ref($cmd[0]) ? shift(@cmd) : undef;
 	# In compat <= 10, we warn, compat 11 we detect and error, in
-	# compat 12 we assume peolpe know what they are doing.
+	# compat 12 we assume people know what they are doing.
 	if (not defined($options) and @cmd == 1 and compat(11) and $cmd[0] =~ m/[\s<&>|;]/) {
 		deprecated_functionality('doit() + doit_*() calls will no longer spawn a shell in compat 11 for single string arguments (please use complex_doit instead)',
 								 11);
