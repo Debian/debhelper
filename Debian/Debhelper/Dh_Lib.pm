@@ -63,7 +63,7 @@ our (@EXPORT, %dh);
 	    XARGS_INSERT_PARAMS_HERE &glob_expand_error_handler_reject
 	    &glob_expand_error_handler_warn_and_discard &glob_expand
 	    &glob_expand_error_handler_silently_ignore DH_BUILTIN_VERSION
-	    &print_and_complex_doit &default_sourcedir
+	    &print_and_complex_doit &default_sourcedir &qx_cmd
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -340,6 +340,19 @@ sub _format_cmdline {
 		$cmd_line .= ' > ' . escape_shell($output);
 	}
 	return $cmd_line;
+}
+
+sub qx_cmd {
+	my (@cmd) = @_;
+	my $output;
+	open(my $fd, '-|', @cmd) or error('fork+exec (' . escape_shell(@cmd) . "): $!");
+	local $/ = undef;
+	$output = <$fd>;
+	if (not close($fd)) {
+		error("close pipe failed: $!") if $!;
+		error_exitcode(escape_shell(@cmd));
+	}
+	return $output;
 }
 
 # Run a command and display the command to stdout if verbose mode is on.
