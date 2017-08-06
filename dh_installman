@@ -141,11 +141,11 @@ init(options => {
 my (@sofiles, @sodests);
 my @all_packages = getpackages();
 
-my $error_handler = compat(10) ? \&glob_expand_error_handler_warn_and_discard : \&glob_expand_error_handler_reject;
+my $default_error_handler = compat(10) ? \&glob_expand_error_handler_warn_and_discard : \&glob_expand_error_handler_reject;
 my $nodocs = is_build_profile_active('nodoc') ? 1 : 0;
 # We cannot assume documentation is built under nodoc, but if it is we must flag it as handled
 # or dh_missing might make noise.
-$error_handler = \&glob_expand_error_handler_silently_ignore if $nodocs;
+$default_error_handler = \&glob_expand_error_handler_silently_ignore if $nodocs;
 
 on_items_in_parallel(\@all_packages, sub {
 
@@ -156,6 +156,8 @@ on_items_in_parallel(\@all_packages, sub {
 		my $file = pkgfile($package, "manpages");
 		my @manpages;
 		my @search_dirs = ('.');
+		my $skip_install = process_pkg($package) ? 0 : 1;
+		my $error_handler = $skip_install ? \&glob_expand_error_handler_silently_ignore : $default_error_handler;
 		@search_dirs = ($dh{SOURCEDIR} // '.', default_sourcedir($package)) if not compat(10);
 
 		@manpages = filearray($file, \@search_dirs, $error_handler) if $file;
@@ -166,7 +168,7 @@ on_items_in_parallel(\@all_packages, sub {
 
 		log_installed_files($package, @manpages);
 
-		next if not process_pkg($package) or $nodocs;
+		next if $skip_install or $nodocs;
 
 		foreach my $page (@manpages) {
 			my $basename = basename($page);
