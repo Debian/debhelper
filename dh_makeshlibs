@@ -169,7 +169,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		my ($library, $major);
 		chomp;
 		push @lib_files, $_;
-		my $ret=qx_cmd($objdump, '-p', $_);
+		my $ret = compat(10) ? `$objdump -p "$_"` : qx_cmd($objdump, '-p', $_);
 		if ($ret=~m/\s+SONAME\s+(.*)\.so\.(.*)/) {
 			# proper soname format
 			$library=$1;
