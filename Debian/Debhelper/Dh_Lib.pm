@@ -344,14 +344,19 @@ sub _format_cmdline {
 
 sub qx_cmd {
 	my (@cmd) = @_;
-	my $output;
+	my ($output, @output);
 	open(my $fd, '-|', @cmd) or error('fork+exec (' . escape_shell(@cmd) . "): $!");
-	local $/ = undef;
-	$output = <$fd>;
+	if (wantarray) {
+		@output = <$fd>;
+	} else {
+		local $/ = undef;
+		$output = <$fd>;
+	}
 	if (not close($fd)) {
 		error("close pipe failed: $!") if $!;
 		error_exitcode(escape_shell(@cmd));
 	}
+	return @output if wantarray;
 	return $output;
 }
 
