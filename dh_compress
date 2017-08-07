@@ -203,7 +203,7 @@ on_pkgs_in_parallel {
 		chdir($olddir);
 
 		# Fix up symlinks that were pointing to the uncompressed files.
-		my %links = map { chomp; $_ => 1 } `find $tmp -type l`;
+		my %links = map { chomp; $_ => 1 } qx_cmd('find', $tmp, '-type', 'l');
 		my $changed;
 		# Keep looping through looking for broken links until no more
 		# changes are made. This is done in case there are links pointing

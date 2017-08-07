@@ -90,7 +90,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	if (-d "$new_schemas_dir") {
 		# Get a list of the schemas
-		my $schemas = `find $new_schemas_dir -type f -name \\*.schemas -printf '%P '`;
+		my $schemas = qx_cmd('find', $new_schemas_dir, '-type', 'f', '-name', '*.schemas',
+							 '-printf', '%P');
 		if ($schemas ne '') {
 			addsubstvar($package, "misc:Depends", "gconf2 (>= 2.28.1-2)");
 		}

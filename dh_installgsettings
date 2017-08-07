@@ -78,7 +78,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	if (-d "$gsettings_schemas_dir") {
 		# Get a list of the schemas
-		my $schemas = `find $gsettings_schemas_dir -type f \\( -name \\*.xml -o -name \\*.override \\) -printf '%P '`;
+		my $schemas = qx_cmd('find', $gsettings_schemas_dir, '-type', 'f',
+							 '(', '-name', '*.xml', '-o', '-name', '*.override',
+							 ')', '-printf', '%P');
 		if ($schemas ne '') {
 			addsubstvar($package, "misc:Depends", "dconf-gsettings-backend | gsettings-backend");
 		}
