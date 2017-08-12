@@ -77,7 +77,7 @@ if (@ARGV) {
 	}
 }
 
-my $nodocs = is_build_profile_active('nodoc') ? 1 : 0;
+my $nodocs = is_build_profile_active('nodoc') || get_buildoption('nodoc') ? 1 : 0;
 
 # PROMISE: DH NOOP WITHOUT wm
 
