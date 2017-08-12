@@ -637,7 +637,8 @@ B<-DCMAKE_INSTALL_RUNSTATEDIR=/run> to L<cmake(1)>.
 
 B<Caveat>: This option silently does nothing in cmake versions prior
 to 3.8.  Please keep this in mind if your package is regularly
-backported (e.g. to stretch-backports) where cmake is older than 3.8.
+backported to a suite (e.g. stretch-backports) where cmake is older
+than 3.8.
 
 =item -
 
@@ -695,8 +696,10 @@ L<Debian::Debhelper::Dh_Lib> that made them spawn a shell in one
 particular circumstance.  This bug is now removed and will cause
 helpers that rely on the bug to fail with an error.
 
-In compatibility 11, there is still a detection for this case.  This
-detection will be removed in compatibility level 12.
+In compatibility 11, there is still a detection for this case to
+provide a useful error message.  This detection will be removed in
+compatibility 12, where the string will be interpreted as a literal
+command and fail with a "command not found" error.
 
 =item -
 
