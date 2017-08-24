@@ -7,4 +7,4 @@ use Test::More;
 eval 'use Test::Pod';
 plan skip_all => 'Test::Pod required' if $@;
 
-all_pod_files_ok(grep { -x $_ } glob 'dh_*');
+all_pod_files_ok('debhelper.pod', grep { -x $_ } 'dh', glob 'dh_*');
