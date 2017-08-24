@@ -10,7 +10,7 @@ use Test::DH;
 
 use Config;
 my $binpath = $ENV{AUTOPKGTEST_TMP} ? '/usr/bin' : '.';
-my $libpath = $ENV{AUTOPKGTEST_TMP} ? $Config{vendorlib} : '.';
+my $libpath = $ENV{AUTOPKGTEST_TMP} ? $Config{vendorlib} : 'lib';
 
 my @targets;
 if ($0 =~ m{syntax-progs\.t$}) {
