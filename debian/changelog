@@ -33,6 +33,9 @@ debhelper (10.7.3) UNRELEASED; urgency=medium
     symlink_to_dir and dir_to_symlink maintscripts.  The version
     requirements are satisfied in oldoldstable.
   * dh_installdocs: Merge two chmod calls to save a fork+exec.
+  * dh_strip: Disable parallelism when --dbg-package is used as it
+    causes non-deterministic failures in some cases.  Thanks to
+    Helmut Grohne for reporting the issue.  (Closes: #872007)
 
   [ Geoffrey Thomas ]
   * Support building debhelper on case-insensitive filesystems by
