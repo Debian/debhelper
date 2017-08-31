@@ -36,6 +36,11 @@ debhelper (10.7.3) UNRELEASED; urgency=medium
   * dh_strip: Disable parallelism when --dbg-package is used as it
     causes non-deterministic failures in some cases.  Thanks to
     Helmut Grohne for reporting the issue.  (Closes: #872007)
+  * dh_installdocs: Auto-detect "main package" for documentation
+    packages in compat 11 to assist with Debian policy §12.3.  This
+    auto-detection can be overrules with the new --doc-main-package.
+    (Closes: #824221)
+  * dh_installexamples: Ditto.
 
   [ Adam Conrad ]
   * dh_gencontrol: Change the synopsis of dbgsym packages so it

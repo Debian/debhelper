@@ -64,6 +64,7 @@ our (@EXPORT, %dh);
 	    &glob_expand_error_handler_warn_and_discard &glob_expand
 	    &glob_expand_error_handler_silently_ignore DH_BUILTIN_VERSION
 	    &print_and_complex_doit &default_sourcedir &qx_cmd
+	    &compute_doc_main_package
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -1989,5 +1990,28 @@ sub on_items_in_parallel {
 
 *on_selected_pkgs_in_parallel = \&on_items_in_parallel;
 
+sub compute_doc_main_package {
+	my ($doc_package) = @_;
+	# if explicitly set, then choose that.
+	return $dh{DOC_MAIN_PACKAGE} if $dh{DOC_MAIN_PACKAGE};
+	# In compat 10 (and earlier), there is no auto-detection
+	return $doc_package if compat(10);
+	my $target_package = $doc_package;
+	# If it is not a -doc package, then docs should be installed
+	# under its own package name.
+	return $doc_package if $target_package !~ s/-doc$//;
+	# FOO-doc hosts the docs for FOO; seems reasonable
+	return $target_package if exists($package_types{$target_package});
+	if ($doc_package =~ m/^lib./) {
+		# Special case, "libFOO-doc" can host docs for "libFOO-dev"
+		my $lib_dev = "${target_package}-dev";
+		return $lib_dev if exists($package_types{$lib_dev});
+		# Technically, we could go look for a libFOO<something>-dev,
+		# but atm. it is presumed to be that much of a corner case
+		# that it warrents an override.
+	}
+	# We do not know; make that clear to the caller
+	return;
+}
 
 1

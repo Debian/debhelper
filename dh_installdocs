@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+=encoding UTF-8
+
 =head1 NAME
 
 dh_installdocs - install documentation into package build directories
@@ -95,6 +97,26 @@ acted on.
 Exclude files that contain I<item> anywhere in their filename from
 being installed. Note that this includes doc-base files.
 
+=item B<--doc-main-package=>I<main-package>
+
+Set the main package for a documentation package.  This is used to
+install the documentation of the documentation package in F<<
+/usr/share/doc/I<main-package> >> as recommended by the Debian policy
+manual 3.9.7 in §12.3.
+
+In compat 11 (or later), this option is only useful if debhelper's
+auto-detection of the main package is wrong.  The option can also be
+used to silence a warning from debhelper when the auto-detection fails
+but the default happens to be correct.
+
+This option cannot be used when B<dh_installdocs> is instructed to act
+on multiple packages.  If you need this option, you will generally
+need to combine it with B<-p> to ensure exactly one package is acted
+on.
+
+Please keep in mind that some documentation (notably, the copyright
+file and the package changelog) will be unaffected by this option.
+
 =item B<--link-doc=>I<package>
 
 Make the documentation directory of all packages acted on be a symlink to
@@ -182,6 +204,7 @@ sub ensure_docdir {
 init(options => {
 	"link-doc=s" => \$dh{LINK_DOC},
 	"sourcedir=s" => \$dh{SOURCEDIR},
+	'doc-main-package=s' => \$dh{DOC_MAIN_PACKAGE},
 });
 
 my $called_getpackages = 0;
@@ -190,6 +213,10 @@ my $nodocs = is_build_profile_active('nodoc') || get_buildoption('nodoc') ? 1 : 
 # We cannot assume documentation is built under nodoc, but if it is we must flag it as handled
 # or dh_missing might make noise.
 $default_error_handler = \&glob_expand_error_handler_silently_ignore if $nodocs;
+
+if (@{$dh{DOPACKAGES}} > 1 and $dh{DOC_MAIN_PACKAGE}) {
+	error('--doc-main-package should be used with -p<doc-pkg>');
+}
 
 foreach my $package (getpackages()) {
 	next if is_udeb($package);
@@ -248,9 +275,17 @@ foreach my $package (getpackages()) {
 
 	if (not $nodocs and @docs) {
 		my $exclude = ' -and ! -empty';
+		my $target_package = compute_doc_main_package($package);
+		if (not defined($target_package)) {
+			warning("Cannot auto-detect main package for ${package}.  If the default is wrong, please use --doc-main-package");
+			$target_package = $package;
+		}
 		if ($dh{EXCLUDE_FIND}) {
 			$exclude .= ' -and ! \( '.$dh{EXCLUDE_FIND}.' \)';
 		}
+		my $target_dir = "usr/share/doc/$target_package";
+		install_dir($target_dir) unless -l $target_dir;
+
 		foreach my $doc (@docs) {
 			next if excludefile($doc);
 			next if -f $doc && ! -s _; # ignore empty files
@@ -260,14 +295,13 @@ foreach my $package (getpackages()) {
 				my $dir = ($basename eq '.') ? $doc : "$doc/..";
 				my $pwd=`pwd`;
 				chomp $pwd;
-				my $docdir = "$pwd/$tmp/usr/share/doc/$package";
+				my $docdir = "${pwd}/${target_dir}";
 				complex_doit("cd '$dir' && " .
 							 "find '$basename' \\( -type f -or -type l \\)$exclude -print0 | LC_ALL=C sort -z | " .
 							 "xargs -0 -I {} cp --reflink=auto --parents -dp {} $docdir");
 			}
 			else {
-				doit("cp", '--reflink=auto', "-a", $doc,
-					 "$tmp/usr/share/doc/$package");
+				doit("cp", '--reflink=auto', "-a", $doc, "${tmp}/${target_dir}");
 			}
 		}
 		doit("chown","-R","0:0","$tmp/usr/share/doc");
