@@ -283,7 +283,7 @@ foreach my $package (getpackages()) {
 		if ($dh{EXCLUDE_FIND}) {
 			$exclude .= ' -and ! \( '.$dh{EXCLUDE_FIND}.' \)';
 		}
-		my $target_dir = "usr/share/doc/$target_package";
+		my $target_dir = "${tmp}/usr/share/doc/${target_package}";
 		install_dir($target_dir) unless -l $target_dir;
 
 		foreach my $doc (@docs) {
@@ -295,13 +295,14 @@ foreach my $package (getpackages()) {
 				my $dir = ($basename eq '.') ? $doc : "$doc/..";
 				my $pwd=`pwd`;
 				chomp $pwd;
-				my $docdir = "${pwd}/${target_dir}";
+				# Gracefully handling tmpdir being absolute (-P/...)
+				my $docdir = $target_dir =~ m{^/} ? $target_dir : "${pwd}/${target_dir}";
 				complex_doit("cd '$dir' && " .
 							 "find '$basename' \\( -type f -or -type l \\)$exclude -print0 | LC_ALL=C sort -z | " .
 							 "xargs -0 -I {} cp --reflink=auto --parents -dp {} $docdir");
 			}
 			else {
-				doit("cp", '--reflink=auto', "-a", $doc, "${tmp}/${target_dir}");
+				doit("cp", '--reflink=auto', "-a", $doc, $target_dir);
 			}
 		}
 		doit("chown","-R","0:0","$tmp/usr/share/doc");

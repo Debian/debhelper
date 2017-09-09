@@ -138,7 +138,7 @@ foreach my $package (getpackages()) {
 			warning("Cannot auto-detect main package for ${package}.  If the default is wrong, please use --doc-main-package");
 			$target_package = $package;
 		}
-		my $target_dir = "usr/share/doc/${target_package}/examples";
+		my $target_dir = "${tmp}/usr/share/doc/${target_package}/examples";
 		install_dir($target_dir);
 
 		my $exclude = '';
@@ -152,12 +152,14 @@ foreach my $package (getpackages()) {
 				my $basename = basename($example);
 				my $dir = ($basename eq '.') ? $example : "$example/..";
 				chomp($pwd=`pwd`) if not defined($pwd);
+				# Gracefully handling tmpdir being absolute (-P/...)
+				my $destdir = $target_dir =~ m{^/} ? $target_dir : "${pwd}/${target_dir}";
 				complex_doit("cd '$dir' && " .
 							 "find '$basename' -type f$exclude -print0 | LC_ALL=C sort -z | " .
-							 "xargs -0 -I {} cp --reflink=auto --parents -dp {} ${pwd}/${target_dir}");
+							 "xargs -0 -I {} cp --reflink=auto --parents -dp {} ${destdir}");
 			}
 			else {
-				doit("cp", '--reflink=auto', "-a", $example, "${tmp}/${target_dir}");
+				doit("cp", '--reflink=auto', "-a", $example, $target_dir);
 			}
 		}
 	}
