@@ -9,6 +9,7 @@ dh_shlibdeps - calculate shared library dependencies
 use strict;
 use warnings;
 use Cwd;
+use File::Find;
 use Debian::Debhelper::Dh_Lib;
 
 our $VERSION = DH_BUILTIN_VERSION;
@@ -110,7 +111,7 @@ on_pkgs_in_parallel {
 	foreach my $package (@_) {
 		my $tmp=tmpdir($package);
 		my $ext=pkgext($package);
-		my (@filelist, $ff);
+		my (@filelist);
 
 		# Generate a list of ELF binaries in the package, ignoring any
 		# we were told to exclude.
@@ -118,18 +119,57 @@ on_pkgs_in_parallel {
 		if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
 			$find_options="! \\( $dh{EXCLUDE_FIND} \\)";
 		}
-		foreach my $file (split(/\n/,`find $tmp -type f \\( -perm /111 -or -name "*.so*" -or -name "*.cmxs" -or -name "*.node" \\) $find_options -print`)) {
-			# Prune directories that contain separated debug symbols.
-			# CAVEAT: There are files in /usr/lib/debug that are not detached debug symbols,
-			# which should be processed.  (see #865982)
-			next if $file=~m!^\Q$tmp\E/usr/lib/debug/(lib|lib64|usr|bin|sbin|opt|dev|emul|\.build-id)/!;
-			# TODO this is slow, optimize. Ie, file can run once on
-			# multiple files..
-			$ff = qx_cmd('file', '-e', 'apptype', '-e', 'ascii', '-e', 'encoding',
-				'-e', 'cdf', '-e', 'compress', '-e', 'tar', $file);
-			if ($ff=~m/ELF/ && $ff!~/statically linked/) {
-				push @filelist,$file;
+		next if not -d $tmp;
+		if (compat(10)) {
+			foreach my $file (split(/\n/, `find $tmp -type f \\( -perm /111 -or -name "*.so*" -or -name "*.cmxs" -or -name "*.node" \\) $find_options -print`)) {
+				# Prune directories that contain separated debug symbols.
+				# CAVEAT: There are files in /usr/lib/debug that are not detached debug symbols,
+				# which should be processed.  (see #865982)
+				next if $file =~ m!^\Q$tmp\E/usr/lib/debug/(lib|lib64|usr|bin|sbin|opt|dev|emul|\.build-id)/!;
+				# TODO this is slow, optimize. Ie, file can run once on
+				# multiple files..
+				my $ff = qx_cmd('file', '-e', 'apptype', '-e', 'ascii', '-e', 'encoding',
+					'-e', 'cdf', '-e', 'compress', '-e', 'tar', $file);
+				if ($ff =~ m/ELF/ && $ff !~ /statically linked/) {
+					push @filelist, $file;
+				}
 			}
+		} else {
+			my $find_elf_files = sub {
+				my $fn = $_;
+				return if -l $fn; # Ignore symlinks
+				# See if we were asked to exclude this file.
+				# Note that we have to test on the full filename, including directory.
+				foreach my $f (@{$dh{EXCLUDE}}) {
+					if ($fn =~ m/\Q$f\E/) {
+						$File::Find::prune = 1 if -d _;
+						return;
+					}
+				}
+				if (-d _) {
+					# Prune directories that contain separated debug symbols.
+					# CAVEAT: There are files in /usr/lib/debug that are not detached debug symbols,
+					# which should be processed.  (see #865982)
+					if ($fn =~ m!^\Q$tmp\E/usr/lib/debug/(lib|lib64|usr|bin|sbin|opt|dev|emul|\.build-id)/!) {
+						$File::Find::prune = 1;
+					}
+					return;
+				}
+
+				return if not -f _;
+				return if not is_so_or_exec_elf_file($fn);
+				# TODO this is slow, optimize. Ie, file can run once on
+				# multiple files..
+				my $ff = qx_cmd('file', '-e', 'apptype', '-e', 'ascii', '-e', 'encoding',
+					'-e', 'cdf', '-e', 'compress', '-e', 'tar', $fn);
+				if ($ff =~ m/ELF/ && $ff !~ /statically linked/) {
+					push(@filelist, $fn);
+				}
+			};
+			find({
+					wanted => $find_elf_files,
+					no_chdir => 1,
+			}, $tmp);
 		}
 
 		if (@filelist) {

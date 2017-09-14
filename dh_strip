@@ -181,35 +181,57 @@ sub testfile {
 	# See if we were asked to exclude this file.
 	# Note that we have to test on the full filename, including directory.
 	foreach my $f (@{$dh{EXCLUDE}}) {
-		return if ($fn=~m/\Q$f\E/);
+		if ($fn =~ m/\Q$f\E/) {
+			$File::Find::prune = 1 if -d _;
+			return;
+		}
 	}
+	return if -d _;
 
 	# Is it a debug library in a debug subdir?
 	return if $fn=~m/debug\/.*\.so/;
 
-	# Does its filename look like a shared library?
-	#  - *.cmxs are OCaml native code shared libraries
-	#  - *.node are also native ELF binaries (for node-js)
-	if ($fn =~ m/\.(?:so.*?|cmxs|node)$/) {
-		# Ok, do the expensive test.
-		my $type=get_file_type($fn, 1);
-		if ($type=~m/ELF.*shared/) {
-			push @shared_libs, $fn;
+	if (compat(10)) {
+		# In compat 10 and earlier, we used filenames and file(1)
+
+		# Does its filename look like a shared library?
+		#  - *.cmxs are OCaml native code shared libraries
+		#  - *.node are also native ELF binaries (for node-js)
+		if ($fn =~ m/\.(?:so.*?|cmxs|node)$/) {
+			# Ok, do the expensive test.
+			my $type = get_file_type($fn, 1);
+			if ($type =~ m/ELF.*shared/) {
+				push @shared_libs, $fn;
+				return;
+			}
+		}
+
+		# Is it executable? -x isn't good enough, so we need to use stat.
+		my (undef, undef, $mode, undef) = stat(_);
+		if ($mode & 0111) {
+			# Ok, expensive test.
+			my $type = get_file_type($fn, 1);
+			if ($type =~ m/ELF.*(executable|shared)/) {
+				push(@executables, $fn);
+				return;
+			}
+		}
+	} else {
+		# In compat 11, we check the ELF header manually (because bulking file(1) is a pain and
+		# it is too slow otherwise)
+
+		# Exploit the previous stat call, so we can check if it is executable or not (-x is not good enough
+		# for this test)
+		my (undef, undef, $mode, undef) = stat(_);
+		if (is_so_or_exec_elf_file($fn)) {
+			if ($mode & 0111) {
+				push(@executables, $fn);
+			} else {
+				push(@shared_libs, $fn);
+			}
 			return;
 		}
 	}
-	
-	# Is it executable? -x isn't good enough, so we need to use stat.
-	my (undef,undef,$mode,undef)=stat(_);
-	if ($mode & 0111) {
-		# Ok, expensive test.
-		my $type=get_file_type($fn, 1);
-		if ($type=~m/ELF.*(executable|shared)/) {
-			push @executables, $fn;
-			return;
-		}
-	}
-	
 	# Is it a static library, and not a debug library?
 	if ($fn =~ m/\/lib[^\/]*\.a$/ && $fn !~ m/.*_g\.a$/) {
 		# Is it a binary file, or something else (maybe a linker

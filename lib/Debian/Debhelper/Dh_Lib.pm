@@ -64,7 +64,7 @@ our (@EXPORT, %dh);
 	    &glob_expand_error_handler_warn_and_discard &glob_expand
 	    &glob_expand_error_handler_silently_ignore DH_BUILTIN_VERSION
 	    &print_and_complex_doit &default_sourcedir &qx_cmd
-	    &compute_doc_main_package
+	    &compute_doc_main_package &is_so_or_exec_elf_file
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -1928,6 +1928,51 @@ sub log_installed_files {
 	return 1;
 }
 
+use constant {
+	# The ELF header is at least 0x32 bytes (32bit); any filer shorter than that is not an ELF file
+	ELF_MIN_LENGTH => 0x32,
+	ELF_MAGIC => "\x7FELF",
+	ELF_ENDIAN_LE => 0x01,
+	ELF_ENDIAN_BE => 0x02,
+	ELF_TYPE_EXECUTABLE => 0x0002,
+	ELF_TYPE_SHARED_OBJECT => 0x0003,
+};
+
+sub is_so_or_exec_elf_file {
+	my ($file) = @_;
+	open(my $fd, '<:raw', $file) or error("open $file: $!");
+	my $buflen = 0;
+	my ($buf, $endian);
+	while ($buflen < ELF_MIN_LENGTH) {
+		my $r = read($fd, $buf, ELF_MIN_LENGTH - $buflen, $buflen) // error("read ($file): $!");
+		last if $r == 0; # EOF
+		$buflen += $r
+	}
+	close($fd);
+	return 0 if $buflen < ELF_MIN_LENGTH;
+
+	return 0 if substr($buf, 0x00, 4) ne ELF_MAGIC;
+	$endian = unpack('c', substr($buf, 0x05, 1));
+	my ($long_format, $short_format);
+
+	if ($endian == ELF_ENDIAN_BE) {
+		$long_format = 'N';
+		$short_format = 'n';
+	} elsif ($endian == ELF_ENDIAN_LE) {
+		$long_format = 'V';
+		$short_format = 'v';
+	} else {
+		return 0;
+	}
+	my $elf_version = substr($buf, 0x14, 4);
+	my $elf_type = substr($buf, 0x10, 2);
+
+
+	return 0 if unpack($long_format, $elf_version) != 0x00000001;
+	my $elf_type_unpacked = unpack($short_format, $elf_type);
+	return 0 if $elf_type_unpacked != ELF_TYPE_EXECUTABLE and $elf_type_unpacked != ELF_TYPE_SHARED_OBJECT;
+	return 1;
+}
 
 sub on_pkgs_in_parallel(&) {
 	unshift(@_, $dh{DOPACKAGES});

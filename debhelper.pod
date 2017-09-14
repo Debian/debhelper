@@ -722,6 +722,15 @@ the copyright file and the changelog file.
 The B<--doc-main-package> option can be used when the auto-detection
 is insufficient.
 
+=item -
+
+The B<dh_strip> and B<dh_shlibdeps> tools no longer uses filename
+patterns to determine which files to process.  Instead, they read the
+ELF header to determine if a given file is an shared object or an
+ELF executable.
+
+This may cause the tools to process more files than previously.
+
 =back
 
 =back
