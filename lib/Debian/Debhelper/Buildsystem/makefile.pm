@@ -8,7 +8,8 @@ package Debian::Debhelper::Buildsystem::makefile;
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value escape_shell clean_jobserver_makeflags is_cross_compiling compat);
+use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value escape_shell clean_jobserver_makeflags is_cross_compiling compat
+	should_use_root gain_root_cmd);
 use parent qw(Debian::Debhelper::Buildsystem);
 
 my %DEB_DEFAULT_TOOLS = (
@@ -81,7 +82,11 @@ sub do_make {
 	# Note that this will override any -j settings in MAKEFLAGS.
 	unshift @_, "-j" . ($this->get_parallel() > 0 ? $this->get_parallel() : "");
 
-	$this->doit_in_builddir($this->{makecmd}, @_);
+	my @root_cmd;
+	if (exists($this->{_run_make_as_root}) and $this->{_run_make_as_root}) {
+		@root_cmd = gain_root_cmd();
+	}
+	$this->doit_in_builddir(@root_cmd, $this->{makecmd}, @_);
 }
 
 sub make_first_existing_target {
@@ -161,6 +166,10 @@ sub install {
 	}
 	if ( -f $this->get_buildpath('libtool')) {
 		$this->disable_parallel();
+	}
+
+	if (should_use_root('debhelper/upstream-make-install') and $< != 0) {
+		$this->{_run_make_as_root} = 1;
 	}
 
 	$this->make_first_existing_target(['install'],
