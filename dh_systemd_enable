@@ -42,16 +42,41 @@ arguments, e.g. B<dh_systemd_enable quota.service> and B<dh_systemd_enable
 
 =over 4
 
-=item debian/I<package>.service
+=item debian/I<package>.service, debian/I<package>@.service
 
-If this exists, it is installed into lib/systemd/system/I<package>.service in
-the package build directory.
+If this exists, it is installed into lib/systemd/system/I<package>.service (or
+lib/systemd/system/I<package>@.service) in the package build directory.
 
 =item debian/I<package>.tmpfile
 
 If this exists, it is installed into usr/lib/tmpfiles.d/I<package>.conf in the
 package build directory. (The tmpfiles.d mechanism is currently only used
 by systemd.)
+
+=item debian/I<package>.target, debian/I<package>@.target
+
+If this exists, it is installed into lib/systemd/system/I<package>.target (or
+lib/systemd/system/I<package>@.target) in the package build directory.
+
+=item debian/I<package>.socket, debian/I<package>@.socket
+
+If this exists, it is installed into lib/systemd/system/I<package>.socket (or
+lib/systemd/system/I<package>@.socket) in the package build directory.
+
+=item debian/I<package>.mount
+
+If this exists, it is installed into lib/systemd/system/I<package>.mount
+in the package build directory.
+
+=item debian/I<package>.path, debian/I<package>@.path
+
+If this exists, it is installed into lib/systemd/system/I<package>.path (or
+lib/systemd/system/I<package>@.path) in the package build directory.
+
+=item debian/I<package>.timer, debian/I<package>@.timer
+
+If this exists, it is installed into lib/systemd/system/I<package>.timer (or
+lib/systemd/system/I<package>@.timer) in the package build directory.
 
 =back
 
