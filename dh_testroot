@@ -24,8 +24,19 @@ our $VERSION = DH_BUILTIN_VERSION;
 
 inhibit_log();
 
-if ($< != 0) {
+my $requirements = Debian::Debhelper::Dh_Lib::root_requirements();
+
+# By declaration; nothing requires root and this command must be a no-op in that case.
+exit 0 if $requirements eq 'none';
+# The builder /can/ choose to ignore the requirements and just call us as root.
+# If so, we do not bother checking the requirements any further.
+exit 0 if $< == 0;
+if ($requirements eq 'legacy-root') {
 	error("You must run this as root (or use fakeroot).");
+} else {
+	my $env = $ENV{'DPKG_GAIN_ROOT_CMD'};
+	error("Package needs targetted root but builder has not provided a gain-root command via \${DPKG_GAIN_ROOT_CMD}")
+		if not $env;
 }
 
 =head1 SEE ALSO

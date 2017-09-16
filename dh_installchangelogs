@@ -120,8 +120,9 @@ sub install_binNMU_changelog {
 		close $output or error("Couldn't close $output_fn: $!");
 		utime $stat[8], $stat[9], $output_fn;
 
-		chown 0, 0, $output_fn, $output_fn_binary
-			or error "chown: $!";
+		if (should_use_root()) {
+			chown(0, 0, $output_fn, $output_fn_binary) or error("chown: $!");
+		}
 
 		umask $mask;
 

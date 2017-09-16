@@ -66,6 +66,7 @@ our (@EXPORT, %dh);
 	    &print_and_complex_doit &default_sourcedir &qx_cmd
 	    &compute_doc_main_package &is_so_or_exec_elf_file
 	    &assert_opt_is_known_package &dbgsym_tmpdir &find_hardlinks
+	    &should_use_root
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -505,6 +506,7 @@ sub rename_path {
 sub reset_perm_and_owner {
 	my ($mode, @paths) = @_;
 	my $_mode;
+	my $use_root = should_use_root();
 	# Dark goat blood to tell 0755 from "0755"
 	if (length( do { no warnings "numeric"; $mode & "" } ) ) {
 		# 0755, leave it alone.
@@ -515,12 +517,14 @@ sub reset_perm_and_owner {
 	}
 	if ($dh{VERBOSE}) {
 		verbose_print(sprintf('chmod %#o -- %s', $_mode, escape_shell(@paths)));
-		verbose_print(sprintf('chown 0:0 -- %s', escape_shell(@paths)));
+		verbose_print(sprintf('chown 0:0 -- %s', escape_shell(@paths))) if $use_root;
 	}
 	return if $dh{NO_ACT};
 	for my $path (@paths) {
 		chmod($_mode, $path) or error(sprintf('chmod(%#o, %s): %s', $mode, $path, $!));
-		chown(0, 0, $path) or error("chown(0, 0, $path): $!");
+		if ($use_root) {
+			chown(0, 0, $path) or error("chown(0, 0, $path): $!");
+		}
 	}
 }
 
@@ -1285,22 +1289,7 @@ sub is_cross_compiling {
 	}
 }
 
-# Returns source package name
-sub sourcepackage {
-	open (my $fd, '<', 'debian/control') ||
-	    error("cannot read debian/control: $!\n");
-	while (<$fd>) {
-		chomp;
-		s/\s+$//;
-		if (/^Source:\s*(.*)/i) {
-			close($fd);
-			return $1;
-		}
-	}
 
-	close($fd);
-	error("could not find Source: line in control file.");
-}
 
 # Returns a list of packages in the control file.
 # Pass "arch" or "indep" to specify arch-dependent (that will be built
@@ -1311,7 +1300,13 @@ sub sourcepackage {
 # As a side effect, populates %package_arches and %package_types
 # with the types of all packages (not only those returned).
 my (%package_types, %package_arches, %package_multiarches, %packages_by_type,
-    %package_sections);
+    %package_sections, $sourcepackage, %rrr);
+# Returns source package name
+sub sourcepackage {
+	getpackages() if not defined($sourcepackage);
+	return $sourcepackage;
+}
+
 sub getpackages {
 	my ($type) = @_;
 	error("getpackages: First argument must be one of \"arch\", \"indep\", or \"both\"")
@@ -1339,6 +1334,22 @@ sub getpackages {
 	};
 
 	$packages_by_type{$_} = [] for qw(both indep arch all-listed-in-control-file);
+	while (<$fd>) {
+		chomp;
+		s/\s+$//;
+		if (/^Source:\s*(.*)/i) {
+			$sourcepackage = $1;
+			next;
+		} elsif (/^Rules-Requires-Root:\s*(.*)/i) {
+			for my $keyword (split(' ', $1)) {
+				$rrr{$keyword} = 1;
+			}
+			next;
+		}
+		last if (!$_ or eof); # end of stanza.
+	}
+	error("could not find Source: line in control file.") if not defined($sourcepackage);
+	$rrr{'binary-targets'} = 1 if not %rrr;
 
 	while (<$fd>) {
 		chomp;
@@ -1409,6 +1420,29 @@ sub getpackages {
 	close($fd);
 
 	return @{$packages_by_type{$type}};
+}
+
+# Return true if we should use root.
+# - Takes an optional keyword; if passed, this will return true if the keyword is listed in R^3 (Rules-Requires-Root)
+# - If the optional keyword is omitted or not present in R^3 and R^3 is not 'binary-targets', then returns false
+# - Returns true otherwise (i.e. keyword is in R^3 or R^3 is 'binary-targets')
+sub should_use_root {
+	my ($keyword) = @_;
+	getpackages() if not %rrr;
+
+	return 0 if exists($rrr{'no'});
+	return 1 if exists($rrr{'binary-targets'});
+	return 0 if not defined($keyword);
+	return 1 if exists($rrr{$keyword});
+	return 0;
+}
+
+sub root_requirements {
+	getpackages() if not %rrr;
+
+	return 'none' if exists($rrr{'no'});
+	return 'legacy-root' if exists($rrr{'binary-targets'});
+	return 'targeted-promotion';
 }
 
 # Returns the arch a package will build for.

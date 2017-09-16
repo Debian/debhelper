@@ -315,7 +315,7 @@ foreach my $package (getpackages()) {
 				doit("cp", '--reflink=auto', "-a", $doc, $target_dir);
 			}
 		}
-		doit("chown","-R","0:0","$tmp/usr/share/doc");
+		doit("chown","-R","0:0","$tmp/usr/share/doc") if should_use_root();
 		doit("chmod","-R","u+rw,go=rX","$tmp/usr/share/doc");
 	}
 

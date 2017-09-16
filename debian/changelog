@@ -11,6 +11,14 @@ debhelper (10.9.3) UNRELEASED; urgency=medium
     package as long as another on being acted on ships it.
     (Closes: #878911)
   * dh_systemd_start: Ditto.
+  * Dh_Lib.pm: Add support for R³ (Rules-Requires-Root field) to
+    enable package builds without requiring root (or only
+    selectively require root).
+  * dh_fixperms: Skip "chown" calls when R³ is set to anything but
+    "binary-targets".
+  * dh_installchangelogs: Ditto.
+  * dh_installdocs: Ditto.
+  * dh_testroot: Update check for root to support R³.
 
  -- Niels Thykier <niels@thykier.net>  Sat, 14 Oct 2017 11:18:19 +0000
 
