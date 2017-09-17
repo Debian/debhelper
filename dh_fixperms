@@ -97,6 +97,8 @@ on_pkgs_in_parallel {
 	foreach my $package (@_) {
 		my $tmp=tmpdir($package);
 
+		next if not -d $tmp;
+
 		# General permissions fixing.
 		complex_doit("find $tmp ${find_exclude_options} -print0",
 					 "2>/dev/null | xargs -0r chown --no-dereference 0:0");
