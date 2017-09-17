@@ -154,7 +154,7 @@ on_items_in_parallel(\@items, sub {
 		}
 		else {
 			my $filename=$dh{FILENAME};
-			my @cmd = qw(dpkg-deb -z1 -Zxz -Sextreme);
+			my @cmd = qw(dpkg-deb -z6 -Zxz -Sextreme);
 			push(@cmd, @{$dh{U_PARAMS}}) if $dh{U_PARAMS};
 			push(@cmd, '--build', $tmp);
 			if (! $filename) {
