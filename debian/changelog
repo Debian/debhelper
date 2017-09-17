@@ -1,10 +1,69 @@
+debhelper (10.8) unstable; urgency=medium
+
+  [ Niels Thykier ]
+  * Dh_Lib: Introduce a qx_cmd sub to behave like a mix of qx
+    and doit (i.e. avoid the shell while capturing stdout).
+  * dh_makeshlibs: Avoid forking a shell when calling objdump in
+    compat 11.
+  * dh_shlibdeps: Avoid forking a shell when calling file.
+  * dh_shlibdeps: Avoid passing files with "newline" to
+    subprocesses.
+  * dh_installdocs: Ignore missing files in compat 11 for packages
+    that are not processed (e.g. arch:all packages during a -B build).
+    Thanks to Jens Reyer for reporting the issue.  (Closes: #870892)
+  * dh_installexamples: Ditto.
+  * dh_installinfo: Ditto.
+  * dh_installman: Ditto.
+  * dh_compress: Avoid forking a shell for a find command.
+  * dh_gconf: Ditto.
+  * dh_installgsettings: Ditto.
+  * dh_perl: Avoid forking a shell for a dpkg call.
+  * dh_gencontrol: Set the priority of all dbgsym packages to
+    optional to be compliant with Standards-Version 4.0.1.
+    Thanks to Mattia Rizzolo for the report.  (Closes: #870905)
+  * dh_installdocs: Accept "nodoc" via DEB_BUILD_OPTIONS as well.
+    Thanks to Sébastien Villemot for the suggestion.
+    (Closes: #866619)
+  * dh_installexamples: Ditto.
+  * dh_installinfo: Ditto.
+  * dh_installman: Ditto.
+  * dh_installwm: Ditto.
+  * debhelper.pod: Tweak text for some compat 11 changes.
+  * dh_installdeb: Stop emitting versioned Pre-Depends on dpkg for
+    symlink_to_dir and dir_to_symlink maintscripts.  The version
+    requirements are satisfied in oldoldstable.
+  * dh_installdocs: Merge two chmod calls to save a fork+exec.
+  * dh_strip: Disable parallelism when --dbg-package is used as it
+    causes non-deterministic failures in some cases.  Thanks to
+    Helmut Grohne for reporting the issue.  (Closes: #872007)
+  * dh_installdocs: Auto-detect "main package" for documentation
+    packages in compat 11 to assist with Debian policy §12.3.  This
+    auto-detection can be overruled with the new --doc-main-package.
+    (Closes: #824221)
+  * dh_installexamples: Ditto.
+  * dh_update_autotools_config: Improve detection to also catch very
+    old versions of config.{guess,sub} that do not have the
+    "timestamp" variable.  Thanks to Guillem Jover for reporting the
+    bug.  (Closes: #872510)
+
+  [ Adam Conrad ]
+  * dh_gencontrol: Change the synopsis of dbgsym packages so it
+    follows best practises.  (Closes: #872274)
+
+  [ Geoffrey Thomas ]
+  * Support building debhelper on case-insensitive filesystems by
+    moving the Debian (perl package) to the lib subdirectory.
+    (Closes: #873043)
+
+ -- Niels Thykier <niels@thykier.net>  Sat, 09 Sep 2017 15:07:38 +0000
+
 debhelper (10.7.2~bpo9+1) stretch-backports; urgency=medium
 
   * Non-maintainer upload on behalf of maintainer:
     Rebuild for stretch-backports (Closes: #873633).
 
  -- W. Martin Borgert <debacle@debian.org>  Wed, 30 Aug 2017 20:12:47 +0000
-
+ 
 debhelper (10.7.2) unstable; urgency=medium
 
   * Dh_Lib: Fix inverted boolean logic that causes a

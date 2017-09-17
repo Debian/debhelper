@@ -92,7 +92,7 @@ translated-%-stamp: po4a-stamp
 
 version:
 	printf "package Debian::Debhelper::Dh_Version;\n\$$version='$(VERSION)';\n1" > \
-		Debian/Debhelper/Dh_Version.pm
+		lib/Debian/Debhelper/Dh_Version.pm
 
 dh_%.1: dh_%
 	$(POD2MAN) $(POD2MAN_FLAGS) $^ $@
@@ -109,7 +109,7 @@ debhelper-obsolete-compat.7: debhelper-obsolete-compat.pod
 	$(POD2MAN) $(POD2MAN_FLAGS) --name="debhelper" --section=7 $^ > $@
 
 clean:
-	rm -f *-stamp *.1 *.7 Debian/Debhelper/Dh_Version.pm
+	rm -f *-stamp *.1 *.7 lib/Debian/Debhelper/Dh_Version.pm
 ifneq ($(USE_NLS),no)
 	$(PO4A) --previous --rm-translations --rm-backups man/po4a/po4a.cfg
 endif
@@ -124,11 +124,11 @@ install:
 		$(DESTDIR)$(PERLLIBDIR)/Buildsystem
 	install dh $(COMMANDS) $(DESTDIR)$(PREFIX)/bin
 	install -m 0644 autoscripts/* $(DESTDIR)$(PREFIX)/share/debhelper/autoscripts
-	install -m 0644 Debian/Debhelper/*.pm $(DESTDIR)$(PERLLIBDIR)
+	install -m 0644 lib/Debian/Debhelper/*.pm $(DESTDIR)$(PERLLIBDIR)
 	[ "$(PREFIX)" = /usr ] || \
 		sed -i '/$$prefix=/s@/usr@$(PREFIX)@g' $(DESTDIR)$(PERLLIBDIR)/Dh_Lib.pm
-	install -m 0644 Debian/Debhelper/Sequence/*.pm $(DESTDIR)$(PERLLIBDIR)/Sequence
-	install -m 0644 Debian/Debhelper/Buildsystem/*.pm $(DESTDIR)$(PERLLIBDIR)/Buildsystem
+	install -m 0644 lib/Debian/Debhelper/Sequence/*.pm $(DESTDIR)$(PERLLIBDIR)/Sequence
+	install -m 0644 lib/Debian/Debhelper/Buildsystem/*.pm $(DESTDIR)$(PERLLIBDIR)/Buildsystem
 
 test: version
 	MAKEFLAGS= HARNESS_OPTIONS=j$(TEST_JOBS) ./run perl -MTest::Harness -e 'runtests grep { ! /CVS/ && ! /\.svn/ && -f && -x && m/\.t$$/ } @ARGV' t/* t/*/*

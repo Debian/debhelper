@@ -63,7 +63,8 @@ our (@EXPORT, %dh);
 	    XARGS_INSERT_PARAMS_HERE &glob_expand_error_handler_reject
 	    &glob_expand_error_handler_warn_and_discard &glob_expand
 	    &glob_expand_error_handler_silently_ignore DH_BUILTIN_VERSION
-	    &print_and_complex_doit &default_sourcedir
+	    &print_and_complex_doit &default_sourcedir &qx_cmd
+	    &compute_doc_main_package
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -310,7 +311,7 @@ sub _doit {
 	my (@cmd) = @_;
 	my $options = ref($cmd[0]) ? shift(@cmd) : undef;
 	# In compat <= 10, we warn, compat 11 we detect and error, in
-	# compat 12 we assume peolpe know what they are doing.
+	# compat 12 we assume people know what they are doing.
 	if (not defined($options) and @cmd == 1 and compat(11) and $cmd[0] =~ m/[\s<&>|;]/) {
 		deprecated_functionality('doit() + doit_*() calls will no longer spawn a shell in compat 11 for single string arguments (please use complex_doit instead)',
 								 11);
@@ -340,6 +341,24 @@ sub _format_cmdline {
 		$cmd_line .= ' > ' . escape_shell($output);
 	}
 	return $cmd_line;
+}
+
+sub qx_cmd {
+	my (@cmd) = @_;
+	my ($output, @output);
+	open(my $fd, '-|', @cmd) or error('fork+exec (' . escape_shell(@cmd) . "): $!");
+	if (wantarray) {
+		@output = <$fd>;
+	} else {
+		local $/ = undef;
+		$output = <$fd>;
+	}
+	if (not close($fd)) {
+		error("close pipe failed: $!") if $!;
+		error_exitcode(escape_shell(@cmd));
+	}
+	return @output if wantarray;
+	return $output;
 }
 
 # Run a command and display the command to stdout if verbose mode is on.
@@ -1971,5 +1990,28 @@ sub on_items_in_parallel {
 
 *on_selected_pkgs_in_parallel = \&on_items_in_parallel;
 
+sub compute_doc_main_package {
+	my ($doc_package) = @_;
+	# if explicitly set, then choose that.
+	return $dh{DOC_MAIN_PACKAGE} if $dh{DOC_MAIN_PACKAGE};
+	# In compat 10 (and earlier), there is no auto-detection
+	return $doc_package if compat(10);
+	my $target_package = $doc_package;
+	# If it is not a -doc package, then docs should be installed
+	# under its own package name.
+	return $doc_package if $target_package !~ s/-doc$//;
+	# FOO-doc hosts the docs for FOO; seems reasonable
+	return $target_package if exists($package_types{$target_package});
+	if ($doc_package =~ m/^lib./) {
+		# Special case, "libFOO-doc" can host docs for "libFOO-dev"
+		my $lib_dev = "${target_package}-dev";
+		return $lib_dev if exists($package_types{$lib_dev});
+		# Technically, we could go look for a libFOO<something>-dev,
+		# but atm. it is presumed to be that much of a corner case
+		# that it warrents an override.
+	}
+	# We do not know; make that clear to the caller
+	return;
+}
 
 1

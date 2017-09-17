@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+=encoding UTF-8
+
 =head1 NAME
 
 dh_installexamples - install example files into package build directories
@@ -51,6 +53,23 @@ by the B<dh_auto_>I<*> commands. You rarely need to use this option, since
 B<dh_installexamples> automatically looks for files in F<debian/tmp> in debhelper
 compatibility level 11 and above.
 
+=item B<--doc-main-package=>I<main-package>
+
+Set the main package for a documentation package.  This is used to
+install the documentation of the documentation package in F<<
+/usr/share/doc/I<main-package> >> as recommended by the Debian policy
+manual 3.9.7 in §12.3.
+
+In compat 11 (or later), this option is only useful if debhelper's
+auto-detection of the main package is wrong.  The option can also be
+used to silence a warning from debhelper when the auto-detection fails
+but the default happens to be correct.
+
+This option cannot be used when B<dh_installexamples> is instructed to act
+on multiple packages.  If you need this option, you will generally
+need to combine it with B<-p> to ensure exactly one package is acted
+on.
+
 =item B<-X>I<item>, B<--exclude=>I<item>
 
 Exclude files that contain I<item> anywhere in their filename from
@@ -73,16 +92,21 @@ directory, it will install the complete contents of the directory.
 
 init(options => {
 	"sourcedir=s" => \$dh{SOURCEDIR},
+	'doc-main-package=s' => \$dh{DOC_MAIN_PACKAGE},
 });
 
 # PROMISE: DH NOOP WITHOUT pkgfile-logged(examples)
 
 my $pwd;
-my $error_handler = compat(10) ? \&glob_expand_error_handler_warn_and_discard : \&glob_expand_error_handler_reject;
-my $nodocs = is_build_profile_active('nodoc') ? 1 : 0;
+my $default_error_handler = compat(10) ? \&glob_expand_error_handler_warn_and_discard : \&glob_expand_error_handler_reject;
+my $nodocs = is_build_profile_active('nodoc') || get_buildoption('nodoc') ? 1 : 0;
 # We cannot assume documentation is built under nodoc, but if it is we must flag it as handled
 # or dh_missing might make noise.
-$error_handler = \&glob_expand_error_handler_silently_ignore if $nodocs;
+$default_error_handler = \&glob_expand_error_handler_silently_ignore if $nodocs;
+
+if (@{$dh{DOPACKAGES}} > 1 and $dh{DOC_MAIN_PACKAGE}) {
+	error('--doc-main-package should be used with -p<doc-pkg>');
+}
 
 foreach my $package (getpackages()) {
 	next if is_udeb($package);
@@ -90,6 +114,8 @@ foreach my $package (getpackages()) {
 	my $tmp=tmpdir($package);
 	my $file=pkgfile($package,"examples");
 	my @search_dirs = ('.');
+	my $skip_install = process_pkg($package) ? 0 : 1;
+	my $error_handler = $skip_install ? \&glob_expand_error_handler_silently_ignore : $default_error_handler;
 	@search_dirs = ($dh{SOURCEDIR} // '.', default_sourcedir($package)) if not compat(10);
 	
 	my @examples;
@@ -104,10 +130,16 @@ foreach my $package (getpackages()) {
 
 	log_installed_files($package, @examples);
 
-	next if not process_pkg($package) or $nodocs;
+	next if $skip_install or $nodocs;
 
 	if (@examples) {
-		install_dir("$tmp/usr/share/doc/$package/examples");
+		my $target_package = compute_doc_main_package($package);
+		if (not defined($target_package)) {
+			warning("Cannot auto-detect main package for ${package}.  If the default is wrong, please use --doc-main-package");
+			$target_package = $package;
+		}
+		my $target_dir = "${tmp}/usr/share/doc/${target_package}/examples";
+		install_dir($target_dir);
 
 		my $exclude = '';
 		if ($dh{EXCLUDE_FIND}) {
@@ -120,13 +152,14 @@ foreach my $package (getpackages()) {
 				my $basename = basename($example);
 				my $dir = ($basename eq '.') ? $example : "$example/..";
 				chomp($pwd=`pwd`) if not defined($pwd);
+				# Gracefully handling tmpdir being absolute (-P/...)
+				my $destdir = $target_dir =~ m{^/} ? $target_dir : "${pwd}/${target_dir}";
 				complex_doit("cd '$dir' && " .
 							 "find '$basename' -type f$exclude -print0 | LC_ALL=C sort -z | " .
-							 "xargs -0 -I {} cp --reflink=auto --parents -dp {} $pwd/$tmp/usr/share/doc/$package/examples");
+							 "xargs -0 -I {} cp --reflink=auto --parents -dp {} ${destdir}");
 			}
 			else {
-				doit("cp", '--reflink=auto', "-a", $example,
-					 "$tmp/usr/share/doc/$package/examples");
+				doit("cp", '--reflink=auto', "-a", $example, $target_dir);
 			}
 		}
 	}

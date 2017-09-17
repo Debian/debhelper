@@ -123,7 +123,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if ($deps) {
 		my $version="";
 		if ($deps & XS_MODULE or $dh{V_FLAG_SET}) {
-			($version) = `dpkg -s $perl` =~ /^Version:\s*(\S+)/m
+			($version) = qx_cmd('dpkg', '-s', $perl) =~ /^Version:\s*(\S+)/m
 				unless $version;
 			$version = ">= $version";
 		}

@@ -122,12 +122,12 @@ on_pkgs_in_parallel {
 			# Remove and override more or less every standard field.
 			my @dbgsym_options = (qw(
 					-UPre-Depends -URecommends -USuggests -UEnhances -UProvides -UEssential
-						-UConflicts -DPriority=extra -UHomepage
+						-UConflicts -DPriority=optional -UHomepage
 						-DAuto-Built-Package=debug-symbols
 					),
 				"-DPackage=${package}-dbgsym",
 				"-DDepends=${package} (= \${binary:Version})",
-				"-DDescription=Debug symbols for ${package}",
+				"-DDescription=debug symbols for ${package}",
 				"-DBuild-Ids=${build_ids}",
 				"-DSection=${component}debug",
 			);

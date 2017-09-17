@@ -297,7 +297,7 @@ sub attach_debug {
 
 my %all_packages = map { $_ => 1 } getpackages();
 
-on_pkgs_in_parallel {
+sub process_packages {
 	foreach my $package (@_) {
 		my $tmp=tmpdir($package);
 
@@ -395,7 +395,15 @@ on_pkgs_in_parallel {
 			close($fd) or error("close $path failed: $!");
 		}
 	}
-};
+}
+
+if ($dh{DEBUGPACKAGE}) {
+	# Non-deterministic issues with --dbg-package and parallelism (see
+	# #872007).  Analysis and patches welcome for this case.
+	process_packages(@{$dh{DOPACKAGES}});
+} else {
+	on_pkgs_in_parallel(\&process_packages);
+}
 
 =head1 SEE ALSO
 
