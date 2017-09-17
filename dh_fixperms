@@ -130,6 +130,14 @@ on_pkgs_in_parallel {
 		# ADA ali files should be mode 444 to avoid recompilation
 		find_and_reset_perm("${tmp}/usr/lib", 'uga-w', "-type f -name '*.ali'");
 
+		if ( -d "$tmp/usr/lib/nodejs/") {
+			my @nodejs_exec_patterns = qw(*/cli.js */bin.js);
+			my @exec_files = grep {
+				not excludefile($_) and -f $_;
+			} glob_expand(["$tmp/usr/lib/nodejs"], \&glob_expand_error_handler_silently_ignore, @nodejs_exec_patterns);
+			reset_perm_and_owner(0755, @exec_files)
+		}
+
 		if ( -d "$tmp/usr/share/bug/$package") {
 			complex_doit("find $tmp/usr/share/bug/$package -type f",
 						 "! -name 'script' ${find_exclude_options} -print0",
