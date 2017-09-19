@@ -11,7 +11,7 @@ use warnings;
 use Debian::Debhelper::Dh_Lib;
 use Getopt::Long;
 
-my %exclude_package;
+my (%exclude_package, %known_packages);
 
 sub showhelp {
 	my $prog=basename($0);
@@ -41,6 +41,10 @@ sub AddPackage { my($option,$value)=@_;
 		}
 	}
 	elsif ($option eq 'p' or $option eq 'package') {
+		%known_packages = map { $_ => 1 } getpackages() if not %known_packages;
+		if (not exists($known_packages{$value})) {
+			error("Requested unknown package ${value} via -p/--package, expected one of: " . join(' ', getpackages()));
+		}
 		push @{$dh{DOPACKAGES}}, $value;
 	}
 	else {
@@ -56,7 +60,12 @@ sub SetDebugPackage { my($option,$value)=@_;
 }
 
 # Add a package to a list of packages that should not be acted on.
-sub ExcludePackage { my($option,$value)=@_;
+sub ExcludePackage {
+	my($option, $value)=@_;
+	%known_packages = map { $_ => 1 } getpackages() if not %known_packages;
+	if (not exists($known_packages{$value})) {
+		error("Unknown package ${value} given via -N/--no-package, expected one of: " . join(' ', getpackages()));
+	}
 	$exclude_package{$value}=1;
 }
 
@@ -230,7 +239,7 @@ sub parseopts {
 	my $ret=getoptions(\@ARGV, %params);
 	if (!$ret) {
 		if (! compat(7)) {
-			error("unknown option; aborting");
+			error("unknown option or error during option parsing; aborting");
 		}
 	}
 
