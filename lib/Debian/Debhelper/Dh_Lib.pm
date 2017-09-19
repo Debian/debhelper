@@ -322,6 +322,11 @@ sub _doit {
 	my $pid = fork() // error("fork(): $!");
 	if (not $pid) {
 		if (defined($options)) {
+			if (defined(my $dir = $options->{chdir})) {
+				if ($dir ne '.') {
+					chdir($dir) or error("chdir(\"${dir}\) failed: $!");
+				}
+			}
 			if (defined(my $output = $options->{stdout})) {
 				open(STDOUT, '>', $output) or error("redirect STDOUT failed: $!");
 			}
@@ -337,6 +342,9 @@ sub _format_cmdline {
 	my (@cmd) = @_;
 	my $options = ref($cmd[0]) ? shift(@cmd) : {};
 	my $cmd_line = escape_shell(@cmd);
+	if (defined(my $dir = $options->{chdir})) {
+		$cmd_line = join(' ', 'cd', escape_shell($dir), '&&', $cmd_line) if $dir ne '.';
+	}
 	if (defined(my $output = $options->{stdout})) {
 		$cmd_line .= ' > ' . escape_shell($output);
 	}
