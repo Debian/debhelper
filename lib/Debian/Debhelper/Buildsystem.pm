@@ -320,7 +320,7 @@ sub _in_dir {
 # top directory.
 sub doit_in_sourcedir {
 	my ($this, @args) = @_;
-	$this->_in_dir($this->get_sourcedir, \&print_and_doit, @args);
+	print_and_doit({ chdir => $this->get_sourcedir }, @args);
 	return 1;
 }
 
@@ -329,7 +329,7 @@ sub doit_in_sourcedir {
 # top directory. Errors are ignored.
 sub doit_in_sourcedir_noerror {
 	my ($this, @args) = @_;
-	return $this->_in_dir($this->get_sourcedir, \&print_and_doit_noerror, @args);
+	return print_and_doit_noerror({ chdir => $this->get_sourcedir }, @args);
 }
 
 # Changes working directory to the build directory (if needed),
@@ -337,7 +337,7 @@ sub doit_in_sourcedir_noerror {
 # top directory.
 sub doit_in_builddir {
 	my ($this, @args) = @_;
-	$this->_in_dir($this->get_buildpath, \&print_and_doit, @args);
+	print_and_doit({ chdir => $this->get_buildpath }, @args);
 	return 1;
 }
 
@@ -346,7 +346,7 @@ sub doit_in_builddir {
 # top directory. Errors are ignored.
 sub doit_in_builddir_noerror {
 	my ($this, @args) = @_;
-	return $this->_in_dir($this->get_buildpath, \&print_and_doit_noerror, @args);
+	return print_and_doit_noerror({ chdir => $this->get_buildpath }, @args);
 }
 
 # Changes working directory to the build directory (if needed),
