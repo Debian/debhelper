@@ -76,15 +76,18 @@ sub build_and_rename_deb {
 	my ($dpkg_filename, $desired_filename);
 	install_dir($build_dir);
 	doit(@${cmd}, $build_dir);
-	opendir(my $fd, $build_dir);
+	opendir(my $fd, $build_dir) or error("opendir($build_dir) failed: $!");
 	for my $name (readdir($fd)) {
 		next if $name eq '.' or $name eq '..';
 		if ($dpkg_filename) {
-			error("\"@{$cmd}\" produced two debs: $dpkg_filename and $name");
+			error("\"@{$cmd} ${build_dir}\" produced two debs: $dpkg_filename and $name");
 		}
 		$dpkg_filename = $name;
 	}
 	closedir($fd);
+	if (not defined($dpkg_filename)) {
+		error("\"@{$cmd} ${build_dir}\" did not produce *any* file but was successful!?");
+	}
 	local $_ = $dpkg_filename;
 	$rename_sub->();
 	$desired_filename = $_;
