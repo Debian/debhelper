@@ -70,17 +70,6 @@ else {
 	$dh{FILENAME}="/$dh{FILENAME}";
 }
 
-sub default_compressor_args {
-	my ($default_comp, @args) = @_;
-
-	for my $arg (@args) {
-		# Explicit compressor arg given
-		return @args if $arg =~ m/^-Z/;
-	}
-
-	return (@{$default_comp}, @args);
-}
-
 sub build_and_rename_deb {
 	my ($package, $destdir, $cmd, $rename_sub) = @_;
 	my $build_dir = "debian/.debhelper/scratch-space/build-${package}";
