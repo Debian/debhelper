@@ -747,6 +747,14 @@ The B<--list-missing> and B<--fail-missing> in B<dh_install> has been
 removed.  Please use B<dh_missing> and its corresponding options,
 which can also see the files installed by other helpers.
 
+=item -
+
+The B<dh_installinit> helper no longer installs configuration for
+the upstart init system.  Instead, it will abort the build if it
+finds an old upstart configuration file.  The error is there to
+remind the package maintainer to ensure the proper removal of the
+conffiles shipped in previous versions of the package (if any).
+
 =back
 
 =back
