@@ -174,7 +174,7 @@ sub getoptions {
 		$SIG{__WARN__}=sub {};
 	}
 	my $ret=Getopt::Long::GetOptionsFromArray($array, %options);
-	if ($oldwarn) {
+	if ($params{test} || $params{ignore_unknown_options}) {
 		$SIG{__WARN__}=$oldwarn;
 	}
 
