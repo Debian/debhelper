@@ -14,6 +14,12 @@ use parent qw(Debian::Debhelper::Buildsystem::makefile);
 
 our $qmake="qmake";
 
+my %OS_MKSPEC_MAPPING = (
+	'linux'    => 'linux-g++',
+	'kfreebsd' => 'gnukfreebsd-g++',
+	'hurd'     => 'hurd-g++',
+);
+
 sub DESCRIPTION {
 	"qmake (*.pro)";
 }
@@ -55,12 +61,12 @@ sub configure {
 	push @options, '-nocache';
 	if (is_cross_compiling()) {
 		my $host_os = dpkg_architecture_value("DEB_HOST_ARCH_OS");
-		my %os_mkspec_mapping = (
-			'linux'    => 'linux-g++',
-			'kfreebsd' => 'gnukfreebsd-g++',
-			'hurd'     => 'hurd-g++',
-		);
-		push @options, ("-spec", $os_mkspec_mapping{$host_os});
+
+		if (defined(my $spec = $OS_MKSPEC_MAPPING{$host_os})) {
+			push(@options, ("-spec", $OS_MKSPEC_MAPPING{$host_os}));
+		} else {
+			error("Cannot cross-compile: Missing entry for HOST OS ${host_os} for qmake's -spec option");
+		}
 
 		my ($fh, $filename) = tempfile("qt.XXXX", SUFFIX => ".conf", TMPDIR => 1, UNLINK => 1);
 		$fh->print("[Paths]\n");
