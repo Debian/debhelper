@@ -822,6 +822,38 @@ B<DEB_BUILD_PROFILES> environment variable and B<Build-Profiles> fields in
 binary package stanzas in B<debian/control>, according to the draft policy at
 L<https://wiki.debian.org/BuildProfileSpec>.
 
+=head3 Interaction between package selections and Build-Profiles
+
+Build-Profiles affect which packages are included in the package
+selections mechanisms in debhelper.  Generally, the package selections
+are described from the assumption that all packages are enabled.  This
+section describes how the selections react when a package is disabled
+due to the active Build-Profiles (or lack of active Build-Profiles).
+
+=over 4
+
+=item -a/--arch, -i/--indep OR no selection options (a raw "dh_X" call)
+
+The package disabled by Build-Profiles is silently excluded from the
+selection.
+
+Note you will receive a warning if I<all> packages related to these
+selections are disabled.  In that case, it generally does not make
+sense to do the build in the first place.
+
+=item -N I<package> / --no-package I<package>
+
+The option is accepted and effectively does nothing.
+
+=item -p I<package> / --package I<package>
+
+The option is accepted, but debhelper will not act on the package.
+
+=back
+
+Note that it does not matter whether a package is enabled or disabled
+by default.
+
 =head2 Automatic generation of Debian install scripts
 
 Some debhelper commands will automatically generate parts of Debian

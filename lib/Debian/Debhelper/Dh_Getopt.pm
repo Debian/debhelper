@@ -11,7 +11,7 @@ use warnings;
 use Debian::Debhelper::Dh_Lib;
 use Getopt::Long;
 
-my (%exclude_package, %known_packages);
+my (%exclude_package, %known_packages, %profile_enabled_packages, $profile_excluded_pkg);
 
 sub showhelp {
 	my $prog=basename($0);
@@ -45,7 +45,14 @@ sub AddPackage { my($option,$value)=@_;
 		if (not exists($known_packages{$value})) {
 			error("Requested unknown package ${value} via -p/--package, expected one of: " . join(' ', getpackages()));
 		}
-		push @{$dh{DOPACKAGES}}, $value;
+		%profile_enabled_packages = map { $_ => 1 } getpackages('both') if not %profile_enabled_packages;
+		# Silently ignore packages that are not enabled by the
+		# profile.
+		if (exists($profile_enabled_packages{$value})) {
+			push @{$dh{DOPACKAGES}}, $value;
+		} else {
+			$profile_excluded_pkg = 1;
+		}
 	}
 	else {
 		error("bad option $option - should never happen!\n");
@@ -253,14 +260,22 @@ sub parseopts {
 	# want us to act on them all. Note we have to do this before excluding
 	# packages out, below.
 	if (! defined $dh{DOPACKAGES} || ! @{$dh{DOPACKAGES}}) {
+		my $do_exit = 0;
+		if ($profile_excluded_pkg) {
+			if (! $dh{BLOCK_NOOP_WARNINGS}) {
+				warning("All requested packages have been excluded (e.g. via a Build-Profile).");
+			}
+			$do_exit = 1;
+		}
 		if ($dh{DOINDEP} || $dh{DOARCH}) {
 			# User specified that all arch (in)dep package be
 			# built, and there are none of that type.
 			if (! $dh{BLOCK_NOOP_WARNINGS}) {
 				warning("You asked that all arch in(dep) packages be built, but there are none of that type.");
 			}
-			exit(0);
+			$do_exit = 1;
 		}
+		exit(0) if $do_exit;
 		push @{$dh{DOPACKAGES}},getpackages("both");
 	}
 
