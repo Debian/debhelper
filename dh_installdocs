@@ -224,6 +224,10 @@ if (@{$dh{DOPACKAGES}} > 1 and $dh{DOC_MAIN_PACKAGE}) {
 	error('--doc-main-package should be used with -p<doc-pkg>');
 }
 
+if ($dh{DOC_MAIN_PACKAGE}) {
+	assert_opt_is_known_package($dh{DOC_MAIN_PACKAGE}, '--doc-main-package');
+}
+
 foreach my $package (getpackages()) {
 	next if is_udeb($package);
 	

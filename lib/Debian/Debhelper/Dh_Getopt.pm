@@ -11,7 +11,7 @@ use warnings;
 use Debian::Debhelper::Dh_Lib;
 use Getopt::Long;
 
-my (%exclude_package, %known_packages, %profile_enabled_packages, $profile_excluded_pkg);
+my (%exclude_package, %profile_enabled_packages, $profile_excluded_pkg);
 
 sub showhelp {
 	my $prog=basename($0);
@@ -41,10 +41,7 @@ sub AddPackage { my($option,$value)=@_;
 		}
 	}
 	elsif ($option eq 'p' or $option eq 'package') {
-		%known_packages = map { $_ => 1 } getpackages() if not %known_packages;
-		if (not exists($known_packages{$value})) {
-			error("Requested unknown package ${value} via -p/--package, expected one of: " . join(' ', getpackages()));
-		}
+		assert_opt_is_known_package($value, '-p/--package');
 		%profile_enabled_packages = map { $_ => 1 } getpackages('both') if not %profile_enabled_packages;
 		# Silently ignore packages that are not enabled by the
 		# profile.
@@ -69,10 +66,7 @@ sub SetDebugPackage { my($option,$value)=@_;
 # Add a package to a list of packages that should not be acted on.
 sub ExcludePackage {
 	my($option, $value)=@_;
-	%known_packages = map { $_ => 1 } getpackages() if not %known_packages;
-	if (not exists($known_packages{$value})) {
-		error("Unknown package ${value} given via -N/--no-package, expected one of: " . join(' ', getpackages()));
-	}
+	assert_opt_is_known_package($value, '-N/--no-package');
 	$exclude_package{$value}=1;
 }
 

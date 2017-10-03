@@ -65,6 +65,7 @@ our (@EXPORT, %dh);
 	    &glob_expand_error_handler_silently_ignore DH_BUILTIN_VERSION
 	    &print_and_complex_doit &default_sourcedir &qx_cmd
 	    &compute_doc_main_package &is_so_or_exec_elf_file
+	    &assert_opt_is_known_package
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -2065,6 +2066,19 @@ sub compute_doc_main_package {
 	}
 	# We do not know; make that clear to the caller
 	return;
+}
+
+
+{
+	my %known_packages;
+	sub assert_opt_is_known_package {
+		my ($package, $method) = @_;
+		%known_packages = map { $_ => 1 } getpackages() if not %known_packages;
+		if (not exists($known_packages{$package})) {
+			error("Requested unknown package $package via $method, expected one of: " . join(' ', getpackages()));
+		}
+		return 1;
+	}
 }
 
 1
