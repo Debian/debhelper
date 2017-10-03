@@ -114,8 +114,8 @@ on multiple packages.  If you need this option, you will generally
 need to combine it with B<-p> to ensure exactly one package is acted
 on.
 
-Please keep in mind that some documentation (notably, the copyright
-file and the package changelog) will be unaffected by this option.
+Please keep in mind that some documentation (the copyright file,
+README.Debian, etc.) will be unaffected by this option.
 
 =item B<--link-doc=>I<package>
 
@@ -134,6 +134,12 @@ not be installed.
 (An older method to accomplish the same thing, which is still supported,
 is to make the documentation directory of a package be a dangling symlink,
 before calling B<dh_installdocs>.)
+
+Please note that this option only applies to the documentation
+directory for the package itself.  When the package ships
+documentation for another package (e.g. see B<--doc-main-package>), it
+will not use a symlink for the documentation of the other package.
+
 
 B<CAVEAT 1>: If a previous version of the package was built without this
 option and is now built with it (or vice-versa), it requires a "dir to

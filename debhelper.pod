@@ -710,14 +710,13 @@ returns a non-zero exit from analysing a given file.
 
 =item -
 
-The B<dh_installdocs> and B<dh_installexamples> tools will now
-attempt to guess the "main package" for a given documentation
-package (e.g. I<pkg-doc> will have I<pkg> as main package).
-
-When a main package is detected, I<most> documentation will be
-installed into F<< /usr/share/doc/I<main-pkg> >> as recommended
-by Debian policy §12.3 since 3.9.7.  Notably exceptions include
-the copyright file and the changelog file.
+The B<dh_installdocs> and B<dh_installexamples> tools will now attempt
+to guess the "main package" for a given documentation package
+(e.g. I<pkg-doc> will have I<pkg> as main package if the latter
+exists).  If a main package is found, I<most> of the documentation
+will be installed into F<< /usr/share/doc/I<main-pkg> >> by default as
+recommended by Debian policy §12.3 since version 3.9.7.  Notable
+exceptions include the copyright file and changelog files.
 
 The B<--doc-main-package> option can be used when the auto-detection
 is insufficient.
@@ -725,11 +724,11 @@ is insufficient.
 =item -
 
 The B<dh_strip> and B<dh_shlibdeps> tools no longer uses filename
-patterns to determine which files to process.  Instead, they read the
-ELF header to determine if a given file is an shared object or an
-ELF executable.
+patterns to determine which files to process.  Instead, they open the
+file and look for an ELF header to determine if a given file is an
+shared object or an ELF executable.
 
-This may cause the tools to process more files than previously.
+This change may cause the tools to process more files than previously.
 
 =back
 
