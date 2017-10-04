@@ -79,6 +79,10 @@ B<dh_systemd_start> manually.
 
 =cut
 
+if (not compat(10)) {
+	error("dh_systemd_start is no longer used in compat >= 11, please use dh_installsystemd instead");
+}
+
 $dh{RESTART_AFTER_UPGRADE} = 1 if not compat(9);
 
 init(options => {

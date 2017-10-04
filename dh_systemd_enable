@@ -114,6 +114,10 @@ when you are calling B<dh_systemd_enable> manually.
 
 =cut
 
+if (not compat(10)) {
+	error("dh_systemd_enable is no longer used in compat >= 11, please use dh_installsystemd instead");
+}
+
 init(options => {
 	"no-enable" => \$dh{NO_ENABLE},
 });
