@@ -1,0 +1,351 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dh_installsystemd - install systemd unit files
+
+=cut
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+use File::Find;
+use Cwd qw(getcwd abs_path);
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_installsystemd> [S<I<debhelper options>>] [B<--restart-after-upgrade>] [B<--no-stop-on-upgrade>] [B<--no-enable>] [B<--name=>I<name>] [S<I<unit file> ...>]
+
+=head1 DESCRIPTION
+
+B<dh_installsystemd> is a debhelper program that is responsible for enabling,
+disabling, starting, stopping and restarting systemd unit files.
+
+In the simple case, it finds all unit files installed by a package (e.g.
+bacula-fd.service) and enables them. It is not necessary that the machine
+actually runs systemd during package installation time, enabling happens on all
+machines in order to be able to switch from sysvinit to systemd and back.
+
+For only generating blocks for specific service files, you need to pass them as
+arguments, e.g. B<dh_installsystemd quota.service> and B<dh_installsystemd
+--name=quotarpc quotarpc.service>.
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.service, debian/I<package>@.service
+
+If this exists, it is installed into lib/systemd/system/I<package>.service (or
+lib/systemd/system/I<package>@.service) in the package build directory.
+
+=item debian/I<package>.tmpfile
+
+If this exists, it is installed into usr/lib/tmpfiles.d/I<package>.conf in the
+package build directory. (The tmpfiles.d mechanism is currently only used
+by systemd.)
+
+=item debian/I<package>.target, debian/I<package>@.target
+
+If this exists, it is installed into lib/systemd/system/I<package>.target (or
+lib/systemd/system/I<package>@.target) in the package build directory.
+
+=item debian/I<package>.socket, debian/I<package>@.socket
+
+If this exists, it is installed into lib/systemd/system/I<package>.socket (or
+lib/systemd/system/I<package>@.socket) in the package build directory.
+
+=item debian/I<package>.mount
+
+If this exists, it is installed into lib/systemd/system/I<package>.mount
+in the package build directory.
+
+=item debian/I<package>.path, debian/I<package>@.path
+
+If this exists, it is installed into lib/systemd/system/I<package>.path (or
+lib/systemd/system/I<package>@.path) in the package build directory.
+
+=item debian/I<package>.timer, debian/I<package>@.timer
+
+If this exists, it is installed into lib/systemd/system/I<package>.timer (or
+lib/systemd/system/I<package>@.timer) in the package build directory.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--no-enable>
+
+Disable the service(s) on purge, but do not enable them on install.
+
+B<Note> that this option does not affect whether the services are
+started.  That is controlled by L<dh_systemd_start(1)> (using e.g. its
+B<--no-start> option).
+
+=item B<--name=>I<name>
+
+Install the service file as I<name.service> instead of the default filename,
+which is the I<package.service>. When this parameter is used,
+B<dh_systemd_enable> looks for and installs files named
+F<debian/package.name.service> instead of the usual F<debian/package.service>.
+
+=back
+
+=head1 NOTES
+
+Note that this command is not idempotent. L<dh_prep(1)> should be called
+between invocations of this command (with the same arguments). Otherwise, it
+may cause multiple instances of the same text to be added to maintainer
+scripts.
+
+Note that B<dh_systemd_enable> should be run before B<dh_installinit>.
+The default sequence in B<dh> does the right thing, this note is only relevant
+when you are calling B<dh_systemd_enable> manually.
+
+=cut
+
+exit 0 if compat(10);
+
+$dh{RESTART_AFTER_UPGRADE} = 1;
+
+init(options => {
+	"no-enable" => \$dh{NO_ENABLE},
+	"r" => \$dh{R_FLAG},
+	'no-stop-on-upgrade' => \$dh{R_FLAG},
+	"no-restart-on-upgrade" => \$dh{R_FLAG},
+	"no-start" => \$dh{NO_START},
+	"R|restart-after-upgrade!" => \$dh{RESTART_AFTER_UPGRADE},
+	"no-also" => \$dh{NO_ALSO},
+});
+
+sub contains_install_section {
+	my ($unit_path) = @_;
+	my $fh;
+	if (!open($fh, '<', $unit_path)) {
+		warning("Cannot open($unit_path) for extracting the Also= line(s)");
+		return;
+	}
+	while (my $line = <$fh>) {
+		chomp($line);
+		return 1 if $line =~ /^\s*\[Install\]$/i;
+	}
+	close($fh);
+	return 0;
+}
+
+sub install_unit {
+	my ($package, $script, $pkgsuffix, $path, $installsuffix) = @_;
+	$installsuffix = $installsuffix || $pkgsuffix;
+	my $unit = pkgfile($package, $pkgsuffix);
+	return if $unit eq '';
+	install_dir($path);
+	install_file($unit, "${path}/${script}.${installsuffix}");
+}
+
+# Extracts the Also= or Alias= line(s) from a unit file.
+# In case this produces horribly wrong results, you can pass --no-also, but
+# that should really not be necessary. Please report bugs to
+# pkg-systemd-maintainers.
+sub extract_key {
+	my ($unit_path, $key) = @_;
+	my @values;
+	my $fh;
+
+	if ($dh{NO_ALSO}) {
+		return @values;
+	}
+
+	if (!open($fh, '<', $unit_path)) {
+		warning("Cannot open($unit_path) for extracting the Also= line(s)");
+		return;
+	}
+	while (my $line = <$fh>) {
+		chomp($line);
+
+		# The keys parsed from the unit file below can only have
+		# unit names as values. Since unit names can't have
+		# whitespace in systemd, simply use split and strip any
+		# leading/trailing quotes. See systemd-escape(1) for
+		# examples of valid unit names.
+		if ($line =~ /^\s*$key=(.+)$/i) {
+			for my $value (split(/\s+/, $1)) {
+				$value =~ s/^(["'])(.*)\g1$/$2/;
+				push @values, $value;
+			}
+		}
+	}
+	close($fh);
+	return @values;
+}
+
+
+# PROMISE: DH NOOP WITHOUT tmp(lib/systemd/system) mount path service socket target tmpfile timer
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmpdir = tmpdir($package);
+	my @installed_units;
+	my @start_units;
+	my @enable_units;
+	my %aliases;
+
+	# Figure out what filename to install it as.
+	my $script;
+	if (defined $dh{NAME}) {
+		$script=$dh{NAME};
+	}
+	else {
+		$script=$package;
+	}
+
+	foreach my $suffix ('', '@') {
+		install_unit("$package$suffix", $script, 'service', "$tmpdir/lib/systemd/system");
+		install_unit("$package$suffix", $script, 'target', "$tmpdir/lib/systemd/system");
+		install_unit("$package$suffix", $script, 'socket', "$tmpdir/lib/systemd/system");
+		install_unit("$package$suffix", $script, 'mount', "$tmpdir/lib/systemd/system") if $suffix eq '';
+		install_unit("$package$suffix", $script, 'path', "$tmpdir/lib/systemd/system");
+		install_unit("$package$suffix", $script, 'tmpfile', "$tmpdir/usr/lib/tmpfiles.d", 'conf') if $suffix eq '';
+		install_unit("$package$suffix", $script, 'timer', "$tmpdir/lib/systemd/system");
+	}
+
+	my $oldcwd = getcwd();
+	find({
+		wanted => sub {
+			my $name = $File::Find::name;
+			return unless -f $name;
+			return unless $name =~ m,^$tmpdir/lib/systemd/system/[^/]+$,;
+			if (-l) {
+				my $target = abs_path(readlink());
+				$target =~ s,^$oldcwd/,,g;
+				$aliases{$target} = [ $_ ];
+			} else {
+				push @installed_units, $name;
+			}
+			push @installed_units, $name;
+		},
+		no_chdir => 1,
+	}, "${tmpdir}/lib/systemd/system") if -d "${tmpdir}/lib/systemd/system";
+
+	# Handle either only the unit files which were passed as arguments or
+	# all unit files that are installed in this package.
+	my @args = @ARGV > 0 ? @ARGV : @installed_units;
+
+	# support excluding units via -X
+	foreach my $x (@{$dh{EXCLUDE}}) {
+		@args = grep !/(^|\/)$x$/, @args;
+	}
+
+	# This hash prevents us from looping forever in the following while loop.
+	# An actual real-world example of such a loop is systemd’s
+	# systemd-readahead-drop.service, which contains
+	# Also=systemd-readahead-collect.service, and that file in turn
+	# contains Also=systemd-readahead-drop.service, thus forming an endless
+	# loop.
+	my %seen;
+	# We use while/shift because we push to the list in the body.
+	while (@args) {
+		my $name = shift @args;
+		my $base = basename($name);
+
+		# Try to make the path absolute, so that the user can call
+		# dh_installsystemd bacula-fd.service
+		if ($base eq $name) {
+			# NB: This works because @installed_units contains
+			# files from precisely one directory.
+			my ($full) = grep { basename($_) eq $base } @installed_units;
+			if (defined($full)) {
+				$name = $full;
+			} else {
+				warning(qq|Could not find "$name" in the /lib/systemd/system directory of $package. | .
+					qq|This could be a typo, or using Also= with a service file from another package. | .
+					qq|Please check carefully that this message is harmless.|);
+			}
+		}
+
+		# Skip template service files like e.g. getty@.service.
+		# Enabling, disabling, starting or stopping those services
+		# without specifying the instance (e.g. getty@ttyS0.service) is
+		# not useful.
+		if ($name =~ /\@/) {
+			next;
+		}
+
+		# Handle all unit files specified via Also= explicitly.
+		# This is not necessary for enabling, but for disabling, as we
+		# cannot read the unit file when disabling (it was already
+		# deleted).
+		my @also = grep { !exists($seen{$_}) } extract_key($name, 'Also');
+		$seen{$_} = 1 for @also;
+		@args = (@args, @also);
+
+		push @{$aliases{$name}}, $_ for extract_key($name, 'Alias');
+		my @sysv = grep {
+				my $base = $_;
+				$base =~ s/\.(?:mount|service|socket|target|path)$//g;
+				-f "$tmpdir/etc/init.d/$base"
+			} ($base, @{$aliases{$name}});
+		if (@sysv == 0 && !grep { $_ eq $name } @start_units) {
+			push @start_units, $name;
+		}
+
+		if (contains_install_section($name)) {
+			push @enable_units, $name;
+		}
+	}
+
+	next if @start_units == 0 && @enable_units == 0;
+
+	for my $unit (sort @enable_units) {
+		my $base = basename($unit);
+		if ($dh{NO_ENABLE}) {
+			autoscript($package, 'postinst', 'postinst-systemd-dont-enable', { 'UNITFILE' => $base });
+		} else {
+			autoscript($package, 'postinst', 'postinst-systemd-enable', { 'UNITFILE' => $base });
+		}
+	}
+	my $enableunitargs = join(" ", sort map { basename($_) } @enable_units);
+	autoscript($package, 'postrm', 'postrm-systemd', {'UNITFILES' => $enableunitargs });
+	
+	# The $package and $sed parameters are always the same.
+	# This wrapper function makes the following logic easier to read.
+	my $startunitargs = join(" ", sort map { basename($_) } @start_units);
+	my $start_autoscript = sub {
+		my ($script, $filename) = @_;
+		autoscript($package, $script, $filename, { 'UNITFILES' => $startunitargs });
+	};
+
+	if ($dh{RESTART_AFTER_UPGRADE}) {
+		my $snippet = "postinst-systemd-restart" . ($dh{NO_START} ? "nostart" : "");
+		$start_autoscript->("postinst", $snippet);
+	} elsif (!$dh{NO_START}) {
+		# We need to stop/start before/after the upgrade.
+		$start_autoscript->("postinst", "postinst-systemd-start");
+	}
+
+	$start_autoscript->("postrm", "postrm-systemd-reload-only");
+
+	if ($dh{R_FLAG} || $dh{RESTART_AFTER_UPGRADE}) {
+		# stop service only on remove
+		$start_autoscript->("prerm", "prerm-systemd-restart");
+	} elsif (!$dh{NO_START}) {
+		# always stop service
+		$start_autoscript->("prerm", "prerm-systemd");
+	}
+
+	# init-system-helpers ships deb-systemd-helper which we use in our
+	# autoscripts
+	addsubstvar($package, "misc:Depends", "init-system-helpers (>= 1.18~)");
+}
+
+=head1 SEE ALSO
+
+L<dh_systemd_start(1)>, L<debhelper(7)>
+
+=head1 AUTHORS
+
+pkg-systemd-maintainers@lists.alioth.debian.org
+
+=cut
