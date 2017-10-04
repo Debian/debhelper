@@ -320,7 +320,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			push @start_units, $name;
 		}
 
-		if (contains_install_section($name)) {
+		if (contains_install_section($name) && !grep { $_ eq $name } @enable_units) {
 			push @enable_units, $name;
 		}
 	}
