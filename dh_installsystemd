@@ -83,15 +83,48 @@ lib/systemd/system/I<package>@.timer) in the package build directory.
 Disable the service(s) on purge, but do not enable them on install.
 
 B<Note> that this option does not affect whether the services are
-started.  That is controlled by L<dh_systemd_start(1)> (using e.g. its
-B<--no-start> option).
+started.  Please remember to also use B<--no-start> if the service
+should not be started.
 
 =item B<--name=>I<name>
 
 Install the service file as I<name.service> instead of the default filename,
 which is the I<package.service>. When this parameter is used,
-B<dh_systemd_enable> looks for and installs files named
+B<dh_installsystemd> looks for and installs files named
 F<debian/package.name.service> instead of the usual F<debian/package.service>.
+
+=item B<--restart-after-upgrade>
+
+Do not stop the unit file until after the package upgrade has been completed.
+This is the default behaviour in compat 10.
+
+In earlier compat levels the default was to stop the unit file in the
+F<prerm>, and start it again in the F<postinst>.
+
+This can be useful for daemons that should not have a possibly long
+downtime during upgrade. But you should make sure that the daemon will not
+get confused by the package being upgraded while it's running before using
+this option.
+
+=item B<--no-restart-after-upgrade>
+
+Undo a previous B<--restart-after-upgrade> (or the default of compat
+10).  If no other options are given, this will cause the service to be
+stopped in the F<prerm> script and started again in the F<postinst>
+script.
+
+=item B<-r>, B<--no-stop-on-upgrade>, B<--no-restart-on-upgrade>
+
+Do not stop service on upgrade.
+
+=item B<--no-start>
+
+Do not start the unit file after upgrades and after initial installation (the
+latter is only relevant for services without a corresponding init script).
+
+B<Note> that this option does not affect whether the services are
+enabled.  Please remember to also use B<--no-enable> if the services
+should not be enabled.
 
 =back
 
@@ -101,10 +134,6 @@ Note that this command is not idempotent. L<dh_prep(1)> should be called
 between invocations of this command (with the same arguments). Otherwise, it
 may cause multiple instances of the same text to be added to maintainer
 scripts.
-
-Note that B<dh_systemd_enable> should be run before B<dh_installinit>.
-The default sequence in B<dh> does the right thing, this note is only relevant
-when you are calling B<dh_systemd_enable> manually.
 
 =cut
 
@@ -342,7 +371,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 =head1 SEE ALSO
 
-L<dh_systemd_start(1)>, L<debhelper(7)>
+L<debhelper(7)>
 
 =head1 AUTHORS
 
