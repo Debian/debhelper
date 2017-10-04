@@ -21,23 +21,20 @@ if (uid_0_test_is_ok()) {
 }
 
 each_compat_from_and_above_subtest(11, sub {
-	make_path(qw(debian/foo debian/bar debian/baz));
 	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
 	ok(-e "debian/foo.postinst.debhelper");
 	ok(run_dh_tool('dh_clean'));
-
 });
 
 each_compat_up_to_and_incl_subtest(10, sub {
-	make_path(qw(debian/foo debian/bar debian/baz));
 
 	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd'));
 	ok(! -e "debian/foo/lib/systemd/system/foo.service");
 	ok(! -e "debian/foo.postinst.debhelper");
 	ok(run_dh_tool('dh_clean'));
 
-	make_path(qw(debian/foo/lib/systemd/system/ debian/bar debian/baz));
+	make_path(qw(debian/foo/lib/systemd/system/));
 	install_file('debian/foo.service', 'debian/foo/lib/systemd/system/foo.service');
 	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd'));
 	ok(! -e "debian/foo.postinst.debhelper");
