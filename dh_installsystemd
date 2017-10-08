@@ -209,10 +209,7 @@ sub extract_key {
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmpdir = tmpdir($package);
-	my @installed_units;
-	my @start_units;
-	my @enable_units;
-	my %aliases;
+	my (@installed_units, @start_units,  @enable_units, %aliases, @tmpfiles);
 
 	# Figure out what filename to install it as.
 	my $script;
@@ -313,6 +310,26 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 		if (contains_install_section($name) && !grep { $_ eq $name } @enable_units) {
 			push @enable_units, $name;
+		}
+	}
+
+	# Include postinst-init-tmpfiles if the package ships any files
+	# in /usr/lib/tmpfiles.d or /etc/tmpfiles.d
+	if (-d $tmpdir) {
+		find({
+				wanted   => sub {
+					my $name = $File::Find::name;
+					return unless -f $name;
+					$name =~ s/^\Q$tmpdir\E//g;
+					if ($name =~ m,^/usr/lib/tmpfiles\.d/, ||
+						$name =~ m,^/etc/tmpfiles\.d/,) {
+						push @tmpfiles, $name;
+					}
+				},
+				no_chdir => 1,
+			}, $tmpdir);
+		if (@tmpfiles > 0) {
+			autoscript($package, 'postinst', 'postinst-init-tmpfiles', { 'TMPFILES' => join(' ', sort @tmpfiles) });
 		}
 	}
 
