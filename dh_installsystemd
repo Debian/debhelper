@@ -361,10 +361,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# always stop service
 		$start_autoscript->("prerm", "prerm-systemd");
 	}
-
-	# init-system-helpers ships deb-systemd-helper which we use in our
-	# autoscripts
-	addsubstvar($package, "misc:Depends", "init-system-helpers (>= 1.18~)");
 }
 
 =head1 SEE ALSO
