@@ -230,15 +230,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		$script=$package;
 	}
 
-	foreach my $suffix ('', '@') {
-		install_unit("$package$suffix", $script, 'service', "$tmpdir/lib/systemd/system");
-		install_unit("$package$suffix", $script, 'target', "$tmpdir/lib/systemd/system");
-		install_unit("$package$suffix", $script, 'socket', "$tmpdir/lib/systemd/system");
-		install_unit("$package$suffix", $script, 'mount', "$tmpdir/lib/systemd/system") if $suffix eq '';
-		install_unit("$package$suffix", $script, 'path', "$tmpdir/lib/systemd/system");
-		install_unit("$package$suffix", $script, 'tmpfile', "$tmpdir/usr/lib/tmpfiles.d", 'conf') if $suffix eq '';
-		install_unit("$package$suffix", $script, 'timer', "$tmpdir/lib/systemd/system");
+	for my $service_type (qw(service target socket path timer)) {
+		install_unit($package, $script, $service_type, "$tmpdir/lib/systemd/system");
+		install_unit("${package}@", "${script}@", $service_type, "$tmpdir/lib/systemd/system");
 	}
+
+	install_unit($package, $script, 'mount', "$tmpdir/lib/systemd/system");
+	install_unit($package, $script, 'tmpfile', "$tmpdir/usr/lib/tmpfiles.d", 'conf');
 
 	my $oldcwd = getcwd();
 	find({
