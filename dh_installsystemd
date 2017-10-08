@@ -153,11 +153,9 @@ init(options => {
 
 sub contains_install_section {
 	my ($unit_path) = @_;
-	my $fh;
-	if (!open($fh, '<', $unit_path)) {
-		warning("Cannot open($unit_path) for extracting the Also= line(s)");
-		return;
-	}
+
+	open(my $fh, '<', $unit_path) or error("Cannot open($unit_path) for extracting the Also= line(s)");
+
 	while (my $line = <$fh>) {
 		chomp($line);
 		return 1 if $line =~ /^\s*\[Install\]$/i;
@@ -182,16 +180,11 @@ sub install_unit {
 sub extract_key {
 	my ($unit_path, $key) = @_;
 	my @values;
-	my $fh;
 
-	if ($dh{NO_ALSO}) {
-		return @values;
-	}
+	return @values if $dh{NO_ALSO};
 
-	if (!open($fh, '<', $unit_path)) {
-		warning("Cannot open($unit_path) for extracting the Also= line(s)");
-		return;
-	}
+	open(my $fh, '<', $unit_path) or error("Cannot open($unit_path) for extracting the Also= line(s)");
+
 	while (my $line = <$fh>) {
 		chomp($line);
 
