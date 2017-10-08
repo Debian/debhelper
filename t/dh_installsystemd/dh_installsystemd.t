@@ -52,7 +52,7 @@ each_compat_from_and_above_subtest(11, sub {
 	unit_is_enabled('foo', 'foo', 1);
 	unit_is_started('foo', 'foo', 1);
 	unit_is_enabled('foo', 'foo2', 0);
-	unit_is_started('foo', 'foo2', 1);
+	unit_is_started('foo', 'foo2', 0);
 	ok(run_dh_tool('dh_clean'));
 
 	make_path('debian/foo/lib/systemd/system/');
