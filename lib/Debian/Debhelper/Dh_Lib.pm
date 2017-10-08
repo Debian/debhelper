@@ -18,7 +18,7 @@ use constant {
 	# debian-devel@l.d.o before bumping this.
 	'BETA_TESTER_COMPAT' => 10,
 	# Highest compat level permitted
-	'MAX_COMPAT_LEVEL' => 11,
+	'MAX_COMPAT_LEVEL' => 12,
 	# Magic value for xargs
 	'XARGS_INSERT_PARAMS_HERE' => \'<INSERT-HERE>', #'# Hi emacs.
 	# Magic value for debhelper tools to request "current version"
@@ -311,11 +311,10 @@ sub print_and_doit_noerror {
 sub _doit {
 	my (@cmd) = @_;
 	my $options = ref($cmd[0]) ? shift(@cmd) : undef;
-	# In compat <= 10, we warn, compat 11 we detect and error, in
-	# compat 12 we assume people know what they are doing.
-	if (not defined($options) and @cmd == 1 and compat(11) and $cmd[0] =~ m/[\s<&>|;]/) {
-		deprecated_functionality('doit() + doit_*() calls will no longer spawn a shell in compat 11 for single string arguments (please use complex_doit instead)',
-								 11);
+	# In compat <= 11, we warn, in compat 12 we assume people know what they are doing.
+	if (not defined($options) and @cmd == 1 and compat(12) and $cmd[0] =~ m/[\s<&>|;]/) {
+		deprecated_functionality('doit() + doit_*() calls will no longer spawn a shell in compat 12 for single string arguments (please use complex_doit instead)',
+								 12);
 		return 1 if $dh{NO_ACT};
 		return system(@cmd) == 0;
 	}
