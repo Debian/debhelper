@@ -29,6 +29,9 @@ debhelper (10.9.1) UNRELEASED; urgency=medium
     init-system-helpers that is satisfied in oldstable.
   * Dh_Lib: Fix regression where --no-act would actually create
     maintscript snippets.
+  * dh_systemd_*: If an unit file cannot be read (e.g. to check for
+    the [Install] section), error out instead of emitting a warning
+    and continuing.
 
   [ Dmitry Shachnev ]
   * qmake.pm: Add basic cross-building support.  (Closes: #877357)
