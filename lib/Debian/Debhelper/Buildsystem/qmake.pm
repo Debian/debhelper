@@ -63,7 +63,7 @@ sub configure {
 		my $host_os = dpkg_architecture_value("DEB_HOST_ARCH_OS");
 
 		if (defined(my $spec = $OS_MKSPEC_MAPPING{$host_os})) {
-			push(@options, ("-spec", $OS_MKSPEC_MAPPING{$host_os}));
+			push(@options, "-spec", $spec);
 		} else {
 			error("Cannot cross-compile: Missing entry for HOST OS ${host_os} for qmake's -spec option");
 		}
