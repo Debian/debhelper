@@ -22,15 +22,16 @@ if (uid_0_test_is_ok()) {
 }
 
 sub unit_is_enabled {
-	my ($package, $unit, $num_enables) = @_;
+	my ($package, $unit, $num_enables, $num_masks) = @_;
 	my @output;
 	my $matches;
+	$num_masks = $num_masks // $num_enables;
 	@output=`cat debian/$package.postinst.debhelper`;
-	$matches = grep { m{deb-systemd-helper enable .*$unit\.service} } @output;
+	$matches = grep { m{^if deb-systemd-helper .* was-enabled .*$unit\.service} } @output;
 	ok($matches == $num_enables) or diag("$unit appears to have been enabled $matches times (expected $num_enables)");
 	@output=`cat debian/$package.postrm.debhelper`;
 	$matches = grep { m{deb-systemd-helper mask.*$unit\.service} } @output;
-	ok($matches == $num_enables) or diag("$unit appears to have been masked $matches times (expected $num_enables)");
+	ok($matches == $num_masks) or diag("$unit appears to have been masked $matches times (expected $num_masks)");
 }
 sub unit_is_started {
 	my ($package, $unit, $num_starts, $num_stops) = @_;
@@ -88,6 +89,24 @@ each_compat_from_and_above_subtest(11, sub {
 	unit_is_started('foo', 'foo', 0, 1);
 	unit_is_enabled('foo', 'foo2', 1);
 	unit_is_started('foo', 'foo2', 1);
+	ok(run_dh_tool('dh_clean'));
+
+	make_path('debian/foo/lib/systemd/system/');
+	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
+	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd', '--no-enable', 'debian/foo.service'));
+	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd', '-p', 'foo', 'foo2.service'));
+	ok(-e "debian/foo/lib/systemd/system/foo.service");
+	ok(-e "debian/foo.postinst.debhelper");
+	unit_is_enabled('foo', 'foo', 0, 1); # Disabled units are still masked on removal
+	unit_is_started('foo', 'foo', 1, 1);
+	unit_is_enabled('foo', 'foo2', 1);
+	unit_is_started('foo', 'foo2', 1);
+	ok(run_dh_tool('dh_clean'));
+
+	make_path('debian/foo/lib/systemd/system/');
+	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd', '--no-restart-after-upgrade'));
+        my $matches = grep { m{deb-systemd-invoke start .*foo.service} } `cat debian/foo.postinst.debhelper`;
+	ok($matches == 1);
 	ok(run_dh_tool('dh_clean'));
 
 });
