@@ -34,6 +34,10 @@ debhelper (10.9.1) UNRELEASED; urgency=medium
     and continuing.
   * t: Add tests for dh_systemd_* based on WIP tests from Felipe
     Sateler related to a new dh_installsystemd helper.
+  * dh_systemd_enable: Properly quote unit names to preserve
+    escaped names like "\x2d".  Thanks to Bernd Zeimetz for
+    reporting the issue.  (Closes: #764730)
+  * dh_systemd_start: Ditto.
 
   [ Dmitry Shachnev ]
   * qmake.pm: Add basic cross-building support.  (Closes: #877357)

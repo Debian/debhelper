@@ -213,11 +213,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	next if @units == 0;
 
+	# Wrap the basenames in '' to preserve \x2d when the shell parses the
+	# name.  (#764730)
+	my $unitargs = join(' ', sort map { q{'} . basename($_) . q{'} } @units);
 	# The $package and $sed parameters are always the same.
 	# This wrapper function makes the following logic easier to read.
 	my $sd_autoscript = sub {
 		my ($script, $filename) = @_;
-		my $unitargs = join(" ", sort map { basename($_) } @units);
 		autoscript($package, $script, $filename, { 'UNITFILES' => $unitargs });
 	};
 

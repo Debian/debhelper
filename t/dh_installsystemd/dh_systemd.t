@@ -27,10 +27,10 @@ sub unit_is_enabled {
 	my $matches;
 	$num_masks = $num_masks // $num_enables;
 	@output=`cat debian/$package.postinst.debhelper`;
-	$matches = grep { m{^if deb-systemd-helper .* was-enabled .*$unit\.service} } @output;
+	$matches = grep { m{^if deb-systemd-helper .* was-enabled .*'\Q$unit\E\.service'} } @output;
 	ok($matches == $num_enables) or diag("$unit appears to have been enabled $matches times (expected $num_enables)");
 	@output=`cat debian/$package.postrm.debhelper`;
-	$matches = grep { m{deb-systemd-helper mask.*$unit\.service} } @output;
+	$matches = grep { m{deb-systemd-helper mask.*'\Q$unit\E\.service'} } @output;
 	ok($matches == $num_masks) or diag("$unit appears to have been masked $matches times (expected $num_masks)");
 }
 sub unit_is_started {
@@ -39,10 +39,10 @@ sub unit_is_started {
 	my $matches;
 	$num_stops = $num_stops // $num_starts;
 	@output=`cat debian/$package.postinst.debhelper`;
-	$matches = grep { m{deb-systemd-invoke \$_dh_action .*$unit.service} } @output;
+	$matches = grep { m{deb-systemd-invoke \$_dh_action .*'\Q$unit\E.service'} } @output;
 	ok($matches == $num_starts) or diag("$unit appears to have been started $matches times (expected $num_starts)");
 	@output=`cat debian/$package.prerm.debhelper`;
-	$matches = grep { m{deb-systemd-invoke stop .*$unit.service} } @output;
+	$matches = grep { m{deb-systemd-invoke stop .*'\Q$unit\E.service'} } @output;
 	ok($matches == $num_stops) or diag("$unit appears to have been stopped $matches times (expected $num_stops)");
 }
 
@@ -115,6 +115,14 @@ each_compat_up_to_and_incl_subtest(10, sub {
 	ok($matches == 1);
 	ok(run_dh_tool('dh_clean'));
 
+	# Quoting #764730
+	make_path('debian/foo/lib/systemd/system/');
+	install_file('debian/foo.service', 'debian/foo/lib/systemd/system/foo\x2dfuse.service');
+	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_systemd_enable'));
+	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_systemd_start'));
+	unit_is_enabled('foo', 'foo\x2dfuse', 1);
+	unit_is_started('foo', 'foo\x2dfuse', 1);
+	ok(run_dh_tool('dh_clean'));
 });
 
 

@@ -239,9 +239,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	next if @units == 0;
 
-	my $unitargs = join(" ", sort map { basename($_) } @units);
+	# Wrap the basenames in '' to preserve \x2d when the shell parses the
+	# name.  (#764730)
+	my $unitargs = join(' ', sort map { q{'} . basename($_) . q{'}  } @units);
 	for my $unit (sort @units) {
-		my $base = basename($unit);
+		# Wrap the basenames in '' to preserve \x2d when the shell parses the
+		# name.  (#764730)
+		my $base = q{'} . basename($unit) . q{'};
 		if ($dh{NO_ENABLE}) {
 			autoscript($package, 'postinst', 'postinst-systemd-dont-enable', { 'UNITFILE' => $base });
 		} else {
