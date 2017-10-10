@@ -335,19 +335,19 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if @start_units == 0 && @enable_units == 0;
 
 	for my $unit (sort @enable_units) {
-		my $base = basename($unit);
+		my $base = q{'} . basename($unit) . q{'};
 		if ($dh{NO_ENABLE}) {
 			autoscript($package, 'postinst', 'postinst-systemd-dont-enable', { 'UNITFILE' => $base });
 		} else {
 			autoscript($package, 'postinst', 'postinst-systemd-enable', { 'UNITFILE' => $base });
 		}
 	}
-	my $enableunitargs = join(" ", sort map { basename($_) } @enable_units);
+	my $enableunitargs = join(' ', sort map { q{'} . basename($_) . q{'} } @enable_units);
 	autoscript($package, 'postrm', 'postrm-systemd', {'UNITFILES' => $enableunitargs });
 	
 	# The $package and $sed parameters are always the same.
 	# This wrapper function makes the following logic easier to read.
-	my $startunitargs = join(" ", sort map { basename($_) } @start_units);
+	my $startunitargs = join(' ', sort map { q{'} . basename($_) . q{'} } @start_units);
 	my $start_autoscript = sub {
 		my ($script, $filename) = @_;
 		autoscript($package, $script, $filename, { 'UNITFILES' => $startunitargs });
