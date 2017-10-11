@@ -727,12 +727,7 @@ Please use the new name B<--no-stop-on-upgrade>
 There was a bug in the B<doit> (and similar) functions from
 L<Debian::Debhelper::Dh_Lib> that made them spawn a shell in one
 particular circumstance.  This bug is now removed and will cause
-helpers that rely on the bug to fail with an error.
-
-In compatibility 11, there is still a detection for this case to
-provide a useful error message.  This detection will be removed in
-compatibility 12, where the string will be interpreted as a literal
-command and fail with a "command not found" error.
+helpers that rely on the bug to fail with a "command not found"-error.
 
 =item -
 
