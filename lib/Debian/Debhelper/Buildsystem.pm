@@ -31,7 +31,7 @@ sub DESCRIPTION {
 	error("class lacking a DESCRIPTION");
 }
 
-# Default build directory. Can be overriden in the derived
+# Default build directory. Can be overridden in the derived
 # class if really needed.
 sub DEFAULT_BUILD_DIRECTORY {
 	"obj-" . dpkg_architecture_value("DEB_HOST_GNU_TYPE");
@@ -416,9 +416,9 @@ sub post_building_step {
 # building, testing, install and cleaning source packages.
 # In case of failure, the method may just error() out.
 #
-# These methods should be overriden by derived classes to
+# These methods should be overridden by derived classes to
 # implement build system specific steps needed to build the
-# source. Arbitary number of custom step arguments might be
+# source. Arbitrary number of custom step arguments might be
 # passed. Default implementations do nothing.
 sub configure {
 	my $this=shift;

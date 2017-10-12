@@ -1303,8 +1303,8 @@ sub sourcepackage {
 }
 
 # Returns a list of packages in the control file.
-# Pass "arch" or "indep" to specify arch-dependant (that will be built
-# for the system's arch) or independant. If nothing is specified,
+# Pass "arch" or "indep" to specify arch-dependent (that will be built
+# for the system's arch) or independent. If nothing is specified,
 # returns all packages. Also, "both" returns the union of "arch" and "indep"
 # packages.
 #
