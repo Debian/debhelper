@@ -116,6 +116,21 @@ each_compat_from_and_above_subtest(11, sub {
 	unit_is_enabled('foo', 'foo\x2dfuse', 1);
 	unit_is_started('foo', 'foo\x2dfuse', 1);
 	ok(run_dh_tool('dh_clean'));
+
+	# --name flag #870768
+	make_path('debian/foo/lib/systemd/system/');
+	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
+	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd', '--name=foo'));
+	unit_is_enabled('foo', 'foo', 1);
+	unit_is_started('foo', 'foo', 1);
+	unit_is_enabled('foo', 'foo2', 0);
+	unit_is_started('foo', 'foo2', 0);
+	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd', '--name=foo2'));
+	unit_is_enabled('foo', 'foo', 1);
+	unit_is_started('foo', 'foo', 1);
+	unit_is_enabled('foo', 'foo2', 1);
+	unit_is_started('foo', 'foo2', 1);
+	ok(run_dh_tool('dh_clean'));
 });
 
 each_compat_up_to_and_incl_subtest(10, sub {

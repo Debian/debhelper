@@ -92,6 +92,8 @@ Install the service file as I<name.service> instead of the default filename,
 which is the I<package.service>. When this parameter is used,
 B<dh_installsystemd> looks for and installs files named
 F<debian/package.name.service> instead of the usual F<debian/package.service>.
+Moreover, maintainer scripts are only generated for units that match the given
+I<name>.
 
 =item B<--restart-after-upgrade>
 
@@ -247,7 +249,17 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	# Handle either only the unit files which were passed as arguments or
 	# all unit files that are installed in this package.
-	my @args = @ARGV > 0 ? @ARGV : @installed_units;
+	my @args;
+	if (@ARGV > 0) {
+	       @args = @ARGV;
+	}
+	elsif ($dh{NAME}) {
+		# treat --name flag as if the corresponding units were passed in the command line
+		@args = grep /(^|\/)$dh{NAME}\.(mount|path|service|socket|target|tmpfile)$/, @installed_units;
+	}
+	else {
+		@args = @installed_units;
+	}
 
 	# support excluding units via -X
 	foreach my $x (@{$dh{EXCLUDE}}) {
