@@ -58,7 +58,6 @@ sub configure {
 	my @flags;
 
 	push @options, '-makefile';
-	push @options, '-nocache';
 	if (is_cross_compiling()) {
 		my $host_os = dpkg_architecture_value("DEB_HOST_ARCH_OS");
 
