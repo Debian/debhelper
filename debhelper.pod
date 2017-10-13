@@ -589,9 +589,21 @@ Changes from v10 are:
 
 =item -
 
-B<dh_installinit> no longer installs F<service> or F<tmpfile> files, nor
-generates maintainer scripts for those files. Use B<dh_systemd_enable> and
-B<dh_systemd_start> instead.
+B<dh_installinit> no longer installs F<service> or F<tmpfile> files,
+nor generates maintainer scripts for those files.  Please use the new
+B<dh_installsystemd> helper.
+
+=item -
+
+The B<dh_systemd_enable> and B<dh_systemd_start> helpers have been
+replaced by the new B<dh_installsystemd> helper.  For the same reason,
+the B<systemd> sequence for B<dh> has also been removed.  If you need
+to disable the B<dh_installsystemd> helper tool, please use an empty
+override target.
+
+Please note that the B<dh_installsystemd> tool have a slightly
+different behaviour in some cases (e.g. when using the B<--name>
+parameter).
 
 =item -
 
