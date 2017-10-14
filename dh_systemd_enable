@@ -124,7 +124,7 @@ init(options => {
 
 sub contains_install_section {
 	my ($unit_path) = @_;
-	open(my $fh, '<', $unit_path) or error("Cannot open($unit_path) to check for [Install]");
+	open(my $fh, '<', $unit_path) or error("Cannot open($unit_path) to check for [Install]: $!");
 	while (my $line = <$fh>) {
 		chomp($line);
 		return 1 if $line =~ /^\s*\[Install\]$/i;

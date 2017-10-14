@@ -104,7 +104,7 @@ sub extract_key {
 
 	return if $dh{NO_ALSO};
 
-	open(my $fh, '<', $unit_path) or error("Cannot open($unit_path) for extracting the Also= line(s)");
+	open(my $fh, '<', $unit_path) or error("Cannot open($unit_path) for extracting the Also= line(s): $!");
 
 	while (my $line = <$fh>) {
 		chomp($line);

@@ -156,7 +156,7 @@ init(options => {
 sub contains_install_section {
 	my ($unit_path) = @_;
 
-	open(my $fh, '<', $unit_path) or error("Cannot open($unit_path) for extracting the Also= line(s)");
+	open(my $fh, '<', $unit_path) or error("Cannot open($unit_path) to check for [Install]: $!");
 
 	while (my $line = <$fh>) {
 		chomp($line);
@@ -185,7 +185,7 @@ sub extract_key {
 
 	return @values if $dh{NO_ALSO};
 
-	open(my $fh, '<', $unit_path) or error("Cannot open($unit_path) for extracting the Also= line(s)");
+	open(my $fh, '<', $unit_path) or error("Cannot open($unit_path) for extracting the Also= line(s): $!");
 
 	while (my $line = <$fh>) {
 		chomp($line);
