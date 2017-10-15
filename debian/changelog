@@ -23,6 +23,9 @@ debhelper (10.9.3) UNRELEASED; urgency=medium
     R³ contains the "debhelper/upstream-make-install" keyword.
   * dh_builddeb: Pass --root-owner-group to dpkg-deb in packages
     with R³ (except for "binary-targets").
+  * dh_usrlocal: When R³ is enabled (and not "binary-targets"),
+    ignore the ownership/mode information on the directories.
+    Instead, the ownership "root:staff" and the mode 02775 is used.
 
  -- Niels Thykier <niels@thykier.net>  Sat, 14 Oct 2017 11:18:19 +0000
 

@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+=encoding UTF-8
+
 =head1 NAME
 
 dh_usrlocal - migrate usr/local directories to maintainer scripts
@@ -31,12 +33,15 @@ snippets are inserted into the maintainer scripts by B<dh_installdeb>. See
 L<dh_installdeb(1)> for an explanation of debhelper maintainer script
 snippets.
 
-If the directories found in the build tree have unusual owners, groups, or
-permissions, then those values will be preserved in the directories made by
-the F<postinst> script. However, as a special exception, if a directory is owned
-by root.root, it will be treated as if it is owned by root.staff and is mode
-2775. This is useful, since that is the group and mode policy recommends for
-directories in F</usr/local>.
+In a non-legacy R³ build, the directories in F</usr/local> will have
+ownership root:staff and the mode will be 02775.  These values have
+been chosen to comply with the recommendations of the Debian policy
+for directories in F</usr/local>.
+
+In R³ legacy mode, the owners, groups and permissions will be preserved with
+one exception.  If the directory is owned by root:root, then ownership will
+be reset to root:staff and mode will be reset to 02775. This is useful, since
+that is the group and mode policy recommends for directories in F</usr/local>.
 
 =head1 OPTIONS
 
@@ -74,15 +79,21 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		      wanted => sub {
 			my $fn = $File::Find::name;
 			if (-d $fn) {
-				my $stat = stat $fn;
-				my $user = getpwuid $stat->uid;
-				my $group = getgrgid $stat->gid;
-				my $mode = sprintf "%04lo", ($stat->mode & 07777);
-
-				if ($stat->uid == 0 && $stat->gid == 0) {
-					$group = 'staff';
-					$mode = '2775';
+				my $user = 'root';
+				my $group = 'group';
+				my $mode = '02775';
+				if (not should_use_root()) {
+					my $stat = stat $fn;
+					$user = getpwuid $stat->uid;
+					$group = getgrgid $stat->gid;
+					$mode = sprintf "%04lo", ($stat->mode & 07777);
+					if ($stat->uid == 0 && $stat->gid == 0) {
+						$group = 'staff';
+						$mode = '02775';
+					}
 				}
+
+
 
 				$fn =~ s!^\Q$tmp\E!!;
 				return if $fn eq '/usr/local';
