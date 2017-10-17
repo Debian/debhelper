@@ -1304,7 +1304,8 @@ sub is_cross_compiling {
 # As a side effect, populates %package_arches and %package_types
 # with the types of all packages (not only those returned).
 my (%package_types, %package_arches, %package_multiarches, %packages_by_type,
-    %package_sections, $sourcepackage, %rrr);
+    %package_sections, $sourcepackage, %rrr, %package_cross_type);
+
 # Returns source package name
 sub sourcepackage {
 	getpackages() if not defined($sourcepackage);
@@ -1327,7 +1328,7 @@ sub getpackages {
 	my $arch="";
 	my $section="";
 	my ($package_type, $multiarch, %seen, @profiles, $source_section,
-		$included_in_build_profile);
+		$included_in_build_profile, $cross_type, $cross_target_arch);
 	if (exists $ENV{'DEB_BUILD_PROFILES'}) {
 		@profiles=split /\s+/, $ENV{'DEB_BUILD_PROFILES'};
 	}
@@ -1382,7 +1383,11 @@ sub getpackages {
 			$package_type=$1;
 		} elsif (/^Multi-Arch:\s*(.*)/i) {
 			$multiarch = $1;
-
+		} elsif (/^X-DH-Build-For-Type:\s*(.*)/i) {
+			$cross_type = $1;
+			if ($cross_type ne 'host' and $cross_type ne 'target') {
+				error("Unknown value of X-DH-Build-For-Type \"$cross_type\" at debian/control:$.");
+			}
 		} elsif (/^Build-Profiles:\s*(.*)/i) {
 			# rely on libdpkg-perl providing the parsing functions
 			# because if we work on a package with a Build-Profiles
@@ -1407,20 +1412,34 @@ sub getpackages {
 				$package_arches{$package}=$arch;
 				$package_multiarches{$package} = $multiarch;
 				$package_sections{$package} = $section || $source_section;
+				$cross_type //= 'host';
+				$package_cross_type{$package} = $cross_type;
 				push(@{$packages_by_type{'all-listed-in-control-file'}}, $package);
 				if ($included_in_build_profile) {
 					if ($arch eq 'all') {
 						push(@{$packages_by_type{'indep'}}, $package);
 						push(@{$packages_by_type{'both'}}, $package);
-					} elsif ($arch eq 'any' ||
-							 ($arch ne 'all' && samearch(buildarch(), $arch))) {
-						push(@{$packages_by_type{'arch'}}, $package);
-						push(@{$packages_by_type{'both'}}, $package);
+					} else {
+						my $included = 0;
+						$included = 1 if $arch eq 'any';
+						if (not $included) {
+							my $desired_arch = buildarch();
+							if ($cross_type eq 'target') {
+								$cross_target_arch //= dpkg_architecture_value('DEB_TARGET_ARCH');
+								$desired_arch = $cross_target_arch;
+							}
+							$included = 1 if samearch($desired_arch, $arch);
+						}
+						if ($included) {
+							push(@{$packages_by_type{'arch'}}, $package);
+							push(@{$packages_by_type{'both'}}, $package);
+						}
 					}
 				}
 			}
 			$package='';
 			$package_type=undef;
+			$cross_type = undef;
 			$arch='';
 			$section='';
 		}
@@ -1481,7 +1500,9 @@ sub package_binary_arch {
 		warning "package $package is not in control info";
 		return buildarch();
 	}
-	return $package_arches{$package} eq 'all' ? "all" : buildarch();
+	return 'all' if $package_arches{$package} eq 'all';
+	return dpkg_architecture_value('DEB_TARGET_ARCH') if package_cross_type($package) eq 'target';
+	return buildarch();
 }
 
 # Returns the Architecture: value which the package declared.
@@ -1531,6 +1552,18 @@ sub package_section {
 		return 'unknown';
 	}
 	return $package_sections{$package} // 'unknown';
+}
+
+sub package_cross_type {
+	my ($package) = @_;
+
+	# Test the architecture field instead, as it is common for a
+	# package to not have a multi-arch value.
+	if (! exists $package_cross_type{$package}) {
+		warning "package $package is not in control info";
+		return 'host';
+	}
+	return $package_cross_type{$package} // 'host';
 }
 
 # Return true if a given package is really a udeb.
