@@ -23,6 +23,9 @@ use constant {
 	'XARGS_INSERT_PARAMS_HERE' => \'<INSERT-HERE>', #'# Hi emacs.
 	# Magic value for debhelper tools to request "current version"
 	'DH_BUILTIN_VERSION' => \'<DH_LIB_VERSION>', #'# Hi emacs.
+
+	# Kill-switch for R³ (for backports)
+	'DH_ENABLE_RRR_SUPPORT' => 1,
 };
 
 my %NAMED_COMPAT_LEVELS = (
@@ -1428,6 +1431,7 @@ sub getpackages {
 # - Returns true otherwise (i.e. keyword is in R^3 or R^3 is 'binary-targets')
 sub should_use_root {
 	my ($keyword) = @_;
+	return 1 if not DH_ENABLE_RRR_SUPPORT;
 	getpackages() if not %rrr;
 
 	return 0 if exists($rrr{'no'});
@@ -1445,6 +1449,8 @@ sub gain_root_cmd {
 }
 
 sub root_requirements {
+	return 'legacy-root' if not DH_ENABLE_RRR_SUPPORT;
+
 	getpackages() if not %rrr;
 
 	return 'none' if exists($rrr{'no'});
