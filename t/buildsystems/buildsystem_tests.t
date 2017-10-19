@@ -148,7 +148,7 @@ test_buildsystem_paths_api($bs, "no builddir, sourcedir=autoconf", \%tmp);
 # Prefer out of source tree building when
 # sourcedir=builddir=autoconf hence builddir should be dropped.
 $bs->prefer_out_of_source_building(builddir => "autoconf");
-test_buildsystem_paths_api($bs, "out of source prefered, sourcedir=builddir", \%tmp);
+test_buildsystem_paths_api($bs, "out of source preferred, sourcedir=builddir", \%tmp);
 
 # builddir=bld/dir, sourcedir=autoconf. Should be the same as sourcedir=autoconf.
 $bs = $BS_CLASS->new(builddir => "bld/dir", sourcedir => "autoconf");

@@ -295,7 +295,9 @@ if (not compat(9, 1)) {
 	# sequence add-on so existing --without=autoreconf
 	unshift(@ARGV, "--with=autoreconf");
 	# Enable systemd support by default in compat 10 or later.
-	unshift(@ARGV, "--with=systemd");
+	# - compat 11 injects the dh_installsystemd tool directly in the
+	#   sequence instead of using a --with sequence.
+	unshift(@ARGV, "--with=systemd") if compat(10, 1);
 	unshift(@ARGV, "--with=build-stamp");
 }
 
@@ -398,6 +400,10 @@ my @i = (qw{
 	dh_installifupdown
 	dh_installinfo
 	dh_installinit
+},
+   (!compat(10) ? qw(dh_installsystemd) : qw()),
+
+qw{
 	dh_installmenu
 	dh_installmime
 	dh_installmodules

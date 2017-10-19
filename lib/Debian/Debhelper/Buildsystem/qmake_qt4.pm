@@ -2,7 +2,6 @@ package Debian::Debhelper::Buildsystem::qmake_qt4;
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(error);
 use parent qw(Debian::Debhelper::Buildsystem::qmake);
 
 sub DESCRIPTION {

@@ -92,8 +92,7 @@ foreach my $package (getpackages()) {
 	if (@info) {
 		install_dir("$tmp/usr/share/info");
 		xargs(\@info, "cp", '--reflink=auto', XARGS_INSERT_PARAMS_HERE, "$tmp/usr/share/info");
-		doit("chmod","-R", "go=rX","$tmp/usr/share/info/");
-		doit("chmod","-R", "u+rw","$tmp/usr/share/info/");
+		doit("chmod","-R", "u+rw,go=rX","$tmp/usr/share/info/");
 	}
 }
 

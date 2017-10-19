@@ -7,7 +7,8 @@ package Debian::Debhelper::Buildsystem::meson;
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value);
+use File::Temp qw(tempfile);
+use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value is_cross_compiling doit warning error);
 use parent qw(Debian::Debhelper::Buildsystem::ninja);
 
 sub DESCRIPTION {
@@ -35,9 +36,6 @@ sub new {
 sub configure {
 	my $this=shift;
 
-	# TODO: Support cross compilation
-	# https://github.com/mesonbuild/meson/wiki/Cross-compilation
-
 	# Standard set of options for meson.
 	my @opts = (
 		'--wrap-mode=nodownload',
@@ -49,6 +47,29 @@ sub configure {
 	my $multiarch=dpkg_architecture_value("DEB_HOST_MULTIARCH");
 	push @opts, "--libdir=lib/$multiarch";
 	push @opts, "--libexecdir=lib/$multiarch";
+
+	if (is_cross_compiling()) {
+		# http://mesonbuild.com/Cross-compilation.html
+		my $cross_file = $ENV{'DH_MESON_CROSS_FILE'};
+		if (not $cross_file) {
+			my $debcrossgen = '/usr/share/meson/debcrossgen';
+			if (not -x $debcrossgen) {
+				warning("Missing debcrossgen (${debcrossgen}) cannot generate a meson cross file and non was provided");
+				error("Cannot cross-compile: Please use meson (>= 0.42.1) or provide a cross file via DH_MESON_CROSS_FILE");
+			}
+			my ($fh, $filename) = tempfile("meson-cross-file.XXXX", SUFFIX => ".conf", TMPDIR => 1, UNLINK => 1);
+			close($fh);
+			doit({ stdout => '/dev/null' }, $debcrossgen, "-o${filename}");
+			$cross_file = $filename;
+		}
+		if ($cross_file !~ m{^/}) {
+			# Make the file name absolute as meson will be called from the build dir.
+			require Cwd;
+			$cross_file =~ s{^\./}{};
+			$cross_file = Cwd::cwd() . "/${cross_file}";
+		}
+		push(@opts, '--cross-file', $cross_file);
+	}
 
 	$this->mkdir_builddir();
 	eval {

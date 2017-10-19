@@ -589,18 +589,21 @@ Changes from v10 are:
 
 =item -
 
-B<dh_installinit> no longer installs F<service> or F<tmpfile> files, nor
-generates maintainer scripts for those files. Use B<dh_systemd_enable> and
-B<dh_systemd_start> instead.
+B<dh_installinit> no longer installs F<service> or F<tmpfile> files,
+nor generates maintainer scripts for those files.  Please use the new
+B<dh_installsystemd> helper.
 
 =item -
 
-The B<-s> (B<--same-arch>) option is removed.  Please use B<-a> (B<--arch>) instead.
+The B<dh_systemd_enable> and B<dh_systemd_start> helpers have been
+replaced by the new B<dh_installsystemd> helper.  For the same reason,
+the B<systemd> sequence for B<dh> has also been removed.  If you need
+to disable the B<dh_installsystemd> helper tool, please use an empty
+override target.
 
-=item -
-
-Invoking B<dh_clean -k> now causes an error instead of a deprecation
-warning.
+Please note that the B<dh_installsystemd> tool have a slightly
+different behaviour in some cases (e.g. when using the B<--name>
+parameter).
 
 =item -
 
@@ -615,17 +618,6 @@ The vast majority of all packages will be unaffected by this change.
 The B<makefile> buildsystem now passes B<INSTALL=install
 --strip-program=true> to L<make(1)>.  Derivative buildsystems
 (e.g. B<configure> or B<cmake>) are unaffected by this change.
-
-=item -
-
-The B<--list-missing> and B<--fail-missing> in B<dh_install> has been
-removed.  Please use B<dh_missing> and its corresponding options,
-which can also see the files installed by other helpers.
-
-=item -
-
-The B<--no-restart-on-upgrade> option in B<dh_installinit> has been removed.
-Please use the new name B<--no-stop-on-upgrade>
 
 =item -
 
@@ -693,34 +685,67 @@ retroactively from existing compat levels as well.
 
 =item -
 
-There was a bug in the B<doit> (and similar) functions from
-L<Debian::Debhelper::Dh_Lib> that made them spawn a shell in one
-particular circumstance.  This bug is now removed and will cause
-helpers that rely on the bug to fail with an error.
-
-In compatibility 11, there is still a detection for this case to
-provide a useful error message.  This detection will be removed in
-compatibility 12, where the string will be interpreted as a literal
-command and fail with a "command not found" error.
-
-=item -
-
 The B<dh_makeshlibs> helper will now exit with an error if objdump
-returns failure code from analysing objdump.
+returns a non-zero exit from analysing a given file.
 
 =item -
 
-The B<dh_installdocs> and B<dh_installexamples> tools will now
-attempt to guess the "main package" for a given documentation
-package (e.g. I<pkg-doc> will have I<pkg> as main package).
-
-When a main package is detected, I<most> documentation will be
-installed into F<< /usr/share/doc/I<main-pkg> >> as recommended
-by Debian policy §12.3 since 3.9.7.  Notably exceptions include
-the copyright file and the changelog file.
+The B<dh_installdocs> and B<dh_installexamples> tools will now attempt
+to guess the "main package" for a given documentation package
+(e.g. I<pkg-doc> will have I<pkg> as main package if the latter
+exists).  If a main package is found, I<most> of the documentation
+will be installed into F<< /usr/share/doc/I<main-pkg> >> by default as
+recommended by Debian policy §12.3 since version 3.9.7.  Notable
+exceptions include the copyright file and changelog files.
 
 The B<--doc-main-package> option can be used when the auto-detection
 is insufficient.
+
+=item -
+
+The B<dh_strip> and B<dh_shlibdeps> tools no longer uses filename
+patterns to determine which files to process.  Instead, they open the
+file and look for an ELF header to determine if a given file is an
+shared object or an ELF executable.
+
+This change may cause the tools to process more files than previously.
+
+=back
+
+=item v12
+
+This compatibility level is still open for development; use with caution.
+
+Changes from v11 are:
+
+=over 8
+
+=item -
+
+The B<-s> (B<--same-arch>) option is removed.  Please use B<-a> (B<--arch>) instead.
+
+=item -
+
+Invoking B<dh_clean -k> now causes an error instead of a deprecation
+warning.
+
+=item -
+
+The B<--no-restart-on-upgrade> option in B<dh_installinit> has been removed.
+Please use the new name B<--no-stop-on-upgrade>
+
+=item -
+
+There was a bug in the B<doit> (and similar) functions from
+L<Debian::Debhelper::Dh_Lib> that made them spawn a shell in one
+particular circumstance.  This bug is now removed and will cause
+helpers that rely on the bug to fail with a "command not found"-error.
+
+=item -
+
+The B<--list-missing> and B<--fail-missing> in B<dh_install> has been
+removed.  Please use B<dh_missing> and its corresponding options,
+which can also see the files installed by other helpers.
 
 =back
 
@@ -764,8 +789,10 @@ compat level.
 =item *
 
 The "beta-tester" compatibility version in unstable and testing will
-often be different than the one in stable-backports.  Accordingly, it
-is not recommended for packages being backported regularly.
+often be different than the one in stable.  Accordingly, it is not
+recommended for packages being backported regularly.  Alternatively,
+please be sure to add explicit versioned Build-Depends on debhelper,
+so you get exactly the compatibility version you expect.
 
 =item *
 
@@ -810,6 +837,38 @@ Also, some additional packages may be excluded based on the contents of the
 B<DEB_BUILD_PROFILES> environment variable and B<Build-Profiles> fields in
 binary package stanzas in B<debian/control>, according to the draft policy at
 L<https://wiki.debian.org/BuildProfileSpec>.
+
+=head3 Interaction between package selections and Build-Profiles
+
+Build-Profiles affect which packages are included in the package
+selections mechanisms in debhelper.  Generally, the package selections
+are described from the assumption that all packages are enabled.  This
+section describes how the selections react when a package is disabled
+due to the active Build-Profiles (or lack of active Build-Profiles).
+
+=over 4
+
+=item -a/--arch, -i/--indep OR no selection options (a raw "dh_X" call)
+
+The package disabled by Build-Profiles is silently excluded from the
+selection.
+
+Note you will receive a warning if I<all> packages related to these
+selections are disabled.  In that case, it generally does not make
+sense to do the build in the first place.
+
+=item -N I<package> / --no-package I<package>
+
+The option is accepted and effectively does nothing.
+
+=item -p I<package> / --package I<package>
+
+The option is accepted, but debhelper will not act on the package.
+
+=back
+
+Note that it does not matter whether a package is enabled or disabled
+by default.
 
 =head2 Automatic generation of Debian install scripts
 

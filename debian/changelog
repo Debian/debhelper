@@ -1,3 +1,130 @@
+debhelper (10.9.2) unstable; urgency=medium
+
+  [ Niels Thykier ]
+  * dh_install: Defer the removal of --list-missing and
+    --fail-missing until compat 12.
+  * dh: Run the new dh_installsystemd helper by default in compat 11.
+  * systemd.pm: Remove the sequence in compat 11.  It has been replaced
+    by the new dh_installsystemd helper.
+
+  [ Lisandro Damián Nicanor Pérez Meyer ]
+  * qmake.pm: Remove unnecessary "-nocache" parameter.
+    (Closes: #878427, LP: #1206234)
+
+  [ Ville Skyttä ]
+  * Fix a number of spelling mistakes.  (Closes: #878325)
+
+  [ Felipe Sateler ]
+  * dh_installsystemd: New command (currently noop except when used in
+    the experimental compat 11).  This new helper:
+    - Generates postinst code for tmpfiles (now that dh_installinit
+      does not).
+    - Follows the naming convention for other built-in dh_* commands.
+    - Replaces dh_systemd_enable and dh_systemd_start in compat 11
+      and later.
+    - Only acts on units with the name specified by "--name" when this
+      option is given.
+    (Closes: #752521, #857306, #870768, #876486)
+  * dh_systemd_enable: Remove as obsolete in compat 11.
+  * dh_systemd_start: Ditto.
+
+  [ Helmut Grohne ]
+  * cmake.pm: Also supply PKGCONFIG_EXECUTABLE for obsolete
+    UsePkgConfig.cmake.  (Closes: #878460)
+
+ -- Niels Thykier <niels@thykier.net>  Sat, 14 Oct 2017 07:19:38 +0000
+
+debhelper (10.9.1) unstable; urgency=medium
+
+  [ Niels Thykier ]
+  * dh_builddeb: Add some missing error checks.
+  * Dh_Lib.pm: Fix bug where debhelper could discard some error
+    messages during parsing when -O options were passed via
+    DH_OPTIONS (among other).  Thanks to Adrian Bunk and
+    Andrew Shadura for reporting the issue.  (Closes: #876689)
+  * Dh_Getopt.pm: Gracefully reduce the tool to a no-op when given
+    a -p<pkg> and <pkg> is disabled by a Build-Profile.
+  * debhelper.7: Document how package selections interact with
+    Build-Profiles.  Thanks to Helmut Grohne for the report.
+    (Closes: #872745)
+  * dh_installdocs: Validate that the package passed to
+    --doc-main-package are listed in debian/control.
+  * dh_installexamples: Ditto.
+  * dh_systemd_start: Regex escape two paths used in a regex.
+  * Dh_Lib: Open compat 12.
+  * dh_clean: Defer making -k an error until compat 12.
+  * Dh_Getopt: Defer making -s an error until compat 12.
+  * dh_installinit: Defer making --no-restart-on-upgrade an error
+    until compat 12.
+  * Dh_Lib: Defer making the "shell-spawning bug" in doit an error
+    until compat 12.
+  * dh_systemd_enable: Fix regression in debhelper/10.9 where
+    template units would be installed as regular units (and
+    possibly replace regular units).  (Closes: #877989)
+  * dh_systemd_enable: Drop versioned dependency on
+    init-system-helpers that is satisfied in oldstable.
+  * Dh_Lib: Fix regression where --no-act would actually create
+    maintscript snippets.
+  * dh_systemd_*: If an unit file cannot be read (e.g. to check for
+    the [Install] section), error out instead of emitting a warning
+    and continuing.
+  * t: Add tests for dh_systemd_* based on WIP tests from Felipe
+    Sateler related to a new dh_installsystemd helper.
+  * dh_systemd_enable: Properly quote unit names to preserve
+    escaped names like "\x2d".  Thanks to Bernd Zeimetz for
+    reporting the issue.  (Closes: #764730)
+  * dh_systemd_start: Ditto.
+  * meson.pm: Add prototype support for cross building by relying
+    on /usr/share/meson/debcrossgen.  Note that this is currently
+    not functional due to #875703.
+  * debian/control: Bump Standards-Versions to 4.1.1 - No changes
+    required.
+
+  [ Dmitry Shachnev ]
+  * qmake.pm: Add basic cross-building support.  (Closes: #877357)
+
+ -- Niels Thykier <niels@thykier.net>  Tue, 10 Oct 2017 19:01:00 +0000
+
+debhelper (10.9) unstable; urgency=medium
+
+  [ Niels Thykier ]
+  * debhelper.pod: Fix typo.
+  * dh_fixperms: Reset permissions of .scss and .sass files to
+    0644.  Thanks to Jonas Smedegaard for the suggestion.
+    (Closes: #875586)
+  * dh_shlibdeps: Disable unused file(1) tests.
+  * dh_strip: In compat 11, rely on file headers/magic to
+    determine whether files are ELF binaries worth processing
+    instead of using filenames/extensions.  (Closes: #35733)
+  * dh_shlibdeps: Ditto.
+  * d/control: Bump Standards-Versions to 4.1.0:
+    - Bump priority of dh-systemd to "optional".
+  * dh_makeshlibs: Avoid gratious warning about a non-existing
+    directory, when the packaging directory does not exist.
+    (Closes: #626685)
+  * dh_gencontrol: Ensure that dbgsym packages do not inherit the
+    "Important" field.
+  * dh_installinfo: Merge two chmod calls into one to save a
+    fork+exec.
+  * dh_builddeb: Use -z6 compression for udebs (up from -z1).
+    Thanks to Adrian Bunk for the suggestion and Aurelien Jarno
+    for confirming it would be fine for d-i.  (Closes: #870201)
+  * dh_fixperms: Set the permissions of /usr/lib/nodejs/*/{cli,bin}.js
+    to 0755.  Thanks to Pirate Praveen for the report.
+    (Closes: #840913)
+  * Dh_lib.pm: Expand *_doit and doit to also support a chdir in the
+    child process.
+  * Dh_Getopt.pm: Validate package names passed via -p and -N to ensure
+    they are present in d/control.  Thanks to Matthias Klose for the
+    report.  (Closes: #795432)
+  * debhelper.7: Fix typo of compatibility.
+
+  [ Felipe Sateler ]
+  * dh_systemd_enable: Refactor and add support for timer units.
+    (Closes: #841746)
+
+ -- Niels Thykier <niels@thykier.net>  Tue, 19 Sep 2017 18:49:57 +0000
+
 debhelper (10.8~bpo9+1) stretch-backports; urgency=medium
 
   * Rebuild for stretch-backports.

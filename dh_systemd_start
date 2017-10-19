@@ -79,6 +79,10 @@ B<dh_systemd_start> manually.
 
 =cut
 
+if (not compat(10)) {
+	error("dh_systemd_start is no longer used in compat >= 11, please use dh_installsystemd instead");
+}
+
 $dh{RESTART_AFTER_UPGRADE} = 1 if not compat(9);
 
 init(options => {
@@ -97,16 +101,11 @@ init(options => {
 sub extract_key {
 	my ($unit_path, $key) = @_;
 	my @values;
-	my $fh;
 
-	if ($dh{NO_ALSO}) {
-		return @values;
-	}
+	return if $dh{NO_ALSO};
 
-	if (!open($fh, '<', $unit_path)) {
-		warning("Cannot open($unit_path) for extracting the Also= line(s)");
-		return;
-	}
+	open(my $fh, '<', $unit_path) or error("Cannot open($unit_path) for extracting the Also= line(s)");
+
 	while (my $line = <$fh>) {
 		chomp($line);
 
@@ -140,10 +139,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		wanted => sub {
 			my $name = $File::Find::name;
 			return unless -f;
-			return unless $name =~ m,^$tmpdir/lib/systemd/system/[^/]+$,;
+			return unless $name =~ m,^\Q${tmpdir}\E/lib/systemd/system/[^/]+$,;
 			if (-l) {
 				my $target = abs_path(readlink());
-				$target =~ s,^$oldcwd/,,g;
+				$target =~ s,^\Q${oldcwd}\E/,,g;
 				$aliases{$target} = [ $_ ];
 			} else {
 				push @installed_units, $name;
@@ -218,11 +217,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	next if @units == 0;
 
+	# Wrap the basenames in '' to preserve \x2d when the shell parses the
+	# name.  (#764730)
+	my $unitargs = join(' ', sort map { q{'} . basename($_) . q{'} } @units);
 	# The $package and $sed parameters are always the same.
 	# This wrapper function makes the following logic easier to read.
 	my $sd_autoscript = sub {
 		my ($script, $filename) = @_;
-		my $unitargs = join(" ", sort map { basename($_) } @units);
 		autoscript($package, $script, $filename, { 'UNITFILES' => $unitargs });
 	};
 

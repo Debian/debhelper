@@ -8,10 +8,17 @@ package Debian::Debhelper::Buildsystem::qmake;
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(error);
+use File::Temp qw(tempfile);
+use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value error is_cross_compiling);
 use parent qw(Debian::Debhelper::Buildsystem::makefile);
 
 our $qmake="qmake";
+
+my %OS_MKSPEC_MAPPING = (
+	'linux'    => 'linux-g++',
+	'kfreebsd' => 'gnukfreebsd-g++',
+	'hurd'     => 'hurd-g++',
+);
 
 sub DESCRIPTION {
 	"qmake (*.pro)";
@@ -51,7 +58,23 @@ sub configure {
 	my @flags;
 
 	push @options, '-makefile';
-	push @options, '-nocache';
+	if (is_cross_compiling()) {
+		my $host_os = dpkg_architecture_value("DEB_HOST_ARCH_OS");
+
+		if (defined(my $spec = $OS_MKSPEC_MAPPING{$host_os})) {
+			push(@options, "-spec", $spec);
+		} else {
+			error("Cannot cross-compile: Missing entry for HOST OS ${host_os} for qmake's -spec option");
+		}
+
+		my ($fh, $filename) = tempfile("qt.XXXX", SUFFIX => ".conf", TMPDIR => 1, UNLINK => 1);
+		$fh->print("[Paths]\n");
+		$fh->print("Prefix=/usr\n");
+		$fh->print("HostData=lib/" . dpkg_architecture_value("DEB_HOST_MULTIARCH") . "/qt5\n");
+		$fh->print("Headers=include/" . dpkg_architecture_value("DEB_HOST_MULTIARCH") . "/qt5\n");
+		close $fh;
+		push @options, ("-qtconf", $filename);
+	}
 
 	if ($ENV{CFLAGS}) {
 		push @flags, "QMAKE_CFLAGS_RELEASE=$ENV{CFLAGS} $ENV{CPPFLAGS}";
@@ -67,6 +90,21 @@ sub configure {
 	}
 	push @flags, "QMAKE_STRIP=:";
 	push @flags, "PREFIX=/usr";
+
+	if (is_cross_compiling()) {
+		if ($ENV{CC}) {
+			push @flags, "QMAKE_CC=" . $ENV{CC};
+		} else {
+			push @flags, "QMAKE_CC=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-gcc";
+		}
+		if ($ENV{CXX}) {
+			push @flags, "QMAKE_CXX=" . $ENV{CXX};
+		} else {
+			push @flags, "QMAKE_CXX=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-g++";
+		}
+		push @flags, "QMAKE_LINK=\$(CXX)";
+		push @flags, "PKG_CONFIG=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-pkg-config";
+	}
 
 	$this->mkdir_builddir();
 	$this->doit_in_builddir($qmake, @options, @flags, @_);

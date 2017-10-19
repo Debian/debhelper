@@ -18,7 +18,7 @@ use constant {
 	# debian-devel@l.d.o before bumping this.
 	'BETA_TESTER_COMPAT' => 10,
 	# Highest compat level permitted
-	'MAX_COMPAT_LEVEL' => 11,
+	'MAX_COMPAT_LEVEL' => 12,
 	# Magic value for xargs
 	'XARGS_INSERT_PARAMS_HERE' => \'<INSERT-HERE>', #'# Hi emacs.
 	# Magic value for debhelper tools to request "current version"
@@ -64,7 +64,8 @@ our (@EXPORT, %dh);
 	    &glob_expand_error_handler_warn_and_discard &glob_expand
 	    &glob_expand_error_handler_silently_ignore DH_BUILTIN_VERSION
 	    &print_and_complex_doit &default_sourcedir &qx_cmd
-	    &compute_doc_main_package
+	    &compute_doc_main_package &is_so_or_exec_elf_file
+	    &assert_opt_is_known_package
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -310,11 +311,10 @@ sub print_and_doit_noerror {
 sub _doit {
 	my (@cmd) = @_;
 	my $options = ref($cmd[0]) ? shift(@cmd) : undef;
-	# In compat <= 10, we warn, compat 11 we detect and error, in
-	# compat 12 we assume people know what they are doing.
-	if (not defined($options) and @cmd == 1 and compat(11) and $cmd[0] =~ m/[\s<&>|;]/) {
-		deprecated_functionality('doit() + doit_*() calls will no longer spawn a shell in compat 11 for single string arguments (please use complex_doit instead)',
-								 11);
+	# In compat <= 11, we warn, in compat 12 we assume people know what they are doing.
+	if (not defined($options) and @cmd == 1 and compat(12) and $cmd[0] =~ m/[\s<&>|;]/) {
+		deprecated_functionality('doit() + doit_*() calls will no longer spawn a shell in compat 12 for single string arguments (please use complex_doit instead)',
+								 12);
 		return 1 if $dh{NO_ACT};
 		return system(@cmd) == 0;
 	}
@@ -322,6 +322,11 @@ sub _doit {
 	my $pid = fork() // error("fork(): $!");
 	if (not $pid) {
 		if (defined($options)) {
+			if (defined(my $dir = $options->{chdir})) {
+				if ($dir ne '.') {
+					chdir($dir) or error("chdir(\"${dir}\) failed: $!");
+				}
+			}
 			if (defined(my $output = $options->{stdout})) {
 				open(STDOUT, '>', $output) or error("redirect STDOUT failed: $!");
 			}
@@ -337,6 +342,9 @@ sub _format_cmdline {
 	my (@cmd) = @_;
 	my $options = ref($cmd[0]) ? shift(@cmd) : {};
 	my $cmd_line = escape_shell(@cmd);
+	if (defined(my $dir = $options->{chdir})) {
+		$cmd_line = join(' ', 'cd', escape_shell($dir), '&&', $cmd_line) if $dir ne '.';
+	}
 	if (defined(my $output = $options->{stdout})) {
 		$cmd_line .= ' > ' . escape_shell($output);
 	}
@@ -907,16 +915,18 @@ sub autoscript {
 		# Add fragments to top so they run in reverse order when removing.
 		if (not defined($sed) or ref($sed)) {
 			verbose_print("[META] Prepend autosnippet \"$filename\" to $script [${outfile}.new]");
-			open(my $out_fd, '>', "${outfile}.new") or error("open(${outfile}.new): $!");
-			print {$out_fd} '# Automatically added by ' . basename($0) . "/${tool_version}\n";
-			autoscript_sed($sed, $infile, undef, $out_fd);
-			print {$out_fd} "# End automatically added section\n";
-			open(my $in_fd, '<', $outfile) or error("open($outfile): $!");
-			while (my $line = <$in_fd>) {
-				print {$out_fd} $line;
+			if (not $dh{NO_ACT}) {
+				open(my $out_fd, '>', "${outfile}.new") or error("open(${outfile}.new): $!");
+				print {$out_fd} '# Automatically added by ' . basename($0) . "/${tool_version}\n";
+				autoscript_sed($sed, $infile, undef, $out_fd);
+				print {$out_fd} "# End automatically added section\n";
+				open(my $in_fd, '<', $outfile) or error("open($outfile): $!");
+				while (my $line = <$in_fd>) {
+					print {$out_fd} $line;
+				}
+				close($in_fd);
+				close($out_fd) or error("close(${outfile}.new): $!");
 			}
-			close($in_fd);
-			close($out_fd) or error("close(${outfile}.new): $!");
 		} else {
 			complex_doit("echo \"# Automatically added by ".basename($0)."/${tool_version}\"> $outfile.new");
 			autoscript_sed($sed, $infile, "$outfile.new");
@@ -926,11 +936,13 @@ sub autoscript {
 		rename_path("${outfile}.new", $outfile);
 	} elsif (not defined($sed) or ref($sed)) {
 		verbose_print("[META] Append autosnippet \"$filename\" to $script [${outfile}]");
-		open(my $out_fd, '>>', $outfile) or error("open(${outfile}): $!");
-		print {$out_fd} '# Automatically added by ' . basename($0) . "/${tool_version}\n";
-		autoscript_sed($sed, $infile, undef, $out_fd);
-		print {$out_fd} "# End automatically added section\n";
-		close($out_fd) or error("close(${outfile}): $!");
+		if (not $dh{NO_ACT}) {
+			open(my $out_fd, '>>', $outfile) or error("open(${outfile}): $!");
+			print {$out_fd} '# Automatically added by ' . basename($0) . "/${tool_version}\n";
+			autoscript_sed($sed, $infile, undef, $out_fd);
+			print {$out_fd} "# End automatically added section\n";
+			close($out_fd) or error("close(${outfile}): $!");
+		}
 	} else {
 		complex_doit("echo \"# Automatically added by ".basename($0)."/${tool_version}\">> $outfile");
 		autoscript_sed($sed, $infile, $outfile);
@@ -1291,8 +1303,8 @@ sub sourcepackage {
 }
 
 # Returns a list of packages in the control file.
-# Pass "arch" or "indep" to specify arch-dependant (that will be built
-# for the system's arch) or independant. If nothing is specified,
+# Pass "arch" or "indep" to specify arch-dependent (that will be built
+# for the system's arch) or independent. If nothing is specified,
 # returns all packages. Also, "both" returns the union of "arch" and "indep"
 # packages.
 #
@@ -1928,6 +1940,51 @@ sub log_installed_files {
 	return 1;
 }
 
+use constant {
+	# The ELF header is at least 0x32 bytes (32bit); any filer shorter than that is not an ELF file
+	ELF_MIN_LENGTH => 0x32,
+	ELF_MAGIC => "\x7FELF",
+	ELF_ENDIAN_LE => 0x01,
+	ELF_ENDIAN_BE => 0x02,
+	ELF_TYPE_EXECUTABLE => 0x0002,
+	ELF_TYPE_SHARED_OBJECT => 0x0003,
+};
+
+sub is_so_or_exec_elf_file {
+	my ($file) = @_;
+	open(my $fd, '<:raw', $file) or error("open $file: $!");
+	my $buflen = 0;
+	my ($buf, $endian);
+	while ($buflen < ELF_MIN_LENGTH) {
+		my $r = read($fd, $buf, ELF_MIN_LENGTH - $buflen, $buflen) // error("read ($file): $!");
+		last if $r == 0; # EOF
+		$buflen += $r
+	}
+	close($fd);
+	return 0 if $buflen < ELF_MIN_LENGTH;
+
+	return 0 if substr($buf, 0x00, 4) ne ELF_MAGIC;
+	$endian = unpack('c', substr($buf, 0x05, 1));
+	my ($long_format, $short_format);
+
+	if ($endian == ELF_ENDIAN_BE) {
+		$long_format = 'N';
+		$short_format = 'n';
+	} elsif ($endian == ELF_ENDIAN_LE) {
+		$long_format = 'V';
+		$short_format = 'v';
+	} else {
+		return 0;
+	}
+	my $elf_version = substr($buf, 0x14, 4);
+	my $elf_type = substr($buf, 0x10, 2);
+
+
+	return 0 if unpack($long_format, $elf_version) != 0x00000001;
+	my $elf_type_unpacked = unpack($short_format, $elf_type);
+	return 0 if $elf_type_unpacked != ELF_TYPE_EXECUTABLE and $elf_type_unpacked != ELF_TYPE_SHARED_OBJECT;
+	return 1;
+}
 
 sub on_pkgs_in_parallel(&) {
 	unshift(@_, $dh{DOPACKAGES});
@@ -2012,6 +2069,19 @@ sub compute_doc_main_package {
 	}
 	# We do not know; make that clear to the caller
 	return;
+}
+
+
+{
+	my %known_packages;
+	sub assert_opt_is_known_package {
+		my ($package, $method) = @_;
+		%known_packages = map { $_ => 1 } getpackages() if not %known_packages;
+		if (not exists($known_packages{$package})) {
+			error("Requested unknown package $package via $method, expected one of: " . join(' ', getpackages()));
+		}
+		return 1;
+	}
 }
 
 1

@@ -120,7 +120,7 @@ the service to be restarted but be stopped during the upgrade, then please
 use B<--no-restart-after-upgrade> (note the "after-upgrade").
 
 Note that the B<--no-restart-on-upgrade> alias is deprecated and will
-be removed in compat 11.  This is to avoid confusion with the
+be removed in compat 12.  This is to avoid confusion with the
 B<--no-restart-after-upgrade> option.  The B<--no-stop-on-upgrade>
 variant was introduced in debhelper 10.2 (included in Debian stretch).
 
@@ -191,7 +191,7 @@ init(options => {
 	"no-restart-on-upgrade" => sub {
 		$dh{R_FLAG} = 1;
 		deprecated_functionality("--no-restart-on-upgrade has been renamed to --no-stop-on-upgrade",
-								 11);
+								 12);
 	},
 	"no-start" => \$dh{NO_START},
 	"R|restart-after-upgrade!" => \$dh{RESTART_AFTER_UPGRADE},

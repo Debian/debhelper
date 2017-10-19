@@ -20,7 +20,7 @@ are run, so the important stuff is clearly visible.
 
 An exception to above rule are dh_auto_* commands and dh itself. They will
 also print the commands interacting with the upstream build system and which
-of the simple debhelper programms are called. (i.e. print what a traditional
+of the simple debhelper programs are called. (i.e. print what a traditional
 non-dh(1) using debian/rules would print but nothing else).
 
 Debhelper programs should accept all options listed in the "SHARED
@@ -166,11 +166,13 @@ doit([$options, ]@command)
 	The following key-value pairs can be used:
 	  * stdout => A file name.  The child process will have its STDOUT redirected
 	    to that file.  [debhelper (>= 10.7)]
+	  * chdir => A directory.  The child process will do a chdir into that
+	    directory before executing the command.  [debhelper (>= 10.9)]
 
 	This will *not* invoke a shell, so meta characters will not have any special
 	meaning.  Use complex_doit for that.
-	NB: In compat 10 and below, there was a bug that would make doit fork a shell
-	in one special case.  This is deprecated and will be removed in compat 11.
+	NB: In compat 11 and below, there was a bug that would make doit fork a shell
+	in one special case.  This is deprecated and will be removed in compat 12.
 	The detection code for this can be disabled by passing an empty hashref for
 	as $options.  This will make doit unconditionally avoid forking a shell.
 print_and_doit([$options, ]@command)
@@ -322,7 +324,7 @@ restore_file_on_clean($file)
 	CAVEAT: This *cannot* undo arbitrary "rm -fr"'ing.  The dir,
 	which is/was in $file, must be present when dh_clean is called.
 make_symlink($src, $dest, $tmp)
-	Creates a Policy compliant sytem link called $dest pointing to
+	Creates a Policy compliant system link called $dest pointing to
 	$src. If $tmp is given, then $tmp will be prefixed to $dest when
 	creating the actual symlink.
 install_dh_config_file($src, $dest[, $mode])

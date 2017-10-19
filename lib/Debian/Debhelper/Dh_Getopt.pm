@@ -11,7 +11,7 @@ use warnings;
 use Debian::Debhelper::Dh_Lib;
 use Getopt::Long;
 
-my %exclude_package;
+my (%exclude_package, %profile_enabled_packages, $profile_excluded_pkg);
 
 sub showhelp {
 	my $prog=basename($0);
@@ -35,13 +35,21 @@ sub AddPackage { my($option,$value)=@_;
 		$dh{DOARCH}=1;
 		if ($option eq 's' or $option eq 'same-arch') {
 			deprecated_functionality('-s/--same-arch is deprecated; please use -a/--arch instead',
-									 11,
+									 12,
 									 '-s/--same-arch has been removed; please use -a/--arch instead'
 			);
 		}
 	}
 	elsif ($option eq 'p' or $option eq 'package') {
-		push @{$dh{DOPACKAGES}}, $value;
+		assert_opt_is_known_package($value, '-p/--package');
+		%profile_enabled_packages = map { $_ => 1 } getpackages('both') if not %profile_enabled_packages;
+		# Silently ignore packages that are not enabled by the
+		# profile.
+		if (exists($profile_enabled_packages{$value})) {
+			push @{$dh{DOPACKAGES}}, $value;
+		} else {
+			$profile_excluded_pkg = 1;
+		}
 	}
 	else {
 		error("bad option $option - should never happen!\n");
@@ -56,7 +64,9 @@ sub SetDebugPackage { my($option,$value)=@_;
 }
 
 # Add a package to a list of packages that should not be acted on.
-sub ExcludePackage { my($option,$value)=@_;
+sub ExcludePackage {
+	my($option, $value)=@_;
+	assert_opt_is_known_package($value, '-N/--no-package');
 	$exclude_package{$value}=1;
 }
 
@@ -165,7 +175,7 @@ sub getoptions {
 		$SIG{__WARN__}=sub {};
 	}
 	my $ret=Getopt::Long::GetOptionsFromArray($array, %options);
-	if ($oldwarn) {
+	if ($params{test} || $params{ignore_unknown_options}) {
 		$SIG{__WARN__}=$oldwarn;
 	}
 
@@ -230,7 +240,7 @@ sub parseopts {
 	my $ret=getoptions(\@ARGV, %params);
 	if (!$ret) {
 		if (! compat(7)) {
-			error("unknown option; aborting");
+			error("unknown option or error during option parsing; aborting");
 		}
 	}
 
@@ -244,14 +254,22 @@ sub parseopts {
 	# want us to act on them all. Note we have to do this before excluding
 	# packages out, below.
 	if (! defined $dh{DOPACKAGES} || ! @{$dh{DOPACKAGES}}) {
+		my $do_exit = 0;
+		if ($profile_excluded_pkg) {
+			if (! $dh{BLOCK_NOOP_WARNINGS}) {
+				warning("All requested packages have been excluded (e.g. via a Build-Profile).");
+			}
+			$do_exit = 1;
+		}
 		if ($dh{DOINDEP} || $dh{DOARCH}) {
 			# User specified that all arch (in)dep package be
 			# built, and there are none of that type.
 			if (! $dh{BLOCK_NOOP_WARNINGS}) {
 				warning("You asked that all arch in(dep) packages be built, but there are none of that type.");
 			}
-			exit(0);
+			$do_exit = 1;
 		}
+		exit(0) if $do_exit;
 		push @{$dh{DOPACKAGES}},getpackages("both");
 	}
 
