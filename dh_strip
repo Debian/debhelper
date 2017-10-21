@@ -332,7 +332,7 @@ sub process_packages {
 			# Avoid creating a dbgsym that would clash with a registered
 			# package or looks like a manual -dbg package.
 			if (not $all_packages{"${package}-dbgsym"} and $package !~ m/-dbg(?:sym)?$/) {
-				$debugtmp = "debian/.debhelper/${package}/dbgsym-root";
+				$debugtmp = dbgsym_tmpdir($package);
 				$keep_debug = 1;
 				$use_build_id = 2;
 			}

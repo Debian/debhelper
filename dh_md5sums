@@ -55,7 +55,7 @@ on_pkgs_in_parallel {
 	foreach my $package (@_) {
 		next if is_udeb($package);
 
-		my $dbgsym_tmp = "debian/.debhelper/${package}/dbgsym-root";
+		my $dbgsym_tmp = dbgsym_tmpdir($package);
 		my $tmp=tmpdir($package);
 
 		install_dir("$tmp/DEBIAN");

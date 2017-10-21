@@ -65,7 +65,7 @@ our (@EXPORT, %dh);
 	    &glob_expand_error_handler_silently_ignore DH_BUILTIN_VERSION
 	    &print_and_complex_doit &default_sourcedir &qx_cmd
 	    &compute_doc_main_package &is_so_or_exec_elf_file
-	    &assert_opt_is_known_package
+	    &assert_opt_is_known_package &dbgsym_tmpdir
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -2069,6 +2069,11 @@ sub compute_doc_main_package {
 	}
 	# We do not know; make that clear to the caller
 	return;
+}
+
+sub dbgsym_tmpdir {
+	my ($package) = @_;
+	return "debian/.debhelper/${package}/dbgsym-root";
 }
 
 
