@@ -1778,7 +1778,12 @@ sub clean_jobserver_makeflags {
 
 # If cross-compiling, returns appropriate cross version of command.
 sub cross_command {
-	my $command=shift;
+	my ($package, $command) = @_;
+	if (package_cross_type($package) eq 'target') {
+		if (dpkg_architecture_value("DEB_HOST_GNU_TYPE") ne dpkg_architecture_value("DEB_TARGET_GNU_TYPE")) {
+			return dpkg_architecture_value("DEB_TARGET_GNU_TYPE") . "-$command";
+		}
+	}
 	if (is_cross_compiling()) {
 		return dpkg_architecture_value("DEB_HOST_GNU_TYPE")."-$command";
 	}

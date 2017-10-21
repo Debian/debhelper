@@ -312,8 +312,8 @@ my %all_packages = map { $_ => 1 } getpackages();
 sub process_packages {
 	foreach my $package (@_) {
 		my $tmp=tmpdir($package);
-		my $objcopy = cross_command("objcopy");
-		my $strip = cross_command("strip");
+		my $objcopy = cross_command($package, "objcopy");
+		my $strip = cross_command($package, "strip");
 
 		# Support for keeping the debugging symbols in a detached file.
 		my $keep_debug=$dh{K_FLAG};

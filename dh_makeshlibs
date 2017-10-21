@@ -145,7 +145,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	
 	my $tmp=tmpdir($package);
 
-	my $objdump=cross_command("objdump");
+	my $objdump = cross_command($package, "objdump");
 
 	my (%seen, $unversioned_so);
 	my $need_ldconfig = 0;
