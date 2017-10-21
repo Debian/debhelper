@@ -66,7 +66,7 @@ our (@EXPORT, %dh);
 	    &glob_expand_error_handler_warn_and_discard &glob_expand
 	    &glob_expand_error_handler_silently_ignore DH_BUILTIN_VERSION
 	    &print_and_complex_doit &default_sourcedir &qx_cmd
-	    &compute_doc_main_package &is_so_or_exec_elf_file
+	    &compute_doc_main_package &is_so_or_exec_elf_file &hostarch
 	    &assert_opt_is_known_package &dbgsym_tmpdir &find_hardlinks
 	    &should_use_root &gain_root_cmd DEFAULT_PACKAGE_TYPE
 	    DBGSYM_PACKAGE_TYPE
@@ -723,14 +723,14 @@ sub default_sourcedir {
 # for the package, and it will return the actual existing filename to use.
 #
 # It tries several filenames:
-#   * debian/package.filename.buildarch
-#   * debian/package.filename.buildos
+#   * debian/package.filename.hostarch
+#   * debian/package.filename.hostos
 #   * debian/package.filename
 #   * debian/filename (if the package is the main package)
 # If --name was specified then the files
 # must have the name after the package name:
-#   * debian/package.name.filename.buildarch
-#   * debian/package.name.filename.buildos
+#   * debian/package.name.filename.hostarch
+#   * debian/package.name.filename.hostos
 #   * debian/package.name.filename
 #   * debian/name.filename (if the package is the main package)
 
@@ -776,18 +776,18 @@ sub default_sourcedir {
 				push(@try, "debian/${pkg}.${filename}");
 				if ($check_expensive) {
 					push(@try,
-						 "debian/${pkg}.${filename}.".buildarch(),
-						 "debian/${pkg}.${filename}.".buildos(),
+						 "debian/${pkg}.${filename}.".hostarch(),
+						 "debian/${pkg}.${filename}.".dpkg_architecture_value("DEB_HOST_ARCH_OS"),
 					);
 				}
 			}
 		} else {
-			# Avoid checking for buildarch+buildos unless we have reason
+			# Avoid checking for hostarch+hostos unless we have reason
 			# to believe that they exist.
 			if ($check_expensive) {
 				push(@try,
-					 "debian/${package}.${filename}.".buildarch(),
-					 "debian/${package}.${filename}.".buildos(),
+					 "debian/${package}.${filename}.".hostarch(),
+					 "debian/${package}.${filename}.".dpkg_architecture_value("DEB_HOST_ARCH_OS"),
 					);
 			}
 			push(@try, "debian/$package.$filename");
@@ -1250,14 +1250,15 @@ sub excludefile {
 	}
 }
 
-# Returns the build architecture.
+# Confusing name for hostarch
 sub buildarch {
-	dpkg_architecture_value('DEB_HOST_ARCH');
+	deprecated_functionality('buildarch() is deprecated and replaced by hostarch()', 12);
+	goto \&hostarch;
 }
 
-# Returns the build OS.
-sub buildos {
-	dpkg_architecture_value("DEB_HOST_ARCH_OS");
+# Returns the architecture that will run binaries produced (DEB_HOST_ARCH)
+sub hostarch {
+	dpkg_architecture_value('DEB_HOST_ARCH');
 }
 
 # Returns a truth value if this seems to be a cross-compile
@@ -1423,7 +1424,7 @@ sub getpackages {
 						my $included = 0;
 						$included = 1 if $arch eq 'any';
 						if (not $included) {
-							my $desired_arch = buildarch();
+							my $desired_arch = hostarch();
 							if ($cross_type eq 'target') {
 								$cross_target_arch //= dpkg_architecture_value('DEB_TARGET_ARCH');
 								$desired_arch = $cross_target_arch;
@@ -1498,11 +1499,11 @@ sub package_binary_arch {
 
 	if (! exists $package_arches{$package}) {
 		warning "package $package is not in control info";
-		return buildarch();
+		return hostarch();
 	}
 	return 'all' if $package_arches{$package} eq 'all';
 	return dpkg_architecture_value('DEB_TARGET_ARCH') if package_cross_type($package) eq 'target';
-	return buildarch();
+	return hostarch();
 }
 
 # Returns the Architecture: value which the package declared.
@@ -1511,7 +1512,7 @@ sub package_declared_arch {
 
 	if (! exists $package_arches{$package}) {
 		warning "package $package is not in control info";
-		return buildarch();
+		return hostarch();
 	}
 	return $package_arches{$package};
 }
@@ -1522,7 +1523,7 @@ sub package_is_arch_all {
 
 	if (! exists $package_arches{$package}) {
 		warning "package $package is not in control info";
-		return buildarch();
+		return hostarch();
 	}
 	return $package_arches{$package} eq 'all';
 }
