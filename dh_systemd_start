@@ -128,6 +128,9 @@ sub extract_key {
 
 # PROMISE: DH NOOP WITHOUT tmp(lib/systemd/system)
 
+my %requested_files = map { basename($_) => 1 } @ARGV;
+my %installed_files;
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmpdir = tmpdir($package);
 	my @installed_units;
@@ -181,12 +184,18 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			my ($full) = grep { basename($_) eq $base } @installed_units;
 			if (defined($full)) {
 				$name = $full;
-			} else {
+			} elsif (not exists($requested_files{$base})) {
 				warning(qq|Could not find "$name" in the /lib/systemd/system directory of $package. | .
 					qq|This could be a typo, or using Also= with a service file from another package. | .
 					qq|Please check carefully that this message is harmless.|);
+			} else {
+				# Ignore an explicitly requested file that is missing; happens when we are acting on
+				# multiple packages and only a subset of them have the unit file.
+				next;
 			}
 		}
+
+		$installed_files{$base} = 1 if exists($requested_files{$base});
 
 		# Skip template service files like e.g. getty@.service.
 		# Enabling, disabling, starting or stopping those services
@@ -244,6 +253,17 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# always stop service
 		$sd_autoscript->("prerm", "prerm-systemd");
 	}
+}
+
+if (%requested_files) {
+	my $any_missing = 0;
+	for my $name (sort(keys(%requested_files))) {
+		if (not exists($installed_files{$name})) {
+			warning(qq{Requested unit "$name" but it was not found in any package acted on.});
+			$any_missing = 1;
+		}
+	}
+	error("Could not handle all of the requested services") if $any_missing;
 }
 
 =head1 SEE ALSO
