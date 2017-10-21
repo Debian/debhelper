@@ -156,21 +156,8 @@ on_pkgs_in_parallel {
 		# Look for files with hard links. If we are going to compress both,
 		# we can preserve the hard link across the compression and save
 		# space in the end.
-		my (@f, %hardlinks, %seen);
-		foreach (@files) {
-			my ($dev, $inode, undef, $nlink)=stat($_);
-			if (defined $nlink && $nlink > 1) {
-				if (! $seen{"$inode.$dev"}) {
-					$seen{"$inode.$dev"}=$_;
-					push @f, $_;
-				} else {
-					# This is a hardlink.
-					$hardlinks{$_}=$seen{"$inode.$dev"};
-				}
-			} else {
-				push @f, $_;
-			}
-		}
+		my ($unique_files, $hardlinks) = find_hardlinks(@files);
+		my @f = @{$unique_files};
 
 		# normalize file names and remove duplicates
 		my $norm_from_dir = $tmp;
@@ -179,7 +166,7 @@ on_pkgs_in_parallel {
 		}
 		my $resolved = abs_path($norm_from_dir)
 			or error("Cannot resolve $norm_from_dir: $!");
-		my @normalized = normalize_paths($norm_from_dir, $resolved, $tmp, @f);
+		my @normalized = normalize_paths($norm_from_dir, $resolved, $tmp, @{$unique_files});
 		my %uniq_f; @uniq_f{@normalized} = ();
 		@f = sort keys %uniq_f;
 
@@ -192,11 +179,11 @@ on_pkgs_in_parallel {
 
 		# Now change over any files we can that used to be hard links so
 		# they are again.
-		foreach (keys %hardlinks) {
+		foreach (keys %{$hardlinks}) {
 			# Remove old file.
 			rm_files($_);
 			# Make new hardlink.
-			doit("ln","-f","$hardlinks{$_}.gz","$_.gz");
+			doit("ln", "-f", "$hardlinks->{$_}.gz", "$_.gz");
 		}
 
 		verbose_print("cd '$olddir'");

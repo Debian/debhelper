@@ -65,7 +65,7 @@ our (@EXPORT, %dh);
 	    &glob_expand_error_handler_silently_ignore DH_BUILTIN_VERSION
 	    &print_and_complex_doit &default_sourcedir &qx_cmd
 	    &compute_doc_main_package &is_so_or_exec_elf_file
-	    &assert_opt_is_known_package &dbgsym_tmpdir
+	    &assert_opt_is_known_package &dbgsym_tmpdir &find_hardlinks
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
@@ -1989,6 +1989,32 @@ sub is_so_or_exec_elf_file {
 sub on_pkgs_in_parallel(&) {
 	unshift(@_, $dh{DOPACKAGES});
 	goto \&on_items_in_parallel;
+}
+
+# Given a list of files, find all hardlinked files and return:
+# 1: a list of unique files (all files in the list are not hardlinked with any other file in that list)
+# 2: a map where the keys are names of hardlinks and the value points to the name selected as the file put in the
+#    list of unique files.
+#
+# This is can be used to relink hard links after modifying one of them.
+sub find_hardlinks {
+	my (@all_files) = @_;
+	my (%seen, %hardlinks, @unique_files);
+	for my $file (@all_files) {
+		my ($dev, $inode, undef, $nlink)=stat($file);
+		if (defined $nlink && $nlink > 1) {
+			if (! $seen{"$inode.$dev"}) {
+				$seen{"$inode.$dev"}=$file;
+				push(@unique_files, $file);
+			} else {
+				# This is a hardlink.
+				$hardlinks{$_}=$seen{"$inode.$dev"};
+			}
+		} else {
+			push(@unique_files, $file);
+		}
+	}
+	return (\@unique_files, \%hardlinks);
 }
 
 sub on_items_in_parallel {
