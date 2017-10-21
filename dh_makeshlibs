@@ -138,14 +138,14 @@ init(options => {
 	"add-udeb=s" => \$dh{SHLIBS_UDEB},
 });
 
-my $objdump=cross_command("objdump");
-
 my $ok=1;
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if is_udeb($package);
 	
 	my $tmp=tmpdir($package);
+
+	my $objdump=cross_command("objdump");
 
 	my (%seen, $unversioned_so);
 	my $need_ldconfig = 0;
