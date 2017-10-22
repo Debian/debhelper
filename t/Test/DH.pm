@@ -16,7 +16,7 @@ use File::Basename qw(dirname);
 our $ROOT_DIR;
 
 BEGIN {
-    my $res = realpath(__FILE__) or error('Cannot resolve ' . __FILE__ . ": $!");
+    my $res = realpath(__FILE__) or die('Cannot resolve ' . __FILE__ . ": $!");
     $ROOT_DIR = dirname(dirname(dirname($res)));
 };
 
@@ -37,6 +37,7 @@ our @EXPORT = qw(
     each_compat_up_to_and_incl_subtest each_compat_subtest
     each_compat_from_and_above_subtest run_dh_tool
     uid_0_test_is_ok create_empty_file readlines
+    error
 );
 
 our ($TEST_DH_COMPAT, $ROOT_OK, $ROOT_CMD);
