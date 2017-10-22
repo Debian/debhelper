@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-dh_testroot - ensure that a package is built as root
+dh_testroot - ensure that a package is built with necessary level of root permissions
 
 =head1 SYNOPSIS
 
@@ -10,9 +10,33 @@ B<dh_testroot> [S<I<debhelper options>>]
 
 =head1 DESCRIPTION
 
-B<dh_testroot> simply checks to see if you are root. If not, it exits with an
-error. Debian packages must be built as root, though you can use 
-L<fakeroot(1)>
+B<dh_testroot> is used to determine if the package has access to at
+least the level of root access that it declared it needed via the
+Rules-Requires-Root (R³) field.
+
+The following is how B<dh_testroot> behaves based on the effective
+value of the R³ field:
+
+=over 4
+
+=item "binary-targets"
+
+B<dh_testroot> asserts that it is run as root or under L<fakeroot(1)>.
+
+=item "no"
+
+B<dh_testroot> returns successfully.
+
+=item Any other value than the above
+
+B<dh_testroot> asserts that it is either run as root (or under
+L<fakeroot(1)>) or the builder has provided the B<DPKG_GAIN_ROOT_CMD>
+environment variable (e.g. via dpkg-buildpackage -r).
+
+=back
+
+For backwards compatibility, B<dh_testroot> will consider the absence
+of the R³ field as if the R³ field was set to "binary-targets".
 
 =cut
 
