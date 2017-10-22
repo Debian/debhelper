@@ -24,7 +24,13 @@ our $VERSION = DH_BUILTIN_VERSION;
 
 inhibit_log();
 
-my $requirements = Debian::Debhelper::Dh_Lib::root_requirements();
+my $requirements = 'legacy-root';
+
+if (-f 'debian/control') {
+	$requirements = Debian::Debhelper::Dh_Lib::root_requirements();
+} else {
+	warning('dh_testroot must be called from the source root');
+}
 
 # By declaration; nothing requires root and this command must be a no-op in that case.
 exit 0 if $requirements eq 'none';
