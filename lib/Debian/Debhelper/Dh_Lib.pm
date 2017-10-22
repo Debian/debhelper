@@ -2055,7 +2055,7 @@ sub find_hardlinks {
 				push(@unique_files, $file);
 			} else {
 				# This is a hardlink.
-				$hardlinks{$_}=$seen{"$inode.$dev"};
+				$hardlinks{$file}=$seen{"$inode.$dev"};
 			}
 		} else {
 			push(@unique_files, $file);

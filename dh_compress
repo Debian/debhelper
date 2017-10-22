@@ -166,7 +166,7 @@ on_pkgs_in_parallel {
 		}
 		my $resolved = abs_path($norm_from_dir)
 			or error("Cannot resolve $norm_from_dir: $!");
-		my @normalized = normalize_paths($norm_from_dir, $resolved, $tmp, @{$unique_files});
+		my @normalized = normalize_paths($norm_from_dir, $resolved, $tmp, @f);
 		my %uniq_f; @uniq_f{@normalized} = ();
 		@f = sort keys %uniq_f;
 

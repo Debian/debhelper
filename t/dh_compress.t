@@ -58,6 +58,28 @@ each_compat_subtest {
     );
 
     rm_test_dir();
+
+	mk_test_dir();
+
+	is(system('cp', '-la', "${PREFIX}/bar.txt", "${PREFIX}/hardlink.txt"), 0,
+	   'create hardlink');
+
+	ok(run_dh_tool('dh_compress'));
+
+    is_deeply(
+        [map { s{${PREFIX}/}{}; $_ } sort glob "$PREFIX/*"],
+        [qw|bar.txt.gz foo.txt hardlink.txt.gz|],
+        'the 5k and its hardlink txt docs compressed'
+    );
+
+	# Verify that the hardlink is preserved.
+	my ($dev1, $inode1) = stat("${PREFIX}/bar.txt.gz") // error("stat ${PREFIX}/bar.txt.gz: $!");
+	my ($dev2, $inode2) = stat("${PREFIX}/hardlink.txt.gz") // error("stat ${PREFIX}/hardlink.txt.gz: $!");
+
+	is($dev1, $dev2, 'Still hardlinked');
+	is($inode1, $inode2, 'Still hardlinked');
+
+	rm_test_dir();
 };
 
 
