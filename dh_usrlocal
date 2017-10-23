@@ -85,7 +85,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				my $user = 'root';
 				my $group = 'staff';
 				my $mode = '02775';
-				if (not should_use_root()) {
+				if (should_use_root()) {
 					my $stat = stat $fn;
 					$user = getpwuid $stat->uid;
 					$group = getgrgid $stat->gid;
