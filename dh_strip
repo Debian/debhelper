@@ -176,7 +176,7 @@ $no_auto_dbgsym = 1 if get_buildoption('noautodbgsym') or get_buildoption('nodde
 my (@shared_libs, @executables, @static_libs, @build_ids, %file_output);
 sub testfile {
 	my $fn = $_;
-	return if -l $fn or -d _; # Skip directories and symlinks always.
+	return if -l $fn; # Always skip symlinks.
 	
 	# See if we were asked to exclude this file.
 	# Note that we have to test on the full filename, including directory.
