@@ -4,6 +4,11 @@ debhelper (10.10.4) UNRELEASED; urgency=medium
     called as otherwise ninja tries and fails to regenerate the
     build rules.  Thanks to Helmut Grohne for reporting the
     bug.  (Closes: #879658)
+  * dh_dwz: Add new experimental tool to run dwz(1) to deduplicate
+    ELF debugging symbols.  It should be generally be run before
+    dh_strip (as dh_strip compresses the debug symbols and dwz
+    expects uncompressed debug symbols).  (Closes: #878888)
+  * dwz.pm: New sequence to add dh_dwz to the sequence.
 
  -- Niels Thykier <niels@thykier.net>  Tue, 24 Oct 2017 05:45:09 +0000
 
