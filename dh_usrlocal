@@ -33,15 +33,18 @@ snippets are inserted into the maintainer scripts by B<dh_installdeb>. See
 L<dh_installdeb(1)> for an explanation of debhelper maintainer script
 snippets.
 
-In a non-legacy R³ build, the directories in F</usr/local> will have
+When the I<Rules-Requires-Root> field is not (effectively)
+I<binary-targets>, the directories in F</usr/local> will have
 ownership root:staff and the mode will be 02775.  These values have
 been chosen to comply with the recommendations of the Debian policy
 for directories in F</usr/local>.
 
-In R³ legacy mode, the owners, groups and permissions will be preserved with
-one exception.  If the directory is owned by root:root, then ownership will
-be reset to root:staff and mode will be reset to 02775. This is useful, since
-that is the group and mode policy recommends for directories in F</usr/local>.
+When I<Rules-Requires-Root> has an effective value of
+I<binary-targets>, the owners, groups and permissions will be
+preserved with one exception.  If the directory is owned by root:root,
+then ownership will be reset to root:staff and mode will be reset to
+02775. This is useful, since that is the group and mode policy
+recommends for directories in F</usr/local>.
 
 =head1 OPTIONS
 

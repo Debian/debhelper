@@ -23,14 +23,19 @@ B<dh_fixperms> is a debhelper program that is responsible for setting the
 permissions of files and directories in package build directories to a
 sane state -- a state that complies with Debian policy.
 
-B<dh_fixperms> makes all files in F<usr/share/doc> in the package build directory
-(excluding files in the F<examples/> directory) be mode 644. It also changes
-the permissions of all man pages to mode 644. It makes all files be owned
-by root, and it removes group and other write permission from all files. It
-removes execute permissions from any libraries, headers, Perl modules, or
-desktop files that have it set. It makes all files in the standard F<bin> and
-F<sbin> directories, F<usr/games/> and F<etc/init.d> executable (since v4). Finally,
-it removes the setuid and setgid bits from all files in the package.
+B<dh_fixperms> makes all files in F<usr/share/doc> in the package
+build directory (excluding files in the F<examples/> directory) be
+mode 644. It also changes the permissions of all man pages to mode
+644. It removes group and other write permission from all files. It
+removes execute permissions from any libraries, headers, Perl modules,
+or desktop files that have it set. It makes all files in the standard
+F<bin> and F<sbin> directories, F<usr/games/> and F<etc/init.d>
+executable (since v4). Finally, it removes the setuid and setgid bits
+from all files in the package.
+
+When the I<Rules-Requires-Root> field has the (effective) value of
+I<binary-targets>, B<dh_fixperms> will also reset the ownership of
+all paths to "root:root".
 
 =head1 OPTIONS
 
