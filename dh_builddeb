@@ -27,8 +27,9 @@ and L<dh_gencontrol(1)> have prepared them.
 It supports building multiple binary packages in parallel, when enabled by
 DEB_BUILD_OPTIONS.
 
-In a non-legacy R³ build, B<dh_builddeb> will pass
-B<--root-owner-group> to L<dpkg-deb(1)>.
+When the I<Rules-Requires-Root> field is not (effectively)
+I<binary-targets>, B<dh_builddeb> will pass B<--root-owner-group> to
+L<dpkg-deb(1)>.
 
 =head1 OPTIONS
 
