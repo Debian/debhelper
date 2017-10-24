@@ -10,6 +10,10 @@ debhelper (10.10.4) UNRELEASED; urgency=medium
     expects uncompressed debug symbols).  (Closes: #878888)
   * dwz.pm: New sequence to add dh_dwz to the sequence.
   * d/control: Add a Suggets on dwz for the optional dh_dwz tool.
+  * Dh_Lib.pm: Fix regression where the source section would not
+    be parsed leading to dbgsym packages possibly getting an
+    incorrect value in the Section field.  Thanks to Mihai
+    Moldovan for reporting the issue.  (Closes: #879667)
 
  -- Niels Thykier <niels@thykier.net>  Tue, 24 Oct 2017 05:45:09 +0000
 

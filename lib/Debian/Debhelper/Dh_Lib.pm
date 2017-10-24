@@ -1351,6 +1351,9 @@ sub getpackages {
 				$rrr{$keyword} = 1;
 			}
 			next;
+		} elsif (/^Section:\s(.*)$/i) {
+			$source_section = $1;
+			next;
 		}
 		last if (!$_ or eof); # end of stanza.
 	}
@@ -1414,8 +1417,6 @@ sub getpackages {
 						push(@{$packages_by_type{'both'}}, $package);
 					}
 				}
-			} elsif ($section and not defined($source_section)) {
-				$source_section = $section;
 			}
 			$package='';
 			$package_type=undef;
