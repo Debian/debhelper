@@ -1029,6 +1029,9 @@ sub autoscript_sed {
 }
 
 # Generated files are cleaned by dh_clean AND dh_prep
+# - Package can be set to "_source" to generate a file relevant
+#   for the source package (the meson build does this atm.).
+#   Files for "_source" are only cleaned by dh_clean.
 sub generated_file {
 	my ($package, $filename, $mkdirs) = @_;
 	my $dir = "debian/.debhelper/generated/${package}";

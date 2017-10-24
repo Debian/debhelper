@@ -7,7 +7,6 @@ package Debian::Debhelper::Buildsystem::meson;
 
 use strict;
 use warnings;
-use File::Temp qw(tempfile);
 use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value is_cross_compiling doit warning error);
 use parent qw(Debian::Debhelper::Buildsystem::ninja);
 
@@ -57,8 +56,7 @@ sub configure {
 				warning("Missing debcrossgen (${debcrossgen}) cannot generate a meson cross file and non was provided");
 				error("Cannot cross-compile: Please use meson (>= 0.42.1) or provide a cross file via DH_MESON_CROSS_FILE");
 			}
-			my ($fh, $filename) = tempfile("meson-cross-file.XXXX", SUFFIX => ".conf", TMPDIR => 1, UNLINK => 1);
-			close($fh);
+			my $filename = generated_file('_source', 'meason-cross-file.conf');
 			doit({ stdout => '/dev/null' }, $debcrossgen, "-o${filename}");
 			$cross_file = $filename;
 		}
