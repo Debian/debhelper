@@ -1343,6 +1343,8 @@ sub getpackages {
 	while (<$fd>) {
 		chomp;
 		s/\s+$//;
+		next if m/^\s*+\#/;
+
 		if (/^Source:\s*(.*)/i) {
 			$sourcepackage = $1;
 			next;
@@ -1355,6 +1357,7 @@ sub getpackages {
 			$source_section = $1;
 			next;
 		}
+		next if not $_ and not defined($sourcepackage);
 		last if (!$_ or eof); # end of stanza.
 	}
 	error("could not find Source: line in control file.") if not defined($sourcepackage);
