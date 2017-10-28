@@ -111,7 +111,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# find scripts
 	find sub {
 		return unless -f and (-x _ or /\.pl$/);
-		return if $File::Find::dir=~/\/usr\/share\/doc\//;
+		if ($File::Find::dir =~ m{/usr/share/doc/}) {
+			$File::Find::prune = 1 if -d _;
+			return;
+		}
 
 		return unless open(my $fd, '<', $_);
 		if (read($fd, local $_, 32) and m%^#!\s*(/usr/bin/perl|/usr/bin/env\s+perl)\s%) {
