@@ -28,16 +28,6 @@ use constant {
 	'DH_ENABLE_RRR_SUPPORT' => 1,
 };
 
-my %NAMED_COMPAT_LEVELS = (
-	# The bleeding-edge compat level is deliberately not documented.
-	# You are welcome to use it, but please subscribe to the git
-	# commit mails if you do.  There is no heads up on changes for
-	# bleeding-edge testers as it is mainly intended for debhelper
-	# developers.
-	'bleeding-edge-tester' => MAX_COMPAT_LEVEL,
-	'beta-tester'          => BETA_TESTER_COMPAT,
-);
-
 use Errno qw(ENOENT);
 use Exporter qw(import);
 use File::Glob qw(bsd_glob GLOB_CSH GLOB_NOMAGIC GLOB_TILDE);
@@ -666,9 +656,7 @@ sub dirname {
 					$c=$l;
 					$c =~ s/^\s*+//;
 					$c =~ s/\s*+$//;
-					if (exists($NAMED_COMPAT_LEVELS{$c})) {
-						$c = $NAMED_COMPAT_LEVELS{$c};
-					} elsif ($c !~ m/^\d+$/) {
+					if ($c !~ m/^\d+$/) {
 						error("debian/compat must contain a positive number (found: \"$c\")");
 					}
 				}

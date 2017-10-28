@@ -764,66 +764,6 @@ conffiles shipped in previous versions of the package (if any).
 
 =back
 
-=head2 Participating in the open beta testing of new compat levels
-
-It is possible to opt-in to the open beta testing of new compat
-levels.  This is done by setting the compat level to the string
-"beta-tester".
-
-Packages using this compat level will automatically be upgraded to the
-highest compatibility level in open beta.  In periods without any open
-beta versions, the compat level will be the highest stable
-compatibility level.
-
-Please consider the following before opting in:
-
-=over 4
-
-=item *
-
-The automatic upgrade in compatibility level may cause the package (or
-a feature in it) to stop functioning.
-
-=item *
-
-Compatibility levels in open beta are still subject to change.  We
-will try to keep the changes to a minimal once the beta starts.
-However, there are no guarantees that the compat will not change
-during the beta.
-
-=item *
-
-We will notify you via debian-devel-announce@lists.debian.org or
-debian-devel@lists.debian.org before we start a
-new open beta compat level.  However, once the beta starts we expect
-that you keep yourself up to date on changes to debhelper for that
-compat level.
-
-=item *
-
-The "beta-tester" compatibility version in unstable and testing will
-often be different than the one in stable.  Accordingly, it is not
-recommended for packages being backported regularly.  Alternatively,
-please be sure to add explicit versioned Build-Depends on debhelper,
-so you get exactly the compatibility version you expect.
-
-=item *
-
-You can always opt-out of the beta by resetting the compatibility
-level of your package to a stable version.
-
-=back
-
-Should you still be interested in the open beta testing, please run:
-
-  % echo beta-tester > debian/compat
-
-You will also need to ensure that debian/control contains:
-
-  Build-Depends: debhelper (>= 9.20160815~)
-
-To ensure that debhelper knows about the "beta-tester" compat level.
-
 =head1 NOTES
 
 =head2 Multiple binary package support
