@@ -131,6 +131,8 @@ on_pkgs_in_parallel {
 				"-DBuild-Ids=${build_ids}",
 				"-DSection=${component}debug",
 			);
+			push(@dbgsym_options, "-DPackage-Type=${\DBGSYM_PACKAGE_TYPE}")
+				if DBGSYM_PACKAGE_TYPE ne DEFAULT_PACKAGE_TYPE;
 			# Disable multi-arch unless the original package is an
 			# multi-arch: same package.  In all other cases, we do not
 			# need a multi-arch value.

@@ -131,8 +131,14 @@ on_items_in_parallel(\@items, sub {
 
 		if ($dbgsym) {
 			my $dbgsym_tmpdir = dbgsym_tmpdir($package);
-			doit("dpkg-deb", @dpkg_options, @{$dh{U_PARAMS}},
-				"--build", $dbgsym_tmpdir, $dh{DESTDIR});
+			my @cmd = ("dpkg-deb", @dpkg_options, @{$dh{U_PARAMS}},
+				"--build", $dbgsym_tmpdir);
+			if (DBGSYM_PACKAGE_TYPE eq DEFAULT_PACKAGE_TYPE) {
+				doit(@cmd, $dh{DESTDIR});
+			} else {
+				build_and_rename_deb($package, $dh{DESTDIR}, \@cmd,
+					sub {s/\.\Q${\DEFAULT_PACKAGE_TYPE}\E$/\.\Q${\DBGSYM_PACKAGE_TYPE}\E/g});
+			}
 			next;
 		}
 		if (exists $ENV{DH_ALWAYS_EXCLUDE} && length $ENV{DH_ALWAYS_EXCLUDE}) {

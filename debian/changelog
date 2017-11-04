@@ -14,6 +14,12 @@ debhelper (10.10.6) UNRELEASED; urgency=medium
   * dh,dh_auto_*: Support skipping all of the dh_auto_* helpers if the
     package does not seem to have a build system (and there are no build
     system related options passed to dh).
+  * Dh_Lib.pm: Define a (hardcoded) extension for dbgsym packages.
+  * dh_gencontrol: Pass -DPackage-Type to dpkg-gencontrol when the
+    package type for dbgsym is different than for regular deb packages.
+  * dh_builddeb: Automatically handle renaming of dbgsym packages when
+    the extension of the dbgsym packages are different than for regular
+    deb packages.
 
  -- Axel Beckert <abe@debian.org>  Fri, 27 Oct 2017 23:48:44 +0200
 

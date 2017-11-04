@@ -23,9 +23,18 @@ use constant {
 	'XARGS_INSERT_PARAMS_HERE' => \'<INSERT-HERE>', #'# Hi emacs.
 	# Magic value for debhelper tools to request "current version"
 	'DH_BUILTIN_VERSION' => \'<DH_LIB_VERSION>', #'# Hi emacs.
+	# Default Package-Type / extension (must be aligned with dpkg)
+	'DEFAULT_PACKAGE_TYPE' => 'deb',
 
 	# Kill-switch for R³ (for backports)
 	'DH_ENABLE_RRR_SUPPORT' => 1,
+};
+
+use constant {
+	# Package-Type / extension for dbgsym packages
+	# TODO: Find a way to determine this automatically from the vendor
+	#  - blocked by Dpkg::Vendor having a rather high load time (for debhelper)
+	'DBGSYM_PACKAGE_TYPE' => DEFAULT_PACKAGE_TYPE,
 };
 
 use Errno qw(ENOENT);
@@ -59,7 +68,8 @@ our (@EXPORT, %dh);
 	    &print_and_complex_doit &default_sourcedir &qx_cmd
 	    &compute_doc_main_package &is_so_or_exec_elf_file
 	    &assert_opt_is_known_package &dbgsym_tmpdir &find_hardlinks
-	    &should_use_root &gain_root_cmd
+	    &should_use_root &gain_root_cmd DEFAULT_PACKAGE_TYPE
+	    DBGSYM_PACKAGE_TYPE
 );
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
