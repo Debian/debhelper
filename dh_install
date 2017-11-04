@@ -213,7 +213,12 @@ foreach my $package (getpackages()) {
 		if (@$set > 1) {
 			$dest=pop @$set;
 		}
-		foreach my $glob (@$set) {
+		# Skip excluded patterns.  We will need two exclude checks per pattern;
+		# 1) exclude the entire pattern as people expect this to work (#814856)
+		# 2) exclude files matched by the pattern as people could have just
+		#    excluded a single file of a "dir/*"-pattern.
+		# This line below filters entire patterns
+		foreach my $glob (grep { not excludefile($_) } @$set) {
 			my @found = glob_expand(\@search_dirs, $glob_error_handler, $glob);
 			push(@filelist, map { tr{/}{/}s; $_ } @found);
 		}
@@ -225,6 +230,7 @@ foreach my $package (getpackages()) {
 		}
 
 		# Do a quick bulk handling of excluded files and update @installed.
+		# - this is for filtering files matched by the pattern
 		@filelist = grep { not excludefile($_) } @filelist if $exclude;
 		push(@installed, @filelist);
 
