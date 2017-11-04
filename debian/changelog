@@ -20,6 +20,9 @@ debhelper (10.10.6) UNRELEASED; urgency=medium
   * dh_builddeb: Automatically handle renaming of dbgsym packages when
     the extension of the dbgsym packages are different than for regular
     deb packages.
+  * dh_installsystemd,dh_systemd_start: Use "restart" instead of the
+    "try-restart" action.  This ensures that newly added services are
+    started the first time they are installed.  (Closes: #879727)
 
  -- Axel Beckert <abe@debian.org>  Fri, 27 Oct 2017 23:48:44 +0200
 
