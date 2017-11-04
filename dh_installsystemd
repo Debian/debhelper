@@ -209,6 +209,9 @@ sub extract_key {
 
 # PROMISE: DH NOOP WITHOUT tmp(lib/systemd/system) mount path service socket target tmpfile timer
 
+my %requested_files = map { basename($_) => 1 } @ARGV;
+my %installed_files;
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmpdir = tmpdir($package);
 	my (@installed_units, @start_units,  @enable_units, %aliases, @tmpfiles);
@@ -292,6 +295,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 					qq|Please check carefully that this message is harmless.|);
 			}
 		}
+
+		$installed_files{$base} = 1 if exists($requested_files{$base});
 
 		# Skip template service files like e.g. getty@.service.
 		# Enabling, disabling, starting or stopping those services
@@ -382,6 +387,17 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# always stop service
 		$start_autoscript->("prerm", "prerm-systemd");
 	}
+}
+
+if (%requested_files) {
+	my $any_missing = 0;
+	for my $name (sort(keys(%requested_files))) {
+		if (not exists($installed_files{$name})) {
+			warning(qq{Requested unit "$name" but it was not found in any package acted on.});
+			$any_missing = 1;
+		}
+	}
+	error("Could not handle all of the requested services") if $any_missing;
 }
 
 =head1 SEE ALSO
