@@ -32,6 +32,12 @@ debhelper (10.10.6) UNRELEASED; urgency=medium
   * dh_installsystemd: Optimize the search for files installed in the
     tmpfiles.d directories to only look in the tmpfiles.d directories.
 
+  [ Felipe Sateler ]
+  * dh_installsystemd: Fix a bug where dh_installsystemd would generate
+    invalid maintscript, when there were no units to start or enable.
+    Thanks to Ben Hutchings and Bastian Blank for the bug report.
+    (Closes: #881190)
+
  -- Axel Beckert <abe@debian.org>  Fri, 27 Oct 2017 23:48:44 +0200
 
 debhelper (10.10.5) unstable; urgency=medium
