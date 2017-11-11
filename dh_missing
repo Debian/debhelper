@@ -8,7 +8,6 @@ dh_missing - check for missing files
 
 use strict;
 use warnings;
-use File::Find;
 use Debian::Debhelper::Dh_Lib;
 
 our $VERSION = DH_BUILTIN_VERSION;
@@ -142,7 +141,14 @@ my $installed=join("|", map {
 	"\Q$_\E\/.*|\Q$_\E";
 } @installed);
 $installed=qr{^($installed)$};
-find(sub {
+
+# Lazy load File::Find
+require File::Find;
+
+File::Find::find(sub {
+	# Lazy loading of File::Find makes perl think that File::Find::dir is only used once
+	# and we might have typo'ed something
+	no warnings qw(once);
 	-f || -l || return;
 	$_="$File::Find::dir/$_";
 	if (! /$installed/ && ! excludefile($_)) {
