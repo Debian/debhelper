@@ -352,7 +352,7 @@ sub process_packages {
 		}
 
 		foreach (@executables) {
-			my $debug_path = make_debug($_, $tmp, $debugtmp, $use_build_id) if $keep_debug;
+			my $debug_path = make_debug($objcopy, $_, $tmp, $debugtmp, $use_build_id) if $keep_debug;
 			doit($strip, "--remove-section=.comment", "--remove-section=.note", $_);
 			attach_debug($objcopy, $_, $debug_path) if defined $debug_path;
 		}
