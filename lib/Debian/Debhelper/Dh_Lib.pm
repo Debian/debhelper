@@ -842,15 +842,25 @@ sub pkgfilename {
 		my $package=shift;
 
 		return $isnative_cache{$package} if defined $isnative_cache{$package};
-		
+
+		if (not %isnative_cache) {
+			require Dpkg::Changelog::Parse;
+		}
+
 		# Make sure we look at the correct changelog.
 		my $isnative_changelog=pkgfile($package,"changelog");
 		if (! $isnative_changelog) {
 			$isnative_changelog="debian/changelog";
 		}
+		my $res = Dpkg::Changelog::Parse::changelog_parse(
+			file => $isnative_changelog,
+			compression => 0,
+		);
+		if (not defined($res)) {
+			error("No changelog entries for $package!? (changelog file: ${isnative_changelog})");
+		}
 		# Get the package version.
-		my $version=`dpkg-parsechangelog -l$isnative_changelog -SVersion`;
-		chomp($dh{VERSION} = $version);
+		$dh{VERSION} = $res->{'Version'};
 		# Did the changelog parse fail?
 		if ($dh{VERSION} eq q{}) {
 			error("changelog parse failure");

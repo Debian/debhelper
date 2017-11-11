@@ -39,6 +39,10 @@ debhelper (10.10.6) UNRELEASED; urgency=medium
     called via dh_gencontrol).
   * dh_makeshlibs: Ignore non-ELF files even if they are named ".so".
     (Closes: #880480)
+  * Dh_Lib: Improve the performance of isnative by using
+    Dpkg::Changelog::Parse instead of calling dpkg-parsechangelog as
+    an external process.  This improves the performance of
+    dh_installchangelogs by ~10%.
 
   [ Felipe Sateler ]
   * dh_installsystemd: Fix a bug where dh_installsystemd would generate
