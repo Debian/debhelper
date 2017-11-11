@@ -540,7 +540,7 @@ sub list_addons {
 	my %addons;
 
 	for my $inc (@INC) {
-		eval q{use File::Spec};
+		require File::Spec;
 		my $path = File::Spec->catdir($inc, "Debian/Debhelper/Sequence");
 		if (-d $path) {
 			for my $module_path (glob "$path/*.pm") {

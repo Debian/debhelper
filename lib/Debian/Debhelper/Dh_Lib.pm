@@ -113,7 +113,7 @@ sub init {
 	if ((defined $ENV{DH_OPTIONS} && length $ENV{DH_OPTIONS}) ||
  	    (defined $ENV{DH_INTERNAL_OPTIONS} && length $ENV{DH_INTERNAL_OPTIONS}) ||
 	    grep /^-/, @ARGV) {
-		eval "use Debian::Debhelper::Dh_Getopt";
+		eval { require Debian::Debhelper::Dh_Getopt; };
 		error($@) if $@;
 		Debian::Debhelper::Dh_Getopt::parseopts(%params);
 	}
@@ -1798,12 +1798,12 @@ sub cross_command {
 # variable and returns the computed value.
 sub get_source_date_epoch {
 	return $ENV{SOURCE_DATE_EPOCH} if exists($ENV{SOURCE_DATE_EPOCH});
-	eval "use Dpkg::Changelog::Debian";
+	eval { require Dpkg::Changelog::Debian };
 	if ($@) {
 		warning "unable to set SOURCE_DATE_EPOCH: $@";
 		return;
 	}
-	eval "use Time::Piece";
+	eval { require Time::Piece };
 	if ($@) {
 		warning "unable to set SOURCE_DATE_EPOCH: $@";
 		return;
@@ -1835,7 +1835,7 @@ sub set_buildflags {
 	# rely on this [CVE-2016-1238]
 	$ENV{PERL_USE_UNSAFE_INC} = 1 if compat(10);
 
-	eval "use Dpkg::BuildFlags";
+	eval { require Dpkg::BuildFlags };
 	if ($@) {
 		warning "unable to load build flags: $@";
 		return;
