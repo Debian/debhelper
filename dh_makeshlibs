@@ -168,6 +168,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	while (<FIND>) {
 		my ($library, $major);
 		chomp;
+		next if not is_so_or_exec_elf_file($_);
 		push @lib_files, $_;
 		my $ret = compat(10) ? `$objdump -p "$_"` : qx_cmd($objdump, '-p', $_);
 		if ($ret=~m/\s+SONAME\s+(.*)\.so\.(.*)/) {
