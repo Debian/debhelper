@@ -179,6 +179,8 @@ sub init {
 	if (! exists $dh{ERROR_HANDLER} || ! defined $dh{ERROR_HANDLER}) {
 		$dh{ERROR_HANDLER}='exit \$?';
 	}
+
+	$dh{U_PARAMS} //= [];
 }
 
 # Run at exit. Add the command to the log files for the packages it acted
