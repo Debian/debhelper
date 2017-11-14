@@ -8,7 +8,6 @@ package Debian::Debhelper::Buildsystem::qmake;
 
 use strict;
 use warnings;
-use File::Temp qw(tempfile);
 use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value error is_cross_compiling);
 use parent qw(Debian::Debhelper::Buildsystem::makefile);
 
@@ -67,12 +66,14 @@ sub configure {
 			error("Cannot cross-compile: Missing entry for HOST OS ${host_os} for qmake's -spec option");
 		}
 
-		my ($fh, $filename) = tempfile("qt.XXXX", SUFFIX => ".conf", TMPDIR => 1, UNLINK => 1);
+		my $filename = generated_file('_source', 'qmake-cross.conf');
+		open(my $fh, '>', $filename) or error("open($filename) failed: $!");
+
 		$fh->print("[Paths]\n");
 		$fh->print("Prefix=/usr\n");
 		$fh->print("HostData=lib/" . dpkg_architecture_value("DEB_HOST_MULTIARCH") . "/qt5\n");
 		$fh->print("Headers=include/" . dpkg_architecture_value("DEB_HOST_MULTIARCH") . "/qt5\n");
-		close $fh;
+		close($fh) or error("close($filename) failed: $!");
 		push @options, ("-qtconf", $filename);
 	}
 
