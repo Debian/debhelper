@@ -99,10 +99,11 @@ sub configure {
 		}
 		if ($ENV{CXX}) {
 			push @flags, "QMAKE_CXX=" . $ENV{CXX};
+			push @flags, "QMAKE_LINK=" . $ENV{CXX};
 		} else {
 			push @flags, "QMAKE_CXX=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-g++";
+			push @flags, "QMAKE_LINK=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-g++";
 		}
-		push @flags, "QMAKE_LINK=\$(CXX)";
 		push @flags, "PKG_CONFIG=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-pkg-config";
 	}
 
