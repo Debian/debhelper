@@ -74,6 +74,12 @@ sub configure {
 		$fh->print("HostData=lib/" . dpkg_architecture_value("DEB_HOST_MULTIARCH") . "/qt5\n");
 		$fh->print("Headers=include/" . dpkg_architecture_value("DEB_HOST_MULTIARCH") . "/qt5\n");
 		close($fh) or error("close($filename) failed: $!");
+		if ($filename !~ m{^/}) {
+			# Make the file name absolute (just in case qmake cares).
+			require Cwd;
+			$filename =~ s{^\./}{};
+			$filename = Cwd::cwd() . "/${filename}";
+		}
 		push @options, ("-qtconf", $filename);
 	}
 
