@@ -69,7 +69,7 @@ build: $(LANG_TARGETS) version debhelper.7 debhelper-obsolete-compat.7 $(MANPAGE
 
 
 po4a-stamp:
-	po4a --previous -L UTF-8 man/po4a/po4a.cfg
+	$(PO4A) --previous -L UTF-8 man/po4a/po4a.cfg
 	touch $@
 
 translated-%-stamp: po4a-stamp
