@@ -8,7 +8,7 @@ package Debian::Debhelper::Buildsystem::qmake;
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value error is_cross_compiling);
+use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value error generated_file is_cross_compiling);
 use parent qw(Debian::Debhelper::Buildsystem::makefile);
 
 our $qmake="qmake";
