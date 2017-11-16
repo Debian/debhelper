@@ -56,7 +56,7 @@ sub configure {
 				warning("Missing debcrossgen (${debcrossgen}) cannot generate a meson cross file and non was provided");
 				error("Cannot cross-compile: Please use meson (>= 0.42.1) or provide a cross file via DH_MESON_CROSS_FILE");
 			}
-			my $filename = generated_file('_source', 'meason-cross-file.conf');
+			my $filename = generated_file('_source', 'meson-cross-file.conf');
 			doit({ stdout => '/dev/null' }, $debcrossgen, "-o${filename}");
 			$cross_file = $filename;
 		}
