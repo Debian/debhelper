@@ -67,12 +67,28 @@ sub configure {
 		}
 
 		my $filename = generated_file('_source', 'qmake-cross.conf');
+		my $host_multiarch = dpkg_architecture_value("DEB_HOST_MULTIARCH");
 		open(my $fh, '>', $filename) or error("open($filename) failed: $!");
 
 		$fh->print("[Paths]\n");
 		$fh->print("Prefix=/usr\n");
-		$fh->print("HostData=lib/" . dpkg_architecture_value("DEB_HOST_MULTIARCH") . "/qt5\n");
-		$fh->print("Headers=include/" . dpkg_architecture_value("DEB_HOST_MULTIARCH") . "/qt5\n");
+		$fh->print("ArchData=lib/$host_multiarch/qt5\n");
+		$fh->print("Binaries=lib/qt5/bin\n");
+		$fh->print("Data=share/qt5\n");
+		$fh->print("Documentation=share/qt5/doc\n");
+		$fh->print("Examples=lib/$host_multiarch/qt5/examples\n");
+		$fh->print("Headers=include/$host_multiarch/qt5\n");
+		$fh->print("HostBinaries=lib/qt5/bin\n");
+		$fh->print("HostData=lib/$host_multiarch/qt5\n");
+		$fh->print("HostLibraries=lib/$host_multiarch\n");
+		$fh->print("Imports=lib/$host_multiarch/qt5/imports\n");
+		$fh->print("Libraries=lib/$host_multiarch\n");
+		$fh->print("LibraryExecutables=lib/$host_multiarch/qt5/libexec\n");
+		$fh->print("Plugins=lib/$host_multiarch/qt5/plugins\n");
+		$fh->print("Qml2Imports=lib/$host_multiarch/qt5/qml\n");
+		$fh->print("Settings=/etc/xdg\n");
+		$fh->print("Translations=share/qt5/translations\n");
+
 		close($fh) or error("close($filename) failed: $!");
 		if ($filename !~ m{^/}) {
 			# Make the file name absolute (just in case qmake cares).
