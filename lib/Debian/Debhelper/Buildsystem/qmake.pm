@@ -99,6 +99,9 @@ sub configure {
 	push @flags, "PREFIX=/usr";
 
 	if (is_cross_compiling()) {
+		# qmake calls $$QMAKE_CXX in toolchain.prf to get a list of library/include paths,
+		# we need -early flag to make sure $$QMAKE_CXX is already properly set on that step.
+		push @flags, "-early";
 		if ($ENV{CC}) {
 			push @flags, "QMAKE_CC=" . $ENV{CC};
 		} else {
