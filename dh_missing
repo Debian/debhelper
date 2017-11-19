@@ -95,8 +95,11 @@ if (! -d $srcdir) {
 		warning("Assuming everything is installed directly into the package directory.");
 		exit(0);
 	}
+	# If there was no explicit source directory, then we do not care
+	# if it is missing.
+	exit(0) if not defined $dh{SOURCEDIR};
 	if (compat(10)) {
-		# Prevent "dh $@ --list-missing --destdir=..." from failing in compat 10.
+		# Prevent "dh $@ --list-missing --destdir=... ..." from failing in compat 10.
 		warning("Cannot check if installation is missing files: $srcdir does not exist");
 		exit(0);
 	} else {
