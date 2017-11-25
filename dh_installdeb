@@ -79,6 +79,11 @@ It was also the intention to escape shell metacharacters in previous
 compat levels.  However, it did not work properly and as such it was
 possible to embed arbitrary shell code in earlier compat levels.
 
+The B<dh_installdeb> tool will do some basic validation of some of
+the commands listed in this file to catch common mistakes.  The
+validation is enabled as a warning since compat 10 and as a hard
+error in compat 12.
+
 =back
 
 =cut
@@ -92,6 +97,10 @@ my %maintscript_predeps = (
 	"mv_conffile" => "",
 	"symlink_to_dir" => "",
 	"dir_to_symlink" => "",
+);
+my %maintscript_validator = (
+	"rm_conffile" => \&_validate_conffile_args,
+	"mv_conffile" => \&_validate_conffile_args,
 );
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -139,6 +148,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				addsubstvar($package, "misc:Pre-Depends", "dpkg",
 					">= $maintscript_predeps{$cmd}")
 					if length $maintscript_predeps{$cmd};
+				if (my $validator = $maintscript_validator{$cmd}) {
+					$validator->($package, @{$line});
+				}
 				push(@params, escape_shell(@{$line}) );
 			}
 			foreach my $script (qw{postinst preinst prerm postrm}) {
@@ -212,6 +224,43 @@ sub install_triggers {
 		@sources = ($merged);
 	}
 	install_file($sources[0], $target);
+}
+
+sub _validate_conffile_args {
+	my ($package, $cmd, @args) = @_;
+	my ($current_conffile, $new_conffile, $prior_version, $owning_package, $other);
+	for my $arg (@args) {
+		if ($arg eq '--') {
+			_maybe_error("The maintscripts file for $package includes a \"--\" for one of the ${cmd} commands, but it should not");
+		}
+	}
+	if ($cmd eq 'rm_conffile') {
+		($current_conffile, $prior_version, $owning_package, $other) = @args;
+	} else {
+		($current_conffile, $new_conffile, $prior_version, $owning_package, $other) = @args;
+	}
+	$current_conffile //= '';
+	_maybe_error("The current conffile path for ${cmd} must be present and absolute, got ${current_conffile}")
+		if not $current_conffile or substr($current_conffile, 0, 1) ne '/';
+	_maybe_error("The new conffile path for ${cmd} must be present and absolute, got ${new_conffile}")
+		if $cmd eq 'mv_conffile' and (not $new_conffile or substr($new_conffile, 0, 1) ne '/');
+
+	_maybe_error("The version for ${cmd} ${current_conffile} is not valid, got ${prior_version}")
+		if $prior_version and $prior_version !~ m{^${Debian::Debhelper::Dh_Lib::PKGVERSION_REGEX}$}o;
+	_maybe_error("The owning package for ${cmd} ${current_conffile} is not valid, got ${owning_package}")
+		if $owning_package and $owning_package !~ m{^${Debian::Debhelper::Dh_Lib::PKGNAME_REGEX}$}o;
+	if (defined($other)) {
+		warning("Too many arguments for ${cmd} ${current_conffile}");
+	}
+}
+
+sub _maybe_error {
+	my ($msg) = @_;
+	if (compat(11)) {
+		warning($msg);
+	} else {
+		error($msg);
+	}
 }
 
 =head1 SEE ALSO

@@ -78,6 +78,13 @@ my $prefix="/usr";
 my $MAX_PROCS = get_buildoption("parallel") || 1;
 my $DH_TOOL_VERSION;
 
+our $PKGNAME_REGEX = qr/[a-z0-9][-+\.a-z0-9]+/o;
+our $PKGVERSION_REGEX = qr/
+                 (?: \d+ : )?                # Optional epoch
+                 [0-9][0-9A-Za-z.+:~]*       # Upstream version (with no hyphens)
+                 (?: - [0-9A-Za-z.+:~]+ )*   # Optional debian revision (+ upstreams versions with hyphens)
+                          /xoa;
+
 sub init {
 	my %params=@_;
 
