@@ -87,7 +87,7 @@ sub run_dh_tool {
 sub uid_0_test_is_ok {
     return $ROOT_OK if defined($ROOT_OK);
     my $ok = 0;
-    if ($< == 0) {
+    if (Debian::Debhelper::Dh_Lib::DH_ENABLE_RRR_SUPPORT or $< == 0) {
         $ok = 1;
     } else {
         system('fakeroot true 2>/dev/null');
