@@ -152,6 +152,9 @@ on_items_in_parallel(\@items, sub {
 					foreach split(":", $ENV{DH_ALWAYS_EXCLUDE});
 			}
 		}
+		if ( $dh{FILENAME} eq "/package" ) {
+			$dh{FILENAME} = "/".$package.".deb";
+		}
 		if (! is_udeb($package)) {
 			doit("dpkg-deb", @dpkg_options, @{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$dh{FILENAME});
 		}
