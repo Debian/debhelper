@@ -357,14 +357,11 @@ sub process_packages {
 			attach_debug($objcopy, $_, $debug_path) if defined $debug_path;
 		}
 
-		if (@static_libs) {
-			foreach (@static_libs) {
-				# NB: The short variant (-D) is broken in Jessie
-				# (binutils/2.25-3)
-				doit($strip, '--strip-debug', '--remove-section=.comment',
-					 '--remove-section=.note', '--enable-deterministic-archives',
-					 $_);
-			}
+		foreach (@static_libs) {
+			# NB: The short variant (-D) is broken in Jessie
+			# (binutils/2.25-3)
+			doit($strip, '--strip-debug', '--remove-section=.comment',
+				 '--remove-section=.note', '--enable-deterministic-archives', $_);
 		}
 		if ($no_auto_dbgsym and $use_build_id > 1) {
 			# When DEB_BUILD_OPTIONS contains noautodbgsym, remove the
