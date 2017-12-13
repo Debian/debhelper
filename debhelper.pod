@@ -958,6 +958,18 @@ your package is built.
 Multiple things to exclude can be separated with colons, as in
 B<DH_ALWAYS_EXCLUDE=CVS:.svn>
 
+=item B<DH_EXTRA_ADDONS>
+
+If set, this adds the specified dh addons to be run in the appropriate places
+in the sequence of commands. This is equivalent to specifying the addon to run
+with the --with flag in the debian/rules file. Any --without calls specifying
+an addon in this environment variable will not be run.
+
+This is intended to be used by downstreams or specific local configurations
+that require a debhelper addon to be run during multiple builds without
+having to patch a large number of rules file. If at all possible, this should
+be avoided in favor of a --with flag in the rules file.
+
 =back
 
 =head1 SEE ALSO
