@@ -147,8 +147,8 @@ msgid ""
 msgstr ""
 "Excepto onde a ferramenta explicitamente denota, caso contrário, todas as "
 "ferramentas do debhelper assumem que são corridas a partir do directório "
-"raiz de um pacote fonte descompactado. Isto é feito para que possam localizar "
-"e encontrar F<debian/control> e F<debian/compat> quando necessário."
+"raiz de um pacote fonte descompactado. Isto é feito para que possam "
+"localizar e encontrar F<debian/control> e F<debian/compat> quando necessário."
 
 #. type: =head1
 #: debhelper.pod:36
@@ -834,7 +834,6 @@ msgstr ""
 
 #. type: =head2
 #: debhelper.pod:304
-#| msgid "This is the lowest supported compatibility level."
 msgid "Supported compatibility levels"
 msgstr "Níveis de compatibilidade suportados"
 
@@ -1106,8 +1105,8 @@ msgid ""
 "regardless of compat level)"
 msgstr ""
 "(Obsoleto: Pois a ferramenta B<dh_pysupport> foi removida a partir de Debian "
-"stretch. Desde o debhelper/10.3, B<dh> já não se activa esta sequência add-on "
-"independentemente do nível de compatibilidade)"
+"stretch. Desde o debhelper/10.3, B<dh> já não se activa esta sequência add-"
+"on independentemente do nível de compatibilidade)"
 
 #. type: textblock
 #: debhelper.pod:450
@@ -1381,10 +1380,6 @@ msgstr "As alterações a partir de v10 são:"
 
 #. type: textblock
 #: debhelper.pod:597
-#| msgid ""
-#| "B<dh_installinit> no longer installs F<service> or F<tmpfile> files, nor "
-#| "generates maintainer scripts for those files. Use B<dh_systemd_enable> "
-#| "and B<dh_systemd_start> instead."
 msgid ""
 "B<dh_installinit> no longer installs F<service> or F<tmpfile> files, nor "
 "generates maintainer scripts for those files.  Please use the new "
@@ -1404,8 +1399,8 @@ msgid ""
 msgstr ""
 "Os ajudantes B<dh_systemd_enable>e B<dh_systemd_start> foram substituídos "
 "pelo novo ajudante B<dh_installsystemd>. Pela mesma razão, a sequência do "
-"B<systemd> para B<dh> foi também removida. Se você precisar de desactivar "
-"a ferramenta de ajuda B<dh_installsystemd>, por favor use um alvo de "
+"B<systemd> para B<dh> foi também removida. Se você precisar de desactivar a "
+"ferramenta de ajuda B<dh_installsystemd>, por favor use um alvo de "
 "sobreposição vazio."
 
 #. type: textblock
@@ -1415,8 +1410,8 @@ msgid ""
 "behaviour in some cases (e.g. when using the B<--name> parameter)."
 msgstr ""
 "Por favor note que a ferramenta B<dh_installsystemd> tem um comportamento "
-"ligeiramente diferente em alguns casos (ex. quando se usa o parâmetro "
-"B<--name>)."
+"ligeiramente diferente em alguns casos (ex. quando se usa o parâmetro B<--"
+"name>)."
 
 #. type: textblock
 #: debhelper.pod:615
@@ -1458,8 +1453,8 @@ msgid ""
 "The B<cmake> buildsystem now passes B<-DCMAKE_INSTALL_RUNSTATEDIR=/run> to "
 "L<cmake(1)>."
 msgstr ""
-"O sistema de compilação B<cmake> agora passa "
-"B<-DCMAKE_INSTALL_RUNSTATEDIR=/run> para L<cmake(1)>."
+"O sistema de compilação B<cmake> agora passa B<-DCMAKE_INSTALL_RUNSTATEDIR=/"
+"run> para L<cmake(1)>."
 
 #. type: textblock
 #: debhelper.pod:637
@@ -1483,22 +1478,17 @@ msgstr ""
 
 #. type: textblock
 #: debhelper.pod:649
-#| msgid ""
-#| "B<dh> no longer creates the package build directory when skipping running "
-#| "debhelper commands. This will not affect packages that only build with "
-#| "debhelper commands, but it may expose bugs in commands not included in "
-#| "debhelper."
 msgid ""
 "B<dh_auto_install> will now only create the destination directory it needs.  "
 "Previously, it would create the package build directory for all packages.  "
 "This will not affect packages that only build with debhelper commands, but "
 "it may expose bugs in commands not included in debhelper."
 msgstr ""
-"B<dh_auto_install> irá agora apenas criar o directório de destino que"
-" precisa. "
-"Anteriormente, iria criar o directório de compilação de pacote para todos os "
-"pacotes. Isto não vai afectar pacotes que apenas compilam com comandos "
-"debhelper, mas pode expor bugs em comandos não incluídos no debhelper."
+"B<dh_auto_install> irá agora apenas criar o directório de destino que "
+"precisa. Anteriormente, iria criar o directório de compilação de pacote para "
+"todos os pacotes. Isto não vai afectar pacotes que apenas compilam com "
+"comandos debhelper, mas pode expor bugs em comandos não incluídos no "
+"debhelper."
 
 #. type: textblock
 #: debhelper.pod:657
@@ -1519,8 +1509,8 @@ msgid ""
 "specify documentation."
 msgstr ""
 "Excepções conhecidas incluem compilar com o perfil B<nodoc>, onde as "
-"ferramentas de cima irão permitir em silêncio correspondências falhadas "
-"onde os padrões são usados para especificar documentação."
+"ferramentas de cima irão permitir em silêncio correspondências falhadas onde "
+"os padrões são usados para especificar documentação."
 
 #. type: textblock
 #: debhelper.pod:667
@@ -1539,14 +1529,14 @@ msgstr ""
 #: debhelper.pod:674
 msgid ""
 "The B<perl-makemaker> and B<perl-build> build systems no longer pass B<-I.> "
-"to perl.  Packages that still need this behaviour can emulate it by "
-"using the B<PERL5LIB> environment variable.  E.g. by adding B<export "
-"PERL5LIB=.> in their debian/rules file (or similar)."
+"to perl.  Packages that still need this behaviour can emulate it by using "
+"the B<PERL5LIB> environment variable.  E.g. by adding B<export PERL5LIB=.> "
+"in their debian/rules file (or similar)."
 msgstr ""
-"Os sistemas de compilação B<perl-makemaker> e B<perl-build> já não passam "
-"B<-I.> ao perl. Os pacotes que ainda precisam deste comportamento podem "
-"emula-lo ao usar a variável de ambiente B<PERL5LIB>. Ex. ao adicionar "
-"B<export PERL5LIB=.> no seu ficheiro debian/rules (ou semelhante)."
+"Os sistemas de compilação B<perl-makemaker> e B<perl-build> já não passam B<-"
+"I.> ao perl. Os pacotes que ainda precisam deste comportamento podem emula-"
+"lo ao usar a variável de ambiente B<PERL5LIB>. Ex. ao adicionar B<export "
+"PERL5LIB=.> no seu ficheiro debian/rules (ou semelhante)."
 
 #. type: textblock
 #: debhelper.pod:681
@@ -1556,9 +1546,9 @@ msgid ""
 "avoid a lot of packages failing to build at the same time."
 msgstr ""
 "A variável de ambiente B<PERL_USE_UNSAFE_INC> já não é definida pelo B<dh> "
-"ou nenhuma das ferramentas B<dh_auto_*>. Ela foi adicionada como um meio "
-"de contorno temporário evitar muitos pacotes a falharem a compilação ao "
-"mesmo tempo."
+"ou nenhuma das ferramentas B<dh_auto_*>. Ela foi adicionada como um meio de "
+"contorno temporário evitar muitos pacotes a falharem a compilação ao mesmo "
+"tempo."
 
 #. type: textblock
 #: debhelper.pod:686
@@ -1620,8 +1610,8 @@ msgid ""
 msgstr ""
 "As ferramentas B<dh_strip> e B<dh_shlibdeps> já não usam mais padrões de "
 "nomes de ficheiros para determinar quais ficheiros processar. Em vez disso, "
-"elas abrem o ficheiro e procuram um cabeçalho ELF para determinar se um "
-"dado ficheiro é um objecto partilhado ou um executável ELF."
+"elas abrem o ficheiro e procuram um cabeçalho ELF para determinar se um dado "
+"ficheiro é um objecto partilhado ou um executável ELF."
 
 #. type: textblock
 #: debhelper.pod:716
@@ -1632,7 +1622,6 @@ msgstr ""
 
 #. type: =item
 #: debhelper.pod:720
-#| msgid "v1"
 msgid "v12"
 msgstr "v12"
 
@@ -1646,13 +1635,11 @@ msgstr ""
 
 #. type: textblock
 #: debhelper.pod:724
-#| msgid "Changes from v10 are:"
 msgid "Changes from v11 are:"
 msgstr "As alterações a partir de v11 são:"
 
 #. type: textblock
 #: debhelper.pod:730
-#| msgid "The B<-s> (B<--same-arch>) option is removed."
 msgid ""
 "The B<-s> (B<--same-arch>) option is removed.  Please use B<-a> (B<--arch>) "
 "instead."
@@ -1674,8 +1661,8 @@ msgid ""
 "The B<--no-restart-on-upgrade> option in B<dh_installinit> has been "
 "removed.  Please use the new name B<--no-stop-on-upgrade>"
 msgstr ""
-"A opção B<--no-restart-on-upgrade> em B<dh_installinit> foi removida. "
-"Por favor use o novo nome B<--no-stop-on-upgrade>"
+"A opção B<--no-restart-on-upgrade> em B<dh_installinit> foi removida. Por "
+"favor use o novo nome B<--no-stop-on-upgrade>"
 
 #. type: textblock
 #: debhelper.pod:744
@@ -1687,9 +1674,9 @@ msgid ""
 msgstr ""
 "Existia um bug nas funções B<doit> (e similares) a partir de L<Debian::"
 "Debhelper::Dh_Lib> que fazia aparece uma linha de comandos numa "
-"circunstância particular. Este bug foi agora removido e irá fazer com que "
-"os ajudantes que contavam com esse bug falhem com um erro de \"comando "
-"não encontrado\"."
+"circunstância particular. Este bug foi agora removido e irá fazer com que os "
+"ajudantes que contavam com esse bug falhem com um erro de \"comando não "
+"encontrado\"."
 
 #. type: textblock
 #: debhelper.pod:751
@@ -1712,10 +1699,10 @@ msgid ""
 "versions of the package (if any)."
 msgstr ""
 "O ajudante B<dh_installinit> já não instala configuração para o sistema de "
-"init upstart. Em vez disso, irá abortar a compilação se encontrar um ficheiro "
-"de configuração upstart antigo. O erro está lá para lembrar ao mantenedor "
-"do pacote para assegurar a remoção apropriada dos ficheiros de configuração "
-"empacotados em versões anteriores do pacote (caso existam)."
+"init upstart. Em vez disso, irá abortar a compilação se encontrar um "
+"ficheiro de configuração upstart antigo. O erro está lá para lembrar ao "
+"mantenedor do pacote para assegurar a remoção apropriada dos ficheiros de "
+"configuração empacotados em versões anteriores do pacote (caso existam)."
 
 #. type: textblock
 #: debhelper.pod:765
@@ -1816,16 +1803,17 @@ msgid ""
 "Profiles (or lack of active Build-Profiles)."
 msgstr ""
 "Build-Profiles afectam quais pacotes são incluídos nos mecanismos de "
-"selecção de pacotes do debhelper. Geralmente, as selecções de pacotes "
-"são descritas a partir do pressuposto que todos os pacotes estão activados. "
-"Esta secção descreve como as selecções reagem quando um pacote é desactivado "
+"selecção de pacotes do debhelper. Geralmente, as selecções de pacotes são "
+"descritas a partir do pressuposto que todos os pacotes estão activados. Esta "
+"secção descreve como as selecções reagem quando um pacote é desactivado "
 "devido a Build-Profiles activos (ou a falta de Build-Profiles activos)."
 
 #. type: =item
 #: debhelper.pod:810
 msgid "-a/--arch, -i/--indep OR no selection options (a raw \"dh_X\" call)"
 msgstr ""
-"-a/--arch, -i/--indep OU nenhuma opção de selecção (uma chamada \"dh_X\" crua)"
+"-a/--arch, -i/--indep OU nenhuma opção de selecção (uma chamada \"dh_X\" "
+"crua)"
 
 #. type: textblock
 #: debhelper.pod:812
@@ -1842,13 +1830,12 @@ msgid ""
 "selections are disabled.  In that case, it generally does not make sense to "
 "do the build in the first place."
 msgstr ""
-"Note que vai receber um aviso se I<todos> os pacotes relacionados com "
-"estas selecções estiverem desactivados. Nesse caso, geralmente não faz "
-"nenhum sentido sequer fazer a compilação."
+"Note que vai receber um aviso se I<todos> os pacotes relacionados com estas "
+"selecções estiverem desactivados. Nesse caso, geralmente não faz nenhum "
+"sentido sequer fazer a compilação."
 
 #. type: =item
 #: debhelper.pod:819
-#| msgid "B<-N>I<package>, B<--no-package=>I<package>"
 msgid "-N I<package> / --no-package I<package>"
 msgstr "-N I<package> / --no-package I<package>"
 
@@ -1859,7 +1846,6 @@ msgstr "A opção é aceite e efectivamente não faz nada."
 
 #. type: =item
 #: debhelper.pod:823
-#| msgid "B<-p>I<package>, B<--package=>I<package>"
 msgid "-p I<package> / --package I<package>"
 msgstr "-p I<package> / --package I<package>"
 
@@ -2648,9 +2634,9 @@ msgid ""
 "When called only with this option, B<dh> can be called from any directory (i."
 "e. it does not need access to files from a source package)."
 msgstr ""
-"Quando chamado apenas com esta opção, o B<dh> pode ser chamado a partir "
-"de qualquer directório (isto é, não precisa de acesso a ficheiros do pacote"
-" fonte)."
+"Quando chamado apenas com esta opção, o B<dh> pode ser chamado a partir de "
+"qualquer directório (isto é, não precisa de acesso a ficheiros do pacote "
+"fonte)."
 
 #. type: textblock
 #: dh:73
@@ -2837,10 +2823,6 @@ msgstr ""
 
 #. type: textblock
 #: dh:136
-#| msgid ""
-#| "Python tools are not run by dh by default, due to the continual change in "
-#| "that area. (Before compatibility level v9, dh does run B<dh_pysupport>.)  "
-#| "Here is how to use B<dh_python2>."
 msgid ""
 "Python tools are not run by dh by default, due to the continual change in "
 "that area. Here is how to use B<dh_python2>."
@@ -3091,13 +3073,6 @@ msgstr ""
 
 #. type: textblock
 #: dh:221
-#| msgid ""
-#| "In compat 10 (or later), B<dh> creates a stamp file F<debian/debhelper-"
-#| "build-stamp> after the build step(s) are complete to avoid re-running "
-#| "them.  Inside an override target, B<dh_*> commands will create a log file "
-#| "F<debian/package.debhelper.log> to keep track of which packages the "
-#| "command(s) have been run for.  These log files are then removed once the "
-#| "override target is complete."
 msgid ""
 "In compat 10 (or later), B<dh> creates a stamp file F<debian/debhelper-build-"
 "stamp> after the build step(s) are complete to avoid re-running them.  It is "
@@ -3109,20 +3084,13 @@ msgstr ""
 "No modo compatibilidade 10 (ou posterior), o B<dh> cria um ficheiro stamp "
 "<debian/debhelper-build-stamp> após os passo(s) de compilação estarem "
 "completos para evitar voltar a corrê-los. É possível evitar o ficheiro stamp "
-"ao passar B<--without=build-stamp> para  B<dh>.  Isto faz com que compilações "
-"\"não limpas\" se comportem mais como o que algumas pessoas esperam à "
-"custa de possivelmente correrem a compilação e testá-la duas vezes (a segunda "
-"vez como root ou sob L<fakeroot(1)>)."
+"ao passar B<--without=build-stamp> para  B<dh>.  Isto faz com que "
+"compilações \"não limpas\" se comportem mais como o que algumas pessoas "
+"esperam à custa de possivelmente correrem a compilação e testá-la duas vezes "
+"(a segunda vez como root ou sob L<fakeroot(1)>)."
 
 #. type: textblock
 #: dh:229
-#| msgid ""
-#| "In compat 10 (or later), B<dh> creates a stamp file F<debian/debhelper-"
-#| "build-stamp> after the build step(s) are complete to avoid re-running "
-#| "them.  Inside an override target, B<dh_*> commands will create a log file "
-#| "F<debian/package.debhelper.log> to keep track of which packages the "
-#| "command(s) have been run for.  These log files are then removed once the "
-#| "override target is complete."
 msgid ""
 "Inside an override target, B<dh_*> commands will create a log file F<debian/"
 "package.debhelper.log> to keep track of which packages the command(s) have "
@@ -3858,8 +3826,7 @@ msgstr ""
 #: dh_clean:21
 #, no-wrap
 msgid ""
-"B<dh_clean> is a debhelper program that is responsible for cleaning up after"
-" a\n"
+"B<dh_clean> is a debhelper program that is responsible for cleaning up after a\n"
 "package is built. It removes the package build directories, and removes some\n"
 "other files including F<debian/files>, and any detritus left behind by other\n"
 "debhelper commands. It also removes common files that should not appear in a\n"
@@ -3924,7 +3891,6 @@ msgstr "Isto está descontinuado, use L<dh_prep(1)> em vez deste."
 
 #. type: textblock
 #: dh_clean:55
-#| msgid "The option is removed in compat 11."
 msgid "The option is removed in compat 12."
 msgstr "A opção foi removida no nível de compatibilidade 12."
 
@@ -4122,16 +4088,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_fixperms:26
-#| msgid ""
-#| "B<dh_fixperms> makes all files in F<usr/share/doc> in the package build "
-#| "directory (excluding files in the F<examples/> directory) be mode 644. It "
-#| "also changes the permissions of all man pages to mode 644. It makes all "
-#| "files be owned by root, and it removes group and other write permission "
-#| "from all files. It removes execute permissions from any libraries, "
-#| "headers, Perl modules, or desktop files that have it set. It makes all "
-#| "files in the standard F<bin> and F<sbin> directories, F<usr/games/> and "
-#| "F<etc/init.d> executable (since v4). Finally, it removes the setuid and "
-#| "setgid bits from all files in the package."
 msgid ""
 "B<dh_fixperms> makes all files in F<usr/share/doc> in the package build "
 "directory (excluding files in the F<examples/> directory) be mode 644. It "
@@ -4148,8 +4104,8 @@ msgstr ""
 "manuais para 644. Remove o grupo e outras permissões de escrita de todos os "
 "ficheiros. Remove permissões de executável de todas as bibliotecas, "
 "cabeçalhos, módulos Perl, ou ficheiro desktop que as têm definidas. Faz "
-"todos os ficheiros nos directórios F<bin> e F<sbin> standard, F<usr/games/> e "
-"F<etc/init.d> executáveis (desde v4). Finalmente, remove os bits setuid e "
+"todos os ficheiros nos directórios F<bin> e F<sbin> standard, F<usr/games/> "
+"e F<etc/init.d> executáveis (desde v4). Finalmente, remove os bits setuid e "
 "setgid de todos os ficheiros do pacote."
 
 #. type: textblock
@@ -4461,15 +4417,6 @@ msgstr "debian/I<pacote>.install"
 
 #. type: textblock
 #: dh_install:46
-#| msgid ""
-#| "List the files to install into each package and the directory they should "
-#| "be installed to. The format is a set of lines, where each line lists a "
-#| "file or files to install, and at the end of the line tells the directory "
-#| "it should be installed in. The name of the files (or directories) to "
-#| "install should be given relative to the current directory, while the "
-#| "installation directory is given relative to the package build directory. "
-#| "You may use wildcards in the names of the files to install (in v3 mode "
-#| "and above)."
 msgid ""
 "List the files to install into each package and the directory they should be "
 "installed to. The format is a set of lines, where each line lists a file or "
@@ -5236,10 +5183,10 @@ msgid ""
 "commands listed in this file to catch common mistakes.  The validation is "
 "enabled as a warning since compat 10 and as a hard error in compat 12."
 msgstr ""
-"A ferramenta B<dh_installdeb> irá fazer alguma validação básica a alguns "
-"dos comandos listados neste ficheiro para apanhar enganos comuns. A "
-"validação é activada como um aviso desde compatibilidade 10 e como um "
-"erro a resolver na compatibilidade 12."
+"A ferramenta B<dh_installdeb> irá fazer alguma validação básica a alguns dos "
+"comandos listados neste ficheiro para apanhar enganos comuns. A validação é "
+"activada como um aviso desde compatibilidade 10 e como um erro a resolver na "
+"compatibilidade 12."
 
 #. type: textblock
 #: dh_installdebconf:5
@@ -5484,8 +5431,8 @@ msgstr ""
 "ferramenta para lidar com a documentação do autor, quando o sistema de "
 "compilação próprio do autor instala toda a documentação desejada "
 "correctamente Neste caso, o B<dh_installdocs> ainda é útil para instalar "
-"documentação relacionada com o empacotamento (ex. o ficheiro "
-"F<debian/copyright>)."
+"documentação relacionada com o empacotamento (ex. o ficheiro F<debian/"
+"copyright>)."
 
 #. type: textblock
 #: dh_installdocs:31
@@ -5636,7 +5583,6 @@ msgstr ""
 
 #. type: =item
 #: dh_installdocs:100 dh_installexamples:56
-#| msgid "B<--mainpackage=>I<package>"
 msgid "B<--doc-main-package=>I<main-package>"
 msgstr "B<--doc-main-package=>I<main-package>"
 
@@ -5647,9 +5593,9 @@ msgid ""
 "the documentation of the documentation package in F<< /usr/share/doc/I<main-"
 "package> >> as recommended by the Debian policy manual 3.9.7 in §12.3."
 msgstr ""
-"Define o pacote principal para pacote de documentação. Isto é usado para "
-"a documentação do pacote de documentação em F<< /usr/share/doc/I<main-"
-"package> >> como recomendado pelo manual de politicas Debian 3.9.7 em §12.3."
+"Define o pacote principal para pacote de documentação. Isto é usado para a "
+"documentação do pacote de documentação em F<< /usr/share/doc/I<main-package> "
+">> como recomendado pelo manual de politicas Debian 3.9.7 em §12.3."
 
 #. type: textblock
 #: dh_installdocs:107 dh_installexamples:63
@@ -5660,9 +5606,9 @@ msgid ""
 "default happens to be correct."
 msgstr ""
 "Em compatibilidade 11 (ou posterior), esta opção apenas é útil se a auto-"
-"detecção do debhelper do pacote principal está errada. A opção também "
-"pode ser usada para silenciar um aviso do debhelper quando a auto-detecção "
-"falha mas acontece a predefinição estar correcta."
+"detecção do debhelper do pacote principal está errada. A opção também pode "
+"ser usada para silenciar um aviso do debhelper quando a auto-detecção falha "
+"mas acontece a predefinição estar correcta."
 
 #. type: textblock
 #: dh_installdocs:112
@@ -5673,8 +5619,8 @@ msgid ""
 msgstr ""
 "Esta opção não pode ser usada quando o B<dh_installdocs> é instruído a "
 "actuar em múltiplos pacotes. Se precisar desta opção, você irá geralmente "
-"precisar de combiná-la com B<-p> para assegurar exactamente que um pacote "
-"é actuado."
+"precisar de combiná-la com B<-p> para assegurar exactamente que um pacote é "
+"actuado."
 
 #. type: textblock
 #: dh_installdocs:117
@@ -5740,18 +5686,13 @@ msgid ""
 "package (e.g. see B<--doc-main-package>), it will not use a symlink for the "
 "documentation of the other package."
 msgstr ""
-"Por favor note que esta opção apenas é aplicada ao directório de documentação "
-"para o próprio pacote. Quando o pacote embarca documentação para outro "
-"pacote (ex. veja B<--doc-main-package>), não irá usar um link simbólico para "
-"a documentação do outro pacote."
+"Por favor note que esta opção apenas é aplicada ao directório de "
+"documentação para o próprio pacote. Quando o pacote embarca documentação "
+"para outro pacote (ex. veja B<--doc-main-package>), não irá usar um link "
+"simbólico para a documentação do outro pacote."
 
 #. type: textblock
 #: dh_installdocs:144
-#| msgid ""
-#| "B<CAVEAT>: If a previous version of the package was built without this "
-#| "option and is now built with it (or vice-versa), it requires a \"dir to "
-#| "symlink\" (or \"symlink to dir\") migration.  Since debhelper has no "
-#| "knowledge of previous versions, you have to enable this migration itself."
 msgid ""
 "B<CAVEAT 1>: If a previous version of the package was built without this "
 "option and is now built with it (or vice-versa), it requires a \"dir to "
@@ -5784,8 +5725,8 @@ msgid ""
 msgstr ""
 "B<CAVEAT 2>: O uso de B<--link-doc> apenas deve ser feito quando os pacotes "
 "têm o mesmo tipo de \"arquitectura\". Um link de um pacote independente de "
-"arquitectura para um pacote depende de arquitectura (ou vice-versa) não "
-"irá funcionar. Desde compatibilidade 10, o debhelper irá rejeitar activamente "
+"arquitectura para um pacote depende de arquitectura (ou vice-versa) não irá "
+"funcionar. Desde compatibilidade 10, o debhelper irá rejeitar activamente "
 "combinações não suportadas."
 
 #. type: textblock
@@ -6025,11 +5966,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_installexamples:51
-#| msgid ""
-#| "Note that this is not the same as the B<--sourcedirectory> option used by "
-#| "the B<dh_auto_>I<*> commands. You rarely need to use this option, since "
-#| "B<dh_install> automatically looks for files in F<debian/tmp> in debhelper "
-#| "compatibility level 7 and above."
 msgid ""
 "Note that this is not the same as the B<--sourcedirectory> option used by "
 "the B<dh_auto_>I<*> commands. You rarely need to use this option, since "
@@ -6048,10 +5984,10 @@ msgid ""
 "on multiple packages.  If you need this option, you will generally need to "
 "combine it with B<-p> to ensure exactly one package is acted on."
 msgstr ""
-"Esta opção não pode ser usada quando B<dh_installexamples> é instruído "
-"para actuar em múltiplos pacotes. Se precisar desta opção, você irá "
-"geralmente precisar de combiná-la com B<-p> para assegurar exactamente "
-"que um pacote é actuado."
+"Esta opção não pode ser usada quando B<dh_installexamples> é instruído para "
+"actuar em múltiplos pacotes. Se precisar desta opção, você irá geralmente "
+"precisar de combiná-la com B<-p> para assegurar exactamente que um pacote é "
+"actuado."
 
 #. type: textblock
 #: dh_installexamples:80
@@ -6167,11 +6103,6 @@ msgstr "Lista ficheiros info a serem instalados."
 
 #. type: textblock
 #: dh_installinfo:48
-#| msgid ""
-#| "Note that this is not the same as the B<--sourcedirectory> option used by "
-#| "the B<dh_auto_>I<*> commands. You rarely need to use this option, since "
-#| "B<dh_install> automatically looks for files in F<debian/tmp> in debhelper "
-#| "compatibility level 7 and above."
 msgid ""
 "Note that this is not the same as the B<--sourcedirectory> option used by "
 "the B<dh_auto_>I<*> commands. You rarely need to use this option, since "
@@ -6180,9 +6111,8 @@ msgid ""
 msgstr ""
 "Note que isto não é o mesmo que a opção B<--sourcedirectory> usada pelos "
 "comandos B<dh_auto_>I<*>. Você raramente vai precisar de usar esta opção, "
-"pois o B<dh_installinfo> procura automaticamente por ficheiros em F<"
-"debian/tmp> "
-"no nível de compatibilidade 11 e superiores do debhelper."
+"pois o B<dh_installinfo> procura automaticamente por ficheiros em F<debian/"
+"tmp> no nível de compatibilidade 11 e superiores do debhelper."
 
 #. type: textblock
 #: dh_installinfo:55
@@ -6212,11 +6142,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_installinit:22
-#| msgid ""
-#| "B<dh_installinit> is a debhelper program that is responsible for "
-#| "installing init scripts with associated defaults files, as well as "
-#| "upstart job files, and systemd service files into package build "
-#| "directories."
 msgid ""
 "B<dh_installinit> is a debhelper program that is responsible for installing "
 "init scripts with associated defaults files.  In compatibility levels up to "
@@ -6225,8 +6150,8 @@ msgid ""
 msgstr ""
 "B<dh_installinit> é um programa debhelper que é responsável por instalar "
 "scripts init com os ficheiros de predefinições associados. Em níveis de "
-"compatibilidade até ao 11, o B<dh_installinit> também lida com ficheiros "
-"de trabalhos upstart, e ficheiros de serviço do systemd."
+"compatibilidade até ao 11, o B<dh_installinit> também lida com ficheiros de "
+"trabalhos upstart, e ficheiros de serviço do systemd."
 
 #. type: textblock
 #: dh_installinit:26
@@ -6294,23 +6219,20 @@ msgid ""
 "package version.  Please consider using the \"rm_conffile\" feature from "
 "L<dh_installdeb(1)> to ensure the proper removal of previous upstart files."
 msgstr ""
-"Em nível de compatibilidade 11, este ficheiro irá disparar um erro com "
-"uma lembrança para assegurar a remoção apropriada do ficheiro upstart "
-"na versão anterior do pacote. Por favor consider usar a funcionalidade "
-"\"rm_conffile\" do L<dh_installdeb(1)> para assegurar a remoção apropriada "
-"de ficheiros upstart anteriores."
+"Em nível de compatibilidade 11, este ficheiro irá disparar um erro com uma "
+"lembrança para assegurar a remoção apropriada do ficheiro upstart na versão "
+"anterior do pacote. Por favor consider usar a funcionalidade \"rm_conffile\" "
+"do L<dh_installdeb(1)> para assegurar a remoção apropriada de ficheiros "
+"upstart anteriores."
 
 #. type: textblock
 #: dh_installinit:57
-#| msgid ""
-#| "If this exists, it is installed into etc/init/I<package>.conf in the "
-#| "package build directory."
 msgid ""
 "In compatibility level 10, if this file exists, it is installed into etc/"
 "init/I<package>.conf in the package build directory."
 msgstr ""
-"No nível de compatibilidade 10, se este ficheiro existir, é instalado em "
-"etc/init/I<pacote>.conf no directório de compilação do pacote."
+"No nível de compatibilidade 10, se este ficheiro existir, é instalado em etc/"
+"init/I<pacote>.conf no directório de compilação do pacote."
 
 #. type: =item
 #: dh_installinit:60
@@ -6458,8 +6380,8 @@ msgid ""
 "Do not stop init script on upgrade.  This has the side-effect of not "
 "restarting the service as a part of the upgrade."
 msgstr ""
-"Não pára o script init na actualização. Isto tem o efeito secundário de "
-"não reiniciar o serviço como parte da actualização."
+"Não pára o script init na actualização. Isto tem o efeito secundário de não "
+"reiniciar o serviço como parte da actualização."
 
 #. type: textblock
 #: dh_installinit:122
@@ -6746,17 +6668,13 @@ msgstr "B<dh_installman> [S<I<debhelper opções>>] [S<I<manpage> ...>]"
 
 #. type: textblock
 #: dh_installman:22
-#| msgid ""
-#| "B<dh_installmanpages> is a debhelper program that is responsible for "
-#| "automatically installing man pages into F<usr/share/man/> in package "
-#| "build directories."
 msgid ""
 "B<dh_installman> is a debhelper program that handles installing man pages "
 "into the correct locations in package build directories."
 msgstr ""
 "B<dh_installman> é um programa debhelper que lida com a instalação de "
-"paginas de manual (man pages) nas localizações correctas nos directórios "
-"de compilação de pacotes."
+"paginas de manual (man pages) nas localizações correctas nos directórios de "
+"compilação de pacotes."
 
 #. type: textblock
 #: dh_installman:25
@@ -6783,24 +6701,13 @@ msgid ""
 "part happens automatically without any explicit configuration."
 msgstr ""
 "Mesmo que prefira usar L<dh_install(1)> para instalar os manuais, o "
-"B<dh_installman> pode ainda ser útil para converter a codificação da "
-"pagina de manual para UTF-8 e para converter links F<.so> (como descrito "
-"abaixo). No entanto, essa parte acontece automaticamente sem nenhuma "
-"configuração explícita."
+"B<dh_installman> pode ainda ser útil para converter a codificação da pagina "
+"de manual para UTF-8 e para converter links F<.so> (como descrito abaixo). "
+"No entanto, essa parte acontece automaticamente sem nenhuma configuração "
+"explícita."
 
 #. type: textblock
 #: dh_installman:38
-#| msgid ""
-#| "B<dh_installman> is a debhelper program that handles installing man pages "
-#| "into the correct locations in package build directories. You tell it what "
-#| "man pages go in your packages, and it figures out where to install them "
-#| "based on the section field in their B<.TH> or B<.Dt> line. If you have a "
-#| "properly formatted B<.TH> or B<.Dt> line, your man page will be installed "
-#| "into the right directory, with the right name (this includes proper "
-#| "handling of pages with a subsection, like B<3perl>, which are placed in "
-#| "F<man3>, and given an extension of F<.3perl>). If your B<.TH> or B<.Dt> "
-#| "line is incorrect or missing, the program may guess wrong based on the "
-#| "file extension."
 msgid ""
 "You tell B<dh_installman> what man pages go in your packages, and it figures "
 "out where to install them based on the section field in their B<.TH> or B<."
@@ -6811,10 +6718,10 @@ msgid ""
 "or B<.Dt> line is incorrect or missing, the program may guess wrong based on "
 "the file extension."
 msgstr ""
-"Você diz ao B<dh_installman> quais manuais vão para os seus pacotes, "
-"e ele descobre onde os instalar com base no campo secção na sua linha B<.TH> "
-"ou B<.Dt>. Se você tem uma linha B<.TH> ou B<.Dt> correctamente formatada, o "
-"seu manual será instalado no directório correcto, com o nome correcto (isto "
+"Você diz ao B<dh_installman> quais manuais vão para os seus pacotes, e ele "
+"descobre onde os instalar com base no campo secção na sua linha B<.TH> ou B<."
+"Dt>. Se você tem uma linha B<.TH> ou B<.Dt> correctamente formatada, o seu "
+"manual será instalado no directório correcto, com o nome correcto (isto "
 "inclui o manuseamento apropriado de páginas com uma sub-secção, como "
 "B<3perl>, a qual é colocada em F<man3>, e é-lhe dada uma extensão "
 "F<.3perl>). Se a sua linha B<.TH> ou B<.Dt> está incorrecta ou em falta, o "
@@ -6902,11 +6809,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_installman:98
-#| msgid ""
-#| "Note that this is not the same as the B<--sourcedirectory> option used by "
-#| "the B<dh_auto_>I<*> commands. You rarely need to use this option, since "
-#| "B<dh_install> automatically looks for files in F<debian/tmp> in debhelper "
-#| "compatibility level 7 and above."
 msgid ""
 "Note that this is not the same as the B<--sourcedirectory> option used by "
 "the B<dh_auto_>I<*> commands. You rarely need to use this option, since "
@@ -6915,8 +6817,8 @@ msgid ""
 msgstr ""
 "Note que isto não é o mesmo que a opção B<--sourcedirectory> usada pelos "
 "comandos B<dh_auto_>I<*>. Você raramente vai precisar de usar esta opção, "
-"pois o B<dh_installman> procura automaticamente por ficheiros em "
-"F<debian/tmp> no nível de compatibilidade 11 e superiores do debhelper."
+"pois o B<dh_installman> procura automaticamente por ficheiros em F<debian/"
+"tmp> no nível de compatibilidade 11 e superiores do debhelper."
 
 #. type: =item
 #: dh_installman:103
@@ -7443,12 +7345,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_installwm:21
-#| msgid ""
-#| "B<dh_installwm> is a debhelper program that is responsible for generating "
-#| "the F<postinst> and F<prerm> commands that register a window manager with "
-#| "L<update-alternatives(8)>. The window manager's man page is also "
-#| "registered as a slave symlink (in v6 mode and up), if it is found in "
-#| "F<usr/share/man/man1/> in the package build directory."
 msgid ""
 "B<dh_installwm> is a debhelper program that is responsible for generating "
 "the F<postinst> and F<prerm> commands that register a window manager with "
@@ -7460,10 +7356,10 @@ msgstr ""
 "B<dh_installwm> é um programa debhelper que é responsável por gerar os "
 "comandos F<postinst> e F<prerm> que registam um gestor de janelas com "
 "L<update-alternatives(8)>. O manual do gestor de janelas é também registado "
-"como um link simbólico escravo (em modo v6 e posterior). Tem de ser instalado "
-"em F<usr/share/man/man1/> no directório de compilação do pacote antes da "
-"chamada B<dh_installwm>. Em compatibilidade 9 e anterior, a página de "
-"manual era opcional."
+"como um link simbólico escravo (em modo v6 e posterior). Tem de ser "
+"instalado em F<usr/share/man/man1/> no directório de compilação do pacote "
+"antes da chamada B<dh_installwm>. Em compatibilidade 9 e anterior, a página "
+"de manual era opcional."
 
 #. type: =item
 #: dh_installwm:32
@@ -7609,11 +7505,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_link:25
-#| msgid ""
-#| "B<dh_link> accepts a list of pairs of source and destination files. The "
-#| "source files are the already existing files that will be symlinked from. "
-#| "The destination files are the symlinks that will be created. There "
-#| "B<must> be an equal number of source and destination files specified."
 msgid ""
 "B<dh_link> accepts a list of pairs of source and destination files. The "
 "source files are the already existing files that will be symlinked from "
@@ -7623,25 +7514,21 @@ msgid ""
 msgstr ""
 "B<dh_link> aceita uma lista de pares de ficheiros de fonte e destino. Os "
 "ficheiros fonte são os ficheiros já existentes de onde se vai criar os links "
-"simbólicos (chamados B<target> pelo L<ln(1)>). Os ficheiros de destino "
-"são os links simbólicos que irão ser criados (chamados B<link name> pelo "
-"L<ln(1)>). O número de ficheiros fonte e destino especificados B<tem> de "
-"ser igual."
+"simbólicos (chamados B<target> pelo L<ln(1)>). Os ficheiros de destino são "
+"os links simbólicos que irão ser criados (chamados B<link name> pelo "
+"L<ln(1)>). O número de ficheiros fonte e destino especificados B<tem> de ser "
+"igual."
 
 #. type: textblock
 #: dh_link:32
-#| msgid ""
-#| "Be sure you B<do> specify the full filename to both the source and "
-#| "destination files (unlike you would do if you were using something like "
-#| "L<ln(1)>)."
 msgid ""
 "Be sure you B<do> specify the absolute path to both the source and "
 "destination files (unlike you would do if you were using something like "
 "L<ln(1)>).  Please note that the leading slash is optional."
 msgstr ""
-"Certifique-se que B<especifica> o caminho absoluto para ambos ficheiros "
-"de fonte e destino (ao contrário do que faria se estivesse a usar "
-"algo como L<ln(1)>). Por favor note que a barra de inicio é opcional."
+"Certifique-se que B<especifica> o caminho absoluto para ambos ficheiros de "
+"fonte e destino (ao contrário do que faria se estivesse a usar algo como "
+"L<ln(1)>). Por favor note que a barra de inicio é opcional."
 
 #. type: textblock
 #: dh_link:36
@@ -7699,8 +7586,8 @@ msgid ""
 msgstr ""
 "Em cada par o ficheiro fonte (chamado B<target> pelo L<ln(1)>) aparece "
 "primeiro e é seguido pelo ficheiro de destino (chamado B<link name> pelo "
-"L<ln(1)>). Assim os pares de fonte e destino em cada linha são fornecidos "
-"na mesma ordem como seriam fornecidos ao L<ln(1)>."
+"L<ln(1)>). Assim os pares de fonte e destino em cada linha são fornecidos na "
+"mesma ordem como seriam fornecidos ao L<ln(1)>."
 
 #. type: textblock
 #: dh_link:61
@@ -7708,8 +7595,8 @@ msgid ""
 "In contrast to L<ln(1)>, source and destination paths must be absolute (the "
 "leading slash is optional)."
 msgstr ""
-"Em contraste ao L<ln(1)>, os caminhos de fonte e destino têm de ser absolutos "
-"(a barra de inicio é opcional)."
+"Em contraste ao L<ln(1)>, os caminhos de fonte e destino têm de ser "
+"absolutos (a barra de inicio é opcional)."
 
 #. type: textblock
 #: dh_link:72
@@ -7785,10 +7672,6 @@ msgstr ""
 #. type: verbatim
 #: dh_link:100
 #, no-wrap
-#| msgid ""
-#| " dh_link var/lib/foo usr/lib/foo \\\n"
-#| "   usr/share/man/man1/foo.1 usr/share/man/man1/bar.1\n"
-#| "\n"
 msgid ""
 " var/lib/foo usr/lib/foo\n"
 " usr/share/man/man1/foo.1 usr/share/man/man1/bar.1\n"
@@ -8897,12 +8780,10 @@ msgstr ""
 #: dh_strip:100
 #, no-wrap
 msgid ""
-"  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<<"
-" 2.1-3~)'\n"
+"  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< 2.1-3~)'\n"
 "\n"
 msgstr ""
-"  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<<"
-" 2.1-3~)'\n"
+"  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< 2.1-3~)'\n"
 "\n"
 
 #. type: =item
@@ -9009,13 +8890,12 @@ msgstr "Testa também a existência destes ficheiros."
 
 #. type: textblock
 #: dh_testroot:7
-#| msgid "dh_testroot - ensure that a package is built as root"
 msgid ""
 "dh_testroot - ensure that a package is built with necessary level of root "
 "permissions"
 msgstr ""
-"dh_testroot - assegura que um pacote é compilado com o nível necessário "
-"de permissões de root."
+"dh_testroot - assegura que um pacote é compilado com o nível necessário de "
+"permissões de root."
 
 #. type: textblock
 #: dh_testroot:11
@@ -9030,8 +8910,8 @@ msgid ""
 "Root (R³) field."
 msgstr ""
 "B<dh_testroot> é usado para determinar se o pacote tem acesso a pelo menos "
-"ao nível de acesso de raiz que declarou que precisava via campo "
-"Rules-Requires-Root (R³)."
+"ao nível de acesso de raiz que declarou que precisava via campo Rules-"
+"Requires-Root (R³)."
 
 #. type: textblock
 #: dh_testroot:19
@@ -9074,8 +8954,8 @@ msgid ""
 "L<fakeroot(1)>) or the builder has provided the B<DPKG_GAIN_ROOT_CMD> "
 "environment variable (e.g. via dpkg-buildpackage -r)."
 msgstr ""
-"B<dh_testroot> declara que ou é corrido como root (ou sob L<fakeroot(1)>) "
-"ou o compilador disponibilizou a variável de ambiente B<DPKG_GAIN_ROOT_CMD> "
+"B<dh_testroot> declara que ou é corrido como root (ou sob L<fakeroot(1)>) ou "
+"o compilador disponibilizou a variável de ambiente B<DPKG_GAIN_ROOT_CMD> "
 "(ex. via dpkg-buildpackage -r)."
 
 #. type: textblock
@@ -9084,9 +8964,9 @@ msgid ""
 "For backwards compatibility, B<dh_testroot> will consider the absence of the "
 "R³ field as if the R³ field was set to \"binary-targets\"."
 msgstr ""
-"Para compatibilidade com versões anteriores. B<dh_testroot> irá considerar "
-"a ausência do campo R³ como se o campo R³ estivesse definido para "
-"\"binary-targets\"."
+"Para compatibilidade com versões anteriores. B<dh_testroot> irá considerar a "
+"ausência do campo R³ como se o campo R³ estivesse definido para \"binary-"
+"targets\"."
 
 #. type: textblock
 #: dh_usrlocal:7
@@ -9136,19 +9016,12 @@ msgid ""
 "the recommendations of the Debian policy for directories in F</usr/local>."
 msgstr ""
 "Quando o campo I<Rules-Requires-Root> não é (efectivamente) I<binary-"
-"targets>, os directórios em F</usr/local> serão da propriedade root:staff "
-"e o modo será 02775. Estes valores foram escolhidos para respeitar a "
+"targets>, os directórios em F</usr/local> serão da propriedade root:staff e "
+"o modo será 02775. Estes valores foram escolhidos para respeitar a "
 "recomendação da política Debian para os directórios em F</usr/local>."
 
 #. type: textblock
 #: dh_usrlocal:42
-#| msgid ""
-#| "If the directories found in the build tree have unusual owners, groups, "
-#| "or permissions, then those values will be preserved in the directories "
-#| "made by the F<postinst> script. However, as a special exception, if a "
-#| "directory is owned by root.root, it will be treated as if it is owned by "
-#| "root.staff and is mode 2775. This is useful, since that is the group and "
-#| "mode policy recommends for directories in F</usr/local>."
 msgid ""
 "When I<Rules-Requires-Root> has an effective value of I<binary-targets>, the "
 "owners, groups and permissions will be preserved with one exception.  If the "
@@ -9157,10 +9030,10 @@ msgid ""
 "mode policy recommends for directories in F</usr/local>."
 msgstr ""
 "Quando I<Rules-Requires-Root> tem um valor efectivo de I<binary-targets>, "
-"donos, grupo e permissões serão preservadas com uma excepção. Se o directório "
-"for propriedade de root:root, então o dono será reiniciado para root:staff "
-"e o modo será reiniciado para 02775. Isto é útil, pois é o grupo e o modo "
-"que a política recomenda para os directórios em F</usr/local>."
+"donos, grupo e permissões serão preservadas com uma excepção. Se o "
+"directório for propriedade de root:root, então o dono será reiniciado para "
+"root:staff e o modo será reiniciado para 02775. Isto é útil, pois é o grupo "
+"e o modo que a política recomenda para os directórios em F</usr/local>."
 
 #. type: textblock
 #: dh_usrlocal:67
@@ -9241,22 +9114,18 @@ msgstr ""
 
 #. type: =item
 #: dh_systemd_enable:45
-#| msgid "debian/I<package>.logcheck.ignore.server"
 msgid "debian/I<package>.service, debian/I<package>@.service"
 msgstr "debian/I<package>.service, debian/I<package>@.service"
 
 #. type: textblock
 #: dh_systemd_enable:47
-#| msgid ""
-#| "If this exists, it is installed into lib/systemd/system/I<package>."
-#| "service in the package build directory."
 msgid ""
 "If this exists, it is installed into lib/systemd/system/I<package>.service "
 "(or lib/systemd/system/I<package>@.service) in the package build directory."
 msgstr ""
-"Se isto existir, é instalado em lib/systemd/system/I<package>.service "
-"(or lib/systemd/system/I<package>@.service) no directório de compilação "
-"do pacote."
+"Se isto existir, é instalado em lib/systemd/system/I<package>.service (or "
+"lib/systemd/system/I<package>@.service) no directório de compilação do "
+"pacote."
 
 #. type: textblock
 #: dh_systemd_enable:52
@@ -9271,53 +9140,39 @@ msgstr ""
 
 #. type: =item
 #: dh_systemd_enable:56
-#| msgid "debian/I<package>.manpages"
 msgid "debian/I<package>.target, debian/I<package>@.target"
 msgstr "debian/I<package>.target, debian/I<package>@.target"
 
 #. type: textblock
 #: dh_systemd_enable:58
-#| msgid ""
-#| "If this exists, it is installed into lib/systemd/system/I<package>."
-#| "service in the package build directory."
 msgid ""
 "If this exists, it is installed into lib/systemd/system/I<package>.target "
 "(or lib/systemd/system/I<package>@.target) in the package build directory."
 msgstr ""
-"Se isto existir, é instalado em lib/systemd/system/I<package>.target "
-"(ou lib/systemd/system/I<package>@.target) no directório de compilação "
-"do pacote."
+"Se isto existir, é instalado em lib/systemd/system/I<package>.target (ou lib/"
+"systemd/system/I<package>@.target) no directório de compilação do pacote."
 
 #. type: =item
 #: dh_systemd_enable:61
-#| msgid "debian/I<package>.manpages"
 msgid "debian/I<package>.socket, debian/I<package>@.socket"
 msgstr "debian/I<package>.socket, debian/I<package>@.socket"
 
 #. type: textblock
 #: dh_systemd_enable:63
-#| msgid ""
-#| "If this exists, it is installed into lib/systemd/system/I<package>."
-#| "service in the package build directory."
 msgid ""
 "If this exists, it is installed into lib/systemd/system/I<package>.socket "
 "(or lib/systemd/system/I<package>@.socket) in the package build directory."
 msgstr ""
-"Se isto existir, é instalado em lib/systemd/system/I<package>.socket "
-"(ou lib/systemd/system/I<package>@.socket) no directório de compilação "
-"do pacote."
+"Se isto existir, é instalado em lib/systemd/system/I<package>.socket (ou lib/"
+"systemd/system/I<package>@.socket) no directório de compilação do pacote."
 
 #. type: =item
 #: dh_systemd_enable:66
-#| msgid "debian/I<package>.menu"
 msgid "debian/I<package>.mount"
 msgstr "debian/I<package>.mount"
 
 #. type: textblock
 #: dh_systemd_enable:68
-#| msgid ""
-#| "If this exists, it is installed into lib/systemd/system/I<package>."
-#| "service in the package build directory."
 msgid ""
 "If this exists, it is installed into lib/systemd/system/I<package>.mount in "
 "the package build directory."
@@ -9327,39 +9182,31 @@ msgstr ""
 
 #. type: =item
 #: dh_systemd_enable:71
-#| msgid "debian/I<package>.manpages"
 msgid "debian/I<package>.path, debian/I<package>@.path"
 msgstr "debian/I<package>.path, debian/I<package>@.path"
 
 #. type: textblock
 #: dh_systemd_enable:73
-#| msgid ""
-#| "If this exists, it is installed into lib/systemd/system/I<package>."
-#| "service in the package build directory."
 msgid ""
 "If this exists, it is installed into lib/systemd/system/I<package>.path (or "
 "lib/systemd/system/I<package>@.path) in the package build directory."
 msgstr ""
-"Se isto existir, é instalado em lib/systemd/system/I<package>.path (ou "
-"lib/systemd/system/I<package>@.path) no directório de compilação do pacote."
+"Se isto existir, é instalado em lib/systemd/system/I<package>.path (ou lib/"
+"systemd/system/I<package>@.path) no directório de compilação do pacote."
 
 #. type: =item
 #: dh_systemd_enable:76
-#| msgid "debian/I<package>.manpages"
 msgid "debian/I<package>.timer, debian/I<package>@.timer"
 msgstr "debian/I<package>.timer, debian/I<package>@.timer"
 
 #. type: textblock
 #: dh_systemd_enable:78
-#| msgid ""
-#| "If this exists, it is installed into lib/systemd/system/I<package>."
-#| "service in the package build directory."
 msgid ""
 "If this exists, it is installed into lib/systemd/system/I<package>.timer (or "
 "lib/systemd/system/I<package>@.timer) in the package build directory."
 msgstr ""
-"Se isto existir, é instalado em lib/systemd/system/I<package>.timer (ou "
-"lib/systemd/system/I<package>@.timer) no directório de compilação do pacote."
+"Se isto existir, é instalado em lib/systemd/system/I<package>.timer (ou lib/"
+"systemd/system/I<package>@.timer) no directório de compilação do pacote."
 
 #. type: =item
 #: dh_systemd_enable:87
@@ -9368,8 +9215,6 @@ msgstr "B<--no-enable>"
 
 #. type: textblock
 #: dh_systemd_enable:89
-#| msgid ""
-#| "Just disable the service(s) on purge, but do not enable them by default."
 msgid "Disable the service(s) on purge, but do not enable them on install."
 msgstr "Desactiva serviço(s) durante a purga, mas não os activa na instalação."
 
@@ -9381,8 +9226,8 @@ msgid ""
 "option)."
 msgstr ""
 "B<Note> que esta opção não afecta se os serviços são arrancados. Isso é "
-"controlado por L<dh_systemd_start(1)> (usando por exemplo a sua opção "
-"B<--no-start>)."
+"controlado por L<dh_systemd_start(1)> (usando por exemplo a sua opção B<--no-"
+"start>)."
 
 #. type: textblock
 #: dh_systemd_enable:97
