@@ -16,7 +16,7 @@ our @TEST_DH_EXTRA_TEMPLATE_FILES = (qw(
 ));
 
 if (uid_0_test_is_ok()) {
-	plan(tests => 2);
+	plan(tests => 1);
 } else {
 	plan skip_all => 'fakeroot required';
 }
@@ -47,7 +47,7 @@ sub unit_is_started {
 }
 
 # Units are installed and enabled
-each_compat_from_and_above_subtest(11, sub {
+each_compat_subtest {
 	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
 	ok(-e "debian/foo.postinst.debhelper");
@@ -131,19 +131,6 @@ each_compat_from_and_above_subtest(11, sub {
 	unit_is_enabled('foo', 'foo2', 1);
 	unit_is_started('foo', 'foo2', 1);
 	ok(run_dh_tool('dh_clean'));
-});
+};
 
-each_compat_up_to_and_incl_subtest(10, sub {
-
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd'));
-	ok(! -e "debian/foo/lib/systemd/system/foo.service");
-	ok(! -e "debian/foo.postinst.debhelper");
-	ok(run_dh_tool('dh_clean'));
-
-	make_path(qw(debian/foo/lib/systemd/system/));
-	install_file('debian/foo.service', 'debian/foo/lib/systemd/system/foo.service');
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd'));
-	ok(! -e "debian/foo.postinst.debhelper");
-	ok(run_dh_tool('dh_clean'));
-});
 
