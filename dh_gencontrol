@@ -183,6 +183,7 @@ sub read_dbgsym_file {
 		open(my $fd, '<', $dbgsym_path)
 			or error("open $dbgsym_path failed: $!");
 		chomp($result = <$fd>);
+		$result =~ s/\s++$//;
 		close($fd);
 	}
 	return $result;

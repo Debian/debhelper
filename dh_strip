@@ -245,6 +245,16 @@ sub testfile {
 	}
 }
 
+sub write_buildid_file {
+	my ($package, $build_ids) = @_;
+	my $dir = "debian/.debhelper/${package}";
+	my $path = "${dir}/dbgsym-build-ids";
+	install_dir($dir);
+	open(my $fd, '>>', $path) or error("open $path failed: $!");
+	print {$fd} join(q{ }, sort(@{$build_ids})) . ' ';
+	close($fd) or error("close $path failed: $!");
+}
+
 # I could just use `file $_[0]`, but this is safer
 sub get_file_type {
 	my ($file, $cache_ok) = @_;
@@ -337,7 +347,7 @@ sub process_packages {
 				$use_build_id = 2;
 			}
 		}
-		%file_output=@shared_libs=@executables=@static_libs=@build_ids=();
+		%file_output=@shared_libs=@executables=@static_libs=();
 		find({
 			wanted => \&testfile,
 			no_chdir => 1,
@@ -387,19 +397,13 @@ sub process_packages {
 				close($fd) or error("close $path failed: $!");
 			}
 		}
-		if (@build_ids && ($use_build_id > 1 || $dh{DEBUGPACKAGE})) {
-			my ($dir, $path);
-			if ($use_build_id > 1) {
-				$dir = "debian/.debhelper/${package}";
-			} else {
-				$dir = "debian/.debhelper/$dh{DEBUGPACKAGE}";
-			}
-			$path = "${dir}/dbgsym-build-ids";
-			install_dir($dir);
-			open(my $fd, '>>', $path) or error("open $path failed: $!");
-			print {$fd} join(q{ }, sort(@build_ids)) . "\n";
-			close($fd) or error("close $path failed: $!");
+		if ($use_build_id > 1 and @build_ids) {
+			write_buildid_file($package, \@build_ids);
+			@build_ids = ();
 		}
+	}
+	if (@build_ids and $dh{DEBUGPACKAGE}) {
+		write_buildid_file($dh{DEBUGPACKAGE}, \@build_ids);
 	}
 }
 
