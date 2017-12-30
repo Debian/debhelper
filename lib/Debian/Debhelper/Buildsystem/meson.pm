@@ -57,7 +57,11 @@ sub configure {
 				error("Cannot cross-compile: Please use meson (>= 0.42.1) or provide a cross file via DH_MESON_CROSS_FILE");
 			}
 			my $filename = generated_file('_source', 'meson-cross-file.conf');
-			doit({ stdout => '/dev/null' }, $debcrossgen, "-o${filename}");
+			my %options = (
+				stdout => '/dev/null',
+				update_env => { LC_ALL => 'C.UTC-8'},
+			);
+			doit(\%options, $debcrossgen, "-o${filename}");
 			$cross_file = $filename;
 		}
 		if ($cross_file !~ m{^/}) {
@@ -71,7 +75,10 @@ sub configure {
 
 	$this->mkdir_builddir();
 	eval {
-		$this->doit_in_builddir("meson", $this->get_source_rel2builddir(), @opts, @_);
+		my %options = (
+			update_env => { LC_ALL => 'C.UTC-8'},
+		);
+		$this->doit_in_builddir(\%options, "meson", $this->get_source_rel2builddir(), @opts, @_);
 	};
 	if ($@) {
 		if (-e $this->get_buildpath("meson-logs/meson-log.txt")) {
