@@ -168,9 +168,14 @@ doit([$options, ]@command)
 	    to that file.  [debhelper (>= 10.7)]
 	  * chdir => A directory.  The child process will do a chdir into that
 	    directory before executing the command.  [debhelper (>= 10.9)]
+	  * update_env => A hashref.  Each key in it represents an environment variable
+	    that should be set in the child (possibly replacing the existing value)
+	    prior to the exec.  If the value is undef, the environment variable will
+	    be unset.  Environment variables in %ENV but not listed in the update_env
+	    hashref will be preserved as-is.  [debhelper (>= 11.1)]
 
 	This will *not* invoke a shell, so meta characters will not have any special
-	meaning.  Use complex_doit for that.
+	meaning.  Use complex_doit for that (or emulate via "bash -c").
 	NB: In compat 11 and below, there was a bug that would make doit fork a shell
 	in one special case.  This is deprecated and will be removed in compat 12.
 	The detection code for this can be disabled by passing an empty hashref for

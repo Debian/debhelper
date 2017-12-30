@@ -343,6 +343,15 @@ sub _doit {
 			if (defined(my $output = $options->{stdout})) {
 				open(STDOUT, '>', $output) or error("redirect STDOUT failed: $!");
 			}
+			if (defined(my $update_env = $options->{update_env})) {
+				while (my ($k, $v) = each(%{$update_env})) {
+					if (defined($v)) {
+						$ENV{$k} = $v;
+					} else {
+						delete($ENV{$k});
+					}
+				}
+			}
 		}
 		# Force execvp call to avoid shell.  Apparently, even exec can
 		# involve a shell if you don't do this.
