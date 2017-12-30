@@ -58,14 +58,8 @@ will automatically guess the destination to use, the same as if the
 
 =item debian/not-installed
 
-List the files that are deliberately not installed in I<any> binary
-package.  Paths listed in this file are (I<only>) ignored by the check
-done via B<--list-missing> (or B<--fail-missing>).  However, it is
-B<not> a method to exclude files from being installed.  Please use
-B<--exclude> for that.
-
-Please keep in mind that dh_install will B<not> expand wildcards in
-this file.
+Used with the deprecated B<--list-missing> and B<--fail-missing> options.
+Please refer to L<dh_missing(1)> for the documentation of this file.
 
 =back
 
@@ -75,30 +69,21 @@ this file.
 
 =item B<--list-missing>
 
-B<Deprecated>: Please use B<dh_missing --list-missing> instead.
+B<Deprecated>: Please use B<dh_missing --list-missing> instead.  If you use
+this option, B<dh_install> will call B<dh_missing> with that option after it has
+processed all the files.  Please see L<dh_missing(1)> for the documentation of
+this option.
 
-This option makes B<dh_install> keep track of the files it installs, and then at
-the end, compare that list with the files in the source directory. If any of
-the files (and symlinks) in the source directory were not installed to
-somewhere, it will warn on stderr about that.
-
-This may be useful if you have a large package and want to make sure that
-you don't miss installing newly added files in new upstream releases.
-
-Note that files that are excluded from being moved via the B<-X> option are not
-warned about.
+This option is removed in compat 12.
 
 =item B<--fail-missing>
 
-B<Deprecated>: Please use B<dh_missing --fail-missing> instead.
+B<Deprecated>: Please use B<dh_missing --fail-missing> instead.  If you use
+this option, B<dh_install> will call B<dh_missing> with that option after it has
+processed all the files.  Please see L<dh_missing(1)> for the documentation of
+this option.
 
-This option is like B<--list-missing>, except if a file was missed, it will
-not only list the missing files, but also fail with a nonzero exit code. 
-
-=item B<-X>I<item>, B<--exclude=>I<item>
-
-Exclude files that contain I<item> anywhere in their filename from
-being installed.
+This option is removed in compat 12.
 
 =item B<--sourcedir=>I<dir>
 
