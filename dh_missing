@@ -107,7 +107,7 @@ if (! -d $srcdir) {
 	}
 }
 
-for my $file (<debian/.debhelper/generated/*/installed-by-*>) {
+for my $file (glob('debian/.debhelper/generated/*/installed-by-*')) {
 	my ($target_pkg, $helper) = ('unknown', 'unknown');
 	my $had_files = 0;
 	my %seen;
