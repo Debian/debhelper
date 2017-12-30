@@ -44,8 +44,8 @@ However, it is B<not> a method to exclude files from being installed
 by any of the debhelper tool.  If you want a tool to not install a
 given file, please use its B<--exclude> option (where available).
 
-Please keep in mind that B<dh_missing> will B<not> expand wildcards in
-this file.
+B<dh_missing> will expand wildcards in this file (since debhelper 11.1).
+Wildcards without matches will be ignored.
 
 =back
 
@@ -130,10 +130,21 @@ for my $file (glob('debian/.debhelper/generated/*/installed-by-*')) {
 my @missing;
 if ( -f 'debian/not-installed') {
 	my @not_installed = filearray('debian/not-installed');
-	foreach (@not_installed) {
-		s:^\s*:debian/tmp/: unless m:^\s*debian/tmp/:;
+	for my $pattern (@not_installed) {
+		my @matches;
+		# Add an explicit d/tmp if absent as there is no point in
+		# looking outside the debian staging directory
+		$pattern =~ s:^\s*:debian/tmp/: unless $pattern =~ m:^\s*debian/tmp/:;
+		@matches = glob_expand(['.'], \&glob_expand_error_handler_silently_ignore, $pattern);
+		if (@matches) {
+			# Assume classify them as installed
+			push(@installed, @matches);
+		} else {
+			# Assume it is not a pattern and classify it as installed
+			push(@installed, $pattern);
+		}
 	}
-	# Pretend that these are also installed.
+
 	push(@installed, @not_installed);
 }
 my $installed=join("|", map {
