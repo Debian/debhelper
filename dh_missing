@@ -60,6 +60,8 @@ Warn on stderr about source files not installed to somewhere.
 Note that files that are excluded from being moved via the B<-X> option are not
 warned about.
 
+This is the default in compat 12 and later.
+
 =item B<--fail-missing>
 
 This option is like B<--list-missing>, except if a file was missed, it will
@@ -79,6 +81,9 @@ my (@installed, %helpers);
 
 my $srcdir = '.';
 $srcdir = $dh{SOURCEDIR} if defined $dh{SOURCEDIR};
+
+# --list-missing is the default in compat 12+
+$dh{LIST_MISSING} = 1 if !$dh{FAIL_MISSING} && !compat(11);
 
 if (!$dh{LIST_MISSING} && !$dh{FAIL_MISSING}) {
 	exit 0;
