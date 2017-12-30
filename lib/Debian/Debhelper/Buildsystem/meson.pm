@@ -88,9 +88,4 @@ sub configure {
 	}
 }
 
-sub test {
-	my $this=shift;
-	return $this->SUPER::test(@_);
-}
-
 1
