@@ -315,12 +315,19 @@ sub _in_dir {
 	return $code->(@args);
 }
 
+sub _generic_doit_in_dir {
+	my ($this, $dir, $sub, @args) = @_;
+	my %args = ref($args[0]) ? %{$args[0]} : ();
+	$args{chdir} = $dir;
+	return $sub->(\%args, @args);
+}
+
 # Changes working directory to the source directory (if needed),
 # calls print_and_doit(@_) and changes working directory back to the
 # top directory.
 sub doit_in_sourcedir {
 	my ($this, @args) = @_;
-	print_and_doit({ chdir => $this->get_sourcedir }, @args);
+	$this->_generic_doit_in_dir($this->get_sourcedir, \&print_and_doit, @args);
 	return 1;
 }
 
@@ -329,7 +336,7 @@ sub doit_in_sourcedir {
 # top directory. Errors are ignored.
 sub doit_in_sourcedir_noerror {
 	my ($this, @args) = @_;
-	return print_and_doit_noerror({ chdir => $this->get_sourcedir }, @args);
+	return $this->_generic_doit_in_dir($this->get_sourcedir, \&print_and_doit_noerror, @args);
 }
 
 # Changes working directory to the build directory (if needed),
@@ -337,7 +344,7 @@ sub doit_in_sourcedir_noerror {
 # top directory.
 sub doit_in_builddir {
 	my ($this, @args) = @_;
-	print_and_doit({ chdir => $this->get_buildpath }, @args);
+	$this->_generic_doit_in_dir($this->get_buildpath, \&print_and_doit, @args);
 	return 1;
 }
 
@@ -346,7 +353,7 @@ sub doit_in_builddir {
 # top directory. Errors are ignored.
 sub doit_in_builddir_noerror {
 	my ($this, @args) = @_;
-	return print_and_doit_noerror({ chdir => $this->get_buildpath }, @args);
+	return $this->_generic_doit_in_dir($this->get_buildpath, \&print_and_doit_noerror, @args);
 }
 
 # Changes working directory to the build directory (if needed),
