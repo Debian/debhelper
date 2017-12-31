@@ -237,7 +237,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	} elsif (@deb_lines or @udeb_lines) {
 		install_dir("$tmp/DEBIAN");
 		if ($dh{VERBOSE}) {
-			verbose_print('echo ' . escape_shell($_) . ' ' . escape_shell("$tmp/DEBIAN/shlibs"))
+			verbose_print('echo ' . escape_shell($_) . ' >> ' . escape_shell("$tmp/DEBIAN/shlibs"))
 				for @deb_lines, @udeb_lines;
 		}
 		open(my $shlibs_fd, '>', "$tmp/DEBIAN/shlibs") or error("open($tmp/DEBIAN/shlibs): $!");
