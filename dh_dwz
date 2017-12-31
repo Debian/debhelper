@@ -72,11 +72,9 @@ sub testfile {
 
 	# See if we were asked to exclude this file.
 	# Note that we have to test on the full filename, including directory.
-	foreach my $f (@{$dh{EXCLUDE}}) {
-		if ($fn =~ m/\Q$f\E/) {
-			$File::Find::prune = 1 if -d _;
-			return;
-		}
+	if (excludefile($fn)) {
+		$File::Find::prune = 1 if -d _;
+		return;
 	}
 	return if -d _;
 	# Do not process output files from dwz

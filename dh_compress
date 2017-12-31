@@ -139,17 +139,7 @@ on_pkgs_in_parallel {
 
 		# Exclude files from compression.
 		if (@files && defined($dh{EXCLUDE}) && $dh{EXCLUDE}) {
-			my @new=();
-			foreach (@files) {
-				my $ok=1;
-				foreach my $x (@{$dh{EXCLUDE}}) {
-					if (/\Q$x\E/) {
-						$ok='';
-						last;
-					}
-				}
-				push @new,$_ if $ok;
-			}
+			my @new = grep { not excludefile($_) } @files;
 			@files=@new;
 		}
 
