@@ -184,7 +184,7 @@ sub init {
 	# If no error handling function was specified, just propagate
 	# errors out.
 	if (! exists $dh{ERROR_HANDLER} || ! defined $dh{ERROR_HANDLER}) {
-		$dh{ERROR_HANDLER}='exit \$?';
+		$dh{ERROR_HANDLER}='exit 1';
 	}
 
 	$dh{U_PARAMS} //= [];
