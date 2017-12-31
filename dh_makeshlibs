@@ -180,8 +180,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			# idiotic crap soname format
 			$library=$1;
 			$major=$2;
-		} elsif ($ret =~ m/\s+SONAME\s+(?:.*)\.so/) {
+		} elsif ($ret =~ m/\s+SONAME\s+(?:\S)/) {
 			$unversioned_so = 1;
+			push(@lib_files, $_);
 		}
 
 		if (defined($dh{M_PARAMS}) && $dh{M_PARAMS} ne '') {
