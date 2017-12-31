@@ -30,6 +30,12 @@ debhelper (11.1) UNRELEASED; urgency=medium
   * dh_compress: In compat 12, stop compressing any thing in
     /usr/share/doc/$pkg/examples.  Thanks to Piotr Ożarowski for
     the suggestion.  (Closes: #593382)
+  * dh_installinit: Support a new --no-enable parameter to setup the
+    init script with the "defaults-disabled" and add the proper
+    versioned dependency on "init-system-helpers (>= 1.51)", which is
+    the first (functional) version with support for
+    "defaults-disabled".  Thanks to Laurent Bigonville for the
+    report and Evgeni Golov for filing #857452.  (Closes: #709384)
 
  -- Niels Thykier <niels@thykier.net>  Sun, 17 Dec 2017 07:59:18 +0000
 

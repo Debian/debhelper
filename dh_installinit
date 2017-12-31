@@ -134,6 +134,20 @@ variant was introduced in debhelper 10.2 (included in Debian stretch).
 Do not start the init script on install or upgrade, or stop it on removal.
 Only call B<update-rc.d>. Useful for rcS scripts.
 
+=item B<--no-enable>
+
+Disable the init script on purge, but do not enable them on install.
+This implies a versioned dependency on B<init-system-helpers (>=
+1.51)> as it is the first (functional) version that supports
+B<<update-rc.d <script> defaults-disabled>>.
+
+B<Note> that this option does not affect whether the services are
+started.  Please remember to also use B<--no-start> if the service
+should not be started.
+
+Cannot be combined with B<-u>I<params>,
+B<--update-rcd-params=>I<params>, or B<--> I<params>.
+
 =item B<-d>, B<--remove-d>
 
 Remove trailing B<d> from the name of the package, and use the result for the
@@ -147,8 +161,11 @@ described below.)
 
 =item B<--> I<params>
 
-Pass I<params> to L<update-rc.d(8)>. If not specified, B<defaults> will be
-passed to L<update-rc.d(8)>.
+Pass I<params> to L<update-rc.d(8)>. If not specified, B<defaults> (or
+B<defaults-disabled> with B<--no-enable>) will be passed to
+L<update-rc.d(8)>.
+
+Cannot be combined with B<--no-enable>.
 
 =item B<--name=>I<name>
 
@@ -203,6 +220,7 @@ init(options => {
 	"init-script=s" => \$dh{INIT_SCRIPT},
 	"update-rcd-params=s", => \$dh{U_PARAMS},
 	"remove-d" => \$dh{D_FLAG},
+	"no-enable" => \$dh{NO_ENABLE},
 });
 
 # PROMISE: DH NOOP WITHOUT service tmpfile default upstart init init.d tmp(usr/lib/tmpfiles.d) tmp(etc/tmpfiles.d)
@@ -321,13 +339,16 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# This is set by the -u "foo" command line switch, it's
 		# the parameters to pass to update-rc.d. If not set,
 		# we have to say "defaults".
-		my $params='';
-		if (defined($dh{U_PARAMS})) {
+		my $params = 'defaults';
+		if ($dh{NO_ENABLE}) {
+			$params = 'defaults-disabled';
+			addsubstvar($package, "misc:Depends", "init-system-helpers (>= 1.51)");
+		}
+
+		if (defined($dh{U_PARAMS}) and @{$dh{U_PARAMS}}) {
+			error("--no-enable and -- params/-u/--update-rcd-params/ are mutually exclusive") if $dh{NO_ENABLE};
 			$params=join(' ',@{$dh{U_PARAMS}});
 		}	
-		if ($params eq '') {
-			$params="defaults";
-		}
 		
 		if (! $dh{NOSCRIPTS}) {
 			if (! $dh{NO_START}) {
