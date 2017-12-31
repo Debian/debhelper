@@ -160,7 +160,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# because only if we can get a library name and a major number from
 	# objdump is anything actually added.
 	my $exclude='';
-	my (@udeb_lines, @lib_files);
+	my (@udeb_lines, @deb_lines, @lib_files);
 	if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
 		$exclude="! \\( $dh{EXCLUDE_FIND} \\) ";
 	}
@@ -187,8 +187,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (defined($dh{M_PARAMS}) && $dh{M_PARAMS} ne '') {
 			$major=$dh{M_PARAMS};
 		}
-		
-		install_dir("$tmp/DEBIAN");
+
 		my $deps=$package;
 		if ($dh{V_FLAG_SET}) {
 			if ($shlibs_file) {
@@ -220,11 +219,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			my $line="$library $major $deps";
 			if (! $seen{$line}) {
 				$seen{$line}=1;
-				complex_doit("echo '$line' >>$tmp/DEBIAN/shlibs");
+				push(@deb_lines, $line);
 				if (defined($dh{SHLIBS_UDEB}) && $dh{SHLIBS_UDEB} ne '') {
 					my $udeb_deps = $deps;
 					$udeb_deps =~ s/\Q$package\E/$dh{SHLIBS_UDEB}/e;
-			    		$line="udeb: "."$library $major $udeb_deps";
+					$line="udeb: $library $major $udeb_deps";
 					push @udeb_lines, $line;
 				}
 			}
@@ -232,14 +231,19 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 	close FIND;
 
-	# Write udeb: lines last.
-	foreach (@udeb_lines) {
-		complex_doit("echo '$_' >>$tmp/DEBIAN/shlibs");
-	}
-
 	if ($shlibs_file) {
 		install_dir("$tmp/DEBIAN");
 		install_file($shlibs_file, "$tmp/DEBIAN/shlibs");
+	} elsif (@deb_lines or @udeb_lines) {
+		install_dir("$tmp/DEBIAN");
+		if ($dh{VERBOSE}) {
+			verbose_print('echo ' . escape_shell($_) . ' ' . escape_shell("$tmp/DEBIAN/shlibs"))
+				for @deb_lines, @udeb_lines;
+		}
+		open(my $shlibs_fd, '>', "$tmp/DEBIAN/shlibs") or error("open($tmp/DEBIAN/shlibs): $!");
+		# Write the shlibs file with the udeb: lines last.
+		print {$shlibs_fd} "$_\n" for @deb_lines, @udeb_lines;
+		close($shlibs_fd) or error("close($tmp/DEBIAN/shlibs");
 	}
 
 	if (-e "$tmp/DEBIAN/shlibs") {
