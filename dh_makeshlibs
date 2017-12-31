@@ -165,12 +165,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		$exclude="! \\( $dh{EXCLUDE_FIND} \\) ";
 	}
 	open (FIND, "test -d $tmp && find $tmp -type f \\( -name '*.so' -or -name '*.so.*' \\) $exclude | LC_ALL=C sort |");
-	while (<FIND>) {
+	while (my $lib_file = <FIND>) {
 		my ($library, $major);
-		chomp;
-		next if not is_so_or_exec_elf_file($_);
-		push @lib_files, $_;
-		my $ret = compat(10) ? `$objdump -p "$_"` : qx_cmd($objdump, '-p', $_);
+		chomp($lib_file);
+		next if not is_so_or_exec_elf_file($lib_file);
+		push(@lib_files, $lib_file) if compat(11);
+		my $ret = compat(10) ? `$objdump -p "$lib_file"` : qx_cmd($objdump, '-p', $lib_file);
 		if ($ret=~m/\s+SONAME\s+(.*)\.so\.(.*)/) {
 			# proper soname format
 			$library=$1;
@@ -182,7 +182,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$major=$2;
 		} elsif ($ret =~ m/\s+SONAME\s+(?:\S)/) {
 			$unversioned_so = 1;
-			push(@lib_files, $_);
+			push(@lib_files, $lib_file);
 		}
 
 		if (defined($dh{M_PARAMS}) && $dh{M_PARAMS} ne '') {
@@ -216,6 +216,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (defined($library) && defined($major) && defined($deps) &&
 		      $library ne '' && $major ne '' && $deps ne '') {
 			$need_ldconfig=1;
+			push(@lib_files, $lib_file) if not compat(11);
 			# Prevent duplicate lines from entering the file.
 			my $line="$library $major $deps";
 			if (! $seen{$line}) {
