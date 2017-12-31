@@ -346,12 +346,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				if ($dh{R_FLAG} || $dh{RESTART_AFTER_UPGRADE}) {
 					# stops script only on remove
 					autoscript($package,"prerm","prerm-init-norestart",
-						"s/#SCRIPT#/$script/g;s/#INITPARMS#/$params/g;s/#ERROR_HANDLER#/$dh{ERROR_HANDLER}/g");
+						"s/#SCRIPT#/$script/g;s/#ERROR_HANDLER#/$dh{ERROR_HANDLER}/g");
 				}
 				else {
 					# always stops script
 					autoscript($package,"prerm","prerm-init",
-						"s/#SCRIPT#/$script/g;s/#INITPARMS#/$params/g;s/#ERROR_HANDLER#/$dh{ERROR_HANDLER}/g");
+						"s/#SCRIPT#/$script/g;s/#ERROR_HANDLER#/$dh{ERROR_HANDLER}/g");
 				}
 			}
 			else {
@@ -362,7 +362,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 			# removes rc.d links
 			autoscript($package,"postrm","postrm-init",
-				"s/#SCRIPT#/$script/g;s/#INITPARMS#/$params/g;s/#ERROR_HANDLER#/$dh{ERROR_HANDLER}/g");
+				"s/#SCRIPT#/$script/g;s/#ERROR_HANDLER#/$dh{ERROR_HANDLER}/g");
 		}
 	}
 }
