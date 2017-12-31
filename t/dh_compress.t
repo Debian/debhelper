@@ -13,7 +13,7 @@ use Debian::Debhelper::Dh_Lib qw(!dirname);
 
 my $PREFIX = 'debian/debhelper/usr/share/doc/debhelper';
 
-plan tests => 1;
+plan tests => 2;
 
 each_compat_subtest {
     # we are testing compressing doc txt files
@@ -82,27 +82,28 @@ each_compat_subtest {
 	rm_test_dir();
 };
 
+each_compat_from_and_above_subtest(12, sub {
+	make_path("${PREFIX}/examples");
+	create_file_of_size("${PREFIX}/examples/foo.py", 5120);
+	ok(run_dh_tool('dh_compress'));
+	ok(-f "${PREFIX}/examples/foo.py", "${PREFIX}/examples/foo.py is not compressed");
+	ok(! -f "${PREFIX}/examples/foo.py.gz", "${PREFIX}/examples/foo.py is not compressed");
+});
+
+sub create_file_of_size {
+	my ($filename, $size) = @_;
+	open(my $fh, '>', $filename) or error("open($filename) failed: $!");
+	print {$fh} 'X' x $size;
+	close($fh) or error("close($filename) failed: $!");
+}
 
 sub mk_test_dir {
     rm_test_dir();
 
-    make_path('debian/debhelper/usr/share/doc/debhelper');
+	make_path($PREFIX);
 
-    my $fh;
-
-    # write 2k to foo.txt
-    open $fh, '>', 'debian/debhelper/usr/share/doc/debhelper/foo.txt'
-	or die "Could not write to debian/debhelper/usr/share/doc/debhelper/foo.txt: $!";
-    print $fh 'X' x 2048;
-    close $fh
-	or die "Could not write to debian/debhelper/usr/share/doc/debhelper/bar.txt: $!";
-
-    # write 5k to bar.txt
-    open $fh, '>', 'debian/debhelper/usr/share/doc/debhelper/bar.txt'
-	or die "Could not write to debian/debhelper/usr/share/doc/debhelper/bar.txt: $!";
-    print $fh 'X' x 5120;
-    close $fh
-	or die "Could not write to debian/debhelper/usr/share/doc/debhelper/bar.txt: $!";
+	create_file_of_size("${PREFIX}/foo.txt", 2048);
+	create_file_of_size("${PREFIX}/bar.txt", 5120);
 }
 
 sub rm_test_dir {

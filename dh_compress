@@ -90,6 +90,8 @@ on_pkgs_in_parallel {
 		# Run the file name gathering commands from within the directory
 		# structure that will be effected.
 		next unless -d $tmp;
+		my $ignore_doc_dirs = '-name _sources';
+		$ignore_doc_dirs .= qq{ -o -path "usr/share/doc/$package/examples"} if not compat(11);
 		$olddir = getcwd() if not defined $olddir;
 		verbose_print("cd $tmp");
 		chdir($tmp) || error("Can't cd to $tmp: $!");
@@ -117,7 +119,7 @@ on_pkgs_in_parallel {
 					! -iname "*.jpeg" \\
 					2>/dev/null || true;
 				find usr/share/doc \\
-					\\( -type d -name _sources -prune -false \\) -o \\
+					\\( -type d \\( $ignore_doc_dirs \\) -prune -false \\) -o \\
 					-type f \\( -size +4k -o -name "changelog*" -o -name "NEWS*" \\) \\
 					\\( -name changelog.html -o ! -iname "*.htm*" \\) \\
 					! -iname "*.xhtml" \\
