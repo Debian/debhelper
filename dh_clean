@@ -162,8 +162,9 @@ if (! $dh{D_FLAG}) {
 	}
 
 	# vcs directories that should not have their contents cleaned
+	# (plus the internal "quilt" directory)
 	my $vcs_dirs=join " -o ", map { "-path .\\*/" . $_ }
-		(".git", ".svn", ".bzr", ".hg", "CVS");
+		(".git", ".svn", ".bzr", ".hg", "CVS", '.pc', '_darcs');
 
 	# Remove other temp files.
 	complex_doit("find . $find_options \\( \\( \\
