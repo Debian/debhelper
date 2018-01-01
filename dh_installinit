@@ -330,6 +330,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			no_chdir => 1,
 		}, $tmp);
 		if (@tmpfiles > 0) {
+			# Not migrated to hashref based autoscripts.  This will
+			# happen as people migrate to dh_installsystemd.
 			autoscript($package,"postinst", "postinst-init-tmpfiles",
 				"s,#TMPFILES#," . join(" ", sort @tmpfiles).",g");
 		}
@@ -356,34 +358,34 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 					# update-rc.d, and restart (or
 					# start if new install) script
 					autoscript($package,"postinst", "postinst-init-restart",
-						"s/#SCRIPT#/$script/g;s/#INITPARMS#/$params/g;s/#ERROR_HANDLER#/$dh{ERROR_HANDLER}/g");
+						{ 'SCRIPT' => $script, 'INITPARMS' => $params, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} });
 				}
 				else {
 					# update-rc.d, and start script
 					autoscript($package,"postinst", "postinst-init",
-						"s/#SCRIPT#/$script/g;s/#INITPARMS#/$params/g;s/#ERROR_HANDLER#/$dh{ERROR_HANDLER}/g");
+						{ 'SCRIPT' => $script, 'INITPARMS' => $params, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} });
 				}
 			
 				if ($dh{R_FLAG} || $dh{RESTART_AFTER_UPGRADE}) {
 					# stops script only on remove
 					autoscript($package,"prerm","prerm-init-norestart",
-						"s/#SCRIPT#/$script/g;s/#ERROR_HANDLER#/$dh{ERROR_HANDLER}/g");
+						{ 'SCRIPT' => $script, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} });
 				}
 				else {
 					# always stops script
 					autoscript($package,"prerm","prerm-init",
-						"s/#SCRIPT#/$script/g;s/#ERROR_HANDLER#/$dh{ERROR_HANDLER}/g");
+						{ 'SCRIPT' => $script, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} });
 				}
 			}
 			else {
 				# just update-rc.d
 				autoscript($package,"postinst", "postinst-init-nostart",
-					"s/#SCRIPT#/$script/g;s/#INITPARMS#/$params/g;s/#ERROR_HANDLER#/$dh{ERROR_HANDLER}/g");
+					{ 'SCRIPT' => $script, 'INITPARMS' => $params, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} });
 			}
 
 			# removes rc.d links
 			autoscript($package,"postrm","postrm-init",
-				"s/#SCRIPT#/$script/g;s/#ERROR_HANDLER#/$dh{ERROR_HANDLER}/g");
+				{ 'SCRIPT' => $script, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} });
 		}
 	}
 }
