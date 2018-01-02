@@ -182,6 +182,9 @@ sub testfile {
 		$File::Find::prune = 1 if -d _;
 		return;
 	}
+	# Ignore the .../debug/.build-id/ directory.  It is not really helpful
+	# to strip debug symbols.
+	$File::Find::prune = 1 if -d _ && index($fn, '/debug/.build-id/') > -1;
 	return if -d _;
 
 	# Is it a debug library in a debug subdir?
