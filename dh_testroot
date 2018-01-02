@@ -32,7 +32,7 @@ B<dh_testroot> returns successfully.
 =item Any other value than the above
 
 B<dh_testroot> asserts that it is either run as root (or under
-L<fakeroot(1)>) or the builder has provided the B<DPKG_GAIN_ROOT_CMD>
+L<fakeroot(1)>) or the builder has provided the B<DEB_GAIN_ROOT_CMD>
 environment variable (e.g. via dpkg-buildpackage -r).
 
 =back
@@ -66,8 +66,8 @@ exit 0 if $< == 0;
 if ($requirements eq 'legacy-root') {
 	error("You must run this as root (or use fakeroot).");
 } else {
-	my $env = $ENV{'DPKG_GAIN_ROOT_CMD'};
-	error("Package needs targetted root but builder has not provided a gain-root command via \${DPKG_GAIN_ROOT_CMD}")
+	my $env = $ENV{DEB_GAIN_ROOT_CMD} // $ENV{DPKG_GAIN_ROOT_CMD};
+	error("Package needs targetted root but builder has not provided a gain-root command via \${DEB_GAIN_ROOT_CMD}")
 		if not $env;
 }
 
