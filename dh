@@ -454,7 +454,7 @@ $sequences{'build-indep'} = [@bd];
 $sequences{'build-arch'} = [@bd];
 if (! compat(8)) {
 	# From v9, sequences take standard rules targets into account.
-	$sequences{build} = [@bd_minimal, to_rules_target("build-arch"), to_rules_target("build-indep")];
+	$sequences{build} = [to_rules_target("build-arch"), to_rules_target("build-indep")];
 	$sequences{'install-indep'} = [to_rules_target("build-indep"), @i];
 	$sequences{'install-arch'} = [to_rules_target("build-arch"), @i];
 	$sequences{'install'} = [to_rules_target("build"), to_rules_target("install-arch"), to_rules_target("install-indep")];
@@ -574,13 +574,27 @@ if (! exists $sequences{$sequence}) {
 	error "Unknown sequence $sequence (choose from: ".
 		join(" ", sort keys %sequences).")";
 }
-# In compat <= 9, the sequences are always inlined (those versions do not
-# recurse into debian/rules anyway).  In compat 10+, we never inline an
-# existing rules target.
-my @sequence = optimize_sequence(\%sequences, $sequence, (!compat(9) ? 0 : 1));
 
 # The list of all packages that can be acted on.
 my @packages=@{$dh{DOPACKAGES}};
+my @arch_packages = getpackages("arch");
+my @indep_packages = getpackages("indep");
+my %sequence2packages = (
+	'build-arch'   => \@arch_packages,
+	'install-arch' => \@arch_packages,
+	'binary-arch'  => \@arch_packages,
+
+	'build-indep'   => \@indep_packages,
+	'install-indep' => \@indep_packages,
+	'binary-indep'  => \@indep_packages,
+
+	'clean'   => \@packages,
+	'build'   => \@packages,
+	'install' => \@packages,
+	'binary'  => \@packages,
+);
+
+my %completed_sequences;
 
 # Get the options to pass to commands in the sequence.
 # Filter out options intended only for this program.
@@ -593,16 +607,14 @@ if ($sequence eq 'build-arch' ||
 	push @options, "-a";
 	# as an optimisation, remove from the list any packages
 	# that are not arch dependent
-	my %arch_packages = map { $_ => 1 } getpackages("arch");
-	@packages = grep { $arch_packages{$_} } @packages;
+	@packages = @{$sequence2packages{$sequence}};
 }
 elsif ($sequence eq 'build-indep' ||
        $sequence eq 'install-indep' ||
        $sequence eq 'binary-indep') {
 	push @options, "-i";
 	# ditto optimisation for arch indep
-	my %indep_packages = map { $_ => 1 } getpackages("indep");
-	@packages = grep { $indep_packages{$_} } @packages;
+	@packages = @{$sequence2packages{$sequence}};
 }
 while (@ARGV_orig) {
 	my $opt=shift @ARGV_orig;
@@ -647,18 +659,43 @@ while (@ARGV_orig) {
 }
 
 # Figure out at what point in the sequence to start for each package.
-my %logged;
-my %startpoint;
-my %stamp_file;
+my (%logged, %startpoint, %stamp_file);
 
-if ( -f $build_stamp_file) {
+if ( -f $build_stamp_file and not compat(9)) {
 	open(my $fd, '<', $build_stamp_file) or error("open($build_stamp_file, ro) failed: $!");
 	while (my $line = <$fd>) {
 		chomp($line);
 		$stamp_file{$line} = 1;
 	}
 	close($fd);
+	my $build_indep_target_done = 1;
+	my $build_arch_target_done = 1;
+	for my $pkg (@{$sequence2packages{'build-arch'}}) {
+		if (not $stamp_file{$pkg}) {
+			$build_arch_target_done = 0;
+			last;
+		}
+	}
+	for my $pkg (@{$sequence2packages{'build-indep'}}) {
+		if (not $stamp_file{$pkg}) {
+			$build_indep_target_done = 0;
+			last;
+		}
+	}
+	$completed_sequences{'build-arch'} = 1 if $build_arch_target_done;
+	$completed_sequences{'build-indep'} = 1 if $build_indep_target_done;
+	$completed_sequences{'build'} = 1 if $build_indep_target_done and $build_arch_target_done;
 }
+
+# In compat <= 9, the sequences are always inlined (those versions do not
+# recurse into debian/rules anyway).  In compat 10+, we never inline an
+# existing rules target.
+my ($rules_targets, $full_sequence) = optimize_sequence(\%sequences,
+														$sequence,
+														(!compat(9) ? 0 : 1),
+														\%completed_sequences
+														);
+
 
 # Lazy cache of the result of optimize_sequence on the "build"
 # sequence
@@ -673,8 +710,8 @@ foreach my $package (@packages) {
 			# everything (admittedly, it is bit of an over
 			# approximation)
 			# Related bug: #851071
-			my @seq = optimize_sequence(\%sequences, 'build', 1);
-			$optimized_build_seq = \@seq;
+			my (undef, $seq) = optimize_sequence(\%sequences, 'build', 1);
+			$optimized_build_seq = $seq;
 		}
 		@log = @{$optimized_build_seq};
 		# We do not need %logged in compat 10
@@ -682,13 +719,13 @@ foreach my $package (@packages) {
 	if ($dh{AFTER}) {
 		# Run commands in the sequence that come after the
 		# specified command.
-		$startpoint{$package}=command_pos($dh{AFTER}, @sequence) + 1;
+		$startpoint{$package} = command_pos($dh{AFTER}, @{$full_sequence}) + 1;
 		# Write a dummy log entry indicating that the specified
 		# command was, in fact, run. This handles the case where
 		# no commands remain to run after it, communicating to
 		# future dh instances that the specified command should not
 		# be run again.
-		write_log($sequence[$startpoint{$package}-1], $package);
+		write_log($full_sequence->[$startpoint{$package}-1], $package);
 	}
 	elsif ($dh{REMAINING}) {
 		# Start at the beginning so all remaining commands will get
@@ -701,8 +738,8 @@ foreach my $package (@packages) {
 		# command is in the sequence, we're starting at the beginning.. 			
 		$startpoint{$package}=0;
 COMMAND:	foreach my $command (reverse @log) {
-			foreach my $i (0..$#sequence) {
-				if ($command eq $sequence[$i]) {
+			foreach my $i (0..$#{$full_sequence}) {
+				if ($command eq $full_sequence->[$i]) {
 					$startpoint{$package}=$i+1;
 					last COMMAND;
 				}
@@ -712,24 +749,46 @@ COMMAND:	foreach my $command (reverse @log) {
 }
 
 # Figure out what point in the sequence to go to.
-my $stoppoint=$#sequence;
+my $stoppoint=$#{$full_sequence};
 if ($dh{UNTIL}) {
-	$stoppoint=command_pos($dh{UNTIL}, @sequence);
+	$stoppoint = command_pos($dh{UNTIL}, @{$full_sequence});
 }
 elsif ($dh{BEFORE}) {
-	$stoppoint=command_pos($dh{BEFORE}, @sequence) - 1;
+	$stoppoint = command_pos($dh{BEFORE}, @{$full_sequence}) - 1;
+}
+
+for my $rules_command (@{$rules_targets}) {
+	my $rules_target = extract_rules_target_name($rules_command)
+		// error("Internal error: $rules_command was not a rules target!?");
+	# Don't pass DH_ environment variables, since this is
+	# a fresh invocation of debian/rules and any sub-dh commands.
+	delete($ENV{DH_INTERNAL_OPTIONS});
+	delete($ENV{DH_INTERNAL_OVERRIDE});
+	run("debian/rules", $rules_target);
+	my $override_packages = $sequence2packages{$rules_target} // \@packages;
+	for my $package (@{$override_packages}) {
+		my (undef, $seq) = optimize_sequence(\%sequences, $rules_target, 1);
+		COMMAND: for my $c (reverse(@{$seq})) {
+			for my $j (0 .. $#{$full_sequence}) {
+				if ($c eq $full_sequence->[$j]) {
+					$startpoint{$package} = $j + 1;
+					last COMMAND;
+				}
+			}
+		}
+	}
 }
 
 # Now run the commands in the sequence.
 foreach my $i (0..$stoppoint) {
-	my $command=$sequence[$i];
+	my $command = $full_sequence->[$i];
 
 	# Figure out which packages need to run this command.
 	my @todo;
 	my @opts=@options;
 	foreach my $package (@packages) {
 		if ($startpoint{$package} > $i ||
-		    $logged{$package}{$sequence[$i]}) {
+		    $logged{$package}{$full_sequence->[$i]}) {
 			push @opts, "-N$package";
 		}
 		else {
@@ -739,14 +798,8 @@ foreach my $i (0..$stoppoint) {
 	next unless @todo;
 
 	my $rules_target = extract_rules_target_name($command);
-	if (defined $rules_target) {
-		# Don't pass DH_ environment variables, since this is
-		# a fresh invocation of debian/rules and any sub-dh commands.
-		delete $ENV{DH_INTERNAL_OPTIONS};
-		delete $ENV{DH_INTERNAL_OVERRIDE};
-		run("debian/rules", $rules_target);
-		next;
-	}
+	error("Internal error: $command is a rules target, but it is not supported to be!?") if defined($rules_target);
+
 	if (my $stamp_file = stamp_target($command)) {
 		my %seen;
 		print "   create-stamp ".escape_shell($stamp_file)."\n";

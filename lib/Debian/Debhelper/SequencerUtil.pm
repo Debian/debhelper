@@ -32,7 +32,7 @@ sub to_rules_target  {
 }
 
 sub optimize_sequence {
-	my ($sequences, $sequence_name, $always_inline) = @_;
+	my ($sequences, $sequence_name, $always_inline, $completed_sequences) = @_;
 	my (@sequence, @targets, %seen, %non_inlineable_targets, @stack);
 	push(@stack, [@{$sequences->{$sequence_name}}]);
 	while (@stack) {
@@ -41,6 +41,7 @@ sub optimize_sequence {
 		while (@{$current_sequence}) {
 			my $command = shift(@{$current_sequence});
 			my $rules_target=extract_rules_target_name($command);
+			next if (defined($rules_target) and exists($completed_sequences->{$rules_target}));
 			if (defined($rules_target) &&
 				! exists($non_inlineable_targets{$rules_target}) &&
 				! defined(rules_explicit_target($rules_target))) {
@@ -69,7 +70,7 @@ sub optimize_sequence {
 			}
 		}
 	}
-	return (@targets, @sequence);
+	return (\@targets, \@sequence);
 }
 
 
