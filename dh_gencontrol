@@ -194,7 +194,13 @@ sub read_dbgsym_migration {
 }
 
 sub read_dbgsym_build_ids {
-	return read_dbgsym_file('dbgsym-build-ids', @_);
+	my $res = read_dbgsym_file('dbgsym-build-ids', @_);
+	my (%seen, @unique);
+	for my $id (split(' ', $res)) {
+		next if $seen{$id}++;
+		push(@unique, $id);
+	}
+	return join(' ', @unique);
 }
 
 =head1 SEE ALSO
