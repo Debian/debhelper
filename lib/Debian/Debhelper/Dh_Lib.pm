@@ -921,12 +921,18 @@ sub _tool_version {
 # 3: filename of snippet
 # 4: either text: shell-quoted sed to run on the snippet. Ie, 's/#PACKAGE#/$PACKAGE/'
 #    or a sub to run on each line of the snippet. Ie sub { s/#PACKAGE#/$PACKAGE/ }
+#    or a hashref with keys being variables and values being their replacement.  Ie. { PACKAGE => $PACKAGE }
+# 5: Internal usage only
 sub autoscript {
-	my ($package, $script, $filename, $sed) = @_;
+	my ($package, $script, $filename, $sed, $extra_options) = @_;
 
 	my $tool_version = _tool_version();
 	# This is the file we will modify.
 	my $outfile="debian/".pkgext($package)."$script.debhelper";
+	if ($extra_options && exists($extra_options->{'snippet-order'})) {
+		my $order = $extra_options->{'snippet-order'};
+		$outfile = generated_file($package, "${script}.${order}");
+	}
 
 	# Figure out what shell script snippet to use.
 	my $infile;
@@ -1618,6 +1624,18 @@ sub is_udeb {
 	}
 }
 
+sub _concat_slurp_script_files {
+	my (@files) = @_;
+	my $res = '';
+	for my $file (@files) {
+		open(my $fd, '<', $file) or error("open($file) failed: $!");
+		my $f = <$fd>;
+		close($fd);
+		$res .= $f;
+	}
+	return $res;
+}
+
 # Handles #DEBHELPER# substitution in a script; also can generate a new
 # script from scratch if none exists but there is a .debhelper file for it.
 sub debhelper_script_subst {
@@ -1627,34 +1645,56 @@ sub debhelper_script_subst {
 	my $tmp=tmpdir($package);
 	my $ext=pkgext($package);
 	my $file=pkgfile($package,$script);
+	my $service_script = generated_file($package, "${script}.service", 0);
+	my @generated_scripts = ("debian/$ext$script.debhelper", $service_script);
+	if ($script eq 'prerm' or $script eq 'postrm') {
+		@generated_scripts = reverse(@generated_scripts);
+	}
+	@generated_scripts = grep { -f } @generated_scripts;
 
 	if ($file ne '') {
-		if (-f "debian/$ext$script.debhelper") {
+		if (@generated_scripts) {
+			if ($dh{VERBOSE}) {
+				verbose_print('cp -f ' . escape_shell($file) . " $tmp/DEBIAN/$script");
+				verbose_print("perl -p -i -e s~#DEBHELPER#~qx{cat @generated_scripts}~eg\" $tmp/DEBIAN/$script");
+			}
 			# Add this into the script, where it has #DEBHELPER#
-			doit({ stdout => "$tmp/DEBIAN/$script" }, 'perl', '-pe',
-				 "s~#DEBHELPER#~qx{cat debian/$ext$script.debhelper}~eg", $file);
-		}
-		else {
+			my $text = _concat_slurp_script_files(@generated_scripts);
+			if (not $dh{NO_ACT}) {
+				open(my $out_fd, '>', "$tmp/DEBIAN/$script") or error("open($tmp/DEBIAN/$script) failed: $!");
+				open(my $in_fd, '<', $file) or error("open($file) failed: $!");
+				while (my $line = <$in_fd>) {
+					$line =~ s/#DEBHELPER#/$text/g;
+					print {$out_fd} $line;
+				}
+				close($in_fd);
+				close($out_fd) or error("close($tmp/DEBIAN/$script) failed: $!");
+			}
+		} else {
 			# Just get rid of any #DEBHELPER# in the script.
 			doit({ stdout => "$tmp/DEBIAN/$script" }, 'sed', 's/#DEBHELPER#//', $file);
 		}
 		reset_perm_and_owner('0755', "$tmp/DEBIAN/$script");
 	}
-	elsif ( -f "debian/$ext$script.debhelper" ) {
+	elsif (@generated_scripts) {
 		if ($dh{VERBOSE}) {
 			verbose_print(q{printf '#!/bin/sh\nset -e\n' > } . "$tmp/DEBIAN/$script");
-			verbose_print("cat debian/$ext$script.debhelper >> $tmp/DEBIAN/$script");
+			verbose_print("cat @generated_scripts >> $tmp/DEBIAN/$script");
 		}
-		open(my $out_fd, '>', "$tmp/DEBIAN/$script") or error("open($tmp/DEBIAN/$script): $!");
-		print {$out_fd} "#!/bin/sh\n";
-		print {$out_fd} "set -e\n";
-		open(my $in_fd, '<', "debian/$ext$script.debhelper")
-			or error("open(debian/$ext$script.debhelper): $!");
-		while (my $line = <$in_fd>) {
-			print {$out_fd} $line;
+		if (not $dh{NO_ACT}) {
+			open(my $out_fd, '>', "$tmp/DEBIAN/$script") or error("open($tmp/DEBIAN/$script): $!");
+			print {$out_fd} "#!/bin/sh\n";
+			print {$out_fd} "set -e\n";
+			for my $generated_script (@generated_scripts) {
+				open(my $in_fd, '<', $generated_script)
+					or error("open($generated_script) failed: $!");
+				while (my $line = <$in_fd>) {
+					print {$out_fd} $line;
+				}
+				close($in_fd);
+			}
+			close($out_fd) or error("close($tmp/DEBIAN/$script) failed: $!");
 		}
-		close($in_fd);
-		close($out_fd) or error("close($tmp/DEBIAN/$script): $!");
 		reset_perm_and_owner('0755', "$tmp/DEBIAN/$script");
 	}
 }

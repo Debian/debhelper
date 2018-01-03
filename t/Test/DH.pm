@@ -37,7 +37,7 @@ our @EXPORT = qw(
     each_compat_up_to_and_incl_subtest each_compat_subtest
     each_compat_from_and_above_subtest run_dh_tool
     uid_0_test_is_ok create_empty_file readlines
-    error
+    error find_script
 );
 
 our ($TEST_DH_COMPAT, $ROOT_OK, $ROOT_CMD);
@@ -196,6 +196,26 @@ sub readlines {
     close $h;
     chop @lines;
     return \@lines;
+}
+
+# In *inst order (find_script will shuffle them around for *rm order)
+my @SNIPPET_FILE_TEMPLATES = (
+	'debian/#PACKAGE#.#SCRIPT#.debhelper',
+	'debian/.debhelper/generated/#PACKAGE#/#SCRIPT#.service',
+);
+
+sub find_script {
+	my ($package, $script) = @_;
+	my @files;
+	for my $template (@SNIPPET_FILE_TEMPLATES) {
+		my $file = ($template =~ s/#PACKAGE#/$package/r);
+		$file =~ s/#SCRIPT#/$script/;
+		push(@files, $file) if -f $file;
+	}
+	if ($script eq 'postrm' or $script eq 'prerm') {
+		@files = reverse(@files);
+	}
+	return @files;
 }
 
 1;
