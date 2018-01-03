@@ -210,6 +210,8 @@ sub extract_key {
 my %requested_files = map { basename($_) => 1 } @ARGV;
 my %installed_files;
 
+my %snippet_options = ('snippet-order' => 'service');
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmpdir = tmpdir($package);
 	my (@installed_units, @start_units,  @enable_units, %aliases, @tmpfiles);
@@ -349,9 +351,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		for my $unit (sort @enable_units) {
 			my $base = q{'} . basename($unit) . q{'};
 			if ($dh{NO_ENABLE}) {
-				autoscript($package, 'postinst', 'postinst-systemd-dont-enable', { 'UNITFILE' => $base });
+				autoscript($package, 'postinst', 'postinst-systemd-dont-enable', { 'UNITFILE' => $base },
+					\%snippet_options);
 			} else {
-				autoscript($package, 'postinst', 'postinst-systemd-enable', { 'UNITFILE' => $base });
+				autoscript($package, 'postinst', 'postinst-systemd-enable', { 'UNITFILE' => $base },
+					\%snippet_options);
 			}
 		}
 		my $enableunitargs = join(' ', sort map { q{'} . basename($_) . q{'} } @enable_units);
@@ -364,7 +368,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		my $startunitargs = join(' ', sort map { q{'} . basename($_) . q{'} } @start_units);
 		my $start_autoscript = sub {
 			my ($script, $filename) = @_;
-			autoscript($package, $script, $filename, { 'UNITFILES' => $startunitargs });
+			autoscript($package, $script, $filename, { 'UNITFILES' => $startunitargs },
+				\%snippet_options);
 		};
 
 		if ($dh{RESTART_AFTER_UPGRADE}) {

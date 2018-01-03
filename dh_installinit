@@ -225,6 +225,8 @@ init(options => {
 
 # PROMISE: DH NOOP WITHOUT service tmpfile default upstart init init.d tmp(usr/lib/tmpfiles.d) tmp(etc/tmpfiles.d)
 
+my %snippet_options = ('snippet-order' => 'service');
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 
@@ -358,34 +360,40 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 					# update-rc.d, and restart (or
 					# start if new install) script
 					autoscript($package,"postinst", "postinst-init-restart",
-						{ 'SCRIPT' => $script, 'INITPARMS' => $params, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} });
+						{ 'SCRIPT' => $script, 'INITPARMS' => $params, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} },
+						\%snippet_options);
 				}
 				else {
 					# update-rc.d, and start script
 					autoscript($package,"postinst", "postinst-init",
-						{ 'SCRIPT' => $script, 'INITPARMS' => $params, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} });
+						{ 'SCRIPT' => $script, 'INITPARMS' => $params, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} },
+						\%snippet_options);
 				}
 			
 				if ($dh{R_FLAG} || $dh{RESTART_AFTER_UPGRADE}) {
 					# stops script only on remove
 					autoscript($package,"prerm","prerm-init-norestart",
-						{ 'SCRIPT' => $script, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} });
+						{ 'SCRIPT' => $script, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} },
+						\%snippet_options);
 				}
 				else {
 					# always stops script
 					autoscript($package,"prerm","prerm-init",
-						{ 'SCRIPT' => $script, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} });
+						{ 'SCRIPT' => $script, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} },
+						\%snippet_options);
 				}
 			}
 			else {
 				# just update-rc.d
 				autoscript($package,"postinst", "postinst-init-nostart",
-					{ 'SCRIPT' => $script, 'INITPARMS' => $params, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} });
+					{ 'SCRIPT' => $script, 'INITPARMS' => $params, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} },
+					\%snippet_options);
 			}
 
 			# removes rc.d links
 			autoscript($package,"postrm","postrm-init",
-				{ 'SCRIPT' => $script, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} });
+				{ 'SCRIPT' => $script, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} },
+				\%snippet_options);
 		}
 	}
 }

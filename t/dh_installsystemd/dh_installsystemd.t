@@ -26,10 +26,12 @@ sub unit_is_enabled {
 	my @output;
 	my $matches;
 	$num_masks = $num_masks // $num_enables;
-	@output=`cat debian/$package.postinst.debhelper`;
+	my @postinst_snippets = find_script($package, 'postinst');
+	@output=`cat @postinst_snippets` if @postinst_snippets;
 	$matches = grep { m{^if deb-systemd-helper .* was-enabled .*'\Q$unit\E\.service'} } @output;
 	ok($matches == $num_enables) or diag("$unit appears to have been enabled $matches times (expected $num_enables)");
-	@output=`cat debian/$package.postrm.debhelper`;
+	my @postrm_snippets = find_script($package, 'postrm');
+	@output=`cat @postrm_snippets` if @postrm_snippets;
 	$matches = grep { m{deb-systemd-helper mask.*'\Q$unit\E\.service'} } @output;
 	ok($matches == $num_masks) or diag("$unit appears to have been masked $matches times (expected $num_masks)");
 }
@@ -38,10 +40,12 @@ sub unit_is_started {
 	my @output;
 	my $matches;
 	$num_stops = $num_stops // $num_starts;
-	@output=`cat debian/$package.postinst.debhelper`;
+	my @postinst_snippets = find_script($package, 'postinst');
+	@output=`cat @postinst_snippets` if @postinst_snippets;
 	$matches = grep { m{deb-systemd-invoke \$_dh_action .*'\Q$unit\E.service'} } @output;
 	ok($matches == $num_starts) or diag("$unit appears to have been started $matches times (expected $num_starts)");
-	@output=`cat debian/$package.prerm.debhelper`;
+	my @prerm_snippets = find_script($package, 'prerm');
+	@output=`cat @prerm_snippets` if @prerm_snippets;
 	$matches = grep { m{deb-systemd-invoke stop .*'\Q$unit\E.service'} } @output;
 	ok($matches == $num_stops) or diag("$unit appears to have been stopped $matches times (expected $num_stops)");
 }
@@ -50,7 +54,7 @@ sub unit_is_started {
 each_compat_subtest {
 	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
-	ok(-e "debian/foo.postinst.debhelper");
+	ok(find_script('foo', 'postinst'));
 	unit_is_enabled('foo', 'foo', 1);
 	unit_is_started('foo', 'foo', 1);
 	unit_is_enabled('foo', 'foo2', 0);
@@ -61,7 +65,7 @@ each_compat_subtest {
 	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
 	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
-	ok(-e "debian/foo.postinst.debhelper");
+	ok(find_script('foo', 'postinst'));
 	unit_is_enabled('foo', 'foo', 1);
 	unit_is_started('foo', 'foo', 1);
 	unit_is_enabled('foo', 'foo2', 1);
@@ -72,7 +76,7 @@ each_compat_subtest {
 	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
 	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd', '--no-start'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
-	ok(-e "debian/foo.postinst.debhelper");
+	ok(find_script('foo', 'postinst'));
 	unit_is_enabled('foo', 'foo', 1);
 	unit_is_started('foo', 'foo', 0, 1); # present units are stopped on remove even if no start
 	unit_is_enabled('foo', 'foo2', 1);
@@ -84,7 +88,7 @@ each_compat_subtest {
 	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd', '--no-start', 'debian/foo.service'));
 	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd', '-p', 'foo', 'foo2.service'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
-	ok(-e "debian/foo.postinst.debhelper");
+	ok(find_script('foo', 'postinst'));
 	unit_is_enabled('foo', 'foo', 1);
 	unit_is_started('foo', 'foo', 0, 1);
 	unit_is_enabled('foo', 'foo2', 1);
@@ -96,7 +100,7 @@ each_compat_subtest {
 	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd', '--no-enable', 'debian/foo.service'));
 	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd', '-p', 'foo', 'foo2.service'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
-	ok(-e "debian/foo.postinst.debhelper");
+	ok(find_script('foo', 'postinst'));
 	unit_is_enabled('foo', 'foo', 0, 1); # Disabled units are still masked on removal
 	unit_is_started('foo', 'foo', 1, 1);
 	unit_is_enabled('foo', 'foo2', 1);
@@ -105,7 +109,9 @@ each_compat_subtest {
 
 	make_path('debian/foo/lib/systemd/system/');
 	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd', '--no-restart-after-upgrade'));
-        my $matches = grep { m{deb-systemd-invoke start .*foo.service} } `cat debian/foo.postinst.debhelper`;
+	my @foo_postinst = find_script('foo', 'postinst');
+	ok(@foo_postinst);
+	my $matches = @foo_postinst ? grep { m{deb-systemd-invoke start .*foo.service} } `cat @foo_postinst` : -1;
 	ok($matches == 1);
 	ok(run_dh_tool('dh_clean'));
 
