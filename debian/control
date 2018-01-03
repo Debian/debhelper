@@ -28,7 +28,11 @@ Depends: autotools-dev,
          po-debconf,
          ${misc:Depends},
          ${perl:Depends}
-Breaks: dh-systemd (<< 1.38), cmake (<< 3.9~)
+Breaks: dh-systemd (<< 1.38),
+# To ensure cmake understands -DCMAKE_INSTALL_RUNSTATEDIR=/run as used in compat 11
+# - Can be dropped (with the caveat that cmake packages may behave differently
+#   depending on the version of cmake).
+        cmake (<< 3.9~),
 Replaces: dh-systemd (<< 1.38)
 Suggests: dh-make, dwz
 Multi-Arch: foreign
