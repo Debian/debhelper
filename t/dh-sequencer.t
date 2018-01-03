@@ -7,10 +7,8 @@ use Test::More;
 use Debian::Debhelper::SequencerUtil;
 
 # Shorten variants of the sequences.
-my @bd_minimal = qw{
-	dh_testdir
-};
 my @bd = (qw{
+	dh_testdir
 	dh_auto_configure
 	dh_auto_build
 	dh_auto_test
@@ -35,9 +33,9 @@ my @b=qw{
 };
 
 my %sequences = (
-    'build-indep' => [@bd_minimal, @bd],
-    'build-arch'  => [@bd_minimal, @bd],
-    'build'       => [@bd_minimal, to_rules_target("build-arch"), to_rules_target("build-indep")],
+    'build-indep' => [@bd],
+    'build-arch'  => [@bd],
+    'build'       => [to_rules_target("build-arch"), to_rules_target("build-indep")],
 
     'install-indep' => [to_rules_target("build-indep"), @i],
     'install-arch'  => [to_rules_target("build-arch"), @i],
@@ -58,27 +56,27 @@ $Debian::Debhelper::SequencerUtil::RULES_PARSED = 1;
 
 is_deeply(
     [optimize_sequence(\%sequences, 'build')],
-    [[], [@bd_minimal, @bd]],
+    [[], [@bd]],
     'Inlined build sequence matches build-indep/build-arch');
 
 is_deeply(
     [optimize_sequence(\%sequences, 'install')],
-    [[], [@bd_minimal, @bd, @i]],
+    [[], [@bd, @i]],
     'Inlined install sequence matches build-indep/build-arch + install commands');
 
 is_deeply(
     [optimize_sequence(\%sequences, 'binary-arch')],
-    [[], [@bd_minimal, @bd, @i, @ba, @b]],
+    [[], [@bd, @i, @ba, @b]],
     'Inlined binary-arch sequence has all the commands');
 
 is_deeply(
     [optimize_sequence(\%sequences, 'binary-indep')],
-    [[], [@bd_minimal, @bd, @i, @b]],
+    [[], [@bd, @i, @b]],
     'Inlined binary-indep sequence has all the commands except @bd');
 
 is_deeply(
     [optimize_sequence(\%sequences, 'binary')],
-    [[], [@bd_minimal, @bd, @i, @ba, @b]],
+    [[], [@bd, @i, @ba, @b]],
     'Inlined binary sequence has all the commands');
 
 
@@ -102,7 +100,7 @@ is_deeply(
 
     is_deeply(
         [optimize_sequence(\%sequences, 'build')],
-        [[], [@bd_minimal, @bd]],
+        [[], [@bd]],
         'build sequence is inlineable');
 
 }
@@ -114,7 +112,7 @@ is_deeply(
         [optimize_sequence(\%sequences, 'binary')],
 		# @bd_minimal, @bd and @i should be "-i"-only, @ba + @b should be both.
 		# Unfortunately, optimize_sequence cannot show that.
-        [[to_rules_target('install-arch')], [@bd_minimal, @bd, @i, @ba, @b]],
+        [[to_rules_target('install-arch')], [@bd, @i, @ba, @b]],
         'Inlined binary sequence has all the commands');
 }
 
