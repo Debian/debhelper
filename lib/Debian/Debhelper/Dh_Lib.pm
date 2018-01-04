@@ -931,6 +931,8 @@ sub autoscript {
 	my $outfile="debian/".pkgext($package)."$script.debhelper";
 	if ($extra_options && exists($extra_options->{'snippet-order'})) {
 		my $order = $extra_options->{'snippet-order'};
+		error("Internal error - snippet order set to unknown value: \"${order}\"")
+			if $order ne 'service';
 		$outfile = generated_file($package, "${script}.${order}");
 	}
 
