@@ -695,6 +695,7 @@ my ($rules_targets, $full_sequence) = optimize_sequence(\%sequences,
 														(!compat(9) ? 0 : 1),
 														\%completed_sequences
 														);
+my $stoppoint = $#{$full_sequence};
 
 if (compat(9)) {
 	foreach my $package (@packages) {
@@ -731,19 +732,16 @@ if (compat(9)) {
 			}
 		}
 	}
+	# Figure out what point in the sequence to go to.
+	if ($dh{UNTIL}) {
+		$stoppoint = command_pos($dh{UNTIL}, @{$full_sequence});
+	} elsif ($dh{BEFORE}) {
+		$stoppoint = command_pos($dh{BEFORE}, @{$full_sequence}) - 1;
+	}
 } else {
 	foreach my $package (@packages) {
 		$startpoint{$package} = 0;
 	}
-}
-
-# Figure out what point in the sequence to go to.
-my $stoppoint=$#{$full_sequence};
-if ($dh{UNTIL}) {
-	$stoppoint = command_pos($dh{UNTIL}, @{$full_sequence});
-}
-elsif ($dh{BEFORE}) {
-	$stoppoint = command_pos($dh{BEFORE}, @{$full_sequence}) - 1;
 }
 
 for my $rules_command (@{$rules_targets}) {
