@@ -758,7 +758,16 @@ for my $rules_command (@{$rules_targets}) {
 		COMMAND: for my $c (reverse(@{$seq})) {
 			for my $j (0 .. $#{$full_sequence}) {
 				if ($c eq $full_sequence->[$j]) {
-					$startpoint{$package} = $j + 1;
+					# Unfortunately, we do not guarantee any order
+					# between the run targets.  Assuming e.g.
+					# "install-arch" and "build" are opague targets
+					# then we could process "install-arch" first and
+					# then "build".  In this case, it is important
+					# that we do not "reset" the starting point for
+					# "arch" packages.  Otherwise, we might repeat
+					# part of the "install-arch" sequence when we
+					# should not.
+					$startpoint{$package} = $j + 1 if $j + 1 > startpoint{$package};
 					last COMMAND;
 				}
 			}
