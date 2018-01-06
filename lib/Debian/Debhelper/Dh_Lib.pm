@@ -1631,7 +1631,7 @@ sub _concat_slurp_script_files {
 	my $res = '';
 	for my $file (@files) {
 		open(my $fd, '<', $file) or error("open($file) failed: $!");
-		my $f = <$fd>;
+		my $f = join('', <$fd>);
 		close($fd);
 		$res .= $f;
 	}
