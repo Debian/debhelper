@@ -317,7 +317,10 @@ sub _in_dir {
 
 sub _generic_doit_in_dir {
 	my ($this, $dir, $sub, @args) = @_;
-	my %args = ref($args[0]) ? %{$args[0]} : ();
+	my %args;
+	if (ref($args[0])) {
+		%args = %{shift(@args)};
+	}
 	$args{chdir} = $dir;
 	return $sub->(\%args, @args);
 }
