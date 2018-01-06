@@ -182,7 +182,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$major=$2;
 		} elsif ($ret =~ m/\s+SONAME\s+(?:\S)/) {
 			$unversioned_so = 1;
-			push(@lib_files, $lib_file);
+			push(@lib_files, $lib_file) if not compat(11);
 		}
 
 		if (defined($dh{M_PARAMS}) && $dh{M_PARAMS} ne '') {
