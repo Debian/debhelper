@@ -687,12 +687,12 @@ if ( -f $build_stamp_file and not compat(9)) {
 	$completed_sequences{'build'} = 1 if $build_indep_target_done and $build_arch_target_done;
 }
 
-# In compat <= 9, the sequences are always inlined (those versions do not
-# recurse into debian/rules anyway).  In compat 10+, we never inline an
+# In compat <= 8, the sequences are always inlined (those versions do not
+# recurse into debian/rules anyway).  In compat 9+, we never inline an
 # existing rules target.
 my ($rules_targets, $full_sequence) = optimize_sequence(\%sequences,
 														$sequence,
-														(!compat(9) ? 0 : 1),
+														(!compat(8) ? 0 : 1),
 														\%completed_sequences
 														);
 my $stoppoint = $#{$full_sequence};
