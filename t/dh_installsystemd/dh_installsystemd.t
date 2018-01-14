@@ -28,7 +28,10 @@ sub unit_is_enabled {
 	$num_masks = $num_masks // $num_enables;
 	my @postinst_snippets = find_script($package, 'postinst');
 	@output=`cat @postinst_snippets` if @postinst_snippets;
-	$matches = grep { m{^if deb-systemd-helper .* was-enabled .*'\Q$unit\E\.service'} } @output;
+	# Match exactly one tab; the "dont-enable" script has an "enable"
+	# line for re-enabling the service if the admin had it enabled.
+	# But we do not want to include that in our count.
+	$matches = grep { m{^\tif deb-systemd-helper .* was-enabled .*'\Q$unit\E\.service'} } @output;
 	ok($matches == $num_enables) or diag("$unit appears to have been enabled $matches times (expected $num_enables)");
 	my @postrm_snippets = find_script($package, 'postrm');
 	@output=`cat @postrm_snippets` if @postrm_snippets;
