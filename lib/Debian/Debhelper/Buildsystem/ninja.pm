@@ -44,38 +44,54 @@ sub check_auto_buildable {
 
 sub build {
 	my $this=shift;
-
+	my %options = (
+		update_env => {
+			'LC_ALL' => 'C.UTF-8',
+		}
+	);
 	if (!$dh{QUIET}) {
 		unshift @_, "-v";
 	}
 	if ($this->get_parallel() > 0) {
 		unshift @_, "-j" . $this->get_parallel();
 	}
-	$this->doit_in_builddir($this->{buildcmd}, @_);
+	$this->doit_in_builddir(\%options, $this->{buildcmd}, @_);
 }
 
 sub test {
 	my $this=shift;
-
+	my %options = (
+		update_env => {
+			'LC_ALL' => 'C.UTF-8',
+		}
+	);
 	if ($this->get_parallel() > 0) {
-		$ENV{MESON_TESTTHREADS}=$this->get_parallel();
+		$options{update_env}{MESON_TESTTHREADS} = $this->get_parallel();
 	}
-	$this->doit_in_builddir($this->{buildcmd}, "test", @_);
+	$this->doit_in_builddir(\%options, $this->{buildcmd}, "test", @_);
 }
 
 sub install {
 	my $this=shift;
 	my $destdir=shift;
-
-	$ENV{DESTDIR}=$destdir;
-	$this->doit_in_builddir($this->{buildcmd}, "install", @_);
+	my %options = (
+		update_env => {
+			'LC_ALL'  => 'C.UTF-8',
+			'DESTDIR' => $destdir,
+		}
+	);
+	$this->doit_in_builddir(\%options, $this->{buildcmd}, "install", @_);
 }
 
 sub clean {
 	my $this=shift;
-
 	if (!$this->rmdir_builddir()) {
-		$this->doit_in_builddir($this->{buildcmd}, "clean", @_);
+		my %options = (
+			update_env => {
+				'LC_ALL'  => 'C.UTF-8',
+			}
+		);
+		$this->doit_in_builddir(\%options, $this->{buildcmd}, "clean", @_);
 	}
 }
 

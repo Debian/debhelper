@@ -9,6 +9,9 @@ debhelper (11.1.3) UNRELEASED; urgency=medium
   * Dh_Lib.pm: When printing commands (e.g. for doit), also show
     changes to the environment (when done as a part of the
     command).
+  * ninja.pm: Set LC_ALL=C.UTF-8 when calling ninja to avoid
+    meson choking on UTF-8 characters when it embeds itself into
+    e.g. the build or install.  (Closes: #873831)
 
  -- Niels Thykier <niels@thykier.net>  Sun, 14 Jan 2018 09:54:57 +0000
 
