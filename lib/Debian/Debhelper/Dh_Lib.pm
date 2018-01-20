@@ -364,6 +364,25 @@ sub _format_cmdline {
 	my (@cmd) = @_;
 	my $options = ref($cmd[0]) ? shift(@cmd) : {};
 	my $cmd_line = escape_shell(@cmd);
+	if (defined(my $update_env = $options->{update_env})) {
+		my $need_env = 0;
+		my @params;
+		for my $key (sort(keys(%{$update_env}))) {
+			my $value = $update_env->{$key};
+			if (defined($value)) {
+				my $quoted_key = escape_shell($key);
+				push(@params, join('=', $quoted_key, escape_shell($value)));
+				# shell does not like: "FU BAR"=1 cmd
+				# if the ENV key has weird symbols, the best bet is to use env
+				$need_env = 1 if $quoted_key ne $key;
+			} else {
+				$need_env = 1;
+				push(@params, escape_shell("--unset=${key}"));
+			}
+		}
+		unshift(@params, 'env', '--') if $need_env;
+		$cmd_line = join(' ', @params, $cmd_line);
+	}
 	if (defined(my $dir = $options->{chdir})) {
 		$cmd_line = join(' ', 'cd', escape_shell($dir), '&&', $cmd_line) if $dir ne '.';
 	}
