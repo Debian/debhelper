@@ -8,10 +8,8 @@ sub DESCRIPTION {
 	"qmake for QT 4 (*.pro)";
 }
 
-sub configure {
-	my $this=shift;
-	$Debian::Debhelper::Buildsystem::qmake::qmake="qmake-qt4";
-	$this->SUPER::configure(@_);
+sub _qmake {
+	return 'qmake-qt4';
 }
 
 1

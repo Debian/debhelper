@@ -11,8 +11,6 @@ use warnings;
 use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value error generated_file is_cross_compiling);
 use parent qw(Debian::Debhelper::Buildsystem::makefile);
 
-our $qmake="qmake";
-
 my %OS_MKSPEC_MAPPING = (
 	'linux'    => 'linux-g++',
 	'kfreebsd' => 'gnukfreebsd-g++',
@@ -134,7 +132,7 @@ sub configure {
 	}
 
 	$this->mkdir_builddir();
-	$this->doit_in_builddir($qmake, @options, @flags, @_);
+	$this->doit_in_builddir($this->_qmake(), @options, @flags, @_);
 }
 
 sub install {
@@ -144,6 +142,10 @@ sub install {
 	# qmake generated Makefiles use INSTALL_ROOT in install target
 	# where one would expect DESTDIR to be used.
 	$this->SUPER::install($destdir, "INSTALL_ROOT=$destdir", @_);
+}
+
+sub _qmake {
+	return 'qmake';
 }
 
 1
