@@ -242,10 +242,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			verbose_print('echo ' . escape_shell($_) . ' >> ' . escape_shell("$tmp/DEBIAN/shlibs"))
 				for @deb_lines, @udeb_lines;
 		}
-		open(my $shlibs_fd, '>', "$tmp/DEBIAN/shlibs") or error("open($tmp/DEBIAN/shlibs): $!");
-		# Write the shlibs file with the udeb: lines last.
-		print {$shlibs_fd} "$_\n" for @deb_lines, @udeb_lines;
-		close($shlibs_fd) or error("close($tmp/DEBIAN/shlibs");
+		if (not $dh{NO_ACT}) {
+			open(my $shlibs_fd, '>', "$tmp/DEBIAN/shlibs") or error("open($tmp/DEBIAN/shlibs): $!");
+			# Write the shlibs file with the udeb: lines last.
+			print {$shlibs_fd} "$_\n" for @deb_lines, @udeb_lines;
+			close($shlibs_fd) or error("close($tmp/DEBIAN/shlibs");
+		}
 	}
 
 	if (-e "$tmp/DEBIAN/shlibs") {
