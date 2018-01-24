@@ -289,6 +289,9 @@ foreach my $package (getpackages()) {
 		if (not defined($target_package)) {
 			warning("Cannot auto-detect main package for ${package}.  If the default is wrong, please use --doc-main-package");
 			$target_package = $package;
+		} elsif ($dh{PARAMS_ALL} and $package ne $target_package and not $dh{DOC_MAIN_PACKAGE}) {
+			warning("Not using auto-detected $target_package as main doc package for $package: With -A/--all, this would cause file-conflicts.");
+			$target_package = $package;
 		}
 		if ($dh{EXCLUDE_FIND}) {
 			$exclude .= ' -and ! \( '.$dh{EXCLUDE_FIND}.' \)';
