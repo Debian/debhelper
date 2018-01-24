@@ -6,6 +6,10 @@ debhelper (11.1.4) UNRELEASED; urgency=medium
   * dh_installdocs: Discard auto-detected main doc package when
     passed -A/--all as it causes file-conflicts.
     (Closes: #886108, #888294)
+  * Dh_Lib: Fix regression where "foo{bar}" would not be matched
+    when the pattern was handled as a glob.  The bug was
+    introduced in debhelper/10.6.  Thanks to Wouter Verhelst for
+    finding the bug.  (Closes: #888251)
 
  -- Niels Thykier <niels@thykier.net>  Sun, 21 Jan 2018 08:18:20 +0000
 
