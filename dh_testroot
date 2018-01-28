@@ -66,7 +66,7 @@ exit 0 if $< == 0;
 if ($requirements eq 'legacy-root') {
 	error("You must run this as root (or use fakeroot).");
 } else {
-	my $env = $ENV{DEB_GAIN_ROOT_CMD} // $ENV{DPKG_GAIN_ROOT_CMD};
+	my $env = $ENV{DEB_GAIN_ROOT_CMD};
 	error("Package needs targetted root but builder has not provided a gain-root command via \${DEB_GAIN_ROOT_CMD}")
 		if not $env;
 }

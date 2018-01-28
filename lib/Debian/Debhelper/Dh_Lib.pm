@@ -1526,7 +1526,7 @@ sub should_use_root {
 
 # Returns the "gain root command" as a list suitable for passing as a part of the command to "doit()"
 sub gain_root_cmd {
-	my $raw_cmd = $ENV{DEB_GAIN_ROOT_CMD} // $ENV{DPKG_GAIN_ROOT_CMD};
+	my $raw_cmd = $ENV{DEB_GAIN_ROOT_CMD};
 	return if not defined($raw_cmd) or $raw_cmd =~ m/^\s*+$/;
 	return split(' ', $raw_cmd);
 }
