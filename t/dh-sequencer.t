@@ -55,33 +55,33 @@ $Debian::Debhelper::SequencerUtil::RULES_PARSED = 1;
 
 
 is_deeply(
-    [optimize_sequence(\%sequences, 'build')],
+    [unpack_sequence(\%sequences, 'build')],
     [[], [@bd]],
     'Inlined build sequence matches build-indep/build-arch');
 
 is_deeply(
-    [optimize_sequence(\%sequences, 'install')],
+    [unpack_sequence(\%sequences, 'install')],
     [[], [@bd, @i]],
     'Inlined install sequence matches build-indep/build-arch + install commands');
 
 is_deeply(
-    [optimize_sequence(\%sequences, 'binary-arch')],
+    [unpack_sequence(\%sequences, 'binary-arch')],
     [[], [@bd, @i, @ba, @b]],
     'Inlined binary-arch sequence has all the commands');
 
 is_deeply(
-    [optimize_sequence(\%sequences, 'binary-indep')],
+    [unpack_sequence(\%sequences, 'binary-indep')],
     [[], [@bd, @i, @b]],
     'Inlined binary-indep sequence has all the commands except @bd');
 
 is_deeply(
-    [optimize_sequence(\%sequences, 'binary')],
+    [unpack_sequence(\%sequences, 'binary')],
     [[], [@bd, @i, @ba, @b]],
     'Inlined binary sequence has all the commands');
 
 
 is_deeply(
-	[optimize_sequence(\%sequences, 'binary', 0, { 'build' => 1, 'build-arch' => 1, 'build-indep' => 1})],
+	[unpack_sequence(\%sequences, 'binary', 0, { 'build' => 1, 'build-arch' => 1, 'build-indep' => 1})],
 	[[], [@i, @ba, @b]],
 	'Inlined binary sequence with build-* done has @i, @ba and @b');
 
@@ -89,17 +89,17 @@ is_deeply(
     local $Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS{'build'} = 1;
 
     is_deeply(
-        [optimize_sequence(\%sequences, 'binary')],
+        [unpack_sequence(\%sequences, 'binary')],
         [[to_rules_target('build')], [@i, @ba, @b]],
         'Inlined binary sequence has all the commands but build target is opaque');
 
 	is_deeply(
-		[optimize_sequence(\%sequences, 'binary', 0, { 'build' => 1, 'build-arch' => 1, 'build-indep' => 1})],
+		[unpack_sequence(\%sequences, 'binary', 0, { 'build' => 1, 'build-arch' => 1, 'build-indep' => 1})],
 		[[], [@i, @ba, @b]],
 		'Inlined binary sequence has all the commands with build-* done and not build-target');
 
     is_deeply(
-        [optimize_sequence(\%sequences, 'build')],
+        [unpack_sequence(\%sequences, 'build')],
         [[], [@bd]],
         'build sequence is inlineable');
 
@@ -109,9 +109,9 @@ is_deeply(
     local $Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS{'install-arch'} = 1;
 
     is_deeply(
-        [optimize_sequence(\%sequences, 'binary')],
+        [unpack_sequence(\%sequences, 'binary')],
 		# @bd_minimal, @bd and @i should be "-i"-only, @ba + @b should be both.
-		# Unfortunately, optimize_sequence cannot show that.
+		# Unfortunately, unpack_sequence cannot show that.
         [[to_rules_target('install-arch')], [@bd, @i, @ba, @b]],
         'Inlined binary sequence has all the commands');
 }
@@ -120,9 +120,9 @@ is_deeply(
 	local $Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS{'install-arch'} = 1;
 	local $Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS{'build'} = 1;
 
-	my $actual = [optimize_sequence(\%sequences, 'binary')];
+	my $actual = [unpack_sequence(\%sequences, 'binary')];
 	# @i should be "-i"-only, @ba + @b should be both.
-	# Unfortunately, optimize_sequence cannot show that.
+	# Unfortunately, unpack_sequence cannot show that.
 	my $expected = [[to_rules_target('build'), to_rules_target('install-arch')], [@i, @ba, @b]];
 	# Permit some fuzz on the order between build and install-arch
 	if ($actual->[0][0] eq to_rules_target('install-arch')) {

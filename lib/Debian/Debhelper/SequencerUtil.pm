@@ -12,7 +12,7 @@ use Exporter qw(import);
 our @EXPORT = qw(
 	extract_rules_target_name
 	to_rules_target
-	optimize_sequence
+	unpack_sequence
 	rules_explicit_target
 	DUMMY_TARGET
 );
@@ -31,9 +31,11 @@ sub to_rules_target  {
 	return 'debian/rules '.join(' ', @_);
 }
 
-sub optimize_sequence {
+sub unpack_sequence {
 	my ($sequences, $sequence_name, $always_inline, $completed_sequences) = @_;
 	my (@sequence, @targets, %seen, %non_inlineable_targets, @stack);
+	# Walk through the sequence effectively doing a DFS of the rules targets
+	# (when we are allowed to inline them).
 	push(@stack, [@{$sequences->{$sequence_name}}]);
 	while (@stack) {
 		my $current_sequence = pop(@stack);
