@@ -51,8 +51,8 @@ sub unit_is_started {
 
 # Units are installed and enabled
 each_compat_up_to_and_incl_subtest(10, sub {
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_systemd_enable'));
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_systemd_start'));
+	ok(run_dh_tool('dh_systemd_enable'));
+	ok(run_dh_tool('dh_systemd_start'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
 	ok(-e "debian/foo.postinst.debhelper");
 	unit_is_enabled('foo', 'foo', 1);
@@ -63,8 +63,8 @@ each_compat_up_to_and_incl_subtest(10, sub {
 
 	make_path('debian/foo/lib/systemd/system/');
 	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_systemd_enable'));
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_systemd_start'));
+	ok(run_dh_tool('dh_systemd_enable'));
+	ok(run_dh_tool('dh_systemd_start'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
 	ok(-e "debian/foo.postinst.debhelper");
 	unit_is_enabled('foo', 'foo', 1);
@@ -75,8 +75,8 @@ each_compat_up_to_and_incl_subtest(10, sub {
 
 	make_path('debian/foo/lib/systemd/system/');
 	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_systemd_enable'));
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_systemd_start', '--no-start'));
+	ok(run_dh_tool('dh_systemd_enable'));
+	ok(run_dh_tool('dh_systemd_start', '--no-start'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
 	ok(-e "debian/foo.postinst.debhelper");
 	unit_is_enabled('foo', 'foo', 1);
@@ -87,9 +87,9 @@ each_compat_up_to_and_incl_subtest(10, sub {
 
 	make_path('debian/foo/lib/systemd/system/');
 	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_systemd_enable'));
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_systemd_start', '--no-start', 'debian/foo.service'));
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_systemd_start', '-p', 'foo', 'foo2.service'));
+	ok(run_dh_tool('dh_systemd_enable'));
+	ok(run_dh_tool('dh_systemd_start', '--no-start', 'debian/foo.service'));
+	ok(run_dh_tool('dh_systemd_start', '-p', 'foo', 'foo2.service'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
 	ok(-e "debian/foo.postinst.debhelper");
 	unit_is_enabled('foo', 'foo', 1);
@@ -100,9 +100,9 @@ each_compat_up_to_and_incl_subtest(10, sub {
 
 	make_path('debian/foo/lib/systemd/system/');
 	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_systemd_enable', '--no-enable', 'debian/foo.service'));
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_systemd_enable', '-p', 'foo', 'foo2.service'));
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_systemd_start'));
+	ok(run_dh_tool('dh_systemd_enable', '--no-enable', 'debian/foo.service'));
+	ok(run_dh_tool('dh_systemd_enable', '-p', 'foo', 'foo2.service'));
+	ok(run_dh_tool('dh_systemd_start'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
 	ok(-e "debian/foo.postinst.debhelper");
 	unit_is_enabled('foo', 'foo', 0, 1); # Disabled units are still masked on removal
@@ -113,7 +113,7 @@ each_compat_up_to_and_incl_subtest(10, sub {
 
 	make_path('debian/foo/lib/systemd/system/');
 	install_file('debian/foo.service', 'debian/foo/lib/systemd/system/foo.service');
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_systemd_start', '--no-restart-after-upgrade'));
+	ok(run_dh_tool('dh_systemd_start', '--no-restart-after-upgrade'));
         my $matches = grep { m{deb-systemd-invoke start .*foo.service} } `cat debian/foo.postinst.debhelper`;
 	ok($matches == 1);
 	ok(run_dh_tool('dh_clean'));
@@ -121,8 +121,8 @@ each_compat_up_to_and_incl_subtest(10, sub {
 	# Quoting #764730
 	make_path('debian/foo/lib/systemd/system/');
 	install_file('debian/foo.service', 'debian/foo/lib/systemd/system/foo\x2dfuse.service');
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_systemd_enable'));
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_systemd_start'));
+	ok(run_dh_tool('dh_systemd_enable'));
+	ok(run_dh_tool('dh_systemd_start'));
 	unit_is_enabled('foo', 'foo\x2dfuse', 1);
 	unit_is_started('foo', 'foo\x2dfuse', 1);
 	ok(run_dh_tool('dh_clean'));

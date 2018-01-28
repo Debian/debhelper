@@ -55,7 +55,7 @@ sub unit_is_started {
 
 # Units are installed and enabled
 each_compat_subtest {
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd'));
+	ok(run_dh_tool( 'dh_installsystemd'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
 	ok(find_script('foo', 'postinst'));
 	unit_is_enabled('foo', 'foo', 1);
@@ -66,7 +66,7 @@ each_compat_subtest {
 
 	make_path('debian/foo/lib/systemd/system/');
 	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd'));
+	ok(run_dh_tool('dh_installsystemd'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
 	ok(find_script('foo', 'postinst'));
 	unit_is_enabled('foo', 'foo', 1);
@@ -77,7 +77,7 @@ each_compat_subtest {
 
 	make_path('debian/foo/lib/systemd/system/');
 	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd', '--no-start'));
+	ok(run_dh_tool('dh_installsystemd', '--no-start'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
 	ok(find_script('foo', 'postinst'));
 	unit_is_enabled('foo', 'foo', 1);
@@ -88,8 +88,8 @@ each_compat_subtest {
 
 	make_path('debian/foo/lib/systemd/system/');
 	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd', '--no-start', 'debian/foo.service'));
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd', '-p', 'foo', 'foo2.service'));
+	ok(run_dh_tool('dh_installsystemd', '--no-start', 'debian/foo.service'));
+	ok(run_dh_tool('dh_installsystemd', '-p', 'foo', 'foo2.service'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
 	ok(find_script('foo', 'postinst'));
 	unit_is_enabled('foo', 'foo', 1);
@@ -100,8 +100,8 @@ each_compat_subtest {
 
 	make_path('debian/foo/lib/systemd/system/');
 	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd', '--no-enable', 'debian/foo.service'));
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd', '-p', 'foo', 'foo2.service'));
+	ok(run_dh_tool('dh_installsystemd', '--no-enable', 'debian/foo.service'));
+	ok(run_dh_tool('dh_installsystemd', '-p', 'foo', 'foo2.service'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
 	ok(find_script('foo', 'postinst'));
 	unit_is_enabled('foo', 'foo', 0, 1); # Disabled units are still masked on removal
@@ -111,7 +111,7 @@ each_compat_subtest {
 	ok(run_dh_tool('dh_clean'));
 
 	make_path('debian/foo/lib/systemd/system/');
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd', '--no-restart-after-upgrade'));
+	ok(run_dh_tool('dh_installsystemd', '--no-restart-after-upgrade'));
 	my @foo_postinst = find_script('foo', 'postinst');
 	ok(@foo_postinst);
 	my $matches = @foo_postinst ? grep { m{deb-systemd-invoke start .*foo.service} } `cat @foo_postinst` : -1;
@@ -121,7 +121,7 @@ each_compat_subtest {
 	# Quoting #764730
 	make_path('debian/foo/lib/systemd/system/');
 	install_file('debian/foo.service', 'debian/foo/lib/systemd/system/foo\x2dfuse.service');
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd'));
+	ok(run_dh_tool('dh_installsystemd'));
 	unit_is_enabled('foo', 'foo\x2dfuse', 1);
 	unit_is_started('foo', 'foo\x2dfuse', 1);
 	ok(run_dh_tool('dh_clean'));
@@ -129,12 +129,12 @@ each_compat_subtest {
 	# --name flag #870768
 	make_path('debian/foo/lib/systemd/system/');
 	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd', '--name=foo'));
+	ok(run_dh_tool('dh_installsystemd', '--name=foo'));
 	unit_is_enabled('foo', 'foo', 1);
 	unit_is_started('foo', 'foo', 1);
 	unit_is_enabled('foo', 'foo2', 0);
 	unit_is_started('foo', 'foo2', 0);
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd', '--name=foo2'));
+	ok(run_dh_tool('dh_installsystemd', '--name=foo2'));
 	unit_is_enabled('foo', 'foo', 1);
 	unit_is_started('foo', 'foo', 1);
 	unit_is_enabled('foo', 'foo2', 1);

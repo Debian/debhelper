@@ -252,6 +252,7 @@ $ENV{DEB_BUILD_OPTIONS} = "parallel=5";
 
 $tmp = write_debian_rules(<<'EOF');
 #!/usr/bin/make -f
+export DEB_RULES_REQUIRES_ROOT:=no
 override_dh_auto_build:
 	$(MAKE)
 %:

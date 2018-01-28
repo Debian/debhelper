@@ -29,7 +29,7 @@ mv_conffile /etc/2 /etc/3 1.0-1
 EOF
 	close($fd) or die("close($file): $!\n");
 
-	run_dh_tool( { 'needs_root' => 1 }, 'dh_installdeb');
+	run_dh_tool('dh_installdeb');
 
 	for my $script (@scripts) {
 		my @output=`cat debian/debhelper.$script.debhelper`;
@@ -50,7 +50,7 @@ ${contents}
 EOF
 	close($fd) or die("close($file): $!\n");
 
-	my $res = run_dh_tool( { 'needs_root' => 1, 'quiet' => 1 }, 'dh_installdeb');
+	my $res = run_dh_tool( { 'quiet' => 1 }, 'dh_installdeb');
 
 	remove_tree('debian/debhelper', 'debian/tmp', 'debian/.debhelper');
 	rm_files(@scripts);

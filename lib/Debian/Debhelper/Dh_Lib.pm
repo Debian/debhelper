@@ -22,9 +22,6 @@ use constant {
 	'DH_BUILTIN_VERSION' => \'<DH_LIB_VERSION>', #'# Hi emacs.
 	# Default Package-Type / extension (must be aligned with dpkg)
 	'DEFAULT_PACKAGE_TYPE' => 'deb',
-
-	# Kill-switch for R³ (for backports)
-	'DH_ENABLE_RRR_SUPPORT' => 1,
 };
 
 use constant {
@@ -1363,7 +1360,7 @@ sub is_cross_compiling {
 # As a side effect, populates %package_arches and %package_types
 # with the types of all packages (not only those returned).
 my (%package_types, %package_arches, %package_multiarches, %packages_by_type,
-    %package_sections, $sourcepackage, %rrr, %package_cross_type);
+    %package_sections, $sourcepackage, %package_cross_type);
 
 # Returns source package name
 sub sourcepackage {
@@ -1406,11 +1403,6 @@ sub getpackages {
 		if (/^Source:\s*(.*)/i) {
 			$sourcepackage = $1;
 			next;
-		} elsif (/^Rules-Requires-Root:\s*(.*)/i) {
-			for my $keyword (split(' ', $1)) {
-				$rrr{$keyword} = 1;
-			}
-			next;
 		} elsif (/^Section:\s(.*)$/i) {
 			$source_section = $1;
 			next;
@@ -1419,7 +1411,6 @@ sub getpackages {
 		last if (!$_ or eof); # end of stanza.
 	}
 	error("could not find Source: line in control file.") if not defined($sourcepackage);
-	$rrr{'binary-targets'} = 1 if not %rrr;
 
 	while (<$fd>) {
 		chomp;
@@ -1512,16 +1503,21 @@ sub getpackages {
 # - Takes an optional keyword; if passed, this will return true if the keyword is listed in R^3 (Rules-Requires-Root)
 # - If the optional keyword is omitted or not present in R^3 and R^3 is not 'binary-targets', then returns false
 # - Returns true otherwise (i.e. keyword is in R^3 or R^3 is 'binary-targets')
-sub should_use_root {
-	my ($keyword) = @_;
-	return 1 if not DH_ENABLE_RRR_SUPPORT;
-	getpackages() if not %rrr;
+{
+	my %rrr;
+	sub should_use_root {
+		my ($keyword) = @_;
+		my $rrr_env = $ENV{'DEB_RULES_REQUIRES_ROOT'} // 'binary-targets';
+		$rrr_env =~ s/^\s++//;
+		$rrr_env =~ s/\s++$//;
+		return 0 if $rrr_env eq 'no';
+		return 1 if $rrr_env eq 'binary-targets';
+		return 0 if not defined($keyword);
 
-	return 0 if exists($rrr{'no'});
-	return 1 if exists($rrr{'binary-targets'});
-	return 0 if not defined($keyword);
-	return 1 if exists($rrr{$keyword});
-	return 0;
+		%rrr = map { $_ => 1 } split(' ', $rrr_env) if not %rrr;
+		return 1 if exists($rrr{$keyword});
+		return 0;
+	}
 }
 
 # Returns the "gain root command" as a list suitable for passing as a part of the command to "doit()"
@@ -1532,12 +1528,11 @@ sub gain_root_cmd {
 }
 
 sub root_requirements {
-	return 'legacy-root' if not DH_ENABLE_RRR_SUPPORT;
-
-	getpackages() if not %rrr;
-
-	return 'none' if exists($rrr{'no'});
-	return 'legacy-root' if exists($rrr{'binary-targets'});
+	my $rrr_env = $ENV{'DEB_RULES_REQUIRES_ROOT'} // 'binary-targets';
+	$rrr_env =~ s/^\s++//;
+	$rrr_env =~ s/\s++$//;
+	return 'none' if $rrr_env eq 'no';
+	return 'legacy-root' if $rrr_env eq 'binary-targets';
 	return 'targeted-promotion';
 }
 

@@ -25,8 +25,8 @@ if (uid_0_test_is_ok()) {
 each_compat_from_and_above_subtest(11, sub {
 	make_path('debian/foo/usr/lib/tmpfiles.d');
 	create_empty_file('debian/foo/usr/lib/tmpfiles.d/foo.conf');
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installinit'));
-	ok(run_dh_tool({ 'needs_root' => 1 }, 'dh_installsystemd'));
+	ok(run_dh_tool('dh_installinit'));
+	ok(run_dh_tool('dh_installsystemd'));
 	ok(-e "debian/foo/etc/init.d/foo");
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
 	my @postinst = find_script('foo', 'postinst');
