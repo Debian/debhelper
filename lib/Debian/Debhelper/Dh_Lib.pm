@@ -14,9 +14,6 @@ use constant {
 	# Lowest compat level that does *not* cause deprecation
 	# warnings
 	'LOWEST_NON_DEPRECATED_COMPAT_LEVEL' => 9,
-	# Highest "open-beta" compat level.  Remember to notify
-	# debian-devel@l.d.o before bumping this.
-	'BETA_TESTER_COMPAT' => 10,
 	# Highest compat level permitted
 	'MAX_COMPAT_LEVEL' => 12,
 	# Magic value for xargs
