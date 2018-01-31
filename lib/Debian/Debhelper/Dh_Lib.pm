@@ -1675,7 +1675,7 @@ sub debhelper_script_subst {
 		if (@generated_scripts) {
 			if ($dh{VERBOSE}) {
 				verbose_print('cp -f ' . escape_shell($file) . " $tmp/DEBIAN/$script");
-				verbose_print("perl -p -i -e s~#DEBHELPER#~qx{cat @generated_scripts}~eg\" $tmp/DEBIAN/$script");
+				verbose_print("perl -p -i -e \"s~#DEBHELPER#~qx{cat @generated_scripts}~eg\" $tmp/DEBIAN/$script");
 			}
 			# Add this into the script, where it has #DEBHELPER#
 			my $text = _concat_slurp_script_files(@generated_scripts);
