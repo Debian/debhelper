@@ -15,11 +15,7 @@ our @TEST_DH_EXTRA_TEMPLATE_FILES = (qw(
     debian/foo2.service
 ));
 
-if (uid_0_test_is_ok()) {
-	plan(tests => 1);
-} else {
-	plan skip_all => 'fakeroot required';
-}
+plan(tests => 1);
 
 sub unit_is_enabled {
 	my ($package, $unit, $num_enables, $num_masks) = @_;

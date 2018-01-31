@@ -9,11 +9,7 @@ use lib dirname(__FILE__);
 use Test::DH;
 use Debian::Debhelper::Dh_Lib qw(!dirname);
 
-if (uid_0_test_is_ok()) {
-	plan(tests => 2);
-} else {
-	plan skip_all => 'fakeroot required';
-}
+plan(tests => 2);
 
 each_compat_up_to_and_incl_subtest(10, sub {
 	my @scripts = qw{postinst preinst prerm postrm};

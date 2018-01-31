@@ -14,11 +14,7 @@ our @TEST_DH_EXTRA_TEMPLATE_FILES = (qw(
     debian/foo.service
 ));
 
-if (uid_0_test_is_ok()) {
-	plan(tests => 2);
-} else {
-	plan skip_all => 'fakeroot required';
-}
+plan(tests => 2);
 
 each_compat_up_to_and_incl_subtest(10, sub {
 	make_path(qw(debian/foo debian/bar debian/baz));

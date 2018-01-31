@@ -16,11 +16,8 @@ our @TEST_DH_EXTRA_TEMPLATE_FILES = (qw(
     debian/copyright
 ));
 
-if (uid_0_test_is_ok()) {
-	plan(tests => 5);
-} else {
-	plan skip_all => 'fakeroot required';
-}
+plan(tests => 5);
+
 
 my $NODOC_PROFILE = {
 	'env' => {

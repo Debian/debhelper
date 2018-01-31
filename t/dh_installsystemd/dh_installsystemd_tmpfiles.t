@@ -15,11 +15,7 @@ our @TEST_DH_EXTRA_TEMPLATE_FILES = (qw(
     debian/foo.init
 ));
 
-if (uid_0_test_is_ok()) {
-	plan(tests => 1);
-} else {
-	plan skip_all => 'fakeroot required';
-}
+plan(tests => 1);
 
 # Units are installed and enabled
 each_compat_from_and_above_subtest(11, sub {
