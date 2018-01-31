@@ -139,7 +139,8 @@ sub check_auto_buildable {
 sub build {
 	my $this=shift;
 	if (ref($this) eq 'Debian::Debhelper::Buildsystem::makefile' and is_cross_compiling()) {
-		while (my ($var, $tool) = each %DEB_DEFAULT_TOOLS) {
+		for my $var (sort(keys(%DEB_DEFAULT_TOOLS))) {
+			my $tool = $DEB_DEFAULT_TOOLS{$var};
 			if ($ENV{$var}) {
 				unshift @_, $var . "=" . $ENV{$var};
 			} else {
