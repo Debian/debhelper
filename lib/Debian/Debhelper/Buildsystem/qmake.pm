@@ -8,7 +8,7 @@ package Debian::Debhelper::Buildsystem::qmake;
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value error generated_file is_cross_compiling);
+use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value error is_cross_compiling);
 use parent qw(Debian::Debhelper::Buildsystem::makefile);
 
 my %OS_MKSPEC_MAPPING = (
@@ -63,38 +63,6 @@ sub configure {
 		} else {
 			error("Cannot cross-compile: Missing entry for HOST OS ${host_os} for qmake's -spec option");
 		}
-
-		my $filename = generated_file('_source', 'qmake-cross.conf');
-		my $host_multiarch = dpkg_architecture_value("DEB_HOST_MULTIARCH");
-		open(my $fh, '>', $filename) or error("open($filename) failed: $!");
-
-		$fh->print("[Paths]\n");
-		$fh->print("Prefix=/usr\n");
-		$fh->print("ArchData=lib/$host_multiarch/qt5\n");
-		$fh->print("Binaries=lib/qt5/bin\n");
-		$fh->print("Data=share/qt5\n");
-		$fh->print("Documentation=share/qt5/doc\n");
-		$fh->print("Examples=lib/$host_multiarch/qt5/examples\n");
-		$fh->print("Headers=include/$host_multiarch/qt5\n");
-		$fh->print("HostBinaries=lib/qt5/bin\n");
-		$fh->print("HostData=lib/$host_multiarch/qt5\n");
-		$fh->print("HostLibraries=lib/$host_multiarch\n");
-		$fh->print("Imports=lib/$host_multiarch/qt5/imports\n");
-		$fh->print("Libraries=lib/$host_multiarch\n");
-		$fh->print("LibraryExecutables=lib/$host_multiarch/qt5/libexec\n");
-		$fh->print("Plugins=lib/$host_multiarch/qt5/plugins\n");
-		$fh->print("Qml2Imports=lib/$host_multiarch/qt5/qml\n");
-		$fh->print("Settings=/etc/xdg\n");
-		$fh->print("Translations=share/qt5/translations\n");
-
-		close($fh) or error("close($filename) failed: $!");
-		if ($filename !~ m{^/}) {
-			# Make the file name absolute (just in case qmake cares).
-			require Cwd;
-			$filename =~ s{^\./}{};
-			$filename = Cwd::cwd() . "/${filename}";
-		}
-		push @options, ("-qtconf", $filename);
 	}
 
 	if ($ENV{CFLAGS}) {
@@ -112,25 +80,6 @@ sub configure {
 	push @flags, "QMAKE_STRIP=:";
 	push @flags, "PREFIX=/usr";
 
-	if (is_cross_compiling()) {
-		# qmake calls $$QMAKE_CXX in toolchain.prf to get a list of library/include paths,
-		# we need -early flag to make sure $$QMAKE_CXX is already properly set on that step.
-		push @flags, "-early";
-		if ($ENV{CC}) {
-			push @flags, "QMAKE_CC=" . $ENV{CC};
-		} else {
-			push @flags, "QMAKE_CC=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-gcc";
-		}
-		if ($ENV{CXX}) {
-			push @flags, "QMAKE_CXX=" . $ENV{CXX};
-			push @flags, "QMAKE_LINK=" . $ENV{CXX};
-		} else {
-			push @flags, "QMAKE_CXX=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-g++";
-			push @flags, "QMAKE_LINK=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-g++";
-		}
-		push @flags, "PKG_CONFIG=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-pkg-config";
-	}
-
 	$this->mkdir_builddir();
 	$this->doit_in_builddir($this->_qmake(), @options, @flags, @_);
 }
@@ -145,6 +94,9 @@ sub install {
 }
 
 sub _qmake {
+	if (is_cross_compiling()) {
+		return dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-qmake";
+	}
 	return 'qmake';
 }
 
