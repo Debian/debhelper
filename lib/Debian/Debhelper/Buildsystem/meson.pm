@@ -59,7 +59,7 @@ sub configure {
 			my $filename = generated_file('_source', 'meson-cross-file.conf');
 			my %options = (
 				stdout => '/dev/null',
-				update_env => { LC_ALL => 'C.UTC-8'},
+				update_env => { LC_ALL => 'C.UTF-8'},
 			);
 			doit(\%options, $debcrossgen, "-o${filename}");
 			$cross_file = $filename;
@@ -76,7 +76,7 @@ sub configure {
 	$this->mkdir_builddir();
 	eval {
 		my %options = (
-			update_env => { LC_ALL => 'C.UTC-8'},
+			update_env => { LC_ALL => 'C.UTF-8'},
 		);
 		$this->doit_in_builddir(\%options, "meson", $this->get_source_rel2builddir(), @opts, @_);
 	};
