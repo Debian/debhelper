@@ -9,6 +9,8 @@
 # We disable autoreconf to avoid build-depending on it (it does
 # nothing for debhelper and it keeps the set of B-D smaller)
 
+PERL ?= perl
+
 %:
 	./run dh $@ --without autoreconf --with build-stamp
 
@@ -18,3 +20,5 @@ override_dh_update_autotools_config override_dh_strip_nondeterminism:
 
 override_dh_auto_install:
 	./run dh_auto_install --destdir=debian/debhelper
+	PERLLIBDIR=$$($(PERL) -MConfig -e 'print $$Config{vendorlib}')/Debian/Debhelper ; \
+	    $(PERL) -I"debian/debhelper/$${PERLLIBDIR}" debian/gen-provides > debian/debhelper.substvars
