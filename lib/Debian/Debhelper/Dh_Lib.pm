@@ -674,6 +674,7 @@ sub dirname {
 
 # Pass in a number, will return true iff the current compatibility level
 # is less than or equal to that number.
+my $compat_from_bd;
 {
 	my $warned_compat = $ENV{DH_INTERNAL_TESTSUITE_SILENT_WARNINGS} ? 1 : 0;
 	my $c;
@@ -681,6 +682,8 @@ sub dirname {
 	sub compat {
 		my $num=shift;
 		my $nowarn=shift;
+
+		getpackages() if not defined($compat_from_bd);
 	
 		if (! defined $c) {
 			$c=1;
@@ -694,15 +697,23 @@ sub dirname {
 				}
 				else {
 					chomp $l;
-					$c=$l;
-					$c =~ s/^\s*+//;
-					$c =~ s/\s*+$//;
-					if ($c !~ m/^\d+$/) {
-						error("debian/compat must contain a positive number (found: \"$c\")");
+					my $new_compat = $l;
+					$new_compat =~ s/^\s*+//;
+					$new_compat =~ s/\s*+$//;
+					if ($new_compat !~ m/^\d+$/) {
+						error("debian/compat must contain a positive number (found: \"${new_compat}\")");
 					}
+					if (defined($compat_from_bd) and $compat_from_bd != -1) {
+						warning("Please specific the debhelper compat level exactly once.");
+						warning(" * debian/compat requests compat ${new_compat}.");
+						warning(" * debian/control requests compat ${compat_from_bd} via \"debhelper-compat (= ${compat_from_bd})\"");
+						error("debhelper compat level specified both in debian/compat and via build-dependency on debhelper-compat");
+					}
+					$c = $new_compat;
 				}
-			}
-			elsif (not $nowarn) {
+			} elsif ($compat_from_bd != -1) {
+				$c = $compat_from_bd;
+			} elsif (not $nowarn) {
 				error("Please specify the compatibility level in debian/compat");
 			}
 
@@ -1386,7 +1397,8 @@ sub getpackages {
 	my $arch="";
 	my $section="";
 	my ($package_type, $multiarch, %seen, @profiles, $source_section,
-		$included_in_build_profile, $cross_type, $cross_target_arch);
+		$included_in_build_profile, $cross_type, $cross_target_arch,
+		@build_deps, $in_build_deps);
 	if (exists $ENV{'DEB_BUILD_PROFILES'}) {
 		@profiles=split /\s+/, $ENV{'DEB_BUILD_PROFILES'};
 	}
@@ -1404,15 +1416,59 @@ sub getpackages {
 
 		if (/^Source:\s*(.*)/i) {
 			$sourcepackage = $1;
+			$in_build_deps = 0;
 			next;
 		} elsif (/^Section:\s(.*)$/i) {
 			$source_section = $1;
+			$in_build_deps = 0;
 			next;
+		} elsif (/^Build-Depends(?:-Arch|-Indep)?:\s*(.*)$/i) {
+			$in_build_deps = 1;
+			push(@build_deps, ', ') if @build_deps and $build_deps[-1] !~ m/\s*,\s*$/;
+			push(@build_deps, $1);
+		} elsif (/^\S/) {
+			$in_build_deps = 0;
+		} elsif (/^\s/ and $in_build_deps) {
+			push(@build_deps, $_);
 		}
 		next if not $_ and not defined($sourcepackage);
 		last if (!$_ or eof); # end of stanza.
 	}
 	error("could not find Source: line in control file.") if not defined($sourcepackage);
+	if (@build_deps) {
+		my $bd = join(' ', @build_deps);
+		my ($dh_compat_bd, $final_level);
+		for my $dep (split(/\s*,\s*/, $bd)) {
+			if ($dep =~ m/^debhelper-compat\s*[(]\s*=\s*(${PKGVERSION_REGEX})\s*[)]$/) {
+				my $version = $1;
+				if ($version =~m/^(\d+)\D.*$/) {
+					my $guessed_compat = $1;
+					warning("Please use the compat level as the exact version rather than the full version.");
+					warning("  Perhaps you meant: debhelper-compat (= ${guessed_compat})");
+					error("Invalid compat level ${version}, derived from relation: ${dep}");
+				}
+				$final_level = $version;
+				error("Duplicate debhelper-compat build-dependency: ${dh_compat_bd} vs. ${dep}") if $dh_compat_bd;
+				$dh_compat_bd = $dep;
+			} elsif ($dep =~ m/^debhelper-compat\s*(?:\S.*)?$/) {
+				my $clevel = "${\MAX_COMPAT_LEVEL}";
+				eval {
+					require Debian::Debhelper::Dh_Version;
+					$clevel = $Debian::Debhelper::Dh_Version::version;
+				};
+				$clevel =~ s/^\d+\K\D.*$//;
+				warning("Found invalid debhelper-compat relation: ${dep}");
+				warning(" * Please format the relation as (example): debhelper-compat (= ${clevel})");
+				warning(" * Note that alternatives, architecture restrictions, build-profiles etc. are not supported.");
+				warning(" * If this is not possible, then please remove the debhelper-compat relation and insert the");
+				warning("   compat level into the file debian/compat.  (E.g. \"echo ${clevel} > debian/compat\")");
+				error("Could not parse desired debhelper compat level from relation: $dep");
+			}
+		}
+		$compat_from_bd = $final_level // -1;
+	} else {
+		$compat_from_bd = -1;
+	}
 
 	while (<$fd>) {
 		chomp;
