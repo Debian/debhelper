@@ -11,6 +11,11 @@ debhelper (11.1.5) UNRELEASED; urgency=medium
     of the "C.UTF-8" locale.
   * autoscripts/postinst-systemd-restart: Apply patch from
     Christoph Biedl to fix indentation.  (Closes: #890373)
+  * dh_testroot: With the advent of DEB_RULES_REQUIRES_ROOT, it
+    no longer needs to read debian/control to tell whether root
+    is needed or not.  However, the warning remains for calling
+    dh_testroot outside the source root (as we may need to check
+    the compat level in a future version of debhelper).
 
  -- Niels Thykier <niels@thykier.net>  Sun, 04 Feb 2018 18:03:34 +0000
 

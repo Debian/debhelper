@@ -50,11 +50,9 @@ our $VERSION = DH_BUILTIN_VERSION;
 
 inhibit_log();
 
-my $requirements = 'legacy-root';
+my $requirements = Debian::Debhelper::Dh_Lib::root_requirements();
 
-if (-f 'debian/control') {
-	$requirements = Debian::Debhelper::Dh_Lib::root_requirements();
-} else {
+if (! -f 'debian/control') {
 	warning('dh_testroot must be called from the source root');
 }
 
@@ -67,7 +65,7 @@ if ($requirements eq 'legacy-root') {
 	error("You must run this as root (or use fakeroot).");
 } else {
 	my $env = $ENV{DEB_GAIN_ROOT_CMD};
-	error("Package needs targetted root but builder has not provided a gain-root command via \${DEB_GAIN_ROOT_CMD}")
+	error("Package needs targeted root but builder has not provided a gain-root command via \${DEB_GAIN_ROOT_CMD}")
 		if not $env;
 }
 
