@@ -30,6 +30,9 @@ Depends: autotools-dev,
          dpkg-dev (>= 1.19.0.5~),
          file (>= 3.23),
          libdpkg-perl (>= 1.17.14),
+# makefile.pm uses -O which according to #768791 requires make (>= 4~).
+# The -O is an aid to maintainers, debhelper works perfectly fine without it.
+         make (>= 4~),
          man-db,
          po-debconf,
          ${misc:Depends},
