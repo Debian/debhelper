@@ -196,6 +196,7 @@ sub read_dbgsym_migration {
 sub read_dbgsym_build_ids {
 	my $res = read_dbgsym_file('dbgsym-build-ids', @_);
 	my (%seen, @unique);
+	return '' if not defined($res);
 	for my $id (split(' ', $res)) {
 		next if $seen{$id}++;
 		push(@unique, $id);
