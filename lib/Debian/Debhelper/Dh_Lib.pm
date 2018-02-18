@@ -806,9 +806,10 @@ sub default_sourcedir {
 			for my $pkg (@{$package}) {
 				push(@try, "debian/${pkg}.${filename}");
 				if ($check_expensive) {
+					my $cross_type = uc(package_cross_type($package));
 					push(@try,
-						 "debian/${pkg}.${filename}.".hostarch(),
-						 "debian/${pkg}.${filename}.".dpkg_architecture_value("DEB_HOST_ARCH_OS"),
+						 "debian/${pkg}.${filename}.".dpkg_architecture_value("DEB_${cross_type}_ARCH"),
+						 "debian/${pkg}.${filename}.".dpkg_architecture_value("DEB_${cross_type}_ARCH_OS"),
 					);
 				}
 			}
@@ -816,9 +817,10 @@ sub default_sourcedir {
 			# Avoid checking for hostarch+hostos unless we have reason
 			# to believe that they exist.
 			if ($check_expensive) {
+				my $cross_type = uc(package_cross_type($package));
 				push(@try,
-					 "debian/${package}.${filename}.".hostarch(),
-					 "debian/${package}.${filename}.".dpkg_architecture_value("DEB_HOST_ARCH_OS"),
+					 "debian/${package}.${filename}.".dpkg_architecture_value("DEB_${cross_type}_ARCH"),
+					 "debian/${package}.${filename}.".dpkg_architecture_value("DEB_${cross_type}_ARCH_OS"),
 					);
 			}
 			push(@try, "debian/$package.$filename");
