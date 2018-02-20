@@ -1398,7 +1398,7 @@ sub getpackages {
 	my $section="";
 	my ($package_type, $multiarch, %seen, @profiles, $source_section,
 		$included_in_build_profile, $cross_type, $cross_target_arch,
-		@build_deps, $in_build_deps);
+		%bd_fields, $bd_field_value);
 	if (exists $ENV{'DEB_BUILD_PROFILES'}) {
 		@profiles=split /\s+/, $ENV{'DEB_BUILD_PROFILES'};
 	}
@@ -1416,53 +1416,64 @@ sub getpackages {
 
 		if (/^Source:\s*(.*)/i) {
 			$sourcepackage = $1;
-			$in_build_deps = 0;
+			$bd_field_value = undef;
 			next;
 		} elsif (/^Section:\s(.*)$/i) {
 			$source_section = $1;
-			$in_build_deps = 0;
+			$bd_field_value = undef;
 			next;
-		} elsif (/^Build-Depends(?:-Arch|-Indep)?:\s*(.*)$/i) {
-			$in_build_deps = 1;
-			push(@build_deps, ', ') if @build_deps and $build_deps[-1] !~ m/\s*,\s*$/;
-			push(@build_deps, $1);
+		} elsif (/^(Build-Depends(?:-Arch|-Indep)?):\s*(.*)$/i) {
+			my ($field, $value) = (lc($1), $2);
+			$bd_field_value = [$value];
+			$bd_fields{$field} = $bd_field_value;
 		} elsif (/^\S/) {
-			$in_build_deps = 0;
-		} elsif (/^\s/ and $in_build_deps) {
-			push(@build_deps, $_);
+			$bd_field_value = undef;
+		} elsif (/^\s/ and $bd_field_value) {
+			push(@{$bd_field_value}, $_);
 		}
 		next if not $_ and not defined($sourcepackage);
 		last if (!$_ or eof); # end of stanza.
 	}
 	error("could not find Source: line in control file.") if not defined($sourcepackage);
-	if (@build_deps) {
-		my $bd = join(' ', @build_deps);
+	if (%bd_fields) {
 		my ($dh_compat_bd, $final_level);
-		for my $dep (split(/\s*,\s*/, $bd)) {
-			if ($dep =~ m/^debhelper-compat\s*[(]\s*=\s*(${PKGVERSION_REGEX})\s*[)]$/) {
-				my $version = $1;
-				if ($version =~m/^(\d+)\D.*$/) {
-					my $guessed_compat = $1;
-					warning("Please use the compat level as the exact version rather than the full version.");
-					warning("  Perhaps you meant: debhelper-compat (= ${guessed_compat})");
-					error("Invalid compat level ${version}, derived from relation: ${dep}");
+		for my $field (sort(keys(%bd_fields))) {
+			my $value = join(' ', @{$bd_fields{$field}});
+			$value =~ s/\s*,\s*$//;
+			for my $dep (split(/\s*,\s*/, $value)) {
+				if ($dep =~ m/^debhelper-compat\s*[(]\s*=\s*(${PKGVERSION_REGEX})\s*[)]$/) {
+					my $version = $1;
+					if ($version =~m/^(\d+)\D.*$/) {
+						my $guessed_compat = $1;
+						warning("Please use the compat level as the exact version rather than the full version.");
+						warning("  Perhaps you meant: debhelper-compat (= ${guessed_compat})");
+						if ($field ne 'build-depends') {
+							warning(" * Also, please move the declaration to Build-Depends (it was found in ${field})");
+						}
+						error("Invalid compat level ${version}, derived from relation: ${dep}");
+					}
+					$final_level = $version;
+					error("Duplicate debhelper-compat build-dependency: ${dh_compat_bd} vs. ${dep}") if $dh_compat_bd;
+					error("The debhelper-compat build-dependency must be in the Build-Depends field (not $field)")
+						if $field ne 'build-depends';
+					$dh_compat_bd = $dep;
+				} elsif ($dep =~ m/^debhelper-compat\s*(?:\S.*)?$/) {
+					my $clevel = "${\MAX_COMPAT_LEVEL}";
+					eval {
+						require Debian::Debhelper::Dh_Version;
+						$clevel = $Debian::Debhelper::Dh_Version::version;
+					};
+					$clevel =~ s/^\d+\K\D.*$//;
+					warning("Found invalid debhelper-compat relation: ${dep}");
+					warning(" * Please format the relation as (example): debhelper-compat (= ${clevel})");
+					warning(" * Note that alternatives, architecture restrictions, build-profiles etc. are not supported.");
+					if ($field ne 'build-depends') {
+						warning(" * Also, please move the declaration to Build-Depends (it was found in ${field})");
+					}
+					warning(" * If this is not possible, then please remove the debhelper-compat relation and insert the");
+					warning("   compat level into the file debian/compat.  (E.g. \"echo ${clevel} > debian/compat\")");
+					error("Could not parse desired debhelper compat level from relation: $dep");
 				}
-				$final_level = $version;
-				error("Duplicate debhelper-compat build-dependency: ${dh_compat_bd} vs. ${dep}") if $dh_compat_bd;
-				$dh_compat_bd = $dep;
-			} elsif ($dep =~ m/^debhelper-compat\s*(?:\S.*)?$/) {
-				my $clevel = "${\MAX_COMPAT_LEVEL}";
-				eval {
-					require Debian::Debhelper::Dh_Version;
-					$clevel = $Debian::Debhelper::Dh_Version::version;
-				};
-				$clevel =~ s/^\d+\K\D.*$//;
-				warning("Found invalid debhelper-compat relation: ${dep}");
-				warning(" * Please format the relation as (example): debhelper-compat (= ${clevel})");
-				warning(" * Note that alternatives, architecture restrictions, build-profiles etc. are not supported.");
-				warning(" * If this is not possible, then please remove the debhelper-compat relation and insert the");
-				warning("   compat level into the file debian/compat.  (E.g. \"echo ${clevel} > debian/compat\")");
-				error("Could not parse desired debhelper compat level from relation: $dep");
 			}
 		}
 		$compat_from_bd = $final_level // -1;
