@@ -27,6 +27,11 @@ debhelper (11.1.5) UNRELEASED; urgency=medium
   * Dh_Lib: pkgfile() now properly uses for DEB_TARGET_ARCH{,_OS}
     when the package is set to be built for the target
     architecture.
+  * d/control: Drop dependency on binutils; it does not reflect
+    our actual requirement and the package or builder will ensure
+    that the current binutils is installed for other reasons
+    any way.  Thanks to Helmut Grohne for the report.
+    (Closes: #891187)
 
  -- Niels Thykier <niels@thykier.net>  Sun, 04 Feb 2018 18:03:34 +0000
 
