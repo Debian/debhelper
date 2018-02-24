@@ -17,8 +17,8 @@ debhelper (11.1.5) UNRELEASED; urgency=medium
     dh_testroot outside the source root (as we may need to check
     the compat level in a future version of debhelper).
   * makefile.pm: Synchronize output from make (via -O) when
-    make runs in parallel.  Thanks to Goswin von Brederlow for
-    the suggestion.  (Closes: #768791)
+    make runs in parallel except when STDOUT is a TTY.  Thanks
+    to Goswin von Brederlow for the suggestion.  (Closes: #768791)
   * dh_gencontrol: Avoid uninitialized value warning when there
     are no build-ids (e.g. because the builder disabled the
     dbgsym building via DEB_BUILD_OPTIONS).  This regression
