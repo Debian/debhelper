@@ -1,3 +1,17 @@
+debhelper (11.1.6) UNRELEASED; urgency=medium
+
+  * Dh_Lib: Avoid passing invalid parameters to a function, which
+    caused tons of "package ARRAY(...) is not in control info"
+    warnings from dh in some cases.  It triggers when dh thinks
+    the package might have architecture qualified debhelper config
+    files.  The warning is harmless (besides the noise) for all
+    native builds and most cross builds, but it did invalidate
+    attempt to make pkgfile() use "DEB_TARGET_ARCH{,_OS}"
+    (see 11.1.5~alpha1).  Thanks to Andreas Beckmann for reporting
+    the issue.  (Closes: #891546)
+
+ -- Niels Thykier <niels@thykier.net>  Mon, 26 Feb 2018 19:32:52 +0000
+
 debhelper (11.1.5) unstable; urgency=medium
 
   * Upload to unstable.

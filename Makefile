@@ -41,7 +41,7 @@ MAKEMANLIST=$(PERL) -e ' \
 		} \
 		END { \
 			my $$recommended_compat = q{$(VERSION)}; \
-			$$recommended_compat =~ s{\..*}{}; \
+			$$recommended_compat =~ s{^\d+\K(?:\D.*|\..*)?}{}; \
 			while (<STDIN>) { \
 				s/\#LIST\#/$$list/g; \
 				s/\#LIST_DEPRECATED\#/$$list_deprecated/g; \

@@ -817,7 +817,7 @@ sub default_sourcedir {
 			for my $pkg (@{$package}) {
 				push(@try, "debian/${pkg}.${filename}");
 				if ($check_expensive) {
-					my $cross_type = uc(package_cross_type($package));
+					my $cross_type = uc(package_cross_type($pkg));
 					push(@try,
 						 "debian/${pkg}.${filename}.".dpkg_architecture_value("DEB_${cross_type}_ARCH"),
 						 "debian/${pkg}.${filename}.".dpkg_architecture_value("DEB_${cross_type}_ARCH_OS"),
