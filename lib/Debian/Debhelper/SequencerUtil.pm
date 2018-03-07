@@ -45,9 +45,9 @@ sub unpack_sequence {
 			my $command = shift(@{$current_sequence});
 			my $rules_target=extract_rules_target_name($command);
 			next if (defined($rules_target) and exists($completed_sequences->{$rules_target}));
-			if (defined($rules_target) &&
+			if (defined($rules_target) && ($always_inline ||
 				! exists($non_inlineable_targets{$rules_target}) &&
-				! defined(rules_explicit_target($rules_target))) {
+				! defined(rules_explicit_target($rules_target)))) {
 
 				# inline the sequence for this implicit target.
 				push(@stack, $current_sequence);
