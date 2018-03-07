@@ -452,25 +452,13 @@ $sequences{clean} = [@bd_minimal, qw{
 }];
 $sequences{'build-indep'} = [@bd];
 $sequences{'build-arch'} = [@bd];
-if (! compat(8)) {
-	# From v9, sequences take standard rules targets into account.
-	$sequences{build} = [to_rules_target("build-arch"), to_rules_target("build-indep")];
-	$sequences{'install-indep'} = [to_rules_target("build-indep"), @i];
-	$sequences{'install-arch'} = [to_rules_target("build-arch"), @i];
-	$sequences{'install'} = [to_rules_target("build"), to_rules_target("install-arch"), to_rules_target("install-indep")];
-	$sequences{'binary-indep'} = [to_rules_target("install-indep"), @b];
-	$sequences{'binary-arch'} = [to_rules_target("install-arch"), @ba, @b];
-	$sequences{binary} = [to_rules_target("install"), to_rules_target("binary-arch"), to_rules_target("binary-indep")];
-}
-else {
-	$sequences{build} = [@bd];
-	$sequences{'install'} = [@{$sequences{build}}, @i];
-	$sequences{'install-indep'} = [@{$sequences{'build-indep'}}, @i];
-	$sequences{'install-arch'} = [@{$sequences{'build-arch'}}, @i];
-	$sequences{binary} = [@{$sequences{install}}, @ba, @b];
-	$sequences{'binary-indep'} = [@{$sequences{'install-indep'}}, @b];
-	$sequences{'binary-arch'} = [@{$sequences{'install-arch'}}, @ba, @b];
-}
+$sequences{build} = [to_rules_target("build-arch"), to_rules_target("build-indep")];
+$sequences{'install-indep'} = [to_rules_target("build-indep"), @i];
+$sequences{'install-arch'} = [to_rules_target("build-arch"), @i];
+$sequences{'install'} = [to_rules_target("build"), to_rules_target("install-arch"), to_rules_target("install-indep")];
+$sequences{'binary-indep'} = [to_rules_target("install-indep"), @b];
+$sequences{'binary-arch'} = [to_rules_target("install-arch"), @ba, @b];
+$sequences{binary} = [to_rules_target("install"), to_rules_target("binary-arch"), to_rules_target("binary-indep")];
 
 # Additional command options
 my %command_opts;
