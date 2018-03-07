@@ -60,7 +60,7 @@ my %sequences_unpacked = (
 	'binary'       => [@bd, @i, @ba, @b],
 );
 
-plan tests => 11;
+plan tests => 11 + 3 * scalar(keys(%sequences));
 
 # We will horse around with %EXPLICIT_TARGETS in this test; it should
 # definitely not attempt to read d/rules or the test will be break.
@@ -116,6 +116,14 @@ is_deeply(
         [[], $sequences_unpacked{'build'}],
         'build sequence is inlineable');
 
+
+	# Compat <= 8 ignores explicit targets!
+	for my $seq_name (sort(keys(%sequences))) {
+		is_deeply(
+			[unpack_sequence(\%sequences, $seq_name, 1)],
+			[[], $sequences_unpacked{$seq_name}],
+			"Compat <= 8 ignores explicit build target in sequence ${seq_name}");
+	}
 }
 
 {
@@ -127,6 +135,14 @@ is_deeply(
 		# Unfortunately, unpack_sequence cannot show that.
         [[to_rules_target('install-arch')], [@bd, @i, @ba, @b]],
         'Inlined binary sequence has all the commands');
+
+	# Compat <= 8 ignores explicit targets!
+	for my $seq_name (sort(keys(%sequences))) {
+		is_deeply(
+			[unpack_sequence(\%sequences, $seq_name, 1)],
+			[[], $sequences_unpacked{$seq_name}],
+			"Compat <= 8 ignores explicit install-arch target in sequence ${seq_name}");
+	}
 }
 
 {
@@ -146,4 +162,12 @@ is_deeply(
 		$actual,
 		$expected,
 		'Inlined binary sequence has all the commands');
+
+	# Compat <= 8 ignores explicit targets!
+	for my $seq_name (sort(keys(%sequences))) {
+		is_deeply(
+			[unpack_sequence(\%sequences, $seq_name, 1)],
+			[[], $sequences_unpacked{$seq_name}],
+			"Compat <= 8 ignores explicit build + install-arch targets in sequence ${seq_name}");
+	}
 }
