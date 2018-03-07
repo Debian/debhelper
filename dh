@@ -1047,23 +1047,6 @@ sub can_skip {
 	return 1;
 }
 
-sub extract_skipinfo {
-	my ($command) = @_;
-
-	foreach my $dir (split (':', $ENV{PATH})) {
-		if (open (my $h, "<", "$dir/$command")) {
-			while (<$h>) {
-				if (m/PROMISE: DH NOOP( WITHOUT\s+(.*))?\s*$/) {
-					close $h;
-					return split(' ', $2) if defined($2);
-					return ('always-skip');
-				}
-			}
-			close $h;
-			return ();
-		}
-	}
-}
 
 =head1 SEE ALSO
 

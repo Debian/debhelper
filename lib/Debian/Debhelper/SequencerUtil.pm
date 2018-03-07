@@ -14,6 +14,7 @@ our @EXPORT = qw(
 	to_rules_target
 	unpack_sequence
 	rules_explicit_target
+	extract_skipinfo
 	DUMMY_TARGET
 );
 
@@ -127,5 +128,25 @@ sub rules_explicit_target {
 
 	return $EXPLICIT_TARGETS{$target};
 }
+
+sub extract_skipinfo {
+	my ($command) = @_;
+
+	foreach my $dir (split(':', $ENV{PATH})) {
+		if (open (my $h, "<", "$dir/$command")) {
+			while (<$h>) {
+				if (m/PROMISE: DH NOOP( WITHOUT\s+(.*))?\s*$/) {
+					close $h;
+					return split(' ', $2) if defined($2);
+					return ('always-skip');
+				}
+			}
+			close $h;
+			return;
+		}
+	}
+	return;
+}
+
 
 1;
