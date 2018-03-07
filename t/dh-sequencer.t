@@ -46,6 +46,19 @@ my %sequences = (
     'binary'       => [to_rules_target("install"), to_rules_target("binary-arch"), to_rules_target("binary-indep")],
 );
 
+my %sequences_unpacked = (
+	'build-indep' => [@bd],
+	'build-arch'  => [@bd],
+	'build'       => [@bd],
+
+	'install-indep' => [@bd, @i],
+	'install-arch'  => [@bd, @i],
+	'install'       => [@bd, @i],
+
+	'binary-indep' => [@bd, @i, @b],
+	'binary-arch'  => [@bd, @i, @ba, @b],
+	'binary'       => [@bd, @i, @ba, @b],
+);
 
 plan tests => 11;
 
@@ -56,27 +69,27 @@ $Debian::Debhelper::SequencerUtil::RULES_PARSED = 1;
 
 is_deeply(
     [unpack_sequence(\%sequences, 'build')],
-    [[], [@bd]],
+    [[], $sequences_unpacked{'build'}],
     'Inlined build sequence matches build-indep/build-arch');
 
 is_deeply(
     [unpack_sequence(\%sequences, 'install')],
-    [[], [@bd, @i]],
+    [[], $sequences_unpacked{'install'}],
     'Inlined install sequence matches build-indep/build-arch + install commands');
 
 is_deeply(
     [unpack_sequence(\%sequences, 'binary-arch')],
-    [[], [@bd, @i, @ba, @b]],
+    [[], $sequences_unpacked{'binary-arch'}],
     'Inlined binary-arch sequence has all the commands');
 
 is_deeply(
     [unpack_sequence(\%sequences, 'binary-indep')],
-    [[], [@bd, @i, @b]],
+    [[], $sequences_unpacked{'binary-indep'}],
     'Inlined binary-indep sequence has all the commands except @bd');
 
 is_deeply(
     [unpack_sequence(\%sequences, 'binary')],
-    [[], [@bd, @i, @ba, @b]],
+    [[], $sequences_unpacked{'binary'}],
     'Inlined binary sequence has all the commands');
 
 
@@ -100,7 +113,7 @@ is_deeply(
 
     is_deeply(
         [unpack_sequence(\%sequences, 'build')],
-        [[], [@bd]],
+        [[], $sequences_unpacked{'build'}],
         'build sequence is inlineable');
 
 }
