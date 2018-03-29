@@ -13,6 +13,11 @@ debhelper (11.1.6) UNRELEASED; urgency=medium
   * autopkgtests: Remove "use-name" tests as it no longer works.
     The debhelper module makes assumptions in which directory it is
     run from and the test breaks these assumptions.
+  * debian/control: Comment out versioned dependency on make.
+    It is not strictly necessary for Debian and causes issues with
+    make-guile.  On the other hand, it is useful for people
+    backporting debhelper on derivatives and hench leaving it as a
+    comment.  (Closes: #892586)
 
  -- Niels Thykier <niels@thykier.net>  Mon, 26 Feb 2018 19:32:52 +0000
 
