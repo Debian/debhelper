@@ -16,10 +16,11 @@ Vcs-Browser: https://salsa.debian.org/debian/debhelper
 Package: debhelper
 Architecture: all
 Depends: autotools-dev,
-# Version 12 is where dh-autoreconf supports --sourcedirectory.  Can be
-# relaxed if no packages rely on it.
-# Version 16 fixes #887482
-         dh-autoreconf (>= 16~),
+# Version 12 is where dh-autoreconf supports --sourcedirectory.
+# Version 16 fixes #887482, version 17 fixes #889567
+# Constraint can be relaxed if packages do not rely/require any of the
+# above fixes
+         dh-autoreconf (>= 17~),
 # Version constraint is to get a version of dh-strip-nondeterminism
 # without several bugs.  The constraint can be relaxed if an older
 # version is sufficient.
