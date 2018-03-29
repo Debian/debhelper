@@ -1821,9 +1821,17 @@ sub make_symlink{
 	my $dest = shift;
 	my $src = _expand_path(shift);
 	my $tmp = shift;
-        $tmp = '' if not defined($tmp);
-	$src=~s:^/::;
-	$dest=~s:^/::;
+	$tmp = '' if not defined($tmp);
+
+	if ($dest =~ m{(?:^|/)*[.]{2}(?:/|$)}) {
+		error("Invalid destination/link name (contains \"..\"-segments): $dest");
+	}
+
+	$src =~ s{^(?:[.]/+)++}{};
+	$dest =~ s{^(?:[.]/+)++}{};
+
+	$src=~s:^/++::;
+	$dest=~s:^/++::;
 
 	if ($src eq $dest) {
 		warning("skipping link from $src to self");
@@ -1835,8 +1843,8 @@ sub make_symlink{
 	# Policy says that if the link is all within one toplevel
 	# directory, it should be relative. If it's between
 	# top level directories, leave it absolute.
-	my @src_dirs=split(m:/+:,$src);
-	my @dest_dirs=split(m:/+:,$dest);
+	my @src_dirs = grep { $_ ne '.' } split(m:/+:,$src);
+	my @dest_dirs = grep { $_ ne '.' } split(m:/+:,$dest);
 	if (@src_dirs > 0 && $src_dirs[0] eq $dest_dirs[0]) {
 		# Figure out how much of a path $src and $dest
 		# share in common.

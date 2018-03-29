@@ -31,6 +31,11 @@ debhelper (11.1.6) UNRELEASED; urgency=medium
     ensures that the generated maintscript snippets are bit-for-bit
     reproducible when a package ships xfons in multiple fonts
     directories.  (Closes: #894227)
+  * Dh_Lib: Improve the "make_symlink" code to avoid non-compliant
+    symlinks when the link name was not a normalized path.  Note
+    that ".."-segments are now disallowed in the link name (but not
+    the link target).  Thanks to Nicolas Boulenguez for reporting
+    the bug plus the test cases.  (Closes: #894229)
 
  -- Niels Thykier <niels@thykier.net>  Mon, 26 Feb 2018 19:32:52 +0000
 
