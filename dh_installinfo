@@ -93,6 +93,8 @@ foreach my $package (getpackages()) {
 		push @info, @ARGV;
 	}
 
+	log_installed_files($package, @info);
+
 	next if $skip_install or $nodocs;
 
 	if (@info) {
