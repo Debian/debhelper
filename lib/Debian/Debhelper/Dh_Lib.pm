@@ -188,6 +188,10 @@ sub init {
 # on, if it's exiting successfully.
 my $write_log=1;
 sub END {
+	# If there is no 'debian/control', then we are not being run from
+	# a package directory and then the write_log will not do what we
+	# expect.
+	return if not -f 'debian/control';
 	if ($? == 0 && $write_log && (compat(9, 1) || $ENV{DH_INTERNAL_OVERRIDE})) {
 		write_log(basename($0), @{$dh{DOPACKAGES}});
 	}
