@@ -86,7 +86,7 @@ sub do_make {
 		$parallel = '' if $parallel == 0;
 		# -O is for synchronizing the output; only if STDOUT
 		# is not a TTY
-		unshift(@_, '-O') if not -t STDOUT;
+		unshift(@_, '-Oline') if not -t STDOUT;
 		unshift(@_, "-j${parallel}");
 	} else {
 		unshift(@_, '-j1');
