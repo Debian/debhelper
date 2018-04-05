@@ -907,12 +907,13 @@ sub pkgfilename {
 		if (not defined($res)) {
 			error("No changelog entries for $package!? (changelog file: ${isnative_changelog})");
 		}
-		# Get the package version.
-		$dh{VERSION} = $res->{'Version'};
-		# Did the changelog parse fail?
-		if ($dh{VERSION} eq q{}) {
-			error("changelog parse failure");
+		my $version = $res->{'Version'};
+		# Do we have a valid version?
+		if (not defined($version) or not $version->is_valid) {
+			error("changelog parse failure; invalid or missing version");
 		}
+		# Get the package version.
+		$dh{VERSION} = $version->as_string;
 
 		# Is this a native Debian package?
 		if (index($dh{VERSION}, '-') > -1) {

@@ -7,6 +7,9 @@ debhelper (11.1.7) UNRELEASED; urgency=medium
   * makefile.pm: Use -Oline with make.  This avoids make mistaking
     a target name for a value for -O and should make build time
     outs less likely for "long" targets.  (Closes: #894573)
+  * Dh_Lib.pm: Fix bug that make debhelper trip on packages with
+    the version "0".  Thanks to Chris Lamb for reporting the bug
+    plus debugging the issue.  (Closes: #894895)
 
   [ Nicolas Boulenguez ]
   * dh_installxfonts: Fix typo that causes a misc:Depends on
