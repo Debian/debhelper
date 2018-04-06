@@ -90,7 +90,7 @@ sub run_auto_buildable_tests {
 	rm_files("${sourcedir}/configure");
 
 	create_empty_file("${sourcedir}/CMakeLists.txt");
-	test_check_auto_buildable($bs{cmake}, "CMakeLists.txt", { configure => 1, clean => 1 });
+	test_check_auto_buildable($bs{'cmake+makefile'}, "CMakeLists.txt", { configure => 1, clean => 1 });
 	rm_files("${sourcedir}/CMakeLists.txt");
 
 	create_empty_file("${sourcedir}/Makefile.PL");
@@ -98,7 +98,7 @@ sub run_auto_buildable_tests {
 	rm_files("${sourcedir}/Makefile.PL");
 
 	create_empty_file("${sourcedir}/meson.build");
-	test_check_auto_buildable($bs{meson}, "meson.build", { configure => 1, clean => 1 });
+	test_check_auto_buildable($bs{'meson+ninja'}, "meson.build", { configure => 1, clean => 1 });
 	# Leave meson.build
 
 	create_empty_file("${builddir}/build.ninja");
@@ -106,7 +106,7 @@ sub run_auto_buildable_tests {
 	# Leave ninja.build
 
 	# Meson + ninja
-	test_check_auto_buildable($bs{meson}, "meson.build+build.ninja", { configure => 1, build => 1, clean => 1, install => 1, test => 1 });
+	test_check_auto_buildable($bs{'meson+ninja'}, "meson.build+build.ninja", { configure => 1, build => 1, clean => 1, install => 1, test => 1 });
 	rm_files("${sourcedir}/meson.build", "${builddir}/build.ninja");
 
 	# With Makefile
@@ -120,9 +120,9 @@ sub run_auto_buildable_tests {
 
 	# ... +cmake
 	create_empty_file("${sourcedir}/CMakeLists.txt");
-	test_check_auto_buildable($bs{cmake}, "CMakeLists.txt+Makefile", 1);
+	test_check_auto_buildable($bs{'cmake+makefile'}, "CMakeLists.txt+Makefile", 1);
 	create_empty_file("$builddir/CMakeCache.txt"); # strong evidence that cmake was run
-	test_check_auto_buildable($bs{cmake}, "CMakeCache.txt+Makefile", 2);
+	test_check_auto_buildable($bs{'cmake+makefile'}, "CMakeCache.txt+Makefile", 2);
 	rm_files("${builddir}/Makefile", "${sourcedir}/CMakeLists.txt");
 
 	# Makefile.PL forces in-source
@@ -189,7 +189,7 @@ sub run_autoselection_tests {
 	# CMake
 	create_empty_file("${sourcedir}/CMakeLists.txt");
 	test_autoselection("cmake without CMakeCache.txt",
-					   { configure => "cmake", build => "makefile",
+					   { configure => "cmake+makefile", build => "makefile",
 						 test => "makefile", install => "makefile",
 						 clean => "makefile"
 					   },
@@ -201,7 +201,7 @@ sub run_autoselection_tests {
 
 	create_empty_file("${sourcedir}/CMakeLists.txt");
 	test_autoselection("cmake with CMakeCache.txt",
-					   "cmake",
+					   "cmake+makefile",
 					   %options,
 					   code_configure => sub {
 						   create_empty_file("$builddir/Makefile");

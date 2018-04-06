@@ -8,11 +8,20 @@ package Debian::Debhelper::Buildsystem::meson;
 use strict;
 use warnings;
 use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value is_cross_compiling doit warning error generated_file);
-use parent qw(Debian::Debhelper::Buildsystem::ninja);
+use parent qw(Debian::Debhelper::Buildsystem);
 
 sub DESCRIPTION {
 	"Meson (meson.build)"
 }
+
+sub IS_GENERATOR_BUILD_SYSTEM {
+	return 1;
+}
+
+sub SUPPORTED_TARGET_BUILD_SYSTEMS {
+	return qw(ninja);
+}
+
 
 sub check_auto_buildable {
 	my $this=shift;
@@ -22,7 +31,14 @@ sub check_auto_buildable {
 
 	# Handle configure explicitly; inherit the rest
 	return 1 if $step eq "configure";
-	return $this->SUPER::check_auto_buildable(@_);
+	my $ret = $this->{targetbuildsystem}->check_auto_buildable(@_);
+	if ($ret == 0 and $step eq 'clean' and defined($this->get_builddir())) {
+		# Assume that the package can be cleaned (i.e. the build directory can
+		# be removed) as long as it is built out-of-source tree and can be
+		# configured.
+		$ret++;
+	}
+	return $ret;
 }
 
 sub new {

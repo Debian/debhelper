@@ -30,14 +30,6 @@ sub check_auto_buildable {
 		# This is always called in the source directory, but generally
 		# Ninja files are created (or live) in the build directory.
 		return 1;
-	} elsif ($step eq "clean" && defined $this->get_builddir() &&
-	         $this->check_auto_buildable("configure"))
-	{
-		# Assume that the package can be cleaned (i.e. the build directory can
-		# be removed) as long as it is built out-of-source tree and can be
-		# configured. This is useful for derivative buildsystems which
-		# generate Ninja files.
-		return 1;
 	}
 	return 0;
 }

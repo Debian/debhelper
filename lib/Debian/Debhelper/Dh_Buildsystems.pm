@@ -25,11 +25,11 @@ our @BUILDSYSTEMS = (
 	"makefile",
 	"python_distutils",
 	(compat(7) ? "perl_build" : ()),
-	"cmake",
+	"cmake+makefile",
 	"ant",
 	"qmake",
 	"qmake_qt4",
-	"meson",
+	"meson+ninja",
 	"ninja",
 );
 
@@ -45,13 +45,21 @@ my $opt_list;
 my $opt_parallel;
 
 sub create_buildsystem_instance {
-	my ($system, $required, %bsopts) = @_;
-	my $module = "Debian::Debhelper::Buildsystem::$system";
+	my ($full_name, $required, %bsopts) = @_;
+	my @parts = split(m{[+]}, $full_name, 2);
+	my $name = $parts[0];
+	my $module = "Debian::Debhelper::Buildsystem::$name";
+	if (@parts > 1) {
+		if (exists($bsopts{'targetbuildsystem'})) {
+			error("Conflicting target buildsystem for ${name} (load as ${full_name}, but target configured in bsopts)");
+		}
+		$bsopts{'targetbuildsystem'} = $parts[1];
+	}
 
 	eval "use $module";
 	if ($@) {
 		return if not $required;
-		error("unable to load build system class '$system': $@");
+		error("unable to load build system class '$name': $@");
 	}
 
 	if (!exists $bsopts{builddir} && defined $opt_builddir) {
@@ -73,9 +81,15 @@ sub autoselect_buildsystem {
 	my $selected_level = 0;
 
 	foreach my $inst (@_) {
-		# Only derived (i.e. more specific) build system can be
-		# considered beyond the currently selected one.
-		next if defined $selected && !$inst->isa(ref $selected);
+		# Only  more specific build system can be considered beyond
+		# the currently selected one.
+		if (defined($selected)) {
+			my $ok = $inst->isa(ref($selected)) ? 1 : 0;
+			if (not $ok and $inst->IS_GENERATOR_BUILD_SYSTEM) {
+				$ok = 1 if $inst->{targetbuildsystem}->NAME eq $selected->NAME;
+			}
+			next if not $ok;
+		}
 
 		# If the build system says it is auto-buildable at the current
 		# step and it can provide more specific information about its
@@ -121,7 +135,8 @@ sub load_buildsystem {
 
 sub load_all_buildsystems {
 	my $incs=shift || \@INC;
-	my (%buildsystems, @buildsystems);
+	my %opts = @_;
+	my (%buildsystems, %genbuildsystems, @buildsystems);
 
 	foreach my $inc (@$incs) {
 		my $path = File::Spec->catdir($inc, "Debian/Debhelper/Buildsystem");
@@ -129,8 +144,19 @@ sub load_all_buildsystems {
 			foreach my $module_path (glob "$path/*.pm") {
 				my $name = basename($module_path);
 				$name =~ s/\.pm$//;
-				next if exists $buildsystems{$name};
-				$buildsystems{$name} = create_buildsystem_instance($name, 1, @_);
+				next if exists $buildsystems{$name} or exists $genbuildsystems{$name};
+				my $system = create_buildsystem_instance($name, 1, %opts);
+				if ($system->IS_GENERATOR_BUILD_SYSTEM) {
+					$genbuildsystems{$name} = 1;
+					for my $target_name ($system->SUPPORTED_TARGET_BUILD_SYSTEMS) {
+						my $full_name = "${name}+${target_name}";
+						my $full_system = create_buildsystem_instance($name, 1, %opts,
+							'targetbuildsystem' => $target_name);
+						$buildsystems{$full_name} = $full_system;
+					}
+				} else {
+					$buildsystems{$name} = $system;
+				}
 			}
 		}
 	}
@@ -209,22 +235,31 @@ sub buildsystems_list {
 	my @buildsystems = load_all_buildsystems();
 	my %auto_selectable = map { $_ => 1 } @THIRD_PARTY_BUILDSYSTEMS;
 	my $auto = autoselect_buildsystem($step, grep { ! $_->{thirdparty} || $auto_selectable{$_->NAME} } @buildsystems);
-	my $specified;
+	my $specified_text;
+
+	if ($opt_buildsys) {
+		for my $inst (@buildsystems) {
+			my $full_name = $inst->NAME;
+			if ($full_name eq $opt_buildsys) {
+				$specified_text = $full_name;
+			} elsif ($inst->IS_GENERATOR_BUILD_SYSTEM and ref($inst)->NAME eq $opt_buildsys) {
+				my $default = $inst->DEFAULT_TARGET_BUILD_SYSTEM;
+				$specified_text = "${opt_buildsys}+${default} (default for ${opt_buildsys})";
+			}
+		}
+	}
 
 	# List build systems (including auto and specified status)
 	foreach my $inst (@buildsystems) {
-		if (! defined $specified && defined $opt_buildsys && $opt_buildsys eq $inst->NAME()) {
-			$specified = $inst;
-		}
-		printf("%-20s %s", $inst->NAME(), $inst->DESCRIPTION());
+		printf("%-20s %s", $inst->NAME(), $inst->FULL_DESCRIPTION());
 		print " [3rd party]" if $inst->{thirdparty};
 		print "\n";
 	}
 	print "\n";
 	print "Auto-selected: ", $auto->NAME(), "\n" if defined $auto;
-	print "Specified: ", $specified->NAME(), "\n" if defined $specified;
+	print "Specified: ", $specified_text, "\n" if defined $specified_text;
 	print "No system auto-selected or specified\n"
-		if ! defined $auto && ! defined $specified;
+		if ! defined $auto && ! defined $specified_text;
 }
 
 sub buildsystems_do {

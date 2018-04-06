@@ -9,7 +9,7 @@ package Debian::Debhelper::Buildsystem::cmake;
 use strict;
 use warnings;
 use Debian::Debhelper::Dh_Lib qw(compat dpkg_architecture_value error is_cross_compiling);
-use parent qw(Debian::Debhelper::Buildsystem::makefile);
+use parent qw(Debian::Debhelper::Buildsystem);
 
 my @STANDARD_CMAKE_FLAGS = qw(
   -DCMAKE_INSTALL_PREFIX=/usr
@@ -31,12 +31,26 @@ sub DESCRIPTION {
 	"CMake (CMakeLists.txt)"
 }
 
+sub IS_GENERATOR_BUILD_SYSTEM {
+	return 1;
+}
+
+sub SUPPORTED_TARGET_BUILD_SYSTEMS {
+	return qw(makefile);
+}
+
 sub check_auto_buildable {
 	my $this=shift;
 	my ($step)=@_;
 	if (-e $this->get_sourcepath("CMakeLists.txt")) {
 		my $ret = ($step eq "configure" && 1) ||
-		          $this->SUPER::check_auto_buildable(@_);
+		          $this->{targetbuildsystem}->check_auto_buildable(@_);
+		if ($step eq "clean" && defined($this->get_builddir())) {
+			# Assume that the package can be cleaned (i.e. the build directory can
+			# be removed) as long as it is built out-of-source tree and can be
+			# configured.
+			$ret++ if not $ret;
+		}
 		# Existence of CMakeCache.txt indicates cmake has already
 		# been used by a prior build step, so should be used
 		# instead of the parent makefile class.
@@ -111,13 +125,16 @@ sub configure {
 
 sub test {
 	my $this=shift;
-
-	# Unlike make, CTest does not have "unlimited parallel" setting (-j implies
-	# -j1). So in order to simulate unlimited parallel, allow to fork a huge
-	# number of threads instead.
-	my $parallel = ($this->get_parallel() > 0) ? $this->get_parallel() : 999;
+	my $target = $this->{targetbuildsystem};
 	$ENV{CTEST_OUTPUT_ON_FAILURE} = 1;
-	return $this->SUPER::test(@_, "ARGS+=-j$parallel");
+	if ($target->NAME eq 'makefile') {
+		# Unlike make, CTest does not have "unlimited parallel" setting (-j implies
+		# -j1). So in order to simulate unlimited parallel, allow to fork a huge
+		# number of threads instead.
+		my $parallel = ($this->get_parallel() > 0) ? $this->get_parallel() : 999;
+		push(@_, "ARGS+=-j$parallel")
+	}
+	return $this->SUPER::test(@_);
 }
 
 1
