@@ -26,6 +26,7 @@ our @BUILDSYSTEMS = (
 	"python_distutils",
 	(compat(7) ? "perl_build" : ()),
 	"cmake+makefile",
+	"cmake+ninja",
 	"ant",
 	"qmake",
 	"qmake_qt4",

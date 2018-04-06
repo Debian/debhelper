@@ -27,6 +27,11 @@ my %DEB_HOST2CMAKE_SYSTEM = (
 	'hurd'     => 'GNU',
 );
 
+my %TARGET_BUILD_SYSTEM2CMAKE_GENERATOR = (
+	'makefile' => 'Unix Makefiles',
+	'ninja'    => 'Ninja',
+);
+
 sub DESCRIPTION {
 	"CMake (CMakeLists.txt)"
 }
@@ -36,7 +41,7 @@ sub IS_GENERATOR_BUILD_SYSTEM {
 }
 
 sub SUPPORTED_TARGET_BUILD_SYSTEMS {
-	return qw(makefile);
+	return qw(makefile ninja);
 }
 
 sub check_auto_buildable {
@@ -71,9 +76,14 @@ sub configure {
 	my $this=shift;
 	# Standard set of cmake flags
 	my @flags = @STANDARD_CMAKE_FLAGS;
+	my $backend = $this->{targetbuildsystem}->NAME;
 
 	if (not compat(10)) {
 		push(@flags, '-DCMAKE_INSTALL_RUNSTATEDIR=/run');
+	}
+	if (exists($TARGET_BUILD_SYSTEM2CMAKE_GENERATOR{$backend})) {
+		my $generator = $TARGET_BUILD_SYSTEM2CMAKE_GENERATOR{$backend};
+		push(@flags, "-G${generator}");
 	}
 
 	if (is_cross_compiling()) {
