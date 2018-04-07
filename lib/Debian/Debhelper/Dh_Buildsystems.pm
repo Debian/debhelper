@@ -87,7 +87,7 @@ sub autoselect_buildsystem {
 		if (defined($selected)) {
 			my $ok = $inst->isa(ref($selected)) ? 1 : 0;
 			if (not $ok and $inst->IS_GENERATOR_BUILD_SYSTEM) {
-				$ok = 1 if $inst->{targetbuildsystem}->NAME eq $selected->NAME;
+				$ok = 1 if $inst->get_targetbuildsystem->NAME eq $selected->NAME;
 			}
 			next if not $ok;
 		}

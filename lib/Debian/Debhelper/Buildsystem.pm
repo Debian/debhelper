@@ -186,7 +186,14 @@ sub set_targetbuildsystem {
 		my $name = $this->NAME;
 		error("Buildsystem ${name} does not support ${target_bs_name} as target build system.");
 	}
-	$this->{targetbuildsystem} = $target_system
+	$this->{'targetbuildsystem'} = $target_system
+}
+
+# Returns the target build system if it is provided
+sub get_targetbuildsystem {
+	my $this = shift;
+	return if not exists($this->{'targetbuildsystem'});
+	return $this->{'targetbuildsystem'};
 }
 
 # This instance method is called to check if the build system is able
@@ -498,7 +505,7 @@ sub pre_building_step {
 		delete $this->{warn_insource};
 	}
 	if ($this->IS_GENERATOR_BUILD_SYSTEM) {
-		$this->{targetbuildsystem}->pre_building_step(@_);
+		$this->get_targetbuildsystem->pre_building_step(@_);
 	}
 }
 
@@ -509,7 +516,7 @@ sub post_building_step {
 	my $this=shift;
 	my ($step)=@_;
 	if ($this->IS_GENERATOR_BUILD_SYSTEM) {
-		$this->{targetbuildsystem}->post_building_step(@_);
+		$this->get_targetbuildsystem->post_building_step(@_);
 	}
 }
 
@@ -532,14 +539,14 @@ sub configure {
 sub build {
 	my $this=shift;
 	if ($this->IS_GENERATOR_BUILD_SYSTEM) {
-		$this->{targetbuildsystem}->build(@_);
+		$this->get_targetbuildsystem->build(@_);
 	}
 }
 
 sub test {
 	my $this=shift;
 	if ($this->IS_GENERATOR_BUILD_SYSTEM) {
-		$this->{targetbuildsystem}->test(@_);
+		$this->get_targetbuildsystem->test(@_);
 	}
 }
 
@@ -549,7 +556,7 @@ sub install {
 	my ($destdir) = @_;
 
 	if ($this->IS_GENERATOR_BUILD_SYSTEM) {
-		$this->{targetbuildsystem}->install(@_);
+		$this->get_targetbuildsystem->install(@_);
 	}
 }
 
@@ -557,7 +564,7 @@ sub clean {
 	my $this=shift;
 
 	if ($this->IS_GENERATOR_BUILD_SYSTEM) {
-		$this->{targetbuildsystem}->clean(@_);
+		$this->get_targetbuildsystem->clean(@_);
 	}
 }
 

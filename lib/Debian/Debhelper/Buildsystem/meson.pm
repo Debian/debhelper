@@ -31,7 +31,7 @@ sub check_auto_buildable {
 
 	# Handle configure explicitly; inherit the rest
 	return 1 if $step eq "configure";
-	my $ret = $this->{targetbuildsystem}->check_auto_buildable(@_);
+	my $ret = $this->get_targetbuildsystem->check_auto_buildable(@_);
 	if ($ret == 0 and $step eq 'clean' and defined($this->get_builddir())) {
 		# Assume that the package can be cleaned (i.e. the build directory can
 		# be removed) as long as it is built out-of-source tree and can be

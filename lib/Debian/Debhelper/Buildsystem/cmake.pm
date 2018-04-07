@@ -49,7 +49,7 @@ sub check_auto_buildable {
 	my ($step)=@_;
 	if (-e $this->get_sourcepath("CMakeLists.txt")) {
 		my $ret = ($step eq "configure" && 1) ||
-		          $this->{targetbuildsystem}->check_auto_buildable(@_);
+		          $this->get_targetbuildsystem->check_auto_buildable(@_);
 		if ($step eq "clean" && defined($this->get_builddir())) {
 			# Assume that the package can be cleaned (i.e. the build directory can
 			# be removed) as long as it is built out-of-source tree and can be
@@ -76,7 +76,7 @@ sub configure {
 	my $this=shift;
 	# Standard set of cmake flags
 	my @flags = @STANDARD_CMAKE_FLAGS;
-	my $backend = $this->{targetbuildsystem}->NAME;
+	my $backend = $this->get_targetbuildsystem->NAME;
 
 	if (not compat(10)) {
 		push(@flags, '-DCMAKE_INSTALL_RUNSTATEDIR=/run');
@@ -135,7 +135,7 @@ sub configure {
 
 sub test {
 	my $this=shift;
-	my $target = $this->{targetbuildsystem};
+	my $target = $this->get_targetbuildsystem;
 	$ENV{CTEST_OUTPUT_ON_FAILURE} = 1;
 	if ($target->NAME eq 'makefile') {
 		# Unlike make, CTest does not have "unlimited parallel" setting (-j implies
