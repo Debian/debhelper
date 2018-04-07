@@ -70,6 +70,65 @@ each_compat_subtest {
 
 	perform_test(
 		[
+		 '/usr/local/foo/bar',
+		 '/usr/local/foo/baz',
+		],
+		[
+		 '/usr/local/foo',
+		 '/usr/local/foo/bar',
+		 '/usr/local/foo/baz',
+		],
+		[
+		 '/usr/local/foo/bar',
+		 '/usr/local/foo/baz',
+		]
+	);
+
+	perform_test(
+		[qw(
+		 /usr/local/a/a/a
+		 /usr/local/a/a/b
+		 /usr/local/a/b/a
+		 /usr/local/a/b/b
+		 /usr/local/b/a/a
+		 /usr/local/b/a/b
+		 /usr/local/b/b/a
+		 /usr/local/b/b/b
+		)],
+		[qw(
+		 /usr/local/a
+		 /usr/local/a/a
+		 /usr/local/a/a/a
+		 /usr/local/a/a/b
+		 /usr/local/a/b
+		 /usr/local/a/b/a
+		 /usr/local/a/b/b
+		 /usr/local/b
+		 /usr/local/b/a
+		 /usr/local/b/a/a
+		 /usr/local/b/a/b
+		 /usr/local/b/b
+		 /usr/local/b/b/a
+		 /usr/local/b/b/b
+		 )],
+		[qw(
+		 /usr/local/a/a/a
+		 /usr/local/a/a/b
+		 /usr/local/a/a
+		 /usr/local/a/b/a
+		 /usr/local/a/b/b
+		 /usr/local/a/b
+		 /usr/local/b/a/a
+		 /usr/local/b/a/b
+		 /usr/local/b/a
+		 /usr/local/b/b/a
+		 /usr/local/b/b/b
+		 /usr/local/b/b
+		 )]
+	);
+
+	perform_test(
+		[
 		 '/usr/local/foo/dir/somewhere',
 		 '/usr/local/bar/another-dir/elsewhere',
 		 '/usr/local/baz/foo+bar/thing',
