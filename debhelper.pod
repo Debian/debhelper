@@ -78,7 +78,11 @@ complicated formats.
 
 Note for the first (or only) binary package listed in
 F<debian/control>, debhelper will use F<debian/foo> when there's no
-F<debian/package.foo> file.
+F<debian/I<package>.foo> file.  However, it is often a good idea to keep
+the F<I<package>.> prefix as it is more explicit.  The primary exception
+to this are files that debhelper by default installs in every binary
+package when it does not have a package prefix (such as
+F<debian/copyright> or F<debian/changelog>).
 
 In some rare cases, you may want to have different versions of these files
 for different architectures or OSes. If files named debian/I<package>.foo.I<ARCH>
