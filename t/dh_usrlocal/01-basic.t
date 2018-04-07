@@ -51,7 +51,7 @@ sub perform_test {
 	@prerm = extract_generated_lines("debian/debhelper.prerm.debhelper");
 
 	is_deeply(\@postinst,
-			  [map { "$_ 02775 root staff" } @{$expected_dirs_postinst}],
+			  [map { "$_ default" } @{$expected_dirs_postinst}],
 			  "Correct postinst"
 		) or do { diag("postinst: $_") for @postinst; };
 	is_deeply(\@prerm,

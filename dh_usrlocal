@@ -33,18 +33,19 @@ snippets are inserted into the maintainer scripts by B<dh_installdeb>. See
 L<dh_installdeb(1)> for an explanation of debhelper maintainer script
 snippets.
 
-When the I<Rules-Requires-Root> field is not (effectively)
-I<binary-targets>, the directories in F</usr/local> will have
-ownership root:staff and the mode will be 02775.  These values have
-been chosen to comply with the recommendations of the Debian policy
-for directories in F</usr/local>.
+When the I<DEB_RULES_REQUIRES_ROOT> environment variable is not (effectively)
+I<binary-targets>, the directories in F</usr/local> will be handled as if
+they were owned by root:root (see below).
 
-When I<Rules-Requires-Root> has an effective value of
+When the I<DEB_RULES_REQUIRES_ROOT> environment variable has an effective value of
 I<binary-targets>, the owners, groups and permissions will be
-preserved with one exception.  If the directory is owned by root:root,
-then ownership will be reset to root:staff and mode will be reset to
-02775. This is useful, since that is the group and mode policy
-recommends for directories in F</usr/local>.
+preserved with the sole exception where the directory is owned by root:root.
+
+If a directory is owned by root:root, then ownership will be determined
+at install time.  The ownership and permission bits will either be root:root
+mode 0755 or root:staff mode 02775.  The actual choice depends on whether
+the system has F/etc/staff-group-for-usr-local> (as documented in the Debian
+Policy Manual §9.1.2 since version 4.1.4)
 
 =head1 OPTIONS
 
@@ -107,7 +108,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				  if (should_use_root()) {
 					  my $stat = stat $File::Find::dir;
 					  if ($stat->uid == 0 && $stat->gid == 0) {
-						  push @dirs, "$fn 02775 root staff";
+						  # Figure out the ownership and permission at runtime
+						  # (required by Policy 9.1.2)
+						  push(@dirs, "$fn default");
 					  } else {
 						  my $user = getpwuid $stat->uid;
 						  my $group = getgrgid $stat->gid;
@@ -115,7 +118,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 						  push @dirs, "$fn $mode $user $group";
 					  }
 				  } else {
-					  push @dirs, "$fn 02775 root staff";
+					  # Figure out the ownership and permission at runtime
+					  # (required by Policy 9.1.2)
+					  push(@dirs, "$fn default");
 				  }
 		      }}, "$tmp/usr/local");
 
