@@ -1,4 +1,4 @@
-debhelper (11.1.7) UNRELEASED; urgency=medium
+debhelper (11.2) UNRELEASED; urgency=medium
 
   [ Niels Thykier ]
   * debhelper.7: Add a ~ to the suggested Build-Depends to ensure
@@ -10,6 +10,15 @@ debhelper (11.1.7) UNRELEASED; urgency=medium
   * Dh_Lib.pm: Fix bug that make debhelper trip on packages with
     the version "0".  Thanks to Chris Lamb for reporting the bug
     plus debugging the issue.  (Closes: #894895)
+  * Buildsystem.pm: Rewrite to support build systems that generate
+    build files for another build system (without using
+    inheritenece).  This enables generator build systems to have
+    multiple backends.
+  * cmake.pm: Support ninja as alternative backend (by using the
+    build system cmake+ninja).  Thanks to Kyle Edwards for the
+    suggestion.  (Closes: #895044)
+  * meson.pm: Rewrite as a generator build system with ninja as
+    the only backend.
 
   [ Nicolas Boulenguez ]
   * dh_installxfonts: Fix typo that causes a misc:Depends on
