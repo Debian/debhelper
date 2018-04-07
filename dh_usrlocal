@@ -77,54 +77,49 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	if (-d "$tmp/usr/local") {
 		my (@dirs, @justdirs);
-		find({bydepth => 1,
-		      no_chdir => 1,
-		      wanted => sub {
-			my $fn = $File::Find::name;
-			if (-d $fn) {
-				my $user = 'root';
-				my $group = 'staff';
-				my $mode = '02775';
-				if (should_use_root()) {
-					my $stat = stat $fn;
-					$user = getpwuid $stat->uid;
-					$group = getgrgid $stat->gid;
-					$mode = sprintf "%04lo", ($stat->mode & 07777);
-					if ($stat->uid == 0 && $stat->gid == 0) {
-						$group = 'staff';
-						$mode = '02775';
-					}
-				}
-
-
-
-				$fn =~ s!^\Q$tmp\E!!;
-				return if $fn eq '/usr/local';
-				
-				# @dirs is in parents-first order for dir creation...
-				unshift @dirs, "$fn $mode $user $group";
-				# ...whereas @justdirs is depth-first for removal.
-				push @justdirs, $fn;
-				doit('rmdir', $_);
-			}
-			else {
-				warning("$fn is not a directory");
-			}
+		find({no_chdir => 1,
+		      preprocess => sub {
+				  # Ensure a reproducible traversal.
+				  return sort @_;
+		      },
+		      postprocess => sub {
+				  # Uninstall, unless a direct child of /usr/local.
+				  $_ = $File::Find::dir;
+				  s!^\Q$tmp\E!!;
+				  push @justdirs, $_ if m!/usr/local/.*/!;
+				  # Remove a directory after its childs.
+				  doit('rmdir', $File::Find::dir);
+		      },
+			  wanted => sub {
+				  # rmdir would fail later anyways.
+				  error("${File::Find::name} is not a directory")
+					  if not -d $File::Find::name;
+				  # Install directory before its childs.
+				  my $fn = $File::Find::name;
+				  $fn =~ s!^\Q$tmp\E!!;
+				  return if $fn eq '/usr/local';
+				  if (should_use_root()) {
+					  my $stat = stat $File::Find::dir;
+					  if ($stat->uid == 0 && $stat->gid == 0) {
+						  push @dirs, "$fn 02775 root staff";
+					  } else {
+						  my $user = getpwuid $stat->uid;
+						  my $group = getgrgid $stat->gid;
+						  my $mode = sprintf "%04lo", ($stat->mode & 07777);
+						  push @dirs, "$fn $mode $user $group";
+					  }
+				  } else {
+					  push @dirs, "$fn 02775 root staff";
+				  }
 		      }}, "$tmp/usr/local");
-		doit('rmdir', "$tmp/usr/local");
-	
-		my $bs = "\\";     # A single plain backslash
-		my $ebs = $bs x 2; # Escape the backslash from the shell
+
 		# This constructs the body of a 'sed' c\ expression which
 		# is parsed by the shell in double-quotes
-		my $dirs = join("$ebs\n", sort @dirs);
-		pop @justdirs; # don't remove directories directly in /usr/local
-		my $justdirs = join("$ebs\n", reverse sort @justdirs);
 		if (! $dh{NOSCRIPTS}) { 
 			autoscript($package,"postinst", "postinst-usrlocal",
-				   "/#DIRS#/ c${ebs}\n${dirs}");
+					   { 'DIRS' => join ("\n", @dirs)}) if @dirs;
 			autoscript($package,"prerm", "prerm-usrlocal",
-				   "/#JUSTDIRS#/ c${ebs}\n${justdirs}") if length $justdirs;
+					   { 'JUSTDIRS' => join ("\n", @justdirs)}) if @justdirs;
 		}
 	}
 }
