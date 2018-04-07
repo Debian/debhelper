@@ -174,7 +174,7 @@ sub set_targetbuildsystem {
 	my $target_bs_name = $target_system->NAME;
 	if (not $this->IS_GENERATOR_BUILD_SYSTEM) {
 		my $name = $this->NAME;
-		error("Buildsystem ${name} is not a generator build system");
+		error("Cannot set a target build system: Buildsystem ${name} is not a generator build system");
 	}
 	for my $supported_bs_name ($this->SUPPORTED_TARGET_BUILD_SYSTEMS) {
 		if ($supported_bs_name eq $target_bs_name) {
