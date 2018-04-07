@@ -32,8 +32,9 @@ sub extract_generated_lines {
 	return @lines;
 }
 
-each_compat_subtest {
 
+sub perform_test {
+	my ($install_dirs, $expected_dirs_postinst, $expected_dirs_prerm) = @_;
 	my (@postinst, @prerm);
 	my @scripts = qw(
         debian/debhelper.postinst.debhelper
@@ -42,52 +43,56 @@ each_compat_subtest {
 
 	rm_files(@scripts);
 	remove_tree('debian/debhelper');
-	install_dir('debian/debhelper/usr/local/foo');
-	install_dir('debian/debhelper/usr/local/bar');
-
-	ok(run_dh_tool('dh_usrlocal'));
-	@postinst = extract_generated_lines("debian/debhelper.postinst.debhelper");
-	@prerm = extract_generated_lines("debian/debhelper.prerm.debhelper");
-
-	is_deeply(\@postinst, [
-				  '/usr/local/bar 02775 root staff',
-				  '/usr/local/foo 02775 root staff',
-			  ], "Correct dir creation")
-		or do { diag("postinst: $_") for @postinst; };
-	is_deeply(\@prerm, [], "No removal of top level dirs #894549")
-		or do { diag("prerm: $_") for @prerm; };
-	
-	remove_tree('debian/debhelper');
-	rm_files(@scripts);
-	install_dir('debian/debhelper/usr/local/foo/dir/somewhere');
-	install_dir('debian/debhelper/usr/local/bar/another-dir/elsewhere');
-	install_dir('debian/debhelper/usr/local/baz/foo+bar/thing');
+	install_dir(map { "debian/debhelper/$_" } @{$install_dirs});
 
 	ok(run_dh_tool('dh_usrlocal'));
 
 	@postinst = extract_generated_lines("debian/debhelper.postinst.debhelper");
 	@prerm = extract_generated_lines("debian/debhelper.prerm.debhelper");
 
-	is_deeply(\@postinst, [
-				  '/usr/local/bar 02775 root staff',
-				  '/usr/local/bar/another-dir 02775 root staff',
-				  '/usr/local/bar/another-dir/elsewhere 02775 root staff',
-				  '/usr/local/baz 02775 root staff',
-				  '/usr/local/baz/foo+bar 02775 root staff',
-				  '/usr/local/baz/foo+bar/thing 02775 root staff',
-				  '/usr/local/foo 02775 root staff',
-				  '/usr/local/foo/dir 02775 root staff',
-				  '/usr/local/foo/dir/somewhere 02775 root staff',
-			  ], "Correct dir creation")
-		or do { diag("postinst: $_") for @postinst; };
-	is_deeply(\@prerm, [
-				  '/usr/local/bar/another-dir/elsewhere',
-				  '/usr/local/bar/another-dir',
-				  '/usr/local/baz/foo+bar/thing',
-				  '/usr/local/baz/foo+bar',
-				  '/usr/local/foo/dir/somewhere',
-				  '/usr/local/foo/dir',
-			  ], "Correct dir removal")
-		or do { diag("prerm: $_") for @prerm; };
+	is_deeply(\@postinst,
+			  [map { "$_ 02775 root staff" } @{$expected_dirs_postinst}],
+			  "Correct postinst"
+		) or do { diag("postinst: $_") for @postinst; };
+	is_deeply(\@prerm,
+			  $expected_dirs_prerm,
+			  "Correct prerm"
+		) or do { diag("prerm: $_") for @prerm; };
+}
+
+each_compat_subtest {
+
+	perform_test(
+		['/usr/local/bar', '/usr/local/foo'],
+		['/usr/local/bar', '/usr/local/foo'],
+		[]
+	);
+
+	perform_test(
+		[
+		 '/usr/local/foo/dir/somewhere',
+		 '/usr/local/bar/another-dir/elsewhere',
+		 '/usr/local/baz/foo+bar/thing',
+		],
+		[
+		 '/usr/local/bar',
+		 '/usr/local/bar/another-dir',
+		 '/usr/local/bar/another-dir/elsewhere',
+		 '/usr/local/baz',
+		 '/usr/local/baz/foo+bar',
+		 '/usr/local/baz/foo+bar/thing',
+		 '/usr/local/foo',
+		 '/usr/local/foo/dir',
+		 '/usr/local/foo/dir/somewhere',
+		],
+		[
+		 '/usr/local/bar/another-dir/elsewhere',
+		 '/usr/local/bar/another-dir',
+		 '/usr/local/baz/foo+bar/thing',
+		 '/usr/local/baz/foo+bar',
+		 '/usr/local/foo/dir/somewhere',
+		 '/usr/local/foo/dir',
+		]
+	);
 };
 
