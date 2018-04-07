@@ -61,6 +61,7 @@ each_compat_subtest {
 	rm_files(@scripts);
 	install_dir('debian/debhelper/usr/local/foo/dir/somewhere');
 	install_dir('debian/debhelper/usr/local/bar/another-dir/elsewhere');
+	install_dir('debian/debhelper/usr/local/baz/foo+bar/thing');
 
 	ok(run_dh_tool('dh_usrlocal'));
 
@@ -71,6 +72,9 @@ each_compat_subtest {
 				  '/usr/local/bar 02775 root staff',
 				  '/usr/local/bar/another-dir 02775 root staff',
 				  '/usr/local/bar/another-dir/elsewhere 02775 root staff',
+				  '/usr/local/baz 02775 root staff',
+				  '/usr/local/baz/foo+bar 02775 root staff',
+				  '/usr/local/baz/foo+bar/thing 02775 root staff',
 				  '/usr/local/foo 02775 root staff',
 				  '/usr/local/foo/dir 02775 root staff',
 				  '/usr/local/foo/dir/somewhere 02775 root staff',
@@ -79,6 +83,8 @@ each_compat_subtest {
 	is_deeply(\@prerm, [
 				  '/usr/local/bar/another-dir/elsewhere',
 				  '/usr/local/bar/another-dir',
+				  '/usr/local/baz/foo+bar/thing',
+				  '/usr/local/baz/foo+bar',
 				  '/usr/local/foo/dir/somewhere',
 				  '/usr/local/foo/dir',
 			  ], "Correct dir removal")

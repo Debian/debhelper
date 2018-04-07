@@ -98,6 +98,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				  my $fn = $File::Find::name;
 				  $fn =~ s!^\Q$tmp\E!!;
 				  return if $fn eq '/usr/local';
+				  # Detect some obvious cases of "this will not end
+				  # well".  We rely on what "while read dir ... ; do"
+				  # can handle for correctness.
+				  if ($fn =~ m{[\s!'"\$()*#;<>?@\[\]\\`|]}) {
+					  error("Cannot generate a correct shell script for $fn due to shell metacharacters");
+				  }
 				  if (should_use_root()) {
 					  my $stat = stat $File::Find::dir;
 					  if ($stat->uid == 0 && $stat->gid == 0) {
