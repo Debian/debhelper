@@ -165,6 +165,11 @@ sub _set_builddir {
 		}
 	}
 	$this->{builddir} = $builddir;
+	# Use get as guard because this method is (also) called from the
+	# constructor before the target build system is setup.
+	if ($this->get_targetbuildsystem) {
+		$this->get_targetbuildsystem->{builddir} = $builddir;
+	};
 	return $builddir;
 }
 
@@ -229,6 +234,11 @@ sub enforce_in_source_building {
 		$this->{warn_insource} = 1;
 		$this->{builddir} = undef;
 	}
+	if ($this->IS_GENERATOR_BUILD_SYSTEM) {
+		$this->get_targetbuildsystem->enforce_in_source_building(@_);
+		# Only warn in once build system.
+		delete($this->{warn_insource});
+	}
 }
 
 # Derived class can call this method in its constructor to *prefer*
@@ -246,6 +256,9 @@ sub prefer_out_of_source_building {
 			# the source directory, building might fail.
 			error("default build directory is the same as the source directory." .
 			      " Please specify a custom build directory");
+		}
+		if ($this->IS_GENERATOR_BUILD_SYSTEM) {
+			$this->get_targetbuildsystem->prefer_out_of_source_building(@_);
 		}
 	}
 }
@@ -355,6 +368,9 @@ sub get_parallel {
 sub disable_parallel {
 	my ($this) = @_;
 	$this->{parallel} = 1;
+	if ($this->IS_GENERATOR_BUILD_SYSTEM) {
+		$this->get_targetbuildsystem->disable_parallel;
+	}
 }
 
 # When given a relative path to the build directory, converts it
