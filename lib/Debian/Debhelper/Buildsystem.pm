@@ -238,7 +238,7 @@ sub enforce_in_source_building {
 	}
 	if ($this->IS_GENERATOR_BUILD_SYSTEM) {
 		$this->get_targetbuildsystem->enforce_in_source_building(@_);
-		# Only warn in once build system.
+		# Only warn in one build system.
 		delete($this->{warn_insource});
 	}
 }
