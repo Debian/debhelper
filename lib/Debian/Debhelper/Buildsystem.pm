@@ -21,8 +21,10 @@ sub NAME {
 	my $class = ref($this);
 	my $target_name;
 	if ($class) {
-		if ($this->IS_GENERATOR_BUILD_SYSTEM) {
-			$target_name = $this->{'targetbuildsystem'}->NAME;
+		# Do not assume that the target buildsystem has been provided.
+		# NAME could be called during an error in the constructor.
+		if ($this->IS_GENERATOR_BUILD_SYSTEM and $this->get_targetbuildsystem) {
+			$target_name = $this->get_targetbuildsystem->NAME;
 		}
 	} else {
 		$class = $this;
