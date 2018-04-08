@@ -4,6 +4,13 @@ debhelper (11.2.1) UNRELEASED; urgency=medium
     target buildsystems.  Thanks to Helmut Grohne, Adrian Bunk
     and Tobias Frost for the reports and debugging.
     (Closes: #895174, #895181)
+  * Buildsystems: Avoid choosing a build system for the clean
+    step if it is not necessary.  Previously, debhelper could
+    choose a "random" build system that would prefer building
+    in a separate build directory on the basis that the build
+    directory should be removed.  With this, change we only
+    choose such a build system if there is a build directory
+    to remove.
 
  -- Niels Thykier <niels@thykier.net>  Sun, 08 Apr 2018 07:13:22 +0000
 

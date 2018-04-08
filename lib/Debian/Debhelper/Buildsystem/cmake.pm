@@ -50,7 +50,7 @@ sub check_auto_buildable {
 	if (-e $this->get_sourcepath("CMakeLists.txt")) {
 		my $ret = ($step eq "configure" && 1) ||
 		          $this->get_targetbuildsystem->check_auto_buildable(@_);
-		if ($step eq "clean" && defined($this->get_builddir())) {
+		if ($this->check_auto_buildable_clean_oos_buildir(@_)) {
 			# Assume that the package can be cleaned (i.e. the build directory can
 			# be removed) as long as it is built out-of-source tree and can be
 			# configured.

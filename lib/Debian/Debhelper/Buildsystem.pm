@@ -399,6 +399,17 @@ sub mkdir_builddir {
 	}
 }
 
+sub check_auto_buildable_clean_oos_buildir {
+	my $this = shift;
+	my ($step) = @_;
+	# This only applies to clean
+	return 0 if $step ne 'clean';
+	my $builddir = $this->get_builddir;
+	# If there is no builddir, then this rule does not apply.
+	return 0 if not defined($builddir) or not -d $builddir;
+	return 1;
+}
+
 sub _cd {
 	my ($this, $dir)=@_;
 	verbose_print("cd $dir");
