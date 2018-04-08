@@ -110,7 +110,23 @@ sub new {
 	                   builddir => undef,
 	                   parallel => undef,
 	                   cwd => Cwd::getcwd() }, $class);
+
+	# Setup the target buildsystem early, so e.g. _set_builddir also
+	# applies to the target build system.  Useful if the generator
+	# and target does not agree on (e.g.) the default build dir.
 	my $target_bs_name;
+	if (exists $opts{targetbuildsystem}) {
+		$target_bs_name = $opts{targetbuildsystem};
+	}
+
+	$target_bs_name //= $this->DEFAULT_TARGET_BUILD_SYSTEM if $this->IS_GENERATOR_BUILD_SYSTEM;
+
+	if (defined($target_bs_name)) {
+		my %target_opts = %opts;
+		delete($target_opts{'targetbuildsystem'});
+		my $target_system = load_buildsystem($target_bs_name, undef, %target_opts);
+		$this->set_targetbuildsystem($target_system);
+	}
 
 	if (exists $opts{sourcedir}) {
 		# Get relative sourcedir abs_path (without symlinks)
@@ -125,18 +141,6 @@ sub new {
 	}
 	if (defined $opts{parallel}) {
 		$this->{parallel} = $opts{parallel};
-	}
-	if (exists $opts{targetbuildsystem}) {
-		$target_bs_name = $opts{targetbuildsystem};
-	}
-
-	$target_bs_name //= $this->DEFAULT_TARGET_BUILD_SYSTEM if $this->IS_GENERATOR_BUILD_SYSTEM;
-
-	if (defined($target_bs_name)) {
-		my %target_opts = %opts;
-		delete($target_opts{'targetbuildsystem'});
-		my $target_system = load_buildsystem($target_bs_name, undef, %target_opts);
-		$this->set_targetbuildsystem($target_system);
 	}
 
 	return $this;
