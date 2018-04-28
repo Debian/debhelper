@@ -246,9 +246,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				# Clear the flag to avoid duplicate warnings.
 				$v_flag_set = 0;
 				$v_flag = '';
-			} elsif ($v_flag eq '') {
-				$v_flag = compat(11) ? 'None' : 'Upstream-Version';
+			} else {
+				# Set the default "-V" (with no value) is passed.
+				$v_flag = 'Upstream-Version' if $v_flag eq '';
 			}
+		} elsif ($v_flag eq '') {
+			# Set the default if "-V" is omitted.
+			$v_flag = compat(11) ? 'None' : 'Upstream-Version';
 		}
 		if ($v_flag ne '') {
 			if ($v_flag eq 'Upstream-Version') {
