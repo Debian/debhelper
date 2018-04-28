@@ -195,6 +195,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	my (%seen, $unversioned_so);
 	my $need_ldconfig = 0;
+	# Note that since each package can have a shlibs file independently of
+	# each other, we need to make these local.
+	my $v_flag_set = $dh{V_FLAG_SET};
+	my $v_flag = $dh{V_FLAG} // '';
 	my $shlibs_file = pkgfile($package, 'shlibs');
 
 	rm_files("$tmp/DEBIAN/shlibs");
@@ -236,18 +240,18 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 
 		my $deps=$package;
-		if ($dh{V_FLAG_SET}) {
+		if ($v_flag_set) {
 			if ($shlibs_file) {
 				warning("The provided ${shlibs_file} file overwrites -V");
 				# Clear the flag to avoid duplicate warnings.
-				$dh{V_FLAG_SET} = 0;
-				delete($dh{V_FLAG});
-			} elsif ($dh{V_FLAG} eq '') {
-				$dh{V_FLAG} = compat(11) ? 'None' : 'Upstream-Version';
+				$v_flag_set = 0;
+				$v_flag = '';
+			} elsif ($v_flag eq '') {
+				$v_flag = compat(11) ? 'None' : 'Upstream-Version';
 			}
 		}
-		if (defined($dh{V_FLAG}) and $dh{V_FLAG} ne '') {
-			if ($dh{V_FLAG} eq 'Upstream-Version') {
+		if ($v_flag ne '') {
+			if ($v_flag eq 'Upstream-Version') {
 				# Call isnative because it sets $dh{VERSION}
 				# as a side effect.
 				isnative($package);
@@ -257,8 +261,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				# Remove debian version, if any.
 				$version =~ s/-[^-]+$//;
 				$deps = "$package (>= $version)";
-			} elsif ($dh{V_FLAG} ne 'None') {
-				$deps = $dh{V_FLAG};
+			} elsif ($v_flag ne 'None') {
+				$deps = $v_flag;
 			}
 		}
 		if (defined($library) && defined($major) && defined($deps) &&
