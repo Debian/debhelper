@@ -1,8 +1,17 @@
-debhelper (11.2.2) UNRELEASED; urgency=medium
+debhelper (11.3) UNRELEASED; urgency=medium
 
   [ Niels Thykier ]
   * Buildsystem.pm: Fix use of undefined variable in certain
     error conditions.
+  * dh_makeshlibs: Support -VUpstream-Version and -VNone as
+    alternative to passing -V or omitting -V respectively.
+  * dh_makeshlibs: Make -VUpstream-Version the default in
+    compat 12 when -V is omitted.  (Closes: #896464)
+  * dh_makeshlibs: Correct handling of an explicit -V when
+    a source builds multiple library packages and provides
+    explicit shlibs files for a subset of them.  Previously,
+    the -V option could have been ignored for some of the
+    packages containing libraries.
 
   [ Dmitry Shachnev ]
   * qmake.pm: Use ${DEB_HOST_GNU_TYPE}-qmake wrapper for
