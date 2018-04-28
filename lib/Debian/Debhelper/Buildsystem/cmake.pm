@@ -86,6 +86,12 @@ sub configure {
 		push(@flags, "-G${generator}");
 	}
 
+	if ($ENV{CC}) {
+		push @flags, "-DCMAKE_C_COMPILER=" . $ENV{CC};
+	}
+	if ($ENV{CXX}) {
+		push @flags, "-DCMAKE_CXX_COMPILER=" . $ENV{CXX};
+	}
 	if (is_cross_compiling()) {
 		my $deb_host = dpkg_architecture_value("DEB_HOST_ARCH_OS");
 		if (my $cmake_system = $DEB_HOST2CMAKE_SYSTEM{$deb_host}) {
@@ -94,14 +100,10 @@ sub configure {
 			error("Cannot cross-compile - CMAKE_SYSTEM_NAME not known for ${deb_host}");
 		}
 		push @flags, "-DCMAKE_SYSTEM_PROCESSOR=" . dpkg_architecture_value("DEB_HOST_GNU_CPU");
-		if ($ENV{CC}) {
-			push @flags, "-DCMAKE_C_COMPILER=" . $ENV{CC};
-		} else {
+		if (not $ENV{CC}) {
 			push @flags, "-DCMAKE_C_COMPILER=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-gcc";
 		}
-		if ($ENV{CXX}) {
-			push @flags, "-DCMAKE_CXX_COMPILER=" . $ENV{CXX};
-		} else {
+		if (not $ENV{CXX}) {
 			push @flags, "-DCMAKE_CXX_COMPILER=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-g++";
 		}
 		push(@flags, "-DPKG_CONFIG_EXECUTABLE=/usr/bin/" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-pkg-config");
