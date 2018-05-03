@@ -31,7 +31,7 @@ use constant {
 	'DBGSYM_PACKAGE_TYPE' => DEFAULT_PACKAGE_TYPE,
 };
 
-use Errno qw(ENOENT);
+use Errno qw(ENOENT EXDEV);
 use Exporter qw(import);
 use File::Glob qw(bsd_glob GLOB_CSH GLOB_NOMAGIC GLOB_TILDE);
 our (@EXPORT, %dh);
@@ -535,8 +535,16 @@ sub rename_path {
 	}
 	return 1 if $dh{NO_ACT};
 	if (not rename($source, $dest)) {
-		my $files = escape_shell($source, $dest);
-		error("mv $files: $!")
+		my $ok = 0;
+		if ($! == EXDEV) {
+			# Replay with a fork+exec to handle crossing two mount
+			# points (See #897569)
+			$ok = _doit('mv', $source, $dest);
+		}
+		if (not $ok) {
+			my $files = escape_shell($source, $dest);
+			error("mv $files: $!");
+		}
 	}
 	return 1;
 }

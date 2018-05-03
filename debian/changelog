@@ -12,6 +12,12 @@ debhelper (11.3) UNRELEASED; urgency=medium
     explicit shlibs files for a subset of them.  Previously,
     the -V option could have been ignored for some of the
     packages containing libraries.
+  * Dh_Lib.pm: Fall back to a regular mv(1) when rename fails
+    with EXDEV (cross mount point moves).  This restores
+    debhelper's ability to move files between mount points,
+    which can happen in dh_builddeb has to correct the
+    extension of a binary package built by dpkg-deb.
+    Thanks to Evan Krall for the report.  (Closes: #897569)
 
   [ Dmitry Shachnev ]
   * qmake.pm: Use ${DEB_HOST_GNU_TYPE}-qmake wrapper for
