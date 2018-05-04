@@ -1465,7 +1465,8 @@ sub getpackages {
 		my ($dh_compat_bd, $final_level);
 		for my $field (sort(keys(%bd_fields))) {
 			my $value = join(' ', @{$bd_fields{$field}});
-			$value =~ s/\s*,\s*$//;
+			$value =~ s/^\s*//;
+			$value =~ s/\s*(?:,\s*)?$//;
 			for my $dep (split(/\s*,\s*/, $value)) {
 				if ($dep =~ m/^debhelper-compat\s*[(]\s*=\s*(${PKGVERSION_REGEX})\s*[)]$/) {
 					my $version = $1;
