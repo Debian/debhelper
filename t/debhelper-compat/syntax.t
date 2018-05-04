@@ -56,7 +56,7 @@ plan(tests => scalar @levels);
 
 for my $level (@levels) {
 	subtest "compat $level" => sub {
-		plan(tests => 6);
+		plan(tests => 7);
 		subtest 'only' => sub {
 			test_build_depends($level, "debhelper-compat (= $level)");
 		};
@@ -71,6 +71,9 @@ for my $level (@levels) {
 		};
 		subtest 'second-nl' => sub {
 			test_build_depends($level, "bar,\n debhelper-compat (= $level)");
+		};
+		subtest 'nl-first' => sub {
+			test_build_depends($level, "\n debhelper-compat (= $level),\n bar");
 		};
 		subtest 'nl-second' => sub {
 			test_build_depends($level, "\n bar,\n debhelper-compat (= $level)");
