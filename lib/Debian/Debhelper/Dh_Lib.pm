@@ -691,6 +691,12 @@ my $compat_from_bd;
 	my $warned_compat = $ENV{DH_INTERNAL_TESTSUITE_SILENT_WARNINGS} ? 1 : 0;
 	my $c;
 
+	# Used mainly for testing
+	sub resetcompat {
+		undef $c;
+		undef $compat_from_bd;
+	}
+
 	sub compat {
 		my $num=shift;
 		my $nowarn=shift;
@@ -1388,6 +1394,13 @@ sub is_cross_compiling {
 my (%package_types, %package_arches, %package_multiarches, %packages_by_type,
     %package_sections, $sourcepackage, %package_cross_type);
 
+# Resets the arrays; used mostly for testing
+sub resetpackages {
+	undef $sourcepackage;
+	%package_types = %package_arches = %package_multiarches =
+	    %packages_by_type = %package_sections = %package_cross_type = ();
+}
+
 # Returns source package name
 sub sourcepackage {
 	getpackages() if not defined($sourcepackage);
@@ -1489,7 +1502,7 @@ sub getpackages {
 				}
 			}
 		}
-		if (defined($final_level)) {
+		if (defined($final_level) && !$ENV{DH_INTERNAL_TESTSUITE_SILENT_WARNINGS}) {
 			warning("The use of \"debhelper-compat (= ${final_level})\" is experimental and may change (or be retired) without notice");
 		}
 		$compat_from_bd = $final_level // -1;

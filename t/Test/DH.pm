@@ -39,7 +39,7 @@ our @EXPORT = qw(
     each_compat_up_to_and_incl_subtest each_compat_subtest
     each_compat_from_and_above_subtest run_dh_tool
     uid_0_test_is_ok create_empty_file readlines
-    error find_script
+    error find_script non_deprecated_compat_levels
 );
 
 our ($TEST_DH_COMPAT, $ROOT_OK, $ROOT_CMD);
@@ -218,6 +218,12 @@ sub find_script {
 		@files = reverse(@files);
 	}
 	return @files;
+}
+
+sub non_deprecated_compat_levels() {
+    my $start = Debian::Debhelper::Dh_Lib::LOWEST_NON_DEPRECATED_COMPAT_LEVEL;
+    my $end = Debian::Debhelper::Dh_Lib::MAX_COMPAT_LEVEL;
+    return ($start..$end);
 }
 
 1;
