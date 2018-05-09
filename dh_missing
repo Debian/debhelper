@@ -21,9 +21,11 @@ B<dh_missing> [B<-X>I<item>] [B<--sourcedir=>I<dir>] [S<I<debhelper options>>]
 B<dh_missing> compares the list of installed files with the files in
 the source directory. If any of the files (and symlinks) in the source
 directory were not installed to somewhere, it will warn on stderr
-about that (B<--list-missing>) or fail (B<--fail-missing>).  Please
-note that without either of these options, B<dh_missing> will silently
-do nothing.
+about that (B<--list-missing>) or fail (B<--fail-missing>).
+
+Please note that in compat 11 and earlier without either of these
+options, B<dh_missing> will silently do nothing.  From compat 12 on,
+B<--list-missing> is the default.
 
 This may be useful if you have a large package and want to make sure that
 you don't miss installing newly added files in new upstream releases.
