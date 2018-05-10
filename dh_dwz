@@ -30,6 +30,20 @@ running L<dwz(1)> on all the ELF binaries in the package.
 
 =over 4
 
+=item B<--multifile>, B<--no-multifile>
+
+Whether L<dwz(1)> should generate a I<multifile> from the ELF binaries
+in the same package (it does by default).  When enabled, if a package
+ships at least 2 ELF binaries, B<dh_dwz> will instruct L<dwz(1)> to
+generate a multifile for the package.
+
+Note this options may not work if a package contains more ELF binaries
+than can fit on a single command line.  If this becomes a problem,
+please pass B<--no-multifile> to work around the issue.
+
+The generated multifile will be compressed with B<objcopy
+--compress-debug-sections>.
+
 =item B<-X>I<item>, B<--exclude=>I<item>
 
 Exclude files that contain I<item> anywhere in their filename from being
@@ -57,7 +71,11 @@ test"-cycles) rather than optimizing for size.
 
 =cut
 
-init();
+my $create_multifile = 1;
+
+init(options => {
+	'multifile!' => \$create_multifile,
+});
 
 # This variable can be used to turn off stripping (see Policy).
 exit 0 if get_buildoption('nostrip');
@@ -99,10 +117,21 @@ for my $package (@{$dh{DOPACKAGES}}) {
 	# Consistent order;
 	@elf_files = sort(@elf_files);
 	my ($unique_files, $hardlinks) = find_hardlinks(@elf_files);
+	my @dwz_options;
+	if ($create_multifile and @{$unique_files} > 1) {
+		my $objcopy = cross_command($package, 'objcopy');
+		my $ma_dir = dpkg_architecture_value('DEB_HOST_MULTIARCH');
+		my $dwz_dir = "usr/lib/debug/.dwz/${ma_dir}";
+		my $m = "${dwz_dir}/${package}.debug";
+		my @dwz_options = ("-m${tmp}/${m}", "-M/${m}");
+		install_dir("${tmp}/${dwz_dir}");
+		doit('dwz', '-q', @dwz_options, @{$dh{U_PARAMS}}, '--', @{$unique_files});
+		doit($objcopy, '--compress-debug-sections', "${tmp}/${m}");
+	} else {
+		xargs($unique_files, 'dwz', '-q', @{$dh{U_PARAMS}}, '--');
+	}
 
-	# TODO: Support multifile (-m)
 
-	xargs($unique_files, 'dwz', '-q', @{$dh{U_PARAMS}}, '--');
 	# Now change over any files we can that used to be hard links so
 	# they are again.
 	for my $hardlink (keys %{$hardlinks}) {
