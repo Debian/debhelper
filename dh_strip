@@ -374,6 +374,13 @@ sub process_packages {
 			doit($strip, '--strip-debug', '--remove-section=.comment',
 				 '--remove-section=.note', '--enable-deterministic-archives', $_);
 		}
+		if (-d "$tmp/usr/lib/debug/.dwz" and ($use_build_id > 1 or $dh{DEBUGPACKAGE})) {
+			my @files = glob_expand(["$tmp/usr/lib/debug/.dwz"], \&glob_expand_error_handler_reject, '*');
+			install_dir("$debugtmp/usr/lib/debug/.dwz");
+			xargs(\@files, 'cp', '--reflink=auto', "-a", XARGS_INSERT_PARAMS_HERE, "$debugtmp/usr/lib/debug/.dwz");
+			doit('rm', '-fr', "$tmp/usr/lib/debug/.dwz");
+		}
+
 		if ($no_auto_dbgsym and $use_build_id > 1) {
 			# When DEB_BUILD_OPTIONS contains noautodbgsym, remove the
 			# dbgsym dir and clear the build-ids.

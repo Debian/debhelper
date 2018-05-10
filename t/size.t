@@ -21,7 +21,7 @@ foreach my $file (@progs) {
 	while (<$fd>) {
 		$cutting=1 if /^=/;
 		$cutting=0 if /^=cut/;
-		next if $cutting || /^(?:=|\s*(?:\#.*)?$)/;
+		next if $cutting || /^(?:=|\s*(?:\#.*|[}]\s*)?$)/;
 		$lines++;
 		$maxlength=length($_) if length($_) > $maxlength;
 	}
