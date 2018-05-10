@@ -22,6 +22,11 @@ debhelper (11.3) UNRELEASED; urgency=medium
     defaults to --list-missing in compat 12.  Thanks to
     Robie Basak for spotting the contradicting documentation.
     (Closes: #898161)
+  * dh_installman: If both the .so and the target manpage are
+    compressed, then generate the link as compressed.  This
+    prevents dh_compress from adding another ".gz" extension
+    to the link.  Thanks to Andreas Hasenack for reporting
+    the bug.  Partly fixes LP: #1765851.
 
   [ Dmitry Shachnev ]
   * qmake.pm: Use ${DEB_HOST_GNU_TYPE}-qmake wrapper for
