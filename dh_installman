@@ -351,17 +351,10 @@ sub find_so_man {
 		elsif ($solink =~ m!/!) {
 			$solink="../$solink";
 		}
-		my $target;
 
-		if ( -e $solink) {
-			$target = $solink;
-		} elsif (-e "${solink}.gz") {
-			$target = "${solink}.gz";
-		}
-
-		if (defined($target)) {
-			push(@sofiles,"$File::Find::dir/$_");
-			push(@sodests, $target);
+		if (-e $solink || -e "$solink.gz") {
+			push @sofiles,"$File::Find::dir/$_";
+			push @sodests,$solink;
 		}
 	}
 }
