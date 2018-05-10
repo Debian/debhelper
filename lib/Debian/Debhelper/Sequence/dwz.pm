@@ -3,9 +3,11 @@
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(warning);
+use Debian::Debhelper::Dh_Lib;
 
-warning('The "dwz"-sequence is experimental and may change (or be retired) without any notice');
+if (not compat(11)) {
+	error("In compat 12, dh_dwz is run by default and the dwz-sequence is no longer required.");
+}
 
 insert_before('dh_strip', 'dh_dwz');
 

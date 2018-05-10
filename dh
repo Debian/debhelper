@@ -432,11 +432,13 @@ qw{
 	dh_fixperms
 	dh_missing
 });
-my @ba=qw{
+my @ba=(
+	(!compat(11) ? qw(dh_dwz) : qw()),
+qw{
 	dh_strip
 	dh_makeshlibs
 	dh_shlibdeps
-};
+});
 if (! getpackages("arch")) {
 	@ba=();
 }
