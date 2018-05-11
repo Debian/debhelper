@@ -30,7 +30,7 @@ running L<dwz(1)> on all the ELF binaries in the package.
 
 =over 4
 
-=item B<--multifile>, B<--no-multifile>
+=item B<--dwz-multifile>, B<--no-dwz-multifile>
 
 Whether L<dwz(1)> should generate a I<multifile> from the ELF binaries
 in the same package (it does by default).  When enabled, if a package
@@ -39,7 +39,7 @@ generate a multifile for the package.
 
 Note this options may not work if a package contains more ELF binaries
 than can fit on a single command line.  If this becomes a problem,
-please pass B<--no-multifile> to work around the issue.
+please pass B<--no-dwz-multifile> to work around the issue.
 
 The generated multifile will be compressed with B<objcopy
 --compress-debug-sections>.
@@ -74,7 +74,7 @@ test"-cycles) rather than optimizing for size.
 my $create_multifile = 1;
 
 init(options => {
-	'multifile!' => \$create_multifile,
+	'dwz-multifile!' => \$create_multifile,
 });
 
 # This variable can be used to turn off stripping (see Policy).
