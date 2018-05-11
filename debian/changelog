@@ -33,6 +33,14 @@ debhelper (11.3) UNRELEASED; urgency=medium
   * dh: Run dh_dwz by default in compat 12.
   * dh_dwz/dwz.pm: Remove warning about the dwz feature being
     experimental.
+  * dh_installsystemd: Use the basename of the "tmpfiles" config
+    files.  This makes "systemd-tmpfiles --create" search for it
+    in both /usr/lib/tmpfiles.d and in /etc/tmpfiles.d.  With
+    this change the system administrator can now override the
+    "tmpfiles" config shipped by the package in
+    /usr/libtmpfiles.d.  Thanks to Nick Groenen and Seyeong Kim
+    for filing the bug.  (Closes: #894510)
+  * dh_installinit: Ditto.
 
   [ Dmitry Shachnev ]
   * qmake.pm: Use ${DEB_HOST_GNU_TYPE}-qmake wrapper for

@@ -326,7 +326,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				$name =~ s/^\Q$tmp\E//g;
 				if ($name =~ m,^/usr/lib/tmpfiles\.d/, ||
 					$name =~ m,^/etc/tmpfiles\.d/,) {
-					push @tmpfiles, $name;
+					push(@tmpfiles, basename($name));
 				}
 			},
 			no_chdir => 1,

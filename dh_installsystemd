@@ -337,8 +337,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				wanted   => sub {
 					my $name = $File::Find::name;
 					return unless -f $name;
-					$name =~ s/^\Q$tmpdir\E//g;
-					push(@tmpfiles, $name);
+					push(@tmpfiles, basename($name));
 				},
 				no_chdir => 1,
 			}, @dirs) if @dirs;
