@@ -145,18 +145,11 @@ my $upstream_html;
 if (! defined $upstream) {
 	if (! isnative($dh{MAINPACKAGE}) && !compat(6)) {
 		foreach my $dir (qw{. doc docs}) {
-			my @files=sort glob("$dir/*");
-			foreach my $suffix ('', qw(.txt .md .rst)) {
-				foreach my $name (qw{changelog changes history}) {
-					my @matches=grep {
-						lc basename($_) eq "$name$suffix" && -f $_ && -s _ && ! excludefile($_)
-					} @files;
-					if (@matches) {
-						$upstream=shift @matches;
-						$upstream_text=$upstream;
-						last;
-					}
-				}
+			my $changelog = find_changelog($dir);
+			if ($changelog) {
+				$upstream = $changelog;
+				$upstream_text = $upstream;
+				last;
 			}
 		}
 	}
@@ -167,6 +160,22 @@ if (! defined $upstream) {
 elsif ($upstream=~m/\.html?$/i) {
 	$upstream_html=$upstream;
 	$upstream_text=shift;
+}
+
+sub find_changelog {
+	my ($dir) = @_;
+	my @files=sort glob("$dir/*");
+	foreach my $suffix ('', qw(.txt .md .rst)) {
+		foreach my $name (qw{changelog changes history}) {
+			my @matches=grep {
+				lc basename($_) eq "$name$suffix" && -f $_ && -s _ && ! excludefile($_)
+			} @files;
+			if (@matches) {
+				return shift(@matches);
+			}
+		}
+	}
+	return;
 }
 
 on_pkgs_in_parallel {
