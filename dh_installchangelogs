@@ -21,14 +21,25 @@ B<dh_installchangelogs> [S<I<debhelper options>>] [B<-k>] [B<-X>I<item>] [I<upst
 B<dh_installchangelogs> is a debhelper program that is responsible for
 installing changelogs into package build directories.
 
-An upstream F<changelog> file may be specified as an option. If none is
-specified, it looks for files with names that seem likely to be changelogs.
-(In compatibility level 7 and above.)
+An upstream F<changelog> file may be specified as an option. If none
+is specified, B<dh_installchangelogs> may look for files with names
+that seem likely to be changelogs as described in the next paragraphs
+(assuming the package is using compatibility level 7 or above).
+
+In non-native packages, B<dh_installchangelogs> will first look for
+changelog files installed by the upstream build system into F<<
+usr/share/doc/I<package> >> (of the package build directory) and
+rename the most likely candidate (if any) to F<<
+usr/share/doc/I<package>/changelog >>.  Note that
+B<dh_installchangelogs> does I<not> look into any source directory
+(such as F<debian/tmp>). Otherwise, B<dh_installchangelogs> (at
+compatibility level 7 or any later) will look for changelog files in
+the source directory (e.g. the root or the F<docs> subdirectory).
 
 If there is an upstream F<changelog> file, it will be installed as
 F<usr/share/doc/package/changelog> in the package build directory.
 
-If the upstream changelog is an F<html> file (determined by file
+If the specified upstream changelog is an F<html> file (determined by file
 extension), it will be installed as F<usr/share/doc/package/changelog.html>
 instead. If the html changelog is converted to plain text, that variant
 can be specified as a second upstream changelog file. When no plain
@@ -75,6 +86,8 @@ package refers to the F<changelog> file.
 
 Exclude upstream F<changelog> files that contain I<item> anywhere in their
 filename from being installed.
+
+Note that directory name of the changelog is also part of the match.
 
 =item I<upstream>
 
@@ -139,7 +152,7 @@ init();
 my $news_name="NEWS.Debian";
 my $changelog_name="changelog.Debian";
 
-my $default_upstream=shift;
+my $default_upstream = $ARGV[0];
 my $default_upstream_text=$default_upstream;
 my $default_upstream_html;
 if (! defined($default_upstream)) {
@@ -159,7 +172,7 @@ if (! defined($default_upstream)) {
 }
 elsif ($default_upstream=~m/\.html?$/i) {
 	$default_upstream_html=$default_upstream;
-	$default_upstream_text=shift;
+	$default_upstream_text=$ARGV[1];
 }
 
 sub find_changelog {
@@ -185,6 +198,24 @@ on_pkgs_in_parallel {
 		my $tmp=tmpdir($package);
 		my $changelog=pkgfile($package,"changelog");
 		my $news=pkgfile($package,"NEWS");
+		my $upstream_changelog = $ARGV[0];
+		my ($upstream_changelog_text, $upstream_changelog_html);
+		my $changelog_from_tmp_dir = 0;
+
+		if (! defined($upstream_changelog)) {
+			# Check if the upstream build system provided a
+			# changelog
+			$upstream_changelog = find_changelog("${tmp}/usr/share/doc/${package}");
+			if ($upstream_changelog) {
+				$upstream_changelog_text = $upstream_changelog;
+				$changelog_from_tmp_dir = 1;
+			}
+		}
+		if (not $upstream_changelog || defined($ARGV[0])) {
+			$upstream_changelog = $default_upstream;
+			$upstream_changelog_text = $default_upstream_text;
+			$upstream_changelog_html = $default_upstream_html;
+		}
 
 		if (!$changelog) {
 			$changelog="debian/changelog";
@@ -225,17 +256,31 @@ on_pkgs_in_parallel {
 			install_file($news, "$tmp/usr/share/doc/$package/$news_name");
 		}
 
-		if (defined($default_upstream)) {
+		if (defined($upstream_changelog)) {
 			my $link_to;
 			my $base="$tmp/usr/share/doc/$package";
-			if (defined($default_upstream_text)) {
-				install_file($default_upstream_text, "$base/changelog");
+			if (defined($upstream_changelog_text)) {
+				if ($changelog_from_tmp_dir and not $dh{K_FLAG}) {
+					# mv (unless if it is the same file)
+					rename_path($upstream_changelog_text, "$base/changelog")
+						if basename($upstream_changelog_text) ne 'changelog';
+					reset_perm_and_owner(0644, "$base/changelog");
+				} else {
+					install_file($upstream_changelog_text, "$base/changelog");
+				}
 				$link_to='changelog';
 			}
-			if (defined($default_upstream_html)) {
-				install_file($default_upstream_html,"$base/changelog.html");
+			if (defined($upstream_changelog_html)) {
+				if ($changelog_from_tmp_dir and not $dh{K_FLAG}) {
+					# mv (unless if it is the same file)
+					rename_path($upstream_changelog_html, "$base/changelog.html")
+						if basename($upstream_changelog_text) ne 'changelog.html';
+					reset_perm_and_owner(0644, "$base/changelog.html");
+				} else {
+					install_file($upstream_changelog_html,"$base/changelog.html");
+				}
 				$link_to='changelog.html';
-				if (! defined($default_upstream_text)) {
+				if (! defined($upstream_changelog_text)) {
 					complex_doit("echo 'See changelog.html.gz' > $base/changelog");
 					reset_perm_and_owner(0644,"$base/changelog");
 				}
@@ -243,7 +288,7 @@ on_pkgs_in_parallel {
 			if ($dh{K_FLAG}) {
 				# Install symlink to original name of the upstream changelog file.
 				# Use basename in case original file was in a subdirectory or something.
-				doit('ln', '-sf', $link_to, "$tmp/usr/share/doc/$package/".basename($default_upstream));
+				doit('ln', '-sf', $link_to, "$tmp/usr/share/doc/$package/".basename($upstream_changelog));
 			}
 		}
 	}

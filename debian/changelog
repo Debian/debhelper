@@ -41,6 +41,12 @@ debhelper (11.3) UNRELEASED; urgency=medium
     /usr/libtmpfiles.d.  Thanks to Nick Groenen and Seyeong Kim
     for filing the bug.  (Closes: #894510)
   * dh_installinit: Ditto.
+  * dh_installchangelogs: Look for changelog files installed by the
+    upstream build system in the package build dir (i.e. d/<pkg>/
+    and *not* debian/tmp!) and use them in preference to the one in the
+    source package where available.  This avoids some cases of duplicated
+    upstream changelogs.  Thanks to Evgeni Golov for the suggestion.
+    (Closes: #513521)
 
   [ Dmitry Shachnev ]
   * qmake.pm: Use ${DEB_HOST_GNU_TYPE}-qmake wrapper for
