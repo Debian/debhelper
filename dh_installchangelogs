@@ -139,16 +139,16 @@ init();
 my $news_name="NEWS.Debian";
 my $changelog_name="changelog.Debian";
 
-my $upstream=shift;
-my $upstream_text=$upstream;
-my $upstream_html;
-if (! defined $upstream) {
+my $default_upstream=shift;
+my $default_upstream_text=$default_upstream;
+my $default_upstream_html;
+if (! defined($default_upstream)) {
 	if (! isnative($dh{MAINPACKAGE}) && !compat(6)) {
 		foreach my $dir (qw{. doc docs}) {
 			my $changelog = find_changelog($dir);
 			if ($changelog) {
-				$upstream = $changelog;
-				$upstream_text = $upstream;
+				$default_upstream = $changelog;
+				$default_upstream_text = $default_upstream;
 				last;
 			}
 		}
@@ -157,9 +157,9 @@ if (! defined $upstream) {
 		$changelog_name='changelog';
 	}
 }
-elsif ($upstream=~m/\.html?$/i) {
-	$upstream_html=$upstream;
-	$upstream_text=shift;
+elsif ($default_upstream=~m/\.html?$/i) {
+	$default_upstream_html=$default_upstream;
+	$default_upstream_text=shift;
 }
 
 sub find_changelog {
@@ -225,17 +225,17 @@ on_pkgs_in_parallel {
 			install_file($news, "$tmp/usr/share/doc/$package/$news_name");
 		}
 
-		if (defined $upstream) {
+		if (defined($default_upstream)) {
 			my $link_to;
 			my $base="$tmp/usr/share/doc/$package";
-			if (defined $upstream_text) {
-				install_file($upstream_text, "$base/changelog");
+			if (defined($default_upstream_text)) {
+				install_file($default_upstream_text, "$base/changelog");
 				$link_to='changelog';
 			}
-			if (defined $upstream_html) {
-				install_file($upstream_html,"$base/changelog.html");
+			if (defined($default_upstream_html)) {
+				install_file($default_upstream_html,"$base/changelog.html");
 				$link_to='changelog.html';
-				if (! defined $upstream_text) {
+				if (! defined($default_upstream_text)) {
 					complex_doit("echo 'See changelog.html.gz' > $base/changelog");
 					reset_perm_and_owner(0644,"$base/changelog");
 				}
@@ -243,7 +243,7 @@ on_pkgs_in_parallel {
 			if ($dh{K_FLAG}) {
 				# Install symlink to original name of the upstream changelog file.
 				# Use basename in case original file was in a subdirectory or something.
-				doit("ln","-sf",$link_to,"$tmp/usr/share/doc/$package/".basename($upstream));
+				doit('ln', '-sf', $link_to, "$tmp/usr/share/doc/$package/".basename($default_upstream));
 			}
 		}
 	}
