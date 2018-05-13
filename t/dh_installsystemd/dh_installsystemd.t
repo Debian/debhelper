@@ -8,7 +8,7 @@ use Test::DH;
 use File::Path qw(remove_tree make_path);
 use Debian::Debhelper::Dh_Lib qw(!dirname);
 
-plan(tests => 2);
+plan(tests => 4);
 
 sub write_file {
 	my ($path, $content) = @_;
@@ -196,7 +196,9 @@ each_compat_subtest {
 	unit_is_enabled('foo', 'source', 0);
 	unit_is_enabled('foo', 'target', 1);
 	ok(run_dh_tool('dh_clean'));
+};
 
+each_compat_up_to_and_incl_subtest(11, sub {
 	make_path('debian/foo/lib/systemd/system/');
 	make_path('debian/foo/etc/init.d/');
 	install_file('debian/foo.service', 'debian/foo/lib/systemd/system/target.service');
@@ -211,4 +213,20 @@ each_compat_subtest {
 	unit_is_started('foo', 'source', 0);
 	unit_is_started('foo', 'target', 0);
 	ok(run_dh_tool('dh_clean'));
-};
+});
+
+each_compat_from_and_above_subtest(12, sub {
+	make_path('debian/foo/lib/systemd/system/');
+	make_path('debian/foo/etc/init.d/');
+	install_file('debian/foo.service', 'debian/foo/lib/systemd/system/target.service');
+	make_symlink_raw_target('target.service', 'debian/foo/lib/systemd/system/source.service');
+	write_file('debian/foo/etc/init.d/source', '# something');
+	ok(run_dh_tool('dh_installsystemd'));
+	unit_is_enabled('foo', 'foo', 1);
+	# Alias= realized by symlinks are not enabled in maintaner scripts
+	unit_is_enabled('foo', 'source', 0);
+	unit_is_enabled('foo', 'target', 1);
+	unit_is_started('foo', 'source', 0);
+	unit_is_started('foo', 'target', 1);
+	ok(run_dh_tool('dh_clean'));
+});

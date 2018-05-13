@@ -349,6 +349,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# the parameters to pass to update-rc.d. If not set,
 		# we have to say "defaults".
 		my $params = 'defaults';
+		my $update_rcd_params = compat(11) ? '' : '--skip-systemd-native ';
 		if ($dh{NO_ENABLE}) {
 			$params = 'defaults-disabled';
 			addsubstvar($package, "misc:Depends", "init-system-helpers (>= 1.51)");
@@ -364,29 +365,47 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				if ($dh{RESTART_AFTER_UPGRADE}) {
 					# update-rc.d, and restart (or
 					# start if new install) script
-					autoscript($package,"postinst", "postinst-init-restart",
-						{ 'SCRIPT' => $script, 'INITPARMS' => $params, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} },
+					autoscript($package, 'postinst', 'postinst-init-restart',
+						{
+							'SCRIPT' => $script, 'INITPARMS' => $params, 'ERROR_HANDLER' => $dh{ERROR_HANDLER},
+							'INVOKE_RCD_PARAMS' => $update_rcd_params,
+						},
 						\%snippet_options);
 				}
 				else {
 					# update-rc.d, and start script
-					autoscript($package,"postinst", "postinst-init",
-						{ 'SCRIPT' => $script, 'INITPARMS' => $params, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} },
+					autoscript($package, 'postinst', 'postinst-init',
+						{
+							'SCRIPT' => $script, 'INITPARMS' => $params, 'ERROR_HANDLER' => $dh{ERROR_HANDLER},
+							'INVOKE_RCD_PARAMS' => $update_rcd_params,
+						},
 						\%snippet_options);
 				}
 			
 				if ($dh{R_FLAG} || $dh{RESTART_AFTER_UPGRADE}) {
 					# stops script only on remove
-					autoscript($package,"prerm","prerm-init-norestart",
-						{ 'SCRIPT' => $script, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} },
+					autoscript($package, 'prerm', 'prerm-init-norestart',
+						{
+							'SCRIPT' => $script, 'ERROR_HANDLER' => $dh{ERROR_HANDLER},
+							'INVOKE_RCD_PARAMS' => $update_rcd_params,
+						},
 						\%snippet_options);
 				}
 				else {
 					# always stops script
-					autoscript($package,"prerm","prerm-init",
-						{ 'SCRIPT' => $script, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} },
+					autoscript($package, 'prerm', 'prerm-init',
+						{
+							'SCRIPT' => $script, 'ERROR_HANDLER' => $dh{ERROR_HANDLER},
+							'INVOKE_RCD_PARAMS' => $update_rcd_params,
+						},
 						\%snippet_options);
 				}
+				# The --skip-systemd-native option requires
+				# init-system-helpers (>= 1.54) and since we need it
+				# from prerm we need init-system-helpers to have been
+				# unpacked before the package is being unpacked.
+				addsubstvar($package, 'misc:Pre-Depends', 'init-system-helpers (>= 1.54~)')
+					if $update_rcd_params !~ m/^\s*$/;
 			}
 			else {
 				# just update-rc.d

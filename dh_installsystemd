@@ -347,7 +347,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# Extract unit aliases.
 		push @{$aliases{$unit}}, $_ for extract_key($path, 'Alias');
 
-		if (! grep { has_sysv_equivalent($tmpdir, $_) } ($unit, @{$aliases{$unit}})) {
+		# In compat 11 (and earlier), dh_installinit will handle services with
+		# a sysv-equivalent service.  In compat 12, dh_installsystemd will
+		# take care of it.
+		if (not compat(11) or not grep { has_sysv_equivalent($tmpdir, $_) } ($unit, @{$aliases{$unit}})) {
 			push @start_units, $unit;
 		}
 
