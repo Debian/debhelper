@@ -399,6 +399,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			autoscript($package,"postrm","postrm-init",
 				{ 'SCRIPT' => $script, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} },
 				\%snippet_options);
+
+			if (compat(11)) {
+				autoscript($package, 'postrm', 'postrm-systemd-reload-only', \%snippet_options);
+			}
 		}
 	}
 }
