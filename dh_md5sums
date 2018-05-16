@@ -82,26 +82,14 @@ on_pkgs_in_parallel {
 		my $find="find . -type f $exclude ! -regex './DEBIAN/.*' -printf '%P\\0'";
 		complex_doit("(cd $tmp >/dev/null ; $find | LC_ALL=C sort -z | xargs -r0 md5sum | " .
 			q{perl -pe 'if (s@^\\\\@@) { s/\\\\\\\\/\\\\/g; }' > DEBIAN/md5sums) >/dev/null});
-		# If the file's empty, no reason to waste inodes on it.
-		if (-z "$tmp/DEBIAN/md5sums") {
-			rm_files("$tmp/DEBIAN/md5sums");
-		}
-		else {
-			reset_perm_and_owner(0644, "$tmp/DEBIAN/md5sums");
-		}
+		reset_perm_and_owner(0644, "$tmp/DEBIAN/md5sums");
 		if ( -d $dbgsym_tmp) {
 			install_dir("${dbgsym_tmp}/DEBIAN");
 
 			$find = "find . -type f ! -regex './DEBIAN/.*' -printf '%P\\0'";
 			complex_doit("(cd $dbgsym_tmp >/dev/null ; $find | LC_ALL=C sort -z | xargs -r0 md5sum | " .
 				q{perl -pe 'if (s@^\\\\@@) { s/\\\\\\\\/\\\\/g; }' > DEBIAN/md5sums) >/dev/null});
-			# If the file's empty, no reason to waste inodes on it.
-			if (-z "${dbgsym_tmp}/DEBIAN/md5sums") {
-				rm_files("${dbgsym_tmp}/DEBIAN/md5sums");
-			}
-			else {
-				reset_perm_and_owner(0644, "${dbgsym_tmp}/DEBIAN/md5sums");
-			}
+			reset_perm_and_owner(0644, "${dbgsym_tmp}/DEBIAN/md5sums");
 		}
 	}
 };
