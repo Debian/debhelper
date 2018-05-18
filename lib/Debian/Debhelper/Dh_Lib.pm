@@ -7,6 +7,7 @@
 package Debian::Debhelper::Dh_Lib;
 use strict;
 use warnings;
+use utf8;
 
 use constant {
 	# Lowest compat level supported
@@ -35,36 +36,138 @@ use Errno qw(ENOENT EXDEV);
 use Exporter qw(import);
 use File::Glob qw(bsd_glob GLOB_CSH GLOB_NOMAGIC GLOB_TILDE);
 our (@EXPORT, %dh);
-@EXPORT=qw(&init &doit &doit_noerror &complex_doit &verbose_print &error
-            &nonquiet_print &print_and_doit &print_and_doit_noerror
-            &warning &tmpdir &pkgfile &pkgext &pkgfilename &isnative
-	    &autoscript &filearray &filedoublearray &is_build_profile_active
-	    &getpackages &basename &dirname &xargs %dh &process_pkg
-	    &compat &addsubstvar &delsubstvar &excludefile &package_arch
-	    &package_is_arch_all &package_binary_arch &package_declared_arch
-	    &is_udeb &debhelper_script_subst &escape_shell
-	    &inhibit_log &load_log &write_log &commit_override_log
-	    &dpkg_architecture_value &sourcepackage &make_symlink
-	    &is_make_jobserver_unavailable &clean_jobserver_makeflags
-	    &cross_command &set_buildflags &get_buildoption
-	    &install_dh_config_file &error_exitcode &package_multiarch
-	    &install_file &install_prog &install_lib &install_dir
-	    &get_source_date_epoch &is_cross_compiling
-	    &generated_file &autotrigger &package_section
-	    &restore_file_on_clean &restore_all_files
-	    &open_gz &reset_perm_and_owner &deprecated_functionality
-	    &log_installed_files &buildarch &rename_path
-	    &on_pkgs_in_parallel &on_selected_pkgs_in_parallel
-	    &rm_files &make_symlink_raw_target &on_items_in_parallel
-	    XARGS_INSERT_PARAMS_HERE &glob_expand_error_handler_reject
-	    &glob_expand_error_handler_warn_and_discard &glob_expand
-	    &glob_expand_error_handler_silently_ignore DH_BUILTIN_VERSION
-	    &print_and_complex_doit &default_sourcedir &qx_cmd
-	    &compute_doc_main_package &is_so_or_exec_elf_file &hostarch
-	    &assert_opt_is_known_package &dbgsym_tmpdir &find_hardlinks
-	    &should_use_root &gain_root_cmd DEFAULT_PACKAGE_TYPE
-	    DBGSYM_PACKAGE_TYPE
-);
+@EXPORT = (
+	# debhelper basis functionality
+qw(
+	init
+	%dh
+	compat
+),
+	# External command tooling API
+qw(
+	doit
+	doit_noerror
+	qx_cmd
+	xargs
+	XARGS_INSERT_PARAMS_HERE
+	print_and_doit
+	print_and_doit_noerror
+
+	complex_doit
+	escape_shell
+	print_and_complex_doit
+),
+	# Logging/messaging/error handling
+qw(
+	error
+	error_exitcode
+	warning
+	verbose_print
+	nonquiet_print
+),
+	# Package related actions
+qw(
+	getpackages
+	sourcepackage
+	tmpdir
+	dbgsym_tmpdir
+	default_sourcedir
+	pkgfile
+	pkgext
+	pkgfilename
+	package_is_arch_all
+	package_binary_arch
+	package_declared_arch
+	package_multiarch
+	package_section
+	package_arch
+	process_pkg
+	compute_doc_main_package
+	isnative
+	is_udeb
+),
+	# File/path related actions
+qw(
+	basename
+	dirname
+	install_file
+	install_prog
+	install_lib
+	install_dir
+	install_dh_config_file
+	make_symlink
+	make_symlink_raw_target
+	rename_path
+	find_hardlinks
+	rm_files
+	excludefile
+	is_so_or_exec_elf_file
+	reset_perm_and_owner
+	log_installed_files
+
+	filearray
+	filedoublearray
+	glob_expand
+	glob_expand_error_handler_reject
+	glob_expand_error_handler_warn_and_discard
+	glob_expand_error_handler_silently_ignore
+
+),
+	# Generate triggers, substvars, maintscripts, build-time temporary files
+qw(
+	autoscript
+	autotrigger
+	addsubstvar
+	delsubstvar
+
+	generated_file
+	restore_file_on_clean
+),
+	# Split tasks among different cores
+qw(
+	on_pkgs_in_parallel
+	on_items_in_parallel
+	on_selected_pkgs_in_parallel
+),
+	# R³ framework
+qw(
+	should_use_root
+	gain_root_cmd
+
+),
+	# Architecture, cross-tooling, build options and profiles
+qw(
+	dpkg_architecture_value
+	hostarch
+	cross_command
+	is_cross_compiling
+	is_build_profile_active
+	get_buildoption
+),
+	# Other
+qw(
+	open_gz
+	get_source_date_epoch
+	deprecated_functionality
+),
+	# Special-case functionality (e.g. tool specific), debhelper(-core) functionality and deprecated functions
+qw(
+	inhibit_log
+	load_log
+	write_log
+	commit_override_log
+	debhelper_script_subst
+	is_make_jobserver_unavailable
+	clean_jobserver_makeflags
+	set_buildflags
+	DEFAULT_PACKAGE_TYPE
+	DBGSYM_PACKAGE_TYPE
+	DH_BUILTIN_VERSION
+	assert_opt_is_known_package
+	restore_all_files
+
+	buildarch
+));
 
 # The Makefile changes this if debhelper is installed in a PREFIX.
 my $prefix="/usr";
