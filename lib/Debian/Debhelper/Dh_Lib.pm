@@ -55,7 +55,6 @@ qw(
 
 	complex_doit
 	escape_shell
-	print_and_complex_doit
 ),
 	# Logging/messaging/error handling
 qw(
@@ -522,19 +521,6 @@ sub complex_doit {
 		# The join makes system get a scalar so it forks off a shell.
 		system(join(" ", @_)) == 0 || error_exitcode(join(" ", @_))
 	}			
-}
-
-# Run a command and display the command to stdout except when quiet
-# Use print_and_doit() if you can, instead of this function, because
-# this function forks a shell. However, this function can handle more
-# complicated stuff like redirection.
-sub print_and_complex_doit {
-	nonquiet_print(join(" ",@_));
-
-	if (! $dh{NO_ACT}) {
-		# The join makes system get a scalar so it forks off a shell.
-		system(join(" ", @_)) == 0 || error_exitcode(join(" ", @_))
-	}
 }
 
 
