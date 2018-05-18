@@ -101,6 +101,7 @@ qw(
 	rm_files
 	excludefile
 	is_so_or_exec_elf_file
+	is_empty_dir
 	reset_perm_and_owner
 	log_installed_files
 
@@ -2358,6 +2359,23 @@ sub is_so_or_exec_elf_file {
 	my $elf_type_unpacked = unpack($short_format, $elf_type);
 	return 0 if $elf_type_unpacked != ELF_TYPE_EXECUTABLE and $elf_type_unpacked != ELF_TYPE_SHARED_OBJECT;
 	return 1;
+}
+
+# Returns true iff the given argument is an empty directory.
+# Corner-cases:
+#  - false if not a directory
+sub is_empty_dir {
+	my ($dir) = @_;
+	return 0 if not -d $dir;
+	my $ret = 1;
+	opendir(my $dir_fd, $dir) or error("opendir($dir) failed: $!");
+	while (defined(my $entry = readdir($dir_fd))) {
+		next if $entry eq '.' or $entry eq '..';
+		$ret = 0;
+		last;
+	}
+	closedir($dir_fd);
+	return $ret;
 }
 
 sub on_pkgs_in_parallel(&) {
