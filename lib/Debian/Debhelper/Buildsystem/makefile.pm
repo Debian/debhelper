@@ -84,9 +84,6 @@ sub do_make {
 	if ($parallel == 0 or $parallel > 1) {
 		# We have to use the empty string for "unlimited"
 		$parallel = '' if $parallel == 0;
-		# -O is for synchronizing the output; only if STDOUT
-		# is not a TTY
-		unshift(@_, '-Oline') if not -t STDOUT;
 		unshift(@_, "-j${parallel}");
 	} else {
 		unshift(@_, '-j1');
