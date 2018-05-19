@@ -62,7 +62,6 @@ sub create_buildsystem_instance {
 		return if not $required;
 		error("unable to load build system class '$name': $@");
 	}
-	%bsopts = _insert_cmd_opts(%bsopts);
 	return $module->new(%bsopts);
 }
 
@@ -115,24 +114,25 @@ sub autoselect_buildsystem {
 sub load_buildsystem {
 	my $system=shift;
 	my $step=shift;
+	my %opts = _insert_cmd_opts(@_);
 	my $system_options;
 	if (defined($system) && ref($system) eq 'HASH') {
 		$system_options = $system;
 		$system = $system_options->{'system'};
 	}
 	if (defined $system) {
-		my $inst = create_buildsystem_instance($system, 1, @_);
+		my $inst = create_buildsystem_instance($system, 1, %opts);
 		return $inst;
 	}
 	else {
 		# Try to determine build system automatically
 		my @buildsystems;
 		foreach $system (@BUILDSYSTEMS) {
-			push @buildsystems, create_buildsystem_instance($system, 1, @_);
+			push @buildsystems, create_buildsystem_instance($system, 1, %opts);
 		}
 		if (!$system_options || $system_options->{'enable-thirdparty'}) {
 			foreach $system (@THIRD_PARTY_BUILDSYSTEMS) {
-				push @buildsystems, create_buildsystem_instance($system, 0, @_);
+				push @buildsystems, create_buildsystem_instance($system, 0, %opts);
 			}
 		}
 		return autoselect_buildsystem($step, @buildsystems);
@@ -141,7 +141,7 @@ sub load_buildsystem {
 
 sub load_all_buildsystems {
 	my $incs=shift || \@INC;
-	my %opts = @_;
+	my %opts = _insert_cmd_opts(@_);
 	my (%buildsystems, %genbuildsystems, @buildsystems);
 
 	foreach my $inc (@$incs) {
