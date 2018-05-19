@@ -62,7 +62,12 @@ sub create_buildsystem_instance {
 		return if not $required;
 		error("unable to load build system class '$name': $@");
 	}
+	%bsopts = _insert_cmd_opts(%bsopts);
+	return $module->new(%bsopts);
+}
 
+sub _insert_cmd_opts {
+	my (%bsopts) = @_;
 	if (!exists $bsopts{builddir} && defined $opt_builddir) {
 		$bsopts{builddir} = ($opt_builddir eq "") ? undef : $opt_builddir;
 	}
@@ -72,7 +77,7 @@ sub create_buildsystem_instance {
 	if (!exists $bsopts{parallel}) {
 		$bsopts{parallel} = $opt_parallel;
 	}
-	return $module->new(%bsopts);
+	return %bsopts;
 }
 
 # Autoselect a build system from the list of instances
