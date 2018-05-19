@@ -14,7 +14,7 @@ our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
-B<dh_installdirs> [S<I<debhelper options>>] [B<-A>] [S<I<dir> ...>]
+B<dh_installdirs> [S<I<debhelper options>>] [B<-A>] [B<--sourcedir=>I<dir>] [B<--create-in-sourcedir>] [S<I<dir> ...>]
 
 =head1 DESCRIPTION
 
@@ -48,6 +48,23 @@ commands.
 Create any directories specified by command line parameters in ALL packages
 acted on, not just the first.
 
+=item B<--create-in-sourcedir>, B<--no-create-in-sourcedir>
+
+Whether to create the specified directories in the source directory
+(usually F<debian/tmp>) I<in addition to> in the package build directory
+(usually F<< debian/I<package> >>).
+
+The default is B<--no-create-in-sourcedir>.
+
+=item B<--sourcedir=>I<dir>
+
+Consider I<dir> the source directory for the packages acted on instead
+of the default (which is usually F<debian/tmp>).
+
+Please note that this option is dependent on the
+B<--create-in-sourcedir> option (when B<--no-create-in-sourcedir> is
+in effect, this option does nothing in B<dh_installdirs>).
+
 =item I<dir> ...
 
 Create these directories in the package build directory of the first
@@ -57,13 +74,19 @@ package acted on. (Or in all packages if B<-A> is specified.)
 
 =cut
 
-init();
+my $create_in_sourcedir = 0;
+
+init(options => {
+	'sourcedir=s' => \$dh{SOURCEDIR},
+	'create-in-sourcedir!' => \$create_in_sourcedir,
+});
 
 # PROMISE: DH NOOP WITHOUT dirs
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $file=pkgfile($package,"dirs");
+	my $srcdir = $dh{SOURCEDIR} // default_sourcedir($package);
 
 	install_dir($tmp) if compat(10);
 
@@ -83,14 +106,22 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# be in the right directory, but more importantly, it 
 		# protects against the danger of absolute dirs being
 		# specified.
-		@dirs=map {
-				$_="$tmp/$_";
-				tr:/:/:s; # just beautification.
-				$_
-			  } @dirs;
+		my @make_dirs;
+		push(@make_dirs, map {
+				my $dir = "$tmp/$_";
+				$dir =~ tr:/:/:s; # just beautification.
+				$dir;
+			} @dirs);
+		if ($create_in_sourcedir) {
+			push(@make_dirs, map {
+					my $dir = "${srcdir}/$_";
+					$dir =~ tr:/:/:s; # just beautification.
+					$dir;
+				} @dirs);
+		}
 
 		# Create dirs.
-		install_dir(@dirs);
+		install_dir(@make_dirs);
 	}
 }
 

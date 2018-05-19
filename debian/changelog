@@ -58,6 +58,12 @@ debhelper (11.3) UNRELEASED; urgency=medium
     suggestion.  (Closes: #491027)
   * installinitramfs.pm: New sequence to enable dh_installinitramfs in
     compat 11 and earlier.
+  * dh_installdirs: Add --(no-)create-in-sourcedir option to make
+    dh_installdirs create directories in the source directory in addition
+    in the package build directory.  Furthermore, dh_installdirs now
+    accepts --sourcedir to overrule the default source directory (just
+    like e.g. dh_install).  Thanks to Robert Luberda for the suggestion.
+    (Closes: #816332)
 
   [ Dmitry Shachnev ]
   * qmake.pm: Use ${DEB_HOST_GNU_TYPE}-qmake wrapper for
