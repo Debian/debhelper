@@ -8,6 +8,7 @@ package Debian::Debhelper::Dh_Buildsystems;
 
 use strict;
 use warnings;
+use Debian::Debhelper::Buildsystem;
 use Debian::Debhelper::Dh_Lib;
 use File::Spec;
 
@@ -45,25 +46,7 @@ my $opt_builddir;
 my $opt_list;
 my $opt_parallel;
 
-sub create_buildsystem_instance {
-	my ($full_name, $required, %bsopts) = @_;
-	my @parts = split(m{[+]}, $full_name, 2);
-	my $name = $parts[0];
-	my $module = "Debian::Debhelper::Buildsystem::$name";
-	if (@parts > 1) {
-		if (exists($bsopts{'targetbuildsystem'})) {
-			error("Conflicting target buildsystem for ${name} (load as ${full_name}, but target configured in bsopts)");
-		}
-		$bsopts{'targetbuildsystem'} = $parts[1];
-	}
-
-	eval "use $module";
-	if ($@) {
-		return if not $required;
-		error("unable to load build system class '$name': $@");
-	}
-	return $module->new(%bsopts);
-}
+*create_buildsystem_instance = \&Debian::Debhelper::Buildsystem::_create_buildsystem_instance;
 
 sub _insert_cmd_opts {
 	my (%bsopts) = @_;

@@ -11,7 +11,6 @@ use warnings;
 use Cwd ();
 use File::Spec;
 use Debian::Debhelper::Dh_Lib;
-use Debian::Debhelper::Dh_Buildsystems qw(load_buildsystem);
 
 # Build system name. Defaults to the last component of the class
 # name. Do not override this method unless you know what you are
@@ -124,7 +123,7 @@ sub new {
 	if (defined($target_bs_name)) {
 		my %target_opts = %opts;
 		delete($target_opts{'targetbuildsystem'});
-		my $target_system = load_buildsystem($target_bs_name, undef, %target_opts);
+		my $target_system =_create_buildsystem_instance($target_bs_name, 1, %target_opts);
 		$this->set_targetbuildsystem($target_system);
 	}
 
@@ -591,6 +590,27 @@ sub clean {
 	if ($this->IS_GENERATOR_BUILD_SYSTEM) {
 		$this->get_targetbuildsystem->clean(@_);
 	}
+}
+
+
+sub _create_buildsystem_instance {
+	my ($full_name, $required, %bsopts) = @_;
+	my @parts = split(m{[+]}, $full_name, 2);
+	my $name = $parts[0];
+	my $module = "Debian::Debhelper::Buildsystem::$name";
+	if (@parts > 1) {
+		if (exists($bsopts{'targetbuildsystem'})) {
+			error("Conflicting target buildsystem for ${name} (load as ${full_name}, but target configured in bsopts)");
+		}
+		$bsopts{'targetbuildsystem'} = $parts[1];
+	}
+
+	eval "use $module";
+	if ($@) {
+		return if not $required;
+		error("unable to load build system class '$name': $@");
+	}
+	return $module->new(%bsopts);
 }
 
 1
