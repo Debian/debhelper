@@ -66,7 +66,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		install_dir($hook_dir);
 		install_file($hook_script, "${hook_dir}/${package}");
 		$has_hooks = 1;
-	} elsif (-d $hook_dir and not is_empty_dir($hook_dir) and not compat(11)) {
+	} elsif (-d $hook_dir and not is_empty_dir($hook_dir)) {
 		$has_hooks = 1;
 		
 	}

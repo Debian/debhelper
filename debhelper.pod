@@ -793,10 +793,12 @@ in F<</usr/share/doc/I<package>/examples>>.)
 
 =item -
 
-The standard sequence in B<dh> now includes B<dh_dwz> by default.  This makes
-the B<dwz> sequence obsolete and it will now fail with an error.  If you want
-to skip B<dh_dwz>, then please insert an empty I<override_dh_dwz> target in
-F<debian/rules>.
+The standard sequence in B<dh> now includes B<dh_dwz> and
+B<dh_installinitramfs> by default.  This makes the B<dwz> and
+B<installinitramfs> sequences obsolete and they will now fail with an
+error.  If you want to skip these commands, then please insert an
+empty override target for them in F<debian/rules>
+(e.g. I<override_dh_dwz:>)
 
 =item -
 
