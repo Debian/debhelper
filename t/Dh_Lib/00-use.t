@@ -16,5 +16,5 @@ chdir($test_dir);
 # Packages that need to be able to (at least) load without requring
 # d/control or d/compat.
 
-use_ok('Debian::Debhelper::Dh_Lib');
+use_ok('Debian::Debhelper::Dh_Lib', '!dirname');
 use_ok('Debian::Debhelper::Buildsystem');
