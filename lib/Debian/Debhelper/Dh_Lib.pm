@@ -1530,15 +1530,15 @@ sub getpackages {
 		s/\s+$//;
 		next if m/^\s*+\#/;
 
-		if (/^Source:\s*(.*)/i) {
+		if (/^Source:\s*+(.*)/i) {
 			$sourcepackage = $1;
 			$bd_field_value = undef;
 			next;
-		} elsif (/^Section:\s(.*)$/i) {
+		} elsif (/^Section:\s*+(.*)$/i) {
 			$source_section = $1;
 			$bd_field_value = undef;
 			next;
-		} elsif (/^(Build-Depends(?:-Arch|-Indep)?):\s*(.*)$/i) {
+		} elsif (/^(Build-Depends(?:-Arch|-Indep)?):\s*+(.*)$/i) {
 			my ($field, $value) = (lc($1), $2);
 			$bd_field_value = [$value];
 			$bd_fields{$field} = $bd_field_value;
@@ -1604,7 +1604,7 @@ sub getpackages {
 	while (<$fd>) {
 		chomp;
 		s/\s+$//;
-		if (/^Package:\s*(.*)/i) {
+		if (/^Package:\s*+(.*)/i) {
 			$package=$1;
 			# Detect duplicate package names in the same control file.
 			if (! $seen{$package}) {
@@ -1614,20 +1614,20 @@ sub getpackages {
 				error("debian/control has a duplicate entry for $package");
 			}
 			$included_in_build_profile=1;
-		} elsif (/^Section:\s(.*)$/i) {
+		} elsif (/^Section:\s*+(.*)$/i) {
 			$section = $1;
-		} elsif (/^Architecture:\s*(.*)/i) {
+		} elsif (/^Architecture:\s*+(.*)/i) {
 			$arch=$1;
-		} elsif (/^(?:X[BC]*-)?Package-Type:\s*(.*)/i) {
+		} elsif (/^(?:X[BC]*-)?Package-Type:\s*+(.*)/i) {
 			$package_type=$1;
 		} elsif (/^Multi-Arch:\s*(.*)/i) {
 			$multiarch = $1;
-		} elsif (/^X-DH-Build-For-Type:\s*(.*)/i) {
+		} elsif (/^X-DH-Build-For-Type:\s*+(.*)/i) {
 			$cross_type = $1;
 			if ($cross_type ne 'host' and $cross_type ne 'target') {
 				error("Unknown value of X-DH-Build-For-Type \"$cross_type\" at debian/control:$.");
 			}
-		} elsif (/^Build-Profiles:\s*(.*)/i) {
+		} elsif (/^Build-Profiles:\s*+(.*)/i) {
 			# rely on libdpkg-perl providing the parsing functions
 			# because if we work on a package with a Build-Profiles
 			# field, then a high enough version of dpkg-dev is needed
