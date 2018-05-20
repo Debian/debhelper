@@ -1,5 +1,7 @@
 #!/usr/bin/perl
-use Test;
+use strict;
+use warnings;
+use Test::More;
 plan(tests => 1);
 
 # This test is here to detect breakage in
@@ -22,5 +24,7 @@ EOF
 close OUT;
 system("chmod +x t/tmp/debian/rules");
 my @output=`cd t/tmp && debian/rules build 2>&1`;
-ok(grep { m/override called/ } @output);
+ok(grep { m/override called/ } @output) or do {
+	diag($_) for @output;
+};
 system("rm -rf t/tmp");
