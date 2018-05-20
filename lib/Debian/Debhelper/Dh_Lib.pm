@@ -812,7 +812,7 @@ my $compat_from_bd;
 						error("debian/compat must contain a positive number (found: \"${new_compat}\")");
 					}
 					if (defined($compat_from_bd) and $compat_from_bd != -1) {
-						warning("Please specific the debhelper compat level exactly once.");
+						warning("Please specify the debhelper compat level exactly once.");
 						warning(" * debian/compat requests compat ${new_compat}.");
 						warning(" * debian/control requests compat ${compat_from_bd} via \"debhelper-compat (= ${compat_from_bd})\"");
 						error("debhelper compat level specified both in debian/compat and via build-dependency on debhelper-compat");
