@@ -10,11 +10,11 @@ package Debian::Debhelper::Buildsystem::python_distutils;
 use strict;
 use warnings;
 use Cwd ();
-use Debian::Debhelper::Dh_Lib qw(error);
+use Debian::Debhelper::Dh_Lib qw(error deprecated_functionality);
 use parent qw(Debian::Debhelper::Buildsystem);
 
 sub DESCRIPTION {
-	"Python Distutils (setup.py)"
+	"Python Distutils (setup.py) [DEPRECATED]"
 }
 
 sub DEFAULT_BUILD_DIRECTORY {
@@ -59,6 +59,9 @@ sub create_cfg {
 sub pre_building_step {
 	my $this=shift;
 	my $step=shift;
+
+	deprecated_functionality('Please use the third-party "pybuild" build system instead of python-distutils',
+		12);
 
 	return unless grep /$step/, qw(build install clean);
 
