@@ -1593,9 +1593,6 @@ sub getpackages {
 				}
 			}
 		}
-		if (defined($final_level) && !$ENV{DH_INTERNAL_TESTSUITE_SILENT_WARNINGS}) {
-			warning("The use of \"debhelper-compat (= ${final_level})\" is experimental and may change (or be retired) without notice");
-		}
 		$compat_from_bd = $final_level // -1;
 	} else {
 		$compat_from_bd = -1;
