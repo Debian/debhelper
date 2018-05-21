@@ -152,6 +152,7 @@ init();
 my $news_name="NEWS.Debian";
 my $changelog_name="changelog.Debian";
 
+my $explicit_changelog = @ARGV ? 1 : 0;
 my $default_upstream = $ARGV[0];
 my $default_upstream_text=$default_upstream;
 my $default_upstream_html;
@@ -198,11 +199,15 @@ on_pkgs_in_parallel {
 		my $tmp=tmpdir($package);
 		my $changelog=pkgfile($package,"changelog");
 		my $news=pkgfile($package,"NEWS");
-		my $upstream_changelog = $ARGV[0];
+		my $upstream_changelog;
 		my ($upstream_changelog_text, $upstream_changelog_html);
 		my $changelog_from_tmp_dir = 0;
 
-		if (! defined($upstream_changelog)) {
+		if ($explicit_changelog) {
+			$upstream_changelog = $default_upstream;
+			$upstream_changelog_text = $default_upstream_text;
+			$upstream_changelog_html = $default_upstream_html;
+		} else {
 			# Check if the upstream build system provided a
 			# changelog
 			$upstream_changelog = find_changelog("${tmp}/usr/share/doc/${package}");
@@ -210,11 +215,6 @@ on_pkgs_in_parallel {
 				$upstream_changelog_text = $upstream_changelog;
 				$changelog_from_tmp_dir = 1;
 			}
-		}
-		if (not $upstream_changelog || defined($ARGV[0])) {
-			$upstream_changelog = $default_upstream;
-			$upstream_changelog_text = $default_upstream_text;
-			$upstream_changelog_html = $default_upstream_html;
 		}
 
 		if (!$changelog) {
