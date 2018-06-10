@@ -182,6 +182,18 @@ our $PKGVERSION_REGEX = qr/
                  (?: - [0-9A-Za-z.+:~]+ )*   # Optional debian revision (+ upstreams versions with hyphens)
                           /xoa;
 
+# From Policy 5.1:
+#
+#  The field name is composed of US-ASCII characters excluding control
+#  characters, space, and colon (i.e., characters in the ranges U+0021
+#  (!) through U+0039 (9), and U+003B (;) through U+007E (~),
+#  inclusive). Field names must not begin with the comment character
+#  (U+0023 #), nor with the hyphen character (U+002D -).
+our $DEB822_FIELD_REGEX = qr/
+	    [\x21\x22\x24-\x2C\x2F-\x39\x3B-\x7F]  # First character
+	    [\x21-\x39\x3B-\x7F]*                  # Subsequent characters (if any)
+    /xoa;
+
 sub init {
 	my %params=@_;
 
@@ -1531,7 +1543,7 @@ sub getpackages {
 	my $valid_pkg_re = qr{^${PKGNAME_REGEX}$}o;
 	my ($package_type, $multiarch, %seen, @profiles, $source_section,
 		$included_in_build_profile, $cross_type, $cross_target_arch,
-		%bd_fields, $bd_field_value);
+		%bd_fields, $bd_field_value, %seen_fields);
 	if (exists $ENV{'DEB_BUILD_PROFILES'}) {
 		@profiles=split /\s+/, $ENV{'DEB_BUILD_PROFILES'};
 	}
@@ -1547,29 +1559,47 @@ sub getpackages {
 		s/\s+$//;
 		next if m/^\s*+\#/;
 
-		if (/^Source:\s*+(.*)/i) {
-			$sourcepackage = $1;
-			$bd_field_value = undef;
-			if ($sourcepackage !~ $valid_pkg_re) {
-				error('Source-field must be a valid package name, ' .
-					  "got: \"${sourcepackage}\", should match \"${valid_pkg_re}\"");
+		if (/^\s/) {
+			if (not %seen_fields) {
+				error("Continuation line seen before first stanza in debian/control (line $.)");
 			}
+			# Continuation line
+			push(@{$bd_field_value}, $_) if $bd_field_value;
+		} elsif (not $_ and not %seen_fields) {
+			# Ignore empty lines before first stanza
 			next;
-		} elsif (/^Section:\s*+(.*)$/i) {
-			$source_section = $1;
-			$bd_field_value = undef;
-			next;
-		} elsif (/^(Build-Depends(?:-Arch|-Indep)?):\s*+(.*)$/i) {
-			my ($field, $value) = (lc($1), $2);
-			$bd_field_value = [$value];
-			$bd_fields{$field} = $bd_field_value;
-		} elsif (/^\S/) {
-			$bd_field_value = undef;
-		} elsif (/^\s/ and $bd_field_value) {
-			push(@{$bd_field_value}, $_);
+		} elsif ($_) {
+			my ($field_name, $value);
+
+			if (m/^($DEB822_FIELD_REGEX):\s*(.*)/o) {
+				($field_name, $value) = (lc($1), $2);
+				if (exists($seen_fields{$field_name})) {
+					my $first_time = $seen_fields{$field_name};
+					error("${field_name}-field appears twice in the same stanza of debian/control. " .
+						  "First time on line $first_time, second time: $.");
+				}
+				$seen_fields{$field_name} = $.;
+				$bd_field_value = undef;
+			} else {
+				# Invalid file
+				error("Parse error in debian/control, line $., read: $_");
+			}
+			if ($field_name eq 'source') {
+				$sourcepackage = $value;
+				if ($sourcepackage !~ $valid_pkg_re) {
+					error('Source-field must be a valid package name, ' .
+						  "got: \"${sourcepackage}\", should match \"${valid_pkg_re}\"");
+				}
+				next;
+			} elsif ($field_name eq 'section') {
+				$source_section = $value;
+				next;
+			} elsif ($field_name =~ /^(?:build-depends(?:-arch|-indep)?)$/) {
+				$bd_field_value = [$value];
+				$bd_fields{$field_name} = $bd_field_value;
+			}
 		}
-		next if not $_ and not defined($sourcepackage);
-		last if (!$_ or eof); # end of stanza.
+		last if not $_ or eof;
 	}
 	error("could not find Source: line in control file.") if not defined($sourcepackage);
 	if (%bd_fields) {
