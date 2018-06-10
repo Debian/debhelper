@@ -16,61 +16,55 @@ our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
-B<dh_installsystemd> [S<I<debhelper options>>] [B<--restart-after-upgrade>] [B<--no-stop-on-upgrade>] [B<--no-enable>] [B<--name=>I<name>] [S<I<unit file> ...>]
+B<dh_installsystemd> [S<I<debhelper options>>] [B<--restart-after-upgrade>] [B<--no-stop-on-upgrade>] [B<--no-enable>] [B<--no-start>] [B<--name=>I<name>] [S<I<unit file> ...>]
 
 =head1 DESCRIPTION
 
-B<dh_installsystemd> is a debhelper program that is responsible for enabling,
-disabling, starting, stopping and restarting systemd unit files.
+B<dh_installsystemd> is a debhelper program that is responsible for
+installing package maintainer supplied systemd unit files.
 
-In the simple case, it finds all unit files installed by a package (e.g.
-bacula-fd.service) and enables them. It is not necessary that the machine
-actually runs systemd during package installation time, enabling happens on all
-machines in order to be able to switch from sysvinit to systemd and back.
+It also finds the service files installed by a package and generates
+F<preinst>, F<postinst>, and F<prerm> code blocks for enabling,
+disabling, starting, stopping, and restarting the corresponding
+systemd services, when the package is installed, updated, or
+removed. These snippets are added to the maintainer scripts by
+L<dh_installdeb(1)>.
 
-For only generating blocks for specific service files, you need to pass them as
-arguments, e.g. B<dh_installsystemd quota.service> and B<dh_installsystemd
---name=quotarpc quotarpc.service>.
+L<deb-systemd-helper(1)> is used to enable and disable systemd units,
+thus it is not necessary that the machine actually runs systemd during
+package installation time, enabling happens on all machines in order
+to be able to switch from sysvinit to systemd and back.
+
+B<dh_installsystemd> operates on all unit files installed by a
+package. For only generating blocks for specific unit files, pass them
+as arguments, C<dh_installsystemd quota.service>. Specific unit files
+can be excluded from processing using the B<-X> common L<debhelper(1)>
+option.
 
 =head1 FILES
 
 =over 4
 
-=item debian/I<package>.service, debian/I<package>@.service
+=item debian/I<package>.mount,
+      debian/I<package>.path,
+      debian/I<package>@.path,
+      debian/I<package>.service,
+      debian/I<package>@.service,
+      debian/I<package>.socket,
+      debian/I<package>@.socket,
+      debian/I<package>.target,
+      debian/I<package>@.target,
+      debian/I<package>.timer,
+      debian/I<package>@.timer
 
-If this exists, it is installed into lib/systemd/system/I<package>.service (or
-lib/systemd/system/I<package>@.service) in the package build directory.
+If any of those fiels exists, they are installed into
+F<lib/systemd/system/> in the package build directory.
 
 =item debian/I<package>.tmpfile
 
-If this exists, it is installed into usr/lib/tmpfiles.d/I<package>.conf in the
-package build directory. (The tmpfiles.d mechanism is currently only used
-by systemd.)
-
-=item debian/I<package>.target, debian/I<package>@.target
-
-If this exists, it is installed into lib/systemd/system/I<package>.target (or
-lib/systemd/system/I<package>@.target) in the package build directory.
-
-=item debian/I<package>.socket, debian/I<package>@.socket
-
-If this exists, it is installed into lib/systemd/system/I<package>.socket (or
-lib/systemd/system/I<package>@.socket) in the package build directory.
-
-=item debian/I<package>.mount
-
-If this exists, it is installed into lib/systemd/system/I<package>.mount
-in the package build directory.
-
-=item debian/I<package>.path, debian/I<package>@.path
-
-If this exists, it is installed into lib/systemd/system/I<package>.path (or
-lib/systemd/system/I<package>@.path) in the package build directory.
-
-=item debian/I<package>.timer, debian/I<package>@.timer
-
-If this exists, it is installed into lib/systemd/system/I<package>.timer (or
-lib/systemd/system/I<package>@.timer) in the package build directory.
+If this exists, it is installed into F<usr/lib/tmpfiles.d/> in the
+package build directory. Note that the C<tmpfiles.d> mechanism is
+currently only used by systemd.
 
 =back
 
@@ -88,12 +82,12 @@ should not be started.
 
 =item B<--name=>I<name>
 
-Install the service file as I<name.service> instead of the default filename,
-which is the I<package.service>. When this parameter is used,
+Install the service file as I<name.service> instead of the default
+filename I<package.service>. When this parameter is used,
 B<dh_installsystemd> looks for and installs files named
-F<debian/package.name.service> instead of the usual F<debian/package.service>.
-Moreover, maintainer scripts are only generated for units that match the given
-I<name>.
+F<debian/package.name.service> instead of the usual
+F<debian/package.service>.  Moreover, maintainer scripts are only
+generated for units that match the given I<name>.
 
 =item B<--restart-after-upgrade>
 
@@ -132,10 +126,10 @@ should not be enabled.
 
 =head1 NOTES
 
-Note that this command is not idempotent. L<dh_prep(1)> should be called
-between invocations of this command (with the same arguments). Otherwise, it
-may cause multiple instances of the same text to be added to maintainer
-scripts.
+This command is not idempotent. L<dh_prep(1)> should be called between
+invocations of this command (with the same arguments). Otherwise, it
+may cause multiple instances of the same text to be added to
+maintainer scripts.
 
 =cut
 
@@ -404,7 +398,7 @@ if (%requested_files) {
 
 =head1 SEE ALSO
 
-L<debhelper(7)>
+L<debhelper(7)>, L<dh_installinit(1)>, L<deb-systemd-helper(1)>
 
 =head1 AUTHORS
 
