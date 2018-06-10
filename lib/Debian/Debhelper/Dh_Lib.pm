@@ -1528,6 +1528,7 @@ sub getpackages {
 	my $package="";
 	my $arch="";
 	my $section="";
+	my $valid_pkg_re = qr{^${PKGNAME_REGEX}$}o;
 	my ($package_type, $multiarch, %seen, @profiles, $source_section,
 		$included_in_build_profile, $cross_type, $cross_target_arch,
 		%bd_fields, $bd_field_value);
@@ -1549,6 +1550,10 @@ sub getpackages {
 		if (/^Source:\s*+(.*)/i) {
 			$sourcepackage = $1;
 			$bd_field_value = undef;
+			if ($sourcepackage !~ $valid_pkg_re) {
+				error('Source-field must be a valid package name, ' .
+					  "got: \"${sourcepackage}\", should match \"${valid_pkg_re}\"");
+			}
 			next;
 		} elsif (/^Section:\s*+(.*)$/i) {
 			$source_section = $1;
@@ -1625,6 +1630,10 @@ sub getpackages {
 			}
 			else {
 				error("debian/control has a duplicate entry for $package");
+			}
+			if ($package !~ $valid_pkg_re) {
+				error('Package-field must be a valid package name, ' .
+					  "got: \"${package}\", should match \"${valid_pkg_re}\"");
 			}
 			$included_in_build_profile=1;
 		} elsif (/^Section:\s*+(.*)$/i) {
