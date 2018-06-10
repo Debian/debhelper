@@ -1700,6 +1700,11 @@ sub getpackages {
 			} elsif ($field_name eq 'architecture') {
 				$arch = $value;
 			} elsif ($field_name =~ m/^(?:x[bc]*-)?package-type$/) {
+				if (defined($package_type)) {
+					my $help = "(issue seen prior \"Package\"-field)";
+					$help = "for package ${package}" if $package;
+					error("Multiple definitions of (X-)Package-Type in line $. ${help}");
+				}
 				$package_type = $value;
 			} elsif ($field_name eq 'multi-arch') {
 				$multiarch = $value;
