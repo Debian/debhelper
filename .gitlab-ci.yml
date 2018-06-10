@@ -1,0 +1,23 @@
+tests-stable-backports:
+  stage: test
+  image: debian:stable-backports
+  script:
+    - apt-get update
+    - apt-get build-dep -y .
+    - dpkg-buildpackage -us -uc -tc
+
+tests-testing:
+  stage: test
+  image: debian:testing
+  script:
+    - apt-get update
+    - apt-get build-dep -y .
+    - dpkg-buildpackage -us -uc -tc
+
+tests-unstable:
+  stage: test
+  image: debian:unstable
+  script:
+    - apt-get update
+    - apt-get build-dep -y .
+    - dpkg-buildpackage -us -uc -tc
