@@ -1649,54 +1649,85 @@ sub getpackages {
 		$compat_from_bd = -1;
 	}
 
+	%seen_fields = ();
+
 	while (<$fd>) {
 		chomp;
 		s/\s+$//;
-		if (/^Package:\s*+(.*)/i) {
-			$package=$1;
-			# Detect duplicate package names in the same control file.
-			if (! $seen{$package}) {
-				$seen{$package}=1;
+		next if m/^\s*+\#/;
+
+
+		if (/^\s/) {
+			# Continuation line
+			if (not %seen_fields) {
+				error("Continuation line seen outside stanza in debian/control (line $.)");
 			}
-			else {
-				error("debian/control has a duplicate entry for $package");
-			}
-			if ($package !~ $valid_pkg_re) {
-				error('Package-field must be a valid package name, ' .
-					  "got: \"${package}\", should match \"${valid_pkg_re}\"");
-			}
-			$included_in_build_profile=1;
-		} elsif (/^Section:\s*+(.*)$/i) {
-			$section = $1;
-		} elsif (/^Architecture:\s*+(.*)/i) {
-			$arch=$1;
-		} elsif (/^(?:X[BC]*-)?Package-Type:\s*+(.*)/i) {
-			$package_type=$1;
-		} elsif (/^Multi-Arch:\s*(.*)/i) {
-			$multiarch = $1;
-		} elsif (/^X-DH-Build-For-Type:\s*+(.*)/i) {
-			$cross_type = $1;
-			if ($cross_type ne 'host' and $cross_type ne 'target') {
-				error("Unknown value of X-DH-Build-For-Type \"$cross_type\" at debian/control:$.");
-			}
-		} elsif (/^Build-Profiles:\s*+(.*)/i) {
-			# rely on libdpkg-perl providing the parsing functions
-			# because if we work on a package with a Build-Profiles
-			# field, then a high enough version of dpkg-dev is needed
-			# anyways
-			my $build_profiles=$1;
-			eval {
-				require Dpkg::BuildProfiles;
-				my @restrictions=Dpkg::BuildProfiles::parse_build_profiles($build_profiles);
-				if (@restrictions) {
-					$included_in_build_profile=Dpkg::BuildProfiles::evaluate_restriction_formula(\@restrictions, \@profiles);
+		} elsif (not $_ and not %seen_fields) {
+			# Ignore empty lines before first stanza
+			next;
+		} elsif ($_) {
+			my ($field_name, $value);
+
+			if (m/^($DEB822_FIELD_REGEX):\s*(.*)/o) {
+				($field_name, $value) = (lc($1), $2);
+				if (exists($seen_fields{$field_name})) {
+					my $first_time = $seen_fields{$field_name};
+					error("${field_name}-field appears twice in the same stanza of debian/control. " .
+						  "First time on line $first_time, second time: $.");
 				}
-			};
-			if ($@) {
-				error("The control file has a Build-Profiles field. Requires libdpkg-perl >= 1.17.14");
+				$seen_fields{$field_name} = $.;
+				$bd_field_value = undef;
+			} else {
+				# Invalid file
+				error("Parse error in debian/control, line $., read: $_");
+			}
+
+			if ($field_name eq 'package') {
+				$package = $value;
+				# Detect duplicate package names in the same control file.
+				if (! $seen{$package}) {
+					$seen{$package}=1;
+				} else {
+					error("debian/control has a duplicate entry for $package");
+				}
+				if ($package !~ $valid_pkg_re) {
+					error('Package-field must be a valid package name, ' .
+						  "got: \"${package}\", should match \"${valid_pkg_re}\"");
+				}
+				$included_in_build_profile=1;
+			} elsif ($field_name eq 'section') {
+				$section = $value;
+			} elsif ($field_name eq 'architecture') {
+				$arch = $value;
+			} elsif ($field_name =~ m/^(?:x[bc]*-)?package-type$/) {
+				$package_type = $value;
+			} elsif ($field_name eq 'multi-arch') {
+				$multiarch = $value;
+			} elsif ($field_name eq 'x-dh-build-for-type') {
+				$cross_type = $value;
+				if ($cross_type ne 'host' and $cross_type ne 'target') {
+					error("Unknown value of X-DH-Build-For-Type \"$cross_type\" at debian/control:$.");
+				}
+			} elsif ($field_name eq 'build-profiles') {
+				# rely on libdpkg-perl providing the parsing functions
+				# because if we work on a package with a Build-Profiles
+				# field, then a high enough version of dpkg-dev is needed
+				# anyways
+				my $build_profiles=$1;
+				eval {
+					require Dpkg::BuildProfiles;
+					my @restrictions=Dpkg::BuildProfiles::parse_build_profiles($build_profiles);
+					if (@restrictions) {
+						$included_in_build_profile = Dpkg::BuildProfiles::evaluate_restriction_formula(
+							\@restrictions,
+							\@profiles);
+					}
+				};
+				if ($@) {
+					error("The control file has a Build-Profiles field. Requires libdpkg-perl >= 1.17.14");
+				}
 			}
 		}
-
 		if (!$_ or eof) { # end of stanza.
 			if ($package) {
 				$package_types{$package}=$package_type // 'deb';
@@ -1722,8 +1753,8 @@ sub getpackages {
 							$included = 1 if samearch($desired_arch, $arch);
 						}
 						if ($included) {
-							push(@{$packages_by_type{'arch'}}, $package);
-							push(@{$packages_by_type{'both'}}, $package);
+								push(@{$packages_by_type{'arch'}}, $package);
+								push(@{$packages_by_type{'both'}}, $package);
 						}
 					}
 				}
@@ -1733,6 +1764,7 @@ sub getpackages {
 			$cross_type = undef;
 			$arch='';
 			$section='';
+			%seen_fields = ();
 		}
 	}
 	close($fd);
