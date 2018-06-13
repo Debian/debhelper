@@ -115,10 +115,10 @@ easy way to do with is by adding an override target for that command.
 	#!/usr/bin/make -f
 	%:
 		dh $@
-	
+
 	override_dh_strip:
 		dh_strip -Xfoo
-	
+
 	override_dh_auto_configure:
 		dh_auto_configure -- --with-foo --disable-bar
 
@@ -199,7 +199,7 @@ want it to run, by defining empty override targets for each command.
 	#!/usr/bin/make -f
 	%:
 		dh $@
-	
+
 	# Commands not to run:
 	override_dh_auto_test override_dh_compress override_dh_fixperms:
 
@@ -210,7 +210,7 @@ These will be skipped when running build-arch and binary-arch sequences.
 	#!/usr/bin/make -f
 	%:
 		dh $@
-	
+
 	override_dh_auto_build-indep:
 		$(MAKE) -C docs
 
@@ -272,7 +272,7 @@ option to ensure they only work on architecture dependent packages.
 
 =head1 DEPRECATED OPTIONS
 
-The following options are deprecated. It's much 
+The following options are deprecated. It's much
 better to use override targets instead.  They are B<not> available
 in compat 10.
 
@@ -308,7 +308,7 @@ my @ARGV_orig=@ARGV;
 my (@addons, @addon_requests);
 
 inhibit_log();
-		
+
 init(options => {
 		"until=s" => \$dh{UNTIL},
 		"after=s" => \$dh{AFTER},
@@ -325,7 +325,7 @@ init(options => {
 		"l" => \&list_addons,
 		"list" => \&list_addons,
 	},
-	# Disable complaints about unknown options; they are passed on to 
+	# Disable complaints about unknown options; they are passed on to
 	# the debhelper commands.
 	ignore_unknown_options => 1,
 	# Bundling does not work well since there are unknown options.
@@ -405,6 +405,7 @@ my @i = (qw{
 	dh_installinit
 },
    (!compat(10) ? qw(dh_installsystemd) : qw()),
+   (compat(12) ? qw(dh_installsystemduser) : qw()),
 
 qw{
 	dh_installmenu
@@ -499,7 +500,7 @@ sub remove_command {
 	foreach my $sequence (keys %sequences) {
 		$sequences{$sequence}=[grep { $_ ne $command } @{$sequences{$sequence}}];
 	}
-	
+
 }
 sub add_command {
 	my ($command, $sequence) = @_;
@@ -864,7 +865,7 @@ foreach my $i (0..$stoppoint) {
 		close($fd) or error("close($stamp_file) failed: $!");
 		next;
 	}
-	
+
 	# Check for override targets in debian/rules, and run instead of
 	# the usual command. (The non-arch-specific override is tried first,
 	# for simplest semantics; mixing it with arch-specific overrides
