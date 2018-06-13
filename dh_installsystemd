@@ -198,6 +198,30 @@ sub extract_key {
 	return @values;
 }
 
+sub list_installed_units {
+	my ($tmpdir, $aliases) = @_;
+
+	my $lib_systemd_system = "$tmpdir/lib/systemd/system";
+	my @installed;
+
+	return unless -d $lib_systemd_system;
+	opendir(my $dh, "$lib_systemd_system") or error("Cannot opendir($lib_systemd_system): $!");
+
+	foreach my $name (readdir($dh)) {
+		my $path = "$lib_systemd_system/$name";
+		next unless -f $path;
+		if (-l "$path") {
+			my $dest = basename(readlink($path));
+			$aliases->{$dest} = $name;
+		} else {
+			push @installed, $name;
+		}
+	}
+
+	closedir($dh);
+	return @installed;
+}
+
 
 # PROMISE: DH NOOP WITHOUT tmp(lib/systemd/system) tmp(usr/lib/tmpfiles.d) tmp(etc/tmpfiles.d) mount path service socket target tmpfile timer
 
@@ -256,28 +280,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 # installed, upgraded or removed.
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmpdir = tmpdir($package);
-	my (@installed_units, @start_units,  @enable_units, %aliases);
+	my (@args, @start_units, @enable_units, %aliases);
 
-	my $oldcwd = getcwd();
-	find({
-		wanted => sub {
-			my $name = $File::Find::name;
-			return unless -f $name;
-			return unless $name =~ m,^\Q${tmpdir}\E/lib/systemd/system/[^/]+$,;
-			if (-l) {
-				my $target = abs_path(readlink());
-				$target =~ s,^\Q${oldcwd}\E/,,g;
-				$aliases{$target} = [ $_ ];
-			} else {
-				push @installed_units, $name;
-			}
-		},
-		no_chdir => 1,
-	}, "${tmpdir}/lib/systemd/system") if -d "${tmpdir}/lib/systemd/system";
+	my @installed_units = list_installed_units($tmpdir, \%aliases);
 
 	# Handle either only the unit files which were passed as arguments or
 	# all unit files that are installed in this package.
-	my @args;
 	if (@ARGV > 0) {
 	       @args = @ARGV;
 	}
@@ -301,31 +309,17 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# contains Also=systemd-readahead-drop.service, thus forming an endless
 	# loop.
 	my %seen;
+
 	# We use while/shift because we push to the list in the body.
 	while (@args) {
-		my $name = shift @args;
-		my $base = basename($name);
-
-		# Try to make the path absolute, so that the user can call
-		# dh_installsystemd bacula-fd.service
-		if ($base eq $name) {
-			# NB: This works because @installed_units contains
-			# files from precisely one directory.
-			my ($full) = grep { basename($_) eq $base } @installed_units;
-			if (defined($full)) {
-				$name = $full;
-			} else {
-				warning(qq|Could not find "$name" in the /lib/systemd/system directory of $package. | .
-					qq|This could be a typo, or using Also= with a service file from another package. | .
-					qq|Please check carefully that this message is harmless.|);
-			}
-		}
+		my $unit = shift @args;
+		my $path = "${tmpdir}/lib/systemd/system/${unit}";
 
 		# Skip template service files like e.g. getty@.service.
 		# Enabling, disabling, starting or stopping those services
 		# without specifying the instance (e.g. getty@ttyS0.service) is
 		# not useful.
-		if ($name =~ /\@/) {
+		if ($unit =~ /\@/) {
 			next;
 		}
 
@@ -333,28 +327,28 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# This is not necessary for enabling, but for disabling, as we
 		# cannot read the unit file when disabling (it was already
 		# deleted).
-		my @also = grep { !exists($seen{$_}) } extract_key($name, 'Also');
+		my @also = grep { !exists($seen{$_}) } extract_key($path, 'Also');
 		$seen{$_} = 1 for @also;
 		@args = (@args, @also);
 
-		push @{$aliases{$name}}, $_ for extract_key($name, 'Alias');
+		push @{$aliases{$unit}}, $_ for extract_key($path, 'Alias');
 		my @sysv = grep {
 				my $base = $_;
 				$base =~ s/\.(?:mount|service|socket|target|path)$//g;
 				-f "$tmpdir/etc/init.d/$base"
-			} ($base, @{$aliases{$name}});
-		if (@sysv == 0 && !grep { $_ eq $name } @start_units) {
-			push @start_units, $name;
+			} ($unit, @{$aliases{$unit}});
+		if (@sysv == 0 && !grep { $_ eq $unit } @start_units) {
+			push @start_units, $unit;
 		}
 
-		if (contains_install_section($name) && !grep { $_ eq $name } @enable_units) {
-			push @enable_units, $name;
+		if (contains_install_section($path) && !grep { $_ eq $unit } @enable_units) {
+			push @enable_units, $unit;
 		}
 	}
 
 	if (@enable_units) {
 		for my $unit (sort @enable_units) {
-			my $base = q{'} . basename($unit) . q{'};
+			my $base = q{'} . $unit . q{'};
 			if ($dh{NO_ENABLE}) {
 				autoscript($package, 'postinst', 'postinst-systemd-dont-enable', { 'UNITFILE' => $base },
 					\%snippet_options);
@@ -363,14 +357,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 					\%snippet_options);
 			}
 		}
-		my $enableunitargs = join(' ', sort map { q{'} . basename($_) . q{'} } @enable_units);
+		my $enableunitargs = join(' ', sort map { q{'} . $_ . q{'} } @enable_units);
 		autoscript($package, 'postrm', 'postrm-systemd', {'UNITFILES' => $enableunitargs });
 	}
 
 	if (@start_units) {
 		# The $package and $sed parameters are always the same.
 		# This wrapper function makes the following logic easier to read.
-		my $startunitargs = join(' ', sort map { q{'} . basename($_) . q{'} } @start_units);
+		my $startunitargs = join(' ', sort map { q{'} . $_ . q{'} } @start_units);
 		my $start_autoscript = sub {
 			my ($script, $filename) = @_;
 			autoscript($package, $script, $filename, { 'UNITFILES' => $startunitargs },

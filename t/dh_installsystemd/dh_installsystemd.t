@@ -123,7 +123,7 @@ each_compat_subtest {
 
 	make_path('debian/foo/lib/systemd/system/');
 	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
-	ok(run_dh_tool('dh_installsystemd', '--no-start', 'debian/foo.service'));
+	ok(run_dh_tool('dh_installsystemd', '-p', 'foo', '--no-start', 'foo.service'));
 	ok(run_dh_tool('dh_installsystemd', '-p', 'foo', 'foo2.service'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
 	ok(find_script('foo', 'postinst'));
@@ -135,7 +135,7 @@ each_compat_subtest {
 
 	make_path('debian/foo/lib/systemd/system/');
 	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
-	ok(run_dh_tool('dh_installsystemd', '--no-enable', 'debian/foo.service'));
+	ok(run_dh_tool('dh_installsystemd', '-p', 'foo', '--no-enable', 'foo.service'));
 	ok(run_dh_tool('dh_installsystemd', '-p', 'foo', 'foo2.service'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
 	ok(find_script('foo', 'postinst'));
