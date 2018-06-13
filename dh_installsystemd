@@ -145,6 +145,16 @@ init(options => {
 	"no-also" => \$dh{NO_ALSO},
 });
 
+sub quote {
+	# Add single quotes around the argument.
+	return '\'' . $_[0] . '\'';
+}
+
+sub uniq {
+	my %seen;
+	return grep { !$seen{$_}++ } @_;
+}
+
 sub contains_install_section {
 	my ($unit_path) = @_;
 
@@ -158,6 +168,13 @@ sub contains_install_section {
 	return 0;
 }
 
+sub has_sysv_equivalent {
+	my ($tmpdir, $unit) = @_;
+
+	$unit =~ s/\.(?:mount|service|socket|target|path)$//g;
+	return -f "$tmpdir/etc/init.d/$unit";
+}
+
 sub install_unit {
 	my ($package, $script, $pkgsuffix, $path, $installsuffix) = @_;
 	$installsuffix = $installsuffix || $pkgsuffix;
@@ -167,10 +184,10 @@ sub install_unit {
 	install_file($unit, "${path}/${script}.${installsuffix}");
 }
 
-# Extracts the Also= or Alias= line(s) from a unit file.
-# In case this produces horribly wrong results, you can pass --no-also, but
-# that should really not be necessary. Please report bugs to
-# pkg-systemd-maintainers.
+# Extracts the directive values from a unit file. Handles repeated
+# directives in the same unit file. Assumes values can only be
+# composed of lists of unit names. This is good enough for the 'Also='
+# and 'Alias=' directives handled here.
 sub extract_key {
 	my ($unit_path, $key) = @_;
 	my @values;
@@ -182,11 +199,9 @@ sub extract_key {
 	while (my $line = <$fh>) {
 		chomp($line);
 
-		# The keys parsed from the unit file below can only have
-		# unit names as values. Since unit names can't have
-		# whitespace in systemd, simply use split and strip any
-		# leading/trailing quotes. See systemd-escape(1) for
-		# examples of valid unit names.
+		# Since unit names can't have whitespace in systemd, simply
+		# use split and strip any leading/trailing quotes. See
+		# systemd-escape(1) for examples of valid unit names.
 		if ($line =~ /^\s*$key=(.+)$/i) {
 			for my $value (split(/\s+/, $1)) {
 				$value =~ s/^(["'])(.*)\g1$/$2/;
@@ -194,6 +209,7 @@ sub extract_key {
 			}
 		}
 	}
+
 	close($fh);
 	return @values;
 }
@@ -225,8 +241,6 @@ sub list_installed_units {
 
 # PROMISE: DH NOOP WITHOUT tmp(lib/systemd/system) tmp(usr/lib/tmpfiles.d) tmp(etc/tmpfiles.d) mount path service socket target tmpfile timer
 
-my %snippet_options = ('snippet-order' => 'service');
-
 
 # Install package maintainer supplied unit files
 foreach my $package (@{$dh{DOPACKAGES}}) {
@@ -257,20 +271,18 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmpdir = tmpdir($package);
 	my @tmpfiles;
 
-	if (-d $tmpdir) {
-		my @dirs = grep { -d } map { "${tmpdir}/$_" } qw(usr/lib/tmpfiles.d etc/tmpfiles.d);
-		find({
-				wanted   => sub {
-					my $name = $File::Find::name;
-					return unless -f $name;
-					push(@tmpfiles, basename($name));
-				},
-				no_chdir => 1,
-			 }, @dirs) if @dirs;
+	my @dirs = grep { -d } map { "${tmpdir}/$_" } qw(usr/lib/tmpfiles.d etc/tmpfiles.d);
 
-		if (@tmpfiles) {
-			autoscript($package, 'postinst', 'postinst-init-tmpfiles', { 'TMPFILES' => join(' ', sort @tmpfiles) });
-		}
+	find({
+		wanted => sub {
+			my $name = $File::Find::name;
+			return unless -f $name;
+			push(@tmpfiles, basename($name)); },
+		no_chdir => 1,
+		}, @dirs) if @dirs;
+
+	if (@tmpfiles) {
+		autoscript($package, 'postinst', 'postinst-init-tmpfiles', { 'TMPFILES' => join(' ', sort @tmpfiles) });
 	}
 }
 
@@ -284,109 +296,94 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	my @installed_units = list_installed_units($tmpdir, \%aliases);
 
-	# Handle either only the unit files which were passed as arguments or
-	# all unit files that are installed in this package.
-	if (@ARGV > 0) {
+	# Handle either only the unit files which were passed as arguments
+	# or all unit files that are installed in this package.
+	if (@ARGV) {
 	       @args = @ARGV;
 	}
 	elsif ($dh{NAME}) {
-		# treat --name flag as if the corresponding units were passed in the command line
+		# Treat --name option as if the corresponding unit names were
+		# passed in the command line.  
 		@args = grep /(^|\/)$dh{NAME}\.(mount|path|service|socket|target|tmpfile)$/, @installed_units;
 	}
 	else {
 		@args = @installed_units;
 	}
 
-	# support excluding units via -X
+	# Support excluding units via the -X debhelper common option.
 	foreach my $x (@{$dh{EXCLUDE}}) {
 		@args = grep !/(^|\/)$x$/, @args;
 	}
 
-	# This hash prevents us from looping forever in the following while loop.
-	# An actual real-world example of such a loop is systemd’s
-	# systemd-readahead-drop.service, which contains
+	# This hash prevents us from looping forever in the following
+	# while loop.  An actual real-world example of such a loop is
+	# systemd's systemd-readahead-drop.service, which contains
 	# Also=systemd-readahead-collect.service, and that file in turn
-	# contains Also=systemd-readahead-drop.service, thus forming an endless
-	# loop.
+	# contains Also=systemd-readahead-drop.service, thus forming an
+	# endless loop.
 	my %seen;
 
-	# We use while/shift because we push to the list in the body.
+	# Must use while and shift because the loop alters the list.
 	while (@args) {
 		my $unit = shift @args;
 		my $path = "${tmpdir}/lib/systemd/system/${unit}";
 
-		# Skip template service files like e.g. getty@.service.
-		# Enabling, disabling, starting or stopping those services
-		# without specifying the instance (e.g. getty@ttyS0.service) is
-		# not useful.
-		if ($unit =~ /\@/) {
-			next;
-		}
+		# Skip template service files. Enabling, disabling, starting
+		# or stopping those services without specifying the instance
+		# is not useful.
+		next if ($unit =~ /\@/);
 
-		# Handle all unit files specified via Also= explicitly.
-		# This is not necessary for enabling, but for disabling, as we
-		# cannot read the unit file when disabling (it was already
-		# deleted).
-		my @also = grep { !exists($seen{$_}) } extract_key($path, 'Also');
-		$seen{$_} = 1 for @also;
+		# Handle all unit files specified via Also= explicitly. This
+		# is not necessary for enabling, but for disabling, as we
+		# cannot read the unit file when disabling as it has already
+		# been deleted.
+		my @also = grep { !$seen{$_}++ } extract_key($path, 'Also');
 		@args = (@args, @also);
 
+		# Extract unit aliases.
 		push @{$aliases{$unit}}, $_ for extract_key($path, 'Alias');
-		my @sysv = grep {
-				my $base = $_;
-				$base =~ s/\.(?:mount|service|socket|target|path)$//g;
-				-f "$tmpdir/etc/init.d/$base"
-			} ($unit, @{$aliases{$unit}});
-		if (@sysv == 0 && !grep { $_ eq $unit } @start_units) {
+
+		if (! grep { has_sysv_equivalent($tmpdir, $_) } ($unit, @{$aliases{$unit}})) {
 			push @start_units, $unit;
 		}
 
-		if (contains_install_section($path) && !grep { $_ eq $unit } @enable_units) {
+		if (contains_install_section($path)) {
 			push @enable_units, $unit;
 		}
 	}
 
+	@enable_units = map { quote($_) } uniq sort @enable_units;
+	@start_units = map { quote($_) } uniq sort @start_units;
+
+	my %options = ('snippet-order' => 'service');
+
 	if (@enable_units) {
-		for my $unit (sort @enable_units) {
-			my $base = q{'} . $unit . q{'};
-			if ($dh{NO_ENABLE}) {
-				autoscript($package, 'postinst', 'postinst-systemd-dont-enable', { 'UNITFILE' => $base },
-					\%snippet_options);
-			} else {
-				autoscript($package, 'postinst', 'postinst-systemd-enable', { 'UNITFILE' => $base },
-					\%snippet_options);
-			}
+		for my $unit (@enable_units) {
+			my $snippet = $dh{NO_ENABLE} ? 'postinst-systemd-dont-enable' : 'postinst-systemd-enable';
+			autoscript($package, 'postinst', $snippet, { 'UNITFILE' => $unit }, \%options);
 		}
-		my $enableunitargs = join(' ', sort map { q{'} . $_ . q{'} } @enable_units);
-		autoscript($package, 'postrm', 'postrm-systemd', {'UNITFILES' => $enableunitargs });
+		autoscript($package, 'postrm', 'postrm-systemd', {'UNITFILES' => join(' ', @enable_units) });
 	}
 
 	if (@start_units) {
-		# The $package and $sed parameters are always the same.
-		# This wrapper function makes the following logic easier to read.
-		my $startunitargs = join(' ', sort map { q{'} . $_ . q{'} } @start_units);
-		my $start_autoscript = sub {
-			my ($script, $filename) = @_;
-			autoscript($package, $script, $filename, { 'UNITFILES' => $startunitargs },
-				\%snippet_options);
-		};
+		my $units = { 'UNITFILES' => join(' ', @start_units) };
 
 		if ($dh{RESTART_AFTER_UPGRADE}) {
-				my $snippet = "postinst-systemd-restart" . ($dh{NO_START} ? "nostart" : "");
-			$start_autoscript->("postinst", $snippet);
+			my $snippet = $dh{NO_START} ? 'postinst-systemd-restartnostart' : 'postinst-systemd-restart';
+			autoscript($package, 'postinst', $snippet, $units, \%options);
 		} elsif (!$dh{NO_START}) {
-			# We need to stop/start before/after the upgrade.
-			$start_autoscript->("postinst", "postinst-systemd-start");
+			# (stop|start) service (before|after) upgrade
+			autoscript($package, 'postinst', 'postinst-systemd-start', $units, \%options);
 		}
 
-		$start_autoscript->("postrm", "postrm-systemd-reload-only");
+		autoscript($package, 'postrm', 'postrm-systemd-reload-only', $units, \%options);
 
 		if ($dh{R_FLAG} || $dh{RESTART_AFTER_UPGRADE}) {
 			# stop service only on remove
-			$start_autoscript->("prerm", "prerm-systemd-restart");
+			autoscript($package, 'prerm', 'prerm-systemd-restart', $units, \%options);
 		} elsif (!$dh{NO_START}) {
 			# always stop service
-			$start_autoscript->("prerm", "prerm-systemd");
+			autoscript($package, 'prerm', 'prerm-systemd', $units, \%options);
 		}
 	}
 }
