@@ -158,7 +158,7 @@ sub uniq {
 sub contains_install_section {
 	my ($unit_path) = @_;
 
-	open(my $fh, '<', $unit_path) or error("Cannot open($unit_path) to check for [Install]: $!");
+	open(my $fh, '<', $unit_path) or error("Cannot open($unit_path): $!");
 
 	while (my $line = <$fh>) {
 		chomp($line);
@@ -194,7 +194,7 @@ sub extract_key {
 
 	return @values if $dh{NO_ALSO};
 
-	open(my $fh, '<', $unit_path) or error("Cannot open($unit_path) for extracting the Also= line(s): $!");
+	open(my $fh, '<', $unit_path) or error("Cannot open($unit_path): $!");
 
 	while (my $line = <$fh>) {
 		chomp($line);
@@ -303,7 +303,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 	elsif ($dh{NAME}) {
 		# Treat --name option as if the corresponding unit names were
-		# passed in the command line.  
+		# passed in the command line.
 		@args = grep /(^|\/)$dh{NAME}\.(mount|path|service|socket|target|tmpfile)$/, @installed_units;
 	}
 	else {
@@ -327,6 +327,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	while (@args) {
 		my $unit = shift @args;
 		my $path = "${tmpdir}/lib/systemd/system/${unit}";
+
+		error("Package '$package' does not install unit '$unit'.") unless (-f $path);
 
 		# Skip template service files. Enabling, disabling, starting
 		# or stopping those services without specifying the instance
