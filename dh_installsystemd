@@ -302,7 +302,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	elsif ($dh{NAME}) {
 		# Treat --name option as if the corresponding unit names were
 		# passed in the command line.
-		@args = grep /(^|\/)$dh{NAME}\.(mount|path|service|socket|target|tmpfile)$/, @installed_units;
+		@args = grep /(^|\/)$dh{NAME}\.(mount|path|service|socket|target|timer)$/, @installed_units;
 	}
 	else {
 		@args = @installed_units;
