@@ -226,7 +226,8 @@ sub list_installed_units {
 		next unless -f $path;
 		if (-l "$path") {
 			my $dest = basename(readlink($path));
-			$aliases->{$dest} = $name;
+			$aliases->{$dest} //= [ ];
+			push @{$aliases->{$dest}}, $name;
 		} else {
 			push @installed, $name;
 		}

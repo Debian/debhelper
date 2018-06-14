@@ -10,6 +10,17 @@ use Debian::Debhelper::Dh_Lib qw(!dirname);
 
 plan(tests => 2);
 
+sub write_file {
+	my ($path, $content) = @_;
+
+	my $dir = dirname($path);
+	install_dir($dir);
+
+	open(my $fd, '>>', $path) or error("open($path) failed: $!");
+	print {$fd} $content . '\n';
+	close($fd) or error("close($path) failed: $!");
+}
+
 sub unit_is_enabled {
 	my ($package, $unit, $num_enables, $num_masks) = @_;
 	my @output;
@@ -175,6 +186,29 @@ each_compat_subtest {
 	unit_is_enabled('foo', 'foo2', 1);
 	unit_is_started('foo', 'foo2', 1);
 	ok(run_dh_tool('dh_clean'));
+
+	make_path('debian/foo/lib/systemd/system/');
+	install_file('debian/foo.service', 'debian/foo/lib/systemd/system/target.service');
+	make_symlink_raw_target('target.service', 'debian/foo/lib/systemd/system/source.service');
+	ok(run_dh_tool('dh_installsystemd'));
+	unit_is_enabled('foo', 'foo', 1);
+	# Alias= realized by symlinks are not enabled in maintaner scripts
+	unit_is_enabled('foo', 'source', 0);
+	unit_is_enabled('foo', 'target', 1);
+	ok(run_dh_tool('dh_clean'));
+
+	make_path('debian/foo/lib/systemd/system/');
+	make_path('debian/foo/etc/init.d/');
+	install_file('debian/foo.service', 'debian/foo/lib/systemd/system/target.service');
+	make_symlink_raw_target('target.service', 'debian/foo/lib/systemd/system/source.service');
+	write_file('debian/foo/etc/init.d/source', '# something');
+	ok(run_dh_tool('dh_installsystemd'));
+	unit_is_enabled('foo', 'foo', 1);
+	# Alias= realized by symlinks are not enabled in maintaner scripts
+	unit_is_enabled('foo', 'source', 0);
+	unit_is_enabled('foo', 'target', 1);
+	# The presence of a sysvinit script for the alias unit inhibits start of both
+	unit_is_started('foo', 'source', 0);
+	unit_is_started('foo', 'target', 0);
+	ok(run_dh_tool('dh_clean'));
 };
-
-
