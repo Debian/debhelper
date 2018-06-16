@@ -8,14 +8,7 @@ use Test::DH;
 use File::Path qw(remove_tree make_path);
 use Debian::Debhelper::Dh_Lib qw(!dirname);
 
-our @TEST_DH_EXTRA_TEMPLATE_FILES = (qw(
-    debian/changelog
-    debian/control
-    debian/foo.service
-    debian/foo2.service
-));
-
-plan(tests => 1);
+plan(tests => 2);
 
 sub unit_is_enabled {
 	my ($package, $unit, $num_enables, $num_masks) = @_;
@@ -34,6 +27,7 @@ sub unit_is_enabled {
 	$matches = grep { m{deb-systemd-helper mask.*'\Q$unit\E\.service'} } @output;
 	ok($matches == $num_masks) or diag("$unit appears to have been masked $matches times (expected $num_masks)");
 }
+
 sub unit_is_started {
 	my ($package, $unit, $num_starts, $num_stops) = @_;
 	my @output;
@@ -49,7 +43,52 @@ sub unit_is_started {
 	ok($matches == $num_stops) or diag("$unit appears to have been stopped $matches times (expected $num_stops)");
 }
 
-# Units are installed and enabled
+
+#
+# Test a simple source package defining a single binary package
+#
+our $TEST_DH_FIXTURE_DIR = 'simple';
+our @TEST_DH_EXTRA_TEMPLATE_FILES = (qw(
+    debian/changelog
+    debian/control
+    debian/foo.service
+));
+
+each_compat_subtest {
+	ok(run_dh_tool('dh_installsystemd'));
+	ok(-e 'debian/foo/lib/systemd/system/foo.service');
+	ok(find_script('foo', 'postinst'));
+	unit_is_enabled('foo', 'foo', 1);
+	unit_is_started('foo', 'foo', 1);
+	ok(run_dh_tool('dh_clean'));
+
+	ok(run_dh_tool('dh_installsystemd', '--no-start'));
+	ok(-e 'debian/foo/lib/systemd/system/foo.service');
+	ok(find_script('foo', 'postinst'));
+	unit_is_enabled('foo', 'foo', 1);
+	unit_is_started('foo', 'foo', 0, 1);
+	ok(run_dh_tool('dh_clean'));
+
+	ok(run_dh_tool('dh_installsystemd', '--no-start', 'foo.service'));
+	ok(-e 'debian/foo/lib/systemd/system/foo.service');
+	ok(find_script('foo', 'postinst'));
+	unit_is_enabled('foo', 'foo', 1);
+	unit_is_started('foo', 'foo', 0, 1);
+	ok(run_dh_tool('dh_clean'));
+};
+
+
+#
+# Test a more complex source package defining three binary packages
+#
+our $TEST_DH_FIXTURE_DIR = '.';
+our @TEST_DH_EXTRA_TEMPLATE_FILES = (qw(
+    debian/changelog
+    debian/control
+    debian/foo.service
+    debian/foo2.service
+));
+
 each_compat_subtest {
 	ok(run_dh_tool( 'dh_installsystemd'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
