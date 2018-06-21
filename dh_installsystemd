@@ -142,7 +142,7 @@ init(options => {
 	"no-restart-on-upgrade" => \$dh{R_FLAG},
 	"no-start" => \$dh{NO_START},
 	"R|restart-after-upgrade!" => \$dh{RESTART_AFTER_UPGRADE},
-	"no-also" => \$dh{NO_ALSO},
+	"no-also" => \$dh{NO_ALSO}, # undocumented option
 });
 
 sub quote {
@@ -191,8 +191,6 @@ sub install_unit {
 sub extract_key {
 	my ($unit_path, $key) = @_;
 	my @values;
-
-	return @values if $dh{NO_ALSO};
 
 	open(my $fh, '<', $unit_path) or error("Cannot open($unit_path): $!");
 
@@ -338,9 +336,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# Handle all unit files specified via Also= explicitly. This
 		# is not necessary for enabling, but for disabling, as we
 		# cannot read the unit file when disabling as it has already
-		# been deleted.
-		my @also = grep { !$seen{$_}++ } extract_key($path, 'Also');
-		@args = (@args, @also);
+		# been deleted. The undocumented --no-also option disables
+		# handling of units linked via Also=. This option is provided
+		# only to suport a very specific use case in network-manager.
+		unless ($dh{NO_ALSO}) {
+			push @args, $_ for grep { !$seen{$_}++ } extract_key($path, 'Also');
+		}
 
 		# Extract unit aliases.
 		push @{$aliases{$unit}}, $_ for extract_key($path, 'Alias');
