@@ -751,7 +751,8 @@ sub error {
 
 # Output a warning.
 sub warning {
-	my $message=shift;
+	my ($message) = @_;
+	$message //= '';
 	
 	print STDERR basename($0).": $message\n";
 }
