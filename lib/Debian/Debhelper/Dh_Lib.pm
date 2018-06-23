@@ -1336,7 +1336,7 @@ sub filedoublearray {
 		require Cwd;
 		my $cmd=Cwd::abs_path($file);
 		$ENV{"DH_CONFIG_ACT_ON_PACKAGES"} = join(",", @{$dh{"DOPACKAGES"}});
-		open (DH_FARRAY_IN, "$cmd |") || error("cannot run $file: $!");
+		open(DH_FARRAY_IN, '-|', $cmd) || error("cannot run $file: $!");
 		delete $ENV{"DH_CONFIG_ACT_ON_PACKAGES"};
 	}
 	else {
