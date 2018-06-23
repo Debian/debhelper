@@ -99,10 +99,41 @@ You can also put comments in these files; lines beginning with B<#> are
 ignored.
 
 The syntax of these files is intentionally kept very simple to make them
-easy to read, understand, and modify. If you prefer power and complexity,
-you can make the file executable, and write a program that outputs
-whatever content is appropriate for a given situation. When you do so,
-the output is not further processed to expand wildcards or strip comments.
+easy to read, understand, and modify.
+
+=head2 Executable debhelper config files
+
+If you need additional flexibility, many of the debhelper tools
+(e.g. L<dh_install(1)>) support executing a config file as a script.
+
+To use this feature, simply mark the config file as executable
+(e.g. B<< chmod +x debian/I<package>.install >>) and the tool will
+attempt to execute it and use the output of the script.  In many
+cases, you can use L<dh-exec(1)> as interpreter of the config file to
+retain most of the original syntax while getting the additional
+flexibility you need.
+
+
+When using executable debhelper config files, please be aware of the
+following:
+
+=over 4
+
+=item *
+
+The executable config file B<must> exit with success (i.e. its return
+code should indicate success).
+
+=item *
+
+The output will be used exactly as it is.  Notably, debhelper will
+I<not> expand wildcards or strip comments in the output.
+
+=back
+
+If you need the package to build on a file system where you cannot
+disable the executable bit, then you can use L<dh-exec(1)> and its
+B<strip-output> script.
 
 =head1 SHARED DEBHELPER OPTIONS
 

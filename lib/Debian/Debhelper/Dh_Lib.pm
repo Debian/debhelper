@@ -1387,6 +1387,8 @@ sub filedoublearray {
 				warning("be run as a stand-alone script/program (e.g. \"./${file}\")");
 				warning("Otherwise, please remove the executable bit from the file (e.g. chmod -x \"${file}\")");
 				warning();
+				warning('Please see "Executable debhelper config files" in debhelper(7) for more information.');
+				warning();
 			}
 			$? = $proc_err;
 			error_exitcode("$file (executable config)");
