@@ -1375,7 +1375,20 @@ sub filedoublearray {
 
 	if (!close(DH_FARRAY_IN)) {
 		if ($x) {
-			error("Error closing fd/process for $file: $!") if $!;
+			my ($err, $proc_err) = ($!, $?);
+			error("Error closing fd/process for $file: $err") if $err;
+			# The interpreter did not like the file for some reason.
+			# Lets check if the maintainer intended it to be
+			# executable.
+			if (not is_so_or_exec_elf_file($file) and not _has_shbang_line($file)) {
+				warning("$file is marked executable but does not appear to an executable config.");
+				warning();
+				warning("If $file is intended to be an executable config file, please ensure it can");
+				warning("be run as a stand-alone script/program (e.g. \"./${file}\")");
+				warning("Otherwise, please remove the executable bit from the file (e.g. chmod -x \"${file}\")");
+				warning();
+			}
+			$? = $proc_err;
 			error_exitcode("$file (executable config)");
 		} else {
 			error("problem reading $file: $!");
@@ -2357,6 +2370,15 @@ sub is_so_or_exec_elf_file {
 	my $elf_type_unpacked = unpack($short_format, $elf_type);
 	return 0 if $elf_type_unpacked != ELF_TYPE_EXECUTABLE and $elf_type_unpacked != ELF_TYPE_SHARED_OBJECT;
 	return 1;
+}
+
+sub _has_shbang_line {
+	my ($file) = @_;
+	open(my $fd, '<', $file) or error("open $file: $!");
+	my $line = <$fd>;
+	close($fd);
+	return 1 if (defined($line) and substr($line, 0, 2) eq '#!');
+	return 0;
 }
 
 # Returns true iff the given argument is an empty directory.
