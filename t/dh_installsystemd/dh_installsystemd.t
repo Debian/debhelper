@@ -92,8 +92,8 @@ each_compat_subtest {
 #
 # Test a more complex source package defining three binary packages
 #
-our $TEST_DH_FIXTURE_DIR = '.';
-our @TEST_DH_EXTRA_TEMPLATE_FILES = (qw(
+$TEST_DH_FIXTURE_DIR = '.';
+@TEST_DH_EXTRA_TEMPLATE_FILES = (qw(
     debian/changelog
     debian/control
     debian/foo.service
