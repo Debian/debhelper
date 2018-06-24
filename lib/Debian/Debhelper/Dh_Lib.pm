@@ -1718,7 +1718,7 @@ sub getpackages {
 				# because if we work on a package with a Build-Profiles
 				# field, then a high enough version of dpkg-dev is needed
 				# anyways
-				my $build_profiles=$1;
+				my $build_profiles = $value;
 				eval {
 					require Dpkg::BuildProfiles;
 					my @restrictions=Dpkg::BuildProfiles::parse_build_profiles($build_profiles);
