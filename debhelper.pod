@@ -727,16 +727,31 @@ returns a non-zero exit from analysing a given file.
 
 =item -
 
-The B<dh_installdocs> and B<dh_installexamples> tools will now attempt
-to guess the "main package" for a given documentation package
-(e.g. I<pkg-doc> will have I<pkg> as main package if the latter
-exists).  If a main package is found, I<most> of the documentation
-will be installed into F<< /usr/share/doc/I<main-pkg> >> by default as
-recommended by Debian policy §12.3 since version 3.9.7.  Notable
-exceptions include the copyright file and changelog files.
+The B<dh_installdocs> and B<dh_installexamples> tools may now install
+I<most> of the documentation in a different path to comply with the
+recommendation from Debian policy §12.3 (since version 3.9.7).
+
+Note that if a given source package only contains a single binary
+package in F<debian/control> or none of the packages are I<-doc>
+packages, then this change is not relevant for that source package and
+you can skip to the next change.
+
+By default, these tools will now attempt to determine a "main package
+for the documentation" (called a I<doc-main-package> from here on) for
+every I<-doc> package.  If they find such a I<doc-main-package>, they
+will now install the documentation into the path F<<
+/usr/share/doc/I<doc-main-package> >> in the given doc package.
+I.e. the path can change but the documentation is still shipped in the
+I<-doc> package.
 
 The B<--doc-main-package> option can be used when the auto-detection
-is insufficient.
+is insufficient or to reset the path to its previous value if there is
+a reason to diverge from Debian policy recommendation.
+
+Some documentation will not be affected by this change.  These
+exceptions include the copyright file, changelog files, README.Debian,
+etc.  These files will still be installed in the path F<<
+/usr/share/doc/I<package> >>.
 
 =item -
 
