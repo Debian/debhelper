@@ -111,7 +111,7 @@ qw(
 	glob_expand_error_handler_reject
 	glob_expand_error_handler_warn_and_discard
 	glob_expand_error_handler_silently_ignore
-
+	glob_expand_error_handler_reject_nomagic_warn_discard
 ),
 	# Generate triggers, substvars, maintscripts, build-time temporary files
 qw(
@@ -1303,6 +1303,20 @@ sub glob_expand_error_handler_warn_and_discard {
 	my $msg = _glob_expand_error_default_msg(@_);
 	warning("$msg\n");
 	return;
+}
+
+# Emulates the "old" glob mechanism; not recommended for new code as
+# it permits some globs expand to nothing with only a warning.
+sub glob_expand_error_handler_reject_nomagic_warn_discard {
+	my ($pattern, $dir_ref) = @_;
+	for my $dir (@{$dir_ref}) {
+		my $full_pattern = "$dir/$pattern";
+		my @matches = bsd_glob($full_pattern, GLOB_CSH & ~(GLOB_TILDE));
+		if (@matches) {
+			goto \&glob_expand_error_handler_reject;
+		}
+	}
+	goto \&glob_expand_error_handler_warn_and_discard;
 }
 
 sub glob_expand_error_handler_silently_ignore {

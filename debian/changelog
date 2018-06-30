@@ -1,3 +1,18 @@
+debhelper (11.3.5) UNRELEASED; urgency=medium
+
+  * Dh_Lib.pm: Introduce a new glob_expand error handler to
+    better emulate the old style glob code to fail when a
+    non-glob entry in the config file is missing.
+  * dh_installdocs: Use the new glob_expand error handler to
+    restore the behaviour to that of debhelper/10.5.1 and older.
+    Thanks to Christoph Berg for reporting the issue.
+    (Closes: #902355)
+  * dh_installexamples: Ditto.
+  * dh_installinfo: Ditto.
+  * dh_installman: Ditto.
+
+ -- Niels Thykier <niels@thykier.net>  Sat, 30 Jun 2018 11:16:30 +0000
+
 debhelper (11.3.4) unstable; urgency=medium
 
   * Dh_Lib.pm: Fix bug that made the parser assign the wrong

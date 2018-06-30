@@ -102,7 +102,7 @@ init(options => {
 # PROMISE: DH NOOP WITHOUT pkgfile-logged(examples)
 
 my $pwd;
-my $default_error_handler = compat(10) ? \&glob_expand_error_handler_warn_and_discard : \&glob_expand_error_handler_reject;
+my $default_error_handler = compat(10) ? \&glob_expand_error_handler_reject_nomagic_warn_discard : \&glob_expand_error_handler_reject;
 my $nodocs = is_build_profile_active('nodoc') || get_buildoption('nodoc') ? 1 : 0;
 # We cannot assume documentation is built under nodoc, but if it is we must flag it as handled
 # or dh_missing might make noise.
