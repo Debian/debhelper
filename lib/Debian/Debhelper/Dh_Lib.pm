@@ -1668,7 +1668,14 @@ sub getpackages {
 	while (<$fd>) {
 		chomp;
 		s/\s+$//;
-		next if m/^\s*+\#/;
+		if (m/^\#/) {
+			# Skip unless EOF for the special case where the last line
+			# is a comment line directly after the last stanza.  In
+			# that case we need to "commit" the last stanza as well or
+			# we end up omitting the last package.
+			next if not eof;
+			$_  = '';
+		}
 
 
 		if (/^\s/) {
