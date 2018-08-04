@@ -292,19 +292,7 @@ matches, the last one in the sequence will be used.
 
 # Stash this away before init modifies it.
 my @ARGV_orig=@ARGV;
-
-if (not compat(9, 1)) {
-	# Enable autoreconf'ing by default in compat 10 or later.  Use the
-	# sequence add-on so existing --without=autoreconf
-	unshift(@ARGV, "--with=autoreconf");
-	# Enable systemd support by default in compat 10 or later.
-	# - compat 11 injects the dh_installsystemd tool directly in the
-	#   sequence instead of using a --with sequence.
-	unshift(@ARGV, "--with=systemd") if compat(10, 1);
-	unshift(@ARGV, "--with=build-stamp");
-}
-
-push(@{$dh{WITH}},split(",", $ENV{DH_EXTRA_ADDONS})) if $ENV{DH_EXTRA_ADDONS};
+my (@addons, @addon_requests);
 
 inhibit_log();
 		
@@ -314,13 +302,12 @@ init(options => {
 		"before=s" => \$dh{BEFORE},
 		"remaining" => \$dh{REMAINING},
 		"with=s" => sub {
-			my ($option,$value)=@_;
-			push @{$dh{WITH}},split(",", $value);
+			my ($option, $value) = @_;
+			push(@addon_requests, map { "+${_}" } split(",", $value));
 		},
 		"without=s" => sub {
-			my ($option,$value)=@_;
-			my %without = map { $_ => 1 } split(",", $value);
-			@{$dh{WITH}} = grep { ! $without{$_} } @{$dh{WITH}};
+			my ($option, $value) = @_;
+			push(@addon_requests, map { "-${_}" } split(",", $value));
 		},
 		"l" => \&list_addons,
 		"list" => \&list_addons,
@@ -553,8 +540,59 @@ sub list_addons {
 	exit 0;
 }
 
+sub _compute_addons {
+	my (@addon_requests_from_args) = @_;
+	my (@enabled_addons, %disabled_addons, %enabled);
+	my @addon_requests;
+
+	# Order is important; DH_EXTRA_ADDONS must come before everything
+	# else; then comes built-in and finally argument provided add-ons
+	# requests.
+	push(@addon_requests,  map { "+${_}" } split(",", $ENV{DH_EXTRA_ADDONS}))
+		if $ENV{DH_EXTRA_ADDONS};
+	if (not compat(9, 1)) {
+		# Enable autoreconf'ing by default in compat 10 or later.
+		push(@addon_requests, '+autoreconf');
+
+		# Enable systemd support by default in compat 10 or later.
+		# - compat 11 injects the dh_installsystemd tool directly in the
+		#   sequence instead of using a --with sequence.
+		push(@addon_requests, '+systemd') if compat(10, 1);
+		push(@addon_requests, '+build-stamp');
+	}
+	push(@addon_requests, @addon_requests_from_args);
+
+	# Removing disabled add-ons are expensive (O(N) per time), so we
+	# attempt to make removals in bulk.  Note that we have to be order
+	# preserving (due to #885580), so there is a limit to how "smart"
+	# we can be.
+	my $flush_disable_cache = sub {
+		@enabled_addons = grep { not exists($disabled_addons{$_}) } @enabled_addons;
+		for my $addon (keys(%disabled_addons)) {
+			delete($enabled{$addon});
+		}
+		%disabled_addons = ();
+	};
+
+	for my $request (@addon_requests) {
+		if ($request =~ s/^[+]//) {
+			$flush_disable_cache->() if %disabled_addons;
+			push(@enabled_addons, $request) if not $enabled{$request}++;
+		} elsif ($request =~ s/^-//) {
+			$disabled_addons{$request} = 1;
+		} else {
+			error("Internal error: Invalid add-on request: $request (Missing +/- prefix)");
+		}
+	}
+
+	$flush_disable_cache->() if %disabled_addons;
+	return @enabled_addons;
+}
+
+@addons = _compute_addons(@addon_requests);
+
 # Load addons, which can modify sequences.
-foreach my $addon (@{$dh{WITH}}) {
+foreach my $addon (@addons) {
 	my $mod="Debian::Debhelper::Sequence::$addon";
 	$mod=~s/-/_/g;
 	eval "use $mod";
