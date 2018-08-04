@@ -61,7 +61,7 @@ sub configure {
 	push @opts, "--localstatedir=/var";
 	my $multiarch=dpkg_architecture_value("DEB_HOST_MULTIARCH");
 	push @opts, "--libdir=lib/$multiarch";
-	push @opts, "--libexecdir=lib/$multiarch";
+	push(@opts, "--libexecdir=lib/$multiarch") if not compat(11);
 
 	if (is_cross_compiling()) {
 		# http://mesonbuild.com/Cross-compilation.html

@@ -846,6 +846,22 @@ error.  If you want to skip these commands, then please insert an
 empty override target for them in F<debian/rules>
 (e.g. I<override_dh_dwz:>)
 
+=item -
+
+The build systems B<meson> and B<autoconf> no longer explicitly set
+the B<--libexecdir> variable and thus relies on the build system
+default - which should be B</usr/libexec> (per FHS 3.0, adopted in
+Debian Policy 4.1.5).
+
+If a particular upstream package does not use the correct default, the
+parameter can often be passed manually via L<dh_auto_configure(1)>.  E.g.
+via the following example:
+
+    override_dh_auto_configure:
+    	dh_auto_configure -- --libexecdir=/usr/libexec
+
+Note the B<--> before the B<--libexecdir> parameter.
+
 =back
 
 =back
