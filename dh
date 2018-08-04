@@ -55,6 +55,16 @@ This is used when there is a third-party package that provides
 debhelper commands. See the F<PROGRAMMING> file for documentation about
 the sequence addon interface.
 
+A B<Build-Depends> relation on the package B<dh-sequence->I<addon>
+implies a B<--with> I<addon>. This avoids the need for an explicit
+B<--with> in F<debian/rules> that only duplicates what is already
+declared via the build dependencies in F<debian/control>.  Note that
+only relations in the B<Build-Depends> field are considered
+(i.e. B<Build-Depends-Indep> and B<Build-Depends-Arch> are
+deliberately unsupported).  Please keep in mind that B<dh> insists on
+"simple" relations (e.g. a relation like "B<dh-sequence->I<addon> |
+B<some-other-pkg>" will I<not> imply B<--with> I<addon>).
+
 =item B<--without> I<addon>
 
 The inverse of B<--with>, disables using the given addon. This option
@@ -560,6 +570,7 @@ sub _compute_addons {
 		push(@addon_requests, '+systemd') if compat(10, 1);
 		push(@addon_requests, '+build-stamp');
 	}
+	push(@addon_requests, map { "+${_}" } Debian::Debhelper::Dh_Lib::bd_dh_sequences());
 	push(@addon_requests, @addon_requests_from_args);
 
 	# Removing disabled add-ons are expensive (O(N) per time), so we

@@ -1524,13 +1524,14 @@ sub is_cross_compiling {
 # As a side effect, populates %package_arches and %package_types
 # with the types of all packages (not only those returned).
 my (%package_types, %package_arches, %package_multiarches, %packages_by_type,
-    %package_sections, $sourcepackage, %package_cross_type);
+    %package_sections, $sourcepackage, %package_cross_type, %dh_bd_sequences);
 
 # Resets the arrays; used mostly for testing
 sub resetpackages {
 	undef $sourcepackage;
 	%package_types = %package_arches = %package_multiarches =
 	    %packages_by_type = %package_sections = %package_cross_type = ();
+	%dh_bd_sequences = ();
 }
 
 # Returns source package name
@@ -1655,6 +1656,16 @@ sub getpackages {
 					warning(" * If this is not possible, then please remove the debhelper-compat relation and insert the");
 					warning("   compat level into the file debian/compat.  (E.g. \"echo ${clevel} > debian/compat\")");
 					error("Could not parse desired debhelper compat level from relation: $dep");
+				}
+				# Build-Depends on dh-sequence-<foo> OR dh-sequence-<foo> (<op> <version>)
+				if ($dep =~ m/^dh-sequence-(${PKGNAME_REGEX})\s*(?:[(]\s*(?:[<>]?=|<<|>>)\s*(${PKGVERSION_REGEX})\s*[)])?$/) {
+					my $sequence = $1;
+					if ($field ne 'build-depends') {
+						warning("Ignoring dh sequence add-on request for sequenece ${sequence} via ${field}: Please move it to the Build-Depends field");
+						warning("The relation that triggered this warning was: ${dep} (from the ${field} field)");
+						next;
+					}
+					$dh_bd_sequences{$sequence} = 1;
 				}
 			}
 		}
@@ -1940,6 +1951,14 @@ sub is_udeb {
 		}
 		return $packages_to_process{$package} // 0;
 	}
+}
+
+# Only useful for dh(1)
+sub bd_dh_sequences {
+	# Use $sourcepackage as check because %dh_bd_sequence can be empty
+	# after running getpackages().
+	getpackages() if not defined($sourcepackage);
+	return sort(keys(%dh_bd_sequences));
 }
 
 sub _concat_slurp_script_files {
