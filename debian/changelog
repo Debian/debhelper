@@ -1,4 +1,4 @@
-debhelper (11.3.6) UNRELEASED; urgency=medium
+debhelper (11.4) UNRELEASED; urgency=medium
 
   * dh_dwz.1: Remove now obsolete note in manpage claming that dh_dwz
     was experimental.  Since debhelper/11.3, dh_dwz was no longer
@@ -10,6 +10,12 @@ debhelper (11.3.6) UNRELEASED; urgency=medium
   * autoconf.pm: Leave --libexecdir at upstream default (/usr/libexec)
     in compat 12 and later.  (Closes: #859724)
   * meson.pm: Ditto.
+  * dh: Support implicitly loading addons via "dh-sequence-${name}"
+    relations in Build-Depends (which would imply "dh ... --with ${name}").
+    Only simple relations in Build-Depends are considered at the moment.
+  * debian/control: Provide dh-sequence-dwz, dh-sequence-installinitramfs,
+    and dh-sequence-systemd, which enables packages to use the new
+    feature to implicitly autoload dh addons via Build-Depends.
 
  -- Niels Thykier <niels@thykier.net>  Wed, 01 Aug 2018 10:27:22 +0000
 
