@@ -16,6 +16,11 @@ debhelper (11.4) UNRELEASED; urgency=medium
   * debian/control: Provide dh-sequence-dwz, dh-sequence-installinitramfs,
     and dh-sequence-systemd, which enables packages to use the new
     feature to implicitly autoload dh addons via Build-Depends.
+  * dh_md5sums: Rewrite handling of conffiles and excludes to better
+    support an arbitrary number of files that should be omitted from the
+    md5sums file.  Previously, dh_md5sums could fail with the error:
+    """... "/bin/sh": Argument list too long at ..."""
+    (Closes: #864182)
 
  -- Niels Thykier <niels@thykier.net>  Wed, 01 Aug 2018 10:27:22 +0000
 
