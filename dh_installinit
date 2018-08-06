@@ -19,9 +19,14 @@ B<dh_installinit> [S<I<debhelper options>>] [B<--name=>I<name>] [B<-n>] [B<-R>] 
 
 =head1 DESCRIPTION
 
-B<dh_installinit> is a debhelper program that is responsible for installing
-init scripts with associated defaults files.  In compatibility levels up to
-11, B<dh_installinit> also handled upstart job files and systemd service files.
+B<dh_installinit> is a debhelper program that is responsible for
+installing init scripts with associated defaults files.  In
+compatibility levels up to and including 10, B<dh_installinit> will
+also install some systemd related files provided by the debian
+packaging (see the L</FILES> section below).  In compatability levels
+up to and including 11, B<dh_installinit> will also handle upstart
+jobs provided in the debian packaging (see the L</FILES> for more
+information on this as well).
 
 It also automatically generates the F<postinst> and F<postrm> and F<prerm>
 commands needed to set up the symlinks in F</etc/rc*.d/> to start and stop
@@ -400,7 +405,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 =head1 SEE ALSO
 
-L<debhelper(7)>
+L<debhelper(7)>, L<dh_installsystemd(1)>
 
 This program is a part of debhelper.
 
