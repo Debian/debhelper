@@ -50,11 +50,13 @@ earlier.  In compat 10, please use L<dh_makeshlibs(1)>.
 
 =item I<package>.conffiles
 
-This control file will be installed into the F<DEBIAN> directory.
+Historically, this file was needed to manually mark files files as
+conffiles.  However, it has become de facto obsolete since debhelper
+automatically computed which files should be marked as conffiles.
 
-In v3 compatibility mode and higher, all files in the F<etc/> directory in a
-package will automatically be flagged as conffiles by this program, so
-there is no need to list them manually here.
+In compatibility level up and including 11, this control file will be
+installed into the F<DEBIAN> directory.  In compatibility level 12 and
+later, the file is silently ignored.
 
 =item I<package>.maintscript
 
@@ -175,7 +177,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	# Install non-executable files
-	my @non_exec_files = (qw{conffiles});
+	my @non_exec_files;
+	# Removed in compat 12.
+	push(@non_exec_files, 'conffiles') if compat(11);
 	# In compat 10, we let dh_makeshlibs handle "shlibs".
 	push(@non_exec_files, 'shlibs') if compat(9);
 	foreach my $file (@non_exec_files) {
