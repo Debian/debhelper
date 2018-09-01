@@ -1001,22 +1001,33 @@ sub pkgfilename {
 # As a side effect, sets $dh{VERSION} to the version of this package.
 {
 	# Caches return code so it only needs to run dpkg-parsechangelog once.
-	my %isnative_cache;
+	my (%isnative_cache, %pkg_version);
 	
 	sub isnative {
-		my $package=shift;
+		my ($package) = @_;
+		my $cache_key = $package;
 
-		return $isnative_cache{$package} if defined $isnative_cache{$package};
+		if (exists($isnative_cache{$cache_key})) {
+			$dh{VERSION} = $pkg_version{$cache_key};
+			return $isnative_cache{$cache_key};
+		}
+
+		# Make sure we look at the correct changelog.
+		my $isnative_changelog = pkgfile($package,"changelog");
+		if (! $isnative_changelog) {
+			$isnative_changelog = "debian/changelog";
+			$cache_key = '_source';
+			# check if we looked up the default changelog
+			if (exists($isnative_cache{$cache_key})) {
+				$dh{VERSION} = $pkg_version{$cache_key};
+				return $isnative_cache{$cache_key};
+			}
+		}
 
 		if (not %isnative_cache) {
 			require Dpkg::Changelog::Parse;
 		}
 
-		# Make sure we look at the correct changelog.
-		my $isnative_changelog=pkgfile($package,"changelog");
-		if (! $isnative_changelog) {
-			$isnative_changelog="debian/changelog";
-		}
 		my $res = Dpkg::Changelog::Parse::changelog_parse(
 			file => $isnative_changelog,
 			compression => 0,
@@ -1029,15 +1040,15 @@ sub pkgfilename {
 		if (not defined($version) or not $version->is_valid) {
 			error("changelog parse failure; invalid or missing version");
 		}
-		# Get the package version.
-		$dh{VERSION} = $version->as_string;
+		# Get and cache the package version.
+		$dh{VERSION} = $pkg_version{$cache_key} = $version->as_string;
 
 		# Is this a native Debian package?
 		if (index($dh{VERSION}, '-') > -1) {
-			return $isnative_cache{$package}=0;
+			return $isnative_cache{$cache_key} = 0;
 		}
 		else {
-			return $isnative_cache{$package}=1;
+			return $isnative_cache{$cache_key} = 1;
 		}
 	}
 }

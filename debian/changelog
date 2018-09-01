@@ -28,6 +28,11 @@ debhelper (11.4) UNRELEASED; urgency=medium
     issue.
   * dh_installdeb: In compat 12, ignore the maintainer provided conffiles.
     It has not been useful since compat 3.
+  * Dh_Lib.pm: isnative() now also resets $dh{VERSION} as a side-effect when
+    using the cache to answer the request.  This is mostly useful because
+    it enables the following optimization.
+  * Dh_Lib.pm: Have isnative() special-case debian/changelog to avoid
+    reparsing that file over and over in the same helper.
 
   [ Juhani Numminen ]
   * dh_installsystemd.1: Fix typo in manpage.
