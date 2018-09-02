@@ -95,7 +95,7 @@ sub generate_md5sums_file {
 	while (my $line = <$find_fd>) {
 		chomp($line);
 		next if excludefile($line);
-		next if %{$conffiles} and exists($conffiles->{$line});
+		next if $conffiles and %{$conffiles} and exists($conffiles->{$line});
 		push(@files, $line);
 	}
 	close($find_fd) or error_exitcode("find -type f ! -regex './DEBIAN/.*' -printf '%P\\0'");
