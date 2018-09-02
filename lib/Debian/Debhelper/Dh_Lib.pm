@@ -255,7 +255,7 @@ sub init {
 	# make sure verbose is on. Otherwise, check DH_QUIET.
 	if (defined $ENV{DH_VERBOSE} && $ENV{DH_VERBOSE} ne "") {
 		$dh{VERBOSE}=1;
-	} elsif (defined $ENV{DH_QUIET} && $ENV{DH_QUIET} ne "") {
+	} elsif (defined $ENV{DH_QUIET} && $ENV{DH_QUIET} ne "" || get_buildoption("terse")) {
 		$dh{QUIET}=1;
 	}
 

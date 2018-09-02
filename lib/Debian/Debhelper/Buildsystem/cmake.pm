@@ -8,12 +8,11 @@ package Debian::Debhelper::Buildsystem::cmake;
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(compat dpkg_architecture_value error is_cross_compiling);
+use Debian::Debhelper::Dh_Lib qw(%dh compat dpkg_architecture_value error is_cross_compiling);
 use parent qw(Debian::Debhelper::Buildsystem);
 
 my @STANDARD_CMAKE_FLAGS = qw(
   -DCMAKE_INSTALL_PREFIX=/usr
-  -DCMAKE_VERBOSE_MAKEFILE=ON
   -DCMAKE_BUILD_TYPE=None
   -DCMAKE_INSTALL_SYSCONFDIR=/etc
   -DCMAKE_INSTALL_LOCALSTATEDIR=/var
@@ -84,6 +83,9 @@ sub configure {
 	if (exists($TARGET_BUILD_SYSTEM2CMAKE_GENERATOR{$backend})) {
 		my $generator = $TARGET_BUILD_SYSTEM2CMAKE_GENERATOR{$backend};
 		push(@flags, "-G${generator}");
+	}
+	unless ($dh{QUIET}) {
+		push(@flags, "-DCMAKE_VERBOSE_MAKEFILE=ON");
 	}
 
 	if ($ENV{CC}) {

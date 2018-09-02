@@ -8,7 +8,7 @@ package Debian::Debhelper::Buildsystem::autoconf;
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value sourcepackage compat);
+use Debian::Debhelper::Dh_Lib qw(%dh dpkg_architecture_value sourcepackage compat);
 use parent qw(Debian::Debhelper::Buildsystem::makefile);
 
 sub DESCRIPTION {
@@ -38,7 +38,7 @@ sub configure {
 	push @opts, "--infodir=\${prefix}/share/info";
 	push @opts, "--sysconfdir=/etc";
 	push @opts, "--localstatedir=/var";
-	if (defined $ENV{DH_QUIET} && $ENV{DH_QUIET} ne "") {
+	if ($dh{QUIET}) {
 		push @opts, "--enable-silent-rules";
 	} else {
 		push @opts, "--disable-silent-rules";
