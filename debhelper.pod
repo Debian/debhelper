@@ -869,6 +869,22 @@ F<conffiles> file.  The file has mostly been obsolete since
 compatibility level 3, where B<dh_installdeb> began to automatically
 compute the resulting F<conffiles> control file.
 
+=item -
+
+The B<dh_installsystemd> tool no longer relies on B<dh_installinit> for
+handling systemd services that have a sysvinit alternative.  Both tools
+must now be used in such a case to ensure the service is properly started
+under both sysvinit and systemd.
+
+If you have an override for B<dh_installinit> (e.g. to call it with
+B<--no-start>) then you will probably need one for
+B<dh_installsystemd> as well now.
+
+This change makes B<dh_installinit> inject a I<misc:Pre-Depends> for
+B<< init-system-helpers (>= 1.54~) >>.  Please ensure that the package
+lists B<${misc:Pre-Depends}> in its B<Pre-Depends> field before
+upgrading to compat 12.
+
 =back
 
 =back

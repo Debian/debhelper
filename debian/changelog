@@ -42,6 +42,10 @@ debhelper (11.4) UNRELEASED; urgency=medium
   * Dh_Getopt.pm: Remove --priority from the list of options supported by all
     debhelper tools.  The only external consumer was dh_installtex from
     tex-common, which was fixed in 6.10.
+  * dh_installinit: In compat 12, pass --skip-systemd-native to update-rc.d
+    to make it ignore systemd services.
+  * dh_installsystemd: In compat 12, avoid relying on dh_installinit's
+    shell snippets for starting services.  (Closes: #887904, #887900)
 
   [ Juhani Numminen ]
   * dh_installsystemd.1: Fix typo in manpage.
