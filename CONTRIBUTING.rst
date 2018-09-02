@@ -71,7 +71,7 @@ Here are some guidelines that may be useful:
    careful of ``Dpkg::*``-modules, which tend to have very high load
    costs.
 
- * Helpers / tools should generally `do the right thing` by default
+ * Helpers / tools should generally *do the right thing* by default
    (subject to backwards compatibility).  If most people neeed some
    particular option to make the tool work for them, then the default
    should be changed (again, subject to backwards compatibility).
@@ -108,9 +108,13 @@ we work based on the following guidelines:
   1) it should be trivial to use/Build-Depend on debhelper in
      ``stable-backports``, and
   2) the debhelper in ``stable-backports`` should behave the same as
-     in ``unstable``.
+     in ``testing`` when backporting a package from ``testing``.
 
-In some cases, we can disable some minor functionality in
+     * Note that we do not require feature/bug compatibility with
+       debhelper in ``stable`` (as most packages will still use
+       debhelper from ``stable``).
+
+In some cases, we can disable some *minor* functionality in
 ``stable-backports`` (previous cases being ``dbgsym`` and ``R³``).
 
 Where possible, use versioned ``Breaks`` against other packages to
