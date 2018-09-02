@@ -144,8 +144,6 @@ sub getoptions {
 		"A" => \$dh{PARAMS_ALL},
 		"all" => \$dh{PARAMS_ALL},
 	
-		"priority=s" => \$dh{PRIORITY},
-		
 		"h|help" => \&showhelp,
 
 		"mainpackage=s" => \$dh{MAINPACKAGE},

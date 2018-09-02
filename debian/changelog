@@ -34,11 +34,14 @@ debhelper (11.4) UNRELEASED; urgency=medium
   * Dh_Lib.pm: Have isnative() special-case debian/changelog to avoid
     reparsing that file over and over in the same helper.
   * dh_gconf: Explicitly declare the --priority parameter with the intend
-    to remove it from the default debhelper options in a later release.
+    to remove it from the default debhelper options.
   * dh_installemacsen: Ditto.
   * dh_installgsettings: Ditto.
   * dh_installudev: Ditto.
   * dh_installwm: Ditto.
+  * Dh_Getopt.pm: Remove --priority from the list of options supported by all
+    debhelper tools.  The only external consumer was was dh_installtex from
+    tex-common, which was fixed in 6.10.
 
   [ Juhani Numminen ]
   * dh_installsystemd.1: Fix typo in manpage.
