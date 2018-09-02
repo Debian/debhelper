@@ -383,8 +383,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			autoscript($package, 'postinst', 'postinst-systemd-start', $units, \%options);
 		}
 
-		autoscript($package, 'postrm', 'postrm-systemd-reload-only', $units, \%options);
-
 		if ($dh{R_FLAG} || $dh{RESTART_AFTER_UPGRADE}) {
 			# stop service only on remove
 			autoscript($package, 'prerm', 'prerm-systemd-restart', $units, \%options);
@@ -392,6 +390,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			# always stop service
 			autoscript($package, 'prerm', 'prerm-systemd', $units, \%options);
 		}
+
+		# Run this with "default" order so it is always after other
+		# service related autosnippets.
+		autoscript($package, 'postrm', 'postrm-systemd-reload-only', $units);
 	}
 }
 
