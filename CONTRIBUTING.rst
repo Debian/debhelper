@@ -187,7 +187,8 @@ reading (some) of the documents below.
  * `Debian's Social Contract and Free Software Guidelines <https://www.debian.org/social_contract>`_.
 
  * (very optional read) `Debian's Constitution <https://www.debian.org/devel/constitution>`_.
-   - The primary point of importance from this document is the
+
+   * The primary point of importance from this document is the
      debhelper project is subject the Debian's technical committee and
      the Debian General Resolution (GR) process.  These
      bodies/processes can make decisions that the debhelper project
