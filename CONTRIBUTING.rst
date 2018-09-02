@@ -5,7 +5,8 @@ Thanks for your interest in improving debhelper.
 
 No matter how you identify yourself or how others perceive you: we
 welcome you. We welcome contributions from you as long as they
-interact constructively with our community.  See also :ref:`coc`.
+interact constructively with our community.  See also
+:ref:`code-of-conduct`.
 
 This document will cover what you need to get started on working with
 debhelper, where to submit patches or contributions and what we expect
@@ -61,7 +62,8 @@ Here are some guidelines that may be useful:
    or have a narrow scope are generally better shipped in a separate
    package.  If the scope becomes more general, the tooling can be
    merged in to debhelper at a later stage.
-   - Examples: Most ``dh-*`` packages in Debian are examples of this.
+
+   * Examples: Most ``dh-*`` packages in Debian are examples of this.
 
  * Changes that affect performance considerably generally must only
    affect packages that need them and only affect a limited subset of
@@ -151,7 +153,7 @@ reportbug tool installed.
 You can find the list of open bugs against debhelper at:
 https://bugs.debian.org/src:debhelper
 
-.. _coc:
+.. _code-of-conduct:
 
 Code of Conduct, Social rules and conflict resolution
 -----------------------------------------------------
@@ -167,17 +169,19 @@ reading (some) of the documents below.
 
 
  * `Debian's Code of Conduct <https://www.debian.org/code_of_conduct>`_
-   - If you feel a contributor is violating the code of contact, please
+
+   * If you feel a contributor is violating the code of contact, please
      contact the `Debian anti-harassment team <https://wiki.debian.org/AntiHarassment>`_
      if you are uncomfortable with engaging with them directly.
 
  * `Debian's Diversity Statement <https://www.debian.org/intro/diversity>`_
-   - Note that `interact constructively with our community` has the
+
+   * Note that `interact constructively with our community` has the
      implication that contributors extend the same acceptance and
      welcome to others as they can expect from others based on the
      diversity statement.
 
-   - The rationale for this implication is based on the `Paradoc of tolerance <https://en.wikipedia.org/wiki/Paradox_of_tolerance>`_.
+   * The rationale for this implication is based on the `Paradoc of tolerance <https://en.wikipedia.org/wiki/Paradox_of_tolerance>`_.
      
 
  * `Debian's Social Contract and Free Software Guidelines <https://www.debian.org/social_contract>`_.
