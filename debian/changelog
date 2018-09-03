@@ -46,6 +46,10 @@ debhelper (11.4) UNRELEASED; urgency=medium
     to make it ignore systemd services.
   * dh_installsystemd: In compat 12, avoid relying on dh_installinit's
     shell snippets for starting services.  (Closes: #887904, #887900)
+  * dh_installinit: Drop unnecessary "systemctl daemon-reload" in
+    auto-generated postrm script.  The systemd package has a trigger for
+    handling sysvinit scripts and dh_installsystemd handles the requirement
+    for native systemd unit files.
 
   [ Juhani Numminen ]
   * dh_installsystemd.1: Fix typo in manpage.
