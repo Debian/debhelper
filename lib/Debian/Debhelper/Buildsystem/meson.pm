@@ -7,7 +7,7 @@ package Debian::Debhelper::Buildsystem::meson;
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value is_cross_compiling doit warning error generated_file);
+use Debian::Debhelper::Dh_Lib qw(compat dpkg_architecture_value is_cross_compiling doit warning error generated_file);
 use parent qw(Debian::Debhelper::Buildsystem);
 
 sub DESCRIPTION {
