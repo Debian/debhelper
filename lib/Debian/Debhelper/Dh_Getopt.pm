@@ -107,7 +107,7 @@ sub getoptions {
 		"arch" => \&AddPackage,
 	
 		"p=s" => \&AddPackage,
-	        "package=s" => \&AddPackage,
+		"package=s" => \&AddPackage,
 		
 		"N=s" => \&ExcludePackage,
 		"no-package=s" => \&ExcludePackage,
@@ -131,9 +131,6 @@ sub getoptions {
 		
 		"d" => \$dh{D_FLAG},
 	
-		"k" => \$dh{K_FLAG},
-		"keep" => \$dh{K_FLAG},
-
 		"P=s" => \$dh{TMPDIR},
 		"tmpdir=s" => \$dh{TMPDIR},
 

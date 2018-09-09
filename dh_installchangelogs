@@ -147,7 +147,9 @@ sub install_binNMU_changelog {
 	}
 }
 
-init();
+init(options => {
+	'keep|k'  => \$dh{K_FLAG},
+});
 
 my $news_name="NEWS.Debian";
 my $changelog_name="changelog.Debian";
