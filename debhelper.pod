@@ -885,6 +885,14 @@ B<< init-system-helpers (>= 1.54~) >>.  Please ensure that the package
 lists B<${misc:Pre-Depends}> in its B<Pre-Depends> field before
 upgrading to compat 12.
 
+=item -
+
+The third-party B<dh_golang> tool (from B<dh-golang> package) now defaults on
+honoring B<DH_GOLANG_EXCLUDES> variable for source installation in -dev
+packages and not only during the building process. Please set
+B<DH_GOLANG_EXCLUDES_ALL> to false to revert to the previous behaviour. See
+B<Debian::Debhelper::Buildsystem::golang(3pm)> for details and examples.
+
 =back
 
 =back
