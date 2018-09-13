@@ -874,7 +874,7 @@ foreach my $i (0..$stoppoint) {
 	}
 	next unless @todo;
 
-	next if can_skip($command, @todo) && ! $dh{NO_ACT};
+	next if can_skip($command, @todo);
 
 	# No need to run the command for any packages handled by the
 	# override targets.
@@ -1030,6 +1030,8 @@ sub command_pos {
 my %skipinfo;
 sub can_skip {
 	my ($command, @packages) = @_;
+
+	return 0 if $dh{NO_ACT} and not $ENV{DH_INTERNAL_TEST_CAN_SKIP};
 
 	return 0 if $unoptimizable_user_option ||
 		(exists $ENV{DH_OPTIONS} && length $ENV{DH_OPTIONS});
