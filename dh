@@ -8,6 +8,9 @@ dh - debhelper command sequencer
 
 use strict;
 use warnings;
+use constant {
+	'UNSKIPPABLE_CLI_OPTIONS_BUILD_SYSTEM' => q(-S|--buildsystem|-D|--sourcedirectory|-B|--builddirectory),
+};
 use Debian::Debhelper::Dh_Lib;
 use Debian::Debhelper::SequencerUtil;
 
@@ -641,7 +644,7 @@ my %completed_sequences;
 # Get the options to pass to commands in the sequence.
 # Filter out options intended only for this program.
 my (@options, %seen_options);
-my $user_specified_non_option = 0;
+my $unoptimizable_user_option = 0;
 
 if ($sequence eq 'build-arch' ||
     $sequence eq 'install-arch' ||
@@ -682,18 +685,20 @@ while (@ARGV_orig) {
 			$max_parallel = get_buildoption('parallel') // 1;
 			next if $max_parallel == 1;
 		}
-		if ($opt =~ m/^(-[^=]++)=/) {
-			$optname = $1;
+		if ($opt =~ m/^(--[^=]++)(?:=.*)?$/ or $opt =~ m/^(-[^-])$/) {
+			my $optname = $1;
+			$seen_options{$optname} = 1;
+		} else {
+			$unoptimizable_user_option = 1;
 		}
-		$seen_options{$optname} = 1;
 		push @options, "-O".$opt;
 	}
 	elsif (@options) {
-		$user_specified_non_option = 1;
 		if ($options[$#options]=~/^-O--/) {
 			$options[$#options].="=".$opt;
 		}
 		else {
+			$unoptimizable_user_option = 1;
 			$options[$#options].=$opt;
 		}
 	}
@@ -1039,7 +1044,7 @@ my %skipinfo;
 sub can_skip {
 	my ($command, @packages) = @_;
 
-	return 0 if $user_specified_non_option || %seen_options ||
+	return 0 if $unoptimizable_user_option ||
 		(exists $ENV{DH_OPTIONS} && length $ENV{DH_OPTIONS});
 
 	return 0 if exists($command_opts{$command})
@@ -1051,7 +1056,7 @@ sub can_skip {
 	my @skipinfo=@{$skipinfo{$command}};
 	return 0 unless @skipinfo;
 	return 1 if scalar(@skipinfo) == 1 and $skipinfo[0] eq 'always-skip';
-	my $all_pkgs;
+	my ($all_pkgs, $had_cli_options);
 
 	foreach my $skipinfo (@skipinfo) {
 		if ($skipinfo=~/^([a-zA-Z0-9-_]+)\((.*)\)$/) {
@@ -1066,12 +1071,20 @@ sub can_skip {
 				my $pkgs;
 				if ($type eq 'pkgfile') {
 					$pkgs = \@packages;
-				} else {
-					$all_pkgs //= [getpackages()];
+				}
+				else {
+					$all_pkgs //= [ getpackages() ];
 					$pkgs = $all_pkgs;
 				}
 				# Use the secret bulk check call
 				return 0 if pkgfile($pkgs, $need) ne '';
+			} elsif ($type eq 'cli-options') {
+				$had_cli_options = 1;
+				$need =~ s/(?:^|\s)BUILDSYSTEM(?:\s|$)/${\UNSKIPPABLE_CLI_OPTIONS_BUILD_SYSTEM}/;
+				my @behavior_options = split(qr/\Q|\E/, $need);
+				for my $opt (@behavior_options) {
+					return 0 if exists($seen_options{$opt});
+				}
 			} elsif ($type eq 'buildsystem') {
 				require Debian::Debhelper::Dh_Buildsystems;
 				my $system = Debian::Debhelper::Dh_Buildsystems::load_buildsystem(undef, $need);
@@ -1085,6 +1098,7 @@ sub can_skip {
 			return 0 if pkgfile(\@packages, $skipinfo) ne '';
 		}
 	}
+	return 0 if not $had_cli_options and %seen_options;
 	return 1;
 }
 
