@@ -524,13 +524,6 @@ breaks binNMUs.
 
 =item -
 
-B<dh> no longer creates the package build directory when skipping
-running debhelper commands. This will not affect packages that only build
-with debhelper commands, but it may expose bugs in commands not included in
-debhelper.
-
-=item -
-
 B<dh_installdeb> no longer installs a maintainer-provided
 debian/I<package>.shlibs file.  This is now done by B<dh_makeshlibs>
 instead.
@@ -615,6 +608,18 @@ package
 The B<systemd> sequence is now enabled by default.  Please pass
 B<--without systemd> to B<dh> if this is not desirable for a given
 package.
+
+=item -
+
+B<Retroactively removed>: B<dh> no longer creates the package build
+directory when skipping running debhelper commands. This will not
+affect packages that only build with debhelper commands, but it may
+expose bugs in commands not included in debhelper.
+
+This compatibility feature had a bug since its inception in
+debhelper/9.20130516 that made it fail to apply in compat 9 and
+earlier.  As there has been no reports of issues caused by this bug in
+those ~5 years, this item have been removed rather than fixed.
 
 =back
 
