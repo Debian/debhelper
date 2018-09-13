@@ -92,6 +92,7 @@ sub getoptions {
 	if (! exists $params{bundling} || $params{bundling}) {
 		Getopt::Long::config("bundling");
 	}
+	Getopt::Long::config('no_ignore_case');
 
 	my @test;
 	my %options=(	
