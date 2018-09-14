@@ -47,10 +47,10 @@ sub configure {
 	if (! compat(8)) {
 		if (defined $multiarch) {
 			push @opts, "--libdir=\${prefix}/lib/$multiarch";
-			push(@opts, "--libexecdir=\${prefix}/lib/$multiarch") if not compat(11);
+			push(@opts, "--libexecdir=\${prefix}/lib/$multiarch") if compat(11);
 		}
 		else {
-			push(@opts, "--libexecdir=\${prefix}/lib") if not compat(11);
+			push(@opts, "--libexecdir=\${prefix}/lib") if compat(11);
 		}
 	}
 	else {
