@@ -58,6 +58,13 @@ debhelper (11.4) UNRELEASED; urgency=medium
     debhelper tools.  The only external consumer was dh_gtkmodules which is now
     deprecated and a "noop" dh_installtex.  No consumers of dh_gtkmodules
     appear to pass -k/--keep to dh_gtkmodules any longer.
+  * dh: Rewrite command line optimization logic to enable support for a new
+    NOOP PROMISE for command line options.  This will make dh able to skip
+    helpers in some cases even when passed options.  (Closes: #866581)
+  * dh_*: Add a NOOP PROMISE for command options where applicable.
+  * dh: Remove old compatibility code from compat 10 that never worked.
+  * Dh_Getopt.pm: Fix a bug that would make "-S" be interpreted as "-s" when
+    "-S" was not given an argument.
 
   [ Juhani Numminen ]
   * dh_installsystemd.1: Fix typo in manpage.
