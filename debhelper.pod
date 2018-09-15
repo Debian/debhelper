@@ -30,8 +30,8 @@ package contains a tutorial about making your first package using debhelper.
 
 Except where tool explicitly denotes otherwise, all of the debhelper
 tools assumes that they run from root directory of an unpacked source
-package.  This is so they can locate find F<debian/control> and
-F<debian/compat> when needed.
+package.  This is so they can locate find files like F<debian/control>
+when needed.
 
 =head1 DEBHELPER COMMANDS
 
@@ -317,17 +317,30 @@ to debhelper, to keep it clean and well-designed as needs change and its
 author gains more experience. To prevent such major changes from breaking
 existing packages, the concept of debhelper compatibility levels was 
 introduced. You must tell debhelper which compatibility level it should use, and
-it modifies its behavior in various ways.  The compatibility level is
-specified in the F<debian/compat> file and the file must be present.
+it modifies its behavior in various ways.
 
-Tell debhelper what compatibility level to use by writing a number to
-F<debian/compat>. For example, to use v#RECOMMENDED_COMPAT# mode:
+In current debhelper, you can specify the compatibility level in
+F<debian/control> by adding a Build-Depends on the debhelper-compat package.
+For example, to use v#RECOMMENDED_COMPAT# mode, ensure F<debian/control> has:
 
-  % echo #RECOMMENDED_COMPAT# > debian/compat
+  Build-Depends: debhelper-compat (= #RECOMMENDED_COMPAT#)
 
-Your package will also need a versioned build dependency on a version of
-debhelper equal to (or greater than) the compatibility level your package
-uses. So for compatibility level #RECOMMENDED_COMPAT#, ensure debian/control has:
+This also serves as an appropriate versioned build dependency on a sufficient
+version of the debhelper package, so you do not need to specify a separate
+versioned build dependency on the debhelper package unless you need a specific
+point release of debhelper (such as for the introduction of a new feature or
+bugfix within a compatibility level).
+
+Prior versions of debhelper required specifying the compatibility level in the
+file F<debian/compat>, and current debhelper still supports this for backward
+compatibility, though a package may not specify a compatibility level via
+multiple methods at once. To use this method, F<debian/compat> should contain
+the compatibility level as a single number, and no other content. If you
+specify the compatibility level by this method, your package will also need a
+versioned build dependency on a version of the debhelper package equal to (or
+greater than) the compatibility level your package uses. So, if you specify
+compatibility level #RECOMMENDED_COMPAT# in F<debian/compat>, ensure
+F<debian/control> has:
 
   Build-Depends: debhelper (>= #RECOMMENDED_COMPAT#~)
 
@@ -1063,7 +1076,8 @@ Ignored if DH_VERBOSE is also set.
 =item B<DH_COMPAT>
 
 Temporarily specifies what compatibility level debhelper should run at,
-overriding any value in F<debian/compat>.
+overriding any value specified via Build-Depends on debhelper-compat or via the
+F<debian/compat> file.
 
 =item B<DH_NO_ACT>
 
