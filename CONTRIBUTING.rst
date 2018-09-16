@@ -129,7 +129,8 @@ Submitting your contribution
 We accept merge requests on https://salsa.debian.org/debian/debhelper
 and in general prfer these to bug reports with patches.  This is
 because the merge requests will run our CI to ensure the tests still
-pass.
+pass.  When opening a merge request, please consider allowing
+committers to edit the branch as this enables us to rebase it for you.
 
 However, we fully respect that not everyone may want to sign up on a
 Debian service (e.g. it might be a steep overhead for a one-time
