@@ -331,6 +331,10 @@ versioned build dependency on the debhelper package unless you need a specific
 point release of debhelper (such as for the introduction of a new feature or
 bugfix within a compatibility level).
 
+Note that debhelper does not provide debhelper-compat for experimental or beta
+compatibility levels; packages experimenting with those compatibility levels
+should use F<debian/compat> or B<DH_COMPAT>.
+
 Prior versions of debhelper required specifying the compatibility level in the
 file F<debian/compat>, and current debhelper still supports this for backward
 compatibility, though a package may not specify a compatibility level via
