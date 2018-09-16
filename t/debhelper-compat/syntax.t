@@ -31,7 +31,7 @@ sub test_build_depends {
 	    error("close $dir/debian/control failed: $!");
 	close($in);
 
-	my $start_dir = Test::DH::cwd();
+	my $start_dir = Test::DH::getcwd();
 	chdir($dir) or error("chdir($dir): $!");
 
 	plan(tests => 5);

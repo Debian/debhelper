@@ -83,7 +83,7 @@ if (!$destdir) {
 		$destdir=tmpdir($dh{MAINPACKAGE});
 	}
 }
-$destdir = File::Spec->rel2abs($destdir, cwd());
+$destdir = File::Spec->rel2abs($destdir, getcwd());
 
 if (compat(10)) {
 	# Ensure that all debian/<pkg> directories exist

@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-use Cwd qw(cwd realpath);
+use Cwd qw(getcwd realpath);
 use Errno qw(EEXIST);
 use Exporter qw(import);
 
@@ -44,7 +44,7 @@ our @EXPORT = qw(
 
 our ($TEST_DH_COMPAT, $ROOT_OK, $ROOT_CMD);
 
-my $START_DIR = cwd();
+my $START_DIR = getcwd();
 my $TEST_DIR;
 
 sub run_dh_tool {

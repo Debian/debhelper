@@ -84,7 +84,7 @@ sub configure {
 			# Make the file name absolute as meson will be called from the build dir.
 			require Cwd;
 			$cross_file =~ s{^\./}{};
-			$cross_file = Cwd::cwd() . "/${cross_file}";
+			$cross_file = Cwd::getcwd() . "/${cross_file}";
 		}
 		push(@opts, '--cross-file', $cross_file);
 	}
