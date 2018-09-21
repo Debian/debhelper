@@ -379,6 +379,7 @@ sub process_packages {
 			install_dir("$debugtmp/usr/lib/debug/.dwz");
 			xargs(\@files, 'cp', '--reflink=auto', "-a", XARGS_INSERT_PARAMS_HERE, "$debugtmp/usr/lib/debug/.dwz");
 			doit('rm', '-fr', "$tmp/usr/lib/debug/.dwz");
+			doit('rmdir', '-p', '--ignore-fail-on-non-empty', "$tmp/usr/lib/debug");
 		}
 
 		if ($no_auto_dbgsym and $use_build_id > 1) {
