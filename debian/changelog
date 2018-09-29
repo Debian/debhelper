@@ -8,6 +8,12 @@ debhelper (11.4.1) UNRELEASED; urgency=medium
   * dh_strip: Remove empty /usr/lib/debug directories left over
     by dh_dwz.  Thanks to Ferenc Wágner for reporting the issue.
     (Closes: #909303)
+  * dh: Disable optimization to skip tools based on command-line
+    parameters when dh is passed long options.  Since debhelper
+    had implicit support for auto-abbrevation of long options
+    and people have started to rely on it, the optimization in
+    debhelper/11.4 caused regressions.  The optimization is
+    still enabled for short options.  (Closes: #909704)
 
   [ Josh Triplett ]
   * debhelper.pod: Document how to declare the debhelper compat

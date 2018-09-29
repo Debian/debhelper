@@ -644,7 +644,7 @@ my %completed_sequences;
 # Get the options to pass to commands in the sequence.
 # Filter out options intended only for this program.
 my (@options, %seen_options);
-my $unoptimizable_user_option = 0;
+my ($unoptimizable_user_option, $long_options_seen) = (0, 0);
 
 if ($sequence eq 'build-arch' ||
     $sequence eq 'install-arch' ||
@@ -687,6 +687,7 @@ while (@ARGV_orig) {
 		}
 		if ($opt =~ m/^(--[^=]++)(?:=.*)?$/ or $opt =~ m/^(-[^-])$/) {
 			my $optname = $1;
+			$long_options_seen = 1 if length($optname) > 2;
 			$seen_options{$optname} = 1;
 		} else {
 			$unoptimizable_user_option = 1;
@@ -1069,6 +1070,10 @@ sub can_skip {
 				return 0 if pkgfile($pkgs, $need) ne '';
 			} elsif ($type eq 'cli-options') {
 				$had_cli_options = 1;
+				# Long options are subject to abbreviations so it is
+				# very difficult to implement this optimization with
+				# long options.
+				return 0 if $long_options_seen;
 				$need =~ s/(?:^|\s)BUILDSYSTEM(?:\s|$)/${\UNSKIPPABLE_CLI_OPTIONS_BUILD_SYSTEM}/;
 				my @behavior_options = split(qr/\Q|\E/, $need);
 				for my $opt (@behavior_options) {
