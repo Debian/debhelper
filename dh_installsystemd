@@ -389,27 +389,34 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	if (@start_units) {
-		my $units = { 'UNITFILES' => join(' ', @start_units) };
+		my $replace = { 'UNITFILES' => join(' ', @start_units) };
 
 		if ($dh{RESTART_AFTER_UPGRADE}) {
-			my $snippet = $dh{NO_START} ? 'postinst-systemd-restartnostart' : 'postinst-systemd-restart';
-			autoscript($package, 'postinst', $snippet, $units, \%options);
+			my $snippet;
+			if ($dh{NO_START}) {
+				$snippet = 'postinst-systemd-restartnostart';
+				$replace->{RESTART_ACTION} = 'try-restart';
+			} else {
+				$snippet = 'postinst-systemd-restart';
+				$replace->{RESTART_ACTION} = 'restart';
+			}
+			autoscript($package, 'postinst', $snippet, $replace, \%options);
 		} elsif (!$dh{NO_START}) {
 			# (stop|start) service (before|after) upgrade
-			autoscript($package, 'postinst', 'postinst-systemd-start', $units, \%options);
+			autoscript($package, 'postinst', 'postinst-systemd-start', $replace, \%options);
 		}
 
 		if ($dh{R_FLAG} || $dh{RESTART_AFTER_UPGRADE}) {
 			# stop service only on remove
-			autoscript($package, 'prerm', 'prerm-systemd-restart', $units, \%options);
+			autoscript($package, 'prerm', 'prerm-systemd-restart', $replace, \%options);
 		} elsif (!$dh{NO_START}) {
 			# always stop service
-			autoscript($package, 'prerm', 'prerm-systemd', $units, \%options);
+			autoscript($package, 'prerm', 'prerm-systemd', $replace, \%options);
 		}
 
 		# Run this with "default" order so it is always after other
 		# service related autosnippets.
-		autoscript($package, 'postrm', 'postrm-systemd-reload-only', $units);
+		autoscript($package, 'postrm', 'postrm-systemd-reload-only', $replace);
 	}
 }
 
