@@ -82,12 +82,19 @@ should not be started.
 
 =item B<--name=>I<name>
 
-Install the service file as I<name.service> instead of the default
-filename I<package.service>. When this parameter is used,
-B<dh_installsystemd> looks for and installs files named
-F<debian/package.name.service> instead of the usual
-F<debian/package.service>.  Moreover, maintainer scripts are only
-generated for units that match the given I<name>.
+This option controls several things.
+
+It changes the name that B<dh_installsystemd> uses when it looks for
+maintainer provided systemd unit files as listed in the L</FILES>
+section.  As an example, B<dh_installsystemd --name foo> will look for
+F<<< I<debian/package.>B<< I<foo> >>I<.service> >>> instead of
+F<< I<debian/package.service> >>).  These unit files are installed as F<<
+I<name.unit-extension> >> (in the example, it would be installed as
+F<<< B<< I<foo> >>I<.service> >>>).
+
+Furthermore, if no unit files are passed explicitly as command line
+arguments, B<dh_installsystemd> will only act on unit files called
+I<name> (rather than all unit files found in the package).
 
 =item B<--restart-after-upgrade>
 
@@ -121,6 +128,15 @@ latter is only relevant for services without a corresponding init script).
 B<Note> that this option does not affect whether the services are
 enabled.  Please remember to also use B<--no-enable> if the services
 should not be enabled.
+
+=item S<B<unit file> ...>
+
+Only process and generate maintscripts for the installed unit files
+with the (base)name I<unit file>.
+
+Note: B<dh_installsystemd> will still install unit files from
+F<debian/> but it will not generate any maintscripts for them unless
+they are explicitly listed in S<B<unit file> ...>
 
 =back
 
