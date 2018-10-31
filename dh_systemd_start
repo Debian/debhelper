@@ -232,13 +232,24 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# The $package and $sed parameters are always the same.
 	# This wrapper function makes the following logic easier to read.
 	my $sd_autoscript = sub {
-		my ($script, $filename) = @_;
-		autoscript($package, $script, $filename, { 'UNITFILES' => $unitargs });
+		my ($script, $filename, $restart_action) = @_;
+		my $replace = {
+			'UNITFILES' => $unitargs,
+			'RESTART_ACTION' => $restart_action // '',
+		};
+		autoscript($package, $script, $filename, $replace);
 	};
 
 	if ($dh{RESTART_AFTER_UPGRADE}) {
-		my $snippet = "postinst-systemd-restart" . ($dh{NO_START} ? "nostart" : "");
-		$sd_autoscript->("postinst", $snippet);
+		my ($snippet, $restart_action);
+		if ($dh{NO_START}) {
+			$snippet = 'postinst-systemd-restartnostart';
+			$restart_action = 'try-restart';
+		} else {
+			$snippet = 'postinst-systemd-restart';
+			$restart_action = 'restart';
+		}
+		$sd_autoscript->("postinst", $snippet, $restart_action);
 	} elsif (!$dh{NO_START}) {
 		# We need to stop/start before/after the upgrade.
 		$sd_autoscript->("postinst", "postinst-systemd-start");
