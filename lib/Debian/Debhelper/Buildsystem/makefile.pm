@@ -9,7 +9,7 @@ package Debian::Debhelper::Buildsystem::makefile;
 use strict;
 use warnings;
 use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value escape_shell clean_jobserver_makeflags is_cross_compiling compat
-	should_use_root gain_root_cmd);
+	should_use_root gain_root_cmd %dh);
 use parent qw(Debian::Debhelper::Buildsystem);
 
 my %DEB_DEFAULT_TOOLS = (
@@ -87,6 +87,12 @@ sub do_make {
 		unshift(@_, "-j${parallel}");
 	} else {
 		unshift(@_, '-j1');
+	}
+
+	if ($dh{QUIET}) {
+		unshift(@_, 'V=0');
+	} else {
+		unshift(@_, 'V=1');
 	}
 
 	my @root_cmd;
