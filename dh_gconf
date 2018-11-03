@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-dh_gconf - install GConf defaults files and register schemas
+dh_gconf - install GConf defaults files and register schemas (deprecated)
 
 =cut
 
@@ -57,6 +57,8 @@ packages (B<90>).
 init(options => {
 	"priority=s" => \$dh{PRIORITY},
 });
+
+warning("Please migrate to dh_installgsettings; gconf + dh_gconf is scheduled for removal.");
 
 my $priority=10;
 if (defined $dh{PRIORITY}) {
