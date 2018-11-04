@@ -34,7 +34,7 @@ sub NAME {
 		return $name;
 	}
 	else {
-		error("ınvalid build system class name: $class");
+		error("Invalid build system class name: $class");
 	}
 }
 
