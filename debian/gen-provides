@@ -9,7 +9,7 @@ my @provides;
 my $version = $Debian::Debhelper::Dh_Version::version;
 $version =~ s/~.*//; # Drop backports marker
 $version =~ s/^\d+\K\..*//;
-for (my $i = Debian::Debhelper::Dh_Lib::LOWEST_NON_DEPRECATED_COMPAT_LEVEL ; $i <= $version ; $i++) {
+for (my $i = Debian::Debhelper::Dh_Lib::LOWEST_VIRTUAL_DEBHELPER_COMPAT_LEVEL ; $i <= $version ; $i++) {
     push(@provides, "debhelper-compat (= $i)");
 }
 print "dh:CompatLevels=" . join(", ", @provides) . "\n";

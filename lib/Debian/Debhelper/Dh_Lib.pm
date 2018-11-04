@@ -15,6 +15,9 @@ use constant {
 	# Lowest compat level that does *not* cause deprecation
 	# warnings
 	'LOWEST_NON_DEPRECATED_COMPAT_LEVEL' => 9,
+	# Lowest compat level to generate "debhelper-compat (= X)"
+	# relations for.
+	'LOWEST_VIRTUAL_DEBHELPER_COMPAT_LEVEL' => 9,
 	# Highest compat level permitted
 	'MAX_COMPAT_LEVEL' => 12,
 	# Magic value for xargs
