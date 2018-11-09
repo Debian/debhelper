@@ -405,7 +405,7 @@ my @i = (qw{
 	dh_installinit
 },
    (!compat(10) ? qw(dh_installsystemd) : qw()),
-   (compat(12) ? qw(dh_installsystemduser) : qw()),
+   (!compat(11) ? qw(dh_installsystemduser) : qw()),
 
 qw{
 	dh_installmenu
