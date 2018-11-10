@@ -26,6 +26,10 @@ my %DEB_HOST2CMAKE_SYSTEM = (
 	'hurd'     => 'GNU',
 );
 
+my %GNU_CPU2SYSTEM_PROCESSOR = (
+	'powerpc64le' => 'ppc64le',
+);
+
 my %TARGET_BUILD_SYSTEM2CMAKE_GENERATOR = (
 	'makefile' => 'Unix Makefiles',
 	'ninja'    => 'Ninja',
@@ -101,7 +105,12 @@ sub configure {
 		} else {
 			error("Cannot cross-compile - CMAKE_SYSTEM_NAME not known for ${deb_host}");
 		}
-		push @flags, "-DCMAKE_SYSTEM_PROCESSOR=" . dpkg_architecture_value("DEB_HOST_GNU_CPU");
+		my $gnu_cpu = dpkg_architecture_value("DEB_HOST_GNU_CPU");
+		if (exists($GNU_CPU2SYSTEM_PROCESSOR{$gnu_cpu})) {
+			push @flags, "-DCMAKE_SYSTEM_PROCESSOR=" . $GNU_CPU2SYSTEM_PROCESSOR{$gnu_cpu};
+		} else {
+			push @flags, "-DCMAKE_SYSTEM_PROCESSOR=${gnu_cpu}";
+		}
 		if (not $ENV{CC}) {
 			push @flags, "-DCMAKE_C_COMPILER=" . dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-gcc";
 		}
