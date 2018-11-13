@@ -456,6 +456,7 @@ sub _doit {
 					chdir($dir) or error("chdir(\"${dir}\) failed: $!");
 				}
 			}
+			open(STDIN, '<', '/dev/null') or error("redirect STDIN failed: $!");
 			if (defined(my $output = $options->{stdout})) {
 				open(STDOUT, '>', $output) or error("redirect STDOUT failed: $!");
 			}
