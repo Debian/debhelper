@@ -5,7 +5,9 @@ debhelper (11.5.4) UNRELEASED; urgency=medium
     (which is what nohup(1) does).  Thanks to Julian Gilbey for reporting
     the issue and providing a sample patch for it as well.
     (Closes: #913663)
-  * dh_installman: Ditto.
+  * dh_installman: Check PATH for an executable man(1) rather than trying
+    to run "man --version".  This avoids awkward warnings when man is not
+    available or when stdin is open for writing rather than reading.
 
  -- Niels Thykier <niels@thykier.net>  Tue, 13 Nov 2018 20:30:49 +0000
 
