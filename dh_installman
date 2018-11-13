@@ -272,7 +272,7 @@ on_items_in_parallel(\@all_packages, sub {
 });
 
 # Now utf-8 conversion.
-if (has_man()) {
+if (defined(`man --version`)) {
 	my (@manpages_to_reencode, @issues);
 	for my $package (@{$dh{DOPACKAGES}}) {
 		next if is_udeb($package);
@@ -357,13 +357,6 @@ sub find_so_man {
 			push @sodests,$solink;
 		}
 	}
-}
-
-sub has_man {
-	for my $dir (split(':', $ENV{'PATH'})) {
-		return 1 if -x "${dir}/man";
-	}
-	return 0;
 }
 
 =head1 SEE ALSO
