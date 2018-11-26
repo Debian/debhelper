@@ -1,5 +1,6 @@
 debhelper (11.5.4) UNRELEASED; urgency=medium
 
+  [ Niels Thykier ]
   * Dh_Lib.pm: Reopen stdin to read from /dev/null in doit (and its sibling
     functions) to prevent issues when stdin is open in write-only mode
     (which is what nohup(1) does).  Thanks to Julian Gilbey for reporting
@@ -7,6 +8,11 @@ debhelper (11.5.4) UNRELEASED; urgency=medium
     (Closes: #913663)
   * fr.po: Add missing dash in "--parallel" in a translation.  Thanks to
     Christian Marillat for reporting the issue.  (Closes: #915255)
+
+  [ Luca Boccassi ]
+  * makefile.pm: revert passing V=0/1 to makefiles. Fixes FTBFS in apcupsd
+    (and possibly more).
+    (Closes: #914419)
 
  -- Niels Thykier <niels@thykier.net>  Tue, 13 Nov 2018 20:30:49 +0000
 
