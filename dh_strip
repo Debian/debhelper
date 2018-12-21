@@ -291,6 +291,7 @@ sub make_debug {
 		} else {
 			# For dbgsyms, we need build-id (else it will not be
 			# co-installable).
+			warning("Could not find the BuildID in $file");
 			return if $use_build_id > 1;
 		}
 	}
