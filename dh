@@ -1071,6 +1071,9 @@ sub can_skip {
 				return 0 if pkgfile($pkgs, $need) ne '';
 			} elsif ($type eq 'cli-options') {
 				$had_cli_options = 1;
+				# If cli-options is empty, we no the helper does not
+				# react to any thing and can always be skipped.
+				next if $need =~ m/^\s*$/;
 				# Long options are subject to abbreviations so it is
 				# very difficult to implement this optimization with
 				# long options.
