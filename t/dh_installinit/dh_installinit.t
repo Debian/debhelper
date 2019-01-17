@@ -29,6 +29,7 @@ each_compat_from_and_above_subtest(11, sub {
 	make_path(qw(debian/foo debian/bar debian/baz));
 
 	ok(run_dh_tool('dh_installinit'));
+	ok(! run_dh_tool({'quiet' => 1}, 'dh_installinit', '--name=missing'));
 	ok(! -e "debian/foo/lib/systemd/system/foo.service");
 	ok(!find_script('foo', 'postinst'));
 	ok(run_dh_tool('dh_clean'));
