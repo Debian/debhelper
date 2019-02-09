@@ -7,6 +7,14 @@ debhelper (12.1) UNRELEASED; urgency=medium
   * dh_strip: Print a warning when an ELF binary does not have a
     build-id (or when dh_strip cannot find it).
 
+  [ Niels Thykier ]
+  * Dh_Lib.pm: Strip leading and trailing whitespace from lines in
+    regular debhelper config files.  Whitespace-only lines from
+    executable config files are now explicitly detected and triggers
+    a human readable error message early rather than warnings/errors
+    about uninitialized variables.   Thanks to Ben Finney for the
+    suggestion and the initial patch.  (Closes: #919853)
+
  -- Niels Thykier <niels@thykier.net>  Fri, 04 Jan 2019 18:27:58 +0100
 
 debhelper (12) unstable; urgency=medium

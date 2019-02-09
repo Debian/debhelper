@@ -1387,9 +1387,17 @@ sub filedoublearray {
 	my @ret;
 	while (<DH_FARRAY_IN>) {
 		chomp;
-		if (not $x)  {
-			next if /^#/ || /^$/;
+		if ($x) {
+			if (m/^\s++$/) {
+				error("Executable config file $file produced a non-empty whitespace-only line");
+			}
+		} else {
+			s/^\s++//;
+			next if /^#/;
+			s/\s++$//;
 		}
+		# We always ignore/permit empty lines
+		next if $_ eq '';
 		my @line;
 
 		if (defined($globdir) && ! $x) {
