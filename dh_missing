@@ -59,8 +59,12 @@ Wildcards without matches will be ignored.
 
 Warn on stderr about source files not installed to somewhere.
 
-Note that files that are excluded from being moved via the B<-X> option are not
-warned about.
+Note that many dh-tools acting on a path will mark the path as
+installed even if it has been excluded via B<-X> or B<--exclude>.
+This is also seen when a dh-tool is acting on a directory and
+exclusion is used to ignore some files in the directory.  In either
+case, this will make B<dh_missing> silently assume the excluded files
+have been handled.
 
 This is the default in compat 12 and later.
 
