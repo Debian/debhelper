@@ -91,7 +91,12 @@ on_pkgs_in_parallel {
 		# structure that will be effected.
 		next unless -d $tmp;
 		my $ignore_doc_dirs = '-name _sources';
-		$ignore_doc_dirs .= qq{ -o -path "usr/share/doc/$package/examples"} if not compat(11);
+		if (not compat(11)) {
+			my $target_package = compute_doc_main_package($package);
+			$ignore_doc_dirs .= qq{ -o -path "usr/share/doc/${package}/examples"};
+			$ignore_doc_dirs .= qq{ -o -path "usr/share/doc/${target_package}/examples"}
+				if $target_package and $target_package ne $package;
+		}
 		$olddir = getcwd() if not defined $olddir;
 		verbose_print("cd $tmp");
 		chdir($tmp) || error("Can't cd to $tmp: $!");
