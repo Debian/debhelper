@@ -1,4 +1,4 @@
-debhelper (12.2.5) UNRELEASED; urgency=medium
+debhelper (12.3) UNRELEASED; urgency=medium
 
   [ Translations ]
   * Update Portuguese translation (Américo Monteiro)  (Closes: #927394)
@@ -16,6 +16,13 @@ debhelper (12.2.5) UNRELEASED; urgency=medium
     --dwz-multifile.  (Closes: #933541)
   * dh_dwz: Skip multifile generation for udeb packages.
     (Closes: #933212)
+  * dh_makeshlibs: Attempt to automatically detect udeb packages
+    for a given (non-udeb) library package.  In simple cases, it
+    can replace the need for an explicit --add-udeb parameter.
+    However, there are many cases where the auto-detection falls
+    short and --add-udeb is still needed (see dh_makeshlibs(1)
+    for details).  Packagers are advised to verify the resulting
+    shlibs file before removing --add-udeb in an upload.
 
  -- Niels Thykier <niels@thykier.net>  Sun, 21 Jul 2019 18:40:38 +0000
 

@@ -26,6 +26,21 @@ it finds shared libraries.  Since debhelper 9.20151004, this is done via a
 dpkg trigger.  In older versions of debhelper, B<dh_makeshlibs> would
 generate a maintainer script for this purpose.
 
+Since debhelper 12.3, B<dh_makeshlibs> will by default add an additional
+I<udeb> line for udebs in the shlibs file, when the udeb has the same
+name as the deb followed by a "-udeb" suffix (e.g. if the deb is called
+"libfoo1", then debhelper will auto-detect the udeb if it is named
+"libfoo1-udeb"). Please use the B<--add-udeb> and B<--no-add-udeb> options
+below when this auto-detection is insufficient.
+
+If you previously used B<--add-udeb> and is considering to migrate to
+using the auto-detection new auto-detection feature in 12.3, then
+please remember to test that the resulting F<DEBIAN/shlibs> files are
+as expected.  There are some known corner cases, where the
+auto-detection is insufficient.  These include when the udeb contains
+library files from multiple regular deb packages or when the packages
+do not follow the expected naming convention.
+
 =head1 FILES
 
 =over 4
@@ -146,6 +161,15 @@ from being treated as shared libraries.
 Create an additional line for udebs in the shlibs file and use I<udeb> as the
 package name for udebs to depend on instead of the regular library package.
 
+This is option is only useful for special cases such as when debhelper
+cannot auto-detect package name of the udeb package or when the udeb
+will contain libaries from multiple deb packages.
+
+=item B<--no-add-udeb>
+
+Do not add any udeb lines to the shlibs file.  This can be used to disable the
+default auto-detection of udebs.
+
 =item B<--> I<params>
 
 Pass I<params> to L<dpkg-gensymbols(1)>.
@@ -177,11 +201,14 @@ Generates a shlibs file that looks something like:
 
 =cut
 
+my $shlibs_udeb;
+
 init(options => {
 	"m=s", => \$dh{M_PARAMS},
 	"major=s" => \$dh{M_PARAMS},
 	"version-info:s" => \$dh{V_FLAG},
-	"add-udeb=s" => \$dh{SHLIBS_UDEB},
+	"add-udeb=s" => \$shlibs_udeb,
+	"no-add-udeb" => sub { $shlibs_udeb = ''; },
 });
 
 my $ok=1;
@@ -210,9 +237,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# because only if we can get a library name and a major number from
 	# objdump is anything actually added.
 	my $exclude='';
-	my (@udeb_lines, @deb_lines, @lib_files);
+	my (@udeb_lines, @deb_lines, @lib_files, $udeb_name);
 	if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
 		$exclude="! \\( $dh{EXCLUDE_FIND} \\) ";
+	}
+	if (defined($shlibs_udeb) && $shlibs_udeb ne '') {
+		$udeb_name = $shlibs_udeb;
+	} else {
+		my $guessed_udeb = "${package}-udeb";
+		$udeb_name = $guessed_udeb if is_known_package($guessed_udeb) and is_udeb($guessed_udeb);
 	}
 	open (FIND, "test -d $tmp && find $tmp -type f \\( -name '*.so' -or -name '*.so.*' \\) $exclude | LC_ALL=C sort |");
 	while (my $lib_file = <FIND>) {
@@ -278,9 +311,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			if (! $seen{$line}) {
 				$seen{$line}=1;
 				push(@deb_lines, $line);
-				if (defined($dh{SHLIBS_UDEB}) && $dh{SHLIBS_UDEB} ne '') {
+				if (defined($udeb_name) && $udeb_name ne '') {
 					my $udeb_deps = $deps;
-					$udeb_deps =~ s/\Q$package\E/$dh{SHLIBS_UDEB}/e;
+					$udeb_deps =~ s/\Q$package\E/$udeb_name/e;
 					$line="udeb: $library $major $udeb_deps";
 					push @udeb_lines, $line;
 				}
