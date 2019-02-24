@@ -166,6 +166,7 @@ qw(
 	DEFAULT_PACKAGE_TYPE
 	DBGSYM_PACKAGE_TYPE
 	DH_BUILTIN_VERSION
+	is_known_package
 	assert_opt_is_known_package
 	restore_all_files
 
@@ -2658,10 +2659,16 @@ sub dbgsym_tmpdir {
 
 {
 	my %known_packages;
+	sub is_known_package {
+		my ($package) = @_;
+		%known_packages = map { $_ => 1 } getpackages() if not %known_packages;
+		return 1 if exists($known_packages{$package});
+		return 0
+	}
+
 	sub assert_opt_is_known_package {
 		my ($package, $method) = @_;
-		%known_packages = map { $_ => 1 } getpackages() if not %known_packages;
-		if (not exists($known_packages{$package})) {
+		if (not is_known_package($package)) {
 			error("Requested unknown package $package via $method, expected one of: " . join(' ', getpackages()));
 		}
 		return 1;
