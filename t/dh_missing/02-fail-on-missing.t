@@ -28,6 +28,6 @@ each_compat_subtest {
 	isnt($?, -1, 'dh_missing was executed');
 	ok(! ($? & 127), 'dh_missing did not die due to a signal');
 	my $exitcode = ($? >> 8);
-	is($exitcode, 2, 'dh_missing exited with exit code 2');
+	is($exitcode, 255, 'dh_missing exited with exit code 255');
 };
 

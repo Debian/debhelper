@@ -761,8 +761,9 @@ sub nonquiet_print {
 
 # Output an error message and die (can be caught).
 sub error {
-	my $message=shift;
-
+	my ($message) = @_;
+	# ensure the error code is well defined.
+	$! = 255;
 	die basename($0).": $message\n";
 }
 
