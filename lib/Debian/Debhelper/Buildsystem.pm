@@ -122,10 +122,17 @@ sub new {
 
 	if (defined($target_bs_name)) {
 		my %target_opts = %opts;
+		# Let the target know it is used as a target build system.
+		# E.g. the makefile has special cases based on whether it is
+		# the main or a target build system.
 		delete($target_opts{'targetbuildsystem'});
+		$target_opts{'_is_targetbuildsystem'} = 1;
 		my $target_system =_create_buildsystem_instance($target_bs_name, 1, %target_opts);
 		$this->set_targetbuildsystem($target_system);
 	}
+
+	$this->{'_is_targetbuildsystem'} = $opts{'_is_targetbuildsystem'}
+	  if exists($opts{'_is_targetbuildsystem'});
 
 	if (exists $opts{sourcedir}) {
 		# Get relative sourcedir abs_path (without symlinks)
@@ -197,6 +204,12 @@ sub set_targetbuildsystem {
 		error("Buildsystem ${name} does not support ${target_bs_name} as target build system.");
 	}
 	$this->{'targetbuildsystem'} = $target_system
+}
+
+sub _is_targetbuildsystem {
+	my ($this) = @_;
+	return 0 if not exists($this->{'_is_targetbuildsystem'});
+	return $this->{'_is_targetbuildsystem'};
 }
 
 # Returns the target build system if it is provided
