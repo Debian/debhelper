@@ -27,6 +27,7 @@ my %DEB_HOST2CMAKE_SYSTEM = (
 );
 
 my %GNU_CPU2SYSTEM_PROCESSOR = (
+	'mips64el'    => 'mips64',
 	'powerpc64le' => 'ppc64le',
 );
 
