@@ -109,19 +109,26 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}, @dirs if @dirs;
 
 	# find scripts
-	find sub {
-		return unless -f and (-x _ or /\.pl$/);
-		if ($File::Find::dir =~ m{/usr/share/doc/}) {
-			$File::Find::prune = 1 if -d _;
+	$tmp =~ tr:/:/:s;
+	$tmp =~ s{[^/]\K/$}{};
+	my $usd_dir = "$tmp/usr/share/doc";
+	my $check_script = sub {
+		if ($_ eq $usd_dir) {
+			$File::Find::prune = 1 if -d $_;
 			return;
 		}
+		return unless -f and (-x _ or /\.pl$/);
 
 		return unless open(my $fd, '<', $_);
 		if (read($fd, local $_, 32) and m%^#!\s*(/usr/bin/perl|/usr/bin/env\s+perl)\s%) {
 			$deps |= PROGRAM;
 		}
 		close($fd);
-	}, $tmp;
+	};
+	find({
+		wanted => $check_script,
+		no_chdir => 1,
+	}, $tmp);
 
 	if ($deps) {
 		my $version="";
