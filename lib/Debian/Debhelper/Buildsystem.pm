@@ -428,30 +428,6 @@ sub check_auto_buildable_clean_oos_buildir {
 	return 1;
 }
 
-sub _cd {
-	my ($this, $dir)=@_;
-	verbose_print("cd $dir");
-	if (! $dh{NO_ACT}) {
-		chdir $dir or error("error: unable to chdir to $dir");
-	}
-}
-
-sub _in_dir {
-	my ($this, $dir, $code, @args) = @_;
-	if ($dir ne '.') {
-		my $ret;
-		$this->_cd($dir);
-		eval {
-			$ret = $code->(@args);
-		};
-		my $saved_exception = $@;
-		$this->_cd($this->_rel2rel($this->{cwd}, $dir));
-		die $saved_exception if $saved_exception;
-		return $ret;
-	}
-	return $code->(@args);
-}
-
 sub _generic_doit_in_dir {
 	my ($this, $dir, $sub, @args) = @_;
 	my %args;
