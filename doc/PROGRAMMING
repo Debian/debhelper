@@ -248,7 +248,11 @@ autoscript($package, $scriptname, $snippetname, $substparam)
 	Pass parameters:
 	 - binary package to be affected
 	 - script to add to
-	 - filename of snippet
+	 - filename of snippet. For testing purposes, you can set the
+	   environment variable DH_AUTOSCRIPTDIR to a directory contaning
+	   the snippets, which can be used to shadow the snippets provided
+	   in /usr/share/debhelper/autoscripts (or to test newly added
+	   snippets).
 	 - (optional) A substitution parameter, which is one of 3 times:
 	   * sed commands to run on the snippet. E.g. s/#PACKAGE#/$PACKAGE/
 	     Note: Passed to the shell inside double quotes.
