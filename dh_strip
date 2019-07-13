@@ -260,12 +260,14 @@ sub write_buildid_file {
 sub get_file_type {
 	my ($file, $cache_ok) = @_;
 	return $file_output{$file} if $cache_ok && $file_output{$file};
-	open (FILE, '-|') # handle all filenames safely
-		|| exec('file', '-e', 'apptype', '-e', 'ascii', '-e', 'encoding',
-				'-e', 'cdf', '-e', 'compress', '-e', 'tar', $file)
-		|| die "can't exec file: $!";
-	my $type=<FILE>;
-	close FILE;
+	my @cmdline = ('file', '-e', 'apptype', '-e', 'ascii', '-e', 'encoding', '-e', 'cdf', '-e', 'compress', '-e',
+		'tar', $file);
+
+	open(my $fd, '-|', @cmdline) // error("cannot fork+exec file: $!");
+	my $type = <$fd>;
+	close($fd) || error_exitcode(escape_shell(@cmdline));
+
+	error("file(1) gave no result for $file!?") if (not $type) ;
 	return $file_output{$file} = $type;
 }
 
