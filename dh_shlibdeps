@@ -110,8 +110,9 @@ if (defined $dh{V_FLAG}) {
 on_pkgs_in_parallel {
 	my $is_non_statically_linked_elf_file = sub {
 		my ($file) = @_;
-		my $ff = qx_cmd('file', '--brief', '-e', 'apptype', '-e', 'ascii', '-e', 'encoding',
-						'-e', 'cdf', '-e', 'compress', '-e', 'tar', $file);
+		my @file_args = Debian::Debhelper::Dh_Lib::_internal_optional_file_args();
+		my $ff = qx_cmd('file', @file_args, '--brief', '-e', 'apptype', '-e', 'ascii',
+						'-e', 'encoding', '-e', 'cdf', '-e', 'compress', '-e', 'tar', $file);
 		return 1 if $ff =~ m/^ELF/ && $ff !~ /statically linked/;
 		return 0;
 	};

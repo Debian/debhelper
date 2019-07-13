@@ -2676,4 +2676,23 @@ sub dbgsym_tmpdir {
 	}
 }
 
+{
+	my $_disable_file_seccomp;
+	sub _internal_optional_file_args {
+		if (not defined($_disable_file_seccomp)) {
+			my $consider_disabling_seccomp = 0;
+			if ($ENV{'FAKEROOTKEY'} or ($ENV{'LD_PRELOAD'}//'') =~ m/fakeroot/) {
+				$consider_disabling_seccomp = 1;
+			}
+			if ($consider_disabling_seccomp) {
+				my $has_no_sandbox = (qx_cmd('file', '--help') // '') =~ m/--no-sandbox/;
+				$consider_disabling_seccomp = 0 if not $has_no_sandbox;
+			}
+			$_disable_file_seccomp = $consider_disabling_seccomp;
+		}
+		return ('--no-sandbox') if $_disable_file_seccomp;
+		return;
+	}
+}
+
 1

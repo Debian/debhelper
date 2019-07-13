@@ -260,8 +260,9 @@ sub write_buildid_file {
 sub get_file_type {
 	my ($file, $cache_ok) = @_;
 	return $file_output{$file} if $cache_ok && $file_output{$file};
-	my @cmdline = ('file', '--brief', '-e', 'apptype', '-e', 'ascii', '-e', 'encoding', '-e', 'cdf', '-e', 'compress',
-		'-e', 'tar', $file);
+	my @file_args = Debian::Debhelper::Dh_Lib::_internal_optional_file_args();
+	my @cmdline = ('file', @file_args, '--brief', '-e', 'apptype', '-e', 'ascii', '-e', 'encoding', '-e', 'cdf',
+				   '-e', 'compress', '-e', 'tar', $file);
 
 	open(my $fd, '-|', @cmdline) // error("cannot fork+exec file: $!");
 	my $type = <$fd>;
