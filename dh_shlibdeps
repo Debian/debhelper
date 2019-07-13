@@ -128,9 +128,9 @@ on_pkgs_in_parallel {
 				next if $file =~ m!^\Q$tmp\E/usr/lib/debug/(lib|lib64|usr|bin|sbin|opt|dev|emul|\.build-id)/!;
 				# TODO this is slow, optimize. Ie, file can run once on
 				# multiple files..
-				my $ff = qx_cmd('file', '-e', 'apptype', '-e', 'ascii', '-e', 'encoding',
+				my $ff = qx_cmd('file', '--brief', '-e', 'apptype', '-e', 'ascii', '-e', 'encoding',
 					'-e', 'cdf', '-e', 'compress', '-e', 'tar', $file);
-				if ($ff =~ m/ELF/ && $ff !~ /statically linked/) {
+				if ($ff =~ m/^ELF/ && $ff !~ /statically linked/) {
 					push @filelist, $file;
 				}
 			}
@@ -158,9 +158,9 @@ on_pkgs_in_parallel {
 				return if not is_so_or_exec_elf_file($fn);
 				# TODO this is slow, optimize. Ie, file can run once on
 				# multiple files..
-				my $ff = qx_cmd('file', '-e', 'apptype', '-e', 'ascii', '-e', 'encoding',
+				my $ff = qx_cmd('file', '--brief', '-e', 'apptype', '-e', 'ascii', '-e', 'encoding',
 					'-e', 'cdf', '-e', 'compress', '-e', 'tar', $fn);
-				if ($ff =~ m/ELF/ && $ff !~ /statically linked/) {
+				if ($ff =~ m/^ELF/ && $ff !~ /statically linked/) {
 					push(@filelist, $fn);
 				}
 			};

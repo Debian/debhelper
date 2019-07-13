@@ -205,7 +205,7 @@ sub testfile {
 		if ($fn =~ m/\.(?:so.*?|cmxs|node)$/) {
 			# Ok, do the expensive test.
 			my $type = get_file_type($fn, 1);
-			if ($type =~ m/ELF.*shared/) {
+			if ($type =~ m/^ELF.*shared/) {
 				push @shared_libs, $fn;
 				return;
 			}
@@ -215,7 +215,7 @@ sub testfile {
 		if ($mode & 0111) {
 			# Ok, expensive test.
 			my $type = get_file_type($fn, 1);
-			if ($type =~ m/ELF.*(executable|shared)/) {
+			if ($type =~ m/^ELF.*(executable|shared)/) {
 				push(@executables, $fn);
 				return;
 			}
@@ -260,8 +260,8 @@ sub write_buildid_file {
 sub get_file_type {
 	my ($file, $cache_ok) = @_;
 	return $file_output{$file} if $cache_ok && $file_output{$file};
-	my @cmdline = ('file', '-e', 'apptype', '-e', 'ascii', '-e', 'encoding', '-e', 'cdf', '-e', 'compress', '-e',
-		'tar', $file);
+	my @cmdline = ('file', '--brief', '-e', 'apptype', '-e', 'ascii', '-e', 'encoding', '-e', 'cdf', '-e', 'compress',
+		'-e', 'tar', $file);
 
 	open(my $fd, '-|', @cmdline) // error("cannot fork+exec file: $!");
 	my $type = <$fd>;
