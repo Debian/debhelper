@@ -1149,6 +1149,15 @@ that require a debhelper addon to be run during multiple builds without
 having to patch a large number of rules file. If at all possible, this should
 be avoided in favor of a --with flag in the rules file.
 
+=item B<CFLAGS>, B<CPPFLAGS>, B<CXXFLAGS>, B<OBJCFLAGS>, B<OBJCXXFLAGS>, B<GCJFLAGS>, B<FFLAGS>, B<FCFLAGS>, B<LDFLAGS>
+
+By default (in any non-deprecated compat level), debhelper will automatically
+set these flags by using L<dpkg-buildflags(1)>, when they are unset.  If you
+need to change the default flags, please use the features from
+L<dpkg-buildflags(1)> to do this (e.g. B<DEB_BUILD_MAINT_OPTIONS=hardening=all>
+or B<DEB_CPPFLAGS_MAINT_APPEND=-DCUSTOM_MACRO=true>) rather than setting the
+concrete variable directly.
+
 =back
 
 =head1 SEE ALSO
