@@ -101,10 +101,15 @@ error in compat 12.
 
 =item B<-D>I<TOKEN=VALUE>, B<--define> I<TOKEN=VALUE>
 
-Request that B<< #I<TOKEN># >> in the maintainer script is replaced
-by I<VALUE>.  If I<VALUE> starts with a literal I<@>-sign, then
-I<VALUE> is expected to point to a file containing the actual value
-to insert.
+Define tokens to be replaced inside the maintainer scripts when
+it is generated.  Please note that the limitations described in
+L</Limitations in token names> also applies to tokens defined
+on the command line.
+
+In the simple case, this parameter will cause B<< #I<TOKEN># >>
+to be replaced by I<VALUE>.  If I<VALUE> starts with a literal
+I<@>-sign, then I<VALUE> is expected to point to a file
+containing the actual value to insert.
 
 An explicit declared token with this parameter will replace built-in
 tokens.
@@ -115,8 +120,41 @@ Test examples to aid with the understanding:
 	#SIMPLE#
 	#FILEBASED#
 	EOF
-	echo "Complex value" > some-file
+	echo -n "Complex value" > some-file
     dh_installdeb --define SIMPLE=direct --define FILEBASED=@some-file
+
+In this example, B<#SIMPLE#> will expand to B<direct> and B<#FILEBASED#>
+will expand to B<Complex value>.
+
+It is also possible to do set package-specific values for a given
+token.  This is useful when B<dh_installdeb> is acting on multiple
+packages that need different values for the same token.  This is
+done by prefixing the token name with B<< pkg.I<package-name>. >>.
+
+This can be used as in the following example:
+
+	cat >> debian/foo.postinst <<EOF
+	# Script for #PACKAGE#
+	#TOKEN#
+	EOF
+	cat >> debian/bar.postinst <<EOF
+	# Script for #PACKAGE#
+	#TOKEN#
+	EOF
+	cat >> debian/baz.postinst <<EOF
+	# Script for #PACKAGE#
+	#TOKEN#
+	EOF
+    dh_installdeb -pfoo -pbar -pbaz  --define TOKEN=default --define pkg.bar.TOKEN=unique-bar-value \
+      --define pkg.baz.TOKEN=unique-baz-value
+
+In this example, B<#TOKEN#> will expand to B<default> in F<debian/foo.postinst>,
+to B<unique-bar-value> in F<debian/bar.postinst> and to B<unique-baz-value>
+in F<debian/baz.postinst>.
+
+Note that the B<#pkg.*#> tokens will be visible in all scripts acted on.  E.g.
+you can refer to B<#pkg.bar.TOKEN#> inside F<debian/foo.postinst> and it will
+be replaced by B<unique-bar-value>.
 
 =back
 
@@ -254,10 +292,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	# Install debian scripts.
-	my %package_subst = %PROVIDED_SUBST;
-	$package_subst{'PACKAGE'} = $package if not exists($package_subst{'PACKAGE'});
+	my $package_subst = per_package_subst($package, \%PROVIDED_SUBST);
 	foreach my $script (qw{postinst preinst prerm postrm}) {
-		debhelper_script_subst($package, $script, \%package_subst);
+		debhelper_script_subst($package, $script, $package_subst);
 	}
 
 	# Install non-executable files
@@ -349,6 +386,19 @@ sub _maybe_error {
 	} else {
 		error($msg);
 	}
+}
+
+sub per_package_subst {
+	my ($package, $provided_subst) = @_;
+	my %vars = %{$provided_subst};
+	$vars{'PACKAGE'} = $package if not exists($vars{'PACKAGE'});
+	for my $var (keys(%{$provided_subst})) {
+		if ($var =~ m/^pkg[.]\Q${package}\E[.](.+)$/) {
+			my $new_key = $1;
+			$vars{$new_key} = $provided_subst->{$var};
+		}
+	}
+	return \%vars;
 }
 
 =head1 SEE ALSO
