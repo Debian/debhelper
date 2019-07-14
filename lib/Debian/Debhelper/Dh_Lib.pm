@@ -1998,43 +1998,66 @@ sub _concat_slurp_script_files {
 	return $res;
 }
 
+sub _substitution_generator {
+	my ($input) = @_;
+	my $cache = {};
+	return sub {
+		my ($orig_key) = @_;
+		return $cache->{$orig_key} if exists($cache->{$orig_key});
+		my $value = exists($input->{$orig_key}) ? $input->{$orig_key} : undef;
+		if (not defined($value)) {
+			if ($orig_key =~ m/^DEB_(?:BUILD|HOST|TARGET)_/) {
+				$value = dpkg_architecture_value($orig_key);
+			} elsif ($orig_key =~ m{^ENV[.](\S+)$}) {
+				$value = $ENV{$1} // '';
+			}
+		} elsif (ref($value) eq 'CODE') {
+			$value = $value->($orig_key);
+		} elsif ($value =~ s/^@//) {
+			$value = _concat_slurp_script_files($value);
+		}
+		$cache->{$orig_key} = $value;
+		return $value;
+	};
+}
+
 # Handles #DEBHELPER# substitution in a script; also can generate a new
 # script from scratch if none exists but there is a .debhelper file for it.
 sub debhelper_script_subst {
-	my $package=shift;
-	my $script=shift;
-	
+	my ($package, $script, $extra_vars) = @_;
+
 	my $tmp=tmpdir($package);
 	my $ext=pkgext($package);
 	my $file=pkgfile($package,$script);
+	my %variables = defined($extra_vars) ? %{$extra_vars} : ();
 	my $service_script = generated_file($package, "${script}.service", 0);
 	my @generated_scripts = ("debian/$ext$script.debhelper", $service_script);
+	my $subst;
+	@generated_scripts = grep { -f } @generated_scripts;
 	if ($script eq 'prerm' or $script eq 'postrm') {
 		@generated_scripts = reverse(@generated_scripts);
 	}
-	@generated_scripts = grep { -f } @generated_scripts;
+	if (not exists($variables{'DEBHELPER'})) {
+		$variables{'DEBHELPER'} = sub {
+			return _concat_slurp_script_files(@generated_scripts);
+		};
+	}
+	$subst = _substitution_generator(\%variables);
 
 	if ($file ne '') {
-		if (@generated_scripts) {
-			if ($dh{VERBOSE}) {
-				verbose_print('cp -f ' . escape_shell($file) . " $tmp/DEBIAN/$script");
-				verbose_print("perl -p -i -e \"s~#DEBHELPER#~qx{cat @generated_scripts}~eg\" $tmp/DEBIAN/$script");
+		if ($dh{VERBOSE}) {
+			verbose_print('cp -f ' . escape_shell($file) . " $tmp/DEBIAN/$script");
+			verbose_print("[META] Replace #TOKEN#s in \"$tmp/DEBIAN/$script\"");
+		}
+		if (not $dh{NO_ACT}) {
+			open(my $out_fd, '>', "$tmp/DEBIAN/$script") or error("open($tmp/DEBIAN/$script) failed: $!");
+			open(my $in_fd, '<', $file) or error("open($file) failed: $!");
+			while (my $line = <$in_fd>) {
+				$line =~ s{#([A-Za-z0-9_.]+)#}{$subst->($1) // "#${1}#"}ge;
+				print {$out_fd} $line;
 			}
-			# Add this into the script, where it has #DEBHELPER#
-			my $text = _concat_slurp_script_files(@generated_scripts);
-			if (not $dh{NO_ACT}) {
-				open(my $out_fd, '>', "$tmp/DEBIAN/$script") or error("open($tmp/DEBIAN/$script) failed: $!");
-				open(my $in_fd, '<', $file) or error("open($file) failed: $!");
-				while (my $line = <$in_fd>) {
-					$line =~ s/#DEBHELPER#/$text/g;
-					print {$out_fd} $line;
-				}
-				close($in_fd);
-				close($out_fd) or error("close($tmp/DEBIAN/$script) failed: $!");
-			}
-		} else {
-			# Just get rid of any #DEBHELPER# in the script.
-			doit({ stdout => "$tmp/DEBIAN/$script" }, 'sed', 's/#DEBHELPER#//', $file);
+			close($in_fd);
+			close($out_fd) or error("close($tmp/DEBIAN/$script) failed: $!");
 		}
 		reset_perm_and_owner('0755', "$tmp/DEBIAN/$script");
 	}
