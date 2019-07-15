@@ -232,6 +232,12 @@ init(options => {
 
 my %snippet_options = ('snippet-order' => 'service');
 
+if (my $name = $dh{NAME}) {
+	if (!grep { -f "debian/$_.${name}.init" } @{$dh{DOPACKAGES}}) {
+		error("--name=$dh{NAME} option specified, but init script not found");
+	}
+}
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 
@@ -310,10 +316,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	my $init=pkgfile($package,$scriptsrc) || pkgfile($package,"init") ||
 		pkgfile($package,"init.d");
-
-	if (!$init && defined $dh{NAME}) {
-		error("--name=$dh{NAME} option specified, but init script not found");
-	}
 
 	if ($init ne '' && ! $dh{ONLYSCRIPTS}) {
 		install_dir("$tmp/etc/init.d");

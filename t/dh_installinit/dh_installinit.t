@@ -12,6 +12,7 @@ our @TEST_DH_EXTRA_TEMPLATE_FILES = (qw(
     debian/changelog
     debian/control
     debian/foo.service
+    debian/bar.other.init
 ));
 
 plan(tests => 2);
@@ -30,6 +31,7 @@ each_compat_from_and_above_subtest(11, sub {
 
 	ok(run_dh_tool('dh_installinit'));
 	ok(! run_dh_tool({'quiet' => 1}, 'dh_installinit', '--name=missing'));
+	ok(  run_dh_tool({'queit' => 1}, 'dh_installinit', '--name=other'));
 	ok(! -e "debian/foo/lib/systemd/system/foo.service");
 	ok(!find_script('foo', 'postinst'));
 	ok(run_dh_tool('dh_clean'));
