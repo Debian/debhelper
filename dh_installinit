@@ -233,8 +233,8 @@ init(options => {
 my %snippet_options = ('snippet-order' => 'service');
 
 if (my $name = $dh{NAME}) {
-	if (!grep { -f "debian/$_.${name}.init" } @{$dh{DOPACKAGES}}) {
-		error("--name=$dh{NAME} option specified, but init script not found");
+	if (!grep { -f "debian/$_.${name}.init" || -f "debian/$_.${name}.default" } @{$dh{DOPACKAGES}}) {
+		error("--name=$dh{NAME} option specified, but init script nor default file not found");
 	}
 }
 
