@@ -11,7 +11,8 @@ use warnings;
 use Debian::Debhelper::Dh_Lib;
 use Getopt::Long;
 
-my (%exclude_package, %profile_enabled_packages, $profile_excluded_pkg);
+my (%exclude_package, %internal_excluded_package, %explicitly_reqested_packages, %profile_enabled_packages,
+	$profile_excluded_pkg);
 
 sub showhelp {
 	my $prog=basename($0);
@@ -43,6 +44,7 @@ sub AddPackage { my($option,$value)=@_;
 	elsif ($option eq 'p' or $option eq 'package') {
 		assert_opt_is_known_package($value, '-p/--package');
 		%profile_enabled_packages = map { $_ => 1 } getpackages('both') if not %profile_enabled_packages;
+		$explicitly_reqested_packages{$value} = 1;
 		# Silently ignore packages that are not enabled by the
 		# profile.
 		if (exists($profile_enabled_packages{$value})) {
@@ -215,7 +217,8 @@ sub parseopts {
 		if (defined $dh{DOPACKAGES}) {
 			foreach my $package (getpackages()) {
 				if (! grep { $_ eq $package } @{$dh{DOPACKAGES}}) {
-					$exclude_package{$package}=1;
+					$exclude_package{$package} = 1;
+					$internal_excluded_package{$package} = 1;
 				}
 			}
 		}
@@ -293,10 +296,26 @@ sub parseopts {
 	if (! defined $dh{DOPACKAGES} || ! @{$dh{DOPACKAGES}}) {
 		if (! $dh{BLOCK_NOOP_WARNINGS}) {
 			my %archs;
+			if (%explicitly_reqested_packages) {
+				# Avoid sending a confusing error message when debhelper must exclude a package given via -p.
+				# This commonly happens due to Build-Profiles or/and when build only a subset of the packages
+				# (e.g. dpkg-buildpackage -A vs. -B vs. none of the options)
+				for my $pkg (sort(keys(%explicitly_reqested_packages))) {
+					if (exists($internal_excluded_package{$pkg}) or not exists($profile_enabled_packages{$pkg})) {
+						delete($explicitly_reqested_packages{$pkg});
+					}
+				}
+				if (not %explicitly_reqested_packages) {
+					warning('All requested packages have been excluded'
+						. ' (e.g. via a Build-Profile or due to architecture restrictions).');
+					exit(0);
+				}
+			}
 			for my $pkg (getpackages()) {
 				$archs{package_declared_arch($pkg)} = 1;
 			}
-			warning("No packages to build. Architecture mismatch: " . hostarch() . ", want: " . join(" ", sort keys %archs));
+			warning("No packages to build. Possible architecture mismatch: " . hostarch() .
+				", want: " . join(" ", sort keys %archs));
 		}
 		exit(0);
 	}
