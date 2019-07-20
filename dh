@@ -1050,50 +1050,47 @@ sub can_skip {
 	my ($all_pkgs, $had_cli_options);
 
 	foreach my $skipinfo (@skipinfo) {
+		my $type = 'pkgfile';
+		my $need = $skipinfo;
 		if ($skipinfo=~/^([a-zA-Z0-9-_]+)\((.*)\)$/) {
-			my $type = $1;
-			my $need = $2;
-			if ($type eq 'tmp') {
-				foreach my $package (@packages) {
-					my $tmp = tmpdir($package);
-					return 0 if -e "$tmp/$need";
-				}
-			} elsif ($type eq 'pkgfile' or $type eq 'pkgfile-logged') {
-				my $pkgs;
-				if ($type eq 'pkgfile') {
-					$pkgs = \@packages;
-				}
-				else {
-					$all_pkgs //= [ getpackages() ];
-					$pkgs = $all_pkgs;
-				}
-				# Use the secret bulk check call
-				return 0 if pkgfile($pkgs, $need) ne '';
-			} elsif ($type eq 'cli-options') {
-				$had_cli_options = 1;
-				# If cli-options is empty, we no the helper does not
-				# react to any thing and can always be skipped.
-				next if $need =~ m/^\s*$/;
-				# Long options are subject to abbreviations so it is
-				# very difficult to implement this optimization with
-				# long options.
-				return 0 if $long_options_seen;
-				$need =~ s/(?:^|\s)BUILDSYSTEM(?:\s|$)/${\UNSKIPPABLE_CLI_OPTIONS_BUILD_SYSTEM}/;
-				my @behavior_options = split(qr/\Q|\E/, $need);
-				for my $opt (@behavior_options) {
-					return 0 if exists($seen_options{$opt});
-				}
-			} elsif ($type eq 'buildsystem') {
-				require Debian::Debhelper::Dh_Buildsystems;
-				my $system = Debian::Debhelper::Dh_Buildsystems::load_buildsystem(undef, $need);
-				return 0 if defined($system);
-			} else {
-				# Unknown hint - make no assumptions
-				return 0;
+			($type, $need) = ($1, $2);
+		}
+		if ($type eq 'tmp') {
+			foreach my $package (@packages) {
+				my $tmp = tmpdir($package);
+				return 0 if -e "$tmp/$need";
 			}
-		} else {
+		} elsif ($type eq 'pkgfile' or $type eq 'pkgfile-logged') {
+			my $pkgs;
+			if ($type eq 'pkgfile') {
+				$pkgs = \@packages;
+			} else {
+				$all_pkgs //= [ getpackages() ];
+				$pkgs = $all_pkgs;
+			}
 			# Use the secret bulk check call
-			return 0 if pkgfile(\@packages, $skipinfo) ne '';
+			return 0 if pkgfile($pkgs, $need) ne '';
+		} elsif ($type eq 'cli-options') {
+			$had_cli_options = 1;
+			# If cli-options is empty, we know the helper does not
+			# react to any thing and can always be skipped.
+			next if $need =~ m/^\s*$/;
+			# Long options are subject to abbreviations so it is
+			# very difficult to implement this optimization with
+			# long options.
+			return 0 if $long_options_seen;
+			$need =~ s/(?:^|\s)BUILDSYSTEM(?:\s|$)/${\UNSKIPPABLE_CLI_OPTIONS_BUILD_SYSTEM}/;
+			my @behavior_options = split(qr/\Q|\E/, $need);
+			for my $opt (@behavior_options) {
+				return 0 if exists($seen_options{$opt});
+			}
+		} elsif ($type eq 'buildsystem') {
+			require Debian::Debhelper::Dh_Buildsystems;
+			my $system = Debian::Debhelper::Dh_Buildsystems::load_buildsystem(undef, $need);
+			return 0 if defined($system);
+		} else {
+			# Unknown hint - make no assumptions
+			return 0;
 		}
 	}
 	return 0 if not $had_cli_options and %seen_options;
