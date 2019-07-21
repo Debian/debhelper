@@ -244,7 +244,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		push @enable_units, $name if contains_install_section($path);
 	}
 
-	@enable_units = map { quote($_) } sort uniq @enable_units;
+	@enable_units = map { quote($_) } sort(uniq(@enable_units));
 
 	if (@enable_units) {
 		# The generated maintainer script code blocks use the --user
