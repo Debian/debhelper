@@ -30,9 +30,17 @@ running L<dwz(1)> on all the ELF binaries in the package.
 =item B<--dwz-multifile>, B<--no-dwz-multifile>
 
 Whether L<dwz(1)> should generate a I<multifile> from the ELF binaries
-in the same package (it does by default).  When enabled, if a package
-ships at least 2 ELF binaries, B<dh_dwz> will instruct L<dwz(1)> to
-generate a multifile for the package.
+in the same package.  When enabled, if a package ships at least 2 ELF
+binaries, B<dh_dwz> will instruct L<dwz(1)> to generate a multifile
+for the package.
+
+By default, B<dh_dwz> will attempt to create a multifile but will
+continue without if L<dwz(1)> does create one (but succeeds anyway).
+This commonly happens when the debug files do not contain debug
+symbols (e.g. a missing -g to the compiler) or when the debug
+symbols are compressed (see Debian bug #931891).  If B<--dwz-multifile>
+is passed, then B<dh_dwz> will abort with an error if L<dwz(1)> does
+not create a multifile.
 
 Note this options may not work if a package contains more ELF binaries
 than can fit on a single command line.  If this becomes a problem,
@@ -68,7 +76,7 @@ test"-cycles) rather than optimizing for size.
 
 =cut
 
-my $create_multifile = 1;
+my $create_multifile = 'auto';
 
 init(options => {
 	'dwz-multifile!' => \$create_multifile,
@@ -120,7 +128,16 @@ for my $package (@{$dh{DOPACKAGES}}) {
 		my @dwz_options = ("-m${tmp}/${m}", "-M/${m}");
 		install_dir("${tmp}/${dwz_dir}");
 		doit('dwz', @dwz_options, @{$dh{U_PARAMS}}, '--', @{$unique_files});
-		doit($objcopy, '--compress-debug-sections', "${tmp}/${m}");
+		if ( -f "${tmp}/${m}") {
+			doit($objcopy, '--compress-debug-sections', "${tmp}/${m}");
+		} else {
+			error("dwz failed to create a multifile as requested") if $create_multifile ne 'auto';
+			warning("No dwz multifile created, but not explicitly requested either so ignoring it.");
+			warning("Common issues include no debug information at all (missing -g) and");
+			warning("compressed debug information (#931891).");
+			# Clean up after ourselves to avoid leaving empty directories in packages
+			doit('rmdir', '-p', '--ignore-fail-on-non-empty', "${tmp}/usr/lib/debug/.dwz/${ma_dir}");
+		}
 	} else {
 		xargs($unique_files, 'dwz', @{$dh{U_PARAMS}}, '--');
 	}

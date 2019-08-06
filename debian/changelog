@@ -10,6 +10,10 @@ debhelper (12.2.5) UNRELEASED; urgency=medium
   * dh_dwz: Remove the -q flag when calling dwz(1).  It is
     sufficiently silently with -q and aids with debugging for others.
     (Closes: #933561, #931792)
+  * dh_dwz: Gracefully handle when dwz fails to create a multifile
+    but succeeds anyway by default.  The previous behaviour of
+    insisting on a multifile can be obtained by explicitly passing
+    --dwz-multifile.  (Closes: #933541)
 
  -- Niels Thykier <niels@thykier.net>  Sun, 21 Jul 2019 18:40:38 +0000
 
