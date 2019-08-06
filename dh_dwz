@@ -49,6 +49,10 @@ please pass B<--no-dwz-multifile> to work around the issue.
 The generated multifile will be compressed with B<objcopy
 --compress-debug-sections>.
 
+Note for B<udeb> packages: B<dh_dwz> will never generate multifiles
+for B<udeb> packages.  It will still use B<dwz> to reduce the
+file size of debug files if it finds any.
+
 =item B<-X>I<item>, B<--exclude=>I<item>
 
 Exclude files that contain I<item> anywhere in their filename from being
@@ -120,7 +124,7 @@ for my $package (@{$dh{DOPACKAGES}}) {
 	# Consistent order;
 	@elf_files = sort(@elf_files);
 	my ($unique_files, $hardlinks) = find_hardlinks(@elf_files);
-	if ($create_multifile and @{$unique_files} > 1) {
+	if ($create_multifile and @{$unique_files} > 1 and not is_udeb($package)) {
 		my $objcopy = cross_command($package, 'objcopy');
 		my $ma_dir = dpkg_architecture_value('DEB_HOST_MULTIARCH');
 		my $dwz_dir = "usr/lib/debug/.dwz/${ma_dir}";
