@@ -332,7 +332,7 @@ init(options => {
 	bundling => 0,
 );
 set_buildflags();
-warn_deprecated();
+reject_obsolete_params();
 
 # If make is using a jobserver, but it is not available
 # to this process, clean out MAKEFLAGS. This avoids
@@ -994,14 +994,10 @@ sub stamp_target {
 }
 
 
-sub warn_deprecated {
+sub reject_obsolete_params {
 	foreach my $deprecated ('until', 'after', 'before', 'remaining') {
 		if (defined $dh{uc $deprecated}) {
-			if (compat(9)) {
-				warning("The --$deprecated option is deprecated. Use override targets instead.");
-			} else {
-				error("The --$deprecated option is not supported in compat 10+. Use override targets instead.");
-			}
+			error("The --$deprecated option is not supported any longer (#932537). Use override targets instead.");
 		}
 	}
 }
