@@ -1691,8 +1691,9 @@ sub getpackages {
 					error("Could not parse desired debhelper compat level from relation: $dep");
 				}
 				# Build-Depends on dh-sequence-<foo> OR dh-sequence-<foo> (<op> <version>)
-				if ($dep =~ m/^dh-sequence-(${PKGNAME_REGEX})\s*(?:[(]\s*(?:[<>]?=|<<|>>)\s*(${PKGVERSION_REGEX})\s*[)])?$/) {
+				if ($dep =~ m/^dh-sequence-(${PKGNAME_REGEX})\s*(?:[(]\s*(?:[<>]?=|<<|>>)\s*(?:${PKGVERSION_REGEX})\s*[)])?(\s*[^\|]+[]>]\s*)?$/) {
 					my $sequence = $1;
+					my $has_profile_or_arch_restriction = $2 ? 1 : 0;
 					my $addon_type = $field2addon_type{$field};
 					if (not defined($field)) {
 						warning("Cannot map ${field} to an add-on type (like \"both\", \"indep\" or \"arch\")");
@@ -1701,6 +1702,13 @@ sub getpackages {
 					if (defined($dh_bd_sequences{$sequence})) {
 						error("Saw $dep multiple times (last time in $field).  However dh only support that build-"
 							. 'dependency at most once across all Build-Depends(-Arch|-Indep) fields');
+					}
+					if ($has_profile_or_arch_restriction) {
+						require Dpkg::Deps;
+						my $dpkg_dep = Dpkg::Deps::deps_parse($dep, build_profiles => \@profiles, build_dep => 1,
+							reduce_restrictions => 1);
+						# If dpkg reduces it to nothing, then it was not relevant for us after all
+						next if not $dpkg_dep;
 					}
 					$dh_bd_sequences{$sequence} = $addon_type;
 				}
