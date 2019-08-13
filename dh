@@ -723,43 +723,19 @@ my $stoppoint = $#{$full_sequence};
 if (compat(9)) {
 	foreach my $package (@packages) {
 		my @log = load_log($package, \%logged);
-		if ($dh{AFTER}) {
-			# Run commands in the sequence that come after the
-			# specified command.
-			$startpoint{$package} = command_pos($dh{AFTER}, @{$full_sequence}) + 1;
-			# Write a dummy log entry indicating that the specified
-			# command was, in fact, run. This handles the case where
-			# no commands remain to run after it, communicating to
-			# future dh instances that the specified command should not
-			# be run again.
-			write_log($full_sequence->[$startpoint{$package} - 1], $package);
-		}
-		elsif ($dh{REMAINING}) {
-			# Start at the beginning so all remaining commands will get
-			# run.
-			$startpoint{$package} = 0;
-		}
-		else {
-			# Find the last logged command that is in the sequence, and
-			# continue with the next command after it. If no logged
-			# command is in the sequence, we're starting at the beginning..
-			$startpoint{$package} = 0;
-			COMMAND:
-			foreach my $command (reverse @log) {
-				foreach my $i (0 .. $#{$full_sequence}) {
-					if ($command eq $full_sequence->[$i]) {
-						$startpoint{$package} = $i + 1;
-						last COMMAND;
-					}
+		# Find the last logged command that is in the sequence, and
+		# continue with the next command after it. If no logged
+		# command is in the sequence, we're starting at the beginning..
+		$startpoint{$package} = 0;
+		COMMAND:
+		foreach my $command (reverse @log) {
+			foreach my $i (0 .. $#{$full_sequence}) {
+				if ($command eq $full_sequence->[$i]) {
+					$startpoint{$package} = $i + 1;
+					last COMMAND;
 				}
 			}
 		}
-	}
-	# Figure out what point in the sequence to go to.
-	if ($dh{UNTIL}) {
-		$stoppoint = command_pos($dh{UNTIL}, @{$full_sequence});
-	} elsif ($dh{BEFORE}) {
-		$stoppoint = command_pos($dh{BEFORE}, @{$full_sequence}) - 1;
 	}
 } else {
 	foreach my $package (@packages) {
@@ -971,29 +947,6 @@ sub reject_obsolete_params {
 		if (defined $dh{uc $deprecated}) {
 			error("The --$deprecated option is not supported any longer (#932537). Use override targets instead.");
 		}
-	}
-}
-
-sub command_pos {
-	my ($command, @sequence) = @_;
-
-	foreach my $i (0..$#sequence) {
-		if ($command eq $sequence[$i]) {
-			return $i;
-		}
-	}
-
-	my @matches;
-	foreach my $i (0..$#sequence) {
-		if ($sequence[$i] =~ /\Q$command\E/) {
-			push @matches, $i;
-		}
-	}
-	if (! @matches) {
-		error "command specification \"$command\" does not match any command in the sequence"
-	}
-	else {
-		return pop @matches;
 	}
 }
 
