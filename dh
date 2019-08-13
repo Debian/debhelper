@@ -12,6 +12,7 @@ use constant {
 	'UNSKIPPABLE_CLI_OPTIONS_BUILD_SYSTEM' => q(-S|--buildsystem|-D|--sourcedir(?:ectory)?|-B|--builddir(?:ectory)?),
 };
 use Debian::Debhelper::Dh_Lib;
+use Debian::Debhelper::Sequence;
 use Debian::Debhelper::SequencerUtil;
 
 our $VERSION = DH_BUILTIN_VERSION;
@@ -404,13 +405,19 @@ qw{
 	dh_fixperms
 	dh_missing
 });
-my @ba=(
+my @ba=(map {
+	{
+		'command'             => $_,
+		'command-options'     => [],
+		'sequence-limitation' => SEQUENCE_TYPE_ARCH_ONLY,
+	}
+} (
 	(!compat(11) ? qw(dh_dwz) : qw()),
 qw{
 	dh_strip
 	dh_makeshlibs
 	dh_shlibdeps
-});
+}));
 if (! getpackages("arch")) {
 	@ba=();
 }
@@ -420,19 +427,28 @@ my @b=qw{
 	dh_md5sums
 	dh_builddeb
 };
-$sequences{clean} = [@bd_minimal, qw{
+
+sub _add_sequence {
+	my @args = @_;
+	my $seq = Debian::Debhelper::Sequence->new(@args);
+	my $name = $seq->name;
+	$sequences{$name} = $seq;
+	if ($seq->allowed_subsequences eq SEQUENCE_ARCH_INDEP_SUBSEQUENCES) {
+		for my $subseq ((SEQUENCE_TYPE_ARCH_ONLY, SEQUENCE_TYPE_INDEP_ONLY)) {
+			my $subname = "${name}-${subseq}";
+			$sequences{$subname} = $seq;
+		}
+	}
+	return;
+}
+
+_add_sequence('build', SEQUENCE_ARCH_INDEP_SUBSEQUENCES, @bd);
+_add_sequence('install', SEQUENCE_ARCH_INDEP_SUBSEQUENCES, to_rules_target("build"), @i);
+_add_sequence('binary', SEQUENCE_ARCH_INDEP_SUBSEQUENCES, to_rules_target("install"), @ba, @b);
+_add_sequence('clean', SEQUENCE_NO_SUBSEQUENCES, @bd_minimal, qw{
 	dh_auto_clean
 	dh_clean
-}];
-$sequences{'build-indep'} = [@bd];
-$sequences{'build-arch'} = [@bd];
-$sequences{build} = [to_rules_target("build-arch"), to_rules_target("build-indep")];
-$sequences{'install-indep'} = [to_rules_target("build-indep"), @i];
-$sequences{'install-arch'} = [to_rules_target("build-arch"), @i];
-$sequences{'install'} = [to_rules_target("build"), to_rules_target("install-arch"), to_rules_target("install-indep")];
-$sequences{'binary-indep'} = [to_rules_target("install-indep"), @b];
-$sequences{'binary-arch'} = [to_rules_target("install-arch"), @ba, @b];
-$sequences{binary} = [to_rules_target("install"), to_rules_target("binary-arch"), to_rules_target("binary-indep")];
+});
 
 # Additional command options
 my %command_opts;
@@ -452,34 +468,18 @@ sub _filter_sequences_for_conditional_add_ons {
 	my @sequences = @_;
 	# If it is unconditional, then there is no issues.
 	return @sequences if $DH_INTERNAL_ADDON_TYPE eq 'both' or not @sequences;
-	# Typically, if you add a command to a sequence, then you will in fact add it to two. E.g.
-	# Adding dh_foo after dh_installdocs will affect both install-arch AND install-indep.  We want
-	# this to "just work(tm)" with a conditional add-on to avoid too much hassle (i.e. only affect
-	# the relevant sequence).  At the same time, we must abort if a sequence like "clean" is
-	# affected.
-	my (%sequence_stems, @filtered);
+	for my $seq (@sequences) {
+		# Typically, if you add a command to a sequence, then you will in fact add it to two. E.g.
+		# Adding dh_foo after dh_installdocs will affect both install-arch AND install-indep.  We want
+		# this to "just work(tm)" with a conditional add-on to avoid too much hassle (i.e. only affect
+		# the relevant sequence).  At the same time, we must abort if a sequence like "clean" is
+		# affected.
+		#
+		# We solve the above by checking if the sequence has an -arch + an -indep variant and then
+		# insert the command only for that sequence variant.
 
-	for my $sequence_name (@sequences) {
-		my $sequence_type = _sequence_type($sequence_name);
-		my $sequence_stem = $sequence_name;
-		if ($sequence_type ne 'both') {
-			$sequence_stem =~ s/-\Q${sequence_type}//;
-		}
-		if ($sequence_type eq $DH_INTERNAL_ADDON_TYPE) {
-			push(@filtered, $sequence_name);
-			$sequence_stems{$sequence_stem} = 1;
-		}
-		elsif (not exists($sequence_stems{$sequence_stem})) {
-			$sequence_stems{$sequence_stem} = 0;
-		}
-	}
-	for my $sequence_name (@sequences) {
-		my $sequence_type = _sequence_type($sequence_name);
-		my $sequence_stem = $sequence_name;
-		if ($sequence_type ne 'both') {
-			$sequence_stem =~ s/-\Q${sequence_type}//;
-		}
-		if (not $sequence_stems{$sequence_stem}) {
+		if ($seq->allowed_subsequences ne SEQUENCE_ARCH_INDEP_SUBSEQUENCES) {
+			my $sequence_name = $seq->name;
 			warning("The add-on ${DH_INTERNAL_ADDON_NAME} attempted to modify the sequence ${sequence_name} (possibly "
 				. "indirectly) but the add-on is conditional for \"*-${DH_INTERNAL_ADDON_TYPE}\" targets");
 			warning("Hint: You may have to move the build-dependency for dh-sequence-${DH_INTERNAL_ADDON_NAME} to "
@@ -488,7 +488,7 @@ sub _filter_sequences_for_conditional_add_ons {
 				. " targets\n");
 		}
 	}
-	return @filtered;
+	return @sequences;
 }
 
 sub _register_cmd_added_by_addon {
@@ -522,14 +522,24 @@ sub _sequences_containing_cmd {
 	my ($cmd) = @_;
 	my @sequences;
 	foreach my $sequence_name (keys %sequences) {
-		for my $scmd (@{$sequences{$sequence_name}}) {
-			if ($scmd eq $cmd) {
-				push(@sequences, $sequence_name);
+		my $seq = $sequences{$sequence_name};
+		for my $scmd (@{$seq->{'_cmds'}}) {
+			if ($scmd->{'command'} eq $cmd) {
+				push(@sequences, $seq);
 				last;
 			}
 		}
 	}
 	return @sequences;
+}
+
+sub _seq_cmd {
+	my ($cmd_name) = @_;
+	return {
+		'command'             => $cmd_name,
+		'command-options'     => [],
+		'sequence-limitation' => $DH_INTERNAL_ADDON_TYPE,
+	};
 }
 
 # sequence addon interface
@@ -539,20 +549,8 @@ sub _insert {
 	@affected_sequences = _filter_sequences_for_conditional_add_ons(@affected_sequences);
 	return if not @affected_sequences;
 	_register_cmd_added_by_addon($new);
-	foreach my $sequence (@affected_sequences) {
-		my @list=@{$sequences{$sequence}};
-		my @new;
-		foreach my $command (@list) {
-			if ($command eq $existing) {
-				push @new, $new if $offset < 0;
-				push @new, $command;
-				push @new, $new if $offset > 0;
-			}
-			else {
-				push @new, $command;
-			}
-		}
-		$sequences{$sequence}=\@new;
+	for my $seq (@affected_sequences) {
+		$seq->_insert($offset, $existing, _seq_cmd($new));
 	}
 }
 sub insert_before {
@@ -568,25 +566,38 @@ sub remove_command {
 	my @affected_sequences = _sequences_containing_cmd($command);
 	@affected_sequences = _filter_sequences_for_conditional_add_ons(@affected_sequences);
 	return if not @affected_sequences;
-	foreach my $sequence (@affected_sequences) {
-		$sequences{$sequence}=[grep { $_ ne $command } @{$sequences{$sequence}}];
+	for my $seq (@affected_sequences) {
+		$seq->remove_command($command);
 	}
 	return;
 }
 sub add_command {
 	my ($command, $sequence) = @_;
-	_filter_sequences_for_conditional_add_ons($sequence);
+	_assert_not_conditional_sequence_addon('add_command');
 	_register_cmd_added_by_addon($command);
-	unshift @{$sequences{$sequence}}, $command;
+	if (not exists($sequences{$sequence})) {
+		_add_sequence($sequence, SEQUENCE_NO_SUBSEQUENCES, _seq_cmd($command));
+	} else {
+		my $seq = $sequences{$sequence};
+		_filter_sequences_for_conditional_add_ons($seq);
+		$seq->add_command_at_start(_seq_cmd($command))
+	}
 	return;
 }
 sub add_command_at_end {
 	my ($command, $sequence) = @_;
-	_filter_sequences_for_conditional_add_ons($sequence);
+	_assert_not_conditional_sequence_addon('add_command');
 	_register_cmd_added_by_addon($command);
-	push(@{$sequences{$sequence}}, $command);
+	if (not exists($sequences{$sequence})) {
+		_add_sequence($sequence, SEQUENCE_NO_SUBSEQUENCES, _seq_cmd($command));
+	} else {
+		my $seq = $sequences{$sequence};
+		_filter_sequences_for_conditional_add_ons($seq);
+		$seq->add_command_at_end(_seq_cmd($command))
+	}
 	return;
 }
+
 sub add_command_options {
 	my $command=shift;
 	# Implement if actually needed (Complicated as dh_foo becomes dh_foo -a && dh_foo -i <extra_options>
@@ -595,6 +606,7 @@ sub add_command_options {
 	push @{$command_opts{$command}}, @_;
 	return;
 }
+
 sub remove_command_options {
 	my ($command, @cmd_options) = @_;
 	# Implement if actually needed (Complicated as dh_foo <extra_options> becomes
@@ -643,7 +655,7 @@ sub _compute_addons {
 	my ($sequence_name, @addon_requests_from_args) = @_;
 	my (@enabled_addons, %disabled_addons, %enabled, $bd_dh_sequences_ref);
 	my @addon_requests;
-	my $sequence_type = _sequence_type($sequence_name);
+	my $sequence_type = sequence_type($sequence_name);
 
 	# Order is important; DH_EXTRA_ADDONS must come before everything
 	# else; then comes built-in and finally argument provided add-ons
@@ -1163,16 +1175,6 @@ sub can_skip {
 	}
 	return 0 if not $had_cli_options and %seen_options;
 	return 1;
-}
-
-sub _sequence_type {
-	my ($sequence_name) = @_;
-	if ($sequence_name =~ m/-indep$/) {
-		return 'indep';
-	} elsif ($sequence_name =~ m/-arch/) {
-		return 'arch';
-	}
-	return 'both';
 }
 
 =head1 SEE ALSO
