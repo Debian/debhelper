@@ -1647,6 +1647,11 @@ sub getpackages {
 	error("could not find Source: line in control file.") if not defined($sourcepackage);
 	if (%bd_fields) {
 		my ($dh_compat_bd, $final_level);
+		my %field2addon_type = (
+			'build-depends' => 'both',
+			'build-depends-arch' => 'arch',
+			'build-depends-indep' => 'indep',
+		);
 		for my $field (sort(keys(%bd_fields))) {
 			my $value = join(' ', @{$bd_fields{$field}});
 			$value =~ s/^\s*//;
@@ -1688,12 +1693,16 @@ sub getpackages {
 				# Build-Depends on dh-sequence-<foo> OR dh-sequence-<foo> (<op> <version>)
 				if ($dep =~ m/^dh-sequence-(${PKGNAME_REGEX})\s*(?:[(]\s*(?:[<>]?=|<<|>>)\s*(${PKGVERSION_REGEX})\s*[)])?$/) {
 					my $sequence = $1;
-					if ($field ne 'build-depends') {
-						warning("Ignoring dh sequence add-on request for sequenece ${sequence} via ${field}: Please move it to the Build-Depends field");
-						warning("The relation that triggered this warning was: ${dep} (from the ${field} field)");
-						next;
+					my $addon_type = $field2addon_type{$field};
+					if (not defined($field)) {
+						warning("Cannot map ${field} to an add-on type (like \"both\", \"indep\" or \"arch\")");
+						error("Internal error: Cannot satisfy dh sequence add-on request for sequence ${sequence} via ${field}.");
 					}
-					$dh_bd_sequences{$sequence} = 1;
+					if (defined($dh_bd_sequences{$sequence})) {
+						error("Saw $dep multiple times (last time in $field).  However dh only support that build-"
+							. 'dependency at most once across all Build-Depends(-Arch|-Indep) fields');
+					}
+					$dh_bd_sequences{$sequence} = $addon_type;
 				}
 			}
 		}
@@ -1986,7 +1995,7 @@ sub bd_dh_sequences {
 	# Use $sourcepackage as check because %dh_bd_sequence can be empty
 	# after running getpackages().
 	getpackages() if not defined($sourcepackage);
-	return sort(keys(%dh_bd_sequences));
+	return \%dh_bd_sequences;
 }
 
 sub _concat_slurp_script_files {
