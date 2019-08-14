@@ -188,7 +188,8 @@ sub testfile {
 	return if -d _;
 
 	# Is it a debug library in a debug subdir?
-	return if $fn=~m/debug\/.*\.so/;
+	return if $fn=~m{debug/.*\.so};
+	return if $fn=~m{/guile/.*\.go$};
 
 	# Exploit the previous stat call to get the $mode, so we can check
 	# later if it is executable or not.
