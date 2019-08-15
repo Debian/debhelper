@@ -18,7 +18,7 @@ PERL ?= perl
 # builds without needing autotools-dev, dh-strip-nondetermism etc.)
 override_dh_update_autotools_config override_dh_strip_nondeterminism:
 
-override_dh_auto_install:
-	./run dh_auto_install --destdir=debian/debhelper
+override_dh_install:
+	./run dh_install
 	PERLLIBDIR=$$($(PERL) -MConfig -e 'print $$Config{vendorlib}')/Debian/Debhelper ; \
 	    $(PERL) -I"debian/debhelper/$${PERLLIBDIR}" debian/gen-provides > debian/debhelper.substvars

@@ -31,6 +31,7 @@ Depends: autotools-dev,
          file (>= 3.23),
          libdpkg-perl (>= 1.17.14),
          man-db,
+         libdebhelper-perl (= ${source:Version}),
          po-debconf,
          ${misc:Depends},
          ${perl:Depends}
@@ -60,6 +61,20 @@ Description: helper programs for debian/rules
  files, fix file permissions, integrate your package with the Debian
  menu system, debconf, doc-base, etc. Most Debian packages use debhelper
  as part of their build process.
+
+Package: libdebhelper-perl
+Section: perl
+Architecture: all
+Depends: ${misc:Depends},
+         ${perl:Depends}
+Replaces: debhelper (<< 12.6~)
+Breaks: debhelper (<< 12.6~)
+Multi-Arch: foreign
+Description: debhelper perl modules
+ A collection of programs that can be used in a debian/rules file to
+ automate common tasks related to building Debian packages.
+ .
+ This package provides the perl modules used by the scripts in debhelper.
 
 Package: dh-systemd
 Section: oldlibs
