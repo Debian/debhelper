@@ -86,7 +86,7 @@ defaults to match the current packaging norms or fix a bug).
 
   * For trivial issues or (mostly) unused functionality/bugs, then we
     can make exceptions.  Preferably, have all consumers migrate away
-    from the feature being changed (ìn Debian `unstable`) before
+    from the feature being changed (in Debian `unstable`) before
     applying it.
 
 Note that we tend to support compat levels for a long time (10+
