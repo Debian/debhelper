@@ -944,6 +944,14 @@ B<dh_auto_test> that passes extra parameters to upstream test runner
 should be reviewed as B<meson test> is not command line compatible
 with B<ninja test>.
 
+=item -
+
+All debhelper like tools based on the official debhelper library
+(including B<dh> and the official B<dh_*> tools) no longer accepts
+abbreviated command parameters.  At the same time, B<dh> now
+optimizes out calls to redundant B<dh_*> helpers even when passed
+long command line options.
+
 =back
 
 =back

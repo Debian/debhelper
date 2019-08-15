@@ -612,7 +612,7 @@ my %completed_sequences;
 # Get the options to pass to commands in the sequence.
 # Filter out options intended only for this program.
 my (@options, %seen_options);
-my ($unoptimizable_user_option, $long_options_seen) = (0, 0);
+my ($unoptimizable_user_option, $unoptimizable_option_bundle) = (0, 0);
 
 if ($sequence eq 'build-arch' ||
     $sequence eq 'install-arch' ||
@@ -654,7 +654,13 @@ while (@ARGV_orig) {
 		}
 		if ($opt =~ m/^(--[^=]++)(?:=.*)?$/ or $opt =~ m/^(-[^-])$/) {
 			my $optname = $1;
-			$long_options_seen = 1 if length($optname) > 2;
+			if (length($optname) > 2 and (compat(12, 1) or m/^-[^-][^=]/)) {
+				# We cannot optimize bundled options but we can optimize a single
+				# short option with an explicit parameter (-B=F is ok, -BF is not)
+				# In compat 12 or earlier, we also punt on long options due to
+				# auto-abbreviation.
+				$unoptimizable_option_bundle = 1
+			}
 			$seen_options{$optname} = 1;
 		} else {
 			$unoptimizable_user_option = 1;
@@ -1040,7 +1046,7 @@ sub can_skip {
 			# Long options are subject to abbreviations so it is
 			# very difficult to implement this optimization with
 			# long options.
-			return 0 if $long_options_seen;
+			return 0 if $unoptimizable_option_bundle;
 			$need =~ s/(?:^|\s)BUILDSYSTEM(?:\s|$)/${\UNSKIPPABLE_CLI_OPTIONS_BUILD_SYSTEM}/;
 			my @behavior_options = split(qr/\Q|\E/, $need);
 			for my $opt (@behavior_options) {

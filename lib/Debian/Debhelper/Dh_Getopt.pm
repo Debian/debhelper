@@ -95,6 +95,9 @@ sub getoptions {
 		Getopt::Long::config("bundling");
 	}
 	Getopt::Long::config('no_ignore_case');
+	if (! compat(12, 1)) {
+		Getopt::Long::config('no_auto_abbrev');
+	}
 
 	my @test;
 	my %options=(	
