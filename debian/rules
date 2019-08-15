@@ -22,3 +22,6 @@ override_dh_install:
 	./run dh_install
 	PERLLIBDIR=$$($(PERL) -MConfig -e 'print $$Config{vendorlib}')/Debian/Debhelper ; \
 	    $(PERL) -I"debian/debhelper/$${PERLLIBDIR}" debian/gen-provides > debian/debhelper.substvars
+
+override_dh_missing:
+	./run dh_missing --fail-missing
