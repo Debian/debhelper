@@ -834,6 +834,9 @@ my $compat_from_bd;
 						warning("Please specify the debhelper compat level exactly once.");
 						warning(" * debian/compat requests compat ${new_compat}.");
 						warning(" * debian/control requests compat ${compat_from_bd} via \"debhelper-compat (= ${compat_from_bd})\"");
+						warning();
+						warning("Hint: If you just added a build-dependency on debhelper-compat, then please remember to remove debian/compat");
+						warning();
 						error("debhelper compat level specified both in debian/compat and via build-dependency on debhelper-compat");
 					}
 					$c = $new_compat;
