@@ -16,7 +16,7 @@ our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
-B<dh_builddeb> [S<I<debhelper options>>] [B<--destdir=>I<directory>] [B<--filename=>I<name>] [S<B<--> I<params>>]
+B<dh_builddeb> [S<I<debhelper options>>] [B<--filename=>I<name>] [S<B<--> I<params>>]
 
 =head1 DESCRIPTION
 
@@ -34,11 +34,6 @@ L<dpkg-deb(1)>.
 =head1 OPTIONS
 
 =over 4
-
-=item B<--destdir=>I<directory>
-
-Use this if you want the generated F<.deb> files to be put in a directory
-other than the default of "F<..>".
 
 =item B<--filename=>I<name>
 
@@ -61,13 +56,10 @@ It is deprecated; use B<--> instead.
 
 init(options => {
 	"filename=s" => \$dh{FILENAME},
-	"destdir=s" => \$dh{DESTDIR},
 });
 
 # Set the default destination directory.
-if (! defined $dh{DESTDIR}) {
-	$dh{DESTDIR}='..';
-}
+$dh{DESTDIR}='..';
 
 if (! defined $dh{FILENAME}) {
 	$dh{FILENAME}='';
