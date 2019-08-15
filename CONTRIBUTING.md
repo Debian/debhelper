@@ -168,7 +168,7 @@ reading (some) of the documents below.
  * [Debian's Code of Conduct](https://www.debian.org/code_of_conduct)
 
    * If you feel a contributor is violating the code of contact, please
-     contact the `Debian anti-harassment team <https://wiki.debian.org/AntiHarassment>`_
+     contact the [Debian anti-harassment team](https://wiki.debian.org/AntiHarassment)
      if you are uncomfortable with engaging with them directly.
 
  * [Debian's Diversity Statement](https://www.debian.org/intro/diversity)
