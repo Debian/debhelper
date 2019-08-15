@@ -185,9 +185,11 @@ sub buildsystems_init {
 	# Available command line options
 	my %options = (
 	    "D=s" => \$opt_sourcedir,
+	    "sourcedir=s" => \$opt_sourcedir,
 	    "sourcedirectory=s" => \$opt_sourcedir,
 
 	    "B:s" => \$opt_builddir,
+	    "builddir:s" => \$opt_builddir,
 	    "builddirectory:s" => \$opt_builddir,
 
 	    "S=s" => \$opt_buildsys,
