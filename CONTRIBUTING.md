@@ -156,8 +156,8 @@ You can find the list of open bugs against debhelper at:
 ## Code of Conduct, Social rules and conflict resolution
 
 The debhelper suite is a part of Debian. Accordingly, the Code of
-Conduct, Social rules and conflict resolution applies to debhelper and
-all of its contributors.
+Conduct, Social rules and conflict resolution from Debian applies to
+debhelper and all of its contributors.
 
 As a guiding principle, we strive to have an open welcoming community
 working on making Debian packaging easier.  Hopefully, this will be
