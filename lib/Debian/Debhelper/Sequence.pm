@@ -8,6 +8,7 @@ use warnings;
 
 use Exporter qw(import);
 
+use Debian::Debhelper::Dh_Lib qw(getpackages);
 use Debian::Debhelper::SequencerUtil qw(extract_rules_target_name sequence_type	SEQUENCE_NO_SUBSEQUENCES
 	SEQUENCE_ARCH_INDEP_SUBSEQUENCES SEQUENCE_TYPE_ARCH_ONLY SEQUENCE_TYPE_INDEP_ONLY SEQUENCE_TYPE_BOTH);
 
@@ -112,8 +113,12 @@ sub flatten_sequence {
 	my ($this, $sequence_type) = @_;
 	die("Invalid sequence type $sequence_type") if $sequence_type eq SEQUENCE_NO_SUBSEQUENCES;
 	my @cmds;
+	my $has_arch_pkgs = getpackages("arch") ? 1 : 0;
+	my $has_indep_pkgs = getpackages("indep") ? 1 : 0;
 	for my $cmd_desc (@{$this->{'_cmds'}}) {
 		my $seq_limitation = $cmd_desc->{'sequence-limitation'};
+		next if ($seq_limitation eq SEQUENCE_TYPE_ARCH_ONLY and not $has_arch_pkgs);
+		next if ($seq_limitation eq SEQUENCE_TYPE_INDEP_ONLY and not $has_indep_pkgs);
 		if ($seq_limitation eq $sequence_type or $sequence_type eq SEQUENCE_TYPE_BOTH or $seq_limitation eq SEQUENCE_TYPE_BOTH) {
 			my $cmd = $cmd_desc->{'command'};
 			my @cmd_options = $cmd_desc->{'command-options'};
