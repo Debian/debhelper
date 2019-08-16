@@ -213,6 +213,27 @@ init(options => {
 
 my $ok=1;
 
+sub _all_so_files {
+	my ($root_dir) = @_;
+	return if not -d $root_dir;
+	my @all_so_files;
+	require File::Find;
+	File::Find::find(sub {
+		# Lazy loading of File::Find makes perl think that File::Find::dir is only used once
+		# and we might have typo'ed something
+		no warnings qw(once);
+		# Only real/regular files
+		-l && return;
+		-f _ || return;
+		return if not is_so_or_exec_elf_file($_) or excludefile($_);
+		my $path = "$File::Find::dir/$_";
+		push(@all_so_files, $path);
+	}, $root_dir);
+
+	@all_so_files = sort(@all_so_files);
+	return @all_so_files;
+}
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if is_udeb($package);
 	
@@ -236,24 +257,17 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# packages. This may have a few false positives, which is ok,
 	# because only if we can get a library name and a major number from
 	# objdump is anything actually added.
-	my $exclude='';
 	my (@udeb_lines, @deb_lines, @lib_files, $udeb_name);
-	if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
-		$exclude="! \\( $dh{EXCLUDE_FIND} \\) ";
-	}
 	if (defined($shlibs_udeb)) {
 		$udeb_name = $shlibs_udeb if $shlibs_udeb ne '';
 	} else {
 		my $guessed_udeb = "${package}-udeb";
 		$udeb_name = $guessed_udeb if is_known_package($guessed_udeb) and is_udeb($guessed_udeb);
 	}
-	open (FIND, "test -d $tmp && find $tmp -type f \\( -name '*.so' -or -name '*.so.*' \\) $exclude | LC_ALL=C sort |");
-	while (my $lib_file = <FIND>) {
+	for my $lib_file (_all_so_files($tmp)) {
 		my ($library, $major);
-		chomp($lib_file);
-		next if not is_so_or_exec_elf_file($lib_file);
 		push(@lib_files, $lib_file) if compat(11);
-		my $ret = compat(10) ? `$objdump -p "$lib_file"` : qx_cmd($objdump, '-p', $lib_file);
+		my $ret = qx_cmd($objdump, '-p', $lib_file);
 		if ($ret=~m/\s+SONAME\s+(.*)\.so\.(.*)/) {
 			# proper soname format
 			$library=$1;
@@ -320,7 +334,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			}
 		}
 	}
-	close FIND;
 
 	if ($shlibs_file) {
 		install_dir("$tmp/DEBIAN");
