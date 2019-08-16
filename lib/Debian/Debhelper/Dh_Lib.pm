@@ -1575,18 +1575,20 @@ sub getpackages {
 
 	$type //= 'all-listed-in-control-file';
 
-	if (%packages_by_type) {
-		return @{$packages_by_type{$type}};
+	if (not %packages_by_type) {
+		_parse_debian_control();
 	}
+	return @{$packages_by_type{$type}};
+}
 
-	my $fd;
+sub _parse_debian_control {
 	my $package="";
 	my $arch="";
 	my $section="";
 	my $valid_pkg_re = qr{^${PKGNAME_REGEX}$}o;
 	my ($package_type, $multiarch, %seen, @profiles, $source_section,
 		$included_in_build_profile, $cross_type, $cross_target_arch,
-		%bd_fields, $bd_field_value, %seen_fields);
+		%bd_fields, $bd_field_value, %seen_fields, $fd);
 	if (exists $ENV{'DEB_BUILD_PROFILES'}) {
 		@profiles=split /\s+/, $ENV{'DEB_BUILD_PROFILES'};
 	}
@@ -1850,8 +1852,6 @@ sub getpackages {
 		}
 	}
 	close($fd);
-
-	return @{$packages_by_type{$type}};
 }
 
 # Return true if we should use root.
