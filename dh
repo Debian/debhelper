@@ -62,12 +62,25 @@ the sequence addon interface.
 A B<Build-Depends> relation on the package B<dh-sequence->I<addon>
 implies a B<--with> I<addon>. This avoids the need for an explicit
 B<--with> in F<debian/rules> that only duplicates what is already
-declared via the build dependencies in F<debian/control>.  Note that
-only relations in the B<Build-Depends> field are considered
-(i.e. B<Build-Depends-Indep> and B<Build-Depends-Arch> are
-deliberately unsupported).  Please keep in mind that B<dh> insists on
-"simple" relations (e.g. a relation like "B<dh-sequence->I<addon> |
-B<some-other-pkg>" will I<not> imply B<--with> I<addon>).
+declared via the build dependencies in F<debian/control>.  The
+relation can (since 12.5) be made optional via e.g.
+build-profiles.  This enables you to easily disable an addon that
+is only useful with certain profiles (e.g. to facilitate
+bootstraping).
+
+Since debhelper 12.5, addons can also be activated in B<indep>-only
+mode (via B<Build-Depends-Indep>) or B<arch>-only mode (via
+B<Build-Depends-Arch>). Such addons are only active in the particular
+sequence (e.g. B<binary-indep>) which simplifies dependency
+management for cross-builds.
+
+Please note that addons activated via B<Build-Depends-Indep> or
+B<Build-Depends-Arch> are subject to additional limitations to
+ensure the result is deterministic even when the addon is
+unavailable (e.g. during clean).  This implies that some addons
+are incompatible with these restrictions and can only be used via
+B<Build-Depends> (or manually via F<debian/rules>).  Currently,
+such addons can only add commands to sequences.
 
 =item B<--without> I<addon>
 

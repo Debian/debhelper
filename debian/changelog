@@ -24,6 +24,17 @@ debhelper (12.5) UNRELEASED; urgency=medium
     exclude "udeb:" lines for libraries omitted from the udeb.  At the
     same time, verbosely fail if the udeb contains a library not present
     in the deb (overridable with --add-udeb).  (Closes: #934889)
+  * dh: Support making "dh-sequence-ADDON" Build-Depends relation
+    conditonal on build-profiles (etc.).  If the relation is ignored due
+    to the current build-profiles (etc.), then addon is silently skipped.
+  * dh: Support running addons in "arch-only" or "indep-only" mode by
+    adding "dh-sequence-ADDON" in Build-Depends-Arch or
+    Build-Depends-Indep (respectively).  Not all addons support this and
+    will trigger an error at load time.  Addon providers should ensure
+    that their package provde "dh-sequence-ADDON" and review the
+    doc/PROGRAMMING document (in the debhelper source) if they are
+    considering to make their addon compatible with these requirements.
+    (Closes: #836699)
 
   [ Frank Schaefer ]
   * dh_installmodules: Also lok for compressed kernel modules
