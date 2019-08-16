@@ -241,8 +241,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
 		$exclude="! \\( $dh{EXCLUDE_FIND} \\) ";
 	}
-	if (defined($shlibs_udeb) && $shlibs_udeb ne '') {
-		$udeb_name = $shlibs_udeb;
+	if (defined($shlibs_udeb)) {
+		$udeb_name = $shlibs_udeb if $shlibs_udeb ne '';
 	} else {
 		my $guessed_udeb = "${package}-udeb";
 		$udeb_name = $guessed_udeb if is_known_package($guessed_udeb) and is_udeb($guessed_udeb);
