@@ -749,7 +749,7 @@ my %completed_sequences;
 # Get the options to pass to commands in the sequence.
 # Filter out options intended only for this program.
 my (@options, %seen_options);
-my ($unoptimizable_user_option, $unoptimizable_option_bundle) = (0, 0);
+my ($unoptimizable_user_option, $unoptimizable_option_bundle, $sequence_unpack_flags) = (0, 0, 0);
 
 if ($sequence eq 'build-arch' ||
     $sequence eq 'install-arch' ||
@@ -765,6 +765,12 @@ elsif ($sequence eq 'build-indep' ||
 	push @options, "-i";
 	# ditto optimisation for arch indep
 	@packages = @{$sequence2packages{$sequence}};
+}
+
+if (not @arch_packages) {
+	$sequence_unpack_flags = FLAG_OPT_SOURCE_BUILDS_NO_ARCH_PACKAGES;
+} elsif (not @indep_packages) {
+	$sequence_unpack_flags = FLAG_OPT_SOURCE_BUILDS_NO_INDEP_PACKAGES;
 }
 
 @addons = _compute_addons($sequence, @addon_requests);
@@ -886,7 +892,8 @@ if ( -f $build_stamp_file and not compat(9)) {
 my ($rules_targets, $full_sequence) = unpack_sequence(\%sequences,
 														$sequence,
 														(!compat(8) ? 0 : 1),
-														\%completed_sequences
+														\%completed_sequences,
+														$sequence_unpack_flags,
 														);
 my $stoppoint = $#{$full_sequence};
 

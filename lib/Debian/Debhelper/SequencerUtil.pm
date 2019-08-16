@@ -6,12 +6,14 @@ package Debian::Debhelper::SequencerUtil;
 use strict;
 use warnings;
 use constant {
-	'DUMMY_TARGET' => 'debhelper-fail-me',
-	'SEQUENCE_NO_SUBSEQUENCES' => 'none',
-	'SEQUENCE_ARCH_INDEP_SUBSEQUENCES' => 'both',
-	'SEQUENCE_TYPE_ARCH_ONLY' => 'arch',
-	'SEQUENCE_TYPE_INDEP_ONLY' => 'indep',
-	'SEQUENCE_TYPE_BOTH' => 'both',
+	'DUMMY_TARGET'                             => 'debhelper-fail-me',
+	'SEQUENCE_NO_SUBSEQUENCES'                 => 'none',
+	'SEQUENCE_ARCH_INDEP_SUBSEQUENCES'         => 'both',
+	'SEQUENCE_TYPE_ARCH_ONLY'                  => 'arch',
+	'SEQUENCE_TYPE_INDEP_ONLY'                 => 'indep',
+	'SEQUENCE_TYPE_BOTH'                       => 'both',
+	'FLAG_OPT_SOURCE_BUILDS_NO_ARCH_PACKAGES'  => 0x1,
+	'FLAG_OPT_SOURCE_BUILDS_NO_INDEP_PACKAGES' => 0x2,
 };
 
 use Exporter qw(import);
@@ -29,6 +31,8 @@ our @EXPORT = qw(
 	SEQUENCE_TYPE_ARCH_ONLY
 	SEQUENCE_TYPE_INDEP_ONLY
 	SEQUENCE_TYPE_BOTH
+	FLAG_OPT_SOURCE_BUILDS_NO_ARCH_PACKAGES
+	FLAG_OPT_SOURCE_BUILDS_NO_INDEP_PACKAGES
 );
 
 our (%EXPLICIT_TARGETS, $RULES_PARSED);
@@ -67,13 +71,15 @@ sub _agg_subseq {
 }
 
 sub unpack_sequence {
-	my ($sequences, $sequence_name, $always_inline, $completed_sequences) = @_;
+	my ($sequences, $sequence_name, $always_inline, $completed_sequences, $flags) = @_;
 	my (@sequence, @targets, %seen, %non_inlineable_targets, @stack);
 	my $sequence_type = sequence_type($sequence_name);
 	# Walk through the sequence effectively doing a DFS of the rules targets
 	# (when we are allowed to inline them).
 	my $seq = $sequences->{$sequence_name};
-	push(@stack, [$seq->flatten_sequence($sequence_type)]);
+	$flags //= 0;
+
+	push(@stack, [$seq->flatten_sequence($sequence_type, $flags)]);
 	while (@stack) {
 		my $current_sequence = pop(@stack);
 	  COMMAND:
@@ -88,7 +94,7 @@ sub unpack_sequence {
 				my $subsequence = $sequences->{$rules_target};
 				my $subseq_type = _agg_subseq(sequence_type($rules_target), $sequence_type);
 				push(@stack, $current_sequence);
-				$current_sequence = [$subsequence->flatten_sequence($subseq_type)];
+				$current_sequence = [$subsequence->flatten_sequence($subseq_type, $flags)];
 			} elsif (defined($rules_target)) {
 				my $subsequence = $sequences->{$rules_target};
 				my $subseq_type = _agg_subseq(sequence_type($rules_target), $sequence_type);
@@ -168,7 +174,7 @@ sub unpack_sequence {
 				}
 				if ($transparent_subseq) {
 					push(@stack, $current_sequence);
-					$current_sequence = [$subsequence->flatten_sequence($transparent_subseq)];
+					$current_sequence = [$subsequence->flatten_sequence($transparent_subseq, $flags)];
 				}
 				next COMMAND;
 			} else {

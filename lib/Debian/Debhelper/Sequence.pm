@@ -8,9 +8,9 @@ use warnings;
 
 use Exporter qw(import);
 
-use Debian::Debhelper::Dh_Lib qw(getpackages);
 use Debian::Debhelper::SequencerUtil qw(extract_rules_target_name sequence_type	SEQUENCE_NO_SUBSEQUENCES
-	SEQUENCE_ARCH_INDEP_SUBSEQUENCES SEQUENCE_TYPE_ARCH_ONLY SEQUENCE_TYPE_INDEP_ONLY SEQUENCE_TYPE_BOTH);
+	SEQUENCE_ARCH_INDEP_SUBSEQUENCES SEQUENCE_TYPE_ARCH_ONLY SEQUENCE_TYPE_INDEP_ONLY SEQUENCE_TYPE_BOTH
+	FLAG_OPT_SOURCE_BUILDS_NO_ARCH_PACKAGES	FLAG_OPT_SOURCE_BUILDS_NO_INDEP_PACKAGES);
 
 
 sub _as_command {
@@ -110,15 +110,13 @@ sub as_rules_target_command {
 }
 
 sub flatten_sequence {
-	my ($this, $sequence_type) = @_;
+	my ($this, $sequence_type, $flags) = @_;
 	die("Invalid sequence type $sequence_type") if $sequence_type eq SEQUENCE_NO_SUBSEQUENCES;
 	my @cmds;
-	my $has_arch_pkgs = getpackages("arch") ? 1 : 0;
-	my $has_indep_pkgs = getpackages("indep") ? 1 : 0;
 	for my $cmd_desc (@{$this->{'_cmds'}}) {
 		my $seq_limitation = $cmd_desc->{'sequence-limitation'};
-		next if ($seq_limitation eq SEQUENCE_TYPE_ARCH_ONLY and not $has_arch_pkgs);
-		next if ($seq_limitation eq SEQUENCE_TYPE_INDEP_ONLY and not $has_indep_pkgs);
+		next if ($seq_limitation eq SEQUENCE_TYPE_ARCH_ONLY and ($flags & FLAG_OPT_SOURCE_BUILDS_NO_ARCH_PACKAGES));
+		next if ($seq_limitation eq SEQUENCE_TYPE_INDEP_ONLY and ($flags & FLAG_OPT_SOURCE_BUILDS_NO_INDEP_PACKAGES));
 		if ($seq_limitation eq $sequence_type or $sequence_type eq SEQUENCE_TYPE_BOTH or $seq_limitation eq SEQUENCE_TYPE_BOTH) {
 			my $cmd = $cmd_desc->{'command'};
 			my @cmd_options = $cmd_desc->{'command-options'};

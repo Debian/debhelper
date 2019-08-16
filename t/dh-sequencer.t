@@ -100,7 +100,7 @@ my %sequences_unpacked = (
 	'clean'         => _cmd_names(@c),
 );
 
-plan tests => 18 + 3 * scalar(keys(%sequences));
+plan tests => 21 + 3 * scalar(keys(%sequences));
 
 # We will horse around with %EXPLICIT_TARGETS in this test; it should
 # definitely not attempt to read d/rules or the test will be break.
@@ -143,6 +143,22 @@ is_deeply(
 	[unpack_sequence(\%sequences, 'binary', 0, { 'build-arch' => 1, 'build-indep' => 1})],
 	[[], _cmd_names(@i, @ba, @b)],
 	'Inlined binary sequence with build-* done has @i, @ba and @b');
+
+is_deeply(
+	[unpack_sequence(\%sequences, 'binary', 0, {}, 0)],
+	[[], _cmd_names(@bd, @i, @ba, @b)],
+	'Inlined binary sequence and arch:all + arch:any is reduced to @bd, @i, @ba and @b');
+
+is_deeply(
+	[unpack_sequence(\%sequences, 'binary', 0, {}, FLAG_OPT_SOURCE_BUILDS_NO_ARCH_PACKAGES)],
+	[[], _cmd_names(@bd, @i, @b)],
+	'Inlined binary sequence and not arch:any is reduced to @bd, @i and @b');
+
+is_deeply(
+	[unpack_sequence(\%sequences, 'binary', 0, {}, FLAG_OPT_SOURCE_BUILDS_NO_INDEP_PACKAGES)],
+	[[], _cmd_names(@bd, @i, @ba, @b)],
+	'Inlined binary sequence and not arch:all is reduced to @bd, @i, @ba and @b');
+
 
 {
 	local $Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS{'build-arch'} = 1;
