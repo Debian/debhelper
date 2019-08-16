@@ -214,9 +214,10 @@ init(options => {
 my $ok=1;
 
 sub _all_so_files {
-	my ($root_dir) = @_;
+	my ($package, $root_dir) = @_;
 	return if not -d $root_dir;
-	my @all_so_files;
+	my (@all_so_files, @so_file_data);
+	my $objdump = cross_command($package, "objdump");
 	require File::Find;
 	File::Find::find(sub {
 		# Lazy loading of File::Find makes perl think that File::Find::dir is only used once
@@ -231,15 +232,29 @@ sub _all_so_files {
 	}, $root_dir);
 
 	@all_so_files = sort(@all_so_files);
-	return @all_so_files;
+	for my $lib_file (@all_so_files) {
+		my $ret = qx_cmd($objdump, '-p', $lib_file);
+		my ($library, $major);
+		if ($ret=~m/\s+SONAME\s+(.*)\.so\.(.*)/) {
+			# proper soname format
+			$library=$1;
+			$major=$2;
+		} elsif ($ret=~m/\s+SONAME\s+(.*)-(\d.*)\.so/) {
+			# idiotic crap soname format
+			$library=$1;
+			$major=$2;
+		} elsif ($ret !~ m/\s+SONAME\s+(?:\S)/) {
+			next;
+		}
+		push(@so_file_data, [$lib_file, $library, $major,]);
+	};
+	return @so_file_data;
 }
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if is_udeb($package);
 	
 	my $tmp=tmpdir($package);
-
-	my $objdump = cross_command($package, "objdump");
 
 	my (%seen, $unversioned_so);
 	my $need_ldconfig = 0;
@@ -264,20 +279,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		my $guessed_udeb = "${package}-udeb";
 		$udeb_name = $guessed_udeb if is_known_package($guessed_udeb) and is_udeb($guessed_udeb);
 	}
-	for my $lib_file (_all_so_files($tmp)) {
-		my ($library, $major);
+	for my $so_data (_all_so_files($package, $tmp)) {
+		my ($lib_file, $library, $major) = @{$so_data};
 		push(@lib_files, $lib_file) if compat(11);
-		my $ret = qx_cmd($objdump, '-p', $lib_file);
-		if ($ret=~m/\s+SONAME\s+(.*)\.so\.(.*)/) {
-			# proper soname format
-			$library=$1;
-			$major=$2;
-		}
-		elsif ($ret=~m/\s+SONAME\s+(.*)-(\d.*)\.so/) {
-			# idiotic crap soname format
-			$library=$1;
-			$major=$2;
-		} elsif ($ret =~ m/\s+SONAME\s+(?:\S)/) {
+		if (not defined($library)) {
 			$unversioned_so = 1;
 			push(@lib_files, $lib_file) if not compat(11);
 		}
