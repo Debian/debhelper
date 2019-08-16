@@ -162,8 +162,9 @@ Create an additional line for udebs in the shlibs file and use I<udeb> as the
 package name for udebs to depend on instead of the regular library package.
 
 This is option is only useful for special cases such as when debhelper
-cannot auto-detect package name of the udeb package or when the udeb
-will contain libraries from multiple deb packages.
+cannot auto-detect package name of the udeb package, when the udeb
+will contain libraries from multiple deb packages, or when the udeb
+contains libraries B<not> present in the deb package.
 
 =item B<--no-add-udeb>
 
@@ -201,7 +202,7 @@ Generates a shlibs file that looks something like:
 
 =cut
 
-my $shlibs_udeb;
+my ($shlibs_udeb, %known_udeb_solibs);
 
 init(options => {
 	"m=s", => \$dh{M_PARAMS},
@@ -279,6 +280,18 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		my $guessed_udeb = "${package}-udeb";
 		$udeb_name = $guessed_udeb if is_known_package($guessed_udeb) and is_udeb($guessed_udeb);
 	}
+	if (defined($udeb_name)) {
+		for my $so_data (_all_so_files($udeb_name, tmpdir($udeb_name))) {
+			my ($path, $library, $major) = @{$so_data};
+			$known_udeb_solibs{$udeb_name}{"${library}\x1f${major}"} = 1;
+		}
+		# If the udeb contains no SO files, then we there
+		if (not exists($known_udeb_solibs{$udeb_name})) {
+			error("The udeb $shlibs_udeb does not contain any shared libraries but --add-udeb=$shlibs_udeb was passed!?")
+				if defined($shlibs_udeb);
+			$udeb_name = undef;
+		}
+	}
 	for my $so_data (_all_so_files($package, $tmp)) {
 		my ($lib_file, $library, $major) = @{$so_data};
 		push(@lib_files, $lib_file) if compat(11);
@@ -330,13 +343,30 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			if (! $seen{$line}) {
 				$seen{$line}=1;
 				push(@deb_lines, $line);
-				if (defined($udeb_name) && $udeb_name ne '') {
+				if (defined($udeb_name) && (defined($shlibs_udeb) or exists($known_udeb_solibs{$udeb_name}{"${library}\x1f${major}"}))) {
 					my $udeb_deps = $deps;
 					$udeb_deps =~ s/\Q$package\E/$udeb_name/e;
 					$line="udeb: $library $major $udeb_deps";
 					push @udeb_lines, $line;
+					delete($known_udeb_solibs{$udeb_name}{"${library}\x1f${major}"});
 				}
 			}
+		}
+	}
+
+	if (not defined($shlibs_udeb) and defined($udeb_name)) {
+		my $issues = 0;
+		for my $lib_key (sort(keys(%{$known_udeb_solibs{$udeb_name}}))) {
+			my ($library, $major) = split(qr/\x1f/, $lib_key);
+			warning("$udeb_name contains SO library $library (version $major) but $package does not contain a similar library!?");
+			$issues = 1;
+		}
+		if ($issues) {
+			$ok = 0;
+			warning("Rejecting the generated shlibs file for $udeb_name!");
+			warning("Hint: Either add the missing libraries to $package, remove them from $udeb_name, or");
+			warning("Hint: (if this difference is expected) pass \"--add-udeb=$udeb_name\" to dh_makeshlibs.");
+			warning("Hint: In the latter case, you *may* also need to combine it with \"-p$package\"");
 		}
 	}
 

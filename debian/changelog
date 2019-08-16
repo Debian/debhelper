@@ -20,6 +20,10 @@ debhelper (12.5) UNRELEASED; urgency=medium
     on IRC.
   * dh_makeshlibs: Fix bug where --no-add-udeb could trigger the
     auto-detection code.  (Closes: #934891)
+  * dh_makeshlibs: When using the auto-detection of udeb, automatically
+    exclude "udeb:" lines for libraries omitted from the udeb.  At the
+    same time, verbosely fail if the udeb contains a library not present
+    in the deb (overridable with --add-udeb).  (Closes: #934889)
 
   [ Frank Schaefer ]
   * dh_installmodules: Also lok for compressed kernel modules
