@@ -227,8 +227,9 @@ sub _all_so_files {
 		# Only real/regular files
 		-l && return;
 		-f _ || return;
-		return if not is_so_or_exec_elf_file($_) or excludefile($_);
 		my $path = "$File::Find::dir/$_";
+		return if excludefile($path);
+		return if not is_so_or_exec_elf_file($_);
 		push(@all_so_files, $path);
 	}, $root_dir);
 
