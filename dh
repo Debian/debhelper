@@ -965,7 +965,19 @@ foreach my $i (0..$stoppoint) {
 	# Figure out which packages need to run this command.
 	my @todo;
 	my @opts=@options;
-	foreach my $package (@packages) {
+	my @filtered_packages;
+	if (grep { $_ eq '-i'} @{$command_opts{$command}}) {
+		if (grep { $_ eq '-a'} @{$command_opts{$command}}) {
+			@filtered_packages = @packages;
+		} else {
+			@filtered_packages = @indep_packages;
+		}
+	} elsif (grep { $_ eq '-a'} @{$command_opts{$command}}) {
+		@filtered_packages = @arch_packages;
+	} else {
+		@filtered_packages = @packages;
+	}
+	foreach my $package (@filtered_packages) {
 		if ($startpoint{$package} > $i ||
 		    $logged{$package}{$full_sequence->[$i]}) {
 			push @opts, "-N$package";
