@@ -185,6 +185,7 @@ our $PKGVERSION_REGEX = qr/
                  [0-9][0-9A-Za-z.+:~]*       # Upstream version (with no hyphens)
                  (?: - [0-9A-Za-z.+:~]+ )*   # Optional debian revision (+ upstreams versions with hyphens)
                           /xoa;
+our $MAINTSCRIPT_TOKEN_REGEX = qr/[A-Za-z0-9_.+]+/o;
 
 # From Policy 5.1:
 #
@@ -2075,10 +2076,11 @@ sub debhelper_script_subst {
 			verbose_print("[META] Replace #TOKEN#s in \"$tmp/DEBIAN/$script\"");
 		}
 		if (not $dh{NO_ACT}) {
+			my $regex = qr{#(${MAINTSCRIPT_TOKEN_REGEX})#}o;
 			open(my $out_fd, '>', "$tmp/DEBIAN/$script") or error("open($tmp/DEBIAN/$script) failed: $!");
 			open(my $in_fd, '<', $file) or error("open($file) failed: $!");
 			while (my $line = <$in_fd>) {
-				$line =~ s{#([A-Za-z0-9_.]+)#}{$subst->($1) // "#${1}#"}ge;
+				$line =~ s{$regex}{$subst->($1) // "#${1}#"}ge;
 				print {$out_fd} $line;
 			}
 			close($in_fd);
