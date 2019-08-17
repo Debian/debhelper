@@ -837,7 +837,7 @@ while (@ARGV_orig) {
 		}
 		if ($opt =~ m/^(--[^=]++)(?:=.*)?$/ or $opt =~ m/^(-[^-])$/) {
 			my $optname = $1;
-			if (length($optname) > 2 and (compat(12, 1) or m/^-[^-][^=]/)) {
+			if (length($optname) > 2 and (compat(12, 1) or $optname =~ m/^-[^-][^=]/)) {
 				# We cannot optimize bundled options but we can optimize a single
 				# short option with an explicit parameter (-B=F is ok, -BF is not)
 				# In compat 12 or earlier, we also punt on long options due to
