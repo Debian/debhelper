@@ -104,7 +104,7 @@ error in compat 12.
 Define tokens to be replaced inside the maintainer scripts when
 it is generated.  Please note that the limitations described in
 L</Limitations in token names> also applies to tokens defined
-on the command line.
+on the command line.  Invalid token names will trigger an error.
 
 In the simple case, this parameter will cause B<< #I<TOKEN># >>
 to be replaced by I<VALUE>.  If I<VALUE> starts with a literal
@@ -202,7 +202,9 @@ the concrete script.
 
 All tokens intended to be substituted must match the regex: #[A-Za-z0-9_.+]+#
 
-Tokens that do not match that regex will be silently ignored.
+Tokens that do not match that regex will be silently ignored if found in the
+script template.  Invalid token names passed to B<-D> or B<--define> will
+cause B<dh_installdeb> to reject the command with an error in most cases.
 
 =cut
 
@@ -393,6 +395,10 @@ sub per_package_subst {
 	my %vars = %{$provided_subst};
 	$vars{'PACKAGE'} = $package if not exists($vars{'PACKAGE'});
 	for my $var (keys(%{$provided_subst})) {
+		if ($var !~ $Debian::Debhelper::Dh_Lib::MAINTSCRIPT_TOKEN_REGEX) {
+			warning("User defined token ${var} does not match ${Debian::Debhelper::Dh_Lib::MAINTSCRIPT_TOKEN_REGEX}");
+			error("Invalid provided token ${var}: It cannot be substituted as it does not follow the token name rules");
+		}
 		if ($var =~ m/^pkg[.]\Q${package}\E[.](.+)$/) {
 			my $new_key = $1;
 			$vars{$new_key} = $provided_subst->{$var};
