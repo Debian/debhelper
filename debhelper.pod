@@ -952,6 +952,16 @@ abbreviated command parameters.  At the same time, B<dh> now
 optimizes out calls to redundant B<dh_*> helpers even when passed
 long command line options.
 
+=item -
+
+The ELF related debhelper tools (B<dh_dwz>, B<dh_strip>, B<dh_makeshlibs>,
+B<dh_shlibdeps>) are now only run for arch dependent packages by default
+(i.e. they are excluded from B<*-indep> targets and are passed B<-a>
+by default).
+
+If you need them for B<*-indep> targets, you can add an explicit
+Build-Depends on B<dh-sequence-elf-tools>.
+
 =back
 
 =back

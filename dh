@@ -419,19 +419,9 @@ qw{
 	dh_fixperms
 	dh_missing
 });
-my @ba=(map {
-	{
-		'command'             => $_,
-		'command-options'     => [],
-		'sequence-limitation' => SEQUENCE_TYPE_ARCH_ONLY,
-	}
-} (
-	(!compat(11) ? qw(dh_dwz) : qw()),
-qw{
-	dh_strip
-	dh_makeshlibs
-	dh_shlibdeps
-}));
+
+# Looking for dh_dwz, dh_strip, dh_makeshlibs, dh_shlibdeps (et al)?  They are
+# in the elf-tools addon.
 my @b=qw{
 	dh_installdeb
 	dh_gencontrol
@@ -455,7 +445,7 @@ sub _add_sequence {
 
 _add_sequence('build', SEQUENCE_ARCH_INDEP_SUBSEQUENCES, @bd);
 _add_sequence('install', SEQUENCE_ARCH_INDEP_SUBSEQUENCES, to_rules_target("build"), @i);
-_add_sequence('binary', SEQUENCE_ARCH_INDEP_SUBSEQUENCES, to_rules_target("install"), @ba, @b);
+_add_sequence('binary', SEQUENCE_ARCH_INDEP_SUBSEQUENCES, to_rules_target("install"), @b);
 _add_sequence('clean', SEQUENCE_NO_SUBSEQUENCES, @bd_minimal, qw{
 	dh_auto_clean
 	dh_clean
@@ -664,9 +654,27 @@ sub list_addons {
 
 sub _compute_addons {
 	my ($sequence_name, @addon_requests_from_args) = @_;
-	my (@enabled_addons, %disabled_addons, %enabled, $bd_dh_sequences_ref);
+	my (@enabled_addons, %disabled_addons, %enabled);
 	my @addon_requests;
 	my $sequence_type = sequence_type($sequence_name);
+
+	my %addon_constraints = %{ Debian::Debhelper::Dh_Lib::bd_dh_sequences() };
+
+	# Inject elf-tools early as other addons rely on their presence and it historically
+	# has been considered a part of the "core" sequence.
+	if (exists($addon_constraints{'elf-tools'})) {
+		# Explicitly requested; respect that
+		push(@addon_requests, '+elf-tools');
+	} elsif (compat(12, 1)) {
+		# In compat 12 and earlier, we only inject the sequence if there are arch
+		# packages present.
+		push(@addon_requests, '+elf-tools') if getpackages('arch');
+	} else {
+		# In compat 13, we always inject the addon if not explicitly requested and
+		# then flag it as arch_only
+		push(@addon_requests, '+elf-tools');
+		$addon_constraints{'elf-tools'} = SEQUENCE_TYPE_ARCH_ONLY if not exists($addon_constraints{'elf-tools'});
+	}
 
 	# Order is important; DH_EXTRA_ADDONS must come before everything
 	# else; then comes built-in and finally argument provided add-ons
@@ -683,9 +691,8 @@ sub _compute_addons {
 		push(@addon_requests, '+systemd') if compat(10, 1);
 		push(@addon_requests, '+build-stamp');
 	}
-	$bd_dh_sequences_ref = Debian::Debhelper::Dh_Lib::bd_dh_sequences();
-	for my $addon_name (sort(keys(%{$bd_dh_sequences_ref}))) {
-		my $addon_type = $bd_dh_sequences_ref->{$addon_name};
+	for my $addon_name (sort(keys(%addon_constraints))) {
+		my $addon_type = $addon_constraints{$addon_name};
 		if ($addon_type eq 'both' or $sequence_type eq 'both' or $addon_type eq $sequence_type) {
 			push(@addon_requests, "+${addon_name}");
 		}
@@ -720,7 +727,7 @@ sub _compute_addons {
 	return map {
 		{
 			'name' => $_,
-			'addon-type' => $bd_dh_sequences_ref->{$_} // 'both',
+			'addon-type' => $addon_constraints{$_} // SEQUENCE_TYPE_BOTH,
 		}
 	} @enabled_addons;
 }

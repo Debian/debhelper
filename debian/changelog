@@ -35,6 +35,14 @@ debhelper (12.5) UNRELEASED; urgency=medium
     doc/PROGRAMMING document (in the debhelper source) if they are
     considering to make their addon compatible with these requirements.
     (Closes: #836699)
+  * dh,elf_tools.pm: Extract the ELF related debhelper tools (dh_strip,
+    dh_dwz, dh_makeshlibs, dh_shlibdeps) into their own addon called
+    "elf-tools" enabled by the default.
+  * debian/control: Provide dh-sequence-elf-tools.
+  * dh: In compat 13, the "elf-tools" addon is considered an implicit
+    "arch-only" addon (i.e. they are only available in "-arch" sequences
+    and are always passed a "-a").  If you need the ELF tools for arch:all
+    packages, please add an explicit Builds-Depends on dh-sequence-elf-tools.
 
   [ Frank Schaefer ]
   * dh_installmodules: Also lok for compressed kernel modules
