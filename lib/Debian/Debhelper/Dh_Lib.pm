@@ -458,7 +458,7 @@ sub _doit {
 		if (defined($options)) {
 			if (defined(my $dir = $options->{chdir})) {
 				if ($dir ne '.') {
-					chdir($dir) or error("chdir(\"${dir}\) failed: $!");
+					chdir($dir) or error("chdir(\"${dir}\") failed: $!");
 				}
 			}
 			open(STDIN, '<', '/dev/null') or error("redirect STDIN failed: $!");
