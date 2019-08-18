@@ -235,8 +235,15 @@ sub _all_so_files {
 
 	@all_so_files = sort(@all_so_files);
 	for my $lib_file (@all_so_files) {
-		my $ret = qx_cmd($objdump, '-p', $lib_file);
-		my ($library, $major);
+		my ($library, $majorm, $ret);
+		if (compat(10)) {
+			# In compat 10, we silently ignored failing exit codes
+			# from objdump.  Its horrible, but such was compat 10.
+			$ret = `$objdump -p "$lib_file"`;
+			chomp($ret);
+		} else {
+			$ret = qx_cmd($objdump, '-p', $lib_file);
+		}
 		if ($ret=~m/\s+SONAME\s+(.*)\.so\.(.*)/) {
 			# proper soname format
 			$library=$1;
