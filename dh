@@ -553,12 +553,13 @@ sub _insert {
 	for my $seq (@affected_sequences) {
 		$seq->_insert($offset, $existing, _seq_cmd($new));
 	}
+	return 1;
 }
 sub insert_before {
-	_insert(-1, @_);
+	return _insert(-1, @_);
 }
 sub insert_after {
-	_insert(1, @_);
+	return _insert(1, @_);
 }
 sub remove_command {
 	my ($command) = @_;
@@ -566,11 +567,11 @@ sub remove_command {
 	_assert_not_conditional_sequence_addon('remove_command');
 	my @affected_sequences = _sequences_containing_cmd($command);
 	@affected_sequences = _filter_sequences_for_conditional_add_ons(@affected_sequences);
-	return if not @affected_sequences;
+	return 1 if not @affected_sequences;
 	for my $seq (@affected_sequences) {
 		$seq->remove_command($command);
 	}
-	return;
+	return 1;
 }
 sub add_command {
 	my ($command, $sequence) = @_;
@@ -583,7 +584,7 @@ sub add_command {
 		_filter_sequences_for_conditional_add_ons($seq);
 		$seq->add_command_at_start(_seq_cmd($command))
 	}
-	return;
+	return 1;
 }
 sub add_command_at_end {
 	my ($command, $sequence) = @_;
@@ -596,7 +597,7 @@ sub add_command_at_end {
 		_filter_sequences_for_conditional_add_ons($seq);
 		$seq->add_command_at_end(_seq_cmd($command))
 	}
-	return;
+	return 1;
 }
 
 sub add_command_options {
@@ -605,7 +606,7 @@ sub add_command_options {
 	# and that implies smarter deduplication logic)
 	_assert_not_conditional_sequence_addon('add_command_options');
 	push @{$command_opts{$command}}, @_;
-	return;
+	return 1;
 }
 
 sub remove_command_options {
@@ -626,7 +627,7 @@ sub remove_command_options {
 		# Clear all additional options
 		delete $command_opts{$command};
 	}
-	return;
+	return 1;
 }
 
 sub list_addons {

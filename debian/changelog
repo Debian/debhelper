@@ -3,6 +3,9 @@ debhelper (12.5.2) UNRELEASED; urgency=medium
   * dh_makeshlibs: Fix regression in compat 10 and earlier where
     dh_makeshlibs now failed on error.  This safety check was
     intended to be a compat 11 or later feature.
+  * dh: Ensure addon API functions return 1 to avoid gratious
+    breakage of addons due to perl's idiosyncrasy of requiring a
+    truth value at the end of modules.  (See #935016)
 
  -- Niels Thykier <niels@thykier.net>  Sun, 18 Aug 2019 07:18:04 +0000
 
