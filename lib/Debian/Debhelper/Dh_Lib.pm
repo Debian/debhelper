@@ -199,11 +199,13 @@ our $DEB822_FIELD_REGEX = qr/
 	    [\x21-\x39\x3B-\x7F]*                  # Subsequent characters (if any)
     /xoa;
 
+our $PARSE_DH_SEQUENCE_INFO = 0;
+
 sub init {
 	my %params=@_;
 
 	if ($params{internal_parse_dh_sequence_info}) {
-		_parse_debian_control(1);
+		$PARSE_DH_SEQUENCE_INFO = 1;
 	}
 
 	# Check if we can by-pass the expensive Getopt::Long by optimising for the
@@ -1587,7 +1589,6 @@ sub getpackages {
 }
 
 sub _parse_debian_control {
-	my ($parse_dh_sequence_info) = @_;
 	my $package="";
 	my $arch="";
 	my $section="";
@@ -1699,7 +1700,7 @@ sub _parse_debian_control {
 					error("Could not parse desired debhelper compat level from relation: $dep");
 				}
 				# Build-Depends on dh-sequence-<foo> OR dh-sequence-<foo> (<op> <version>)
-				if ($parse_dh_sequence_info and $dep =~ m/^dh-sequence-(${PKGNAME_REGEX})\s*(?:[(]\s*(?:[<>]?=|<<|>>)\s*(?:${PKGVERSION_REGEX})\s*[)])?(\s*[^\|]+[]>]\s*)?$/) {
+				if ($PARSE_DH_SEQUENCE_INFO and $dep =~ m/^dh-sequence-(${PKGNAME_REGEX})\s*(?:[(]\s*(?:[<>]?=|<<|>>)\s*(?:${PKGVERSION_REGEX})\s*[)])?(\s*[^\|]+[]>]\s*)?$/) {
 					my $sequence = $1;
 					my $has_profile_or_arch_restriction = $2 ? 1 : 0;
 					my $addon_type = $field2addon_type{$field};

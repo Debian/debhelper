@@ -1,3 +1,16 @@
+debhelper (12.5.3) UNRELEASED; urgency=medium
+
+  * Dh_Getopt.pm: Skip compat call if d/control cannot be found
+    and just assume that auto-abbreviation can be disabled in that
+    case.  This avoids breaking options such as --help and --list.
+    (Closes: #935017)
+  * Dh_Lib.pm: Jump to hoops to only parse the Build-Dependency
+    field in dh without breaking dh's own --list or --help
+    parameter.  This fixes a regression since 12.5 where dh's
+    --help and --list options were broken.
+
+ -- Niels Thykier <niels@thykier.net>  Sun, 18 Aug 2019 18:33:50 +0000
+
 debhelper (12.5.2) unstable; urgency=medium
 
   * dh_makeshlibs: Fix regression in compat 10 and earlier where
