@@ -288,17 +288,17 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		my $guessed_udeb = "${package}-udeb";
 		$udeb_name = $guessed_udeb if is_known_package($guessed_udeb) and is_udeb($guessed_udeb);
 	}
-	if (defined($udeb_name)) {
+	# If there is a udeb (which we assume there never is under the "noudeb" build-profile)
+	# then check it for libraries.
+	if (defined($udeb_name) and not is_build_profile_active('noudeb')) {
 		for my $so_data (_all_so_files($udeb_name, tmpdir($udeb_name))) {
-			my ($path, $library, $major) = @{$so_data};
+			my (undef, $library, $major) = @{$so_data};
 			$known_udeb_solibs{$udeb_name}{"${library}\x1f${major}"} = 1;
 		}
-		# If the udeb contains no SO files, then we there
-		if (not exists($known_udeb_solibs{$udeb_name})) {
-			error("The udeb $shlibs_udeb does not contain any shared libraries but --add-udeb=$shlibs_udeb was passed!?")
-				if defined($shlibs_udeb);
-			$udeb_name = undef;
-		}
+		# If the udeb contains no SO files but there was an explicit --add-udeb, then
+		# something is wrong.
+		error("The udeb $shlibs_udeb does not contain any shared libraries but --add-udeb=$shlibs_udeb was passed!?")
+			if defined($shlibs_udeb) and not exists($known_udeb_solibs{$udeb_name});
 	}
 	for my $so_data (_all_so_files($package, $tmp)) {
 		my ($lib_file, $library, $major) = @{$so_data};
