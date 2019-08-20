@@ -65,9 +65,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (@fontdirs) {
 		# Figure out what commands the postinst and postrm will need 
 		# to call.
-		my @cmds;
-		my @cmds_postinst;
-		my @cmds_postrm;
+		my (@cmds, @cmds_postinst, @cmds_postrm);
 		# Sort items for reproducible binary package contents.
 		foreach my $f (sort @fontdirs) {
 			# This must come before update-fonts-dir.
@@ -85,11 +83,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		autoscript($package, "postrm", "postrm-xfonts",
 			{ 'CMDS' => join(";", @cmds, @cmds_postrm) });
 
-		if (@cmds_postrm) {
-			addsubstvar($package, "misc:Depends", "xfonts-utils", ">= 1:7.5+2");
-		} else {
-			addsubstvar($package, "misc:Depends", "xfonts-utils");
-		}
+		addsubstvar($package, "misc:Depends", "xfonts-utils");
 	}
 }
 
