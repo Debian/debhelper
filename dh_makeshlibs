@@ -365,7 +365,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}
 	}
 
-	if (defined($udeb_name)) {
+	if (defined($udeb_name) and not $shlibs_udeb) {
 		my $issues = 0;
 		for my $lib_key (sort(keys(%{$known_udeb_solibs{$udeb_name}}))) {
 			my ($library, $major) = split(qr/\x1f/, $lib_key);

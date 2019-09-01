@@ -3,6 +3,10 @@ debhelper (12.5.4) UNRELEASED; urgency=medium
   * dh_installxfonts: Remove version in dependency on xfonts-utils
     added to ${misc:Depends}.  The version requirement has been
     satisfied for the past 3-4 releases.
+  * dh_makeshlibs: Correct a control check that was only intended
+    for automatic udeb detection, which incorrectly also checked
+    when --add-udeb was passed.  Thanks to Andreas Metzler for
+    reporting the issue.  (Closes: #935577)
 
  -- Niels Thykier <niels@thykier.net>  Tue, 20 Aug 2019 14:14:47 +0000
 
