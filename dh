@@ -668,8 +668,10 @@ sub _compute_addons {
 		push(@addon_requests, '+elf-tools');
 	} elsif (compat(12, 1)) {
 		# In compat 12 and earlier, we only inject the sequence if there are arch
-		# packages present.
-		push(@addon_requests, '+elf-tools') if getpackages('arch');
+		# packages present and the sequence requires it.
+		if (getpackages('arch') and $sequence_type ne SEQUENCE_TYPE_INDEP_ONLY) {
+			push(@addon_requests, '+elf-tools');
+		}
 	} else {
 		# In compat 13, we always inject the addon if not explicitly requested and
 		# then flag it as arch_only
