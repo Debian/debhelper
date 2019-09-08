@@ -293,6 +293,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (defined($udeb_name) and not is_build_profile_active('noudeb')) {
 		for my $so_data (_all_so_files($udeb_name, tmpdir($udeb_name))) {
 			my (undef, $library, $major) = @{$so_data};
+			$major = $dh{M_PARAMS} if defined($dh{M_PARAMS}) and $dh{M_PARAMS} ne '';
+			next if not defined($library) or not defined($major);
 			$known_udeb_solibs{$udeb_name}{"${library}\x1f${major}"} = 1;
 		}
 		# If the udeb contains no SO files but there was an explicit --add-udeb, then
