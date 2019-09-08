@@ -5,6 +5,9 @@ debhelper (12.6) UNRELEASED; urgency=medium
     trigger a rejection of the "generated" shlibs file (despite
     dh_makeshlibs not generating any "shlibs" files).
     (Closes: #939635)
+  * dh_strip: Avoid impossible copy of .../debug/.dwz/ to itself
+    when a manual debug package contained ELF files and was
+    processed by dh_dwz before dh_strip.  (Closes: #939164)
 
   [ Sven Joachim ]
   * Split debhelper into debhelper (the tools) and libdebhelper-perl
