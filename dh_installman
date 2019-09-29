@@ -272,6 +272,9 @@ on_items_in_parallel(\@all_packages, sub {
 });
 
 # Now utf-8 conversion.
+my $has_man_recode = 0;
+$has_man_recode = 1 if has_man_db_tool('man-recode');
+
 if (has_man_db_tool('man')) {
 	my (@manpages_to_reencode, @issues);
 	for my $package (@{$dh{DOPACKAGES}}) {
@@ -296,19 +299,7 @@ if (has_man_db_tool('man')) {
 		}
 	}
 	if (@manpages_to_reencode) {
-		on_items_in_parallel(\@manpages_to_reencode, sub {
-			for my $manpage (@_) {
-				my $manpage_tmp = "${manpage}.dh-new";
-				my $manpage_cmd = ($manpage =~ m{^/}) ? $manpage : "./${manpage}";
-				doit({ stdout => $manpage_tmp }, 'man', '-l', '--recode', 'UTF-8', $manpage_cmd);
-				# recode uncompresses compressed pages
-				my $orig = $manpage;
-				rm_files($orig) if $manpage =~ s/\.(gz|Z)$//;
-				rename_path($manpage_tmp, $manpage);
-			}
-			# Bulk reset permissions of all re-encoded files
-			xargs(\@_, 'chmod', '0644', '--');
-		});
+		on_items_in_parallel(\@manpages_to_reencode, \&reencode_manpages);
 	}
 } else {
 	# Should only occur during debhelper building itself (to avoid a B-D on man-db).
@@ -368,6 +359,26 @@ sub has_man_db_tool {
 	open(*STDERR, '>&', $old_stderr) or error("dup(tmp_fd, STDERR): $!");
 	close($old_stderr);
 	return $res;
+}
+
+sub reencode_manpages {
+	my (@manpages) = @_;
+	if ($has_man_recode) {
+		xargs(\@manpages, 'man-recode', '--to-code', 'UTF-8', '--suffix', '.dh-new');
+	}
+	for my $manpage (@manpages) {
+		my $manpage_tmp = "${manpage}.dh-new";
+		if (not $has_man_recode) {
+			my $manpage_cmd = ($manpage =~ m{^/}) ? $manpage : "./${manpage}";
+			doit({ stdout => $manpage_tmp }, 'man', '-l', '--recode', 'UTF-8', $manpage_cmd);
+		}
+		# recode uncompresses compressed pages
+		my $orig = $manpage;
+		rm_files($orig) if $manpage =~ s/\.(gz|Z)$//;
+		rename_path($manpage_tmp, $manpage);
+	}
+	# Bulk reset permissions of all re-encoded files
+	xargs(\@manpages, 'chmod', '0644', '--');
 }
 
 =head1 SEE ALSO
