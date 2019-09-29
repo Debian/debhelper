@@ -275,7 +275,7 @@ on_items_in_parallel(\@all_packages, sub {
 my $has_man_recode = 0;
 $has_man_recode = 1 if has_man_db_tool('man-recode');
 
-if (has_man_db_tool('man')) {
+if ($has_man_recode || has_man_db_tool('man')) {
 	my (@manpages_to_reencode, @issues);
 	for my $package (@{$dh{DOPACKAGES}}) {
 		next if is_udeb($package);
