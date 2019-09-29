@@ -272,7 +272,7 @@ on_items_in_parallel(\@all_packages, sub {
 });
 
 # Now utf-8 conversion.
-if (defined(`man --version`)) {
+if (has_man_db_tool('man')) {
 	my (@manpages_to_reencode, @issues);
 	for my $package (@{$dh{DOPACKAGES}}) {
 		next if is_udeb($package);
@@ -357,6 +357,17 @@ sub find_so_man {
 			push @sodests,$solink;
 		}
 	}
+}
+
+sub has_man_db_tool {
+	my ($tool) = @_;
+	open(my $old_stderr, '>&', *STDERR) or error("dup(STDERR, tmp_fd): $!");
+	open(*STDERR, '>', '/dev/null') or error("re-open stderr as /dev/null: $!");
+
+	my $res = defined(`$tool --version`);
+	open(*STDERR, '>&', $old_stderr) or error("dup(tmp_fd, STDERR): $!");
+	close($old_stderr);
+	return $res;
 }
 
 =head1 SEE ALSO
