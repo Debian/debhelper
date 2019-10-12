@@ -301,6 +301,37 @@ level that is known to work, or that you wish to support.
 Notably, setting the maximum to 1 is effectively the same as using
 B<--no-parallel>.
 
+=item B<--reload-all-buildenv-variables>
+
+By default, L<dh(1)> will compute several environment (e.g. by using
+L<dpkg-buildflags(1)>) and cache them to avoid having all B<dh_auto_*>
+tool recompute them.
+
+When passing this option, the concrete B<dh_auto_*> tool will ignore
+the cache from L<dh(1)> and retrigger a rebuild of these variables.
+This is useful in the very rare case where the package need to do
+multiple builds but with different B<...FLAGS> options.  A concrete
+example would be needing to change the B<-O> parameter in B<CFLAGS> in
+the second build:
+
+    export DEB_CFLAGS_MAINT_APPEND=-O3
+
+    %:
+        dh $@
+
+    override_dh_auto_configure:
+        dh_auto_configure -Bbuild-deb ...
+        DEB_CFLAGS_MAINT_APPEND=-Os dh_auto_configure \
+           --reload-all-buildenv-variables -Bbuild-udeb ...
+
+Without B<--reload-all-buildenv-variables> in the second call to
+L<dh_auto_configure(1)>, the change in B<DEB_CFLAGS_MAINT_APPEND>
+would be ignored as L<dh_auto_configure(1)> would use the cached value
+of B<CFLAGS> set by L<dh(1)>.
+
+This option is only available with B<< debhelper (>= 12.7~) >> when
+the package uses compatibility level 9 or later.
+
 =item B<--list>, B<-l>
 
 List all build systems supported by debhelper on this system. The list

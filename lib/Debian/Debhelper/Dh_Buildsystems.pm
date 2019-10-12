@@ -201,7 +201,15 @@ sub buildsystems_init {
 	    "parallel" => sub { $max_parallel = -1 },
 	    'no-parallel' => sub { $max_parallel = 1 },
 	    "max-parallel=i" => \$max_parallel,
+
+	    'reload-all-buildenv-variables' => sub { delete($ENV{'DH_INTERNAL_BUILDFLAGS'}); },
 	);
+	if (compat(8)) {
+		# This option only works in compat 9+ where we actually set buildflags
+		$options{'reload-all-buildenv-variables'} = sub {
+			die("--reload-all-buildenv-variables only work reliably in compat 9+");
+		};
+	}
 	$args{options}{$_} = $options{$_} foreach keys(%options);
 	Debian::Debhelper::Dh_Lib::init(%args);
 	Debian::Debhelper::Dh_Lib::set_buildflags();
