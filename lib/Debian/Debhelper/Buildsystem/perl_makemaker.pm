@@ -8,7 +8,7 @@ package Debian::Debhelper::Buildsystem::perl_makemaker;
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(compat);
+use Debian::Debhelper::Dh_Lib qw(compat is_cross_compiling perl_cross_incdir);
 use parent qw(Debian::Debhelper::Buildsystem::makefile);
 use Config;
 
@@ -51,11 +51,22 @@ sub configure {
 	if ($ENV{CFLAGS} && ! compat(8)) {
 		push @flags, "OPTIMIZE=$ENV{CFLAGS} $ENV{CPPFLAGS}";
 	}
+	my $cross_flag;
+	if (is_cross_compiling()) {
+		my $incdir = perl_cross_incdir();
+		$cross_flag = "-I$incdir" if defined $incdir;
+	}
 	if ($ENV{LDFLAGS} && ! compat(8)) {
-		push @flags, "LD=$Config{ld} $ENV{CFLAGS} $ENV{LDFLAGS}";
+		my $ld = $Config{ld};
+		$ld = qx/perl $cross_flag -MConfig -e 'print \$Config{ld}'/
+			if is_cross_compiling() and defined $cross_flag;
+		push @flags, "LD=$ld $ENV{CFLAGS} $ENV{LDFLAGS}";
 	}
 
 	push(@perl_flags, '-I.') if compat(10);
+
+	push @perl_flags, $cross_flag
+		if is_cross_compiling() and defined $cross_flag;
 
 	$this->doit_in_sourcedir("perl", @perl_flags, "Makefile.PL", "INSTALLDIRS=vendor",
 		# if perl_build is not tested first, need to pass packlist
