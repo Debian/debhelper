@@ -171,6 +171,11 @@ contains libraries B<not> present in the deb package.
 Do not add any udeb lines to the shlibs file.  This can be used to disable the
 default auto-detection of udebs.
 
+This may be useful in case you do not want a shlibs file at all for the udeb
+because no package will depend on it.  E.g. because adding a udeb package
+for the library was "overkill" and the library is embedded in a different
+udeb package.
+
 =item B<--> I<params>
 
 Pass I<params> to L<dpkg-gensymbols(1)>.
@@ -380,6 +385,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			warning("Hint: Either add the missing libraries to $package, remove them from $udeb_name, or");
 			warning("Hint: (if this difference is expected) pass \"--add-udeb=$udeb_name\" to dh_makeshlibs.");
 			warning("Hint: In the latter case, you *may* also need to combine it with \"-p$package\"");
+			warning("Hint: Alternatively, if you have merged the shared lib package into $udeb_name and it has no");
+			warning("Hint: other packages need to know of this library, then use \"--no-add-udeb\"");
 		}
 	}
 
