@@ -146,6 +146,7 @@ qw(
 	is_cross_compiling
 	is_build_profile_active
 	get_buildoption
+	perl_cross_incdir
 ),
 	# Other
 qw(
@@ -2708,6 +2709,21 @@ sub dbgsym_tmpdir {
 	return "debian/.debhelper/${package}/dbgsym-root";
 }
 
+sub perl_cross_incdir {
+	return if !is_cross_compiling();
+
+	# native builds don't currently need this so only load it on demand
+	require Config; Config->import();
+
+	my $triplet = dpkg_architecture_value("DEB_HOST_MULTIARCH");
+	my $perl_version = $Config::Config{version};
+	my $incdir = "/usr/lib/$triplet/perl/cross-config-${perl_version}";
+	if (!-e "$incdir/Config.pm") {
+		warning("$incdir/Config.pm does not exist (missing build dependency on perl-xs-dev?)");
+		return;
+	}
+	return $incdir;
+}
 
 {
 	my %known_packages;
