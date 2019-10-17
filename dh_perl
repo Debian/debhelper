@@ -73,6 +73,11 @@ init();
 
 my $vendorlib = substr $Config{vendorlib}, 1;
 my $vendorarch = substr $Config{vendorarch}, 1;
+if (is_cross_compiling()) {
+	my $incdir = perl_cross_incdir();
+	$vendorarch = substr qx/perl -I$incdir -MConfig -e 'print \$Config{vendorarch}'/, 1
+		if defined $incdir;
+}
 
 # Cleaning the paths given on the command line
 foreach (@ARGV) {
