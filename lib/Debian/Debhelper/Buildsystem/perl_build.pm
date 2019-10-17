@@ -8,7 +8,7 @@ package Debian::Debhelper::Buildsystem::perl_build;
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(compat);
+use Debian::Debhelper::Dh_Lib qw(compat is_cross_compiling perl_cross_incdir);
 use parent qw(Debian::Debhelper::Buildsystem);
 use Config;
 
@@ -29,7 +29,17 @@ sub check_auto_buildable {
 
 sub do_perl {
 	my $this=shift;
-	$this->doit_in_sourcedir("perl", @_);
+	my %options;
+	if (is_cross_compiling()) {
+		my $cross_incdir = perl_cross_incdir();
+		if (defined $cross_incdir) {
+			my $perl5lib = $cross_incdir;
+			$perl5lib .= $Config{path_sep} . $ENV{PERL5LIB}
+				if defined $ENV{PERL5LIB};
+			$options{update_env} = { PERL5LIB => $perl5lib };
+		}
+	}
+	$this->doit_in_sourcedir(\%options, "perl", @_);
 }
 
 sub new {
@@ -47,7 +57,13 @@ sub configure {
 		push @flags, "--config", "optimize=$ENV{CFLAGS} $ENV{CPPFLAGS}";
 	}
 	if ($ENV{LDFLAGS} && ! compat(8)) {
-		push @flags, "--config", "ld=$Config{ld} $ENV{CFLAGS} $ENV{LDFLAGS}";
+		my $ld = $Config{ld};
+		if (is_cross_compiling()) {
+			my $incdir = perl_cross_incdir();
+			$ld = qx/perl -I$incdir -MConfig -e 'print \$Config{ld}'/
+				if defined $incdir;
+		}
+		push @flags, "--config", "ld=$ld $ENV{CFLAGS} $ENV{LDFLAGS}";
 	}
 	push(@perl_flags, '-I.') if compat(10);
 	$this->do_perl(@perl_flags, "Build.PL", "--installdirs", "vendor", @flags, @_);
