@@ -109,7 +109,7 @@ sub test {
 	my $target = $this->get_targetbuildsystem;
 
 	eval {
-		if (compat(12) or $target->name ne 'ninja') {
+		if (compat(12) or $target->NAME ne 'ninja') {
 			$target->test(@_);
 		} else {
 			# In compat 13 with meson+ninja, we prefer using "meson test"
@@ -118,7 +118,7 @@ sub test {
 				update_env => {
 					'LC_ALL' => 'C.UTF-8',
 				}
-				);
+			);
 			if ($this->get_parallel() > 0) {
 				$options{update_env}{MESON_TESTTHREADS} = $this->get_parallel();
 			}
