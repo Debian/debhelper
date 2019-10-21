@@ -39,6 +39,9 @@ sub configure {
 	push @opts, "--infodir=\${prefix}/share/info";
 	push @opts, "--sysconfdir=/etc";
 	push @opts, "--localstatedir=/var";
+	# We pass --disable/enable-* options that might be unknown, so we
+	# should not emit warnings.
+	push @opts, "--disable-option-checking";
 	if ($dh{QUIET}) {
 		push @opts, "--enable-silent-rules";
 	} else {
