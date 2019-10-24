@@ -368,6 +368,7 @@ sub reencode_manpages {
 	}
 	for my $manpage (@manpages) {
 		my $manpage_tmp = "${manpage}.dh-new";
+		$manpage_tmp =~ s/\.(gz|Z)\.dh-new$/.dh-new/;
 		if (not $has_man_recode) {
 			my $manpage_cmd = ($manpage =~ m{^/}) ? $manpage : "./${manpage}";
 			doit({ stdout => $manpage_tmp }, 'man', '-l', '--recode', 'UTF-8', $manpage_cmd);
