@@ -9,7 +9,7 @@ use Test::DH;
 use File::Path qw(remove_tree make_path);
 use Debian::Debhelper::Dh_Lib qw(!dirname);
 
-plan(tests => 1);
+plan(tests => 2);
 
 our @TEST_DH_EXTRA_TEMPLATE_FILES = (qw(
     manpage-uncompressed.pod
@@ -29,6 +29,26 @@ each_compat_subtest {
 	}
     ok(run_dh_tool('dh_installman', 'generated-manpages/manpage-uncompressed.1',
 				   'generated-manpages/manpage-compressed.1.gz'));
+    ok(-e 'debian/debhelper/usr/share/man/man1/manpage-uncompressed.1');
+    ok(-e 'debian/debhelper/usr/share/man/man1/manpage-compressed.1');
+    remove_tree('debian/debhelper', 'debian/tmp', 'debian/.debhelper');
+};
+
+each_compat_subtest {
+    my ($compat) = @_;
+	if (! -d 'generated-manpages') {
+		# Static data that can be reused.  Generate only in the first test
+		make_path('generated-manpages');
+		for my $basename (qw(manpage-uncompressed manpage-compressed)) {
+			doit('pod2man', '--utf8', '-c', 'Debhelper', '-r', '1.0', "${basename}.pod",
+				 "generated-manpages/${basename}.1");
+		}
+		doit('gzip', '-9n', 'generated-manpages/manpage-compressed.1');
+	}
+	install_dir('debian/debhelper/usr/share/man/man1');
+	install_file('generated-manpages/manpage-uncompressed.1', 'debian/debhelper/usr/share/man/man1/manpage-uncompressed.1');
+	install_file('generated-manpages/manpage-compressed.1.gz', 'debian/debhelper/usr/share/man/man1/manpage-compressed.1.gz');
+    ok(run_dh_tool('dh_installman'));
     ok(-e 'debian/debhelper/usr/share/man/man1/manpage-uncompressed.1');
     ok(-e 'debian/debhelper/usr/share/man/man1/manpage-compressed.1');
     remove_tree('debian/debhelper', 'debian/tmp', 'debian/.debhelper');
