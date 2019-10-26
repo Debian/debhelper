@@ -14,6 +14,14 @@ tests-testing:
     - apt-get build-dep -y .
     - dpkg-buildpackage -us -uc -tc
 
+tests-unstable-all:
+  stage: test
+  image: debian:unstable
+  script:
+    - apt-get update
+    - apt-get build-dep -y -Ppkg.debhelper.ci .
+    - dpkg-buildpackage -us -uc -tc
+
 tests-unstable:
   stage: test
   image: debian:unstable

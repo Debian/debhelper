@@ -9,7 +9,22 @@ use Test::DH;
 use File::Path qw(remove_tree make_path);
 use Debian::Debhelper::Dh_Lib qw(!dirname);
 
-plan(tests => 2);
+sub has_man_db_tool {
+	my ($tool) = @_;
+	open(my $old_stderr, '>&', *STDERR) or error("dup(STDERR, tmp_fd): $!");
+	open(*STDERR, '>', '/dev/null') or error("re-open stderr as /dev/null: $!");
+
+	my $res = defined(`$tool --version`);
+	open(*STDERR, '>&', $old_stderr) or error("dup(tmp_fd, STDERR): $!");
+	close($old_stderr);
+	return $res;
+}
+
+if (has_man_db_tool('man') || has_man_db_tool('man-recode')) {
+	plan(tests => 2);
+} else {
+	plan(skip_all => 'Test requires man or man-recode');
+}
 
 our @TEST_DH_EXTRA_TEMPLATE_FILES = (qw(
     manpage-uncompressed.pod
