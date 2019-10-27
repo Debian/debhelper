@@ -2718,10 +2718,7 @@ sub perl_cross_incdir {
 	my $triplet = dpkg_architecture_value("DEB_HOST_MULTIARCH");
 	my $perl_version = $Config::Config{version};
 	my $incdir = "/usr/lib/$triplet/perl/cross-config-${perl_version}";
-	if (!-e "$incdir/Config.pm") {
-		warning("$incdir/Config.pm does not exist (missing build dependency on perl-xs-dev?)");
-		return;
-	}
+	return undef if !-e "$incdir/Config.pm";
 	return $incdir;
 }
 
