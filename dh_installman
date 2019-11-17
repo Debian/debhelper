@@ -353,7 +353,9 @@ sub find_so_man {
 sub has_man_db_tool {
 	my ($tool) = @_;
 	open(my $old_stderr, '>&', *STDERR) or error("dup(STDERR, tmp_fd): $!");
-	open(*STDERR, '>', '/dev/null') or error("re-open stderr as /dev/null: $!");
+	# Ignore the error; it is intended as noise-reduction.  As long as we can restore
+	# the stderr later, the log will just be slightly more noisy than planned.
+	open(*STDERR, '>', '/dev/null') or warn("redirect stderr to /dev/null failed: $!");
 
 	my $res = defined(`$tool --version`);
 	open(*STDERR, '>&', $old_stderr) or error("dup(tmp_fd, STDERR): $!");
