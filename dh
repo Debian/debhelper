@@ -696,6 +696,9 @@ sub _compute_addons {
 	}
 	for my $addon_name (sort(keys(%addon_constraints))) {
 		my $addon_type = $addon_constraints{$addon_name};
+
+		# Special-case for the "clean" target to avoid B-D-I dependencies in that for conditional add-ons
+		next if $sequence_name eq 'clean' and $addon_type ne SEQUENCE_TYPE_BOTH;
 		if ($addon_type eq 'both' or $sequence_type eq 'both' or $addon_type eq $sequence_type) {
 			push(@addon_requests, "+${addon_name}");
 		}
