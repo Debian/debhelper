@@ -122,7 +122,7 @@ sub test {
 			if ($this->get_parallel() > 0) {
 				$options{update_env}{MESON_TESTTHREADS} = $this->get_parallel();
 			}
-			$this->doit_in_builddir(\%options, $this->{buildcmd}, "test", @_);
+			$this->doit_in_builddir(\%options, 'meson', 'test', @_);
 		}
 	};
 	if (my $err = $@) {
