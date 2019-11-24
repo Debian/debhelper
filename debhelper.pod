@@ -1008,6 +1008,16 @@ The third-party B<gradle> build system (from B<gradle-debian-helper>
 package) now runs the upstream-provided test suite automatically.  To
 suppress such behavior, override B<dh_auto_test>.
 
+=item -
+
+The B<dh_installman> tool now aborts if it sees conflicting
+definitions of a manpage.  This typically happens if the upstream
+build system is installing a compressed version and the package lists
+an uncompressed version of the manpage in F<<
+debian/I<package>.manpages >>.  Often the easiest fix is to remove the
+manpage from F<< debian/I<package>.manpages >> (assuming both version
+are identical).
+
 =back
 
 =back
