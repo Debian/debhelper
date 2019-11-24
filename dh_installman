@@ -290,20 +290,20 @@ if ($has_man_recode || has_man_db_tool('man')) {
 					push(@issues, $path);
 					return;
 				}
-				my $basename = basename($path);
-				$basename =~ s/\.(?:gz|Z)$//;
-				if (exists($seen{$basename})) {
-					my $msg = "Multiple definitions for manpage ${basename} via different compressions.";
-					my @values = sort ($path, $seen{$basename});
+				my $uncompressed_name = $path;
+				$uncompressed_name =~ s/\.(?:gz|Z)$//;
+				if (exists($seen{$uncompressed_name})) {
+					my $msg = "Multiple definitions for manpage ${uncompressed_name} via different compressions.";
+					my @values = sort ($path, $seen{$uncompressed_name});
 					my $warn_msg = $msg . '  Picking ' . $values[0] . ' as the canonical definition.';
 					my $error_msg = $msg . '  Please ensure there is at most one definition.';
 					deprecated_functionality($warn_msg, 13, $error_msg);
 					$path = $values[0];
-					warn("Removing conflicting definition of ${basename} (" . $values[1]
+					warn("Removing conflicting definition of ${uncompressed_name} (" . $values[1]
 						. ') to ensure deterministic behaviour.');
 					rm_files($values[1]);
 				}
-				$seen{$basename} = $path;
+				$seen{$uncompressed_name} = $path;
 			};
 			find({
 					no_chdir => 1,
