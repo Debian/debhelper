@@ -212,7 +212,7 @@ sub buildsystems_init {
 	}
 	$args{options}{$_} = $options{$_} foreach keys(%options);
 	Debian::Debhelper::Dh_Lib::init(%args);
-	Debian::Debhelper::Dh_Lib::set_buildflags();
+	Debian::Debhelper::Dh_Lib::setup_buildenv();
 	set_parallel($max_parallel);
 }
 

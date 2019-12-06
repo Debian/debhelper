@@ -1018,6 +1018,13 @@ debian/I<package>.manpages >>.  Often the easiest fix is to remove the
 manpage from F<< debian/I<package>.manpages >> (assuming both version
 are identical).
 
+=item -
+
+The B<dh_auto_*> helpers now resets the environment variables B<HOME>
+and common B<XDG_*> variable.  B<HOME> and B<XDG_RUNTIME_DIR> are each
+set to a distinct writable directory. The rest of the environment
+variables are cleared.
+
 =back
 
 =back
@@ -1234,6 +1241,17 @@ need to change the default flags, please use the features from
 L<dpkg-buildflags(1)> to do this (e.g. B<DEB_BUILD_MAINT_OPTIONS=hardening=all>
 or B<DEB_CPPFLAGS_MAINT_APPEND=-DCUSTOM_MACRO=true>) rather than setting the
 concrete variable directly.
+
+=item B<HOME>, B<XDG_*>
+
+In compat 13 and later, these environment variables are reset before invoking
+the upstream build system via the B<dh_auto_*> helpers.  The variables B<HOME>
+and B<XDG_RUNTIME_DIR> will be set to a writable directory. The remaining
+variables will be cleared.
+
+The directories will be created as empty directories but they will be reused
+between calls to B<dh_auto_*>.  Any content will persist until explicitly
+deleted or B<dh_clean>.
 
 =back
 
