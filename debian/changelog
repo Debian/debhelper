@@ -4,6 +4,10 @@ debhelper (12.7.3) UNRELEASED; urgency=medium
   * dh_perl: Use perl:any for perl module in addition to perl
     programs.  Thanks to Helmut Grohne and Niko Tyni for the
     suggestion and analysis.  (Closes: #946655)
+  * dh_gencontrol: Clear the "Built-Using" flag for dbgsym
+    packages.  It is irrelevant as the original binary will
+    have the field plus the field can cause lintian warnings.
+    (Closes: #947506)
 
   [ Debian Janitor ]
   * Fix day-of-week for changelog entry 4.0.0.
