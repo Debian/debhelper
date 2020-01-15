@@ -330,20 +330,6 @@ sub logfile {
 	return "debian/${ext}debhelper.log"
 }
 
-sub add_override {
-	my $line=shift;
-	$line="override_$ENV{DH_INTERNAL_OVERRIDE} $line"
-		if defined $ENV{DH_INTERNAL_OVERRIDE};
-	return $line;
-}
-
-sub remove_override {
-	my $line=shift;
-	$line=~s/^\Qoverride_$ENV{DH_INTERNAL_OVERRIDE}\E\s+//
-		if defined $ENV{DH_INTERNAL_OVERRIDE};
-	return $line;
-}
-
 sub load_log {
 	my ($package, $db)=@_;
 
@@ -351,7 +337,7 @@ sub load_log {
 	open(LOG, "<", logfile($package)) || return;
 	while (<LOG>) {
 		chomp;
-		my $command=remove_override($_);
+		my $command = $_;
 		push @log, $command;
 		$db->{$package}{$command}=1 if defined $db;
 	}
@@ -366,9 +352,9 @@ sub write_log {
 	return if $dh{NO_ACT};
 
 	foreach my $package (@packages) {
-		my $log=logfile($package);
+		my $log = logfile($package);
 		open(LOG, ">>", $log) || error("failed to write to ${log}: $!");
-		print LOG add_override($cmd)."\n";
+		print LOG $cmd."\n";
 		close LOG;
 	}
 }
@@ -379,8 +365,8 @@ sub commit_override_log {
 	return if $dh{NO_ACT};
 
 	foreach my $package (@packages) {
-		my @log=map { remove_override($_) } load_log($package);
-		my $log=logfile($package);
+		my @log = load_log($package);
+		my $log = logfile($package);
 		open(LOG, ">", $log) || error("failed to write to ${log}: $!");
 		print LOG $_."\n" foreach @log;
 		close LOG;
