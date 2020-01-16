@@ -977,7 +977,7 @@ foreach my $i (0..$stoppoint) {
 	# the usual command. (The non-arch-specific override is tried first,
 	# for simplest semantics; mixing it with arch-specific overrides
 	# makes little sense.)
-	@todo = run_hook_target("override_${command}", 10, $command, \@full_todo, @opts);
+	@todo = run_hook_target("override_${command}", undef, $command, \@full_todo, @opts);
 
 	if (@todo and not can_skip($command, @todo)) {
 		# No need to run the command for any packages handled by the
