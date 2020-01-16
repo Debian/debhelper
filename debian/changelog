@@ -1,9 +1,16 @@
-debhelper (12.7.4) UNRELEASED; urgency=medium
+debhelper (12.8) UNRELEASED; urgency=medium
 
   [ Niels Thykier ]
   * Dh_Lib.pm: Simplify internal loggning of which commands
     have been run.  We are no longer interested in whether
     it was an override target or not.
+  * dh: Support "execute_before_X" and "execute_after_X"
+    targets in debian/rules.  This is useful for injecting
+    commands before or after the command "X" that dh runs.
+    Note this feature requires compat 10 or later due to
+    internal limitations in debhelper.  Attempts to use
+    it in compat 9 will trigger an error.  Thanks to
+    Christoph Berg for the suggestion.  (Closes: #885994)
 
   [ Helmut Grohne ]
   * Warn about missing perl-xs-dev for perl_* buildsystems.

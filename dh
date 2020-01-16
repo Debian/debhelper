@@ -157,6 +157,18 @@ after a particular debhelper command is run.
 	%:
 		dh $@
 
+	# Example assumes debhelper/12.8 and compat 10+
+	execute_after_dh_fixperms:
+		chmod 4755 debian/foo/usr/bin/foo
+
+If you are on an older debhelper or compatibility level, the above
+example would have to be written as.
+
+	#!/usr/bin/make -f
+	%:
+		dh $@
+
+	# Older debhelper versions or using compat 9 or lower.
 	override_dh_fixperms:
 		dh_fixperms
 		chmod 4755 debian/foo/usr/bin/foo
@@ -238,8 +250,8 @@ Adding to the example above, suppose you need to chmod a file, but only
 when building the architecture dependent package, as it's not present
 when building only documentation.
 
-	override_dh_fixperms-arch:
-		dh_fixperms
+	# Example assumes debhelper/12.8 and compat 10+
+	execute_after_dh_fixperms-arch:
 		chmod 4755 debian/foo/usr/bin/foo
 
 =head1 INTERNALS
@@ -1016,28 +1028,39 @@ foreach my $i (0..$stoppoint) {
 		next;
 	}
 
+	my @full_todo = @todo;
+	@todo = @full_todo;
+	foreach my $override_type (undef, "arch", "indep") {
+		@todo = run_injected_rules_target("execute_before_${command}", $override_type, 10, $command, \@todo, @opts);
+	}
+
 	# Check for override targets in debian/rules, and run instead of
 	# the usual command. (The non-arch-specific override is tried first,
 	# for simplest semantics; mixing it with arch-specific overrides
 	# makes little sense.)
-	my @oldtodo=@todo;
+	@todo = @full_todo;
 	foreach my $override_type (undef, "arch", "indep") {
-		@todo = run_override($override_type, $command, \@todo, @opts);
+		@todo = run_injected_rules_target("override_$command", $override_type, undef, $command, \@todo, @opts);
 	}
-	next unless @todo;
 
-	next if can_skip($command, @todo);
-
-	# No need to run the command for any packages handled by the
-	# override targets.
-	my %todo=map { $_ => 1 } @todo;
-	foreach my $package (@oldtodo) {
-		if (! $todo{$package}) {
-			push @opts, "-N$package";
+	if (@todo and not can_skip($command, @todo)) {
+		# No need to run the command for any packages handled by the
+		# override targets.
+		my %todo=map { $_ => 1 } @todo;
+		foreach my $package (@full_todo) {
+			if (! $todo{$package}) {
+				push @opts, "-N$package";
+			}
 		}
+
+		run($command, @opts);
 	}
 
-	run($command, @opts);
+	@todo = @full_todo;
+	foreach my $override_type (undef, "arch", "indep") {
+		@todo = run_injected_rules_target("execute_after_${command}", $override_type, 10, $command, \@todo, @opts);
+	}
+
 }
 
 sub run {
@@ -1064,18 +1087,24 @@ sub run {
 	}
 }
 
-# Tries to run an override target for a command. Returns the list of
-# packages that it was unable to run an override target for.
-sub run_override {
-	my ($override_type, $command, $packages, @options) = @_;
+# Tries to run an override / hook target for a command. Returns the list of
+# packages that it was unable to run the target for.
+sub run_injected_rules_target {
+	my ($target_stem, $override_type, $min_compat_level, $command, $packages, @options) = @_;
 
-	my $override="override_$command".
+	my $rules_target = $target_stem .
 		(defined $override_type ? "-".$override_type : "");
+
+	$command //= $rules_target;  # Ensure it is defined
 
 	# Check which packages are of the right architecture for the
 	# override_type.
 	my (@todo, @rest);
-	my $has_explicit_target = rules_explicit_target($override);
+	my $has_explicit_target = rules_explicit_target($rules_target);
+
+	if ($has_explicit_target and defined($min_compat_level) and compat($min_compat_level - 1)) {
+		error("Hook target ${rules_target} is only supported in compat ${min_compat_level} or later");
+	}
 
 	if (defined $override_type) {
 		foreach my $package (@{$packages}) {
@@ -1114,7 +1143,7 @@ sub run_override {
 	# inside the target.
 	$ENV{DH_INTERNAL_OPTIONS}=join("\x1e", @options);
 	$ENV{DH_INTERNAL_OVERRIDE}=$command;
-	run("debian/rules", $override);
+	run("debian/rules", $rules_target);
 	delete $ENV{DH_INTERNAL_OPTIONS};
 	delete $ENV{DH_INTERNAL_OVERRIDE};
 
