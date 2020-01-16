@@ -370,76 +370,6 @@ if ($sequence eq 'debian/rules' ||
 # Definitions of sequences.
 my $build_stamp_file = 'debian/debhelper-build-stamp';
 my %sequences;
-my @bd_minimal = qw{
-	dh_testdir
-};
-my @bd = (@bd_minimal, qw{
-	dh_update_autotools_config
-	dh_auto_configure
-	dh_auto_build
-	dh_auto_test
-});
-my @i = (qw{
-	dh_testroot
-	dh_prep
-	dh_installdirs
-	dh_auto_install
-
-	dh_install
-	dh_installdocs
-	dh_installchangelogs
-	dh_installexamples
-	dh_installman
-
-	dh_installcatalogs
-	dh_installcron
-	dh_installdebconf
-	dh_installemacsen
-	dh_installifupdown
-	dh_installinfo
-	dh_installinit
-},
-   (!compat(10) ? qw(dh_installsystemd) : qw()),
-   (!compat(11) ? qw(dh_installsystemduser) : qw()),
-
-qw{
-	dh_installmenu
-	dh_installmime
-	dh_installmodules
-	dh_installlogcheck
-	dh_installlogrotate
-	dh_installpam
-	dh_installppp
-	dh_installudev
-	dh_installgsettings
-},
-   (!compat(11) ? qw(dh_installinitramfs) : qw()),
-qw{
-	dh_bugfiles
-	dh_ucf
-	dh_lintian
-	dh_gconf
-	dh_icons
-	dh_perl
-	dh_usrlocal
-
-	dh_link
-	dh_installwm
-	dh_installxfonts
-	dh_strip_nondeterminism
-	dh_compress
-	dh_fixperms
-	dh_missing
-});
-
-# Looking for dh_dwz, dh_strip, dh_makeshlibs, dh_shlibdeps (et al)?  They are
-# in the elf-tools addon.
-my @b=qw{
-	dh_installdeb
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
-};
 
 sub _add_sequence {
 	my @args = @_;
@@ -455,13 +385,7 @@ sub _add_sequence {
 	return;
 }
 
-_add_sequence('build', SEQUENCE_ARCH_INDEP_SUBSEQUENCES, @bd);
-_add_sequence('install', SEQUENCE_ARCH_INDEP_SUBSEQUENCES, to_rules_target("build"), @i);
-_add_sequence('binary', SEQUENCE_ARCH_INDEP_SUBSEQUENCES, to_rules_target("install"), @b);
-_add_sequence('clean', SEQUENCE_NO_SUBSEQUENCES, @bd_minimal, qw{
-	dh_auto_clean
-	dh_clean
-});
+load_sequence_addon('root-sequence', SEQUENCE_TYPE_BOTH);
 
 # Additional command options
 my %command_opts;
@@ -804,6 +728,11 @@ if (not @arch_packages) {
 foreach my $addon (@addons) {
 	my $addon_name = $addon->{'name'};
 	my $addon_type = $addon->{'addon-type'};
+	load_sequence_addon($addon_name, $addon_type);
+}
+
+sub load_sequence_addon {
+	my ($addon_name, $addon_type) = @_;
 	my $mod="Debian::Debhelper::Sequence::${addon_name}";
 	$mod=~s/-/_/g;
 	local $DH_INTERNAL_ADDON_NAME = $addon_name;
@@ -813,6 +742,7 @@ foreach my $addon (@addons) {
 		error("unable to load addon ${addon_name}: $@");
 	}
 }
+
 if (%commands_added_by_addon) {
 	while (my ($cmd, $addon) = each(%commands_added_by_addon)) {
 		my $addon_type = $addon->{'addon-type'};
