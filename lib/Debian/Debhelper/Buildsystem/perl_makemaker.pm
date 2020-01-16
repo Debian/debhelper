@@ -54,7 +54,11 @@ sub configure {
 	my $cross_flag;
 	if (is_cross_compiling()) {
 		my $incdir = perl_cross_incdir();
-		$cross_flag = "-I$incdir" if defined $incdir;
+		if (defined $incdir) {
+			$cross_flag = "-I$incdir";
+		} else {
+			warning("cross Config.pm does not exist (missing build dependency on perl-xs-dev?)");
+		}
 	}
 	if ($ENV{LDFLAGS} && ! compat(8)) {
 		my $ld = $Config{ld};

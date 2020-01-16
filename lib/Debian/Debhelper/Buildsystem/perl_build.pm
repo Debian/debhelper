@@ -37,6 +37,8 @@ sub do_perl {
 			$perl5lib .= $Config{path_sep} . $ENV{PERL5LIB}
 				if defined $ENV{PERL5LIB};
 			$options{update_env} = { PERL5LIB => $perl5lib };
+		} else {
+			warning("cross Config.pm does not exist (missing build dependency on perl-xs-dev?)");
 		}
 	}
 	$this->doit_in_sourcedir(\%options, "perl", @_);
