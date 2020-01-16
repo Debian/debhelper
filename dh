@@ -371,6 +371,12 @@ if ($sequence eq 'debian/rules' ||
 my $build_stamp_file = 'debian/debhelper-build-stamp';
 my %sequences;
 
+# Additional command options
+my (%command_opts, %commands_added_by_addon);
+
+# Removed commands
+my %obsolete_command;
+
 sub _add_sequence {
 	my @args = @_;
 	my $seq = Debian::Debhelper::Sequence->new(@args);
@@ -387,9 +393,6 @@ sub _add_sequence {
 
 load_sequence_addon('root-sequence', SEQUENCE_TYPE_BOTH);
 
-# Additional command options
-my %command_opts;
-my %commands_added_by_addon;
 
 sub _assert_not_conditional_sequence_addon {
 	my ($feature) = @_;
@@ -563,6 +566,13 @@ sub remove_command_options {
 		# Clear all additional options
 		delete $command_opts{$command};
 	}
+	return 1;
+}
+
+sub declare_command_obsolete {
+	my ($command) = @_;
+	_assert_not_conditional_sequence_addon('declare_command_obsolete');
+	$obsolete_command{$command} = $DH_INTERNAL_ADDON_NAME;
 	return 1;
 }
 
@@ -851,6 +861,8 @@ my ($rules_targets, $full_sequence) = unpack_sequence(\%sequences,
 														$sequence_unpack_flags,
 														);
 my $stoppoint = $#{$full_sequence};
+
+check_for_obsolete_commands($full_sequence, $stoppoint);
 
 if (compat(9)) {
 	foreach my $package (@packages) {
@@ -1176,6 +1188,34 @@ sub can_skip {
 	}
 	return 0 if not $had_cli_options and %seen_options;
 	return 1;
+}
+
+
+sub check_for_obsolete_commands {
+	my ($full_sequence, $stoppoint) = @_;
+	my ($found_obsolete_targets);
+	for my $i (0..$stoppoint) {
+		my $command = $full_sequence->[$i];
+		if (exists($obsolete_command{$command})) {
+			my $addon_name = $obsolete_command{$command};
+			error("The addon ${addon_name} claimed that $command was obsolete, but it is not!?");
+		}
+	}
+	for my $command (sort(keys(%obsolete_command))) {
+		for my $prefix (qw(execute_before_ execute_after_ override_)) {
+			for my $suffix ('', '-arch', '-indep') {
+				my $target = "${prefix}${command}${suffix}";
+				if (defined(rules_explicit_target($target))) {
+					$found_obsolete_targets = 1;
+					warning("The target ${target} references a now obsolete command and will not be run!");
+				}
+			}
+		}
+	}
+	if ($found_obsolete_targets and not compat(12)) {
+		error("Aborting due to left over override/hook targets for now removed commands.");
+	}
+	return;
 }
 
 =head1 SEE ALSO
