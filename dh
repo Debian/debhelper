@@ -1029,19 +1029,13 @@ foreach my $i (0..$stoppoint) {
 	}
 
 	my @full_todo = @todo;
-	@todo = @full_todo;
-	foreach my $override_type (undef, "arch", "indep") {
-		@todo = run_injected_rules_target("execute_before_${command}", $override_type, 10, $command, \@todo, @opts);
-	}
+	run_hook_target("execute_before_${command}", 10, $command, \@full_todo, @opts);
 
 	# Check for override targets in debian/rules, and run instead of
 	# the usual command. (The non-arch-specific override is tried first,
 	# for simplest semantics; mixing it with arch-specific overrides
 	# makes little sense.)
-	@todo = @full_todo;
-	foreach my $override_type (undef, "arch", "indep") {
-		@todo = run_injected_rules_target("override_$command", $override_type, undef, $command, \@todo, @opts);
-	}
+	@todo = run_hook_target("override_${command}", 10, $command, \@full_todo, @opts);
 
 	if (@todo and not can_skip($command, @todo)) {
 		# No need to run the command for any packages handled by the
@@ -1056,11 +1050,7 @@ foreach my $i (0..$stoppoint) {
 		run($command, @opts);
 	}
 
-	@todo = @full_todo;
-	foreach my $override_type (undef, "arch", "indep") {
-		@todo = run_injected_rules_target("execute_after_${command}", $override_type, 10, $command, \@todo, @opts);
-	}
-
+	run_hook_target("execute_after_${command}", 10, $command, \@full_todo, @opts);
 }
 
 sub run {
@@ -1085,6 +1075,15 @@ sub run {
 	elsif ($ret) {
 		exit 1;
 	}
+}
+
+sub run_hook_target {
+	my ($target_stem, $min_compat_level, $command, $packages, @opts) = @_;
+	my @todo = @{$packages};
+	foreach my $override_type (undef, "arch", "indep") {
+		@todo = run_injected_rules_target($target_stem, $override_type, $min_compat_level, $command, \@todo, @opts);
+	}
+	return @todo;
 }
 
 # Tries to run an override / hook target for a command. Returns the list of
