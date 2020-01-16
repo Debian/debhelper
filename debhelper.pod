@@ -1031,6 +1031,20 @@ The B<dh> command will now error if an override or hook target for an
 obsolete command (e.g. B<dh_systemd_enable>) are present in
 F<debian/rules>.
 
+=item -
+
+The B<dh_missing> command will now default to B<--fail-missing>.  This
+can be reverted to a (non-fatal) warning (like in compat 12) by
+explicitly passing B<--list-missing>.
+
+If you do not want the warning either, please omit the call to
+B<dh_missing>.  If you use the B<dh> command sequencer, then you can
+do this by inserting the an empty override target in the
+F<debian/rules> file of the relevant package.  As an example:
+
+    # Disable dh_missing
+    override_dh_missing:
+
 =back
 
 =back

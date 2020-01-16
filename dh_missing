@@ -88,11 +88,11 @@ my (@installed, %helpers);
 my $srcdir = '.';
 $srcdir = $dh{SOURCEDIR} if defined $dh{SOURCEDIR};
 
-# --list-missing is the default in compat 12+
-$dh{LIST_MISSING} = 1 if !$dh{FAIL_MISSING} && !compat(11);
-
 if (!$dh{LIST_MISSING} && !$dh{FAIL_MISSING}) {
-	exit 0;
+	exit 0 if compat(11);
+	# --list-missing is the default in compat 12 and --fail-missing in compat 13+
+	my $option = compat(12) ? 'LIST_MISSING' : 'FAIL_MISSING';
+	$dh{$option} = 1;
 }
 
 # . as srcdir makes no sense, so this is a special case.
