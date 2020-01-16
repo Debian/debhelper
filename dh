@@ -301,6 +301,9 @@ my @ARGV_orig=@ARGV;
 my (@addons, @addon_requests);
 our ($DH_INTERNAL_ADDON_TYPE, $DH_INTERNAL_ADDON_NAME);
 
+# Reset umask to 0022 per #944691
+umask(0022);
+
 inhibit_log();
 
 init(options => {
