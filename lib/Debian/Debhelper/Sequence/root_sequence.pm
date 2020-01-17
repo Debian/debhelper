@@ -44,6 +44,7 @@ my @i = (qw{
 	dh_installinfo
 	dh_installinit
 },
+	$include_if_compat_X_or_newer->(12, 'dh_installtmpfiles'),
 	$include_if_compat_X_or_newer->(10, 'dh_installsystemd'),
 	$include_if_compat_X_or_newer->(11, 'dh_installsystemduser'),
 qw{

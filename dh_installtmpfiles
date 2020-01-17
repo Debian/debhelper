@@ -1,0 +1,108 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dh_installtmpfiles - install tmpfiles.d configuration files
+
+=cut
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+use File::Find;
+use Cwd qw(getcwd abs_path);
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_installtmpfiles> [S<I<debhelper options>>][B<--name=>I<name>]
+
+=head1 DESCRIPTION
+
+B<dh_installtmpfiles> is a debhelper program that is responsible for
+installing package maintainer supplied tmpfiles.d configuration files
+(e.g. for systemd-tmpfiles).
+
+It also finds the tmpfiles.d configuration files installed by a package
+and generates F<postinst> code blocks for activting the tmpfiles.d
+configuration when the package is installed. These snippets are added
+to the maintainer scripts by L<dh_installdeb(1)>.
+
+
+=head1 OPTIONS
+
+=over 4
+
+This option controls both a prefix used for lookng up maintainer provided
+tmpfiles.d configuration files (those mentioned in the L</FILES> section)
+and also the base name used for the installed version of the file.
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.tmpfile
+
+If this exists, it is installed into F<usr/lib/tmpfiles.d/> in the
+package build directory. Note that the C<tmpfiles.d> mechanism is
+currently only used by systemd.
+
+=back
+
+=head1 NOTES
+
+This command is not idempotent. L<dh_prep(1)> should be called between
+invocations of this command (with the same arguments). Otherwise, it
+may cause multiple instances of the same text to be added to
+maintainer scripts.
+
+=cut
+
+init();
+
+sub uniq {
+	my %seen;
+	return grep { !$seen{$_}++ } @_;
+}
+
+# PROMISE: DH NOOP WITHOUT tmp(usr/lib/tmpfiles.d) tmp(etc/tmpfiles.d) tmpfile cli-options()
+
+# Install package maintainer supplied tmpfiles files
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmpdir = tmpdir($package);
+	my $tmpfile = pkgfile($package, 'tmpfile');
+	my $name = $dh{NAME} // $package;
+	next if not $tmpfile;
+	my $dir = "$tmpdir/usr/lib/tmpfiles.d";
+	install_dir($dir);
+	install_file($tmpfile, "${dir}/${name}.conf");
+}
+
+# Add postinst code blocks to handle tmpfiles
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmpdir = tmpdir($package);
+	my @tmpfiles;
+
+	my @dirs = grep { -d } map { "${tmpdir}/$_" } qw(usr/lib/tmpfiles.d etc/tmpfiles.d);
+
+	find({
+		wanted => sub {
+			my $name = $File::Find::name;
+			return unless -f $name;
+			push(@tmpfiles, basename($name)); },
+		no_chdir => 1,
+	}, @dirs) if @dirs;
+
+	if (@tmpfiles) {
+		autoscript($package, 'postinst', 'postinst-init-tmpfiles', { 'TMPFILES' => join(' ', uniq(sort(@tmpfiles))) });
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+=cut
