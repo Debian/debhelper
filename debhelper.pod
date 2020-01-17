@@ -1260,6 +1260,18 @@ that require a debhelper addon to be run during multiple builds without
 having to patch a large number of rules file. If at all possible, this should
 be avoided in favor of a --with flag in the rules file.
 
+=item B<DH_COLORS>, B<DPKG_COLORS>
+
+These variables can be used to control whether debhelper commands should use
+colors in their textual output.  Can be set to "always", "auto" (the default),
+or "never".
+
+Note that B<DPKG_COLOR> also affects a number of dpkg related tools and
+debhelper uses it on the assumption that you want the same color setting for
+dpkg and debhelper.  In the off-hand chance you want different color setting
+for debhelper, you can use B<DH_COLORS> instead or in addition to
+B<DPKG_COLORS>.
+
 =item B<CFLAGS>, B<CPPFLAGS>, B<CXXFLAGS>, B<OBJCFLAGS>, B<OBJCXXFLAGS>, B<GCJFLAGS>, B<FFLAGS>, B<FCFLAGS>, B<LDFLAGS>
 
 By default (in any non-deprecated compat level), debhelper will automatically

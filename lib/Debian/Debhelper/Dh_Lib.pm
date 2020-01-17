@@ -753,20 +753,51 @@ sub nonquiet_print {
 	}
 }
 
-# Output an error message and die (can be caught).
-sub error {
-	my ($message) = @_;
-	# ensure the error code is well defined.
-	$! = 255;
-	die basename($0).": $message\n";
-}
+{
+	my $_use_color;
+	sub _color {
+		my ($msg, $color) = @_;
+		if (not defined($_use_color)) {
+			# This part is basically Dpkg::ErrorHandling::setup_color over again
+			# (but the module uses Dpkg + Dpkg::Gettext, so it is very expensive
+			# to load)
+		    my $mode = $ENV{'DH_COLORS'} // $ENV{'DPKG_COLORS'} // 'auto';
 
-# Output a warning.
-sub warning {
-	my ($message) = @_;
-	$message //= '';
-	
-	print STDERR basename($0).": $message\n";
+		    if ($mode eq 'auto') {
+			    $_use_color = 1 if -t *STDOUT or -t *STDERR;
+		    } elsif ($mode eq 'always') {
+			    $_use_color = 1;
+		    } else {
+			    $_use_color = 0;
+		    }
+
+			eval {
+				require Term::ANSIColor if $_use_color;
+			};
+			if ($@) {
+				# In case of errors, skip colors.
+				$_use_color = 0;
+			}
+		}
+		return Term::ANSIColor::colored($msg, $color) if $_use_color;
+		return $msg;
+	}
+
+	# Output an error message and die (can be caught).
+	sub error {
+		my ($message) = @_;
+		# ensure the error code is well defined.
+		$! = 255;
+		die(_color(basename($0), 'bold') . ': ' . _color('error', 'bold red') . ": $message\n");
+	}
+
+	# Output a warning.
+	sub warning {
+		my ($message) = @_;
+		$message //= '';
+
+		print STDERR _color(basename($0), 'bold') . ': ' . _color('warning', 'bold yellow') . ": $message\n";
+	}
 }
 
 # Returns the basename of the argument passed to it.

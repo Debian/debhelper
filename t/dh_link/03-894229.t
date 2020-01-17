@@ -33,7 +33,7 @@ sub test_invalid {
     eval {
         make_symlink($link_name, $denoted_dest);
     };
-    like($@, qr{^(?:\S*:\s*)?Invalid destination/link name});
+    like($@, qr{^(?:\S*:(?: error:)?\s*)?Invalid destination/link name});
 }
 
 each_compat_subtest {
