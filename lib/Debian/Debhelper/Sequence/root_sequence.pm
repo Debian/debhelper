@@ -5,14 +5,12 @@ use Debian::Debhelper::SequencerUtil;
 
 my $include_if_compat_X_or_newer = sub {
 	my ($compat, @commands) = @_;
-	if (not compat($compat, 1)) {
-		return @commands;
-	}
-	return;
+	return if compat($compat - 1, 1);
+	return @commands;
 };
 
 my @obsolete_command = (
-	$include_if_compat_X_or_newer->(10, 'dh_systemd_enable', 'dh_systemd_start'),
+	$include_if_compat_X_or_newer->(11, 'dh_systemd_enable', 'dh_systemd_start'),
 );
 
 my @bd_minimal = qw{
@@ -44,9 +42,9 @@ my @i = (qw{
 	dh_installinfo
 	dh_installinit
 },
-	$include_if_compat_X_or_newer->(12, 'dh_installtmpfiles'),
-	$include_if_compat_X_or_newer->(10, 'dh_installsystemd'),
-	$include_if_compat_X_or_newer->(11, 'dh_installsystemduser'),
+	$include_if_compat_X_or_newer->(13, 'dh_installtmpfiles'),
+	$include_if_compat_X_or_newer->(11, 'dh_installsystemd'),
+	$include_if_compat_X_or_newer->(12, 'dh_installsystemduser'),
 qw{
 	dh_installmenu
 	dh_installmime
