@@ -46,7 +46,7 @@ sub unit_is_started {
 }
 
 # Units are installed and enabled
-each_compat_up_to_and_incl_subtest(10, sub {
+each_compat_from_x_to_and_incl_y_subtest(10, 10, sub {
 	ok(run_dh_tool('dh_systemd_enable'));
 	ok(run_dh_tool('dh_systemd_start'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");

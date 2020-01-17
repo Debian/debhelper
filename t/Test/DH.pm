@@ -40,6 +40,7 @@ our @EXPORT = qw(
     each_compat_from_and_above_subtest run_dh_tool
     uid_0_test_is_ok create_empty_file readlines
     error find_script non_deprecated_compat_levels
+    each_compat_from_x_to_and_incl_y_subtest
 );
 
 our ($TEST_DH_COMPAT, $ROOT_OK, $ROOT_CMD);
@@ -133,52 +134,43 @@ sub _prepare_test_root {
     return $dir;
 }
 
-sub each_compat_up_to_and_incl_subtest($&) {
-    my ($compat, $code) = @_;
-    my $low = Debian::Debhelper::Dh_Lib::MIN_COMPAT_LEVEL;
-    error("compat $compat is no longer support! Min compat $low")
-        if $compat < $low;
-    subtest '' => sub {
-        # Keep $dir alive until the test is over
-        my $dir = _prepare_test_root;
-        chdir($dir) or error("chdir($dir): $!");
-        while ($low <= $compat) {
-            local $TEST_DH_COMPAT = $compat;
-            $code->($low);
-            ++$low;
-        }
-        chdir($START_DIR) or error("chdir($START_DIR): $!");
-    };
-    return;
-}
-
-sub each_compat_from_and_above_subtest($&) {
-    my ($compat, $code) = @_;
+sub each_compat_from_x_to_and_incl_y_subtest($$&) {
+	my ($compat, $high_compat, $code) = @_;
     my $lowest = Debian::Debhelper::Dh_Lib::MIN_COMPAT_LEVEL;
-    my $end = Debian::Debhelper::Dh_Lib::MAX_COMPAT_LEVEL;
-    if ($lowest > $compat) {
-        diag("Bumping $compat to $lowest ($compat is no longer supported)");
-        $compat = $lowest;
-    }
-    error("$compat is from the future! Max known is $end")
-        if $compat > $end;
+    my $highest = Debian::Debhelper::Dh_Lib::MAX_COMPAT_LEVEL;
+    error("compat $compat is no longer support! Min compat $lowest")
+        if $compat < $lowest;
+    error("$high_compat is from the future! Max known is $highest")
+        if $high_compat > $highest;
     subtest '' => sub {
         # Keep $dir alive until the test is over
         my $dir = _prepare_test_root;
         chdir($dir) or error("chdir($dir): $!");
-        while ($compat <= $end) {
+        while ($compat <= $high_compat) {
             local $TEST_DH_COMPAT = $compat;
             $code->($compat);
             ++$compat;
         }
         chdir($START_DIR) or error("chdir($START_DIR): $!");
     };
-    return;
+	return;
+}
+
+sub each_compat_up_to_and_incl_subtest($&) {
+	unshift(@_, Debian::Debhelper::Dh_Lib::MIN_COMPAT_LEVEL);
+	goto \&each_compat_from_x_to_and_incl_y_subtest;
+}
+
+sub each_compat_from_and_above_subtest($&) {
+	splice(@_, 1, 0, Debian::Debhelper::Dh_Lib::MAX_COMPAT_LEVEL);
+	goto \&each_compat_from_x_to_and_incl_y_subtest;
 }
 
 sub each_compat_subtest(&) {
-    unshift(@_, Debian::Debhelper::Dh_Lib::MIN_COMPAT_LEVEL);
-    goto \&each_compat_from_and_above_subtest;
+    unshift(@_,
+			Debian::Debhelper::Dh_Lib::MIN_COMPAT_LEVEL,
+			Debian::Debhelper::Dh_Lib::MAX_COMPAT_LEVEL);
+    goto \&each_compat_from_x_to_and_incl_y_subtest;
 }
 
 sub create_empty_file {
