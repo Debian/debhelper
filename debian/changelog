@@ -36,6 +36,25 @@ debhelper (12.8) UNRELEASED; urgency=medium
     latter will also affect dpkg-related tools.
     Note: NO_COLOR is respected in the absence of
     DH_COLORS and DPKG_COLORS.
+  * Dh_Lib.pm: Support substitution variables in files
+    handled by filearray and filedoublearray in compat 13.
+    This also applies to executable configuration files.
+    As the substitution occurs after splitting the files
+    into tokens, it can be used to include spaces in the
+    tokens (often file names).  (Closes: #198507)
+  * dh_install: Support substitution configuration files.
+  * dh_clean: Ditto.
+  * dh_installcatalogs: Ditto.
+  * dh_installdeb: Ditto (maintscripts only).
+  * dh_installdirs: Ditto.
+  * dh_installdocs: Ditto.
+  * dh_installexamples: Ditto.
+  * dh_installinfo: Ditto.
+  * dh_installman: Ditto.
+  * dh_installwm: Ditto.
+  * dh_link: Ditto.
+  * dh_missing: Ditto.
+  * dh_ucf: Ditto.
 
   [ Helmut Grohne ]
   * Warn about missing perl-xs-dev for perl_* buildsystems.

@@ -1399,25 +1399,91 @@ sub glob_expand {
 	return @result;
 }
 
+
+my %BUILT_IN_SUBST = (
+	'Space'        => ' ',
+	'Dollar'       => '$',
+	'Newline'      => "\n",
+	'Tab'          => "\b",
+);
+
+sub _variable_substitution {
+	my ($text, $loc) = @_;
+	return $text if index($text, '$') < 0;
+	my $pos = -1;
+	my $subst_count = 0;
+	my $expansion_count = 0;
+	my $current_size = length($text);
+	my $expansion_size_limit = 3 * $current_size;
+	1 while ($text =~ s<
+			\$\{([A-Za-z0-9][-_:0-9A-Za-z]*)\}  # Match ${something} and replace it
+		>[
+			my $match = $1;
+			my $new_pos = pos()//-1;
+			my $value;
+
+			if ($pos == $new_pos) {
+				# Safe-guard in case we ever implement recursive expansion
+				error("Error substituting in ${loc} (at position $pos); recursion limit while expanding \${${match}")
+					if (++$subst_count >= 20);
+			} else {
+				$subst_count = 0;
+				$pos = $new_pos;
+				if (++$expansion_count >= 50) {
+					error("Error substituting in ${loc}; substitution limit of ${expansion_count} reached");
+				}
+			}
+			if (exists($BUILT_IN_SUBST{$match})) {
+				$value = $BUILT_IN_SUBST{$match};
+			} elsif ($match =~ m/^DEB_(?:BUILD|HOST|TARGET)_/) {
+				$value = dpkg_architecture_value($match) //
+					error(qq{Cannot expand "\${${match}}\" in ${loc} as it is not a known dpkg-architecture value});
+			} elsif ($match =~ m/^env:(.+)/) {
+				my $env_var = $1;
+				$value = $ENV{$env_var} //
+					error(qq{Cannot expand "\${${match}}" in ${loc} as the ENV variable "${env_var}" is unset});
+			}
+			error("Cannot resolve variable \${$match} in ${loc}")
+				if not defined($value);
+			# We do not support recursive expansion.
+			$value =~ s/\$/\$\{\}/;
+			$current_size += length($value) - length($match) - 3;
+			if ($current_size > 4096 and $current_size > $expansion_size_limit) {
+				error("Refusing to expand \${${match}} in ${loc} - the original input seems to grow beyond reasonable'
+						 . ' limits!");
+			}
+			$value;
+		]gex);
+	$text =~ s/\$\{\}/\$/g;
+
+	return $text;
+}
+
 # Reads in the specified file, one line at a time. splits on words, 
 # and returns an array of arrays of the contents.
 # If a value is passed in as the second parameter, then glob
 # expansion is done in the directory specified by the parameter ("." is
 # frequently a good choice).
+# In compat 13+, it will do variable expansion (after splitting the lines
+# into words)
 sub filedoublearray {
 	my ($file, $globdir, $error_handler) = @_;
 
 	# executable config files are a v9 thing.
 	my $x=! compat(8) && -x $file;
+	my $expand_patterns = compat(12) ? 0 : 1;
+	my $source;
 	if ($x) {
 		require Cwd;
 		my $cmd=Cwd::abs_path($file);
 		$ENV{"DH_CONFIG_ACT_ON_PACKAGES"} = join(",", @{$dh{"DOPACKAGES"}});
 		open(DH_FARRAY_IN, '-|', $cmd) || error("cannot run $file: $!");
 		delete $ENV{"DH_CONFIG_ACT_ON_PACKAGES"};
+		$source = "output of ./${file}";
 	}
 	else {
 		open (DH_FARRAY_IN, '<', $file) || error("cannot read $file: $!");
+		$source = $file;
 	}
 
 	my @ret;
@@ -1435,10 +1501,14 @@ sub filedoublearray {
 		# We always ignore/permit empty lines
 		next if $_ eq '';
 		my @line;
+		my $source_ref = "${source} (line $.)";
 
 		if (defined($globdir) && ! $x) {
 			if (ref($globdir)) {
 				my @patterns = split;
+				if ($expand_patterns) {
+					@patterns = map {_variable_substitution($_, $source_ref)} @patterns;
+				}
 				push(@line, glob_expand($globdir, $error_handler, @patterns));
 			} else {
 				# Legacy call - Silently discards globs that match nothing.
@@ -1448,12 +1518,18 @@ sub filedoublearray {
 				# filenames that come out are relative to it.
 				foreach (map { glob "$globdir/$_" } split) {
 					s#^$globdir/##;
+					if ($expand_patterns) {
+						$_ = _variable_substitution($_, $source_ref);
+					}
 					push @line, $_;
 				}
 			}
 		}
 		else {
 			@line = split;
+			if ($expand_patterns) {
+				@line = map {_variable_substitution($_, $source_ref)} @line;
+			}
 		}
 		push @ret, [@line];
 	}

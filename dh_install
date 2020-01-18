@@ -56,6 +56,9 @@ itself, with no explicit destination, then B<dh_install>
 will automatically guess the destination to use, the same as if the
 --autodest option were used.
 
+Supports substitution variables in compat 13 and later as
+documented in L<debhelper(7)>.
+
 =item debian/not-installed
 
 Used with the deprecated B<--list-missing> and B<--fail-missing> options.
@@ -321,6 +324,26 @@ sub compute_dest {
 
 	return $dest;
 }
+
+=head1 EXAMPLES
+
+Here are some small examples of configuration files for dh_install.
+
+    # Install my-prog into usr/bin (as "usr/bin/my-prog")
+    my-prog usr/bin
+
+    # Install a plugins directory into usr/share/my-prog
+    # (as "usr/share/my-prog/plugins/")
+    plugins usr/share/my-prog
+
+    # Install a file with spaces in into usr/share/my-prog/data
+    # (as "usr/share/my-prog/data/my datafile with spaces.txt")
+    # ASSUMES COMPAT 13, where substitution patterns are available
+    my${Space}datafile${Space}with${Space}spaces.txt usr/share/my-prog/data
+
+    # Install a library into the multi-arch lib directory
+    # ASSUMES COMPAT 13, where substitution patterns are available
+    build/output/libfrop*.so.* usr/lib/${DEB_HOST_MULTIARCH}
 
 =head1 LIMITATIONS
 

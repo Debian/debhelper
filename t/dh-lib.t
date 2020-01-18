@@ -10,7 +10,7 @@ use Test::DH;
 
 use Debian::Debhelper::Dh_Lib qw(!dirname);
 
-plan(tests => 1);
+plan(tests => 2);
 
 
 sub ok_autoscript_result {
@@ -41,5 +41,23 @@ each_compat_subtest {
 	ok_autoscript_result;
 
 	ok(rm_files('debian/testpackage.postinst.debhelper'));
-}
+};
 
+$ENV{'FOO'} = "test";
+my @SUBST_TEST_OK = (
+	['unchanged', 'unchanged'],
+	["unchanged\${\n}", "unchanged\${\n}"],  # Newline is not an allowed part of ${}
+	['raw dollar-sign ${}', 'raw dollar-sign $'],
+	['${Dollar}${Space}${Dollar}', '$ $'],
+	['Hello ${env:FOO}', 'Hello test'],
+	['${Dollar}{Space}${}{Space}', '${Space}${Space}'],  # We promise that ${Dollar}/${} never cause recursion
+	['/usr/lib/${DEB_HOST_MULTIARCH}', '/usr/lib/' . dpkg_architecture_value('DEB_HOST_MULTIARCH')],
+);
+
+each_compat_subtest {
+	for my $test (@SUBST_TEST_OK) {
+		my ($input, $expected_output) = @{$test};
+		my $actual_output = Debian::Debhelper::Dh_Lib::_variable_substitution($input, 'test');
+		is($actual_output, $expected_output, qq{${input}" => "${actual_output}" (should be: "${expected_output})"});
+	}
+};

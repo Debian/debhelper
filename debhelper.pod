@@ -101,6 +101,76 @@ ignored.
 The syntax of these files is intentionally kept very simple to make them
 easy to read, understand, and modify.
 
+=head2 Substitutions in debhelper config files
+
+In compatibility level 13 and later, it is possible to use simple
+substitutions in I<some> debhelper config files (particularly,
+the configuration files for L<dh_install>).
+
+All substitution variables are of the form I<${foo}> and the braces
+are mandatory.  Variable names are case-sensitive and consist of
+alphanumerics (a-zA-Z0-9), hyphens (-), underscores (_), and colons (:).
+The first character must be an alphanumeric.
+
+If you need a literal dollar sign that cannot trigger an substitution,
+you can either use the B<${Dollar}> substitution or the sequence B<${}>.
+
+The following expansions are available:
+
+=over 4
+
+=item B<DEB_HOST_*>, B<DEB_BUILD_*>, B<DEB_TARGET_*>
+
+Expands to the relevant L<dpkg-architecture(1)> value (similar to
+I<dpkg-architecture -qVARIABLE_HERE>).
+
+When in doubt, the B<DEB_HOST_*> variant is the that will work both
+for native and cross builds.
+
+For performance reasons, debhelper will attempt to resolve these
+names from the environment first before consulting
+L<dpkg-architecture(1)>.  This is mostly mentioned for completeness
+as it will not matter for most case.
+
+=item B<Dollar>
+
+Expands to a single literal B<$>-symbol.  This symbol will I<never>
+be considered part of a substitution variable.  That is:
+
+   # Triggers an error
+   ${NO_SUCH_TOKEN}
+   # Expands to the literal value "${NO_SUCH_TOKEN}"
+   ${Dollar}{NO_SUCH_TOKEN}
+
+This variable equivalent to the sequence B<${}> and the two can be
+used interchangeably.
+
+=item B<Newline>, B<Space>, B<Tab>
+
+Expands to a single ASCII newline, space and tab respectively.
+
+This can be useful if you need to include a literal whitespace
+character (e.g. space) where it would otherwise be stripped or
+used as a separator.
+
+=item B<< env:I<NAME> >>
+
+Expands to the environment variable I<NAME>.  The environment
+variable must be set (but can be set to the empty string).
+
+=back
+
+Note that all variables must expand to a defined value.  As an example,
+if debhelper sees I<${env:FOO}>, then it will insist that the environment
+variable I<FOO> is set (it can be set to the empty string).
+
+=head3 Substitution limits
+
+To avoid infinite loops and resource exhaustion, debhelper will stop
+with an error if the text contains many substitution variables (50) or
+they expand beyond an a certain size (4096 characters or 3x length of
+the original input - whichever is more).
+
 =head2 Executable debhelper config files
 
 If you need additional flexibility, many of the debhelper tools
@@ -126,8 +196,14 @@ code should indicate success).
 
 =item *
 
-The output will be used exactly as it is.  Notably, debhelper will
-I<not> expand wildcards or strip comments in the output.
+In compatibility level 13+, the output will be subject to substitutions
+(see L</Substitutions in debhelper config files>) where the tool
+support these.  Remember to be careful if your generator I<also> provide
+substitutions as this can cause unnecessary confusion.
+
+Otherwise, the output will be used exactly as-is.  Notably, debhelper
+will I<not> expand wildcards or strip comments or strip whitespace
+in the output.
 
 =back
 
@@ -1051,6 +1127,21 @@ The B<dh> command sequencer now runs B<dh_installtmpfiles> in the
 default sequence.  The B<dh_installtmpfiles> takes over handling of
 tmpfiles.d configuration files.  Related functionality in
 B<dh_installsystemd> is now disabled.
+
+=item -
+
+Many B<dh_*> tools now support limited variable expansion via the
+B<${foo}> syntax.  In many cases, this can be used to reference
+paths that contain either spaces or L<dpkg-architecture(1)> values.
+
+While this can reduce the need for L<dh-exec(1)> in some cases, it
+is B<not> a replacement L<dh-exec(1)> in general (such as the
+filtering syntax, renaming, etc.).
+
+Please see L</Substitutions in debhelper config files> for syntax and
+available substitution variables.  To B<dh_*> tool writers, substitution
+expansion occurs as a part of the B<filearray> and B<filedoublearray>
+functions.
 
 =back
 
