@@ -759,17 +759,20 @@ sub nonquiet_print {
 		my ($msg, $color) = @_;
 		if (not defined($_use_color)) {
 			# This part is basically Dpkg::ErrorHandling::setup_color over again
+			# with some tweaks.
 			# (but the module uses Dpkg + Dpkg::Gettext, so it is very expensive
 			# to load)
-		    my $mode = $ENV{'DH_COLORS'} // $ENV{'DPKG_COLORS'} // 'auto';
+			my $mode = $ENV{'DH_COLORS'} // $ENV{'DPKG_COLORS'};
+			# Support NO_COLOR (https://no-color.org/)
+			$mode //= exists($ENV{'NO_COLOR'}) ? 'never' : 'auto';
 
-		    if ($mode eq 'auto') {
-			    $_use_color = 1 if -t *STDOUT or -t *STDERR;
-		    } elsif ($mode eq 'always') {
-			    $_use_color = 1;
-		    } else {
-			    $_use_color = 0;
-		    }
+			if ($mode eq 'auto') {
+				$_use_color = 1 if -t *STDOUT or -t *STDERR;
+			} elsif ($mode eq 'always') {
+				$_use_color = 1;
+			} else {
+				$_use_color = 0;
+			}
 
 			eval {
 				require Term::ANSIColor if $_use_color;
@@ -779,7 +782,10 @@ sub nonquiet_print {
 				$_use_color = 0;
 			}
 		}
-		return Term::ANSIColor::colored($msg, $color) if $_use_color;
+		if ($_use_color) {
+			local $ENV{'NO_COLOR'} = undef;
+			$msg = Term::ANSIColor::colored($msg, $color);
+		}
 		return $msg;
 	}
 

@@ -1272,6 +1272,16 @@ dpkg and debhelper.  In the off-hand chance you want different color setting
 for debhelper, you can use B<DH_COLORS> instead or in addition to
 B<DPKG_COLORS>.
 
+=item B<NO_COLOR>
+
+If no explicit request for color has been given (e.g. B<DH_COLORS> and
+B<DPKG_COLORS> are both unset), the presence of this environment variable
+cause the default color setting to be "never".
+
+The variable is defined according to L<https://no-color.org/>.  In this
+project, the environment variables (such as B<DH_COLORS>) are considered
+an explicit request for color.
+
 =item B<CFLAGS>, B<CPPFLAGS>, B<CXXFLAGS>, B<OBJCFLAGS>, B<OBJCXXFLAGS>, B<GCJFLAGS>, B<FFLAGS>, B<FCFLAGS>, B<LDFLAGS>
 
 By default (in any non-deprecated compat level), debhelper will automatically
