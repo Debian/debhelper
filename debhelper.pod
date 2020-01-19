@@ -1317,8 +1317,10 @@ Set to B<1> to enable no-act mode.
 
 =item B<DH_OPTIONS>
 
-Anything in this variable will be prepended to the command line arguments
-of all debhelper commands.
+All debhelper tools will parse command line arguments listed in this variable
+before any command option (as if they had been prepended to the command
+line arguments).  Unfortunately, some third-party provided tools may not
+support this variable and will ignore these command line arguments.
 
 When using L<dh(1)>, it can be passed options that will be passed on to each
 debhelper command, which is generally better than using DH_OPTIONS.
