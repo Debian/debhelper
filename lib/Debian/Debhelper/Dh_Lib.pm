@@ -1001,11 +1001,7 @@ sub default_sourcedir {
 			}
 		}
 		foreach my $file (@try) {
-			if (-f $file &&
-				(! $dh{IGNORE} || ! exists $dh{IGNORE}->{$file})) {
-				return $file;
-			}
-
+			return $file if -f $file;
 		}
 
 		return "";

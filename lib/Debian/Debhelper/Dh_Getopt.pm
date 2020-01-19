@@ -77,11 +77,6 @@ sub AddExclude { my($option,$value)=@_;
 	push @{$dh{EXCLUDE}},$value;
 }
 
-# Add a file to the ignore list.
-sub AddIgnore { my($option,$file)=@_;
-	$dh{IGNORE}->{$file}=1;
-}
-
 # This collects non-options values.
 sub NonOption {
 	push @{$dh{ARGV}}, @_;
@@ -154,8 +149,6 @@ sub getoptions {
 		"name=s" => \$dh{NAME},
 
 		"error-handler=s" => \$dh{ERROR_HANDLER},
-		
-		"ignore=s" => \&AddIgnore,
 
 		"O=s" => sub { push @test, $_[1] },
 	      
