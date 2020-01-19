@@ -412,7 +412,7 @@ sub _assert_not_conditional_sequence_addon {
 	    . 'not supported for conditional debhelper sequence add-ons.');
 	warning("Hint: You may have to move the build-dependency for dh-sequence-${DH_INTERNAL_ADDON_NAME} to "
 		. 'Build-Depends to avoid this error assuming it is possible to use the sequence unconditionally.');
-	die("${feature} is not supported for conditional dh sequence add-ons.\n");
+	error("${feature} is not supported for conditional dh sequence add-ons.\n");
 }
 
 sub _filter_sequences_for_conditional_add_ons {
@@ -435,7 +435,7 @@ sub _filter_sequences_for_conditional_add_ons {
 				. "indirectly) but the add-on is conditional for \"*-${DH_INTERNAL_ADDON_TYPE}\" targets");
 			warning("Hint: You may have to move the build-dependency for dh-sequence-${DH_INTERNAL_ADDON_NAME} to "
 				. 'Build-Depends to avoid this error assuming it is possible to use the sequence unconditionally.');
-			die("The add-on ${DH_INTERNAL_ADDON_NAME} cannot be use conditionally for \"*-${DH_INTERNAL_ADDON_TYPE}\""
+			error("The add-on ${DH_INTERNAL_ADDON_NAME} cannot be use conditionally for \"*-${DH_INTERNAL_ADDON_TYPE}\""
 				. " targets\n");
 		}
 	}
@@ -457,7 +457,7 @@ sub _register_cmd_added_by_addon {
 			    . "${old_addon_type}).");
 			warning("Hint: You may have to move the build-dependency for dh-sequence-<X> to "
 				. ' the same build-dependency field to avoid this error assuming it is possible.');
-			die("Multiple sequences have conflicting requests for $cmd.\n");
+			error("Multiple sequences have conflicting requests for $cmd.\n");
 		}
 		return;
 	}

@@ -65,7 +65,7 @@ on_pkgs_in_parallel {
 		if (! $dh{INCLUDE_CONFFILES} && -r "$tmp/DEBIAN/conffiles") {
 			# Generate exclude regexp.
 			open(my $fd, '<', "$tmp/DEBIAN/conffiles")
-				or die("open $tmp/DEBIAN/conffiles failed: $!");
+				or error("open $tmp/DEBIAN/conffiles failed: $!");
 			while (my $line = <$fd>) {
 				chomp($line);
 				$line =~ s/^\///;

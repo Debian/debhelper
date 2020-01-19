@@ -2612,13 +2612,13 @@ sub open_gz {
 	};
 	if ($@) {
 		open($fd, '-|', 'gzip', '-dc', $file)
-		  or die("gzip -dc $file failed: $!");
+		  or error("gzip -dc $file failed: $!");
 	} else {
 		# Pass ":unix" as well due to https://rt.cpan.org/Public/Bug/Display.html?id=114557
 		# Alternatively, we could ensure we always use "POSIX::_exit".  Unfortunately,
 		# loading POSIX is insanely slow.
 		open($fd, '<:unix:gzip', $file)
-		  or die("open $file [<:unix:gzip] failed: $!");
+		  or error("open $file [<:unix:gzip] failed: $!");
 	}
 	return $fd;
 }
