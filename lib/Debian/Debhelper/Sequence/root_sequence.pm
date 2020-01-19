@@ -103,7 +103,7 @@ for my $command (@obsolete_command) {
 for my $entry (@commands_controlled_by_deb_build_options) {
 	my ($command, $dbo_flag) = @{$entry};
 	# Dear reader; Should you be in doubt, then this is internal API that is
-	# subject to change without notice.  If you need this feature, pleas
+	# subject to change without notice.  If you need this feature, please
 	# make an explicit feature request, so we can implement a better solution.
 	_skip_cmd_if_deb_build_options_contains($command, $dbo_flag);
 }
