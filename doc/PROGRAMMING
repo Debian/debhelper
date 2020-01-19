@@ -224,15 +224,7 @@ pkgfile($package, $basename)
 	options, is determined by the existence of 1 or more pkgfiles,
 	or by the existence of a file or directory in a location in the
 	tmpdir, it can be marked as such, which allows dh to automatically
-	skip running it. This is done by inserting a special comment,
-	of the form:
-
-	# PROMISE: DH NOOP WITHOUT pkgfilea pkgfile-logged(pkgfileb) tmp(need/this)
-
-	The "pkgfile-logged" hint notifies dh that the helper logs these files
-	via "log_installed_files".  This means dh will sometimes need to run it
-	even when it is a NO OP because it has to log what it would have
-	installed to avoid dh_missing complaining about missing files.
+	skip running it.  Please see "Optimization techniques" below.
 
 pkgext($package)
 	Pass this command the name of a binary package, and it will return
@@ -479,6 +471,38 @@ declare_command_obsolete($command)
 
 	Cannot be used in "arch-only"/"indep-only" mode.
 
+
+Optimization techniques:
+------------------------
+
+Most debhelper tools will have situations where they are not useful and can
+be skipped.  To support this, dh will look for a "NOOP PROMISE" as a part of
+a comment in the command before running it.  These promises have the form:
+
+    # PROMISE: DH NOOP WITHOUT pkgfile-logged(pkgfileA)  pkgfile-logged(pkgfileB) tmp(need/this) cli-options()
+
+The following keywords are defined:
+
+ * pkgfile(X): The command might do something if debian/X (or debian/<package>.X)
+   exist for any of the packages it will be run for. If the debhelper tool
+   interacts with dh_missing, you always want to use pkgfile-logged(X) instead.
+
+ * pkgfile-logged(X): Same as pkgfile(X) but it will also register which files
+   it handles so dh_missing can see it.
+
+ * tmp(X): The command might do something if debian/<package>/X exists.
+
+ * cli-options(--foo|--bar): The command might do something if *either* --foo
+   OR --bar are passed to the command.
+
+ * cli-options(BUILDSYSTEM): The command is a build system command (dh_auto_*)
+   and will react to standard build system command line options.
+
+ * cli-options(): Special variant of cli-options() to declare that command line
+   options will not affect whether the tool will do something.  This enables
+   dh to skip commands even when passed custom options.  Without an explicit
+   cli-option(...) hint, dh will assume the command might react to it.
+
 Logging helpers and dh_missing:
 -------------------------------
 
@@ -538,7 +562,7 @@ Other helpers:
      to that version, debhelper will wrongly optimize your helper out.
 
 Buildsystem Classes:
--------------------
+--------------------
 
 The dh_auto_* commands are frontends that use debhelper buildsystem
 classes. These classes have names like Debian::Debhelper::Buildsystem::foo,
