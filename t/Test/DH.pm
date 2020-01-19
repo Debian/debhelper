@@ -29,8 +29,8 @@ $ENV{DH_AUTOSCRIPTDIR} = "$ROOT_DIR/autoscripts";
 # Nothing in the tests requires root.
 $ENV{DEB_RULES_REQUIRES_ROOT} = 'no';
 # Disable colors for good measure
-$ENV{DH_COLORS} = 'no';
-$ENV{DPKG_COLORS} = 'no';
+$ENV{DH_COLORS} = 'never';
+$ENV{DPKG_COLORS} = 'never';
 
 # Drop DEB_BUILD_PROFILES and DEB_BUILD_OPTIONS so they don't interfere
 delete($ENV{DEB_BUILD_PROFILES});
