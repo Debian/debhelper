@@ -380,6 +380,8 @@ my (%command_opts, %commands_added_by_addon);
 # Removed commands
 my %obsolete_command;
 
+my %commands_skippable_via_deb_build_options;
+
 sub _add_sequence {
 	my @args = @_;
 	my $seq = Debian::Debhelper::Sequence->new(@args);
@@ -391,6 +393,12 @@ sub _add_sequence {
 			$sequences{$subname} = $seq;
 		}
 	}
+	return;
+}
+
+sub _skip_cmd_if_deb_build_options_contains {
+	my ($command, $flag) = @_;
+	push(@{$commands_skippable_via_deb_build_options{$command}}, $flag);
 	return;
 }
 
@@ -991,8 +999,9 @@ foreach my $i (0..$stoppoint) {
 				push @opts, "-N$package";
 			}
 		}
-
-		run($command, @opts);
+		if (not _should_skip_due_to_dpo($command, Debian::Debhelper::Dh_Lib::_format_cmdline($command, @opts))) {
+			run($command, @opts);
+		}
 	}
 
 	run_hook_target("execute_after_${command}", 10, $command, \@full_todo, @opts);
@@ -1029,6 +1038,29 @@ sub run_hook_target {
 		@todo = run_injected_rules_target($target_stem, $override_type, $min_compat_level, $command, \@todo, @opts);
 	}
 	return @todo;
+}
+
+sub _should_skip_due_to_dpo {
+	my ($command, $to_be_invoked) = @_;
+
+	if (not $dh{'NO_ACT'} and exists($commands_skippable_via_deb_build_options{$command})) {
+		my $flags_ref = $commands_skippable_via_deb_build_options{$command};
+		for my $flag (@{$flags_ref}) {
+			if (get_buildoption($flag)) {
+				_skipped_call_due_dpo($to_be_invoked, $flag) if defined($to_be_invoked);
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+
+sub _skipped_call_due_dpo {
+	my ($command, $dbo_flag) = @_;
+	my $me = Debian::Debhelper::Dh_Lib::_color(basename($0), 'bold');
+	my $skipped = Debian::Debhelper::Dh_Lib::_color('command-omitted', 'yellow');
+	print "${me}: ${skipped}: The call to \"${command}\" was omitted due to \"DEB_BUILD_OPTIONS=${dbo_flag}\"\n";
+	return;
 }
 
 # Tries to run an override / hook target for a command. Returns the list of
@@ -1069,6 +1101,7 @@ sub run_injected_rules_target {
 	return @{$packages} unless defined $has_explicit_target; # no such override
 	return @rest if ! $has_explicit_target; # has empty override
 	return @rest unless @todo; # has override, but no packages to act on
+	return @rest if _should_skip_due_to_dpo($command, "debian/rules $rules_target");
 
 	if (defined $override_type) {
 		# Ensure appropriate -a or -i option is passed when running

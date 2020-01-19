@@ -1143,6 +1143,15 @@ available substitution variables.  To B<dh_*> tool writers, substitution
 expansion occurs as a part of the B<filearray> and B<filedoublearray>
 functions.
 
+=item -
+
+The B<dh> command sequencer will now skip all hook and override targets
+for B<dh_auto_test>, B<dh_dwz> and B<dh_strip> when B<DEB_BUILD_OPTIONS>
+lists the relevant B<nocheck> / B<nostrip> options.
+
+Any package relying on these targets to always be run should instead move
+relevant logic I<out> of those targets.
+
 =back
 
 =back
