@@ -112,7 +112,7 @@ are mandatory.  Variable names are case-sensitive and consist of
 alphanumerics (a-zA-Z0-9), hyphens (-), underscores (_), and colons (:).
 The first character must be an alphanumeric.
 
-If you need a literal dollar sign that cannot trigger an substitution,
+If you need a literal dollar sign that cannot trigger a substitution,
 you can either use the B<${Dollar}> substitution or the sequence B<${}>.
 
 The following expansions are available:
@@ -124,13 +124,13 @@ The following expansions are available:
 Expands to the relevant L<dpkg-architecture(1)> value (similar to
 I<dpkg-architecture -qVARIABLE_HERE>).
 
-When in doubt, the B<DEB_HOST_*> variant is the that will work both
+When in doubt, the B<DEB_HOST_*> variant is the one will work both
 for native and cross builds.
 
 For performance reasons, debhelper will attempt to resolve these
 names from the environment first before consulting
 L<dpkg-architecture(1)>.  This is mostly mentioned for completeness
-as it will not matter for most case.
+as it will not matter for most cases.
 
 =item B<Dollar>
 
@@ -168,8 +168,8 @@ variable I<FOO> is set (it can be set to the empty string).
 
 To avoid infinite loops and resource exhaustion, debhelper will stop
 with an error if the text contains many substitution variables (50) or
-they expand beyond an a certain size (4096 characters or 3x length of
-the original input - whichever is more).
+they expand beyond a certain size (4096 characters or 3x length of
+the original input - whichever is bigger).
 
 =head2 Executable debhelper config files
 
@@ -198,7 +198,7 @@ code should indicate success).
 
 In compatibility level 13+, the output will be subject to substitutions
 (see L</Substitutions in debhelper config files>) where the tool
-support these.  Remember to be careful if your generator I<also> provide
+support these.  Remember to be careful if your generator I<also> provides
 substitutions as this can cause unnecessary confusion.
 
 Otherwise, the output will be used exactly as-is.  Notably, debhelper
