@@ -19,7 +19,8 @@ sub check_auto_buildable {
 	my $this=shift;
 	my ($step)=@_;
 
-	return 0 unless -x $this->get_sourcepath("configure");
+	return 0 unless -f $this->get_sourcepath("configure") &&
+		-x _;
 
 	# Handle configure explicitly; inherit the rest
 	return 1 if $step eq "configure";
