@@ -1060,13 +1060,12 @@ long command line options.
 
 =item -
 
-The ELF related debhelper tools (B<dh_dwz>, B<dh_strip>, B<dh_makeshlibs>,
-B<dh_shlibdeps>) are now only run for arch dependent packages by default
-(i.e. they are excluded from B<*-indep> targets and are passed B<-a>
-by default).
-
-If you need them for B<*-indep> targets, you can add an explicit
-Build-Depends on B<dh-sequence-elf-tools>.
+The ELF related debhelper tools (B<dh_dwz>, B<dh_strip>,
+B<dh_makeshlibs>, B<dh_shlibdeps>) are now only run for arch dependent
+packages by default (i.e. they are excluded from B<*-indep> targets
+and are passed B<-a> by default). If you need them for B<*-indep>
+targets, you can add an explicit Build-Depends on
+B<dh-sequence-elf-tools>.
 
 =item -
 
@@ -1081,7 +1080,7 @@ definitions of a manpage.  This typically happens if the upstream
 build system is installing a compressed version and the package lists
 an uncompressed version of the manpage in F<<
 debian/I<package>.manpages >>.  Often the easiest fix is to remove the
-manpage from F<< debian/I<package>.manpages >> (assuming both version
+manpage from F<< debian/I<package>.manpages >> (assuming both versions
 are identical).
 
 =item -
@@ -1094,14 +1093,14 @@ variables are cleared.
 =item -
 
 The B<dh> command will now error if an override or hook target for an
-obsolete command (e.g. B<dh_systemd_enable>) are present in
-F<debian/rules>.
+obsolete command are present in F<debian/rules>
+(e.g. B<override_dh_systemd_enable:>).
 
 =item -
 
 The B<dh_missing> command will now default to B<--fail-missing>.  This
-can be reverted to a (non-fatal) warning (like in compat 12) by
-explicitly passing B<--list-missing>.
+can be reverted to a non-fatal warning by explicitly passing
+B<--list-missing> like it was in compat 12.
 
 If you do not want the warning either, please omit the call to
 B<dh_missing>.  If you use the B<dh> command sequencer, then you can
@@ -1121,12 +1120,11 @@ B<dh_installsystemd> is now disabled.
 =item -
 
 Many B<dh_*> tools now support limited variable expansion via the
-B<${foo}> syntax.  In many cases, this can be used to reference
-paths that contain either spaces or L<dpkg-architecture(1)> values.
-
-While this can reduce the need for L<dh-exec(1)> in some cases, it
-is B<not> a replacement L<dh-exec(1)> in general (such as the
-filtering syntax, renaming, etc.).
+B<${foo}> syntax.  In many cases, this can be used to reference paths
+that contain either spaces or L<dpkg-architecture(1)> values.  While
+this can reduce the need for L<dh-exec(1)> in some cases, it is B<not>
+a replacement L<dh-exec(1)> in general.  If you need filtering,
+renaming, etc., the package will still need L<dh-exec(1)>.
 
 Please see L</Substitutions in debhelper config files> for syntax and
 available substitution variables.  To B<dh_*> tool writers, substitution
@@ -1139,8 +1137,10 @@ The B<dh> command sequencer will now skip all hook and override targets
 for B<dh_auto_test>, B<dh_dwz> and B<dh_strip> when B<DEB_BUILD_OPTIONS>
 lists the relevant B<nocheck> / B<nostrip> options.
 
-Any package relying on these targets to always be run should instead move
-relevant logic I<out> of those targets.
+Any package relying on these targets to always be run should instead
+move relevant logic out of those targets.  E.g. non-test related
+packaging code from B<override_dh_auto_test> would have to be moved to
+B<execute_after_dh_auto_build> or B<execute_before_dh_auto_install>.
 
 =back
 
