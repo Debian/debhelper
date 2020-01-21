@@ -112,7 +112,7 @@ on_pkgs_in_parallel {
 		my ($file) = @_;
 		my @file_args = Debian::Debhelper::Dh_Lib::_internal_optional_file_args();
 		my $ff = qx_cmd('file', @file_args, '--brief', '-e', 'apptype', '-e', 'ascii',
-						'-e', 'encoding', '-e', 'cdf', '-e', 'compress', '-e', 'tar', $file);
+						'-e', 'encoding', '-e', 'cdf', '-e', 'compress', '-e', 'tar', '--', $file);
 		return 1 if $ff =~ m/ELF/ && $ff !~ /statically linked/;
 		return 0;
 	};
