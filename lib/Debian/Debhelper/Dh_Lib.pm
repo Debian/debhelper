@@ -1190,7 +1190,7 @@ sub autoscript_sed {
 	my ($sed, $infile, $outfile, $out_fd) = @_;
 	if (not defined($sed) or ref($sed)) {
 		my $out = $out_fd;
-		open(my $in, '<', $infile) or die "$infile: $!";
+		open(my $in, '<', $infile) or error("open $infile failed: $!");
 		if (not defined($out_fd)) {
 			open($out, '>>', $outfile) or error("open($outfile): $!");
 		}
@@ -1205,9 +1205,9 @@ sub autoscript_sed {
 			}
 		}
 		if (not defined($out_fd)) {
-			close($out) or error("close($outfile): $!");
+			close($out) or error("close $outfile failed: $!");
 		}
-		close($in) or die "$infile: $!";
+		close($in) or error("close $infile failed: $!");
 	}
 	else {
 		error("Internal error - passed open handle for legacy method") if defined($out_fd);

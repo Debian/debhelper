@@ -9,7 +9,7 @@ package Debian::Debhelper::Buildsystem::makefile;
 use strict;
 use warnings;
 use Debian::Debhelper::Dh_Lib qw(dpkg_architecture_value escape_shell clean_jobserver_makeflags is_cross_compiling compat
-	should_use_root gain_root_cmd);
+	should_use_root gain_root_cmd error);
 use parent qw(Debian::Debhelper::Buildsystem);
 
 my %DEB_DEFAULT_TOOLS = (
@@ -54,7 +54,7 @@ sub exists_make_target {
 	unshift @opts, "-C", $buildpath if $buildpath ne ".";
 
 	my $pid = open(MAKE, "-|");
-	defined($pid) || die "can't fork: $!";
+	defined($pid) || error("fork failed: $!");
 	if (! $pid) {
 		open(STDERR, ">&STDOUT");
 		$ENV{LC_ALL}='C';

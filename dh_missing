@@ -130,7 +130,7 @@ for my $file (glob('debian/.debhelper/generated/*/installed-by-*')) {
 		($target_pkg, $helper) = ($1, $2);
 	}
 
-	open(my $fh, '<', $file) or die "could not open $file: $!";
+	open(my $fh, '<', $file) or error("could not open $file: $!");
 	while (my $line = <$fh>) {
 		chomp($line);
 		next if $line =~ m/^\s*$/;

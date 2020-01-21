@@ -191,10 +191,10 @@ on_items_in_parallel(\@all_packages, sub {
 			# See if there is a .TH or .Dt entry in the man page. If so,
 			# we'll pull the section field from that.
 			if ($gz) {
-				$fd = open_gz($page) or die "$page: $!";
+				$fd = open_gz($page) or error("open $page failed: $!");
 			}
 			else {
-				open($fd, '<', $page) or die "$page: $!";
+				open($fd, '<', $page) or error("open $page failed: $!");
 			}
 			while (<$fd>) {
 				if (/^\.TH\s+\S+\s+"?(\d+[^"\s]*)"?/ ||
@@ -341,10 +341,10 @@ sub find_so_man {
 	# Test first line of file for the .so thing.
 	my $fd;
 	if (/\.gz$/) {
-		$fd = open_gz($_) or die "$_: $!";
+		$fd = open_gz($_) or error("open $_ failed: $!");
 	}
 	else {
-		open($fd, '<', $_) || die "$_: $!";
+		open($fd, '<', $_) || error("open $_ failed: $!");
 	}
 	my $l = <$fd>;
 	close($fd);
