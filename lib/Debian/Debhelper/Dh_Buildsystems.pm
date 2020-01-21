@@ -207,7 +207,7 @@ sub buildsystems_init {
 	if (compat(8)) {
 		# This option only works in compat 9+ where we actually set buildflags
 		$options{'reload-all-buildenv-variables'} = sub {
-			die("--reload-all-buildenv-variables only work reliably in compat 9+");
+			die("--reload-all-buildenv-variables only work reliably in compat 9+.\n");
 		};
 	}
 	$args{options}{$_} = $options{$_} foreach keys(%options);
