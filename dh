@@ -774,8 +774,6 @@ my %sequence2packages = (
 	'binary'  => \@packages,
 );
 
-my %completed_sequences;
-
 # Get the options to pass to commands in the sequence.
 # Filter out options intended only for this program.
 my (@options, %seen_options);
@@ -896,33 +894,9 @@ while (@ARGV_orig) {
 
 
 # Figure out at what point in the sequence to start for each package.
-my (%logged, %startpoint, %stamp_file);
+my (%logged, %startpoint, $completed_sequences);
 
-if ( -f BUILD_STAMP_FILE and not compat(9)) {
-	open(my $fd, '<', BUILD_STAMP_FILE) or error("open(${\BUILD_STAMP_FILE}, ro) failed: $!");
-	while (my $line = <$fd>) {
-		chomp($line);
-		$stamp_file{$line} = 1;
-	}
-	close($fd);
-	my $build_indep_target_done = 1;
-	my $build_arch_target_done = 1;
-	for my $pkg (@{$sequence2packages{'build-arch'}}) {
-		if (not $stamp_file{$pkg}) {
-			$build_arch_target_done = 0;
-			last;
-		}
-	}
-	for my $pkg (@{$sequence2packages{'build-indep'}}) {
-		if (not $stamp_file{$pkg}) {
-			$build_indep_target_done = 0;
-			last;
-		}
-	}
-	$completed_sequences{'build-arch'} = 1 if $build_arch_target_done;
-	$completed_sequences{'build-indep'} = 1 if $build_indep_target_done;
-	$completed_sequences{'build'} = 1 if $build_indep_target_done and $build_arch_target_done;
-}
+$completed_sequences = _check_for_completed_sequences(\%sequence2packages);
 
 # In compat <= 8, the sequences are always inlined (those versions do not
 # recurse into debian/rules anyway).  In compat 9+, we never inline an
@@ -930,35 +904,14 @@ if ( -f BUILD_STAMP_FILE and not compat(9)) {
 my ($rules_targets, $full_sequence) = unpack_sequence(\%sequences,
 														$sequence,
 														(!compat(8) ? 0 : 1),
-														\%completed_sequences,
+														$completed_sequences,
 														$sequence_unpack_flags,
 														);
 my $stoppoint = $#{$full_sequence};
 
 check_for_obsolete_commands($full_sequence, $stoppoint);
 
-if (compat(9)) {
-	foreach my $package (@packages) {
-		my @log = load_log($package, \%logged);
-		# Find the last logged command that is in the sequence, and
-		# continue with the next command after it. If no logged
-		# command is in the sequence, we're starting at the beginning..
-		$startpoint{$package} = 0;
-		COMMAND:
-		foreach my $command (reverse @log) {
-			foreach my $i (0 .. $#{$full_sequence}) {
-				if ($command eq $full_sequence->[$i]) {
-					$startpoint{$package} = $i + 1;
-					last COMMAND;
-				}
-			}
-		}
-	}
-} else {
-	foreach my $package (@packages) {
-		$startpoint{$package} = 0;
-	}
-}
+%startpoint = _compute_starting_point_in_sequences(\@packages, $full_sequence, \%logged);
 
 for my $rules_command (@{$rules_targets}) {
 	my $rules_target = extract_rules_target_name($rules_command)
@@ -976,7 +929,7 @@ for my $rules_command (@{$rules_targets}) {
 				if ($c eq $full_sequence->[$j]) {
 					# Unfortunately, we do not guarantee any order
 					# between the run targets.  Assuming e.g.
-					# "install-arch" and "build" are opague targets
+					# "install-arch" and "build" are opaque targets
 					# then we could process "install-arch" first and
 					# then "build".  In this case, it is important
 					# that we do not "reset" the starting point for
@@ -1067,6 +1020,65 @@ foreach my $i (0..$stoppoint) {
 	}
 
 	run_hook_target("execute_after_${command}", 10, $command, \@full_todo, @opts);
+}
+
+sub _check_for_completed_sequences {
+	my ($sequence2packages) = @_;
+	my (%completed, %stamp_file_content);
+	if ( -f BUILD_STAMP_FILE and not compat(9)) {
+		open(my $fd, '<', BUILD_STAMP_FILE) or error("open(${\BUILD_STAMP_FILE}, ro) failed: $!");
+		while (my $line = <$fd>) {
+			chomp($line);
+			$stamp_file_content{$line} = 1;
+		}
+		close($fd);
+		my $build_indep_target_done = 1;
+		my $build_arch_target_done = 1;
+		for my $pkg (@{$sequence2packages->{'build-arch'}}) {
+			if (not $stamp_file_content{$pkg}) {
+				$build_arch_target_done = 0;
+				last;
+			}
+		}
+		for my $pkg (@{$sequence2packages->{'build-indep'}}) {
+			if (not $stamp_file_content{$pkg}) {
+				$build_indep_target_done = 0;
+				last;
+			}
+		}
+		$completed{'build-arch'} = 1 if $build_arch_target_done;
+		$completed{'build-indep'} = 1 if $build_indep_target_done;
+		$completed{'build'} = 1 if $build_indep_target_done and $build_arch_target_done;
+	}
+	return \%completed;
+}
+
+sub _compute_starting_point_in_sequences {
+	my ($packages_ref, $full_sequence, $logged) = @_;
+	my %startpoint;
+	if (compat(9)) {
+		foreach my $package (@{$packages_ref}) {
+			my @log = load_log($package, $logged);
+			# Find the last logged command that is in the sequence, and
+			# continue with the next command after it. If no logged
+			# command is in the sequence, we're starting at the beginning..
+			$startpoint{$package} = 0;
+			COMMAND:
+			foreach my $command (reverse @log) {
+				foreach my $i (0 .. $#{$full_sequence}) {
+					if ($command eq $full_sequence->[$i]) {
+						$startpoint{$package} = $i + 1;
+						last COMMAND;
+					}
+				}
+			}
+		}
+	} else {
+		foreach my $package (@{$packages_ref}) {
+			$startpoint{$package} = 0;
+		}
+	}
+	return %startpoint;
 }
 
 sub run {
