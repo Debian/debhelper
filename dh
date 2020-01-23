@@ -28,10 +28,29 @@ correspond to the targets of a F<debian/rules> file: B<build-arch>,
 B<build-indep>, B<build>, B<clean>, B<install-indep>, B<install-arch>,
 B<install>, B<binary-arch>, B<binary-indep>, and B<binary>.
 
-=head1 OVERRIDE TARGETS
+=head1 OVERRIDE AND HOOK TARGETS
 
 A F<debian/rules> file using B<dh> can override the command that is run
-at any step in a sequence, by defining an override target.
+at any step in a sequence, by defining an override target.  It is also
+possible to inject a commands before or after any step without affecting
+the step itself.
+
+=head2 Injecting commands before or after a step
+
+I<Note>: This feature requires debhelper 12.8 or later plus the package must
+use compatibility mode 10 or later.
+
+To inject commands before I<dh_command>, add a target named
+B<execute_before_>I<dh_command> to the rules files.  Similarly, if you
+want to inject commands after I<dh_command>, add the target
+B<execute_after_>I<dh_command>.  Both targets can be used for the same
+I<dh_command> and also even if the command is overriden (as described in
+L</Overriding a command> below).
+
+When these targets are defined, B<dh> will call the targets respectively
+before or after it would invoke I<dh_command> (or its override target).
+
+=head2 Overriding a command
 
 To override I<dh_command>, add a target named B<override_>I<dh_command> to
 the rules file. When it would normally run I<dh_command>, B<dh> will
@@ -39,12 +58,33 @@ instead call that target. The override target can then run the command with
 additional options, or run entirely different commands instead. See
 examples below.
 
-Override targets can also be defined to run only when building
-architecture dependent or architecture independent packages.
-Use targets with names like B<override_>I<dh_command>B<-arch>
-and B<override_>I<dh_command>B<-indep>.
-(Note that to use this feature, you should Build-Depend on
-debhelper 8.9.7 or above.)
+=head2 Architecture dependent/independent override and hook targets
+
+The override and hook targets can also be defined to run only
+when building architecture dependent or architecture independent
+packages. Use targets with names like B<override_>I<dh_command>B<-arch>
+and B<execute_after>I<dh_command>B<-indep>.
+
+This feature is available since debhelper 8.9.7 (for override targets)
+and 12.8 (for hook targets).
+
+=head2 Completely empty targets
+
+As a special optimization, B<dh> will skip a target if it is completely empty.
+This is mostly useful for override targets, where the command will simply be
+skipped without the overhead of invoking a dummy target.
+
+Note that the target has to be completely empty for this to work:
+
+     # Skip dh_bar - the good and optimized way
+     # Some rationale for skipping dh_bar goes here
+     override_dh_bar:
+
+
+     # Skip dh_foo - the slow way
+     override_dh_foo:
+        # Some rationale for skipping dh_foo goes here
+        # (these comments causes a dummy target to be run)
 
 =head1 OPTIONS
 
