@@ -86,6 +86,26 @@ Note that the target has to be completely empty for this to work:
         # Some rationale for skipping dh_foo goes here
         # (these comments causes a dummy target to be run)
 
+=head2 Verifying targets are picked up by dh
+
+If you want to confirm that B<dh> has seen an override or a hook target, you
+can use the following command as an example:
+
+    $ dh binary --no-act | grep dh_install | head -n5
+         dh_installdirs
+         dh_install
+         debian/rules execute_after_dh_install
+         dh_installdocs
+         dh_installchangelogs
+
+The B<debian/rules execute_after_dh_install> in the output, which signals
+that B<dh> registered a B<execute_after_dh_install> target and would
+run it directly after L<dh_install(1)>.
+
+Note that L</Completely empty targets> will be omitted in the listing above.
+This makes it a bit harder to spot as you are looking for the omission of
+a command name.  But otherwise, the principle remains the same.
+
 =head1 OPTIONS
 
 =over 4
