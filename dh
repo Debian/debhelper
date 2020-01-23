@@ -10,6 +10,7 @@ use strict;
 use warnings;
 use constant {
 	'UNSKIPPABLE_CLI_OPTIONS_BUILD_SYSTEM' => q(-S|--buildsystem|-D|--sourcedir(?:ectory)?|-B|--builddir(?:ectory)?),
+	'BUILD_STAMP_FILE'                     => 'debian/debhelper-build-stamp',
 };
 use Debian::Debhelper::Dh_Lib;
 use Debian::Debhelper::Sequence;
@@ -431,7 +432,6 @@ if ($sequence eq 'debian/rules' ||
 
 
 # Definitions of sequences.
-my $build_stamp_file = 'debian/debhelper-build-stamp';
 my %sequences;
 
 # Additional command options
@@ -893,11 +893,13 @@ while (@ARGV_orig) {
 	}
 }
 
+
+
 # Figure out at what point in the sequence to start for each package.
 my (%logged, %startpoint, %stamp_file);
 
-if ( -f $build_stamp_file and not compat(9)) {
-	open(my $fd, '<', $build_stamp_file) or error("open($build_stamp_file, ro) failed: $!");
+if ( -f BUILD_STAMP_FILE and not compat(9)) {
+	open(my $fd, '<', BUILD_STAMP_FILE) or error("open(${\BUILD_STAMP_FILE}, ro) failed: $!");
 	while (my $line = <$fd>) {
 		chomp($line);
 		$stamp_file{$line} = 1;
