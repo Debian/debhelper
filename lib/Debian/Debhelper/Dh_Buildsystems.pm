@@ -91,9 +91,9 @@ sub autoselect_buildsystem {
 	return $selected;
 }
 
-# Similar to create_build system_instance(), but it attempts to autoselect
-# a build system if none was specified. In case autoselection fails, undef
-# is returned.
+# Similar to create_buildsystem_instance(), but it attempts to autoselect
+# a build system if none was specified. In case autoselection fails or an
+# explicit “none” is requested, undef is returned.
 sub load_buildsystem {
 	my $system=shift;
 	my $step=shift;
@@ -104,6 +104,7 @@ sub load_buildsystem {
 		$system = $system_options->{'system'};
 	}
 	if (defined $system) {
+		return undef if $system eq 'none';
 		my $inst = create_buildsystem_instance($system, 1, %opts);
 		return $inst;
 	}
