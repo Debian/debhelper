@@ -18,6 +18,9 @@ use constant {
 
 use Exporter qw(import);
 
+use Debian::Debhelper::Dh_Lib qw(basename compat error getpackages load_log);
+
+
 our @EXPORT = qw(
 	extract_rules_target_name
 	to_rules_target
@@ -25,6 +28,9 @@ our @EXPORT = qw(
 	unpack_sequence
 	rules_explicit_target
 	extract_skipinfo
+	compute_selected_addons
+	skipped_call_due_dpo
+	compute_starting_point_in_sequences
 	DUMMY_TARGET
 	SEQUENCE_NO_SUBSEQUENCES
 	SEQUENCE_ARCH_INDEP_SUBSEQUENCES
@@ -263,5 +269,126 @@ sub extract_skipinfo {
 	return;
 }
 
+sub skipped_call_due_dpo {
+	my ($command, $dbo_flag) = @_;
+	my $me = Debian::Debhelper::Dh_Lib::_color(basename($0), 'bold');
+	my $skipped = Debian::Debhelper::Dh_Lib::_color('command-omitted', 'yellow');
+	print "${me}: ${skipped}: The call to \"${command}\" was omitted due to \"DEB_BUILD_OPTIONS=${dbo_flag}\"\n";
+	return;
+}
+
+sub compute_starting_point_in_sequences {
+	my ($packages_ref, $full_sequence, $logged) = @_;
+	my %startpoint;
+	if (compat(9)) {
+		foreach my $package (@{$packages_ref}) {
+			my @log = load_log($package, $logged);
+			# Find the last logged command that is in the sequence, and
+			# continue with the next command after it. If no logged
+			# command is in the sequence, we're starting at the beginning..
+			$startpoint{$package} = 0;
+			COMMAND:
+			foreach my $command (reverse(@log)) {
+				foreach my $i (0 .. $#{$full_sequence}) {
+					if ($command eq $full_sequence->[$i]) {
+						$startpoint{$package} = $i + 1;
+						last COMMAND;
+					}
+				}
+			}
+		}
+	} else {
+		foreach my $package (@{$packages_ref}) {
+			$startpoint{$package} = 0;
+		}
+	}
+	return %startpoint;
+}
+
+
+sub compute_selected_addons {
+	my ($sequence_name, @addon_requests_from_args) = @_;
+	my (@enabled_addons, %disabled_addons, %enabled);
+	my @addon_requests;
+	my $sequence_type = sequence_type($sequence_name);
+
+	my %addon_constraints = %{ Debian::Debhelper::Dh_Lib::bd_dh_sequences() };
+
+	# Inject elf-tools early as other addons rely on their presence and it historically
+	# has been considered a part of the "core" sequence.
+	if (exists($addon_constraints{'elf-tools'})) {
+		# Explicitly requested; respect that
+		push(@addon_requests, '+elf-tools');
+	} elsif (compat(12, 1)) {
+		# In compat 12 and earlier, we only inject the sequence if there are arch
+		# packages present and the sequence requires it.
+		if (getpackages('arch') and $sequence_type ne SEQUENCE_TYPE_INDEP_ONLY) {
+			push(@addon_requests, '+elf-tools');
+		}
+	} else {
+		# In compat 13, we always inject the addon if not explicitly requested and
+		# then flag it as arch_only
+		push(@addon_requests, '+elf-tools');
+		$addon_constraints{'elf-tools'} = SEQUENCE_TYPE_ARCH_ONLY if not exists($addon_constraints{'elf-tools'});
+	}
+
+	# Order is important; DH_EXTRA_ADDONS must come before everything
+	# else; then comes built-in and finally argument provided add-ons
+	# requests.
+	push(@addon_requests,  map { "+${_}" } split(",", $ENV{DH_EXTRA_ADDONS}))
+		if $ENV{DH_EXTRA_ADDONS};
+	if (not compat(9, 1)) {
+		# Enable autoreconf'ing by default in compat 10 or later.
+		push(@addon_requests, '+autoreconf');
+
+		# Enable systemd support by default in compat 10 or later.
+		# - compat 11 injects the dh_installsystemd tool directly in the
+		#   sequence instead of using a --with sequence.
+		push(@addon_requests, '+systemd') if compat(10, 1);
+		push(@addon_requests, '+build-stamp');
+	}
+	for my $addon_name (sort(keys(%addon_constraints))) {
+		my $addon_type = $addon_constraints{$addon_name};
+
+		# Special-case for the "clean" target to avoid B-D-I dependencies in that for conditional add-ons
+		next if $sequence_name eq 'clean' and $addon_type ne SEQUENCE_TYPE_BOTH;
+		if ($addon_type eq 'both' or $sequence_type eq 'both' or $addon_type eq $sequence_type) {
+			push(@addon_requests, "+${addon_name}");
+		}
+	}
+
+	push(@addon_requests, @addon_requests_from_args);
+
+	# Removing disabled add-ons are expensive (O(N) per time), so we
+	# attempt to make removals in bulk.  Note that we have to be order
+	# preserving (due to #885580), so there is a limit to how "smart"
+	# we can be.
+	my $flush_disable_cache = sub {
+		@enabled_addons = grep { not exists($disabled_addons{$_}) } @enabled_addons;
+		for my $addon (keys(%disabled_addons)) {
+			delete($enabled{$addon});
+		}
+		%disabled_addons = ();
+	};
+
+	for my $request (@addon_requests) {
+		if ($request =~ s/^[+]//) {
+			$flush_disable_cache->() if %disabled_addons;
+			push(@enabled_addons, $request) if not $enabled{$request}++;
+		} elsif ($request =~ s/^-//) {
+			$disabled_addons{$request} = 1;
+		} else {
+			error("Internal error: Invalid add-on request: $request (Missing +/- prefix)");
+		}
+	}
+
+	$flush_disable_cache->() if %disabled_addons;
+	return map {
+		{
+			'name' => $_,
+			'addon-type' => $addon_constraints{$_} // SEQUENCE_TYPE_BOTH,
+		}
+	} @enabled_addons;
+}
 
 1;
