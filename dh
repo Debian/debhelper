@@ -15,6 +15,7 @@ use constant {
 use Debian::Debhelper::Dh_Lib;
 use Debian::Debhelper::Sequence;
 use Debian::Debhelper::SequencerUtil;
+use Debian::Debhelper::DH::SequenceState ();
 
 our $VERSION = DH_BUILTIN_VERSION;
 
@@ -429,27 +430,15 @@ if ($sequence eq 'debian/rules' ||
 	exit 0;
 }
 
-
-# Definitions of sequences.
-my %sequences;
-
-# Additional command options
-my (%command_opts, %commands_added_by_addon);
-
-# Removed commands
-my %obsolete_command;
-
-my %commands_skippable_via_deb_build_options;
-
 sub _add_sequence {
 	my @args = @_;
 	my $seq = Debian::Debhelper::Sequence->new(@args);
 	my $name = $seq->name;
-	$sequences{$name} = $seq;
+	$Debian::Debhelper::DH::SequenceState::sequences{$name} = $seq;
 	if ($seq->allowed_subsequences eq SEQUENCE_ARCH_INDEP_SUBSEQUENCES) {
 		for my $subseq ((SEQUENCE_TYPE_ARCH_ONLY, SEQUENCE_TYPE_INDEP_ONLY)) {
 			my $subname = "${name}-${subseq}";
-			$sequences{$subname} = $seq;
+			$Debian::Debhelper::DH::SequenceState::sequences{$subname} = $seq;
 		}
 	}
 	return;
@@ -457,7 +446,7 @@ sub _add_sequence {
 
 sub _skip_cmd_if_deb_build_options_contains {
 	my ($command, $flag) = @_;
-	push(@{$commands_skippable_via_deb_build_options{$command}}, $flag);
+	push(@{$Debian::Debhelper::DH::SequenceState::commands_skippable_via_deb_build_options{$command}}, $flag);
 	return;
 }
 
@@ -503,7 +492,7 @@ sub _filter_sequences_for_conditional_add_ons {
 
 sub _register_cmd_added_by_addon {
 	my ($cmd) = @_;
-	my $existing = $commands_added_by_addon{$cmd};
+	my $existing = $Debian::Debhelper::DH::SequenceState::commands_added_by_addon{$cmd};
 	if ($existing) {
 		if ($existing->{'addon-type'} ne $DH_INTERNAL_ADDON_TYPE) {
 			my $old_addon_name = $existing->{'addon-name'};
@@ -521,7 +510,7 @@ sub _register_cmd_added_by_addon {
 		return;
 	}
 
-	$commands_added_by_addon{$cmd} = {
+	$Debian::Debhelper::DH::SequenceState::commands_added_by_addon{$cmd} = {
 		'addon-name' => $DH_INTERNAL_ADDON_NAME,
 		'addon-type' => $DH_INTERNAL_ADDON_TYPE,
 	};
@@ -531,8 +520,8 @@ sub _register_cmd_added_by_addon {
 sub _sequences_containing_cmd {
 	my ($cmd) = @_;
 	my @sequences;
-	foreach my $sequence_name (keys %sequences) {
-		my $seq = $sequences{$sequence_name};
+	foreach my $sequence_name (keys(%Debian::Debhelper::DH::SequenceState::sequences)) {
+		my $seq = $Debian::Debhelper::DH::SequenceState::sequences{$sequence_name};
 		for my $scmd (@{$seq->{'_cmds'}}) {
 			if ($scmd->{'command'} eq $cmd) {
 				push(@sequences, $seq);
@@ -586,10 +575,10 @@ sub add_command {
 	my ($command, $sequence) = @_;
 	_assert_not_conditional_sequence_addon('add_command');
 	_register_cmd_added_by_addon($command);
-	if (not exists($sequences{$sequence})) {
+	if (not exists($Debian::Debhelper::DH::SequenceState::sequences{$sequence})) {
 		_add_sequence($sequence, SEQUENCE_NO_SUBSEQUENCES, _seq_cmd($command));
 	} else {
-		my $seq = $sequences{$sequence};
+		my $seq = $Debian::Debhelper::DH::SequenceState::sequences{$sequence};
 		_filter_sequences_for_conditional_add_ons($seq);
 		$seq->add_command_at_start(_seq_cmd($command))
 	}
@@ -599,10 +588,10 @@ sub add_command_at_end {
 	my ($command, $sequence) = @_;
 	_assert_not_conditional_sequence_addon('add_command');
 	_register_cmd_added_by_addon($command);
-	if (not exists($sequences{$sequence})) {
+	if (not exists($Debian::Debhelper::DH::SequenceState::sequences{$sequence})) {
 		_add_sequence($sequence, SEQUENCE_NO_SUBSEQUENCES, _seq_cmd($command));
 	} else {
-		my $seq = $sequences{$sequence};
+		my $seq = $Debian::Debhelper::DH::SequenceState::sequences{$sequence};
 		_filter_sequences_for_conditional_add_ons($seq);
 		$seq->add_command_at_end(_seq_cmd($command))
 	}
@@ -614,7 +603,7 @@ sub add_command_options {
 	# Implement if actually needed (Complicated as dh_foo becomes dh_foo -a && dh_foo -i <extra_options>
 	# and that implies smarter deduplication logic)
 	_assert_not_conditional_sequence_addon('add_command_options');
-	push @{$command_opts{$command}}, @_;
+	push(@{$Debian::Debhelper::DH::SequenceState::command_opts{$command}}, @_);
 	return 1;
 }
 
@@ -625,16 +614,16 @@ sub remove_command_options {
 	_assert_not_conditional_sequence_addon('remove_command_options');
 	if (@cmd_options) {
 		# Remove only specified options
-		if (my $opts = $command_opts{$command}) {
+		if (my $opts = $Debian::Debhelper::DH::SequenceState::command_opts{$command}) {
 			foreach my $opt (@cmd_options) {
 				$opts = [ grep { $_ ne $opt } @$opts ];
 			}
-			$command_opts{$command} = $opts;
+			$Debian::Debhelper::DH::SequenceState::command_opts{$command} = $opts;
 		}
 	}
 	else {
 		# Clear all additional options
-		delete $command_opts{$command};
+		delete($Debian::Debhelper::DH::SequenceState::command_opts{$command});
 	}
 	return 1;
 }
@@ -642,7 +631,7 @@ sub remove_command_options {
 sub declare_command_obsolete {
 	my ($command) = @_;
 	_assert_not_conditional_sequence_addon('declare_command_obsolete');
-	$obsolete_command{$command} = $DH_INTERNAL_ADDON_NAME;
+	$Debian::Debhelper::DH::SequenceState::obsolete_command{$command} = $DH_INTERNAL_ADDON_NAME;
 	return 1;
 }
 
@@ -737,21 +726,21 @@ sub load_sequence_addon {
 	}
 }
 
-if (%commands_added_by_addon) {
-	while (my ($cmd, $addon) = each(%commands_added_by_addon)) {
+if (%Debian::Debhelper::DH::SequenceState::commands_added_by_addon) {
+	while (my ($cmd, $addon) = each(%Debian::Debhelper::DH::SequenceState::commands_added_by_addon)) {
 		my $addon_type = $addon->{'addon-type'};
 		if ($addon_type eq 'indep') {
-			unshift(@{$command_opts{$cmd}}, '-i');
+			unshift(@{$Debian::Debhelper::DH::SequenceState::command_opts{$cmd}}, '-i');
 		} elsif ($addon_type eq 'arch') {
-			unshift(@{$command_opts{$cmd}}, '-a');
+			unshift(@{$Debian::Debhelper::DH::SequenceState::command_opts{$cmd}}, '-a');
 		}
 	}
 }
 
 
-if (! exists $sequences{$sequence}) {
-	error "Unknown sequence $sequence (choose from: ".
-		join(" ", sort keys %sequences).")";
+if (! exists($Debian::Debhelper::DH::SequenceState::sequences{$sequence})) {
+	error("Unknown sequence $sequence (choose from: ".
+		join(" ", sort(keys(%Debian::Debhelper::DH::SequenceState::sequences))).")");
 }
 
 while (@ARGV_orig) {
@@ -816,7 +805,7 @@ $completed_sequences = _check_for_completed_sequences(\%sequence2packages);
 # In compat <= 8, the sequences are always inlined (those versions do not
 # recurse into debian/rules anyway).  In compat 9+, we never inline an
 # existing rules target.
-my ($rules_targets, $full_sequence) = unpack_sequence(\%sequences,
+my ($rules_targets, $full_sequence) = unpack_sequence(\%Debian::Debhelper::DH::SequenceState::sequences,
 														$sequence,
 														(!compat(8) ? 0 : 1),
 														$completed_sequences,
@@ -838,7 +827,7 @@ for my $rules_command (@{$rules_targets}) {
 	run("debian/rules", $rules_target);
 	my $override_packages = $sequence2packages{$rules_target} // \@packages;
 	for my $package (@{$override_packages}) {
-		my (undef, $seq) = unpack_sequence(\%sequences, $rules_target, 1);
+		my (undef, $seq) = unpack_sequence(\%Debian::Debhelper::DH::SequenceState::sequences, $rules_target, 1);
 		COMMAND: for my $c (reverse(@{$seq})) {
 			for my $j (0 .. $#{$full_sequence}) {
 				if ($c eq $full_sequence->[$j]) {
@@ -867,13 +856,13 @@ foreach my $i (0..$stoppoint) {
 	my @todo;
 	my @opts=@options;
 	my @filtered_packages;
-	if (grep { $_ eq '-i'} @{$command_opts{$command}}) {
-		if (grep { $_ eq '-a'} @{$command_opts{$command}}) {
+	if (grep { $_ eq '-i'} @{$Debian::Debhelper::DH::SequenceState::command_opts{$command}}) {
+		if (grep { $_ eq '-a'} @{$Debian::Debhelper::DH::SequenceState::command_opts{$command}}) {
 			@filtered_packages = @packages;
 		} else {
 			@filtered_packages = @indep_packages;
 		}
-	} elsif (grep { $_ eq '-a'} @{$command_opts{$command}}) {
+	} elsif (grep { $_ eq '-a'} @{$Debian::Debhelper::DH::SequenceState::command_opts{$command}}) {
 		@filtered_packages = @arch_packages;
 	} else {
 		@filtered_packages = @packages;
@@ -972,8 +961,8 @@ sub run {
 	my ($command, @options) = @_;
 
 	# Include additional command options if any
-	unshift @options, @{$command_opts{$command}}
-		if exists $command_opts{$command};
+	unshift(@options, @{$Debian::Debhelper::DH::SequenceState::command_opts{$command}})
+		if exists($Debian::Debhelper::DH::SequenceState::command_opts{$command});
 
 	# 3 space indent lines the command being run up under the
 	# sequence name after "dh ".
@@ -1004,8 +993,11 @@ sub run_hook_target {
 sub _should_skip_due_to_dpo {
 	my ($command, $to_be_invoked) = @_;
 
-	if (not $dh{'NO_ACT'} and exists($commands_skippable_via_deb_build_options{$command})) {
-		my $flags_ref = $commands_skippable_via_deb_build_options{$command};
+	# Indirection/reference for readability
+	my $commands_ref = \%Debian::Debhelper::DH::SequenceState::commands_skippable_via_deb_build_options;
+
+	if (not $dh{'NO_ACT'} and exists($commands_ref->{$command})) {
+		my $flags_ref = $commands_ref->{$command};
 		for my $flag (@{$flags_ref}) {
 			if (get_buildoption($flag)) {
 				skipped_call_due_dpo($to_be_invoked, $flag) if defined($to_be_invoked);
@@ -1120,8 +1112,8 @@ sub can_skip {
 	return 0 if $unoptimizable_user_option ||
 		(exists $ENV{DH_OPTIONS} && length $ENV{DH_OPTIONS});
 
-	return 0 if exists($command_opts{$command})
-		and @{$command_opts{$command}};
+	return 0 if exists($Debian::Debhelper::DH::SequenceState::command_opts{$command})
+		and @{$Debian::Debhelper::DH::SequenceState::command_opts{$command}};
 
 	if (! defined $skipinfo{$command}) {
 		$skipinfo{$command}=[extract_skipinfo($command)];
@@ -1185,12 +1177,12 @@ sub check_for_obsolete_commands {
 	my ($found_obsolete_targets);
 	for my $i (0..$stoppoint) {
 		my $command = $full_sequence->[$i];
-		if (exists($obsolete_command{$command})) {
-			my $addon_name = $obsolete_command{$command};
+		if (exists($Debian::Debhelper::DH::SequenceState::obsolete_command{$command})) {
+			my $addon_name = $Debian::Debhelper::DH::SequenceState::obsolete_command{$command};
 			error("The addon ${addon_name} claimed that $command was obsolete, but it is not!?");
 		}
 	}
-	for my $command (sort(keys(%obsolete_command))) {
+	for my $command (sort(keys(%Debian::Debhelper::DH::SequenceState::obsolete_command))) {
 		for my $prefix (qw(execute_before_ execute_after_ override_)) {
 			for my $suffix ('', '-arch', '-indep') {
 				my $target = "${prefix}${command}${suffix}";
