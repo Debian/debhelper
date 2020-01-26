@@ -529,59 +529,7 @@ if (! exists($Debian::Debhelper::DH::SequenceState::sequences{$sequence})) {
 		join(" ", sort(keys(%Debian::Debhelper::DH::SequenceState::sequences))).")");
 }
 
-while (@ARGV_orig) {
-	my $opt=shift @ARGV_orig;
-	if ($opt =~ /^--?(after|until|before|with|without)$/) {
-		shift @ARGV_orig;
-		next;
-	}
-	elsif ($opt =~ /^--?(no-act|remaining|(after|until|before|with|without)=)/) {
-		next;
-	}
-	elsif ($opt=~/^-/) {
-		if (not @options and $opt eq '--parallel' or $opt eq '--no-parallel') {
-			my $max_parallel;
-			# Ignore the option if it is the default for the given
-			# compat level.
-			next if compat(9) and $opt eq '--no-parallel';
-			next if not compat(9) and $opt eq '--parallel';
-			# Having an non-empty "@options" hurts performance quite a
-			# bit.  At the same time, we want to promote the use of
-			# --(no-)parallel, so "tweak" the options a bit if there
-			# is no reason to include this option.
-			$max_parallel = get_buildoption('parallel') // 1;
-			next if $max_parallel == 1;
-		}
-		if ($opt =~ m/^(--[^=]++)(?:=.*)?$/ or $opt =~ m/^(-[^-])$/) {
-			my $optname = $1;
-			if (length($optname) > 2 and (compat(12, 1) or $optname =~ m/^-[^-][^=]/)) {
-				# We cannot optimize bundled options but we can optimize a single
-				# short option with an explicit parameter (-B=F is ok, -BF is not)
-				# In compat 12 or earlier, we also punt on long options due to
-				# auto-abbreviation.
-				$unoptimizable_option_bundle = 1
-			}
-			$seen_options{$optname} = 1;
-		} else {
-			$unoptimizable_user_option = 1;
-		}
-		push @options, "-O".$opt;
-	}
-	elsif (@options) {
-		if ($options[$#options]=~/^-O--/) {
-			$options[$#options].="=".$opt;
-		}
-		else {
-			$unoptimizable_user_option = 1;
-			$options[$#options].=$opt;
-		}
-	}
-	else {
-		error "Unknown parameter: $opt";
-	}
-}
-
-
+parse_dh_cmd_options(@ARGV_orig);
 
 # Figure out at what point in the sequence to start for each package.
 my (%logged, %startpoint, $completed_sequences);
@@ -845,6 +793,58 @@ sub can_skip {
 	return 1;
 }
 
+# Options parsed to dh that may need to be passed on to helpers
+sub parse_dh_cmd_options {
+	my (@argv) = @_;
+
+	while (@argv) {
+		my $opt = shift(@argv);
+		if ($opt =~ /^--?(after|until|before|with|without)$/) {
+			shift(@argv);
+			next;
+		} elsif ($opt =~ /^--?(no-act|remaining|(after|until|before|with|without)=)/) {
+			next;
+		} elsif ($opt =~ /^-/) {
+			if (not @options and $opt eq '--parallel' or $opt eq '--no-parallel') {
+				my $max_parallel;
+				# Ignore the option if it is the default for the given
+				# compat level.
+				next if compat(9) and $opt eq '--no-parallel';
+				next if not compat(9) and $opt eq '--parallel';
+				# Having an non-empty "@options" hurts performance quite a
+				# bit.  At the same time, we want to promote the use of
+				# --(no-)parallel, so "tweak" the options a bit if there
+				# is no reason to include this option.
+				$max_parallel = get_buildoption('parallel') // 1;
+				next if $max_parallel == 1;
+			}
+			if ($opt =~ m/^(--[^=]++)(?:=.*)?$/ or $opt =~ m/^(-[^-])$/) {
+				my $optname = $1;
+				if (length($optname) > 2 and (compat(12, 1) or $optname =~ m/^-[^-][^=]/)) {
+					# We cannot optimize bundled options but we can optimize a single
+					# short option with an explicit parameter (-B=F is ok, -BF is not)
+					# In compat 12 or earlier, we also punt on long options due to
+					# auto-abbreviation.
+					$unoptimizable_option_bundle = 1
+				}
+				$seen_options{$optname} = 1;
+			} else {
+				$unoptimizable_user_option = 1;
+			}
+			push(@options, "-O" . $opt);
+		} elsif (@options) {
+			if ($options[$#options] =~ /^-O--/) {
+				$options[$#options] .= '=' . $opt;
+			} else {
+				$unoptimizable_user_option = 1;
+				$options[$#options] .= $opt;
+			}
+		} else {
+			error("Unknown parameter: $opt");
+		}
+	}
+	return;
+}
 
 =head1 SEE ALSO
 
