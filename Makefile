@@ -121,7 +121,8 @@ install:
 	install -d $(DESTDIR)$(PREFIX)/bin \
 		$(DESTDIR)$(PREFIX)/share/debhelper/autoscripts \
 		$(DESTDIR)$(PERLLIBDIR)/Sequence \
-		$(DESTDIR)$(PERLLIBDIR)/Buildsystem
+		$(DESTDIR)$(PERLLIBDIR)/Buildsystem \
+		$(DESTDIR)$(PERLLIBDIR)/DH
 	install dh $(COMMANDS) $(DESTDIR)$(PREFIX)/bin
 	install -m 0644 autoscripts/* $(DESTDIR)$(PREFIX)/share/debhelper/autoscripts
 	install -m 0644 lib/Debian/Debhelper/*.pm $(DESTDIR)$(PERLLIBDIR)
@@ -129,6 +130,7 @@ install:
 		sed -i '/$$prefix=/s@/usr@$(PREFIX)@g' $(DESTDIR)$(PERLLIBDIR)/Dh_Lib.pm
 	install -m 0644 lib/Debian/Debhelper/Sequence/*.pm $(DESTDIR)$(PERLLIBDIR)/Sequence
 	install -m 0644 lib/Debian/Debhelper/Buildsystem/*.pm $(DESTDIR)$(PERLLIBDIR)/Buildsystem
+	install -m 0644 lib/Debian/Debhelper/DH/*.pm $(DESTDIR)$(PERLLIBDIR)/DH
 
 test: version
 	MAKEFLAGS= HARNESS_OPTIONS=j$(TEST_JOBS) ./run perl -MTest::Harness -e 'runtests grep { ! /CVS/ && ! /\.svn/ && -f && -x && m/\.t$$/ } @ARGV' t/* t/*/*
