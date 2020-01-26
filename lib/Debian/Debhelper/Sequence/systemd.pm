@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use warnings;
 use strict;
-use Debian::Debhelper::Dh_Lib;
+use Debian::Debhelper::Dh_Lib qw(compat error);
 
 if (not compat(10)) {
        error("The systemd-sequence is no longer provided in compat >= 11, please rely on dh_installsystemd instead");

@@ -1,8 +1,7 @@
 #!/usr/bin/perl
 
-use warnings;
 use strict;
-use Debian::Debhelper::Dh_Lib;
+use warnings;
 
 add_command_at_end('create-stamp debian/debhelper-build-stamp', 'build');
 add_command_at_end('create-stamp debian/debhelper-build-stamp', 'build-arch');

@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib;
+use Debian::Debhelper::Dh_Lib qw(compat);
 
 insert_after('dh_missing', 'dh_strip');
 if (not compat(11)) {

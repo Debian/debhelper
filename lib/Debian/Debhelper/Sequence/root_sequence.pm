@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+use Debian::Debhelper::Dh_Lib qw(compat);
 use Debian::Debhelper::SequencerUtil;
 
 my $include_if_compat_X_or_newer = sub {
