@@ -18,7 +18,20 @@ use constant {
 
 use Exporter qw(import);
 
-use Debian::Debhelper::Dh_Lib qw(basename compat error getpackages load_log);
+use Debian::Debhelper::Dh_Lib qw(
+	%dh
+	basename
+	commit_override_log
+	compat error
+	escape_shell
+	get_buildoption
+	getpackages
+	load_log
+	package_is_arch_all
+	rm_files
+	warning
+	write_log
+);
 
 
 our @EXPORT = qw(
@@ -30,8 +43,11 @@ our @EXPORT = qw(
 	extract_skipinfo
 	compute_selected_addons
 	load_sequence_addon
-	skipped_call_due_dpo
+	run_sequence_command_and_exit_on_failure
+	should_skip_due_to_dpo
+	check_for_obsolete_commands
 	compute_starting_point_in_sequences
+	run_hook_target
 	DUMMY_TARGET
 	SEQUENCE_NO_SUBSEQUENCES
 	SEQUENCE_ARCH_INDEP_SUBSEQUENCES
@@ -270,12 +286,30 @@ sub extract_skipinfo {
 	return;
 }
 
-sub skipped_call_due_dpo {
+sub _skipped_call_due_dpo {
 	my ($command, $dbo_flag) = @_;
 	my $me = Debian::Debhelper::Dh_Lib::_color(basename($0), 'bold');
 	my $skipped = Debian::Debhelper::Dh_Lib::_color('command-omitted', 'yellow');
 	print "${me}: ${skipped}: The call to \"${command}\" was omitted due to \"DEB_BUILD_OPTIONS=${dbo_flag}\"\n";
 	return;
+}
+
+sub should_skip_due_to_dpo {
+	my ($command, $to_be_invoked) = @_;
+
+	# Indirection/reference for readability
+	my $commands_ref = \%Debian::Debhelper::DH::SequenceState::commands_skippable_via_deb_build_options;
+
+	if (not $dh{'NO_ACT'} and exists($commands_ref->{$command})) {
+		my $flags_ref = $commands_ref->{$command};
+		for my $flag (@{$flags_ref}) {
+			if (get_buildoption($flag)) {
+				_skipped_call_due_dpo($to_be_invoked, $flag) if defined($to_be_invoked);
+				return 1;
+			}
+		}
+	}
+	return 0;
 }
 
 sub compute_starting_point_in_sequences {
@@ -405,5 +439,141 @@ sub load_sequence_addon {
 		error("unable to load addon ${addon_name}: $@");
 	}
 }
+
+sub check_for_obsolete_commands {
+	my ($full_sequence, $stoppoint) = @_;
+	my ($found_obsolete_targets);
+	for my $i (0..$stoppoint) {
+		my $command = $full_sequence->[$i];
+		if (exists($Debian::Debhelper::DH::SequenceState::obsolete_command{$command})) {
+			my $addon_name = $Debian::Debhelper::DH::SequenceState::obsolete_command{$command};
+			error("The addon ${addon_name} claimed that $command was obsolete, but it is not!?");
+		}
+	}
+	for my $command (sort(keys(%Debian::Debhelper::DH::SequenceState::obsolete_command))) {
+		for my $prefix (qw(execute_before_ execute_after_ override_)) {
+			for my $suffix ('', '-arch', '-indep') {
+				my $target = "${prefix}${command}${suffix}";
+				if (defined(rules_explicit_target($target))) {
+					$found_obsolete_targets = 1;
+					warning("The target ${target} references a now obsolete command and will not be run!");
+				}
+			}
+		}
+	}
+	if ($found_obsolete_targets and not compat(12)) {
+		error("Aborting due to left over override/hook targets for now removed commands.");
+	}
+	return;
+}
+
+sub run_sequence_command_and_exit_on_failure {
+	my ($command, @options) = @_;
+
+	# 3 space indent lines the command being run up under the
+	# sequence name after "dh ".
+	if (!$dh{QUIET}) {
+		print "   ".escape_shell($command, @options)."\n";
+	}
+
+	return if $dh{NO_ACT};
+
+	my $ret=system { $command } $command, @options;
+	if ($ret >> 8 != 0) {
+		exit $ret >> 8;
+	}
+	if ($ret) {
+		exit 1;
+	}
+	return;
+}
+
+
+sub run_hook_target {
+	my ($target_stem, $min_compat_level, $command, $packages, @opts) = @_;
+	my @todo = @{$packages};
+	foreach my $override_type (undef, "arch", "indep") {
+		@todo = _run_injected_rules_target($target_stem, $override_type, $min_compat_level, $command, \@todo, @opts);
+	}
+	return @todo;
+}
+
+# Tries to run an override / hook target for a command. Returns the list of
+# packages that it was unable to run the target for.
+sub _run_injected_rules_target {
+	my ($target_stem, $override_type, $min_compat_level, $command, $packages, @options) = @_;
+
+	my $rules_target = $target_stem .
+		(defined $override_type ? "-".$override_type : "");
+
+	$command //= $rules_target;  # Ensure it is defined
+
+	# Check which packages are of the right architecture for the
+	# override_type.
+	my (@todo, @rest);
+	my $has_explicit_target = rules_explicit_target($rules_target);
+
+	if ($has_explicit_target and defined($min_compat_level) and compat($min_compat_level - 1)) {
+		error("Hook target ${rules_target} is only supported in compat ${min_compat_level} or later");
+	}
+
+	if (defined $override_type) {
+		foreach my $package (@{$packages}) {
+			my $isall=package_is_arch_all($package);
+			if (($override_type eq 'indep' && $isall) ||
+				($override_type eq 'arch' && !$isall)) {
+				push @todo, $package;
+			} else {
+				push @rest, $package;
+				push @options, "-N$package";
+			}
+		}
+	} else {
+		@todo=@{$packages};
+	}
+
+	return @{$packages} unless defined $has_explicit_target; # no such override
+	return @rest if ! $has_explicit_target; # has empty override
+	return @rest unless @todo; # has override, but no packages to act on
+	return @rest if should_skip_due_to_dpo($command, "debian/rules $rules_target");
+
+	if (defined $override_type) {
+		# Ensure appropriate -a or -i option is passed when running
+		# an arch-specific override target.
+		my $opt=$override_type eq "arch" ? "-a" : "-i";
+		push @options, $opt unless grep { $_ eq $opt } @options;
+	}
+
+	# Discard any override log files before calling the override
+	# target
+	if (not compat(9)) {
+		my @files = glob('debian/*.debhelper.log');
+		rm_files(@files) if @files;
+	}
+	# This passes the options through to commands called
+	# inside the target.
+	$ENV{DH_INTERNAL_OPTIONS}=join("\x1e", @options);
+	$ENV{DH_INTERNAL_OVERRIDE}=$command;
+	run_sequence_command_and_exit_on_failure("debian/rules", $rules_target);
+	delete $ENV{DH_INTERNAL_OPTIONS};
+	delete $ENV{DH_INTERNAL_OVERRIDE};
+
+	# Update log for overridden command now that it has
+	# finished successfully.
+	# (But avoid logging for dh_clean since it removes
+	# the log earlier.)
+	if (! $dh{NO_ACT} && $command ne 'dh_clean' && compat(9)) {
+		write_log($command, @todo);
+		commit_override_log(@todo);
+	}
+
+	# Override targets may introduce new helper files.  Strictly
+	# speaking this *shouldn't* be necessary, but lets make no
+	# assumptions.
+	Debian::Debhelper::Dh_Lib::dh_clear_unsafe_cache();
+
+	return @rest;
+}
+
 
 1;
