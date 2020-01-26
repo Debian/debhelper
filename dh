@@ -634,77 +634,85 @@ for my $rules_command (@{$rules_targets}) {
 	}
 }
 
-# Now run the commands in the sequence.
-foreach my $i (0..$stoppoint) {
-	my $command = $full_sequence->[$i];
+run_through_command_sequence($full_sequence, $stoppoint, \@options, \@packages, \@arch_packages, \@indep_packages);
 
-	# Figure out which packages need to run this command.
-	my @todo;
-	my @opts=@options;
-	my @filtered_packages = _active_packages_for_command($command, \@packages, \@arch_packages, \@indep_packages);
+sub run_through_command_sequence {
+	my ($full_sequence, $stoppoint, $options, $all_packages, $arch_packages, $indep_packages) = @_;
 
-	foreach my $package (@filtered_packages) {
-		if ($startpoint{$package} > $i ||
-		    $logged{$package}{$full_sequence->[$i]}) {
-			push @opts, "-N$package";
-		}
-		else {
-			push @todo, $package;
-		}
-	}
-	next unless @todo;
+	my $command_opts = \%Debian::Debhelper::DH::SequenceState::command_opts;
 
-	my $rules_target = extract_rules_target_name($command);
-	error("Internal error: $command is a rules target, but it is not supported to be!?") if defined($rules_target);
+	# Now run the commands in the sequence.
+	foreach my $i (0 .. $stoppoint) {
+		my $command = $full_sequence->[$i];
 
-	if (my $stamp_file = stamp_target($command)) {
-		my %seen;
-		print "   create-stamp ".escape_shell($stamp_file)."\n";
+		# Figure out which packages need to run this command.
+		my (@todo, @opts);
+		my @filtered_packages = _active_packages_for_command($command, $all_packages, $arch_packages, $indep_packages);
 
-		next if $dh{NO_ACT};
-		open(my $fd, '+>>', $stamp_file) or error("open($stamp_file, rw) failed: $!");
-		# Seek to the beginning
-		seek($fd, 0, 0) or error("seek($stamp_file) failed: $!");
-		while (my $line = <$fd>) {
-			chomp($line);
-			$seen{$line} = 1;
-		}
-		for my $pkg (grep { not exists $seen{$_} } @todo) {
-			print {$fd} "$pkg\n";
-		}
-		close($fd) or error("close($stamp_file) failed: $!");
-		next;
-	}
-
-	my @full_todo = @todo;
-	run_hook_target("execute_before_${command}", 10, $command, \@full_todo, @opts);
-
-	# Check for override targets in debian/rules, and run instead of
-	# the usual command. (The non-arch-specific override is tried first,
-	# for simplest semantics; mixing it with arch-specific overrides
-	# makes little sense.)
-	@todo = run_hook_target("override_${command}", undef, $command, \@full_todo, @opts);
-
-	if (@todo and not can_skip($command, @todo)) {
-		# No need to run the command for any packages handled by the
-		# override targets.
-		my %todo=map { $_ => 1 } @todo;
-		foreach my $package (@full_todo) {
-			if (! $todo{$package}) {
-				push @opts, "-N$package";
+		foreach my $package (@filtered_packages) {
+			if ($startpoint{$package} > $i ||
+				$logged{$package}{$full_sequence->[$i]}) {
+				push(@opts, "-N$package");
+			}
+			else {
+				push(@todo, $package);
 			}
 		}
-		if (not should_skip_due_to_dpo($command, Debian::Debhelper::Dh_Lib::_format_cmdline($command, @opts))) {
-			my @cmd_options;
-			# Include additional command options if any
-			push(@cmd_options, @{$Debian::Debhelper::DH::SequenceState::command_opts{$command}})
-				if exists($Debian::Debhelper::DH::SequenceState::command_opts{$command});
-			push(@cmd_options, @opts);
-			run_sequence_command_and_exit_on_failure($command, @cmd_options);
-		}
-	}
+		next unless @todo;
+		push(@opts, @{$options});
 
-	run_hook_target("execute_after_${command}", 10, $command, \@full_todo, @opts);
+		my $rules_target = extract_rules_target_name($command);
+		error("Internal error: $command is a rules target, but it is not supported to be!?") if defined($rules_target);
+
+		if (my $stamp_file = stamp_target($command)) {
+			my %seen;
+			print "   create-stamp " . escape_shell($stamp_file) . "\n";
+
+			next if $dh{NO_ACT};
+			open(my $fd, '+>>', $stamp_file) or error("open($stamp_file, rw) failed: $!");
+			# Seek to the beginning
+			seek($fd, 0, 0) or error("seek($stamp_file) failed: $!");
+			while (my $line = <$fd>) {
+				chomp($line);
+				$seen{$line} = 1;
+			}
+			for my $pkg (grep {not exists($seen{$_})} @todo) {
+				print {$fd} "$pkg\n";
+			}
+			close($fd) or error("close($stamp_file) failed: $!");
+			next;
+		}
+
+		my @full_todo = @todo;
+		run_hook_target("execute_before_${command}", 10, $command, \@full_todo, @opts);
+
+		# Check for override targets in debian/rules, and run instead of
+		# the usual command. (The non-arch-specific override is tried first,
+		# for simplest semantics; mixing it with arch-specific overrides
+		# makes little sense.)
+		@todo = run_hook_target("override_${command}", undef, $command, \@full_todo, @opts);
+
+		if (@todo and not can_skip($command, @todo)) {
+			# No need to run the command for any packages handled by the
+			# override targets.
+			my %todo = map {$_ => 1} @todo;
+			foreach my $package (@full_todo) {
+				if (!$todo{$package}) {
+					push @opts, "-N$package";
+				}
+			}
+			if (not should_skip_due_to_dpo($command, Debian::Debhelper::Dh_Lib::_format_cmdline($command, @opts))) {
+				my @cmd_options;
+				# Include additional command options if any
+				push(@cmd_options, @{$command_opts->{$command}})
+					if exists($command_opts->{$command});
+				push(@cmd_options, @opts);
+				run_sequence_command_and_exit_on_failure($command, @cmd_options);
+			}
+		}
+
+		run_hook_target("execute_after_${command}", 10, $command, \@full_todo, @opts);
+	}
 }
 
 sub _active_packages_for_command {
