@@ -476,15 +476,12 @@ my %sequence2packages = (
 	'binary'  => \@packages,
 );
 
-# Get the options to pass to commands in the sequence.
-# Filter out options intended only for this program.
-my (@options, %seen_options);
-my ($unoptimizable_user_option, $unoptimizable_option_bundle, $sequence_unpack_flags) = (0, 0, 0);
+my $sequence_unpack_flags = 0;
 
 if ($sequence eq 'build-arch' ||
     $sequence eq 'install-arch' ||
     $sequence eq 'binary-arch') {
-	push @options, "-a";
+	push(@Debian::Debhelper::DH::SequenceState::options, "-a");
 	# as an optimisation, remove from the list any packages
 	# that are not arch dependent
 	@packages = @{$sequence2packages{$sequence}};
@@ -492,7 +489,7 @@ if ($sequence eq 'build-arch' ||
 elsif ($sequence eq 'build-indep' ||
        $sequence eq 'install-indep' ||
        $sequence eq 'binary-indep') {
-	push @options, "-i";
+	push(@Debian::Debhelper::DH::SequenceState::options, "-i");
 	# ditto optimisation for arch indep
 	@packages = @{$sequence2packages{$sequence}};
 }
@@ -582,7 +579,8 @@ for my $rules_command (@{$rules_targets}) {
 	}
 }
 
-run_through_command_sequence($full_sequence, $stoppoint, \@options, \@packages, \@arch_packages, \@indep_packages);
+run_through_command_sequence($full_sequence, $stoppoint, \@Debian::Debhelper::DH::SequenceState::options,
+	\@packages, \@arch_packages, \@indep_packages);
 
 sub run_through_command_sequence {
 	my ($full_sequence, $stoppoint, $options, $all_packages, $arch_packages, $indep_packages) = @_;
@@ -731,7 +729,7 @@ sub can_skip {
 
 	return 0 if $dh{NO_ACT} and not $ENV{DH_INTERNAL_TEST_CAN_SKIP};
 
-	return 0 if $unoptimizable_user_option ||
+	return 0 if $Debian::Debhelper::DH::SequenceState::unoptimizable_user_option ||
 		(exists $ENV{DH_OPTIONS} && length $ENV{DH_OPTIONS});
 
 	return 0 if exists($Debian::Debhelper::DH::SequenceState::command_opts{$command})
@@ -774,11 +772,11 @@ sub can_skip {
 			# Long options are subject to abbreviations so it is
 			# very difficult to implement this optimization with
 			# long options.
-			return 0 if $unoptimizable_option_bundle;
+			return 0 if $Debian::Debhelper::DH::SequenceState::unoptimizable_option_bundle;
 			$need =~ s/(?:^|\s)BUILDSYSTEM(?:\s|$)/${\UNSKIPPABLE_CLI_OPTIONS_BUILD_SYSTEM}/;
 			my @behavior_options = split(qr/\Q|\E/, $need);
 			for my $opt (@behavior_options) {
-				return 0 if exists($seen_options{$opt});
+				return 0 if exists($Debian::Debhelper::DH::SequenceState::seen_options{$opt});
 			}
 		} elsif ($type eq 'buildsystem') {
 			require Debian::Debhelper::Dh_Buildsystems;
@@ -789,13 +787,16 @@ sub can_skip {
 			return 0;
 		}
 	}
-	return 0 if not $had_cli_options and %seen_options;
+	return 0 if not $had_cli_options and %Debian::Debhelper::DH::SequenceState::seen_options;
 	return 1;
 }
 
 # Options parsed to dh that may need to be passed on to helpers
 sub parse_dh_cmd_options {
 	my (@argv) = @_;
+
+	# Ref for readability
+	my $options_ref = \@Debian::Debhelper::DH::SequenceState::options;
 
 	while (@argv) {
 		my $opt = shift(@argv);
@@ -805,7 +806,7 @@ sub parse_dh_cmd_options {
 		} elsif ($opt =~ /^--?(no-act|remaining|(after|until|before|with|without)=)/) {
 			next;
 		} elsif ($opt =~ /^-/) {
-			if (not @options and $opt eq '--parallel' or $opt eq '--no-parallel') {
+			if (not @{$options_ref} and $opt eq '--parallel' or $opt eq '--no-parallel') {
 				my $max_parallel;
 				# Ignore the option if it is the default for the given
 				# compat level.
@@ -825,19 +826,19 @@ sub parse_dh_cmd_options {
 					# short option with an explicit parameter (-B=F is ok, -BF is not)
 					# In compat 12 or earlier, we also punt on long options due to
 					# auto-abbreviation.
-					$unoptimizable_option_bundle = 1
+					$Debian::Debhelper::DH::SequenceState::unoptimizable_option_bundle = 1
 				}
-				$seen_options{$optname} = 1;
+				$Debian::Debhelper::DH::SequenceState::seen_options{$optname} = 1;
 			} else {
-				$unoptimizable_user_option = 1;
+				$Debian::Debhelper::DH::SequenceState::unoptimizable_user_option = 1;
 			}
-			push(@options, "-O" . $opt);
-		} elsif (@options) {
-			if ($options[$#options] =~ /^-O--/) {
-				$options[$#options] .= '=' . $opt;
+			push(@{$options_ref}, "-O" . $opt);
+		} elsif (@{$options_ref}) {
+			if ($options_ref->[$#{$options_ref}] =~ /^-O--/) {
+				$options_ref->[$#{$options_ref}] .= '=' . $opt;
 			} else {
-				$unoptimizable_user_option = 1;
-				$options[$#options] .= $opt;
+				$Debian::Debhelper::DH::SequenceState::unoptimizable_user_option = 1;
+				$options_ref->[$#{$options_ref}] .= $opt;
 			}
 		} else {
 			error("Unknown parameter: $opt");
