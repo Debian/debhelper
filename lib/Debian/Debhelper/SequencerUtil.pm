@@ -14,6 +14,7 @@ use constant {
 	'SEQUENCE_TYPE_BOTH'                       => 'both',
 	'FLAG_OPT_SOURCE_BUILDS_NO_ARCH_PACKAGES'  => 0x1,
 	'FLAG_OPT_SOURCE_BUILDS_NO_INDEP_PACKAGES' => 0x2,
+	'UNSKIPPABLE_CLI_OPTIONS_BUILD_SYSTEM' => q(-S|--buildsystem|-D|--sourcedir(?:ectory)?|-B|--builddir(?:ectory)?),
 };
 
 use Exporter qw(import);
@@ -28,7 +29,9 @@ use Debian::Debhelper::Dh_Lib qw(
 	getpackages
 	load_log
 	package_is_arch_all
+    pkgfile
 	rm_files
+	tmpdir
 	warning
 	write_log
 );
@@ -47,7 +50,9 @@ our @EXPORT = qw(
 	should_skip_due_to_dpo
 	check_for_obsolete_commands
 	compute_starting_point_in_sequences
+	parse_dh_cmd_options
 	run_hook_target
+	run_through_command_sequence
 	DUMMY_TARGET
 	SEQUENCE_NO_SUBSEQUENCES
 	SEQUENCE_ARCH_INDEP_SUBSEQUENCES
@@ -441,10 +446,9 @@ sub load_sequence_addon {
 }
 
 sub check_for_obsolete_commands {
-	my ($full_sequence, $stoppoint) = @_;
+	my ($full_sequence) = @_;
 	my ($found_obsolete_targets);
-	for my $i (0..$stoppoint) {
-		my $command = $full_sequence->[$i];
+	for my $command (@{$full_sequence}) {
 		if (exists($Debian::Debhelper::DH::SequenceState::obsolete_command{$command})) {
 			my $addon_name = $Debian::Debhelper::DH::SequenceState::obsolete_command{$command};
 			error("The addon ${addon_name} claimed that $command was obsolete, but it is not!?");
@@ -575,5 +579,235 @@ sub _run_injected_rules_target {
 	return @rest;
 }
 
+
+# Options parsed to dh that may need to be passed on to helpers
+sub parse_dh_cmd_options {
+	my (@argv) = @_;
+
+	# Ref for readability
+	my $options_ref = \@Debian::Debhelper::DH::SequenceState::options;
+
+	while (@argv) {
+		my $opt = shift(@argv);
+		if ($opt =~ /^--?(after|until|before|with|without)$/) {
+			shift(@argv);
+			next;
+		} elsif ($opt =~ /^--?(no-act|remaining|(after|until|before|with|without)=)/) {
+			next;
+		} elsif ($opt =~ /^-/) {
+			if (not @{$options_ref} and $opt eq '--parallel' or $opt eq '--no-parallel') {
+				my $max_parallel;
+				# Ignore the option if it is the default for the given
+				# compat level.
+				next if compat(9) and $opt eq '--no-parallel';
+				next if not compat(9) and $opt eq '--parallel';
+				# Having an non-empty "@options" hurts performance quite a
+				# bit.  At the same time, we want to promote the use of
+				# --(no-)parallel, so "tweak" the options a bit if there
+				# is no reason to include this option.
+				$max_parallel = get_buildoption('parallel') // 1;
+				next if $max_parallel == 1;
+			}
+			if ($opt =~ m/^(--[^=]++)(?:=.*)?$/ or $opt =~ m/^(-[^-])$/) {
+				my $optname = $1;
+				if (length($optname) > 2 and (compat(12, 1) or $optname =~ m/^-[^-][^=]/)) {
+					# We cannot optimize bundled options but we can optimize a single
+					# short option with an explicit parameter (-B=F is ok, -BF is not)
+					# In compat 12 or earlier, we also punt on long options due to
+					# auto-abbreviation.
+					$Debian::Debhelper::DH::SequenceState::unoptimizable_option_bundle = 1
+				}
+				$Debian::Debhelper::DH::SequenceState::seen_options{$optname} = 1;
+			} else {
+				$Debian::Debhelper::DH::SequenceState::unoptimizable_user_option = 1;
+			}
+			push(@{$options_ref}, "-O" . $opt);
+		} elsif (@{$options_ref}) {
+			if ($options_ref->[$#{$options_ref}] =~ /^-O--/) {
+				$options_ref->[$#{$options_ref}] .= '=' . $opt;
+			} else {
+				$Debian::Debhelper::DH::SequenceState::unoptimizable_user_option = 1;
+				$options_ref->[$#{$options_ref}] .= $opt;
+			}
+		} else {
+			error("Unknown parameter: $opt");
+		}
+	}
+	return;
+}
+
+
+sub run_through_command_sequence {
+	my ($full_sequence, $startpoint, $logged, $options, $all_packages, $arch_packages, $indep_packages) = @_;
+
+	my $command_opts = \%Debian::Debhelper::DH::SequenceState::command_opts;
+	my $stoppoint = $#{$full_sequence};
+
+	# Now run the commands in the sequence.
+	foreach my $i (0 .. $stoppoint) {
+		my $command = $full_sequence->[$i];
+
+		# Figure out which packages need to run this command.
+		my (@todo, @opts);
+		my @filtered_packages = _active_packages_for_command($command, $all_packages, $arch_packages, $indep_packages);
+
+		foreach my $package (@filtered_packages) {
+			if ($startpoint->{$package} > $i ||
+				$logged->{$package}{$full_sequence->[$i]}) {
+				push(@opts, "-N$package");
+			}
+			else {
+				push(@todo, $package);
+			}
+		}
+		next unless @todo;
+		push(@opts, @{$options});
+
+		my $rules_target = extract_rules_target_name($command);
+		error("Internal error: $command is a rules target, but it is not supported to be!?") if defined($rules_target);
+
+		if (my $stamp_file = _stamp_target($command)) {
+			my %seen;
+			print "   create-stamp " . escape_shell($stamp_file) . "\n";
+
+			next if $dh{NO_ACT};
+			open(my $fd, '+>>', $stamp_file) or error("open($stamp_file, rw) failed: $!");
+			# Seek to the beginning
+			seek($fd, 0, 0) or error("seek($stamp_file) failed: $!");
+			while (my $line = <$fd>) {
+				chomp($line);
+				$seen{$line} = 1;
+			}
+			for my $pkg (grep {not exists($seen{$_})} @todo) {
+				print {$fd} "$pkg\n";
+			}
+			close($fd) or error("close($stamp_file) failed: $!");
+			next;
+		}
+
+		my @full_todo = @todo;
+		run_hook_target("execute_before_${command}", 10, $command, \@full_todo, @opts);
+
+		# Check for override targets in debian/rules, and run instead of
+		# the usual command. (The non-arch-specific override is tried first,
+		# for simplest semantics; mixing it with arch-specific overrides
+		# makes little sense.)
+		@todo = run_hook_target("override_${command}", undef, $command, \@full_todo, @opts);
+
+		if (@todo and not _can_skip_command($command, @todo)) {
+			# No need to run the command for any packages handled by the
+			# override targets.
+			my %todo = map {$_ => 1} @todo;
+			foreach my $package (@full_todo) {
+				if (!$todo{$package}) {
+					push @opts, "-N$package";
+				}
+			}
+			if (not should_skip_due_to_dpo($command, Debian::Debhelper::Dh_Lib::_format_cmdline($command, @opts))) {
+				my @cmd_options;
+				# Include additional command options if any
+				push(@cmd_options, @{$command_opts->{$command}})
+					if exists($command_opts->{$command});
+				push(@cmd_options, @opts);
+				run_sequence_command_and_exit_on_failure($command, @cmd_options);
+			}
+		}
+
+		run_hook_target("execute_after_${command}", 10, $command, \@full_todo, @opts);
+	}
+}
+
+
+sub _stamp_target {
+	my ($command) = @_;
+	if ($command =~ s/^create-stamp\s+//) {
+		return $command;
+	}
+	return;
+}
+
+{
+	my %skipinfo;
+	sub _can_skip_command {
+		my ($command, @packages) = @_;
+
+		return 0 if $dh{NO_ACT} and not $ENV{DH_INTERNAL_TEST_CAN_SKIP};
+
+		return 0 if $Debian::Debhelper::DH::SequenceState::unoptimizable_user_option ||
+			(exists $ENV{DH_OPTIONS} && length $ENV{DH_OPTIONS});
+
+		return 0 if exists($Debian::Debhelper::DH::SequenceState::command_opts{$command})
+			and @{$Debian::Debhelper::DH::SequenceState::command_opts{$command}};
+
+		if (! defined $skipinfo{$command}) {
+			$skipinfo{$command}=[extract_skipinfo($command)];
+		}
+		my @skipinfo=@{$skipinfo{$command}};
+		return 0 unless @skipinfo;
+		return 1 if scalar(@skipinfo) == 1 and $skipinfo[0] eq 'always-skip';
+		my ($all_pkgs, $had_cli_options);
+
+		foreach my $skipinfo (@skipinfo) {
+			my $type = 'pkgfile';
+			my $need = $skipinfo;
+			if ($skipinfo=~/^([a-zA-Z0-9-_]+)\((.*)\)$/) {
+				($type, $need) = ($1, $2);
+			}
+			if ($type eq 'tmp') {
+				foreach my $package (@packages) {
+					my $tmp = tmpdir($package);
+					return 0 if -e "$tmp/$need";
+				}
+			} elsif ($type eq 'pkgfile' or $type eq 'pkgfile-logged') {
+				my $pkgs;
+				if ($type eq 'pkgfile') {
+					$pkgs = \@packages;
+				} else {
+					$all_pkgs //= [ getpackages() ];
+					$pkgs = $all_pkgs;
+				}
+				# Use the secret bulk check call
+				return 0 if pkgfile($pkgs, $need) ne '';
+			} elsif ($type eq 'cli-options') {
+				$had_cli_options = 1;
+				# If cli-options is empty, we know the helper does not
+				# react to any thing and can always be skipped.
+				next if $need =~ m/^\s*$/;
+				# Long options are subject to abbreviations so it is
+				# very difficult to implement this optimization with
+				# long options.
+				return 0 if $Debian::Debhelper::DH::SequenceState::unoptimizable_option_bundle;
+				$need =~ s/(?:^|\s)BUILDSYSTEM(?:\s|$)/${\UNSKIPPABLE_CLI_OPTIONS_BUILD_SYSTEM}/;
+				my @behavior_options = split(qr/\Q|\E/, $need);
+				for my $opt (@behavior_options) {
+					return 0 if exists($Debian::Debhelper::DH::SequenceState::seen_options{$opt});
+				}
+			} elsif ($type eq 'buildsystem') {
+				require Debian::Debhelper::Dh_Buildsystems;
+				my $system = Debian::Debhelper::Dh_Buildsystems::load_buildsystem(undef, $need);
+				return 0 if defined($system);
+			} else {
+				# Unknown hint - make no assumptions
+				return 0;
+			}
+		}
+		return 0 if not $had_cli_options and %Debian::Debhelper::DH::SequenceState::seen_options;
+		return 1;
+	}
+}
+
+sub _active_packages_for_command {
+	my ($command, $all_packages, $arch_packages, $indep_packages) = @_;
+	my $command_opts_ref = $Debian::Debhelper::DH::SequenceState::command_opts{$command};
+	my $selection = $all_packages;
+	if (grep { $_ eq '-i'} @{$command_opts_ref}) {
+		if (grep { $_ ne '-a'} @{$command_opts_ref}) {
+			$selection = $indep_packages;
+		}
+	} elsif (grep { $_ eq '-a'} @{$command_opts_ref}) {
+		$selection = $arch_packages;
+	}
+	return @{$selection};
+}
 
 1;
