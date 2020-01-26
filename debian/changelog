@@ -36,6 +36,11 @@ debhelper (12.9) UNRELEASED; urgency=medium
     is called (and not disabled by that option or
     inhibit_log()).  This prevents Dh_Lib from triggering
     a log write just by being loaded.
+  * dh: Refactor addon loading.  As a side-effect, dh no
+    longer leaks as many functions into the scope of addons.
+    Addons depending on the previous behaviour may now fail
+    due to calls to undefined subroutintes and will need to
+    be fixed.
 
   [ Thorsten Glaser ]
   * dh_auto_*: Make it possible to disable build systems by

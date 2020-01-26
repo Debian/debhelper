@@ -29,6 +29,7 @@ our @EXPORT = qw(
 	rules_explicit_target
 	extract_skipinfo
 	compute_selected_addons
+	load_sequence_addon
 	skipped_call_due_dpo
 	compute_starting_point_in_sequences
 	DUMMY_TARGET
@@ -389,6 +390,20 @@ sub compute_selected_addons {
 			'addon-type' => $addon_constraints{$_} // SEQUENCE_TYPE_BOTH,
 		}
 	} @enabled_addons;
+}
+
+
+sub load_sequence_addon {
+	my ($addon_name, $addon_type) = @_;
+	require Debian::Debhelper::DH::AddonAPI;
+	my $mod="Debian::Debhelper::Sequence::${addon_name}";
+	$mod=~s/-/_/g;
+	local $Debian::Debhelper::DH::AddonAPI::DH_INTERNAL_ADDON_NAME = $addon_name;
+	local $Debian::Debhelper::DH::AddonAPI::DH_INTERNAL_ADDON_TYPE = $addon_type;
+	eval "package Debian::Debhelper::DH::AddonAPI; use $mod";
+	if ($@) {
+		error("unable to load addon ${addon_name}: $@");
+	}
 }
 
 1;
