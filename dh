@@ -641,18 +641,8 @@ foreach my $i (0..$stoppoint) {
 	# Figure out which packages need to run this command.
 	my @todo;
 	my @opts=@options;
-	my @filtered_packages;
-	if (grep { $_ eq '-i'} @{$Debian::Debhelper::DH::SequenceState::command_opts{$command}}) {
-		if (grep { $_ eq '-a'} @{$Debian::Debhelper::DH::SequenceState::command_opts{$command}}) {
-			@filtered_packages = @packages;
-		} else {
-			@filtered_packages = @indep_packages;
-		}
-	} elsif (grep { $_ eq '-a'} @{$Debian::Debhelper::DH::SequenceState::command_opts{$command}}) {
-		@filtered_packages = @arch_packages;
-	} else {
-		@filtered_packages = @packages;
-	}
+	my @filtered_packages = _active_packages_for_command($command, \@packages, \@arch_packages, \@indep_packages);
+
 	foreach my $package (@filtered_packages) {
 		if ($startpoint{$package} > $i ||
 		    $logged{$package}{$full_sequence->[$i]}) {
@@ -715,6 +705,20 @@ foreach my $i (0..$stoppoint) {
 	}
 
 	run_hook_target("execute_after_${command}", 10, $command, \@full_todo, @opts);
+}
+
+sub _active_packages_for_command {
+	my ($command, $all_packages, $arch_packages, $indep_packages) = @_;
+	my $command_opts_ref = $Debian::Debhelper::DH::SequenceState::command_opts{$command};
+	my $selection = $all_packages;
+	if (grep { $_ eq '-i'} @{$command_opts_ref}) {
+		if (grep { $_ ne '-a'} @{$command_opts_ref}) {
+			$selection = $indep_packages;
+		}
+	} elsif (grep { $_ eq '-a'} @{$command_opts_ref}) {
+		$selection = $arch_packages;
+	}
+	return @{$selection};
 }
 
 sub _check_for_completed_sequences {
