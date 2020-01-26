@@ -8,6 +8,7 @@ use warnings;
 
 use Exporter qw(import);
 
+use Debian::Debhelper::Dh_Lib qw(error);
 use Debian::Debhelper::SequencerUtil qw(extract_rules_target_name sequence_type	SEQUENCE_NO_SUBSEQUENCES
 	SEQUENCE_ARCH_INDEP_SUBSEQUENCES SEQUENCE_TYPE_ARCH_ONLY SEQUENCE_TYPE_INDEP_ONLY SEQUENCE_TYPE_BOTH
 	FLAG_OPT_SOURCE_BUILDS_NO_ARCH_PACKAGES	FLAG_OPT_SOURCE_BUILDS_NO_INDEP_PACKAGES);
