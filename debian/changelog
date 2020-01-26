@@ -30,6 +30,12 @@ debhelper (12.9) UNRELEASED; urgency=medium
   * dh.1: Improve documentation for override targets and
     include a section on the new hook target.
     (Closes: #885994)
+  * Dh_Lib.pm: Make it possible to disable the command
+    logging by passing "inhibit_log => 1" to the init sub.
+    Furthermore, the logging is now only enabled when init
+    is called (and not disabled by that option or
+    inhibit_log()).  This prevents Dh_Lib from triggering
+    a log write just by being loaded.
 
   [ Thorsten Glaser ]
   * dh_auto_*: Make it possible to disable build systems by

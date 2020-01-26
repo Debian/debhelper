@@ -306,6 +306,10 @@ get_source_date_epoch()
 inhibit_log()
 	Prevent logging the program's successful finish to
 	debian/*debhelper.log
+
+	Since debhelper/12.9, this can be done by passing the inhibit_log
+	option with a value of 1 to init() instead.  E.g.
+	    init('inhibit_log' => 1);
 load_log($package, $hashref)
 	Loads the log file for the given package and returns a list of
 	logged commands.

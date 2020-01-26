@@ -202,6 +202,12 @@ our $DEB822_FIELD_REGEX = qr/
 
 our $PARSE_DH_SEQUENCE_INFO = 0;
 
+# We need logging in compat 9 or in override/hook targets (for --remaining-packages to work)
+# - This option is a global toggle to disable logs for special commands (e.g. dh or dh_clean)
+# It is initialized during "init".  This implies that commands that never calls init are
+# not dh_* commands or do not need the log
+my $write_log = undef;
+
 sub init {
 	my %params=@_;
 
@@ -309,11 +315,18 @@ sub init {
 	}
 
 	$dh{U_PARAMS} //= [];
+
+	if ($params{'inhibit_log'}) {
+		$write_log = 0;
+	} else {
+		# Only initialize if unset (i.e. avoid overriding an early call
+		# to inhibit_log()
+		$write_log //= 1;
+	}
 }
 
-# Run at exit. Add the command to the log files for the packages it acted
-# on, if it's exiting successfully.
-my $write_log=1;
+# Ensure the log is written if requested but only if the command was
+# successful.
 sub END {
 	return if $? != 0 or not $write_log;
 	# If there is no 'debian/control', then we are not being run from

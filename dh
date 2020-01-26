@@ -365,8 +365,6 @@ our ($DH_INTERNAL_ADDON_TYPE, $DH_INTERNAL_ADDON_NAME);
 # Reset umask to 0022 per #944691
 umask(0022);
 
-inhibit_log();
-
 init(options => {
 		"until=s" => \$dh{UNTIL},
 		"after=s" => \$dh{AFTER},
@@ -389,6 +387,7 @@ init(options => {
 	# Bundling does not work well since there are unknown options.
 	bundling => 0,
 	internal_parse_dh_sequence_info => 1,
+	inhibit_log => 1,
 );
 set_buildflags();
 reject_obsolete_params();

@@ -28,8 +28,7 @@ Packages are listed in the order they appear in F<debian/control>.
 =cut
 
 $dh{BLOCK_NOOP_WARNINGS}=1;
-init();
-inhibit_log();
+init(inhibit_log => 1);
 print join("\n",@{$dh{DOPACKAGES}})."\n";
 
 =head1 SEE ALSO

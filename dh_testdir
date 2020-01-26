@@ -46,8 +46,7 @@ Test for the existence of these files too.
 # we want a nicer error message.
 checkfile('debian/control');
 
-init();
-inhibit_log();
+init(inhibit_log => 1);
 
 foreach my $file (@ARGV) {
 	checkfile($file);

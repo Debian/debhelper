@@ -80,10 +80,11 @@ slash.  Any content in these directories will be removed as well.
 =cut
 
 init(options => {
-	"dirs-only" => \$dh{D_FLAG},
-	"keep|k" => \$dh{K_FLAG},
-});
-inhibit_log();
+		'dirs-only' => \$dh{D_FLAG},
+		'keep|k' => \$dh{K_FLAG},
+	},
+	inhibit_log => 1,
+);
 
 if ($dh{K_FLAG}) {
 	deprecated_functionality('dh_clean -k is deprecated; use dh_prep instead',
