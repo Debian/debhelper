@@ -62,6 +62,9 @@ F<lib/systemd/system/> in the package build directory.
 
 =item debian/I<package>.tmpfile
 
+Only used in compat 12 or earlier.  In compat 13+, this file is
+handled by L<dh_installtmpfiles(1)> instead.
+
 If this exists, it is installed into F<usr/lib/tmpfiles.d/> in the
 package build directory. Note that the C<tmpfiles.d> mechanism is
 currently only used by systemd.
