@@ -43,11 +43,15 @@ and also the base name used for the installed version of the file.
 
 =over 4
 
-=item debian/I<package>.tmpfile
+=item debian/I<package>.tmpfiles
 
 If this exists, it is installed into F<usr/lib/tmpfiles.d/> in the
 package build directory. Note that the C<tmpfiles.d> mechanism is
 currently only used by systemd.
+
+=item debian/I<package>.tmpfile
+
+Deprecated name for debian/I<package>.tmpfiles.
 
 =back
 
@@ -67,15 +71,30 @@ sub uniq {
 	return grep { !$seen{$_}++ } @_;
 }
 
-# PROMISE: DH NOOP WITHOUT tmp(usr/lib/tmpfiles.d) tmp(etc/tmpfiles.d) tmpfile cli-options()
+# PROMISE: DH NOOP WITHOUT tmp(usr/lib/tmpfiles.d) tmp(etc/tmpfiles.d) pkgfile(tmpfiles) pkgfile(tmpfile) cli-options()
 
 # Install package maintainer supplied tmpfiles files
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmpdir = tmpdir($package);
-	my $tmpfile = pkgfile($package, 'tmpfile');
+	my $tmpfile = pkgfile($package, 'tmpfiles');
 	my $name = $dh{NAME} // $package;
-	next if not $tmpfile;
-	my $dir = "$tmpdir/usr/lib/tmpfiles.d";
+	my $old_tmpfile = pkgfile($package, 'tmpfile');
+	my $dir;
+	if (not $tmpfile) {
+		my $new_name;
+		next if not $old_tmpfile;
+		$tmpfile = $old_tmpfile;
+		$new_name = $old_tmpfile;
+		$new_name =~ s{^(.+[./])tmpfile(\..+|)$}{$1tmpfiles$2};
+		warning("The name $tmpfile is deprecated; please use $new_name instead");
+		warning(qq{Possible fix: mv -f "${tmpfile}" "${new_name}"});
+	} elsif ($old_tmpfile) {
+		warning("There is both a $tmpfile and a $old_tmpfile that is relevant for this package!?");
+		warning(qq{Possible fix: rm -f "${old_tmpfile}"});
+		error("Aborting; Please resolve the ambiguity between ${tmpfile} and ${old_tmpfile}.");
+	}
+
+	$dir = "$tmpdir/usr/lib/tmpfiles.d";
 	install_dir($dir);
 	install_file($tmpfile, "${dir}/${name}.conf");
 }
