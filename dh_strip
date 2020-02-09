@@ -377,7 +377,10 @@ sub process_packages {
 			# NB: The short variant (-D) is broken in Jessie
 			# (binutils/2.25-3)
 			doit($strip, '--strip-debug', '--remove-section=.comment',
-				 '--remove-section=.note', '--enable-deterministic-archives', $_);
+				 '--remove-section=.note', '--enable-deterministic-archives',
+				  '-R', '.gnu.lto_*', '-R', '.gnu.debuglto_*',
+				  '-N', '__gnu_lto_slim', '-N', '__gnu_lto_v1',
+				  $_);
 		}
 		if (-d "$tmp/usr/lib/debug/.dwz" and ($use_build_id > 1 or ($dh{DEBUGPACKAGE} and $dh{DEBUGPACKAGE} ne $package))) {
 			my @files = glob_expand(["$tmp/usr/lib/debug/.dwz"], \&glob_expand_error_handler_reject, '*');
