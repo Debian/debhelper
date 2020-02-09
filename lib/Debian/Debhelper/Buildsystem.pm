@@ -231,12 +231,12 @@ sub get_targetbuildsystem {
 # be buildable or not. However, if the build system is derived from
 # another other auto-buildable build system, this method
 # may also check if the source has already been built with this build
-# system partitially by looking for temporary files or other common
+# system partially by looking for temporary files or other common
 # results the build system produces during the build process. The
 # latter checks must be unique to the current build system and must
 # be very unlikely to be true for either its parent or other build
 # systems. If it is determined that the source has already built
-# partitially with this build system, the value returned must be
+# partially with this build system, the value returned must be
 # greater than the one of the SUPER call.
 sub check_auto_buildable {
 	my $this=shift;
