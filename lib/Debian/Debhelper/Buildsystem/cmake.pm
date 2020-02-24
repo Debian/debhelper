@@ -91,7 +91,7 @@ sub configure {
 		push(@flags, "-G${generator}");
 	}
 	unless ($dh{QUIET}) {
-		push(@flags, "-DCMAKE_VERBOSE_MAKEFILE=ON");
+		push(@flags, "-DCMAKE_VERBOSE_MAKEFILE=ON", "-DCMAKE_AUTOGEN_VERBOSE=ON");
 	}
 
 	if ($ENV{CC}) {
