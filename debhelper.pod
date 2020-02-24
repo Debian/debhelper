@@ -1148,6 +1148,14 @@ move relevant logic out of those targets.  E.g. non-test related
 packaging code from B<override_dh_auto_test> would have to be moved to
 B<execute_after_dh_auto_build> or B<execute_before_dh_auto_install>.
 
+=item -
+
+The B<cmake> buildsystem now passes B<-DCMAKE_SKIP_INSTALL_ALL_DEPENDENCY=ON>
+to L<cmake(1)> to speed up automatic installation process. If for some reason
+you need previous behavior, override the flag:
+
+    dh_auto_configure -- -DCMAKE_SKIP_INSTALL_ALL_DEPENDENCY=OFF ...
+
 =back
 
 =back

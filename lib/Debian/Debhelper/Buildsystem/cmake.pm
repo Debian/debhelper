@@ -86,11 +86,15 @@ sub configure {
 	if (not compat(10)) {
 		push(@flags, '-DCMAKE_INSTALL_RUNSTATEDIR=/run');
 	}
+	if (not compat(12)) {
+		# Speed up installation phase a bit.
+		push(@flags, "-DCMAKE_SKIP_INSTALL_ALL_DEPENDENCY=ON");
+	}
 	if (exists($TARGET_BUILD_SYSTEM2CMAKE_GENERATOR{$backend})) {
 		my $generator = $TARGET_BUILD_SYSTEM2CMAKE_GENERATOR{$backend};
 		push(@flags, "-G${generator}");
 	}
-	unless ($dh{QUIET}) {
+	if (not $dh{QUIET}) {
 		push(@flags, "-DCMAKE_VERBOSE_MAKEFILE=ON", "-DCMAKE_AUTOGEN_VERBOSE=ON");
 	}
 
