@@ -73,7 +73,7 @@ sub find_kernel_modules {
 	return unless -d $searchdir;
 	find(sub {
 		if (/\.k?o$/) {
-			my ($kvers)=$File::Find::dir=~m!lib/modules/([^/]+)/!;
+			my ($kvers)=$File::Find::dir=~m!lib/modules/([^/]+)!;
 			if (! defined $kvers || ! length $kvers) {
 				warning("Cannot determine kernel version for module $File::Find::name");
 			}
