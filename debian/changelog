@@ -14,6 +14,10 @@ debhelper (12.9.1) UNRELEASED; urgency=medium
   * dh: Tweak the command-skipping optimization to skip commands
     in a few more cases when the command is known not to react to
     command line options.
+  * dh,dh_installsytemd*: Work around broken NOOP promise caused by
+    dh_installsystemd* using nonstandard "package@" prefix for
+    pkgfiles.  Thanks to Badreddin Aboubakr and Andy Caldwell for
+    reporting it.  (Closes: #950723, #951819)
 
   [ Nicholas Guriev ]
   * cmake: Verbose autogen rules.

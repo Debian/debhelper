@@ -792,6 +792,15 @@ sub _stamp_target {
 				require Debian::Debhelper::Dh_Buildsystems;
 				my $system = Debian::Debhelper::Dh_Buildsystems::load_buildsystem(undef, $need);
 				return 0 if defined($system);
+			} elsif ($type eq 'internal') {
+				if ($need ne 'bug#950723') {
+					warning('Broken internal NOOP hint; should not happen unless someone is using implementation details');
+					error("Unknown internal NOOP type hint in ${command}: ${need}");
+				}
+
+				$all_pkgs //= [ getpackages() ];
+				push(@{$all_pkgs}, map { "${_}@"} getpackages());
+				push(@packages, map { "${_}@"} @packages);
 			} else {
 				# Unknown hint - make no assumptions
 				return 0;
