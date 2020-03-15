@@ -113,10 +113,7 @@ sub contains_install_section {
 }
 
 sub install_user_unit {
-	my ($package, $name, $suffix) = @_;
-
-	my $tmpdir = tmpdir($package);
-	my $path = "$tmpdir/usr/lib/systemd/user";
+	my ($package, $name, $suffix, $path) = @_;
 	my $unit = pkgfile($package, "user.$suffix");
 	return if $unit eq '';
 
@@ -184,9 +181,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# unit file name
 	my $name = $dh{NAME} // $package;
 
+	my $path = "$tmpdir/usr/lib/systemd/user";
 	for my $type (qw(service target socket path timer)) {
-		install_user_unit($package, $name, $type);
-		install_user_unit("${package}@", "${name}@", $type);
+		install_user_unit($package, $name, $type, $path);
+		install_user_unit("${package}@", "${name}@", $type, $path);
 	}
 }
 
