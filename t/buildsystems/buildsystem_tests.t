@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::More tests => 82;
+use Test::More tests => 85;
 
 use strict;
 use warnings;
@@ -212,14 +212,24 @@ test_isnt_parallel( do_parallel_mk("--max-parallel=5"),
 	"No parallel by default with --max-parallel=5" );
 
 $ENV{DEB_BUILD_OPTIONS}="parallel=5";
-test_isnt_parallel( do_parallel_mk(),
-	"DEB_BUILD_OPTIONS=parallel=5 without parallel options" );
+{
+	local $ENV{DH_COMPAT} = 9;
+	# compat 9 is not parallel by default
+	test_isnt_parallel( do_parallel_mk(),
+						"DEB_BUILD_OPTIONS=parallel=5 without parallel options [c9]" );
+}
+
+# compat 10+ are parallel by default
+test_is_parallel( do_parallel_mk(),
+				  "DEB_BUILD_OPTIONS=parallel=5 without parallel options [current compat]" );
 test_is_parallel( do_parallel_mk("--parallel"),
 	"DEB_BUILD_OPTIONS=parallel=5 with --parallel" );
 test_is_parallel( do_parallel_mk("--max-parallel=2"),
 	"DEB_BUILD_OPTIONS=parallel=5 with --max-parallel=2" );
 test_isnt_parallel( do_parallel_mk("--max-parallel=1"),
 	"DEB_BUILD_OPTIONS=parallel=5 with --max-parallel=1" );
+test_isnt_parallel( do_parallel_mk("--no-parallel"),
+	"DEB_BUILD_OPTIONS=parallel=5 with --no-parallel" );
 
 $ENV{MAKEFLAGS} = "--jobserver-fds=105,106 -j";
 $ENV{DEB_BUILD_OPTIONS}="";
