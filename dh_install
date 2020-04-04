@@ -127,7 +127,11 @@ init(options => {
 });
 
 my $srcdir = '.';
-$srcdir = $dh{SOURCEDIR} if defined $dh{SOURCEDIR};
+if (defined($dh{SOURCEDIR})) {
+	$srcdir = $dh{SOURCEDIR};
+	$srcdir =~ s{/+$}{};
+	error("Invalid --sourcedir - must not be empty nor /") if not $srcdir;
+}
 
 my $missing_files = 0;
 

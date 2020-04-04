@@ -89,7 +89,11 @@ init(options => {
 my (@installed, %helpers);
 
 my $srcdir = '.';
-$srcdir = $dh{SOURCEDIR} if defined $dh{SOURCEDIR};
+if (defined($dh{SOURCEDIR})) {
+	$srcdir = $dh{SOURCEDIR};
+	$srcdir =~ s{/+$}{};
+	error("Invalid --sourcedir - must not be empty nor /") if not $srcdir;
+}
 
 if (!$dh{LIST_MISSING} && !$dh{FAIL_MISSING}) {
 	exit 0 if compat(11);

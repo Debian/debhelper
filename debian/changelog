@@ -4,6 +4,11 @@ debhelper (12.10.1) UNRELEASED; urgency=medium
     entry.  Thanks to Andy Caldwell for reporting it.
   * Dh_Lib.pm: Flag compat 9 as deprecated as announced in
     https://lists.debian.org/debian-devel-announce/2020/02/msg00000.html
+  * dh_install: Remove trailing slashes from value to the --sourcedir
+    parameter. This avoids dh_install computing an incorrect directory
+    name.  Thanks to Mihai Moldovan for reporting the issue.
+    (Closes: #955568)
+  * dh_missing: Ditto.
 
  -- Niels Thykier <niels@thykier.net>  Wed, 25 Mar 2020 18:28:58 +0000
 
