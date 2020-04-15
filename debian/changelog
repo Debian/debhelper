@@ -10,6 +10,11 @@ debhelper (12.10.1) unstable; urgency=medium
     name.  Thanks to Mihai Moldovan for reporting the issue.
     (Closes: #955568)
   * dh_missing: Ditto.
+  * SequencerUtil.pm/dh: Fix bug where the long forms of --builddirectory
+    and --sourcedirectory might be ignored by dh causing it to skip
+    dh_auto_* when it should not.  This is in practice only a problem in
+    compat 13 as long form of arguments are not optimized in compat 12 or
+    earlier.
 
   [ Chris Leick ]
   * debhelper.pod: Fix typos.
