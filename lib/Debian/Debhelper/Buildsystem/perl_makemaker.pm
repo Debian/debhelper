@@ -8,7 +8,7 @@ package Debian::Debhelper::Buildsystem::perl_makemaker;
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(compat is_cross_compiling perl_cross_incdir);
+use Debian::Debhelper::Dh_Lib qw(compat is_cross_compiling perl_cross_incdir warning);
 use parent qw(Debian::Debhelper::Buildsystem::makefile);
 use Config;
 
