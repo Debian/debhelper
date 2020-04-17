@@ -2,6 +2,10 @@ debhelper (13.0.1) UNRELEASED; urgency=medium
 
   * dh_installinitramfs: Remove misleading "in compat 12" as the
     behaviour was unrelated to the compat level.
+  * dh_installinitramfs: Migrate to using declaratively triggering
+    update-initramfs as a noawait trigger (replacing maintscript
+    calls to "update-initramfs -u", which had the samme affect).
+    (Closes: #822730).
 
  -- Niels Thykier <niels@thykier.net>  Fri, 17 Apr 2020 21:55:48 +0000
 

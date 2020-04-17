@@ -46,7 +46,10 @@ information about initramfs hooks.
 
 =item B<-n>, B<--no-scripts>
 
-Do not modify F<postinst>/F<postrm> scripts.
+Do not add the "update-initramfs" trigger even if it seems like the package
+might need it.  The option is called B<--no-scripts> for historical
+reasons as B<dh_installinitramfs> would previously generate maintainer
+scripts that called B<update-initramfs -u>.
 
 =back
 
@@ -77,8 +80,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	if ($has_hooks && ! $dh{NOSCRIPTS}) {
-		autoscript($package, 'postinst', 'postinst-initramfs-hook');
-		autoscript($package, 'postrm', 'postrm-initramfs-hook')
+		autotrigger($package, 'activate-noawait', 'update-initramfs');
 	}
 }
 
