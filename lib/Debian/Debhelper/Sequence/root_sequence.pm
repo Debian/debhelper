@@ -63,6 +63,7 @@ qw{
 },
 	(!compat(11) ? qw(dh_installinitramfs) : qw()),
 qw{
+	dh_installalternatives
 	dh_bugfiles
 	dh_ucf
 	dh_lintian

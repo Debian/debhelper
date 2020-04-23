@@ -64,6 +64,12 @@ debhelper (13.0.1) UNRELEASED; urgency=medium
   * dh: Filter out the root-sequence in "--list" output and reject
     attempts to activate or deactivate the sequence as it is an
     implementation detail.
+  * dh_installalternatives: New helper that can setup alternatives
+    (update-alternatives) based on a declarative format.  Currently,
+    the format is converted to calls to update-alternatives, which
+    are inserted into the maintscripts of the package.  Thanks to
+    David Engel and Fumitoshi UKAI for the original requests.
+    (Closes: #45614)
 
   [ Translations ]
   * Fix typo in German translation.  (Andreas Bombe)

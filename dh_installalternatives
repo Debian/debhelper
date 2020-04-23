@@ -1,0 +1,181 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_installalternatives - install declarative alternative rules
+
+=cut
+
+use strict;
+use warnings;
+use constant LINE_PREFIX => ' ' . q{\\} . "\n            ";
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_installalternatives> [S<I<debhelper options>>]
+
+=head1 DESCRIPTION
+
+B<dh_installalternatives> is a debhelper program that is responsible for
+parsing the declarative alternatives format and insert the relevant
+maintscripts snippets to interface with L<update-alternatives(1)>
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.alternatives
+
+An example of the format:
+
+    Name: editor
+    Link: /usr/bin/editor
+    Alternative: /usr/bin/vim.basic
+    Dependents:
+      /usr/share/man/man1/vim.1.gz editor.1.gz /usr/share/man/man1/editor.1.gz
+      /usr/share/man/fr/man1/vim.1.gz editor.fr.1.gz /usr/share/man/fr/man1/editor.1.gz
+      /usr/share/man/it/man1/vim.1.gz editor.it.1.gz /usr/share/man/it/man1/editor.1.gz
+      /usr/share/man/pl/man1/vim.1.gz editor.pl.1.gz /usr/share/man/pl/man1/editor.1.gz
+      /usr/share/man/ru/man1/vim.1.gz editor.ru.1.gz /usr/share/man/ru/man1/editor.1.gz
+    Priority: 50
+
+The fields B<Link>, B<Name>, B<Alternative>, and B<Priority> are mandatory and correspond
+to the L<update-alternatives(1)> B<--install> parameters B<link>, B<name>, B<path>, and
+B<priority> respectively.
+
+The B<Dependents> field is optional and consists of one or more lines. Each non-empty
+line must contain exactly 3 space separated values that match (in order) the values passed
+to the B<--slave> parameter for L<update-alternatives(1)>.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-n>, B<--no-scripts>
+
+Do not modify F<postinst>/F<postrm>/F<prerm> scripts.
+
+=back
+
+=cut
+
+init();
+
+# Explicitly discard attempts to use --name; it does not make sense for
+# this helper.
+if ($dh{NAME}) {
+	warning('Ignoring unsupported --name option');
+}
+$dh{NAME} = undef;
+
+# PROMISE: DH NOOP WITHOUT alternatives cli-options()
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp = tmpdir($package);
+	my $alternatives = pkgfile($package, 'alternatives');
+
+	if (-f $alternatives) {
+		_parse_alternatives_file_and_generate_maintscripts($package, $tmp, $alternatives);
+	}
+}
+
+sub _parse_alternative_and_generate_maintscript {
+	my ($package, $tmpdir, $alternatives_file, $ctrl) = @_;
+
+	my $link_name = $ctrl->{'Name'} // error("Missing mandatory \"Name\" field in ${alternatives_file}");
+	my $link_path = $ctrl->{'Link'}
+		// error("Missing mandatory \"Link\" field for \"${link_name}\" in ${alternatives_file}");
+	my $impl_path = $ctrl->{'Alternative'}
+		// error("Missing mandatory \"Alternative\" field for \"${link_name}\" in ${alternatives_file}");
+	my $priority = $ctrl->{'Priority'}
+		// error("Missing mandatory \"Priority\" field for \"${link_name}\" in ${alternatives_file}");
+	my %maintscript_options;
+
+	if (index($link_name, '/') > -1) {
+		error(qq{Invalid link name "${link_name}" in "${alternatives_file}": Must not contain slash});
+	}
+	if ( ! -f "${tmpdir}/${impl_path}") {
+		error(qq{Alternative "${impl_path}" for "${link_name}" in ${alternatives_file} does not exist in ${tmpdir}});
+	}
+
+	$maintscript_options{'RM_OPTIONS'} = "--remove ${link_name} ${impl_path}";
+	$maintscript_options{'INSTALL_OPTIONS'} = "--install ${link_path} ${link_name} ${impl_path} ${priority}";
+
+	if (defined(my $slave_link_text = $ctrl->{'Dependents'})) {
+		my (%dlink_dup, @dependent_links);
+		for my $line (split(/\n/, $slave_link_text)) {
+			my ($dlink_name, $dlink_path, $dimpl_path, $trailing);
+			my $error_with_def = 0;
+			$line =~ s/^\s++//;
+			$line =~ s/\s++$//;
+			next if $line eq '';  # Ignore empty lines
+			($dlink_path, $dlink_name, $dimpl_path, $trailing) = split(' ', $line, 4);
+			if (not $dlink_name) {
+				warning(qq{Missing link name value (2nd item) for dependent link "${dlink_name}" for "${link_name}"}
+					. qq{ in "${alternatives_file}"});
+				$error_with_def = 1;
+			} elsif (index($dlink_name, '/') > -1) {
+				warning(qq{Invalid dependent link name "${dlink_name}" for "${link_name}"}
+					. qq{ in "${alternatives_file}": Must not contain slash});
+				$error_with_def = 1;
+			} elsif ($dlink_dup{$dlink_name}) {
+				warning(qq{Dependent link "${dlink_name}" is seen more than once for "${link_name}"}
+					. qq{ in ${alternatives_file}});
+				$error_with_def = 1;
+			}
+			if (not $dimpl_path) {
+				warning(qq{Missing path (alternative) value (3rd item) for dependent link "${dlink_name}"}
+					. qq{ for "${link_name}" in "${alternatives_file}"});
+				$error_with_def = 1;
+			}
+			if ($trailing) {
+				warning(qq{Trailing information for dependent link "${dlink_name}" for "${link_name}"}
+					. qq{ in "${alternatives_file}"}) if $trailing;
+				warning("Dependent links must consist of exactly 3 space-separated values");
+				$error_with_def = 1;
+			}
+			if ($error_with_def) {
+				my $link_id = $dlink_name // ('no ' . (scalar(@dependent_links) + 1));
+				error("Error parsing dependent link ${link_id} for \"${link_name}\" in ${alternatives_file}.");
+			}
+			push(@dependent_links, "--slave $dlink_path $dlink_name $dimpl_path");
+		}
+		error("Empty \"Dependents\" field for \"${link_name}\" in ${alternatives_file} (please remove it or add an entry)")
+			if not @dependent_links;
+		$maintscript_options{'INSTALL_OPTIONS'} .=  LINE_PREFIX . join(LINE_PREFIX, @dependent_links);
+	}
+	for my $wrong_name (qw(Slave Slaves Slave-Links)) {
+		if ($ctrl->{$wrong_name}) {
+			error("Please use Dependents instead of ${wrong_name}");
+		}
+	}
+
+	autoscript($package, 'postinst', 'postinst-alternatives', \%maintscript_options);
+	autoscript($package, 'prerm', 'prerm-alternatives', \%maintscript_options);
+	return;
+}
+
+sub _parse_alternatives_file_and_generate_maintscripts {
+	my ($package, $tmpdir, $alternatives_file) = @_;
+	my ($ctrl, $fd);
+	require Dpkg::Control::HashCore;
+	open($fd, '<', $alternatives_file) or error("open $alternatives_file failed: $!");
+	while (defined($ctrl = Dpkg::Control::HashCore->new) and ($ctrl->parse($fd, $alternatives_file))) {
+		_parse_alternative_and_generate_maintscript($package, $tmpdir, $alternatives_file, $ctrl);
+	}
+	close($fd);
+	return;
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=cut
