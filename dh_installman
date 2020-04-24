@@ -200,6 +200,10 @@ on_items_in_parallel(\@all_packages, sub {
 				if (/^\.TH\s+\S+\s+"?(\d+[^"\s]*)"?/ ||
 					/^\.Dt\s+\S+\s+(\d+[^\s]*)/) {
 					$section = $1;
+					if ($section =~ m/^\d+[.]\d+/) {
+						warning("Ignoring section defined in TH/Dt for ${page} as it looks like a version number: ${section}");
+						$section = undef;
+					}
 					last;
 				}
 			}
@@ -210,8 +214,10 @@ on_items_in_parallel(\@all_packages, sub {
 			}
 
 			# Now get the numeric component of the section.
-			my ($realsection) = $section =~ m/^(\d)/ if defined $section;
-			if (!$realsection) {
+			my ($realsection) = $section =~ m/^(\d+)/ if defined $section;
+			if (!$realsection or ($realsection < 0 or $realsection > 9)) {
+				warning("Section for ${page} is computed as \"${section}\", which is not a valid section")
+					if defined($section);
 				error("Could not determine section for $page");
 			}
 
