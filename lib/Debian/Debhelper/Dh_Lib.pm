@@ -1708,9 +1708,8 @@ sub _strip_spaces {
 sub _parse_debian_control {
 	my $package="";
 	my $valid_pkg_re = qr{^${PKGNAME_REGEX}$}o;
-	my ($package_type, %seen, @profiles, $source_section,
-		$cross_type, $cross_target_arch, %field_values, $field_name,
-		%bd_fields, $bd_field_value, %seen_fields, $fd);
+	my (%seen, @profiles, $source_section, $cross_target_arch, %field_values,
+		$field_name, %bd_fields, $bd_field_value, %seen_fields, $fd);
 	if (exists $ENV{'DEB_BUILD_PROFILES'}) {
 		@profiles=split /\s+/, $ENV{'DEB_BUILD_PROFILES'};
 	}
@@ -1882,6 +1881,17 @@ sub _parse_debian_control {
 					error("${field_name}-field appears twice in the same stanza of debian/control. " .
 						  "First time on line $first_time, second time: $.");
 				}
+
+				if ($field_name =~ m/^(?:x[bc]*-)?package-type$/) {
+					# Normalize variants into the main "Package-Type" field
+					$field_name = 'package-type';
+					if (exists($seen_fields{$field_name})) {
+						my $package = _strip_spaces($field_values{'package'} // '');
+						my $help = "(issue seen prior \"Package\"-field)";
+						$help = "for package ${package}" if $package;
+						error("Multiple definitions of (X-)Package-Type in line $. ${help}");
+					}
+				}
 				$seen_fields{$field_name} = $.;
 				$field_values{$field_name} = $value;
 				$bd_field_value = undef;
@@ -1889,10 +1899,19 @@ sub _parse_debian_control {
 				# Invalid file
 				error("Parse error in debian/control, line $., read: $_");
 			}
+		}
+		if (!$_ or eof) { # end of stanza.
+			if (%field_values) {
+				my $package = _strip_spaces($field_values{'package'} // '');
+				my $build_profiles = $field_values{'build-profiles'};
+				my $included_in_build_profile = 1;
+				my $arch = _strip_spaces($field_values{'architecture'} // '');
+				my $cross_type = _strip_spaces($field_values{'x-dh-build-for-type'} // 'host');
 
-			if ($field_name eq 'package') {
-				$package = $value;
 				# Detect duplicate package names in the same control file.
+				if ($package eq '') {
+					error("Binary paragraph ending on line $. is missing mandatory \"Package\"-field");
+				}
 				if (! $seen{$package}) {
 					$seen{$package}=1;
 				} else {
@@ -1902,31 +1921,14 @@ sub _parse_debian_control {
 					error('Package-field must be a valid package name, ' .
 						  "got: \"${package}\", should match \"${valid_pkg_re}\"");
 				}
-			} elsif ($field_name =~ m/^(?:x[bc]*-)?package-type$/) {
-				if (defined($package_type)) {
-					my $help = "(issue seen prior \"Package\"-field)";
-					$help = "for package ${package}" if $package;
-					error("Multiple definitions of (X-)Package-Type in line $. ${help}");
-				}
-				$package_type = $value;
-			} elsif ($field_name eq 'x-dh-build-for-type') {
-				$cross_type = $value;
 				if ($cross_type ne 'host' and $cross_type ne 'target') {
-					error("Unknown value of X-DH-Build-For-Type \"$cross_type\" at debian/control:$.");
+					error("Unknown value of X-DH-Build-For-Type \"$cross_type\" for package $package");
 				}
-			}
-		}
-		if (!$_ or eof) { # end of stanza.
-			if ($package) {
-				my $build_profiles = $field_values{'build-profiles'};
-				my $included_in_build_profile = 1;
-				my $arch = _strip_spaces($field_values{'architecture'} // '');
 
-				$package_types{$package}=$package_type // 'deb';
+				$package_types{$package} = _strip_spaces($field_values{'package-type'} // 'deb');
 				$package_arches{$package} = $arch;
 				$package_multiarches{$package} = _strip_spaces($field_values{'multi-arch'} // '');
 				$package_sections{$package} = _strip_spaces($field_values{'section'} // $source_section);;
-				$cross_type //= 'host';
 				$package_cross_type{$package} = $cross_type;
 				push(@{$packages_by_type{'all-listed-in-control-file'}}, $package);
 
@@ -1971,9 +1973,6 @@ sub _parse_debian_control {
 					}
 				}
 			}
-			$package='';
-			$package_type=undef;
-			$cross_type = undef;
 			%field_values = ();
 			%seen_fields = ();
 		}
