@@ -658,7 +658,7 @@ sub run_through_command_sequence {
 		my @filtered_packages = _active_packages_for_command($command, $all_packages, $arch_packages, $indep_packages);
 
 		foreach my $package (@filtered_packages) {
-			if ($startpoint->{$package} > $i ||
+			if (($startpoint->{$package}//0) > $i ||
 				$logged->{$package}{$full_sequence->[$i]}) {
 				push(@opts, "-N$package");
 			}
