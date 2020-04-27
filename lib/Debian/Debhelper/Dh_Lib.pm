@@ -1698,13 +1698,18 @@ sub getpackages {
 	return @{$packages_by_type{$type}};
 }
 
+sub _strip_spaces {
+	my ($v) = @_;
+	$v =~ s/^\s++//;
+	$v =~ s/\s++$//;
+	return $v;
+}
+
 sub _parse_debian_control {
 	my $package="";
-	my $arch="";
-	my $section="";
 	my $valid_pkg_re = qr{^${PKGNAME_REGEX}$}o;
-	my ($package_type, $multiarch, %seen, @profiles, $source_section,
-		$included_in_build_profile, $cross_type, $cross_target_arch,
+	my ($package_type, %seen, @profiles, $source_section,
+		$cross_type, $cross_target_arch, %field_values, $field_name,
 		%bd_fields, $bd_field_value, %seen_fields, $fd);
 	if (exists $ENV{'DEB_BUILD_PROFILES'}) {
 		@profiles=split /\s+/, $ENV{'DEB_BUILD_PROFILES'};
@@ -1726,12 +1731,15 @@ sub _parse_debian_control {
 				error("Continuation line seen before first stanza in debian/control (line $.)");
 			}
 			# Continuation line
+			s/^\s[.]?//;
 			push(@{$bd_field_value}, $_) if $bd_field_value;
+			# Ensure it is not completely empty or the code below will assume the paragraph ended
+			$_ = '.' if not $_;
 		} elsif (not $_ and not %seen_fields) {
 			# Ignore empty lines before first stanza
 			next;
 		} elsif ($_) {
-			my ($field_name, $value);
+			my ($value);
 
 			if (m/^($DEB822_FIELD_REGEX):\s*(.*)/o) {
 				($field_name, $value) = (lc($1), $2);
@@ -1839,6 +1847,7 @@ sub _parse_debian_control {
 	}
 
 	%seen_fields = ();
+	$field_name = undef;
 
 	while (<$fd>) {
 		chomp;
@@ -1852,18 +1861,20 @@ sub _parse_debian_control {
 			$_  = '';
 		}
 
-
 		if (/^\s/) {
 			# Continuation line
 			if (not %seen_fields) {
 				error("Continuation line seen outside stanza in debian/control (line $.)");
 			}
+			s/^\s[.]?//;
+			$field_values{$field_name} .= ' ' . $_;
+			# Ensure it is not completely empty or the code below will assume the paragraph ended
+			$_ = '.' if not $_;
 		} elsif (not $_ and not %seen_fields) {
 			# Ignore empty lines before first stanza
 			next;
 		} elsif ($_) {
-			my ($field_name, $value);
-
+			my ($value);
 			if (m/^($DEB822_FIELD_REGEX):\s*(.*)/o) {
 				($field_name, $value) = (lc($1), $2);
 				if (exists($seen_fields{$field_name})) {
@@ -1872,6 +1883,7 @@ sub _parse_debian_control {
 						  "First time on line $first_time, second time: $.");
 				}
 				$seen_fields{$field_name} = $.;
+				$field_values{$field_name} = $value;
 				$bd_field_value = undef;
 			} else {
 				# Invalid file
@@ -1890,11 +1902,6 @@ sub _parse_debian_control {
 					error('Package-field must be a valid package name, ' .
 						  "got: \"${package}\", should match \"${valid_pkg_re}\"");
 				}
-				$included_in_build_profile=1;
-			} elsif ($field_name eq 'section') {
-				$section = $value;
-			} elsif ($field_name eq 'architecture') {
-				$arch = $value;
 			} elsif ($field_name =~ m/^(?:x[bc]*-)?package-type$/) {
 				if (defined($package_type)) {
 					my $help = "(issue seen prior \"Package\"-field)";
@@ -1902,42 +1909,46 @@ sub _parse_debian_control {
 					error("Multiple definitions of (X-)Package-Type in line $. ${help}");
 				}
 				$package_type = $value;
-			} elsif ($field_name eq 'multi-arch') {
-				$multiarch = $value;
 			} elsif ($field_name eq 'x-dh-build-for-type') {
 				$cross_type = $value;
 				if ($cross_type ne 'host' and $cross_type ne 'target') {
 					error("Unknown value of X-DH-Build-For-Type \"$cross_type\" at debian/control:$.");
 				}
-			} elsif ($field_name eq 'build-profiles') {
-				# rely on libdpkg-perl providing the parsing functions
-				# because if we work on a package with a Build-Profiles
-				# field, then a high enough version of dpkg-dev is needed
-				# anyways
-				my $build_profiles = $value;
-				eval {
-					require Dpkg::BuildProfiles;
-					my @restrictions=Dpkg::BuildProfiles::parse_build_profiles($build_profiles);
-					if (@restrictions) {
-						$included_in_build_profile = Dpkg::BuildProfiles::evaluate_restriction_formula(
-							\@restrictions,
-							\@profiles);
-					}
-				};
-				if ($@) {
-					error("The control file has a Build-Profiles field. Requires libdpkg-perl >= 1.17.14");
-				}
 			}
 		}
 		if (!$_ or eof) { # end of stanza.
 			if ($package) {
+				my $build_profiles = $field_values{'build-profiles'};
+				my $included_in_build_profile = 1;
+				my $arch = _strip_spaces($field_values{'architecture'} // '');
+
 				$package_types{$package}=$package_type // 'deb';
-				$package_arches{$package}=$arch;
-				$package_multiarches{$package} = $multiarch;
-				$package_sections{$package} = $section || $source_section;
+				$package_arches{$package} = $arch;
+				$package_multiarches{$package} = _strip_spaces($field_values{'multi-arch'} // '');
+				$package_sections{$package} = _strip_spaces($field_values{'section'} // $source_section);;
 				$cross_type //= 'host';
 				$package_cross_type{$package} = $cross_type;
 				push(@{$packages_by_type{'all-listed-in-control-file'}}, $package);
+
+				if (defined($build_profiles)) {
+					eval {
+						# rely on libdpkg-perl providing the parsing functions
+						# because if we work on a package with a Build-Profiles
+						# field, then a high enough version of dpkg-dev is needed
+						# anyways
+						require Dpkg::BuildProfiles;
+						my @restrictions = Dpkg::BuildProfiles::parse_build_profiles($build_profiles);
+						if (@restrictions) {
+							$included_in_build_profile = Dpkg::BuildProfiles::evaluate_restriction_formula(
+								\@restrictions,
+								\@profiles);
+						}
+					};
+					if ($@) {
+						error("The control file has a Build-Profiles field. Requires libdpkg-perl >= 1.17.14");
+					}
+				}
+
 				if ($included_in_build_profile) {
 					if ($arch eq 'all') {
 						push(@{$packages_by_type{'indep'}}, $package);
@@ -1963,8 +1974,7 @@ sub _parse_debian_control {
 			$package='';
 			$package_type=undef;
 			$cross_type = undef;
-			$arch='';
-			$section='';
+			%field_values = ();
 			%seen_fields = ();
 		}
 	}
