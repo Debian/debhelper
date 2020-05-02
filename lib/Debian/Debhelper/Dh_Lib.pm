@@ -1442,7 +1442,7 @@ my %BUILT_IN_SUBST = (
 	'Space'        => ' ',
 	'Dollar'       => '$',
 	'Newline'      => "\n",
-	'Tab'          => "\b",
+	'Tab'          => "\t",
 );
 
 sub _variable_substitution {
