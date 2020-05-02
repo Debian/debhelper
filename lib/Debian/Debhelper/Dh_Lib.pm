@@ -28,6 +28,12 @@ use constant {
 	'DEFAULT_PACKAGE_TYPE' => 'deb',
 };
 
+
+# The Makefile changes this if debhelper is installed in a PREFIX.
+my $prefix="/usr";
+# The Makefile changes this during install to match the actual version.
+use constant HIGHEST_STABLE_COMPAT_LEVEL => undef;
+
 use constant {
 	# Package-Type / extension for dbgsym packages
 	# TODO: Find a way to determine this automatically from the vendor
@@ -173,9 +179,6 @@ qw(
 
 	buildarch
 ));
-
-# The Makefile changes this if debhelper is installed in a PREFIX.
-my $prefix="/usr";
 
 my $MAX_PROCS = get_buildoption("parallel") || 1;
 my $DH_TOOL_VERSION;

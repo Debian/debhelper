@@ -128,6 +128,10 @@ install:
 	install -m 0644 lib/Debian/Debhelper/*.pm $(DESTDIR)$(PERLLIBDIR)
 	[ "$(PREFIX)" = /usr ] || \
 		sed -i '/$$prefix=/s@/usr@$(PREFIX)@g' $(DESTDIR)$(PERLLIBDIR)/Dh_Lib.pm
+	if [ "$(VERSION)" ]; then \
+		MV=$$(echo "$(VERSION)" | $(PERL) -ne 'print $$1 if /^(\d+)[~.]/;') ; \
+		sed -i "/constant HIGHEST_STABLE_COMPAT_LEVEL =>/s@=>.*;@=> $${MV};@g" $(DESTDIR)$(PERLLIBDIR)/Dh_Lib.pm ; \
+	fi
 	install -m 0644 lib/Debian/Debhelper/Sequence/*.pm $(DESTDIR)$(PERLLIBDIR)/Sequence
 	install -m 0644 lib/Debian/Debhelper/Buildsystem/*.pm $(DESTDIR)$(PERLLIBDIR)/Buildsystem
 	install -m 0644 lib/Debian/Debhelper/DH/*.pm $(DESTDIR)$(PERLLIBDIR)/DH
