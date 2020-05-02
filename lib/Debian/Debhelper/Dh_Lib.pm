@@ -5,7 +5,8 @@
 # Joey Hess, GPL copyright 1997-2008.
 
 package Debian::Debhelper::Dh_Lib;
-use strict;
+
+use v5.24;
 use warnings;
 use utf8;
 
@@ -644,29 +645,27 @@ sub error_exitcode {
 	}
 }
 
-{
-	my $_loaded = 0;
-	sub install_dir {
-		my @to_create = grep { not -d $_ } @_;
-		return if not @to_create;
-		if (not $_loaded) {
-			$_loaded++;
-			require File::Path;
-		}
-		verbose_print(sprintf('install -d %s', escape_shell(@to_create)))
-			if $dh{VERBOSE};
-		return 1 if $dh{NO_ACT};
-		eval {
-			File::Path::make_path(@to_create, {
-				# install -d uses 0755 (no umask), make_path uses 0777 (& umask) by default.
-				# Since we claim to run install -d, then ensure the mode is correct.
-				'chmod' => 0755,
-			});
-		};
-		if (my $err = "$@") {
-			$err =~ s/\s+at\s+\S+\s+line\s+\d+\.?\n//;
-			error($err);
-		}
+sub install_dir {
+	my @to_create = grep { not -d $_ } @_;
+	return if not @to_create;
+	state $_loaded;
+	if (not $_loaded) {
+		$_loaded++;
+		require File::Path;
+	}
+	verbose_print(sprintf('install -d %s', escape_shell(@to_create)))
+		if $dh{VERBOSE};
+	return 1 if $dh{NO_ACT};
+	eval {
+		File::Path::make_path(@to_create, {
+			# install -d uses 0755 (no umask), make_path uses 0777 (& umask) by default.
+			# Since we claim to run install -d, then ensure the mode is correct.
+			'chmod' => 0755,
+		});
+	};
+	if (my $err = "$@") {
+		$err =~ s/\s+at\s+\S+\s+line\s+\d+\.?\n//;
+		error($err);
 	}
 }
 
@@ -796,57 +795,55 @@ sub nonquiet_print {
 	}
 }
 
-{
-	my $_use_color;
-	sub _color {
-		my ($msg, $color) = @_;
-		if (not defined($_use_color)) {
-			# This part is basically Dpkg::ErrorHandling::setup_color over again
-			# with some tweaks.
-			# (but the module uses Dpkg + Dpkg::Gettext, so it is very expensive
-			# to load)
-			my $mode = $ENV{'DH_COLORS'} // $ENV{'DPKG_COLORS'};
-			# Support NO_COLOR (https://no-color.org/)
-			$mode //= exists($ENV{'NO_COLOR'}) ? 'never' : 'auto';
+sub _color {
+	my ($msg, $color) = @_;
+	state $_use_color;
+	if (not defined($_use_color)) {
+		# This part is basically Dpkg::ErrorHandling::setup_color over again
+		# with some tweaks.
+		# (but the module uses Dpkg + Dpkg::Gettext, so it is very expensive
+		# to load)
+		my $mode = $ENV{'DH_COLORS'} // $ENV{'DPKG_COLORS'};
+		# Support NO_COLOR (https://no-color.org/)
+		$mode //= exists($ENV{'NO_COLOR'}) ? 'never' : 'auto';
 
-			if ($mode eq 'auto') {
-				$_use_color = 1 if -t *STDOUT or -t *STDERR;
-			} elsif ($mode eq 'always') {
-				$_use_color = 1;
-			} else {
-				$_use_color = 0;
-			}
-
-			eval {
-				require Term::ANSIColor if $_use_color;
-			};
-			if ($@) {
-				# In case of errors, skip colors.
-				$_use_color = 0;
-			}
+		if ($mode eq 'auto') {
+			$_use_color = 1 if -t *STDOUT or -t *STDERR;
+		} elsif ($mode eq 'always') {
+			$_use_color = 1;
+		} else {
+			$_use_color = 0;
 		}
-		if ($_use_color) {
-			local $ENV{'NO_COLOR'} = undef;
-			$msg = Term::ANSIColor::colored($msg, $color);
+
+		eval {
+			require Term::ANSIColor if $_use_color;
+		};
+		if ($@) {
+			# In case of errors, skip colors.
+			$_use_color = 0;
 		}
-		return $msg;
 	}
-
-	# Output an error message and die (can be caught).
-	sub error {
-		my ($message) = @_;
-		# ensure the error code is well defined.
-		$! = 255;
-		die(_color(basename($0), 'bold') . ': ' . _color('error', 'bold red') . ": $message\n");
+	if ($_use_color) {
+		local $ENV{'NO_COLOR'} = undef;
+		$msg = Term::ANSIColor::colored($msg, $color);
 	}
+	return $msg;
+}
 
-	# Output a warning.
-	sub warning {
-		my ($message) = @_;
-		$message //= '';
+# Output an error message and die (can be caught).
+sub error {
+	my ($message) = @_;
+	# ensure the error code is well defined.
+	$! = 255;
+	die(_color(basename($0), 'bold') . ': ' . _color('error', 'bold red') . ": $message\n");
+}
 
-		print STDERR _color(basename($0), 'bold') . ': ' . _color('warning', 'bold yellow') . ": $message\n";
-	}
+# Output a warning.
+sub warning {
+	my ($message) = @_;
+	$message //= '';
+
+	print STDERR _color(basename($0), 'bold') . ': ' . _color('warning', 'bold yellow') . ": $message\n";
 }
 
 # Returns the basename of the argument passed to it.
@@ -1078,57 +1075,53 @@ sub pkgfilename {
 
 # Returns 1 if the package is a native debian package, null otherwise.
 # As a side effect, sets $dh{VERSION} to the version of this package.
-{
-	# Caches return code so it only needs to run dpkg-parsechangelog once.
-	my (%isnative_cache, %pkg_version);
-	
-	sub isnative {
-		my ($package) = @_;
-		my $cache_key = $package;
+sub isnative {
+	my ($package) = @_;
+	my $cache_key = $package;
 
+	state (%isnative_cache, %pkg_version);
+
+	if (exists($isnative_cache{$cache_key})) {
+		$dh{VERSION} = $pkg_version{$cache_key};
+		return $isnative_cache{$cache_key};
+	}
+
+	# Make sure we look at the correct changelog.
+	my $isnative_changelog = pkgfile($package,"changelog");
+	if (! $isnative_changelog) {
+		$isnative_changelog = "debian/changelog";
+		$cache_key = '_source';
+		# check if we looked up the default changelog
 		if (exists($isnative_cache{$cache_key})) {
 			$dh{VERSION} = $pkg_version{$cache_key};
 			return $isnative_cache{$cache_key};
 		}
+	}
 
-		# Make sure we look at the correct changelog.
-		my $isnative_changelog = pkgfile($package,"changelog");
-		if (! $isnative_changelog) {
-			$isnative_changelog = "debian/changelog";
-			$cache_key = '_source';
-			# check if we looked up the default changelog
-			if (exists($isnative_cache{$cache_key})) {
-				$dh{VERSION} = $pkg_version{$cache_key};
-				return $isnative_cache{$cache_key};
-			}
-		}
+	if (not %isnative_cache) {
+		require Dpkg::Changelog::Parse;
+	}
 
-		if (not %isnative_cache) {
-			require Dpkg::Changelog::Parse;
-		}
+	my $res = Dpkg::Changelog::Parse::changelog_parse(
+		file => $isnative_changelog,
+		compression => 0,
+	);
+	if (not defined($res)) {
+		error("No changelog entries for $package!? (changelog file: ${isnative_changelog})");
+	}
+	my $version = $res->{'Version'};
+	# Do we have a valid version?
+	if (not defined($version) or not $version->is_valid) {
+		error("changelog parse failure; invalid or missing version");
+	}
+	# Get and cache the package version.
+	$dh{VERSION} = $pkg_version{$cache_key} = $version->as_string;
 
-		my $res = Dpkg::Changelog::Parse::changelog_parse(
-			file => $isnative_changelog,
-			compression => 0,
-		);
-		if (not defined($res)) {
-			error("No changelog entries for $package!? (changelog file: ${isnative_changelog})");
-		}
-		my $version = $res->{'Version'};
-		# Do we have a valid version?
-		if (not defined($version) or not $version->is_valid) {
-			error("changelog parse failure; invalid or missing version");
-		}
-		# Get and cache the package version.
-		$dh{VERSION} = $pkg_version{$cache_key} = $version->as_string;
-
-		# Is this a native Debian package?
-		if (index($dh{VERSION}, '-') > -1) {
-			return $isnative_cache{$cache_key} = 0;
-		}
-		else {
-			return $isnative_cache{$cache_key} = 1;
-		}
+	# Is this a native Debian package?
+	if (index($dh{VERSION}, '-') > -1) {
+		return $isnative_cache{$cache_key} = 0;
+	} else {
+		return $isnative_cache{$cache_key} = 1;
 	}
 }
 
@@ -1623,32 +1616,30 @@ sub excludefile {
         return 0;
 }
 
-{
-	my %dpkg_arch_output;
-	sub dpkg_architecture_value {
-		my $var = shift;
-		if (exists($ENV{$var})) {
-			my $value = $ENV{$var};
-			return $value if $value ne q{};
-			warning("ENV[$var] is set to the empty string.  It has been ignored to avoid bugs like #862842");
-			delete($ENV{$var});
-		}
-		if (! exists($dpkg_arch_output{$var})) {
-			# Return here if we already consulted dpkg-architecture
-			# (saves a fork+exec on unknown variables)
-			return if %dpkg_arch_output;
-
-			open(my $fd, '-|', 'dpkg-architecture')
-				or error("dpkg-architecture failed");
-			while (my $line = <$fd>) {
-				chomp($line);
-				my ($k, $v) = split(/=/, $line, 2);
-				$dpkg_arch_output{$k} = $v;
-			}
-			close($fd);
-		}
-		return $dpkg_arch_output{$var};
+sub dpkg_architecture_value {
+	my $var = shift;
+	state %dpkg_arch_output;
+	if (exists($ENV{$var})) {
+		my $value = $ENV{$var};
+		return $value if $value ne q{};
+		warning("ENV[$var] is set to the empty string.  It has been ignored to avoid bugs like #862842");
+		delete($ENV{$var});
 	}
+	if (! exists($dpkg_arch_output{$var})) {
+		# Return here if we already consulted dpkg-architecture
+		# (saves a fork+exec on unknown variables)
+		return if %dpkg_arch_output;
+
+		open(my $fd, '-|', 'dpkg-architecture')
+			or error("dpkg-architecture failed");
+		while (my $line = <$fd>) {
+			chomp($line);
+			my ($k, $v) = split(/=/, $line, 2);
+			$dpkg_arch_output{$k} = $v;
+		}
+		close($fd);
+	}
+	return $dpkg_arch_output{$var};
 }
 
 # Confusing name for hostarch
@@ -1668,33 +1659,29 @@ sub is_cross_compiling {
 	    ne dpkg_architecture_value("DEB_HOST_GNU_TYPE");
 }
 
-# Passed an arch and a list of arches to match against, returns true if matched
-{
-	my %knownsame;
+# Passed an arch and a space-separated list of arches to match against, returns true if matched
+sub samearch {
+	my $arch=shift;
+	my @archlist=split(/\s+/,shift);
+	state %knownsame;
 
-	sub samearch {
-		my $arch=shift;
-		my @archlist=split(/\s+/,shift);
-	
-		foreach my $a (@archlist) {
-			if (exists $knownsame{$arch}{$a}) {
-				return 1 if $knownsame{$arch}{$a};
-				next;
-			}
-
-			require Dpkg::Arch;
-			if (Dpkg::Arch::debarch_is($arch, $a)) {
-				return $knownsame{$arch}{$a}=1;
-			}
-			else {
-				$knownsame{$arch}{$a}=0;
-			}
+	foreach my $a (@archlist) {
+		if (exists $knownsame{$arch}{$a}) {
+			return 1 if $knownsame{$arch}{$a};
+			next;
 		}
-	
-		return 0;
-	}
-}
 
+		require Dpkg::Arch;
+		if (Dpkg::Arch::debarch_is($arch, $a)) {
+			return $knownsame{$arch}{$a}=1;
+		}
+		else {
+			$knownsame{$arch}{$a}=0;
+		}
+	}
+
+	return 0;
+}
 
 
 # Returns a list of packages in the control file.
@@ -2020,21 +2007,18 @@ sub _parse_debian_control {
 # - Takes an optional keyword; if passed, this will return true if the keyword is listed in R^3 (Rules-Requires-Root)
 # - If the optional keyword is omitted or not present in R^3 and R^3 is not 'binary-targets', then returns false
 # - Returns true otherwise (i.e. keyword is in R^3 or R^3 is 'binary-targets')
-{
-	my %rrr;
-	sub should_use_root {
-		my ($keyword) = @_;
-		my $rrr_env = $ENV{'DEB_RULES_REQUIRES_ROOT'} // 'binary-targets';
-		$rrr_env =~ s/^\s++//;
-		$rrr_env =~ s/\s++$//;
-		return 0 if $rrr_env eq 'no';
-		return 1 if $rrr_env eq 'binary-targets';
-		return 0 if not defined($keyword);
+sub should_use_root {
+	my ($keyword) = @_;
+	my $rrr_env = $ENV{'DEB_RULES_REQUIRES_ROOT'} // 'binary-targets';
+	$rrr_env =~ s/^\s++//;
+	$rrr_env =~ s/\s++$//;
+	return 0 if $rrr_env eq 'no';
+	return 1 if $rrr_env eq 'binary-targets';
+	return 0 if not defined($keyword);
 
-		%rrr = map { $_ => 1 } split(' ', $rrr_env) if not %rrr;
-		return 1 if exists($rrr{$keyword});
-		return 0;
-	}
+	state %rrr = map { $_ => 1 } split(' ', $rrr_env);
+	return 1 if exists($rrr{$keyword});
+	return 0;
 }
 
 # Returns the "gain root command" as a list suitable for passing as a part of the command to "doit()"
@@ -2148,16 +2132,10 @@ sub is_udeb {
 	return $package_types{$package} eq 'udeb';
 }
 
-{
-	my %packages_to_process;
-
-	sub process_pkg {
-		my ($package) = @_;
-		if (not %packages_to_process) {
-			%packages_to_process = map { $_ => 1 } @{$dh{DOPACKAGES}};
-		}
-		return $packages_to_process{$package} // 0;
-	}
+sub process_pkg {
+	my ($package) = @_;
+	state %packages_to_process = map { $_ => 1 } @{$dh{DOPACKAGES}};
+	return $packages_to_process{$package} // 0;
 }
 
 # Only useful for dh(1)
@@ -2912,41 +2890,37 @@ sub perl_cross_incdir {
 	return $incdir;
 }
 
-{
-	my %known_packages;
-	sub is_known_package {
-		my ($package) = @_;
-		%known_packages = map { $_ => 1 } getpackages() if not %known_packages;
-		return 1 if exists($known_packages{$package});
-		return 0
-	}
-
-	sub assert_opt_is_known_package {
-		my ($package, $method) = @_;
-		if (not is_known_package($package)) {
-			error("Requested unknown package $package via $method, expected one of: " . join(' ', getpackages()));
-		}
-		return 1;
-	}
+sub is_known_package {
+	my ($package) = @_;
+	state %known_packages = map { $_ => 1 } getpackages();
+	return 1 if exists($known_packages{$package});
+	return 0
 }
 
-{
-	my $_disable_file_seccomp;
-	sub _internal_optional_file_args {
-		if (not defined($_disable_file_seccomp)) {
-			my $consider_disabling_seccomp = 0;
-			if ($ENV{'FAKEROOTKEY'} or ($ENV{'LD_PRELOAD'}//'') =~ m/fakeroot/) {
-				$consider_disabling_seccomp = 1;
-			}
-			if ($consider_disabling_seccomp) {
-				my $has_no_sandbox = (qx_cmd('file', '--help') // '') =~ m/--no-sandbox/;
-				$consider_disabling_seccomp = 0 if not $has_no_sandbox;
-			}
-			$_disable_file_seccomp = $consider_disabling_seccomp;
-		}
-		return ('--no-sandbox') if $_disable_file_seccomp;
-		return;
+sub assert_opt_is_known_package {
+	my ($package, $method) = @_;
+	if (not is_known_package($package)) {
+		error("Requested unknown package $package via $method, expected one of: " . join(' ', getpackages()));
 	}
+	return 1;
+}
+
+
+sub _internal_optional_file_args {
+	state $_disable_file_seccomp;
+	if (not defined($_disable_file_seccomp)) {
+		my $consider_disabling_seccomp = 0;
+		if ($ENV{'FAKEROOTKEY'} or ($ENV{'LD_PRELOAD'} // '') =~ m/fakeroot/) {
+			$consider_disabling_seccomp = 1;
+		}
+		if ($consider_disabling_seccomp) {
+			my $has_no_sandbox = (qx_cmd('file', '--help') // '') =~ m/--no-sandbox/;
+			$consider_disabling_seccomp = 0 if not $has_no_sandbox;
+		}
+		$_disable_file_seccomp = $consider_disabling_seccomp;
+	}
+	return('--no-sandbox') if $_disable_file_seccomp;
+	return;
 }
 
 1
