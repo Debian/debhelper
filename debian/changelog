@@ -22,6 +22,12 @@ debhelper (13.0.1) UNRELEASED; urgency=medium
   * Dh_Lib.pm: Provide HIGHEST_STABLE_COMPAT_LEVEL, which reflects
     the latest stable compat level.  Thanks to Jelmer Vernooĳ
     for the suggestion.
+  * Dh_Lib.pm: Respond to DH_DATAFILES environment variable in
+    addition to DH_AUTOSCRIPTS as a means to find data files.  This
+    is mostly useful for testing purposes or to be "self-hosting".
+    The new DH_DATAFILES is more general than DH_AUTOSCRIPTS and
+    enable us to add new data file sources without investing new
+    environment variables.
 
   [ Translations ]
   * Fix typo in German translation.  (Andreas Bombe)

@@ -34,12 +34,38 @@ my $prefix="/usr";
 # The Makefile changes this during install to match the actual version.
 use constant HIGHEST_STABLE_COMPAT_LEVEL => undef;
 
+# Locations we search for data files by default
+my @DATA_INC_PATH = (
+	"${prefix}/share/debhelper",
+);
+# Enable the use of DH_DATAFILES for testing purposes.
+unshift(@DATA_INC_PATH, split(':', $ENV{'DH_DATAFILES'})) if exists($ENV{'DH_DATAFILES'});
+
 use constant {
 	# Package-Type / extension for dbgsym packages
 	# TODO: Find a way to determine this automatically from the vendor
 	#  - blocked by Dpkg::Vendor having a rather high load time (for debhelper)
 	'DBGSYM_PACKAGE_TYPE' => DEFAULT_PACKAGE_TYPE,
 };
+
+
+# Internal constants used to define limits in variable expansions.
+use constant {
+	# How many expansions are permitted in total.
+	_VAR_SUBST_EXPANSION_COUNT_LIMIT              => 50,
+	# When recursion is enabled, how many times will we expand a pattern
+	# on the same position in the string.
+	_VAR_SUBST_SAME_POSITION_RECURSION_LIMIT      => 20,
+	# Expansions are always allowed to grow up to this length regardless
+	# of original input size (provided it does not trip another limit)
+	_VAR_SUBST_EXPANSION_MIN_SUPPORTED_SIZE_LIMIT => 4096,
+	# Factor input is allowed to grow before it triggers an error
+	# (_VAR_SUBST_EXPANSION_MIN_SUPPORTED_SIZE_LIMIT overrules this for a
+	#  given input if the max size limit computed with this factor is less
+	#  than _VAR_SUBST_EXPANSION_MIN_SUPPORTED_SIZE_LIMIT)
+	_VAR_SUBST_EXPANSION_DYNAMIC_EXPANSION_FACTOR_LIMIT => 3,
+};
+
 
 use Errno qw(ENOENT EXDEV);
 use Exporter qw(import);
@@ -1155,11 +1181,17 @@ sub autoscript {
 		$infile="$ENV{DH_AUTOSCRIPTDIR}/$filename";
 	}
 	else {
-		if (-e "$prefix/share/debhelper/autoscripts/$filename") {
-			$infile="$prefix/share/debhelper/autoscripts/$filename";
+		for my $dir (@DATA_INC_PATH) {
+			my $path = "${dir}/autoscripts/${filename}";
+			if (-e $path) {
+				$infile = $path;
+				last;
+			}
 		}
-		else {
-			error("$prefix/share/debhelper/autoscripts/$filename does not exist");
+		if (not defined($infile)) {
+			my @dirs = map { "$_/autoscripts" } @DATA_INC_PATH;
+			unshift(@dirs, $ENV{DH_AUTOSCRIPTDIR}) if exists($ENV{DH_AUTOSCRIPTDIR});
+			error("Could not find autoscript $filename (search path: " . join(':', @dirs) . ')');
 		}
 	}
 
@@ -1427,7 +1459,9 @@ sub _variable_substitution {
 	my $subst_count = 0;
 	my $expansion_count = 0;
 	my $current_size = length($text);
-	my $expansion_size_limit = 3 * $current_size;
+	my $expansion_size_limit = _VAR_SUBST_EXPANSION_DYNAMIC_EXPANSION_FACTOR_LIMIT * $current_size;
+	$expansion_size_limit = _VAR_SUBST_EXPANSION_MIN_SUPPORTED_SIZE_LIMIT
+		if $expansion_size_limit < _VAR_SUBST_EXPANSION_MIN_SUPPORTED_SIZE_LIMIT;
 	1 while ($text =~ s<
 			\$\{([A-Za-z0-9][-_:0-9A-Za-z]*)\}  # Match ${something} and replace it
 		>[
@@ -1438,11 +1472,11 @@ sub _variable_substitution {
 			if ($pos == $new_pos) {
 				# Safe-guard in case we ever implement recursive expansion
 				error("Error substituting in ${loc} (at position $pos); recursion limit while expanding \${${match}")
-					if (++$subst_count >= 20);
+					if (++$subst_count >= _VAR_SUBST_SAME_POSITION_RECURSION_LIMIT);
 			} else {
 				$subst_count = 0;
 				$pos = $new_pos;
-				if (++$expansion_count >= 50) {
+				if (++$expansion_count >= _VAR_SUBST_EXPANSION_COUNT_LIMIT) {
 					error("Error substituting in ${loc}; substitution limit of ${expansion_count} reached");
 				}
 			}
@@ -1461,7 +1495,7 @@ sub _variable_substitution {
 			# We do not support recursive expansion.
 			$value =~ s/\$/\$\{\}/;
 			$current_size += length($value) - length($match) - 3;
-			if ($current_size > 4096 and $current_size > $expansion_size_limit) {
+			if ($current_size > $expansion_size_limit) {
 				error("Refusing to expand \${${match}} in ${loc} - the original input seems to grow beyond reasonable'
 						 . ' limits!");
 			}
