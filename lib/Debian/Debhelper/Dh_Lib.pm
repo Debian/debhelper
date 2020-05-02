@@ -1464,7 +1464,7 @@ sub _variable_substitution {
 
 			if ($pos == $new_pos) {
 				# Safe-guard in case we ever implement recursive expansion
-				error("Error substituting in ${loc} (at position $pos); recursion limit while expanding \${${match}")
+				error("Error substituting in ${loc} (at position $pos); recursion limit while expanding \${${match}}")
 					if (++$subst_count >= _VAR_SUBST_SAME_POSITION_RECURSION_LIMIT);
 			} else {
 				$subst_count = 0;
@@ -1477,13 +1477,13 @@ sub _variable_substitution {
 				$value = $BUILT_IN_SUBST{$match};
 			} elsif ($match =~ m/^DEB_(?:BUILD|HOST|TARGET)_/) {
 				$value = dpkg_architecture_value($match) //
-					error(qq{Cannot expand "\${${match}}\" in ${loc} as it is not a known dpkg-architecture value});
+					error(qq{Cannot expand "\${${match}}" in ${loc} as it is not a known dpkg-architecture value});
 			} elsif ($match =~ m/^env:(.+)/) {
 				my $env_var = $1;
 				$value = $ENV{$env_var} //
 					error(qq{Cannot expand "\${${match}}" in ${loc} as the ENV variable "${env_var}" is unset});
 			}
-			error("Cannot resolve variable \${$match} in ${loc}")
+			error(qq{Cannot resolve variable "\${$match}" in ${loc}})
 				if not defined($value);
 			# We do not support recursive expansion.
 			$value =~ s/\$/\$\{\}/;
