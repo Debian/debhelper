@@ -1709,7 +1709,6 @@ sub _strip_spaces {
 }
 
 sub _parse_debian_control {
-	my $package="";
 	my $valid_pkg_re = qr{^${PKGNAME_REGEX}$}o;
 	my (%seen, @profiles, $source_section, $cross_target_arch, %field_values,
 		$field_name, %bd_fields, $bd_field_value, %seen_fields, $fd);
