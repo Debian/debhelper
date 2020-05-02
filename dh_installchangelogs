@@ -23,8 +23,7 @@ installing changelogs into package build directories.
 
 An upstream F<changelog> file may be specified as an option. If none
 is specified, B<dh_installchangelogs> may look for files with names
-that seem likely to be changelogs as described in the next paragraphs
-(assuming the package is using compatibility level 7 or above).
+that seem likely to be changelogs as described in the next paragraphs.
 
 In non-native packages, B<dh_installchangelogs> will first look for
 changelog files installed by the upstream build system into F<<
@@ -34,17 +33,16 @@ usr/share/doc/I<package>/changelog >>.  Note that
 B<dh_installchangelogs> does I<not> look into any source directory
 (such as F<debian/tmp>). Otherwise, B<dh_installchangelogs> (at
 compatibility level 7 or any later) will look for changelog files in
-the source directory (e.g. the root or the F<docs> subdirectory).
+the source directory (e.g. the root or the F<docs> subdirectory).  It
+will look for F<changelog>, F<changes> and F<history> optionally with
+common extensions (such as F<.txt>, F<.md> and F<.rst>).
 
-If there is an upstream F<changelog> file, it will be installed as
-F<usr/share/doc/package/changelog> in the package build directory.
-
-If the specified upstream changelog is an F<html> file (determined by file
+If a changelog file is specified and is an F<html> file (determined by file
 extension), it will be installed as F<usr/share/doc/package/changelog.html>
 instead. If the html changelog is converted to plain text, that variant
-can be specified as a second upstream changelog file. When no plain
-text variant is specified, a short F<usr/share/doc/package/changelog>
-is generated, pointing readers at the html changelog file.
+can be specified as a second parameter. When no plain text variant is
+specified, a short F<usr/share/doc/package/changelog> is generated,
+pointing readers at the html changelog file.
 
 =head1 FILES
 
