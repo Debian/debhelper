@@ -22,19 +22,22 @@ BEGIN {
 
 use lib "$ROOT_DIR/lib";
 
-$ENV{PATH} = "$ROOT_DIR:$ENV{PATH}" if $ENV{PATH} !~ m{\Q$ROOT_DIR\E/?:};
-$ENV{PERL5LIB} = join(':', "${ROOT_DIR}/lib", (grep { defined } $ENV{PERL5LIB}))
-    if not $ENV{PERL5LIB} or $ENV{PERL5LIB} !~ m{\Q$ROOT_DIR\E(?:/lib)?/?:};
-$ENV{DH_DATAFILES} = $ROOT_DIR;
-# Nothing in the tests requires root.
-$ENV{DEB_RULES_REQUIRES_ROOT} = 'no';
-# Disable colors for good measure
-$ENV{DH_COLORS} = 'never';
-$ENV{DPKG_COLORS} = 'never';
+# These should be done before Dh_lib is loaded.
+BEGIN {
+    $ENV{PATH} = "$ROOT_DIR:$ENV{PATH}" if $ENV{PATH} !~ m{\Q$ROOT_DIR\E/?:};
+    $ENV{PERL5LIB} = join(':', "${ROOT_DIR}/lib", (grep {defined} $ENV{PERL5LIB}))
+        if not $ENV{PERL5LIB} or $ENV{PERL5LIB} !~ m{\Q$ROOT_DIR\E(?:/lib)?/?:};
+    $ENV{DH_DATAFILES} = "${ROOT_DIR}/t/fixtures:${ROOT_DIR}";
+    # Nothing in the tests requires root.
+    $ENV{DEB_RULES_REQUIRES_ROOT} = 'no';
+    # Disable colors for good measure
+    $ENV{DH_COLORS} = 'never';
+    $ENV{DPKG_COLORS} = 'never';
 
-# Drop DEB_BUILD_PROFILES and DEB_BUILD_OPTIONS so they don't interfere
-delete($ENV{DEB_BUILD_PROFILES});
-delete($ENV{DEB_BUILD_OPTIONS});
+    # Drop DEB_BUILD_PROFILES and DEB_BUILD_OPTIONS so they don't interfere
+    delete($ENV{DEB_BUILD_PROFILES});
+    delete($ENV{DEB_BUILD_OPTIONS});
+};
 
 use Debian::Debhelper::Dh_Lib qw(!dirname);
 
