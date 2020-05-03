@@ -44,12 +44,12 @@ use Debian::Debhelper::Dh_Lib qw(!dirname);
 our @EXPORT = qw(
     each_compat_up_to_and_incl_subtest each_compat_subtest
     each_compat_from_and_above_subtest run_dh_tool
-    uid_0_test_is_ok create_empty_file readlines
+    create_empty_file readlines
     error find_script non_deprecated_compat_levels
     each_compat_from_x_to_and_incl_y_subtest
 );
 
-our ($TEST_DH_COMPAT, $ROOT_OK, $ROOT_CMD);
+our ($TEST_DH_COMPAT);
 
 my $START_DIR = getcwd();
 my $TEST_DIR;
@@ -59,12 +59,6 @@ sub run_dh_tool {
     my $compat = $TEST_DH_COMPAT;
     my $options = ref($cmd[0]) ? shift(@cmd) : {};
     my $pid;
-
-    if ($options->{'needs_root'}) {
-        BAIL_OUT('BROKEN TEST - Attempt to run "needs_root" test when not possible')
-            if not uid_0_test_is_ok();
-        unshift(@cmd, $ROOT_CMD) if defined($ROOT_CMD);
-    }
 
     $pid = fork() // BAIL_OUT("fork failed: $!");
     if (not $pid) {
@@ -91,22 +85,6 @@ sub run_dh_tool {
     waitpid($pid, 0) == $pid or BAIL_OUT("waitpid($pid) failed: $!");
     return 1 if not $?;
     return 0;
-}
-
-sub uid_0_test_is_ok {
-    return $ROOT_OK if defined($ROOT_OK);
-    my $ok = 0;
-    if ($< == 0) {
-        $ok = 1;
-    } else {
-        system('fakeroot true 2>/dev/null');
-        if ($? == 0) {
-            $ROOT_CMD = 'fakeroot';
-            $ok = 1;
-        }
-    }
-    $ROOT_OK = $ok;
-    return $ok;
 }
 
 sub _prepare_test_root {
