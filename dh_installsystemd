@@ -121,7 +121,17 @@ script.
 
 =item B<-r>, B<--no-stop-on-upgrade>, B<--no-restart-on-upgrade>
 
-Do not stop service on upgrade.
+Do not stop service on upgrade. This has the side-effect of not
+restarting the service as a part of the upgrade.
+
+If you want to restart the service with minimal downtime, please use
+B<--restart-after-upgrade> (default in compat 10 or later).  If you want
+the service to be restarted but be stopped during the upgrade, then please
+use B<--no-restart-after-upgrade> (note the "after-upgrade").
+
+Note that the B<--no-restart-on-upgrade> alias is deprecated and will
+be removed in compat 14.  This is to avoid confusion with the
+B<--no-restart-after-upgrade> option.
 
 =item B<--no-start>
 
