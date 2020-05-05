@@ -2451,8 +2451,10 @@ sub setup_buildenv {
 }
 
 sub setup_home_and_xdg_dirs {
-	my $home_dir = generated_file('_source', 'home', 0);
-	my $xdg_rundir = generated_file('_source', 'xdg-runtime-dir', 0);
+	require Cwd;
+	my $cwd = Cwd::getcwd();
+	my $home_dir = join('/', $cwd, generated_file('_source', 'home', 0));
+	my $xdg_rundir = join('/', $cwd, generated_file('_source', 'xdg-runtime-dir', 0));
 	my $creating_rundir = -d $xdg_rundir ? 0 : 1;
 	my @paths = (
 		$home_dir,
