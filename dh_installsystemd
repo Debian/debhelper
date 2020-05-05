@@ -162,7 +162,8 @@ maintainer scripts.
 
 =cut
 
-$dh{RESTART_AFTER_UPGRADE} = 1;
+$dh{RESTART_AFTER_UPGRADE} = '';
+$dh{NO_START} = '';
 
 init(options => {
 	"no-enable" => \$dh{NO_ENABLE},
@@ -173,6 +174,10 @@ init(options => {
 	"R|restart-after-upgrade!" => \$dh{RESTART_AFTER_UPGRADE},
 	"no-also" => \$dh{NO_ALSO}, # undocumented option
 });
+
+if ($dh{RESTART_AFTER_UPGRADE} eq '') {
+	$dh{RESTART_AFTER_UPGRADE} = 1 if not defined($dh{R_FLAG}) and $dh{NO_START} eq '';
+}
 
 sub quote {
 	# Add single quotes around the argument.

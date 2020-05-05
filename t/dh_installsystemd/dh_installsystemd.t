@@ -77,14 +77,14 @@ each_compat_subtest {
 	ok(-e 'debian/foo/lib/systemd/system/foo.service');
 	ok(find_script('foo', 'postinst'));
 	unit_is_enabled('foo', 'foo', 1);
-	unit_is_started('foo', 'foo', 0, 1);
+	unit_is_started('foo', 'foo', 0, 0);
 	ok(run_dh_tool('dh_clean'));
 
 	ok(run_dh_tool('dh_installsystemd', '--no-start', 'foo.service'));
 	ok(-e 'debian/foo/lib/systemd/system/foo.service');
 	ok(find_script('foo', 'postinst'));
 	unit_is_enabled('foo', 'foo', 1);
-	unit_is_started('foo', 'foo', 0, 1);
+	unit_is_started('foo', 'foo', 0, 0);
 	ok(run_dh_tool('dh_clean'));
 };
 
@@ -127,9 +127,9 @@ each_compat_subtest {
 	ok(-e 'debian/foo/lib/systemd/system/foo.service');
 	ok(find_script('foo', 'postinst'));
 	unit_is_enabled('foo', 'foo', 1);
-	unit_is_started('foo', 'foo', 0, 1); # present units are stopped on remove even if no start
+	unit_is_started('foo', 'foo', 0, 0);
 	unit_is_enabled('foo', 'foo2', 1);
-	unit_is_started('foo', 'foo2', 0, 1);
+	unit_is_started('foo', 'foo2', 0, 0);
 	ok(run_dh_tool('dh_clean'));
 
 	make_path('debian/foo/lib/systemd/system/');
@@ -139,7 +139,7 @@ each_compat_subtest {
 	ok(-e 'debian/foo/lib/systemd/system/foo.service');
 	ok(find_script('foo', 'postinst'));
 	unit_is_enabled('foo', 'foo', 1);
-	unit_is_started('foo', 'foo', 0, 1);
+	unit_is_started('foo', 'foo', 0, 0);
 	unit_is_enabled('foo', 'foo2', 1);
 	unit_is_started('foo', 'foo2', 1);
 	ok(run_dh_tool('dh_clean'));

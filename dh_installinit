@@ -130,7 +130,7 @@ the service to be restarted but be stopped during the upgrade, then please
 use B<--no-restart-after-upgrade> (note the "after-upgrade").
 
 Note that the B<--no-restart-on-upgrade> alias is deprecated and will
-be removed in compat 14.  This is to avoid confusion with the
+be removed in compat 12.  This is to avoid confusion with the
 B<--no-restart-after-upgrade> option.  The B<--no-stop-on-upgrade>
 variant was introduced in debhelper 10.2 (included in Debian stretch).
 
@@ -210,7 +210,8 @@ instances of the same text to be added to maintainer scripts.
 
 =cut
 
-$dh{RESTART_AFTER_UPGRADE} = 1 if not compat(9);
+$dh{RESTART_AFTER_UPGRADE} = '';
+$dh{NO_START} = '';
 
 init(options => {
 	"r" => \$dh{R_FLAG},
@@ -227,6 +228,10 @@ init(options => {
 	"remove-d" => \$dh{D_FLAG},
 	"no-enable" => \$dh{NO_ENABLE},
 });
+
+if ($dh{RESTART_AFTER_UPGRADE} eq '') {
+	$dh{RESTART_AFTER_UPGRADE} = 1 if not defined($dh{R_FLAG}) and $dh{NO_START} eq '';
+}
 
 # PROMISE: DH NOOP WITHOUT service tmpfile default upstart init init.d tmp(usr/lib/tmpfiles.d) tmp(etc/tmpfiles.d) cli-options(--init-script|-d|--remove-d|-o|--only-scripts)
 
