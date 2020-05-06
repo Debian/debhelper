@@ -108,6 +108,111 @@ Note that L</Completely empty targets> will be omitted in the listing above.
 This makes it a bit harder to spot as you are looking for the omission of
 a command name.  But otherwise, the principle remains the same.
 
+=head2 Caveats with hook targets and makefile conditionals
+
+If you choose to wrap a hook target in makefile conditionals, please
+be aware that B<dh> computes all the hook targets a head of time and
+caches the result for that run.  Furthermore, the conditionals will be
+invoked again when B<dh> calls the hook target later and will assume
+the answer did not change.
+
+The parsing and caching I<often> happens before B<dh> knows whether it
+will build arch:any (-a) or/and arch:all (-i) packages, which can
+produce confusing results - especially when L<dh_listpackages(1)> is
+part of the conditional.
+
+Most of the problems can be avoided by making the hook target
+unconditional and then have the "body" be partially or completely
+conditional.  As an example:
+
+      # SIMPLE: It is well-defined what happens.  The hook target
+      # is always considered.  The "maybe run this" bit is
+      # conditional but dh_foo is definitely skipped.
+      #
+      # Note: The conditional is evaluated "twice" where its
+      # influences what happens.  Once when dh check which hook
+      # targets exist and once when the override_dh_foo hook target
+      # is run.  If *either* times return false, "maybe run this"
+      # is skipped.
+      override_dh_foo:
+      ifneq (...)
+          maybe run this
+      endif
+
+      # SIMPLE: This is also well-defined.  The hook target is always
+      # run and dh_bar is skipped.  The "maybe run this" bit is
+      # conditional as one might expect.
+      #
+      # Note: The conditional is still evaluated multiple times (in
+      # different process each time).  However, only the evaluation
+      # that happens when the hook target is run influences what
+      # happens.
+      override_dh_bar:
+          : # Dummy command to force the target to always be run
+      ifneq (...)
+          maybe run this
+      endif
+
+
+      # COMPLICATED: This case can be non-trivial and have sharp edges.
+      # Use at your own peril if dh_listpackages in the conditional.
+      #
+      # Here, either dh_baz is run normally OR "maybe run this" is run
+      # instead.
+      #
+      # And it gets even more complicated to reason about if dh needs to
+      # recurse into debian/rules because you have an "explicit"
+      # standard target (e.g. a "build-arch:" target separate from "%:").
+      ifneq (...)
+      override_dh_baz:
+          maybe run this
+      endif
+
+These recipes are also relevant for conditional dependency targets,
+which are often seen in a variant of the following example:
+
+      COND_TASKS =
+      ifneq (...)
+      COND_TASKS += maybe-run-this
+      endif
+      ...
+
+      maybe-run-this:
+          ...
+
+      # SIMPLE: It is well-defined what happens.  Either the
+      # $(COND_TASKS) are skipped or run.
+      #
+      # Note: The conditional is evaluated "twice" where its
+      # influences what happens.  Once when dh check which hook
+      # targets exist and once when the override_dh_foo hook target
+      # is run.  If *either* times return false, $(COND_TASKS)
+      # is skipped.
+      override_dh_foo: $(COND_TASKS)
+
+
+      # SIMPLE: This is also well-defined.  The hook target is always
+      # run and dh_bar is skipped.  The $(COND_TASKS) bit is
+      # conditional as one might expect.
+      #
+      # Note: The conditional is still evaluated multiple times (in
+      # different process each time).  However, only the evaluation
+      # that happens when the hook target is run influences what
+      # happens.
+      override_dh_bar: $(COND_TASKS)
+          : # Dummy command to force the target to always be run
+
+      # COMPLICATED: This case can be non-trivial and have sharp edges.
+      # Use at your own peril if dh_listpackages in the conditional.
+      #
+      ifneq (...)
+      override_dh_baz: $(COND_TASKS)
+      endif
+
+
+When in doubt, pick the relevant B<SIMPLE> case in the examples above
+that match your need.
+
 =head1 OPTIONS
 
 =over 4
