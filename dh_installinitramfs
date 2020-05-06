@@ -22,10 +22,10 @@ B<dh_installinitramfs> is a debhelper program that is responsible for
 installing Debian package provided initramfs hooks.
 
 If B<dh_installinitramfs> installs or detects one or more initramfs
-hooks in the package, then it also automatically generates the
-F<postinst> and F<postrm> commands needed to interface with the Debian
-initramfs system.  These commands are inserted into the maintainer
-scripts by L<dh_installdeb(1)>.
+hooks in the package, then it also automatically generates the noawait
+trigger B<update-initframfs> command needed to interface with the
+Debian initramfs system.  This trigger is inserted into the
+packaging by L<dh_installdeb(1)>.
 
 =head1 FILES
 
@@ -46,10 +46,14 @@ information about initramfs hooks.
 
 =item B<-n>, B<--no-scripts>
 
-Do not add the "update-initramfs" trigger even if it seems like the package
+Do not add the B<update-initramfs> trigger even if it seems like the package
 might need it.  The option is called B<--no-scripts> for historical
 reasons as B<dh_installinitramfs> would previously generate maintainer
 scripts that called B<update-initramfs -u>.
+
+Use this option, if you need to interface with the B<update-initramfs>
+system that is not satisfied by the noawait trigger (e.g. because you need
+the extra guarantees and head-aches of a await trigger).
 
 =back
 
@@ -57,7 +61,7 @@ scripts that called B<update-initramfs -u>.
 
 Note that this command is not idempotent. L<dh_prep(1)> should be called
 between invocations of this command. Otherwise, it may cause multiple
-instances of the same text to be added to maintainer scripts.
+instances of the same text to be added to triggers file.
 
 =cut
 
