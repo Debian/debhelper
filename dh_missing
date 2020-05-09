@@ -24,8 +24,9 @@ directory were not installed to somewhere, it will warn on stderr
 about that (B<--list-missing>) or fail (B<--fail-missing>).
 
 Please note that in compat 11 and earlier without either of these
-options, B<dh_missing> will silently do nothing.  From compat 12 on,
-B<--list-missing> is the default.
+options, B<dh_missing> will silently do nothing.  In compat 12,
+B<--list-missing> is the default  In compat 13 and later,
+B<--fail-missing> is the default.
 
 This may be useful if you have a large package and want to make sure that
 you don't miss installing newly added files in new upstream releases.
@@ -69,12 +70,14 @@ exclusion is used to ignore some files in the directory.  In either
 case, this will make B<dh_missing> silently assume the excluded files
 have been handled.
 
-This is the default in compat 12 and later.
+This is the default in compat 12.
 
 =item B<--fail-missing>
 
 This option is like B<--list-missing>, except if a file was missed, it will
 not only list the missing files, but also fail with a nonzero exit code.
+
+This is the default in compat 13 and later.
 
 =back
 
