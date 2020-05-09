@@ -18,18 +18,17 @@ B<dh_clean> [S<I<debhelper options>>] [B<-k>] [B<-d>] [B<-X>I<item>] [S<I<path> 
 
 =head1 DESCRIPTION
 
-B<dh_clean> is a debhelper program that is responsible for cleaning up after a
-package is built. It removes the package build directories, and removes some
-other files including F<debian/files>, and any detritus left behind by other
-debhelper commands. It also removes common files that should not appear in a
-Debian diff:
+B<dh_clean> is a debhelper program that is responsible for cleaning up.  It should
+be the last step of the B<clean> target and other debhelper commands generally
+assume that B<dh_clean> will clean up after them.
+
+It removes the package build directories, and removes some other files including
+F<debian/files>, and any detritus left behind by other debhelper commands. It
+also removes common files that should not appear in a Debian diff:
   #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS .deps/* *.P *-stamp
 
 It does not run "make clean" to clean up after the build process. Use
 L<dh_auto_clean(1)> to do things like that.
-
-B<dh_clean> should be the last debhelper command run in the
-B<clean> target in F<debian/rules>.
 
 =head1 FILES
 
