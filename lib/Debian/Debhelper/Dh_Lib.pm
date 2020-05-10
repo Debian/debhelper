@@ -124,6 +124,7 @@ qw(
 	package_multiarch
 	package_section
 	package_arch
+	package_type
 	process_pkg
 	compute_doc_main_package
 	isnative
@@ -2163,16 +2164,23 @@ sub package_cross_type {
 	return $package_cross_type{$package} // 'host';
 }
 
+sub package_type {
+	my ($package) = @_;
+
+	if (! exists $package_types{$package}) {
+		warning "package $package is not in control info";
+		return DEFAULT_PACKAGE_TYPE;
+	}
+	return $package_types{$package};
+}
+
 # Return true if a given package is really a udeb.
 sub is_udeb {
 	my $package=shift;
 	
-	if (! exists $package_types{$package}) {
-		warning "package $package is not in control info";
-		return 0;
-	}
-	return $package_types{$package} eq 'udeb';
+	return package_type($package) eq 'udeb';
 }
+
 
 sub process_pkg {
 	my ($package) = @_;
