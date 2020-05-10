@@ -227,6 +227,7 @@ our $PKGVERSION_REGEX = qr/
                  (?: - [0-9A-Za-z.+:~]+ )*   # Optional debian revision (+ upstreams versions with hyphens)
                           /xoa;
 our $MAINTSCRIPT_TOKEN_REGEX = qr/[A-Za-z0-9_.+]+/o;
+our $TOOL_NAME = basename($0);
 
 # From Policy 5.1:
 #
@@ -374,7 +375,7 @@ sub END {
 	# expect.
 	return if not -f 'debian/control';
 	if (compat(9, 1) || $ENV{DH_INTERNAL_OVERRIDE}) {
-		write_log(basename($0), @{$dh{DOPACKAGES}});
+		write_log($TOOL_NAME, @{$dh{DOPACKAGES}});
 	}
 }
 
@@ -849,7 +850,7 @@ sub error {
 	my ($message) = @_;
 	# ensure the error code is well defined.
 	$! = 255;
-	die(_color(basename($0), 'bold') . ': ' . _color('error', 'bold red') . ": $message\n");
+	die(_color($TOOL_NAME, 'bold') . ': ' . _color('error', 'bold red') . ": $message\n");
 }
 
 # Output a warning.
@@ -857,7 +858,7 @@ sub warning {
 	my ($message) = @_;
 	$message //= '';
 
-	print STDERR _color(basename($0), 'bold') . ': ' . _color('warning', 'bold yellow') . ": $message\n";
+	print STDERR _color($TOOL_NAME, 'bold') . ': ' . _color('warning', 'bold yellow') . ": $message\n";
 }
 
 # Returns the basename of the argument passed to it.
@@ -1237,7 +1238,7 @@ sub autoscript {
 			verbose_print("[META] Prepend autosnippet \"$filename\" to $script [${outfile}.new]");
 			if (not $dh{NO_ACT}) {
 				open(my $out_fd, '>', "${outfile}.new") or error("open(${outfile}.new): $!");
-				print {$out_fd} '# Automatically added by ' . basename($0) . "/${tool_version}\n";
+				print {$out_fd} '# Automatically added by ' . $TOOL_NAME . "/${tool_version}\n";
 				autoscript_sed($sed, $infile, undef, $out_fd);
 				print {$out_fd} "# End automatically added section\n";
 				open(my $in_fd, '<', $outfile) or error("open($outfile): $!");
@@ -1248,7 +1249,7 @@ sub autoscript {
 				close($out_fd) or error("close(${outfile}.new): $!");
 			}
 		} else {
-			complex_doit("echo \"# Automatically added by ".basename($0)."/${tool_version}\"> $outfile.new");
+			complex_doit("echo \"# Automatically added by ".$TOOL_NAME."/${tool_version}\"> $outfile.new");
 			autoscript_sed($sed, $infile, "$outfile.new");
 			complex_doit("echo '# End automatically added section' >> $outfile.new");
 			complex_doit("cat $outfile >> $outfile.new");
@@ -1258,13 +1259,13 @@ sub autoscript {
 		verbose_print("[META] Append autosnippet \"$filename\" to $script [${outfile}]");
 		if (not $dh{NO_ACT}) {
 			open(my $out_fd, '>>', $outfile) or error("open(${outfile}): $!");
-			print {$out_fd} '# Automatically added by ' . basename($0) . "/${tool_version}\n";
+			print {$out_fd} '# Automatically added by ' . $TOOL_NAME . "/${tool_version}\n";
 			autoscript_sed($sed, $infile, undef, $out_fd);
 			print {$out_fd} "# End automatically added section\n";
 			close($out_fd) or error("close(${outfile}): $!");
 		}
 	} else {
-		complex_doit("echo \"# Automatically added by ".basename($0)."/${tool_version}\">> $outfile");
+		complex_doit("echo \"# Automatically added by ".$TOOL_NAME."/${tool_version}\">> $outfile");
 		autoscript_sed($sed, $infile, $outfile);
 		complex_doit("echo '# End automatically added section' >> $outfile");
 	}
@@ -1333,7 +1334,7 @@ sub autoscript_sed {
                               }x;
 			print {$ofd} $line;
 		}
-		print {$ofd} '# Triggers added by ' . basename($0) . "/${tool_version}\n";
+		print {$ofd} '# Triggers added by ' . $TOOL_NAME . "/${tool_version}\n";
 		print {$ofd} "${trigger_type} ${trigger_target}\n";
 		close($ofd) or error("closing ${triggers_file}.new failed: $!");
 		close($ifd);
@@ -2812,7 +2813,7 @@ sub log_installed_files {
 
 	return if $dh{NO_ACT};
 
-	my $log = generated_file($package, 'installed-by-' . basename($0));
+	my $log = generated_file($package, 'installed-by-' . $TOOL_NAME);
 	open(my $fh, '>>', $log) or error("open $log: $!");
 	for my $src (@patterns) {
 		print $fh "$src\n";
