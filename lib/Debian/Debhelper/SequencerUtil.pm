@@ -412,6 +412,11 @@ sub compute_selected_addons {
 	};
 
 	for my $request (@addon_requests) {
+		if ($request =~ m/^[+-]root[-_]sequence$/) {
+			error("Invalid request to skip the sequence \"root-sequence\": It cannot be disabled")
+				if $request =~ m/^-/;
+			error("Invalid request to load the sequence \"root-sequence\": Do not reference it directly");
+		}
 		if ($request =~ s/^[+]//) {
 			$flush_disable_cache->() if %disabled_addons;
 			push(@enabled_addons, $request) if not $enabled{$request}++;

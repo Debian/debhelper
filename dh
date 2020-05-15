@@ -549,6 +549,7 @@ sub list_addons {
 				my $name = basename($module_path);
 				$name =~ s/\.pm$//;
 				$name =~ s/_/-/g;
+				next if $name eq 'root-sequence';
 				$addons{$name} = 1;
 			}
 		}
