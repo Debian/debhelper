@@ -81,7 +81,7 @@ sub sequence_type {
 	my ($sequence_name) = @_;
 	if ($sequence_name =~ m/-indep$/) {
 		return 'indep';
-	} elsif ($sequence_name =~ m/-arch/) {
+	} elsif ($sequence_name =~ m/-arch$/) {
 		return 'arch';
 	}
 	return 'both';
