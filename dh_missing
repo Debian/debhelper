@@ -6,7 +6,7 @@ dh_missing - check for missing files
 
 =cut
 
-use strict;
+use v5.24;
 use warnings;
 use Debian::Debhelper::Dh_Lib;
 
@@ -89,7 +89,7 @@ init(options => {
 	"sourcedir=s" => \$dh{SOURCEDIR},
 });
 
-my (@installed, %helpers);
+my (@installed, %helpers, %helpers_basename);
 
 my $srcdir = '.';
 if (defined($dh{SOURCEDIR})) {
@@ -194,7 +194,37 @@ File::Find::find(sub {
 	}
 }, $srcdir);
 if (@missing) {
-	warning "$_ exists in $srcdir but is not installed to anywhere" foreach @missing;
+	my $had_related_files;
+	my %seen_basename = map { basename($_) => $_ } @installed;
+	for my $file (@missing) {
+		my $basename = basename($file);
+		if (exists($seen_basename{$basename})) {
+			my $alt_source = $seen_basename{$basename};
+			$had_related_files //= [$file, $alt_source];
+			warning("$file exists in $srcdir but is not installed to anywhere (related file: \"$alt_source\")");
+		} else {
+			warning("$file exists in $srcdir but is not installed to anywhere ");
+		}
+	}
+	if ($had_related_files) {
+		my ($missing, $alt_source) = $had_related_files->@*;
+		nonquiet_print();
+		nonquiet_print('Some of the files had a file that looked similar to a missing counter part. Perhaps');
+		nonquiet_print('one of the debhelper tools should installed the missing file instead of its related');
+		nonquiet_print('file assuming the content is identical.');
+		nonquiet_print();
+		nonquiet_print('As an example, perhaps you want to replace:');
+		nonquiet_print(" * ${alt_source}");
+		nonquiet_print('with:');
+		nonquiet_print(" * ${missing}");
+		nonquiet_print('in a file in debian/ or as argument to one of the dh_* tools called from debian/rules.');
+		nonquiet_print('(Note it is possible the paths are not used verbatim but instead directories ');
+		nonquiet_print('containing or globs matching them are used instead)');
+		nonquiet_print();
+		nonquiet_print('Alternatively, add the missing file to debian/not-installed if it cannot and should not');
+		nonquiet_print('be used.');
+		nonquiet_print();
+	}
 	nonquiet_print("The following debhelper tools have reported what they installed (with files per package)");
 	for my $helper (sort(keys(%helpers))) {
 		my $pkg_info = $helpers{$helper};
@@ -205,7 +235,7 @@ if (@missing) {
 		}
 		nonquiet_print(" * ${helper}: " . join(', ', @results));
 	}
-	nonquiet_print("If the missing files are installed by another tool, please file a bug against it.");
+	nonquiet_print('If the missing files are installed by another tool, please file a bug against it.');
 	nonquiet_print('When filing the report, if the tool is not part of debhelper itself, please reference the');
 	nonquiet_print('"Logging helpers and dh_missing" section from the "PROGRAMMING" guide for debhelper (10.6.3+).');
 	nonquiet_print('  (in the debhelper package: /usr/share/doc/debhelper/PROGRAMMING.gz)');
