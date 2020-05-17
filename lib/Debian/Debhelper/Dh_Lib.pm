@@ -791,7 +791,11 @@ sub nonquiet_print {
 	my $message=shift;
 
 	if (!$dh{QUIET}) {
-		print "\t$message\n";
+		if (defined($message)) {
+			print "\t$message\n";
+		} else {
+			print "\n";
+		}
 	}
 }
 
