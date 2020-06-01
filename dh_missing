@@ -196,6 +196,8 @@ File::Find::find(sub {
 if (@missing) {
 	my $had_related_files;
 	my %seen_basename = map { basename($_) => $_ } @installed;
+	my $multiarch = dpkg_architecture_value("DEB_HOST_MULTIARCH");
+	my $seen_ma_value = 0;
 	for my $file (@missing) {
 		my $basename = basename($file);
 		if (exists($seen_basename{$basename})) {
@@ -205,6 +207,7 @@ if (@missing) {
 		} else {
 			warning("$file exists in $srcdir but is not installed to anywhere ");
 		}
+		$seen_ma_value = 1 if index($file, $multiarch) > -1;
 	}
 	if ($had_related_files) {
 		my ($missing, $alt_source) = $had_related_files->@*;
@@ -241,6 +244,12 @@ if (@missing) {
 	nonquiet_print('  (in the debhelper package: /usr/share/doc/debhelper/PROGRAMMING.gz)');
 	nonquiet_print("Be sure to test with dpkg-buildpackage -A/-B as the results may vary when only a subset is built");
 	nonquiet_print("For a short-term work-around: Add the files to debian/not-installed");
+	if ($seen_ma_value) {
+		nonquiet_print();
+		nonquiet_print("Remember to be careful with paths containing \"${multiarch}\", where you might need to");
+		nonquiet_print("use a wildcard or (assuming compat 13+) e.g. \${DEB_HOST_MULTIARCH} in debian/not-installed");
+		nonquiet_print("to ensure it works on all architectures (see #961104).");
+	}
 	if ($dh{FAIL_MISSING}) {
 		error("missing files, aborting");
 	}
