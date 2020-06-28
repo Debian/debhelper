@@ -281,9 +281,31 @@ sub buildsystems_do {
 
 	my $buildsystem = load_buildsystem($opt_buildsys, $step);
 	if (defined $buildsystem) {
-		$buildsystem->pre_building_step($step);
-		$buildsystem->$step(@_, @{$dh{U_PARAMS}});
-		$buildsystem->post_building_step($step);
+		my ($xdg_runtime_dir, $err, $ref);
+		local $SIG{'INT'} = sub { $ref = 'INT'; die(\$ref); };
+		local $SIG{'TERM'} = sub { $ref = 'TERM'; die(\$ref); };
+		if ($step eq 'test' and not compat(12)) {
+			require File::Temp;
+			$xdg_runtime_dir = File::Temp->newdir('dh-xdg-rundir-XXXXXXXX',
+				TMPDIR  => 1,
+				CLEANUP => 1,
+			);
+			$ENV{'XDG_RUNTIME_DIR'} = $xdg_runtime_dir->dirname;
+		}
+		eval {
+			$buildsystem->pre_building_step($step);
+			$buildsystem->$step(@_, @{$dh{U_PARAMS}});
+			$buildsystem->post_building_step($step);
+		};
+		$err = $@;
+		doit('rm', '-fr', '--', $xdg_runtime_dir) if $xdg_runtime_dir;
+		if ($err) {
+			my $sig;
+			die($err) if $err ne \$ref;
+			$sig = $ref;
+			delete($SIG{$sig});
+			kill($sig => $$);
+		}
 	}
 	return 0;
 }

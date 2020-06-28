@@ -2467,11 +2467,8 @@ sub setup_home_and_xdg_dirs {
 	require Cwd;
 	my $cwd = Cwd::getcwd();
 	my $home_dir = join('/', $cwd, generated_file('_source', 'home', 0));
-	my $xdg_rundir = join('/', $cwd, generated_file('_source', 'xdg-runtime-dir', 0));
-	my $creating_rundir = -d $xdg_rundir ? 0 : 1;
 	my @paths = (
 		$home_dir,
-		$xdg_rundir,
 	);
 	my @clear_env = qw(
 		XDG_CACHE_HOME
@@ -2479,16 +2476,13 @@ sub setup_home_and_xdg_dirs {
 		XDG_CONFIG_HOME
 		XDG_DATA_HOME
 		XDG_DATA_DIRS
+		XDG_RUNTIME_DIR
 	);
 	install_dir(@paths);
-	if ($creating_rundir) {
-		chmod(0700, $xdg_rundir) == 1 or warning("chmod(0700, \"$xdg_rundir\") failed: $! (ignoring)");
-	}
 	for my $envname (@clear_env) {
 		delete($ENV{$envname});
 	}
 	$ENV{'HOME'} = $home_dir;
-	$ENV{'XDG_RUNTIME_DIR'} = $xdg_rundir;
 	return;
 }
 
