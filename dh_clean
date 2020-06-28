@@ -120,7 +120,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 if (not $dh{D_FLAG}) {
 	# Restore all files in our bucket (before we delete said bucket)
-	restore_all_files();
+	restore_all_files(1);
 
 	# Remove internal state data
 	doit('rm', '-rf', 'debian/.debhelper/');

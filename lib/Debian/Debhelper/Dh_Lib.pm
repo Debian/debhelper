@@ -2623,6 +2623,7 @@ sub restore_file_on_clean {
 }
 
 sub restore_all_files {
+	my ($clear_index) = @_;
 	my $bucket_index = 'debian/.debhelper/bucket/index';
 	my $bucket_dir = 'debian/.debhelper/bucket/files';
 
@@ -2644,6 +2645,7 @@ sub restore_all_files {
 		rename_path("${bucket_file}.tmp", $stored_file);
 	}
 	close($fd);
+	rm_files($bucket_index) if $clear_index;
 	return;
 }
 
