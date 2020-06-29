@@ -8,7 +8,7 @@ package Debian::Debhelper::Buildsystem::cmake;
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(%dh compat dpkg_architecture_value error is_cross_compiling);
+use Debian::Debhelper::Dh_Lib qw(%dh basename compat dpkg_architecture_value error is_cross_compiling);
 use parent qw(Debian::Debhelper::Buildsystem);
 
 my @STANDARD_CMAKE_FLAGS = qw(
@@ -133,6 +133,23 @@ sub configure {
 	if ($ENV{CPPFLAGS} && ! compat(8)) {
 		$ENV{CFLAGS}   .= ' ' . $ENV{CPPFLAGS};
 		$ENV{CXXFLAGS} .= ' ' . $ENV{CPPFLAGS};
+	}
+
+	if (my $raw_value = $ENV{"DH_INTERNAL_RB_TEST_BUG962474"}) {
+		# Bug#962474; let the reproducible people fiddle with cmake flags as they like
+		my $me = Debian::Debhelper::Dh_Lib::_color(basename($0), 'bold');
+		my $altered = Debian::Debhelper::Dh_Lib::_color('command-altered', 'yellow');
+		print "${me}: ${altered}: Injecting the following cmake flags for reproducibility testing (#962474)\n";
+		for my $var (split(' ', $raw_value)) {
+			my $value = 'ON';
+			if ($var =~ m/^([^=]++)=(.++)$/) {
+				$var = $1;
+				$value = $2;
+			}
+			print "${me}: ${altered}:  * Adding -D${var}=${value}\n";
+			push(@flags, "-D${var}=${value}");
+		}
+		print "${me}: ${altered}: End injection (this feature will disappear when testing is over)\n";
 	}
 
 	$this->mkdir_builddir();
