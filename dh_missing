@@ -243,7 +243,8 @@ if (@missing) {
 	nonquiet_print('"Logging helpers and dh_missing" section from the "PROGRAMMING" guide for debhelper (10.6.3+).');
 	nonquiet_print('  (in the debhelper package: /usr/share/doc/debhelper/PROGRAMMING.gz)');
 	nonquiet_print("Be sure to test with dpkg-buildpackage -A/-B as the results may vary when only a subset is built");
-	nonquiet_print("For a short-term work-around: Add the files to debian/not-installed");
+	nonquiet_print("If the omission is intentional or no other helper can take care of this consider adding the");
+	nonquiet_print("paths to debian/not-installed.");
 	if ($seen_ma_value) {
 		nonquiet_print();
 		nonquiet_print("Remember to be careful with paths containing \"${multiarch}\", where you might need to");
