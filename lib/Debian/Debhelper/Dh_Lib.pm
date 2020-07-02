@@ -47,6 +47,9 @@ use constant {
 	# TODO: Find a way to determine this automatically from the vendor
 	#  - blocked by Dpkg::Vendor having a rather high load time (for debhelper)
 	'DBGSYM_PACKAGE_TYPE' => DEFAULT_PACKAGE_TYPE,
+	# Lowest compat level supported that is not scheduled for removal.
+	# - Set to MIN_COMPAT_LEVEL when there are no pending compat removals.
+	'MIN_COMPAT_LEVEL_NOT_SCHEDULED_FOR_REMOVAL' => 7,
 };
 
 
@@ -872,6 +875,7 @@ sub dirname {
 # is less than or equal to that number.
 my $compat_from_bd;
 {
+	my $check_pending_removals = get_buildoption('dherroron', '') eq 'obsolete-compat-levels' ? 1 : 0;
 	my $warned_compat = $ENV{DH_INTERNAL_TESTSUITE_SILENT_WARNINGS} ? 1 : 0;
 	my $c;
 
@@ -929,6 +933,11 @@ my $compat_from_bd;
 		if (not $nowarn) {
 			if ($c < MIN_COMPAT_LEVEL) {
 				error("Compatibility levels before ${\MIN_COMPAT_LEVEL} are no longer supported (level $c requested)");
+			}
+
+			if ($check_pending_removals and $c < MIN_COMPAT_LEVEL_NOT_SCHEDULED_FOR_REMOVAL) {
+				my $v = MIN_COMPAT_LEVEL_NOT_SCHEDULED_FOR_REMOVAL;
+				error("Compatibility levels before ${v} are scheduled for removal and DH_COMPAT_ERROR_ON_PENDING_REMOVAL was set (level $c requested)");
 			}
 
 			if ($c < LOWEST_NON_DEPRECATED_COMPAT_LEVEL && ! $warned_compat) {
@@ -2517,20 +2526,25 @@ sub set_buildflags {
 
 # Gets a DEB_BUILD_OPTIONS option, if set.
 sub get_buildoption {
-	my $wanted=shift;
+	my ($wanted, $default) = @_;
 
-	return undef unless exists $ENV{DEB_BUILD_OPTIONS};
+	return $default if not exists($ENV{DEB_BUILD_OPTIONS});
 
 	foreach my $opt (split(/\s+/, $ENV{DEB_BUILD_OPTIONS})) {
 		# currently parallel= is the only one with a parameter
 		if ($opt =~ /^parallel=(-?\d+)$/ && $wanted eq 'parallel') {
 			return $1;
-		}
-		elsif ($opt eq $wanted) {
+		} elsif ($opt =~ m/^dherroron=(\S*)$/ && $wanted eq 'dherroron') {
+			my $value = $1;
+			if ($value ne 'obsolete-compat-levels') {
+				warning("Unknown value \"${value}\" as parameter for \"dherrron\" seen in DEB_BUILD_OPTIONS");
+			}
+			return $value;
+		} elsif ($opt eq $wanted) {
 			return 1;
 		}
 	}
-	return undef;
+	return $default;
 }
 
 # Returns true if DEB_BUILD_PROFILES lists the given profile.

@@ -1355,11 +1355,13 @@ F<preinst>, F<postrm>, F<prerm>, and F<config> scripts, etc.
 
 =head1 ENVIRONMENT
 
-The following environment variables can influence the behavior of debhelper.
+This section describes some of the environment variables that influences
+the behaviour of debhelper or which debhelper interacts with.
+
 It is important to note that these must be actual environment variables in
-order to function properly (not simply F<Makefile> variables). To specify
-them properly in F<debian/rules>, be sure to "B<export>" them. For example,
-"B<export DH_VERBOSE>".
+order to affect the behaviour of debhelper (not simply F<Makefile> variables).
+To specify them properly in F<debian/rules>, be sure to "B<export>" them. For
+example, "B<export DH_VERBOSE>".
 
 =over 4
 
@@ -1467,7 +1469,121 @@ The directories will be created as empty directories but they will be reused
 between calls to B<dh_auto_*>.  Any content will persist until explicitly
 deleted or B<dh_clean>.
 
+=item B<DEB_BUILD_OPTIONS>
+
+Please see L</Supported flags in DEB_BUILD_OPTIONS> for this environment
+variable.
+
+Please note that this variable should I<not> be altered by package maintainers
+inside F<debian/rules> to change the behaviour of debhelper.  Instead, where
+the package maintainer need these features, they should look disabling the
+relevant feature directly (e.g. by overriding the concrete tools).
+
+=item B<DEB_MAINT_BUILD_OPTIONS>
+
+This is a dpkg specific environment variable (see e.g. L<dpkg-buildflags(1)>).
+The debhelper tool suite silently ignores it.
+
+It is documented here because it has a similar name to B<DEB_BUILD_OPTIONS>,
+which make some people mistakenly assume that debhelper will also react to this
+variable.
+
 =back
+
+=head2 Supported flags in DEB_BUILD_OPTIONS
+
+The debhelper tool suite reacts to the following flags in B<DEB_BUILD_OPTIONS>.
+
+=over 4
+
+=item B<dherroron=obsolete-compat-levels>
+
+I<This is a debhelper specific value.>
+
+When B<dherroron> is present and set to B<obsolete-compat-levels>, then
+debhelper tools will promote deprecation warnings for usage of old soon
+to be removed compat levels into errors.
+
+This is useful for automated checking for code relying on deprecated
+compat levels that is scheduled for removal.
+
+This environment variable is intended for testing purposes; not
+production builds.
+
+=item B<nostrip>
+
+I<This value will change the content of the debs being built.  The .deb
+packages built when this is set is therefore not bit-for-bit reproducible
+with a regular build in the general case.>
+
+This value will cause the official debhelper tools will skip actions and
+helpers that either remove, detach or deduplicate debugging symbols in
+ELF binaries.
+
+This value affects L<dh_dwz(1)> and L<dh_strip(1)>.
+
+=item B<nocheck>
+
+This value will cause the official debhelper build systems to skip runs
+of upstream test suites.
+
+Package maintainers looking to avoid running the upstream tests should
+B<not> rely on this.  Instead, they can add an empty override target
+to skip B<dh_auto_test>.
+
+This value affects L<dh_auto_test(1)>.
+
+=item B<nodoc>
+
+I<This value will change the content of the debs being built.  The .deb
+packages built when this is set is therefore not bit-for-bit reproducible
+with a regular build in the general case.>
+
+This value will cause several debhelper tools to skip installation of
+documentation such as manpages or upstream provided documentation.
+Additionally, the tools will also ignore if declared documentation is
+"missing" on the assumption that the documentation has not been built.
+
+This value effects tools I<like> L<dh_installdocs(1)>, which I<knows>
+it is working with documentation.
+
+=item B<noautodbgsym>, B<noddebs>
+
+I<The official name is autodbgsym.  The noddebs variant is accepted
+for historical reasons.>
+
+This value causes debhelper to skip the generation of automatically
+generated debug symbol packages.
+
+This value affects L<dh_strip(1)>.
+
+=item B<parallel=N>
+
+This value enables debhelper to use up to B<N> threads or processes
+(subject to parameters like B<--no-parallel> and B<--max-parallel=M>).
+Not all debhelper tools work with parallel tasks and may silently
+ignore the request.
+
+This value affects many debhelper tools.  Most notably B<dh_auto_*>,
+which will attempt to run the underlying upstream build system with
+that number of threads.
+
+=item B<terse>
+
+This value will cause the official debhelper build systems to configure
+upstream builds to be terse (i.e. reduce verbosity in their output).
+This is subject to the upstream and the debhelper build system
+supporting such features.
+
+This value affects most B<dh_auto_*> tools.
+
+=back
+
+Unknown flags are silently ignored.
+
+Note third-party debhelper-like tools or third-party provided build systems
+may or may not react to the above flags.  This tends to depend on
+implementation details of the tool.
 
 =head1 SEE ALSO
 
