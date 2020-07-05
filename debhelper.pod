@@ -383,6 +383,12 @@ Assume that the original package source tree is at the specified
 I<directory> rather than the top level directory of the Debian
 source package tree.
 
+B<Warning>: The B<--sourcedir> variant matches a similar named option in
+B<dh_install> and B<dh_missing> (etc.) for historical reasons.  While they
+have a similar name, they have very distinct purposes and in some cases
+it can cause errors when this variant is passed to B<dh> (when then passes
+it on to all tools).
+
 =item B<-B>[I<directory>], B<--builddir>[I<=directory>], B<--builddirectory>[I<=directory>]
 
 Enable out of source building and use the specified I<directory> as the build
