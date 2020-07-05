@@ -83,13 +83,11 @@ sub configure {
 	my @flags = @STANDARD_CMAKE_FLAGS;
 	my $backend = $this->get_targetbuildsystem->NAME;
 
-	if (not compat(10)) {
-		push(@flags, '-DCMAKE_INSTALL_RUNSTATEDIR=/run');
-	}
-	if (not compat(12)) {
-		# Speed up installation phase a bit.
-		push(@flags, "-DCMAKE_SKIP_INSTALL_ALL_DEPENDENCY=ON");
-	}
+	push(@flags, '-DCMAKE_INSTALL_RUNSTATEDIR=/run') if not compat(10);
+	# Speed up installation phase a bit.
+	push(@flags, "-DCMAKE_SKIP_INSTALL_ALL_DEPENDENCY=ON") if not compat(12);
+	# Reproducibility #962474
+	push(@flags, "-DCMAKE_SKIP_RPATH=ON", '-DBUILD_RPATH_USE_ORIGIN=ON') if not compat(13);
 	if (exists($TARGET_BUILD_SYSTEM2CMAKE_GENERATOR{$backend})) {
 		my $generator = $TARGET_BUILD_SYSTEM2CMAKE_GENERATOR{$backend};
 		push(@flags, "-G${generator}");

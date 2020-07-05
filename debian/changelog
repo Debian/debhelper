@@ -10,6 +10,11 @@ debhelper (13.1.1) UNRELEASED; urgency=medium
   * Dh_Lib.pm: Add support for raising compat deprecation warnings to
     an error if there are pending removals.  This currently triggers
     for usage of compat 5 and 6.
+  * cmake.pm: Pass -DCMAKE_SKIP_RPATH=ON -DBUILD_RPATH_USE_ORIGIN=ON
+    to cmake in compat 14.  This should fix some reproducibility
+    issues but may cause breakage if packages run binaries directly
+    from the build directory.  Thanks to Timo Röhling for the
+    suggestion.  (Closes: #962474)
 
   [ Anel Husakovic ]
   * debhelper.7: Fix typo/grammatical errors.
