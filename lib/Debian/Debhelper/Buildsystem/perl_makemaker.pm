@@ -72,7 +72,7 @@ sub configure {
 	push @perl_flags, $cross_flag
 		if is_cross_compiling() and defined $cross_flag;
 
-	$this->doit_in_sourcedir("perl", @perl_flags, "Makefile.PL", "INSTALLDIRS=vendor",
+	$this->doit_in_sourcedir($^X, @perl_flags, "Makefile.PL", "INSTALLDIRS=vendor",
 		# if perl_build is not tested first, need to pass packlist
 		# option to handle fallthrough case
 		(compat(7) ? "create_packlist=0" : ()),

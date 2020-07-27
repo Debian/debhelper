@@ -41,7 +41,7 @@ sub do_perl {
 			warning("cross Config.pm does not exist (missing build dependency on perl-xs-dev?)");
 		}
 	}
-	$this->doit_in_sourcedir(\%options, "perl", @_);
+	$this->doit_in_sourcedir(\%options, $^X, @_);
 }
 
 sub new {
