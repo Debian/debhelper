@@ -198,7 +198,7 @@ if (@missing) {
 	my %seen_basename = map { basename($_) => $_ } @installed;
 	my $multiarch = dpkg_architecture_value("DEB_HOST_MULTIARCH");
 	my $seen_ma_value = 0;
-	for my $file (@missing) {
+	for my $file (sort(@missing)) {
 		my $basename = basename($file);
 		if (exists($seen_basename{$basename})) {
 			my $alt_source = $seen_basename{$basename};
