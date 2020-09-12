@@ -203,7 +203,9 @@ sub buildsystems_init {
 	    'no-parallel' => sub { $max_parallel = 1 },
 	    "max-parallel=i" => \$max_parallel,
 
-	    'reload-all-buildenv-variables' => sub { delete($ENV{'DH_INTERNAL_BUILDFLAGS'}); },
+	    'reload-all-buildenv-variables' => sub {
+		Debian::Debhelper::Dh_Lib::reset_buildflags();
+	    },
 	);
 	if (compat(8)) {
 		# This option only works in compat 9+ where we actually set buildflags

@@ -2486,6 +2486,20 @@ sub setup_home_and_xdg_dirs {
 	return;
 }
 
+sub reset_buildflags {
+	eval { require Dpkg::BuildFlags };
+	if ($@) {
+		warning "unable to load build flags: $@";
+		return;
+	}
+	delete($ENV{'DH_INTERNAL_BUILDFLAGS'});
+	my $buildflags = Dpkg::BuildFlags->new();
+	foreach my $flag ($buildflags->list()) {
+		next unless $flag =~ /^[A-Z]/; # Skip flags starting with lowercase
+		delete($ENV{$flag});
+	}
+}
+
 # Sets environment variables from dpkg-buildflags. Avoids changing
 # any existing environment variables.
 sub set_buildflags {
