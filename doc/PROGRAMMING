@@ -250,7 +250,7 @@ autoscript($package, $scriptname, $snippetname, $substparam)
 	   then you can set DH_AUTOSCRIPTDIR to a directory containing
 	   the snippets instead (note it should point to the autoscripts
 	   directory unlike DH_DATAFILES).
-	 - (optional) A substitution parameter, which is one of 3 times:
+	 - (optional) A substitution parameter, which is one of 3 types:
 	   * sed commands to run on the snippet. E.g. s/#PACKAGE#/$PACKAGE/
 	     Note: Passed to the shell inside double quotes.
 	   * a perl sub to invoke with $_ set to each line of the snippet
@@ -340,10 +340,11 @@ install_dh_config_file($src, $dest[, $mode])
 	compat is 9 (or later) and $src is executable, $src will be
 	executed instead and its output will be used to generate the
 	$dest file.
-install_dir($dir)
-	Create the directory denoted by the path $dir and all parent
-	entries as well (as needed).
-        If the directory already exists, the function does nothing.
+install_dir(@dirs)
+	Create the directories denoted by the paths in @dirs and all
+	parent entries as well (as needed).  It uses mode 0755.
+	If a directory listed in @dirs already exists, the function
+	silently skips that directory (similar to mkdir -p).
 install_file($src, $dest)
 	Installs $src into $dest with mode 0644.  The parent dir of
 	$dest must exist (can be created with install_dir).
@@ -536,14 +537,16 @@ Dh_Lib-based helpers:
  * Replace "@{$dh{DOPACKAGES}}" with "getpackages()" and use
    "process_pkg($package)" to determine if the helper should actually
    install anything.
- * Call "log_installed_files" once per package (even on the ones that
-   are not to be acted on) with a list of source files that would be
+ * Call "log_installed_files" at least once per package (even on the ones
+   that are not to be acted on) with a list of source files that would be
    installed.
    - You can list entire directories even if there are files under
      it that are ignored.
    - Please call "log_installed_files" /even if/ the list is empty for that
      packages.  This enables dh_missing to see that the helper has been run
      and nothing should be installed for that package.
+   - Prefer calling "log_installed_files" /exactly once/ per package as
+     this is what it is optimized for.
  * If your helper has a PROMISE, it must use "pkgfile-logged(<file>)"
    for its config files.  (See #867246)
    - CAVEAT: This requires a dependency on "debhelper (>= 10.2.5)".  Prior
