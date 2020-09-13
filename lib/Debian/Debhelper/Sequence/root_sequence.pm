@@ -48,6 +48,7 @@ my @i = (qw{
 	dh_installinit
 },
 	$include_if_compat_X_or_newer->(13, 'dh_installtmpfiles'),
+	$include_if_compat_X_or_newer->(14, 'dh_installsysusers'),
 	$include_if_compat_X_or_newer->(11, 'dh_installsystemd'),
 	$include_if_compat_X_or_newer->(12, 'dh_installsystemduser'),
 qw{
