@@ -68,7 +68,8 @@ on_pkgs_in_parallel {
 				or error("open $tmp/DEBIAN/conffiles failed: $!");
 			while (my $line = <$fd>) {
 				chomp($line);
-				$line =~ s/^\///;
+				next if $line !~ s{^/+}{};
+				next if $line eq '';
 				$conffiles{$line} = 1;
 			}
 			close($fd);
