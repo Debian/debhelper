@@ -75,6 +75,8 @@ if (! -f 'debian/control') {
 	warning('dh_testroot must be called from the source root');
 }
 
+# PROMISE: DH NOOP WITHOUT internal(rrr)
+
 # By declaration; nothing requires root and this command must be a no-op in that case.
 exit 0 if $requirements eq 'none';
 # The builder /can/ choose to ignore the requirements and just call us as root.
