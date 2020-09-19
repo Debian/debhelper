@@ -130,10 +130,6 @@ sub check_auto_buildable {
 	{
 		# This is always called in the source directory, but generally
 		# Makefiles are created (or live) in the build directory.
-		return 1 if $step ne 'configure';
-		# Enable dh to skip the configure step for the makefile build system
-		# as it does nothing anyway.
-		return 0 if ref($this) eq 'Debian::Debhelper::Buildsystem::makefile';
 		return 1;
 	} elsif ($this->check_auto_buildable_clean_oos_buildir(@_)
 			 and $this->check_auto_buildable('configure')) {
