@@ -530,6 +530,7 @@ if (! defined $sequence) {
 # since it causes dh to be run.
 if ($sequence eq 'debian/rules' ||
     $sequence =~ /^override_dh_/ ||
+    $sequence =~ /^execute_(?:after|before)_dh_/ ||
     $sequence eq DUMMY_TARGET) {
 	exit 0;
 }
