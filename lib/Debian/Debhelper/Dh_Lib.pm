@@ -1589,23 +1589,7 @@ sub filedoublearray {
 
 	if (!close(DH_FARRAY_IN)) {
 		if ($x) {
-			my ($err, $proc_err) = ($!, $?);
-			error("Error closing fd/process for $file: $err") if $err;
-			# The interpreter did not like the file for some reason.
-			# Lets check if the maintainer intended it to be
-			# executable.
-			if (not is_so_or_exec_elf_file($file) and not _has_shbang_line($file)) {
-				warning("$file is marked executable but does not appear to an executable config.");
-				warning();
-				warning("If $file is intended to be an executable config file, please ensure it can");
-				warning("be run as a stand-alone script/program (e.g. \"./${file}\")");
-				warning("Otherwise, please remove the executable bit from the file (e.g. chmod -x \"${file}\")");
-				warning();
-				warning('Please see "Executable debhelper config files" in debhelper(7) for more information.');
-				warning();
-			}
-			$? = $proc_err;
-			error_exitcode("$file (executable config)");
+			_executable_dh_config_file_failed($file, $!, $?);
 		} else {
 			error("problem reading $file: $!");
 		}
@@ -2565,6 +2549,31 @@ sub is_build_profile_active {
 	return 0;
 }
 
+
+# Called when an executable config file failed.  It provides a more helpful error message in
+# some cases (especially when the file was not intended to be executable).
+sub _executable_dh_config_file_failed {
+	my ($source, $err, $proc_err) = @_;
+	error("Error closing fd/process for ${source}: $err") if $err;
+	# The interpreter did not like the file for some reason.
+	# Lets check if the maintainer intended it to be
+	# executable.
+	if (not is_so_or_exec_elf_file($source) and not _has_shbang_line($source)) {
+		warning("${source} is marked executable but does not appear to an executable config.");
+		warning();
+		warning("If ${source} is intended to be an executable config file, please ensure it can");
+		warning("be run as a stand-alone script/program (e.g. \"./${source}\")");
+		warning("Otherwise, please remove the executable bit from the file (e.g. chmod -x \"${source}\")");
+		warning();
+		warning('Please see "Executable debhelper config files" in debhelper(7) for more information.');
+		warning();
+	}
+	$? = $proc_err;
+	error_exitcode("${source} (executable config)");
+	return;
+}
+
+
 # install a dh config file (e.g. debian/<pkg>.lintian-overrides) into
 # the package.  Under compat 9+ it may execute the file and use its
 # output instead.
@@ -2583,8 +2592,7 @@ sub install_dh_config_file {
 			print ${tfd} $line;
 		}
 		if (!close($sfd)) {
-			error("cannot close handle from $source: $!") if $!;
-			error_exitcode($source);
+			_executable_dh_config_file_failed($source, $!, $?);
 		}
 		close($tfd) || error("cannot close $target: $!");
 		# Set the mtime (and atime) to ensure reproducibility.
