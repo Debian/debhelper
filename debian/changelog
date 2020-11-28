@@ -395,7 +395,6 @@ debhelper (12.7.2) unstable; urgency=medium
   [ Translations ]
   * Update German translation (Chris Leick)  (Closes: #943853)
 
-
  -- Niels Thykier <niels@thykier.net>  Sat, 07 Dec 2019 17:44:32 +0000
 
 debhelper (12.7.1) unstable; urgency=medium
@@ -408,7 +407,7 @@ debhelper (12.7.1) unstable; urgency=medium
 
 debhelper (12.7) unstable; urgency=medium
 
-  [ Niels Thykier ]:
+  [ Niels Thykier ]
   * dh_installman: Avoid error message when man-db is not installed
     (only occurs in debhelper's own build as man-db is a mandatory
     dependency).
@@ -433,7 +432,7 @@ debhelper (12.7) unstable; urgency=medium
   * meson.pm: Fix invalid call under compat 13.  Thanks to
     Jeremy Bicha for testing it.  (Closes: #942690)
 
-  [ Helmut Grohne ]:
+  [ Helmut Grohne ]
   * cmake buildsystem: Fix CMAKE_SYSTEM_PROCESSOR for 32bit arms.
     (Closes: #941245)
 
@@ -514,7 +513,7 @@ debhelper (12.5.2) unstable; urgency=medium
   * dh_makeshlibs: Fix regression in compat 10 and earlier where
     dh_makeshlibs now failed on error.  This safety check was
     intended to be a compat 11 or later feature.
-  * dh: Ensure addon API functions return 1 to avoid gratious
+  * dh: Ensure addon API functions return 1 to avoid gratuitous
     breakage of addons due to perl's idiosyncrasy of requiring a
     truth value at the end of modules.  (See #935016)
 
@@ -565,7 +564,7 @@ debhelper (12.5) unstable; urgency=medium
     adding "dh-sequence-ADDON" in Build-Depends-Arch or
     Build-Depends-Indep (respectively).  Not all addons support this and
     will trigger an error at load time.  Addon providers should ensure
-    that their package provde "dh-sequence-ADDON" and review the
+    that their package provide "dh-sequence-ADDON" and review the
     doc/PROGRAMMING document (in the debhelper source) if they are
     considering to make their addon compatible with these requirements.
     (Closes: #836699)
@@ -662,7 +661,7 @@ debhelper (12.2.1) unstable; urgency=medium
 debhelper (12.2) unstable; urgency=medium
 
   [ Niels Thykier ]
-  * Dh_Lib: Ensure the error function always triggers the same
+  * Dh_Lib.pm: Ensure the error function always triggers the same
     exit code on termination.  Previously, it depended on the
     value of the last error (if any).
   * Buildsystem/make: Fix regression where cross-flags were
@@ -856,7 +855,7 @@ debhelper (11.5) unstable; urgency=medium
   [ Daniele Nicolodi ]
   * dh_installsystemduser: New helper responsible for installing package
     maintainer supplied systemd user instance units and to produce
-    postinst and postrm maintiner scripts code blocks to appropriately
+    postinst and postrm maintainer scripts code blocks to appropriately
     enable, mask and disable units when the package is installed,
     upgraded, or removed.  (Closes: #764678)
 
@@ -880,7 +879,7 @@ debhelper (11.4.1) unstable; urgency=medium
     (Closes: #909303)
   * dh: Disable optimization to skip tools based on command-line
     parameters when dh is passed long options.  Since debhelper
-    had implicit support for auto-abbrevation of long options
+    had implicit support for auto-abbreviation of long options
     and people have started to rely on it, the optimization in
     debhelper/11.4 caused regressions.  The optimization is
     still enabled for short options.  (Closes: #909704)
@@ -899,11 +898,11 @@ debhelper (11.4.1) unstable; urgency=medium
 debhelper (11.4) unstable; urgency=medium
 
   [ Niels Thykier ]
-  * dh_dwz.1: Remove now obsolete note in manpage claming that dh_dwz
+  * dh_dwz.1: Remove now obsolete note in manpage claiming that dh_dwz
     was experimental.  Since debhelper/11.3, dh_dwz was no longer
     experimental.
   * cmake.pm: Explicitly set CMAKE_INSTALL_LIBDIR on native builds.
-    This should not make any pratical difference but aligns the
+    This should not make any practical difference but aligns the
     behaviour of native and cross builds.  Thanks to Simon McVittie
     for the suggestion.  (Closes: #903042)
   * autoconf.pm: Leave --libexecdir at upstream default (/usr/libexec)
@@ -1063,7 +1062,7 @@ debhelper (11.3.2) unstable; urgency=medium
   * dh_installchangelogs: Fix a second regression that made
     dh_installchangelogs ignore upstream changelogs in the
     source directories.  Thanks to gregor herrmann for
-    reporting the imcomplete fix.  (Closes: #899248)
+    reporting the incomplete fix.  (Closes: #899248)
 
  -- Niels Thykier <niels@thykier.net>  Wed, 23 May 2018 05:59:59 +0000
 
@@ -1181,7 +1180,7 @@ debhelper (11.3) unstable; urgency=medium
     (Closes: #897949)
 
   [ Peter Pentchev ]
-  * Dh_Lib: Permit leading and trailing whitespace around the
+  * Dh_Lib.pm: Permit leading and trailing whitespace around the
     debhelper-compat dependency when it is the first or the last
     relation listed.  (Closes: #897937)
 
@@ -1254,7 +1253,7 @@ debhelper (11.2) unstable; urgency=medium
 
 debhelper (11.1.6) unstable; urgency=medium
 
-  * Dh_Lib: Avoid passing invalid parameters to a function, which
+  * Dh_Lib.pm: Avoid passing invalid parameters to a function, which
     caused tons of "package ARRAY(...) is not in control info"
     warnings from dh in some cases.  It triggers when dh thinks
     the package might have architecture qualified debhelper config
@@ -1275,7 +1274,7 @@ debhelper (11.1.6) unstable; urgency=medium
   * debian/control: Bump dependency on dh-autoreconf for the fix for
     #889567.
   * dh_installinfo: Accept --sourcedir like the documentation says
-    for compat 11.  Prevently the option was incorrectly silently
+    for compat 11.  Previously the option was incorrectly silently
     ignored.  Thanks to Nicolas Boulenguez for the report and the
     patch.  (Closes: #894226)
   * dh_ucf.1: Apply patch from Nicolas Boulenguez to add missing
@@ -1283,9 +1282,9 @@ debhelper (11.1.6) unstable; urgency=medium
     (Closes: #894228)
   * dh_installxfonts: Apply patch from Nicolas Boulenguez.  This
     ensures that the generated maintscript snippets are bit-for-bit
-    reproducible when a package ships xfons in multiple fonts
+    reproducible when a package ships xfonts in multiple fonts
     directories.  (Closes: #894227)
-  * Dh_Lib: Improve the "make_symlink" code to avoid non-compliant
+  * Dh_Lib.pm: Improve the "make_symlink" code to avoid non-compliant
     symlinks when the link name was not a normalized path.  Note
     that ".."-segments are now disallowed in the link name (but not
     the link target).  Thanks to Nicolas Boulenguez for reporting
@@ -1293,7 +1292,7 @@ debhelper (11.1.6) unstable; urgency=medium
   * dh_installinfo: Report installed files to dh_missing.  Thanks
     to Daniel Kahn Gillmor for reporting this omission.
     (Closes: #893160)
-  * Dh_Lib: Make Dh_Lib loadable again without a debian/control being
+  * Dh_Lib.pm: Make Dh_Lib loadable again without a debian/control being
     present.  This makes the autopkgtests work again.
 
  -- Niels Thykier <niels@thykier.net>  Thu, 29 Mar 2018 19:26:59 +0000
@@ -1332,7 +1331,7 @@ debhelper (11.1.5~alpha1) experimental; urgency=medium
     dbgsym building via DEB_BUILD_OPTIONS).  This regression
     was introduced in 11.1.  Thanks to Christian Marillat for
     reporting the bug.  (Closes: #890736)
-  * Dh_Lib: pkgfile() now properly uses for DEB_TARGET_ARCH{,_OS}
+  * Dh_Lib.pm: pkgfile() now properly uses for DEB_TARGET_ARCH{,_OS}
     when the package is set to be built for the target
     architecture.
   * d/control: Drop dependency on binutils; it does not reflect
@@ -1340,7 +1339,7 @@ debhelper (11.1.5~alpha1) experimental; urgency=medium
     that the current binutils is installed for other reasons
     any way.  Thanks to Helmut Grohne for the report.
     (Closes: #891187)
-  * Dh_Lib: Add an experimental feature to determine the requested
+  * Dh_Lib.pm: Add an experimental feature to determine the requested
     compat level from the Build-Depends field.
 
  -- Niels Thykier <niels@thykier.net>  Sat, 24 Feb 2018 16:01:31 +0000
@@ -1354,7 +1353,7 @@ debhelper (11.1.4) unstable; urgency=medium
   * dh_installdocs: Discard auto-detected main doc package when
     passed -A/--all as it causes file-conflicts.
     (Closes: #886108, #888294)
-  * Dh_Lib: Fix regression where "foo{bar}" would not be matched
+  * Dh_Lib.pm: Fix regression where "foo{bar}" would not be matched
     when the pattern was handled as a glob.  The bug was
     introduced in debhelper/10.6.  Thanks to Wouter Verhelst for
     finding the bug.  (Closes: #888251)
@@ -1517,7 +1516,7 @@ debhelper (11) unstable; urgency=medium
     levels prior to 11 now that compat 11 is stable.
 
   [ Chris Leick ]
-  * debhelper.pod: Improve the wording of two parapraphs.
+  * debhelper.pod: Improve the wording of two paragraphs.
 
   [ Translations ]
   * Update Portuguese translation (Américo Monteiro)
@@ -1551,7 +1550,7 @@ debhelper (10.10.8) unstable; urgency=medium
 
   [ Niels Thykier ]
   * Document that compat 11 is now in its open beta phase.
-  * Dh_Getopt: Improve warning message when a package is excluded
+  * Dh_Getopt.pm: Improve warning message when a package is excluded
     due to profiles or architecture restrictions.
   * dh_install: Properly allow patterns to be excluded without
     complaining about missing files.  (Closes: #881658)
@@ -1568,7 +1567,7 @@ debhelper (10.10.7) unstable; urgency=medium
   * dh_strip: Fix a regression that caused debug symbols for
     executables to be discarded instead of included into
     debug packages.
-  * Dh_Lib: Ensure that $dh{U_PARAMS} is always defined as a
+  * Dh_Lib.pm: Ensure that $dh{U_PARAMS} is always defined as a
     list.  Thanks to Adrian Bunk for the bug report.
 
  -- Niels Thykier <niels@thykier.net>  Sat, 11 Nov 2017 14:10:21 +0000
@@ -1614,7 +1613,7 @@ debhelper (10.10.6) unstable; urgency=medium
     called via dh_gencontrol).
   * dh_makeshlibs: Ignore non-ELF files even if they are named ".so".
     (Closes: #880480)
-  * Dh_Lib: Improve the performance of isnative by using
+  * Dh_Lib.pm: Improve the performance of isnative by using
     Dpkg::Changelog::Parse instead of calling dpkg-parsechangelog as
     an external process.  This improves the performance of
     dh_installchangelogs by ~10%.
@@ -1631,7 +1630,7 @@ debhelper (10.10.5) unstable; urgency=medium
 
   * meson.pm: Add missing import of generated_file that broke
     cross building.
-  * Dh_Lib: Fix regression where an empty line before the source
+  * Dh_Lib.pm: Fix regression where an empty line before the source
     paragraph in d/control would cause parse error.
     (Closes: #879762)
 
@@ -1648,7 +1647,7 @@ debhelper (10.10.4) unstable; urgency=medium
     dh_strip (as dh_strip compresses the debug symbols and dwz
     expects uncompressed debug symbols).  (Closes: #878888)
   * dwz.pm: New sequence to add dh_dwz to the sequence.
-  * d/control: Add a Suggets on dwz for the optional dh_dwz tool.
+  * d/control: Add a Suggests on dwz for the optional dh_dwz tool.
   * Dh_Lib.pm: Fix regression where the source section would not
     be parsed leading to dbgsym packages possibly getting an
     incorrect value in the Section field.  Thanks to Mihai
@@ -1660,7 +1659,7 @@ debhelper (10.10.3) unstable; urgency=medium
 
   * dh_strip: Skip the entire directory when an exclude rule
     parameter matches it.
-  * dh_fixperms: Improve the documentation to assume less familarity
+  * dh_fixperms: Improve the documentation to assume less familiarity
     with "Rules-Requires-Root" (R³).
   * dh_usrlocal: Ditto.
   * dh_builddeb: Ditto.
@@ -1675,7 +1674,7 @@ debhelper (10.10.3) unstable; urgency=medium
 
 debhelper (10.10.2) unstable; urgency=medium
 
-  * Dh_Lib: Fix uninitialized warning in find_hardlinks that
+  * Dh_Lib.pm: Fix uninitialized warning in find_hardlinks that
     broke dh_compress's ability to deal with hardlinks.  Thanks
     to Ondřej Surý for finding the bug.
 
@@ -1781,19 +1780,19 @@ debhelper (10.9.1) unstable; urgency=medium
     --doc-main-package are listed in debian/control.
   * dh_installexamples: Ditto.
   * dh_systemd_start: Regex escape two paths used in a regex.
-  * Dh_Lib: Open compat 12.
+  * Dh_Lib.pm: Open compat 12.
   * dh_clean: Defer making -k an error until compat 12.
-  * Dh_Getopt: Defer making -s an error until compat 12.
+  * Dh_Getopt.pm: Defer making -s an error until compat 12.
   * dh_installinit: Defer making --no-restart-on-upgrade an error
     until compat 12.
-  * Dh_Lib: Defer making the "shell-spawning bug" in doit an error
+  * Dh_Lib.pm: Defer making the "shell-spawning bug" in doit an error
     until compat 12.
   * dh_systemd_enable: Fix regression in debhelper/10.9 where
     template units would be installed as regular units (and
     possibly replace regular units).  (Closes: #877989)
   * dh_systemd_enable: Drop versioned dependency on
     init-system-helpers that is satisfied in oldstable.
-  * Dh_Lib: Fix regression where --no-act would actually create
+  * Dh_Lib.pm: Fix regression where --no-act would actually create
     maintscript snippets.
   * dh_systemd_*: If an unit file cannot be read (e.g. to check for
     the [Install] section), error out instead of emitting a warning
@@ -1858,7 +1857,7 @@ debhelper (10.9) unstable; urgency=medium
 debhelper (10.8) unstable; urgency=medium
 
   [ Niels Thykier ]
-  * Dh_Lib: Introduce a qx_cmd sub to behave like a mix of qx
+  * Dh_Lib.pm: Introduce a qx_cmd sub to behave like a mix of qx
     and doit (i.e. avoid the shell while capturing stdout).
   * dh_makeshlibs: Avoid forking a shell when calling objdump in
     compat 11.
@@ -1916,7 +1915,7 @@ debhelper (10.8) unstable; urgency=medium
 
 debhelper (10.7.2) unstable; urgency=medium
 
-  * Dh_Lib: Fix inverted boolean logic that causes a
+  * Dh_Lib.pm: Fix inverted boolean logic that causes a
     compatibility rule to be ignored.  Thanks to Adrian Bunk,
     Andreas Beckmann, Markus Koschany and Emmanuel Bourg for
     reporting and analysing the issue.  (Closes: #870339)
@@ -1925,7 +1924,7 @@ debhelper (10.7.2) unstable; urgency=medium
 
 debhelper (10.7.1) unstable; urgency=medium
 
-  * Dh_Lib: Fix doit's new call to ensure it does not call a shell
+  * Dh_Lib.pm: Fix doit's new call to ensure it does not call a shell
     (like the documentation promises).
   * dh: Ensure that we do not fork a shell for running a simple
     command.
@@ -1946,21 +1945,21 @@ debhelper (10.7) unstable; urgency=medium
   * dh_installmodules: Ensure maintscripts are reproducible even with
     multiple kernel versions detected.
   * Apply patches from gregor herrmann to improve autopkgtests.
-  * Dh_Lib: Introduce a print_and_complex_doit.
+  * Dh_Lib.pm: Introduce a print_and_complex_doit.
   * Buildsystem: Introduce a complex_doit_in_builddir, which is needed
     by gradle-debian-helper.
-  * Dh_Lib: Fix bug in doit + doit_* that made them fork a shell in
+  * Dh_Lib.pm: Fix bug in doit + doit_* that made them fork a shell in
     some cases.  For backwards compatibility, there is detection code
     that should make it warn for this case and retain bug-compatibility.
     This can cause a weird "Please specify the compatibility level in
     debian/compat" error if the tools have chdir to a different directory.
-  * Dh_Lib: Support an optional hashref in doit + doit_* to enable some
+  * Dh_Lib.pm: Support an optional hashref in doit + doit_* to enable some
     trivial operations in the child process (e.g. redirect stdout).
   * dh_installman: Avoid forking a shell where a simple subprocess call
     is sufficient.
-  * Dh_Lib: Avoid forking 2 to 7 subprocesses for adding an autosnippet
+  * Dh_Lib.pm: Avoid forking 2 to 7 subprocesses for adding an autosnippet
     when helper tools use a subroutine rather then a sed snippet.
-  * Dh_Lib: Extend autoscript to accept a hashref and use that for
+  * Dh_Lib.pm: Extend autoscript to accept a hashref and use that for
     substituting into the snippet.  This variant (like the subroutine
     variant) avoids forking a lot of subprocesses and need not worry
     about a shell possibly interpreting metacharacters.
@@ -1974,12 +1973,12 @@ debhelper (10.7) unstable; urgency=medium
   * dh_installxfonts: Ditto.
   * dh_systemd_enable: Ditto.
   * dh_systemd_start: Ditto.
-  * Dh_Lib: Reduce the use of shell and external commands for
+  * Dh_Lib.pm: Reduce the use of shell and external commands for
     generating the final maintscripts.
-  * Dh_Lib: Make getpackages without any arguments return all
+  * Dh_Lib.pm: Make getpackages without any arguments return all
     packages as the documentation promises it should.  Previously,
     it would hide packages not built (e.g. due to Build-Profiles).
-  * Dh_Lib: Provide a better error message when getpackages() is called
+  * Dh_Lib.pm: Provide a better error message when getpackages() is called
     by a helper in the wrong directory.  Unfortunately, dh cannot rely
     on dh_testdir to do this as dh_testdir is called too late.
   * dh: optimize out the call to dh_testdir.  It is useless for
@@ -2089,7 +2088,7 @@ debhelper (10.6.1) unstable; urgency=medium
 
   * Makefile: Enable running some tasks in parallel to better
     utilize multiple cores.
-  * Dh_Lib: Revert a change that caused dh_install (and other
+  * Dh_Lib.pm: Revert a change that caused dh_install (and other
     tools) to take filenames as absolute if they started with
     a leading slash.  Thanks to Sven Joachim for the prompt
     discovery and notification.  (Closes: #866570)
@@ -2102,7 +2101,7 @@ debhelper (10.6) unstable; urgency=medium
 
   * dh_installinfo: Use "xargs" so it works even if there are
     "a lot" of info files.
-  * Dh_Lib: Introduce a is_build_profile_active function, which
+  * Dh_Lib.pm: Introduce a is_build_profile_active function, which
     can be used to check if a given Build-Profile was specified.
   * dh_installdocs: Ignore given documentation files when the
     "nodoc" build profile is specified in DEB_BUILD_PROFILES.
@@ -2134,7 +2133,7 @@ debhelper (10.6) unstable; urgency=medium
     compat 11.  Previously, it did not work as intended.
   * dh_installdocs: Revert change in compat 11, where it would install
     documentation into /usr/share/doc/mainpackage.  (Reopens: #824221)
-  * Dh_Lib: Stop setting PERL_USE_UNSAFE_INC in compat 11.
+  * Dh_Lib.pm: Stop setting PERL_USE_UNSAFE_INC in compat 11.
   * perl_build.pm: Stop passing -I. to perl in compat 11.
   * perl_makemaker.pm: Ditto.
 
@@ -2149,7 +2148,7 @@ debhelper (10.5.1) unstable; urgency=medium
     installed files.
   * Dh_Lib.pm: Implement subroutines to facility file removal and
     symlink creation without a fork+exec.
-  * Dh_Lib: Avoid a fork+exec for rm -f and ln -s.
+  * Dh_Lib.pm: Avoid a fork+exec for rm -f and ln -s.
   * dh_compress: Ditto.
   * dh_installman: Ditto.
   * dh_clean: Avoid a fork+exec for rm -f.
@@ -2158,10 +2157,10 @@ debhelper (10.5.1) unstable; urgency=medium
   * dh_md5sums: Ditto.
   * dh_installdocs: Avoid a fork+exec for ln -s.
   * dh_strip: Ditto.
-  * Dh_Lib: Avoid 1-2 stat calls in make_symlink by reusing existing
+  * Dh_Lib.pm: Avoid 1-2 stat calls in make_symlink by reusing existing
     stat calls.
   * dh_installman: Avoid a fork+exec for renaming a path.
-  * dh_installdocs: Avoid unnecssary stat call.
+  * dh_installdocs: Avoid unnecessary stat call.
   * dh_installman: Ditto.
   * dh_strip: Ditto.
   * dh_shlibdeps: Fix a regression where non-detached debug symbol files
@@ -2184,7 +2183,7 @@ debhelper (10.5) unstable; urgency=medium
   * Upload to unstable.  (Closes: #865363)
 
   [ Niels Thykier ]
-  * dh_installman: Remove unncessary "chown" call that made things a
+  * dh_installman: Remove unnecessary "chown" call that made things a
     lot slower.  Thanks to Kurt Roeckx for reporting it.
   * dh_installman: Fix wrong permission of man pages (set 0755 instead
     of 0644).  Regression introduced in 10.2.2.
@@ -2248,15 +2247,15 @@ debhelper (10.5) unstable; urgency=medium
     "destdir" for dh_auto_install).
 
   [ Iain Lane ]
-  * Dh_Lib: Re-add warning + exit 0 for the -i/-a shortcut that was
+  * Dh_Lib.pm: Re-add warning + exit 0 for the -i/-a shortcut that was
     added in 10.3.  (Closes: #863961)
   * dh_install: Pass --exclude/-X to dh_missing. (Closes: #863447)
 
   [ Michael Stapelberg ]
-  * Dh_Getopt: Provide a more detailed error message when there are
+  * Dh_Getopt.pm: Provide a more detailed error message when there are
     no buildable packages caused by architecture restrictions.
     (Closes: #858467)
-  * Dh_Lib: Split package_arch($package) into three distinct functions.
+  * Dh_Lib.pm: Split package_arch($package) into three distinct functions.
 
  -- Niels Thykier <niels@thykier.net>  Sun, 25 Jun 2017 17:00:00 +0000
 
@@ -2486,7 +2485,7 @@ debhelper (10.1) unstable; urgency=medium
   * debhelper-obsolete-compat.pod: Add a manpage for the
     upgrade checklist for all obsolete/removed compat levels.
     Thanks to Jakub Wilk for the suggestion.
-  * Dh_Getopt,dh_*: Rename --onlyscripts to --only-scripts and
+  * Dh_Getopt.pm,dh_*: Rename --onlyscripts to --only-scripts and
     --noscripts to --no-scripts for consistency with other
     options.  The old variants are accepted for compatibility.
     Thanks to Raphaël Hertzog for the suggestion.
@@ -2665,7 +2664,7 @@ debhelper (9.20160618) unstable; urgency=medium
 
 debhelper (9.20160403) unstable; urgency=medium
 
-  * d/control: Requre dh-autoreconf (>= 12) to ensure
+  * d/control: Require dh-autoreconf (>= 12) to ensure
     non-autotools can be built in compat 10.
   * dh: In a "PROMISE: DH NOOP" clause, make no assumptions
     about being able to skip "foo(bar)" if "foo" is not known.
@@ -2817,7 +2816,7 @@ debhelper (9.20151220) unstable; urgency=medium
 
   * dh_strip: Document that dbgsym packages are built by
     default.
-  * Dh_Lib: Cache the results of getpackages.
+  * Dh_Lib.pm: Cache the results of getpackages.
   * dh_gencontrol: Create debug symbol packages with the same
     component as the original package.
 
@@ -2922,7 +2921,7 @@ debhelper (9.20151005) unstable; urgency=medium
 debhelper (9.20151004) unstable; urgency=medium
 
   [ Niels Thykier ]
-  * dh/dh_auto_*: Apply patch from Eduard Sanou to define
+  * dh,dh_auto_*: Apply patch from Eduard Sanou to define
     SOURCE_DATE_EPOCH.  (Closes: #791823)
   * cmake.pm: Add better cross-compile support for cmake.
     Heavily based on a patch from Helmut Grohne.
@@ -2966,7 +2965,7 @@ debhelper (9.20151004) unstable; urgency=medium
     Files listed here will not cause dh_install to complain
     with --list-missing.  Thanks to Peter Eisentraut for the
     suggestion.  (Closes: #436240)
-  * Dh_Lib: Cherry-pick patch from Chris Lamb to only read
+  * Dh_Lib.pm: Cherry-pick patch from Chris Lamb to only read
     the latest changelog entry when determining the
     SOURCE_DATE_EPOCH.
   * debhelper.7: Provide a better example of how to insert
@@ -2987,7 +2986,7 @@ debhelper (9.20151004) unstable; urgency=medium
   * dh_compress: Apply patch from Rafael Kitover to support
     passing files to dh_compress that would have been
     compressed anyway.  (Closes: #794898)
-  * Dh_Lib: Apply patch from Gergely Nagy to make debhelper
+  * Dh_Lib.pm: Apply patch from Gergely Nagy to make debhelper
     export "DH_CONFIG_ACT_ON_PACKAGES" when executing an
     executable debhelper config file.  This is intended to
     assist dh-exec (etc.) in figuring what packages are
@@ -3003,7 +3002,7 @@ debhelper (9.20151004) unstable; urgency=medium
   * dh_gencontrol: Put debug debs back in the "debug" section.
   * dh_strip/dh_gencontrol: Add a space separated list of
     build-ids in the control file of packages containing
-    deattached debug symbols.
+    detached debug symbols.
 
   [ Andrew Ayer ]
   * d/control: Depend on dh-strip-nondeterminism
@@ -3102,7 +3101,7 @@ debhelper (9.20150519+ddebs) experimental; urgency=medium
   * Dh_Lib.pm: Add "package_multiarch" function.
   * d/control: Add versioned Build-Depends on dpkg-dev to support
     creating ddebs with the ".deb" extension.
-  * Dh_lib.pm: Generate ddebs with the ".deb" extension.
+  * Dh_Lib.pm: Generate ddebs with the ".deb" extension.
   * dh_gencontrol: Reduce the "pkg:arch" to "pkg" as APT and dpkg
     disagree on what satisfies an "pkg:arch" dependency.
   * dh_strip.1: Document what inhibits ddeb generation.
@@ -3162,7 +3161,7 @@ debhelper (9.20150501) unstable; urgency=medium
   * dh_icons: Apply patch from Jérémy Bobbio to ensure stable
     ordering of the icon list inserted into generated maintainer
     scripts.  (Closes: #774102)
-  * Dh_lib: Add a public "make_symlink" subroutine allowing
+  * Dh_Lib.pm: Add a public "make_symlink" subroutine allowing
     dh_*-like tools to generate policy compliant symlinks without
     invoking dh_link.  (Closes: #610173)
   * dh_compress: Apply patch from Osamu Aoki to avoid compressing
@@ -3176,7 +3175,7 @@ debhelper (9.20150501) unstable; urgency=medium
   * The "ant" build system now loads debian/ant.properties
     automatically before build and clean (like CDBS).  Thanks to
     Thomas Koch for the report.  (Closes: #563909)
-  * Dh_lib: Add install_dh_config_file to install a file either by
+  * Dh_Lib.pm: Add install_dh_config_file to install a file either by
     copying the source file or (with an executable file under compat
     9) execute the file and use its output to generate the
     destination.
@@ -3236,7 +3235,7 @@ debhelper (9.20150501) unstable; urgency=medium
   * d/control: Remove versioned conflicts that are no longer relevant.
 
   [ Bernhard R. Link ]
-  * Dh_lib: apply patch from Guillem Jover to support case-insensitive
+  * Dh_Lib.pm: apply patch from Guillem Jover to support case-insensitive
     control field names. (Closes: #772129)
   * add DH_QUIET environment variable to make things more silent
   * dh: don't output commands to run if DH_QUIET is set
@@ -3569,7 +3568,7 @@ debhelper (9.20130516) unstable; urgency=low
 
 debhelper (9.20130509) unstable; urgency=low
 
-  * dh_installinit: Remove obsolete systemd-tempfiles hack in postinst
+  * dh_installinit: Remove obsolete systemd-tmpfiles hack in postinst
     autoscript. Closes: #707159
   * dh_installinfo: Stop inserting dependencies for partial upgrades
     from lenny to squeeze. Closes: #707218
@@ -3597,7 +3596,7 @@ debhelper (9.20130507) unstable; urgency=low
   * dh_installdeb: Drop pre-dependency on dpkg for dpkg-maintscript-helper.
     Closes: #703264
   * makefile buildsystem: Pass any parameters specified after -- when
-    running make -n to test for the existance of targets.
+    running make -n to test for the existence of targets.
     In some makefiles, the parameters may be necessary to enable a target.
     Closes: #706923
   * Revert python2.X-minimal fix, because it was buggy.
@@ -3607,7 +3606,7 @@ debhelper (9.20130507) unstable; urgency=low
 
 debhelper (9.20130504) unstable; urgency=low
 
-  * dh_shlibdeps: Warn if -V flag is passed, to avoid it accidentially being
+  * dh_shlibdeps: Warn if -V flag is passed, to avoid it accidentally being
     used here rather than in dh_makeshlibs. Closes: #680339
   * dh_lintian: Source overrides doc improvement. Closes: #683941
   * dh_installmime: No longer makes maintainer scripts run update-mime and
@@ -3616,7 +3615,7 @@ debhelper (9.20130504) unstable; urgency=low
   * python distutils buildsystem: Propagate failure of pyversions.
     Closes: #683551 Thanks, Clint Byrum
   * python distutils buildsystem: When checking if a version of python is
-    installed, don't trust the presense of the executable, as
+    installed, don't trust the presence of the executable, as
     a python2.X-minimal package may provide it while not having
     distutils installed. Closes: #683557, #690378
   * dh_icons: Improve documentation. Closes: #684895
@@ -3698,7 +3697,7 @@ debhelper (9.20120513) unstable; urgency=low
   * Improve -v logging. Closes: #672448
   * dh_builddeb: Build udebs with xz compression, level 1, extreme strategy.
     This has been chosen to not need any more memory or cpu when uncompressing,
-    while yeilding the best compressions for udebs. Thanks, Philipp Kern.
+    while yielding the best compressions for udebs. Thanks, Philipp Kern.
   * Depend on a new enough dpkg for above features. Backporters will need
     to revert these changes.
 
@@ -3875,7 +3874,7 @@ debhelper (8.9.7) unstable; urgency=low
     but no corresponding override_dh_fixperms-indep, then the unoverridden
     dh_fixperms will be run on the indep packages.
     .
-    Note that the old override_dh_command takes precidence over the new
+    Note that the old override_dh_command takes precedence over the new
     overrides, because mixing the two types of overrides would have been
     too complicated. In particular, it's difficult to ensure an
     old override target will work if it's sometimes constrained to only
@@ -3932,7 +3931,7 @@ debhelper (8.9.4) unstable; urgency=low
 debhelper (8.9.3) unstable; urgency=low
 
   * dh: Remove obsolete optimisation hack that caused sequence breakage
-    in v9 with a rules file with an explict build target. Closes: #634784
+    in v9 with a rules file with an explicit build target. Closes: #634784
 
  -- Joey Hess <joeyh@debian.org>  Tue, 19 Jul 2011 23:26:43 -0400
 
@@ -4220,7 +4219,7 @@ debhelper (7.4.15) unstable; urgency=low
 
   * The fix for #563557 caused some new trouble involving makefile
     that misbehave when stderr is closed. Reopen it to /dev/null
-    when testing for the existance of a makefile target. Closes: #570443
+    when testing for the existence of a makefile target. Closes: #570443
 
  -- Joey Hess <joeyh@debian.org>  Thu, 18 Feb 2010 16:37:34 -0500
 
@@ -4303,8 +4302,8 @@ debhelper (7.4.8) unstable; urgency=low
 
 debhelper (7.4.7) unstable; urgency=low
 
-  * make: Avoid infinite make recursion that occurrs when testing existence
-    of a target in a certian horribly broken makefile, by making the test stop
+  * make: Avoid infinite make recursion that occurs when testing existence
+    of a target in a certain horribly broken makefile, by making the test stop
     after it sees one line of output from make. (This may be better replaced
     with dh's makefile parser in the future.) Closes: #557307
 
@@ -4414,7 +4413,7 @@ debhelper (7.4.1) unstable; urgency=low
 debhelper (7.4.0) unstable; urgency=low
 
   * Optimise -s handling to avoid running dpkg-architecture if a package
-    is arch all. This was, suprisingly, the only overhead of using the -s
+    is arch all. This was, surprisingly, the only overhead of using the -s
     flag with arch all/any packages.
   * The -a flag now does the same thing as the -s flag, so debhelper users
     do not need to worry about using the -s flag when building a package
@@ -4784,7 +4783,7 @@ debhelper (7.2.5) unstable; urgency=low
     to avoid ~/.modulebuildrc influencing the build. Closes: #517423
   * dh_installmenus: Revert removal of update-menus calls. Closes: #518919
     Menu refuses to add unconfigured packages to the menu, and thus
-    omits packages when triggered, unfortunatly. I hope its behavior will
+    omits packages when triggered, unfortunately. I hope its behavior will
     change.
 
  -- Joey Hess <joeyh@debian.org>  Mon, 09 Mar 2009 16:20:41 -0400
@@ -4809,7 +4808,7 @@ debhelper (7.2.3) unstable; urgency=low
     of specific upstream changelogs. re-Closes: #490937
   * Compat level 4 is now deprecated.
   * dh_makeshlibs: Re-add --add-udeb support. Closes: #518655
-  * dh_shlibdeps: Remove --add-udeb switch (was accidentially added here).
+  * dh_shlibdeps: Remove --add-udeb switch (was accidentally added here).
 
  -- Joey Hess <joeyh@debian.org>  Sat, 07 Mar 2009 14:52:20 -0500
 
@@ -4851,7 +4850,7 @@ debhelper (7.2.0) experimental; urgency=low
 debhelper (7.1.1) experimental; urgency=low
 
   * dh_install(1): Order options alphabetically. Closes:# 503896
-  * Fix some docs that refered to --srcdir rather than --sourcedir.
+  * Fix some docs that referred to --srcdir rather than --sourcedir.
     Closes: #504742
   * Add Vcs-Browser field. Closes: #507804
   * Ignore unknown options in DH_OPTIONS. Debhelper will always ignore
@@ -5025,7 +5024,7 @@ debhelper (7.0.8) unstable; urgency=low
 
 debhelper (7.0.7) unstable; urgency=low
 
-  * dh_installxfonts: Fix precidence problem that exposes a new warning
+  * dh_installxfonts: Fix precedence problem that exposes a new warning
     message in perl 5.10.
 
  -- Joey Hess <joeyh@debian.org>  Sun, 04 May 2008 13:43:41 -0400
@@ -5168,10 +5167,10 @@ debhelper (6.0.7) unstable; urgency=low
 
 debhelper (6.0.6) unstable; urgency=low
 
-  * dh_compress: Pass -n to gzip to yeild more reproducible file contents.
+  * dh_compress: Pass -n to gzip to yield more reproducible file contents.
     The time stamp information need not be contained in the .gz file since the
     time stamp is preserved when compressing and decompressing. Closes: #467100
-  * The order of dependencies generated by debhelper has been completly random
+  * The order of dependencies generated by debhelper has been completely random
     (hash key order), so sort it. Closes: #468959
 
  -- Joey Hess <joeyh@debian.org>  Wed, 05 Mar 2008 21:35:21 -0500
@@ -5391,7 +5390,7 @@ debhelper (5.0.49) unstable; urgency=low
 debhelper (5.0.48) unstable; urgency=low
 
   * Remove use of #SECTION# from dh_installinfo postinst snippet
-    that was accidentially re-added in 5.0.46 due to a corrupt svn checkout.
+    that was accidentally re-added in 5.0.46 due to a corrupt svn checkout.
     Closes: #419849
 
  -- Joey Hess <joeyh@debian.org>  Wed, 18 Apr 2007 13:24:58 -0400
@@ -5422,7 +5421,7 @@ debhelper (5.0.45) unstable; urgency=low
     the rules file to the new location on upgrade.
   * This would be a good time for the many packages that manage rules files
     w/o using dh_installudev to begin to use it..
-  * Do script fragement reversal only in v6, since it can break certian
+  * Do script fragment reversal only in v6, since it can break certain
     third party programs such as dh_installtex. Closes: #419060
 
  -- Joey Hess <joeyh@debian.org>  Fri, 13 Apr 2007 12:34:10 -0400
@@ -5480,7 +5479,7 @@ debhelper (5.0.43) unstable; urgency=low
 debhelper (5.0.42) unstable; urgency=low
 
   [ Valery Perrin ]
-  * Update french translation with recents changes in dh_link and
+  * Update french translation with recent changes in dh_link and
     dh_installinfo
 
   [ Joey Hess ]
@@ -5550,13 +5549,13 @@ debhelper (5.0.37.3) unstable; urgency=low
 
   * Non-maintainer upload.
   * Update of dh_python
-    - when buidling for a non-standard Python version, generate more
+    - when building for a non-standard Python version, generate more
       reasonable Depends like "python (>= X.Y) | pythonX.Y"
       Closes: #375576
     - fix handling of private extensions. Closes: #375948
     - fix parsing of XS-Python-Version, it didn't work if only fixed versions
       were listed in XS-Python-Version.
-    - fix use of unitialized value. Closes: #374776
+    - fix use of uninitialized value. Closes: #374776
     - fix typos in POD documentation. Closes: #375936
 
  -- Raphael Hertzog <hertzog@debian.org>  Mon, 10 Jul 2006 13:20:06 +0200
@@ -5662,7 +5661,7 @@ debhelper (5.0.32) unstable; urgency=low
 debhelper (5.0.31) unstable; urgency=low
 
   [ Valery Perrin ]
-  * Update french translation with recents changes in dh_installxfonts,
+  * Update french translation with recent changes in dh_installxfonts,
     dh_link and dh_compress manpages
   * Delete -f option in po4a command line. Bug in po4a has been corrected in
     new version (0.24.1).
@@ -5724,7 +5723,7 @@ debhelper (5.0.27) unstable; urgency=low
 
 debhelper (5.0.26) unstable; urgency=high
 
-  * dh_installinit: Fix badly generated code in maint scripts that used
+  * dh_installinit: Fix badly generated code in maintscripts that used
      || exit 0   instead of the intended
      || exit $?
     due to a bad shell expansion and caused invoke-rc.d errors to be
@@ -5901,7 +5900,7 @@ debhelper (5.0.8) unstable; urgency=low
 
 debhelper (5.0.7) unstable; urgency=low
 
-  * Patch from Valéry Perrin to update Frensh translation, and also update
+  * Patch from Valéry Perrin to update French translation, and also update
     the po4a stuff. Closes: #338713
   * Fix a bad regexp in -s handling code that breaks if an architecture name,
     such as i386-uclibc is the hyphenated version of a different arch.
@@ -6052,7 +6051,7 @@ debhelper (4.9.5) unstable; urgency=low
   * dh_install: in v5 mode, error out if there are wildcards in the file
     list and the wildcards expand to nothing. Done only for v5 as this is a
     behavior change. Closes: #249815
-  * dh_usrlocal: generate prerm scripts that do not remove distroties in
+  * dh_usrlocal: generate prerm scripts that do not remove directories in
     /usr/local, but only subdirectories thereof, in accordance with policy.
     Closes: #319181
 
@@ -6063,8 +6062,8 @@ debhelper (4.9.4) unstable; urgency=low
   * dh_clean: switch to using complex_doit for the evil find command
     and quoting everything explicitly rather than the doit approach used
     before. This way all uses of EXCLUDE_FIND will use complex_doit, which
-    is necesary for sanity.
-  * Dh_Lib: Make COMPLEX_DOIT properly escape wildcards for use with
+    is necessary for sanity.
+  * Dh_Lib.pm: Make COMPLEX_DOIT properly escape wildcards for use with
     complex_doit. Before they were unescaped, which could lead to subtle
     breakage.
 
@@ -6111,7 +6110,7 @@ debhelper (4.9.0) unstable; urgency=low
   * Make compat() cache the expensive bits, since we run it more and more,
     including twice per config file line now..
   * Add a "run" program to source tree to make local testing easier
-    and simplfy the rules file.
+    and simplify the rules file.
   * Man page typo fixes. Closes: #305806, #305816
   * dh_installmenu: menus moved to /usr/share/menu. Closes: #228618
     Anyone with a binary executable menu file is SOL but there are none in
@@ -6175,7 +6174,7 @@ debhelper (4.2.31) unstable; urgency=low
 
 debhelper (4.2.30) unstable; urgency=low
 
-  * dh_installmime: Patch from Loïc Minier to add support for instlaling
+  * dh_installmime: Patch from Loïc Minier to add support for installing
     "sharedmimeinfo" files and calling update-mime-database. Closes: #255719
   * Modified patch to not hardcode pathnames.
   * Modified other autoscripts so there are no hardcoded pathnames at all
@@ -6186,7 +6185,7 @@ debhelper (4.2.30) unstable; urgency=low
 debhelper (4.2.29) unstable; urgency=low
 
   * dh_installdocs Spanish manpage update
-  * dh_installlogcheck: change permissions of logcheck rulefules from 600 to
+  * dh_installlogcheck: change permissions of logcheck rulefiles from 600 to
     644, at request of logcheck maintainer. Closes: #288357
   * dh_installlogcheck: fix indentation
 
@@ -6292,7 +6291,7 @@ debhelper (4.2.15) unstable; urgency=low
 debhelper (4.2.14) unstable; urgency=low
 
   * Make dh_gconf postinst more portable.
-  * Strip spoch when generating udeb filenames. Closes: #258864
+  * Strip epoch when generating udeb filenames. Closes: #258864
 
  -- Joey Hess <joeyh@debian.org>  Sat, 10 Jul 2004 11:15:34 -0400
 
@@ -6304,7 +6303,7 @@ debhelper (4.2.13) unstable; urgency=low
   * dh_gconf: kill gconfd-2 so that the newly installed schemas
     are available straight away. (Josselin Mouette)
   * dh_gconf: fix bashism in restart of gconfd-2
-  * dh_gconf: fix innaccuracy in man page; gconfd-2 is HUPPed, not
+  * dh_gconf: fix inaccuracy in man page; gconfd-2 is HUPPed, not
     killed.
   * dh_scrollkeeper: stop adding scrollkeeper to misc:Depends, since
     the postinst will not run it if it's not installed, and a single run after
@@ -6382,7 +6381,7 @@ debhelper (4.2.4) unstable; urgency=low
 
   * dh_installdocs: ignore .EX files as produced by dh-make.
   * dh_movefiles: if the file cannot be found, do not go ahead and try
-    to move it anyway, as this can produce unpredictable behavor with globs
+    to move it anyway, as this can produce unpredictable behavior with globs
     passed in from the shell. See bug #234105
 
  -- Joey Hess <joeyh@debian.org>  Fri, 20 Feb 2004 10:43:33 -0500
@@ -6417,14 +6416,14 @@ debhelper (4.2.0) unstable; urgency=low
   * Added udeb support, as pioneered by di-packages-build. Understands
     "XC-Package-Type: udeb" in debian/control. See debhelper(1) for
     details.
-  * Dh_Lib: add and export is_udeb and udeb_filename
+  * Dh_Lib.pm: add and export is_udeb and udeb_filename
   * dh_builddeb: name udebs with proper extension
   * dh_gencontrol: pass -n and filename to dpkg-gencontrol
   * dh_installdocs, dh_makeshlibs, dh_md5sums, dh_installchangelogs,
     dh_installexamples, dh_installman, dh_installmanpages: skip udebs
   * dh_shlibdeps: skip udebs. This may be temporary.
   * dh_installdeb: do not process conffiles, shlibs, preinsts, postrms,
-    or prerms for udebs. Do not substiture #DEBHELPER# tokens in
+    or prerms for udebs. Do not substitute #DEBHELPER# tokens in
     postinst scripts for udebs.
   * dh_installdebconf: skip config script for udebs, still do templates
 
@@ -6557,7 +6556,7 @@ debhelper (4.1.76) unstable; urgency=low
 debhelper (4.1.75) unstable; urgency=low
 
   * dh_install: add --fail-missing option. Closes: #120026
-  * Fix mispelling in prerm-sgmlcatalog. Closes: #215189
+  * Fix misspelling in prerm-sgmlcatalog. Closes: #215189
 
  -- Joey Hess <joeyh@debian.org>  Fri, 10 Oct 2003 22:12:59 -0400
 
@@ -6753,7 +6752,7 @@ debhelper (4.1.50) unstable; urgency=low
 
 debhelper (4.1.49) unstable; urgency=low
 
-  * dh_installman: Don't require trailing whitespace after the seciton number
+  * dh_installman: Don't require trailing whitespace after the section number
     in the TH line.
 
  -- Joey Hess <joeyh@debian.org>  Thu,  3 Jul 2003 14:08:41 -0400
@@ -6768,7 +6767,7 @@ debhelper (4.1.48) unstable; urgency=low
 
 debhelper (4.1.47) unstable; urgency=low
 
-  * dh_install: recalculate automatic $dest eash time through the glob loop.
+  * dh_install: recalculate automatic $dest each time through the glob loop.
     It might change if there are multiple wildcards Closes: #196344
 
  -- Joey Hess <joeyh@debian.org>  Mon, 16 Jun 2003 13:35:27 -0400
@@ -7101,7 +7100,7 @@ debhelper (4.1.3) unstable; urgency=low
   * dh_installinit: Always start daemon on upgraded even if
     --no-restart-on-upgrade is given; since the daemon is not stopped
     with that parameter starting it again is a no-op, unless the daemon was
-    not running for some reason. This makes transtions to using the flag
+    not running for some reason. This makes transitions to using the flag
     easier. Closes: #90976 and sorry it took me so long to verify you were
     right.
 
@@ -7123,7 +7122,7 @@ debhelper (4.1.1) unstable; urgency=low
 debhelper (4.1.0) unstable; urgency=low
 
   * Remove /usr/doc manglement code from postinst and prerm.
-    Do not use this verion of debhelper for woody backports!
+    Do not use this version of debhelper for woody backports!
   * Removed dh_installxaw.
 
  -- Joey Hess <joeyh@debian.org>  Sun, 21 Jul 2002 15:26:10 -0400
@@ -7152,7 +7151,7 @@ debhelper (4.0.18) unstable; urgency=low
 debhelper (4.0.17) unstable; urgency=low
 
   * In dh_install, don't limit to -type f when doing the find due to -X.
-    This makes it properly install syml8inks, cf my rpm bug.
+    This makes it properly install symlinks, cf my rpm bug.
 
  -- Joey Hess <joeyh@debian.org>  Fri,  5 Jul 2002 22:58:03 -0400
 
@@ -7264,7 +7263,7 @@ debhelper (4.0.3) unstable; urgency=low
 
 debhelper (4.0.2) unstable; urgency=low
 
-  * dh_install: delay globbing until after destintations have been found.
+  * dh_install: delay globbing until after destinations have been found.
     Closes: #143234
 
  -- Joey Hess <joeyh@debian.org>  Tue, 16 Apr 2002 21:25:32 -0400
@@ -7288,25 +7287,25 @@ debhelper (4.0.0) unstable; urgency=low
     - doesn't have that whole annoying debian/package.files vs. debian/files
       mess, as it uses debian/install.
     - supports copying empty subdirs. Closes: #133037
-    - doesn't use tar, thus no error reproting problems. Closes: #112538
+    - doesn't use tar, thus no error reporting problems. Closes: #112538
     - files are listed relative to the pwd, debian/tmp need not be used at
       all, so no globbing issues. Closes: #100404
     - supports -X. Closes: #116902
     - the whole concept of moving files out of a directory is gone, so this
       bug doesn't really apply. Closes: #120026
     - This is exactly what Bill Allombert asked for in #117383, even though I
-      designed it seemingly independantly. Thank you Bill! Closes: #117383
+      designed it seemingly independently. Thank you Bill! Closes: #117383
   * Made debhelper's debian/rules a lot simpler by means of the above.
   * Updated example rules file to use dh_install. Also some reordering and
     other minor changes.
   * dh_movefiles is lightly deprecated, and when you run into its bugs and
-    bad design, you are incouraged to just use dh_install instead.
+    bad design, you are encouraged to just use dh_install instead.
   * dh_fixperms: in v4 only, make all files in bin/ dirs +x. Closes: #119039
   * dh_fixperms: in v4 only, make all files in etc/init.d executable (of
     course there's -X ..)
   * dh_link: in v4 only, finds existing, non-policy-conformant symlinks
     and corrects them. This has the side effect of making dh_link idempotent.
-  * Added a -h/--help option. This seems very obvious, but it never occured to
+  * Added a -h/--help option. This seems very obvious, but it never occurred to
     me before..
   * use v4 for building debhelper itself
   * v4 mode is done, you may now use it without fear of it changing.
@@ -7332,7 +7331,7 @@ debhelper (3.4.13) unstable; urgency=low
 
 debhelper (3.4.12) unstable; urgency=low
 
-  * Fix to #99169 was accidentually reverted in 3.0.42; reinstated.
+  * Fix to #99169 was accidentally reverted in 3.0.42; reinstated.
 
  -- Joey Hess <joeyh@debian.org>  Sat, 16 Mar 2002 23:31:46 -0500
 
@@ -7402,7 +7401,7 @@ debhelper (3.4.4) unstable; urgency=low
     on. For example, dh_installinit in v4 mode adds sysvinit (>= 2.80-1) to
     that dep list, and dh_installxfonts adds a dep on xutils. This variable
     should make it easier to keep track of what your package needs to depends
-    on, supplimenting the ${shlibs:Depends} and ${perl:Depends} substvars.
+    on, supplementing the ${shlibs:Depends} and ${perl:Depends} substvars.
     Hmm, this appears to be based loosely on an idea by Masato Taruishi
     <taru@debian.org>, filtered through a long period of mulling it over.
     Closes: #76352
@@ -7424,11 +7423,11 @@ debhelper (3.4.2) unstable; urgency=low
   * dh_installxfonts:
     - Packages that use this should depend on xutils. See man page.
     - However, if you really want to, you can skip the dep, and the
-      postinst will avoid running program that arn't available. Closes: #131053
+      postinst will avoid running program that aren't available. Closes: #131053
     - Use update-fonts-dir instead of handling encodings ourselves. Yay!
     - Pass only the last component of the directory name to
-      update-fonts-*, since that's what they perfer now.
-    - Other changes, chould fully comply with Debian X font policy now.
+      update-fonts-*, since that's what they prefer now.
+    - Other changes, should fully comply with Debian X font policy now.
 
  -- Joey Hess <joeyh@debian.org>  Tue, 15 Jan 2002 12:17:43 -0500
 
@@ -7455,7 +7454,7 @@ debhelper (3.4.0) unstable; urgency=low
   * dh_installxaw is deprecated -- xaw-wrappers in no longer in the
     distribution. A warning message is now output when it runs. Currently used
     by: 3 packages (bugs filed).
-  * Added referneces to menufile in dh_installmenu man page. Closes: #127978
+  * Added references to menufile in dh_installmenu man page. Closes: #127978
     (dh_make is not a part of debhelper, if you want it changed, file a bug on
     dh-make.)
 
@@ -7552,7 +7551,7 @@ debhelper (3.0.43) unstable; urgency=low
 debhelper (3.0.42) unstable; urgency=low
 
   * dh_movefiles: Typo, Closes: #106532
-  * Use -x to test for existance of init scripts, rather then -e since
+  * Use -x to test for existence of init scripts, rather then -e since
     we'll be running them, Closes: #109692
   * dh_clean: remove debian/*.debhelper. No need to name files
     specifically; any file matching that is a debhelper temp file.
@@ -7631,10 +7630,10 @@ debhelper (3.0.30) unstable; urgency=low
     data, but it uses a different internal filename now). It will be merged
     with any automatically determined substvars data. See bug #98819
   * I want to stress that no one should ever rely in internal, undocumented
-    debhelper workings. Just because debhelper uses a certian name for some
+    debhelper workings. Just because debhelper uses a certain name for some
     internally used file does not mean that you should feel free to modify
     that file to your own ends in a debian package. If you do use it, don't
-    be at all suprised when it breaks. If you find that debhelper is lacking
+    be at all surprised when it breaks. If you find that debhelper is lacking
     a documented interface for something that you need, ask for it!
     (debhelper's undocumented, internal use only files should now all be
     prefixed with ".debhelper")
@@ -7650,7 +7649,7 @@ debhelper (3.0.29) unstable; urgency=low
 
 debhelper (3.0.28) unstable; urgency=low
 
-  * dh_clean: clean up temp files used by earlier versons of debhelper.
+  * dh_clean: clean up temp files used by earlier versions of debhelper.
     Closes: #99169
 
  -- Joey Hess <joeyh@debian.org>  Wed, 30 May 2001 16:24:09 -0400
@@ -7658,7 +7657,7 @@ debhelper (3.0.28) unstable; urgency=low
 debhelper (3.0.27) unstable; urgency=low
 
   * Fixed issues with extended parameters to dh_gencontrol including spaces
-    and quotes. This was some histirical cruft that deals with splitting up
+    and quotes. This was some historical cruft that deals with splitting up
     the string specified by -u, and it should not have applied to the set
     of options after --. Now that it's fixed, any and all programs that
     support a -- and options after it, do not require any special quoting
@@ -7698,7 +7697,7 @@ debhelper (3.0.24) unstable; urgency=low
 debhelper (3.0.23) unstable; urgency=low
 
   * dh_shlibdeps: the -l switch now just adds to LD_LIBRARY_PATH, if it is
-    already set. Newer fakeroots set it, and clobbering their settings
+    already set. Newer fakeroot sets it, and clobbering their settings
     breaks things since they LD_PRELOAD a library that is specified in the
     LD_LIBRARY_PATH. (blah) Closes: #97494
 
@@ -7706,7 +7705,7 @@ debhelper (3.0.23) unstable; urgency=low
 
 debhelper (3.0.22) unstable; urgency=low
 
-  * dh_installinfo: doc enchancement, Closes: #97515
+  * dh_installinfo: doc enhancement, Closes: #97515
   * dh_md5sums: don't fail if pwd has spaces in it (must be scraping the
     bottom of the bug barrel here). Closes: #97404
 
@@ -7810,10 +7809,10 @@ debhelper (3.0.9) unstable; urgency=low
   * Continues to depend on lynx for html changelog conversions. Yes, these
     and packages with translated debconf templates are rather rare, but
     it makes more sense for debhelper to consistently depend on all utilities
-    it uses internally rather than force people to keep their dependancies
+    it uses internally rather than force people to keep their dependencies
     up to date with debhelper internals. If I decide tomorrow that w3m is
     the better program to use to format html changelogs, I can make the
-    change and packages don't need to update their build dependancies.
+    change and packages don't need to update their build dependencies.
     Closes: #88464, #77743
   * Test for init scripts before running them, since they are conffiles and
     the admin may have removed them for some reason, and policy wants
@@ -7843,7 +7842,7 @@ debhelper (3.0.6) unstable; urgency=low
 
   * Corrected some uninitialized value stuff in dh_suidregister (actually
     quite a bad bug).
-  * dh_installman: fixed variable socoping error, so file conversions
+  * dh_installman: fixed variable scoping error, so file conversions
     should work now.
 
  -- Joey Hess <joeyh@debian.org>  Fri, 16 Feb 2001 14:15:02 -0800
@@ -7871,13 +7870,13 @@ debhelper (3.0.0) unstable; urgency=low
 
   * Added dh_installman, a new program that replaces dh_installmanpages.
     It is not DWIM. You tell it what to install and it figures out where
-    based on .TH section field and filename extension. I reccommend everyone
+    based on .TH section field and filename extension. I recommend everyone
     begin using it, since this is much better then dh_installmanpages's
     evilness. I've been meaning to do this for a very long time..
     Closes: #38673, #53964, #64297, #16933, #17061, #54059, #54373, #61816
   * dh_installmanpages remains in the package for backwards compatibility,
     but is mildly deprecated.
-  * dh_testversion is deprecated; use build dependancies instead.
+  * dh_testversion is deprecated; use build dependencies instead.
   * dh_suidregister: re-enabled. Aj thinks that requiring people to stop
     using it is unacceptable. Who am I to disagree with a rc bug report?
     Closes: #84910 It is still deprecated, and it will still whine at you
@@ -7888,7 +7887,7 @@ debhelper (3.0.0) unstable; urgency=low
     thought-toy, but nobody really used it, right?
   * Since the from-debstd document walks the maintainer through running
     dh_debstd to get a list of debhelper commands, and since that document
-    has really outlives its usefullness, I removed it too. Use dh-make
+    has really outlives its usefulness, I removed it too. Use dh-make
     instead.
   * dh_installman installs only into /usr/share/man, not the X11R6
     directory. Policy says "files must not be installed into
@@ -7904,7 +7903,7 @@ debhelper (3.0.0) unstable; urgency=low
     variable names, pod man pages).
   * Since with the fixing of the man page installer issue, my checklist for
     debhelper v3 is complete, I pronounce debhelper v3 done! Revved the
-    version number appropriatly (a large jump; v3 changes less than I had
+    version number appropriately (a large jump; v3 changes less than I had
     planned). Note that I have no plans for a v4 at this time. :-)
   * Testing: I have used this new version of debhelper to build a large
     number of my own packages, and it seems to work. But this release
@@ -7935,7 +7934,7 @@ debhelper (2.2.19) unstable; urgency=low
 debhelper (2.2.18) unstable; urgency=medium
 
   * Added a suggests to debconf-utils, Closes: #83643
-    I may chenge this to a dependancy at some point in the future,
+    I may change this to a dependency at some point in the future,
     since one debconf command needs the package to work.
 
  -- Joey Hess <joeyh@debian.org>  Tue, 30 Jan 2001 22:39:54 -0800
@@ -8004,7 +8003,7 @@ debhelper (2.2.10) unstable; urgency=low
 
 debhelper (2.2.9) unstable; urgency=low
 
-  * Fixed perl wanring, Closes: #80242
+  * Fixed perl warning, Closes: #80242
 
  -- Joey Hess <joey@kitenet.net>  Thu, 21 Dec 2000 14:43:11 -0800
 
@@ -8064,7 +8063,7 @@ debhelper (2.2.1) unstable; urgency=low
   * Reverted the change to make debian/README be treated as README.Debian,
     after I learned people use it for eg, documenting the source package
     itself. Closes: #34628, since it seems this is not such an "incredibly
-    minor" change after all. Never underetimate the annoyance of
+    minor" change after all. Never underestimate the annoyance of
     backwards-compatibility.
 
  -- Joey Hess <joeyh@debian.org>  Mon, 27 Nov 2000 12:01:52 -0800
@@ -8146,7 +8145,7 @@ debhelper (2.1.22) unstable; urgency=low
 debhelper (2.1.21) unstable; urgency=low
 
   * dh_movefiles: no longer does the symlink ordering hack, as
-    this is supported by dpkg itself now. Added a dependancy on
+    this is supported by dpkg itself now. Added a dependency on
     dpkg-dev >= 1.7.0 to make sure this doesn't break anything.
   * While I'm updating for dpkg 1.7.0, I removed the -ldirectory hack
     from dh_shlibdeps; dpkg-shlibdeps has its own much more brutal hack to
@@ -8218,7 +8217,7 @@ debhelper (2.1.15) unstable; urgency=low
 debhelper (2.1.14) unstable; urgency=low
 
   * Rats, the previous change makes duplicate lines be created in the
-    shlibs file, and lintian conplains. Added some hackery that should
+    shlibs file, and lintian complains. Added some hackery that should
     prevent that. Closes: #73052
 
  -- Joey Hess <joeyh@debian.org>  Tue,  3 Oct 2000 12:32:22 -0700
@@ -8376,7 +8375,7 @@ debhelper (2.0.100) unstable; urgency=low
 
   * Modified all postinst script fragments to only run when called with
     "configure". I looked at the other possibilities, and I don't think any
-    of the supported stuff should be called if the postist is called for
+    of the supported stuff should be called if the postinst is called for
     error unwinds. Closes: #66673
   * Implemented dh_clean -X, to allow specification of files to not delete,
     Closes: #66670
@@ -8385,7 +8384,7 @@ debhelper (2.0.100) unstable; urgency=low
 
 debhelper (2.0.99) unstable; urgency=low
 
-  * dh_installmodules will now install modiles even if etc/modutils already
+  * dh_installmodules will now install modules even if etc/modutils already
     exists (wasn't because of a logic error). Closes: #66289
   * dh_movefiles now uses debian/movelist, rather than just movelist. This
     is to fix an unlikely edge case involving a symlinked debian directory.
@@ -8496,7 +8495,7 @@ debhelper (2.0.86) unstable; urgency=low
 
 debhelper (2.0.85) unstable; urgency=low
 
-  * Downgraded fileutils dependancy just a bit for the Hurd foks.
+  * Downgraded fileutils dependency just a bit for the Hurd folks.
     Closes: #54620
 
  -- Joey Hess <joeyh@debian.org>  Mon, 10 Jan 2000 16:41:29 -0800
@@ -8537,7 +8536,7 @@ debhelper (2.0.80) unstable; urgency=low
 
 debhelper (2.0.79) unstable; urgency=low
 
-  * Corrected mispellings, Closes: #52013
+  * Corrected misspellings, Closes: #52013
 
  -- Joey Hess <joeyh@debian.org>  Mon,  6 Dec 1999 13:46:18 -0800
 
@@ -8576,7 +8575,7 @@ debhelper (2.0.76) unstable; urgency=low
      - dh_installdebfiles is no longer a part of debhelper. This affects
       exactly one package in unstable, biss-awt, which has had a bug filed
       against it for 200+ days now asking that it stop using the program.
-      dh_installdebfiles has been depreacted for nearly 2 years now..
+      dh_installdebfiles has been deprecated for nearly 2 years now..
   * This changelog was automatically generated from CVS commit information.
     Fear makechangelog.
 
@@ -8617,14 +8616,14 @@ debhelper (2.0.72) unstable; urgency=low
 
 debhelper (2.0.71) unstable; urgency=low
 
-  * Oh, the build dependancies include all of debhelper's regular
-    dependancies as well, since it builds using itself.
+  * Oh, the build dependencies include all of debhelper's regular
+    dependencies as well, since it builds using itself.
 
  -- Joey Hess <joeyh@debian.org>  Fri,  5 Nov 1999 14:14:26 -0800
 
 debhelper (2.0.70) unstable; urgency=low
 
-  * Added build dependancies to this package. That was easy; it just uses
+  * Added build dependencies to this package. That was easy; it just uses
     perl5 for regression testing, the rest of its build-deps are things
     in base.
   * dh_version.1: Added note that this program is quickly becoming obsolete.
@@ -8638,7 +8637,7 @@ debhelper (2.0.69) unstable; urgency=low
   * dh_shlibdeps: added -l option, which lets you specify a path that
     LD_LIBRARY_PATH is then set to when dpkg-shlibdeps is run. This
     should make it easier for library packages that also build binary
-    packages to be built with correct dependancies. Closes: #36751
+    packages to be built with correct dependencies. Closes: #36751
   * In honor of Burn all GIFs Day (hi Don!), I added alternative
     image formats .png, .jpg (and .jpeg) to the list of extensions dh_compress
     does not compress. Closes: #41733
@@ -8696,15 +8695,15 @@ debhelper (2.0.62) unstable; urgency=low
     <cwryu@dor17988.kaist.ac.kr>. Closes: #46684
     I made some changes, though:
     - I rewrote lots of this script to be more my style of perl.
-    - I removed all the verbisity from the postinst script fragment, since
+    - I removed all the verbosity from the postinst script fragment, since
       that is a clear violation of policy.
     - I made the postinst fail if the mkfontdir, etc commands fail, because
       this really makes more sense. Consider idempotency.
     - I moved the test to see if the font dir is really a directory into the
       dh_ script and out of the snippet. If the maintainer plays tricks on
-      us, mkfontdir will blow up satisfactorally anyway.
+      us, mkfontdir will blow up satisfactorily anyway.
     - So, the snippet is 9 lines long now, down from 20-some.
-    - I realize this isn't following the reccommendations made in Brando^Hen's
+    - I realize this isn't following the recommendations made in Brando^Hen's
       font policy. I'll fight it out with him. :-)
     - In postrm fragment, used rmdir -p to remove as many parent directories
       as I can.
@@ -8728,7 +8727,7 @@ debhelper (2.0.60) unstable; urgency=low
 debhelper (2.0.59) unstable; urgency=low
 
   * dh_installdocs: if $TMP/usr/share/doc/$PACKAGE is a broken symlink,
-    leaves it alone, assumming that the maintainer knows what they're doing
+    leaves it alone, assuming that the maintainer knows what they're doing
     and is probably linking to the doc dir of another package.
     (Closes: #46183)
 
@@ -8736,7 +8735,7 @@ debhelper (2.0.59) unstable; urgency=low
 
 debhelper (2.0.58) unstable; urgency=low
 
-  * Dh_Lib.pm: fixed bug in xargs() that made boundry words be skipped.
+  * Dh_Lib.pm: fixed bug in xargs() that made boundary words be skipped.
 
  -- Joey Hess <joeyh@debian.org>  Sun,  3 Oct 1999 18:55:29 -0700
 
@@ -8798,7 +8797,7 @@ debhelper (2.0.51) unstable; urgency=low
 
 debhelper (2.0.50) unstable; urgency=medium
 
-  * Oops. Fixed dh_shlibdeps so it actually generates dependancies, broke in
+  * Oops. Fixed dh_shlibdeps so it actually generates dependencies, broke in
     last version.
 
  -- Joey Hess <joeyh@debian.org>  Sat, 18 Sep 1999 19:00:10 -0700
@@ -8815,7 +8814,7 @@ debhelper (2.0.48) unstable; urgency=low
 
   * 4 whole days without a debhelper upload! Can't let that happen. Let's see..
   * dh_installperl.1: explain what you have to put in your control file
-    for the dependancies to be generated.
+    for the dependencies to be generated.
 
  -- Joey Hess <joeyh@debian.org>  Thu, 16 Sep 1999 21:15:05 -0700
 
@@ -8829,7 +8828,7 @@ debhelper (2.0.47) unstable; urgency=low
 debhelper (2.0.46) unstable; urgency=low
 
   * dh_installemacsen: the script fragments it generates now test for the
-    existance of emacs-package-install/remove before calling them. Though
+    existence of emacs-package-install/remove before calling them. Though
     a strict reading of the emacsen policy indicates that such a test
     shouldn't be needed, there may be edge cases (cf bug 44924), where it
     is.
@@ -8871,7 +8870,7 @@ debhelper (2.0.41) unstable; urgency=low
 
 debhelper (2.0.40) unstable; urgency=low
 
-  * FHS complience. Patch from Johnie Ingram <johnie@netgod.net>.
+  * FHS compliance. Patch from Johnie Ingram <johnie@netgod.net>.
     For the most part, this was a straight-forward substitution,
     dh_installmanpages needed a non-obvious change though.
   * Closes: #42489, #42587, #41732.
@@ -8880,7 +8879,7 @@ debhelper (2.0.40) unstable; urgency=low
     to make /usr/doc/<package> a compatibility symlink to
     /usr/share/doc/<package>. Note that currently if something exists in
     /usr/doc/<package> when the postinst is run, it will silently not make
-    the symlink. I'm considering more intellingent handing of this case.
+    the symlink. I'm considering more intelligent handing of this case.
   * Note that if you build a package with this version of debhelper, it will
     use /usr/share/man, /usr/share/doc, and /usr/share/info. You may need to
     modify other files in your package that reference the old locations.
@@ -8897,7 +8896,7 @@ debhelper (2.0.30) unstable; urgency=low
   * examples/rules.multi: use the above method to get rid of -i's and -a's.
   * examples/rules.multi2: new file, example of a multi-binary package that
     works for arch-indep and arch-dependant packages, and also allows
-    building of single binary packages independntly, via binary-<package>
+    building of single binary packages independently, via binary-<package>
     targets. It accomplishes all this using only one list of debhelper
     commands.
   * examples/*: removed source and diff targets. They've been obsolete for 2
@@ -9002,7 +9001,7 @@ debhelper (2.0.16) unstable; urgency=low
   * Dh_lib.pm: when looking for debhelper files in debian/, test with -f,
     not with -e, because it might fail if you're building a package named,
     say, 'docs', with a temp dir of debian/docs. I don't anticipate this
-    ever happenning, but it pays to be safe.
+    ever happening, but it pays to be safe.
 
  -- Joey Hess <joeyh@debian.org>  Tue, 20 Jul 1999 21:00:04 -0700
 
@@ -9048,7 +9047,7 @@ debhelper (2.0.10) unstable; urgency=low
 
   * dh_compress: compress changelog.html files. (Closes: #40626)
   * dh_installchangelogs: installs a link from changelog.html.gz to changelog.gz,
-    because I think it's important that upstream changelogs always be accessable
+    because I think it's important that upstream changelogs always be accessible
     at that name.
   * dh_compress: removed the usr/share/X11R6/man bit. Note part of FHS.
 
@@ -9058,7 +9057,7 @@ debhelper (2.0.09) unstable; urgency=low
 
   * dh_compress: added some FHS support. Though debhelper doesn't put stuff
     there (and won't until people come up with a general transition strategy or
-    decide to not have a clean transiotion), dh_compress now compresses
+    decide to not have a clean transition), dh_compress now compresses
     various files in /usr/share/{man,doc,info}. (Closes: #40892)
 
  -- Joey Hess <joeyh@debian.org>  Wed,  7 Jul 1999 09:55:03 -0700
@@ -9094,7 +9093,7 @@ debhelper (2.0.05) unstable; urgency=low
 debhelper (2.0.04) unstable; urgency=low
 
   * Patch from Raphael Hertzog <rhertzog@hrnet.fr> to make dh_perl support a
-    -d flag that makes it add a dependancy on the sppropriate perl-XXX-base
+    -d flag that makes it add a dependency on the appropriate perl-XXX-base
     package. Few packages will really need this. (Closes: #40631)
 
  -- Joey Hess <joeyh@debian.org>  Fri,  2 Jul 1999 11:22:00 -0700
@@ -9108,7 +9107,7 @@ debhelper (2.0.03) unstable; urgency=low
 
 debhelper (2.0.02) unstable; urgency=low
 
-  * If you're going to use v2, it's reccommended you call
+  * If you're going to use v2, it's recommended you call
     "dh_testversion 2". Added a note about that to doc/v2.
   * Dh_Lib.pm compat: if a version that is greater than the highest
     supported compatibility level is specified, abort with an error. Perhaps
@@ -9144,7 +9143,7 @@ debhelper (1.9.00) unstable; urgency=low
   * This is a release of debhelper in preparation for debhelper v2.
   * doc/v2: added, documented status of v2 changes.
   * README: mention doc/v2
-  * debhelper.1: docuimented DH_COMPAT
+  * debhelper.1: documented DH_COMPAT
   * examples/*: added DH_COMAPT=1 to top of rules files
 
  -- Joey Hess <joeyh@debian.org>  Thu,  1 Jul 1999 13:16:41 -0700
@@ -9182,7 +9181,7 @@ debhelper (1.2.80) unstable; urgency=low
 debhelper (1.2.79) unstable; urgency=low
 
   * Added dh_perl by Raphael Hertzog <rhertzog@hrnet.fr>. dh_perl handles
-    finding dependancies of perl scripts, plus deleting those annoying
+    finding dependencies of perl scripts, plus deleting those annoying
     .packlist files.
   * I don't think dh_perl is going to be useful until the new version of
     perl comes out.
@@ -9206,7 +9205,7 @@ debhelper (1.2.76) unstable; urgency=low
 
   * dh_fixperms: Do not use chmod/chown -R at all anymore, instead it uses
     the (slower) find then chown method. Necessary because the -R methods will
-    happyily attempt to chown a dangling symlink, which makes them fail.
+    happily attempt to chown a dangling symlink, which makes them fail.
     (Closes: #38911)
 
  -- Joey Hess <joeyh@debian.org>  Mon,  7 Jun 1999 20:20:01 -0700
@@ -9268,7 +9267,7 @@ debhelper (1.2.68) unstable; urgency=low
   * doc/README: updated example of using #DEBHELPER# in a perl script, with
     help from Julian Gilbey.
   * dh_link: generate absolute symlinks where appropriate. The links
-    generated before were wrong simetimes (#37774)
+    generated before were wrong sometimes (#37774)
   * Started writing a regression test suite for debhelper. Currently covers
     only the above bugfix and a few more dh_link tests.
   * Tossed Test.pm into the package (for regression tests) until we get perl
@@ -9554,7 +9553,7 @@ debhelper (1.2.30) unstable; urgency=low
 debhelper (1.2.29) unstable; urgency=high
 
   * Do not include bogus chsh, chfn, passwd links in debhelper binary!
-    These were acidentially left in after dh_link testing I did as I was
+    These were accidentally left in after dh_link testing I did as I was
     working on the last version of debhelper.
 
  -- Joey Hess <joeyh@debian.org>  Mon, 25 Jan 1999 20:26:46 -0800
@@ -9574,7 +9573,7 @@ debhelper (1.2.27) unstable; urgency=low
 
 debhelper (1.2.26) unstable; urgency=low
 
-  * dh_installdocs: use prerm-doc-base script fragement. Was using
+  * dh_installdocs: use prerm-doc-base script fragment. Was using
     postrm-doc-base, for some weird reason.
 
  -- Joey Hess <joeyh@debian.org>  Mon, 18 Jan 1999 13:36:40 -0800
@@ -9583,7 +9582,7 @@ debhelper (1.2.25) unstable; urgency=low
 
   * autoscripts/*menu*: It turns out that "command" is like test -w, it will
     still return true if update-menus is not executable. This can
-    legitimatly happen if you are upgrading the menu package, and it makes
+    legitimately happen if you are upgrading the menu package, and it makes
     postinsts that use command fail. Reverted to using test -x. Packages
     built with debhelper >= 1.2.21 that use menus should be rebuilt.
 
@@ -9728,7 +9727,7 @@ debhelper (1.2.10) unstable; urgency=low
 
 debhelper (1.2.9) unstable; urgency=low
 
-  * Added dh_link, which generates policy complient symlinks in binary
+  * Added dh_link, which generates policy compliant symlinks in binary
     packages, painlessly.
 
  -- Joey Hess <joeyh@debian.org>  Thu, 19 Nov 1998 18:43:36 -0800
@@ -9789,7 +9788,7 @@ debhelper (1.2.2) unstable; urgency=low
 
   * dh_du, dh_shlibdeps, dh_undocumented: rewrite in perl.
   * dh_undocumented: shortened the symlink used for section 7 undocumented
-    man pages, since it can link to undocuemented.7.gz in the same directory.
+    man pages, since it can link to undocumented.7.gz in the same directory.
 
  -- Joey Hess <joeyh@debian.org>  Tue, 10 Nov 1998 13:40:22 -0800
 
@@ -9802,7 +9801,7 @@ debhelper (1.2.1) unstable; urgency=low
 debhelper (1.2.0) unstable; urgency=low
 
   * A new unstable dist means I'm back to converting more of debhelper to
-    perl.. Since 1.1 has actually stabalized, I've upped this to 1.2.
+    perl.. Since 1.1 has actually stabilized, I've upped this to 1.2.
   * dh_md5sums: rewritten in perl, for large speed gain under some
     circumstances (old version called perl sometimes, once per package.)
   * dh_installmenu, dh_installemacsen, dh_installwm: perlized.
@@ -9948,10 +9947,10 @@ debhelper (1.1.10) unstable; urgency=low
     need fixing (and will refuse to build with current versions of debhelper).
     I apologize for the inconvenience.
 
-  * dh_clean: fixed a bug, intorduced in version 1.1.8, where it didn't
+  * dh_clean: fixed a bug, introduced in version 1.1.8, where it didn't
     remove debian/files properly.
   * dh_shlibdeps, dh_testdir, dh_testroot, dh_testversion: converted to perl.
-  * Encode the version of debhelper in a sepererate file, so dh_testversion
+  * Encode the version of debhelper in a separate file, so dh_testversion
     doesn't have to be generated when a new version of debhelper is built.
   * Removed bogus menu file.
 
@@ -9971,7 +9970,7 @@ debhelper (1.1.8) unstable; urgency=low
     escaped. Also, no longer escape "-".
   * dh_clean, dh_gencontrol, dh_installcron: converted to perl.
   * dh_gencontrol.1, dh_gencontrol: the man page had said that
-    --update-rcd-params was equivilant to -u for this program. You should
+    --update-rcd-params was equivalent to -u for this program. You should
     really use --dpkg-gencontrol-params.
 
  -- Joey Hess <joeyh@debian.org>  Fri, 14 Aug 1998 14:07:35 -0700
@@ -10004,7 +10003,7 @@ debhelper (1.1.5) unstable; urgency=low
     metacharacters in the output. I probably don't escape out all the
     characters I should, but this is just a convenience to the user anyway.
   * dh_installdebfiles: it's been broken forever, I fixed it. Obviously
-    nobody uses it anymore, which is good, since it's deprected :-)
+    nobody uses it anymore, which is good, since it's deprecated :-)
 
  -- Joey Hess <joeyh@debian.org>  Tue, 11 Aug 1998 15:23:34 -0700
 
@@ -10022,7 +10021,7 @@ debhelper (1.1.4) unstable; urgency=low
     (blank lines in debian/docs file problem), although this same problem
     applies to other debhelper programs... like dh_installexamples, which had
     the same bug fixed when I rewrote it in perl just now.
-  * Dh_Lib.pm: accidentially didn't check DH_VERBOSE if commands were not
+  * Dh_Lib.pm: accidentally didn't check DH_VERBOSE if commands were not
     passed any switches.
   * Dh_Getopt.pm: --noscripts was broken.
 
@@ -10031,12 +10030,12 @@ debhelper (1.1.4) unstable; urgency=low
 debhelper (1.1.3) unstable; urgency=low
 
   * dh_md5sums: -x was broken since version 1.1.1 - fixed.
-  * dh_lib: removed get_arch_indep_packages() function that hasn't been used
+  * Dh_Lib.pm: removed get_arch_indep_packages() function that hasn't been used
     at all for a long while.
   * Added Dh_Lib.pm, a translation of dh_lib into perl.
   * dh_getopt.pl: moved most of it into new Dh_Getopt.pm module, rewriting
     large chunks in the process.
-  * dh_installdocs: completly rewritten in perl. Now it's faster and it can
+  * dh_installdocs: completely rewritten in perl. Now it's faster and it can
     install many oddly named files it died on before.
   * dh_installdocs: fixed a bug that installed TODO files mode 655 in native
     debian packages.
@@ -10072,7 +10071,7 @@ debhelper (1.1.0) unstable; urgency=low
   * Added debhelper.1 man page, which groups all the debhelper options that
     are common to all commands in once place so I can add new options w/o
     updating 27 man pages.
-  * dh_*.1: updated all debheper man pages to refer to debhelper(1) where
+  * dh_*.1: updated all debhelper man pages to refer to debhelper(1) where
     appropriate. Also corrected a host of little errors.
   * doc/README: moved a lot of this file into debhelper.1.
   * dh_*: -N option now excludes a package from the list of packages the
@@ -10135,7 +10134,7 @@ debhelper (0.99) unstable; urgency=low
 
 debhelper (0.98) unstable; urgency=low
 
-  * dh_lib: isnative: pass -l<changelog> to dpkg-parsechangelog, to support
+  * Dh_Lib.pm: isnative: pass -l<changelog> to dpkg-parsechangelog, to support
     odd packages with multiple different debian changelogs.
   * doc/PROGRAMMING: cleaned up the docs on DH_EXCLUDE_FIND.
 
@@ -10144,7 +10143,7 @@ debhelper (0.98) unstable; urgency=low
 debhelper (0.97) unstable; urgency=low
 
   * doc/from-debstd: fixed a typo.
-  * examples/*: install-stamp no longer depends on phony build targey; now
+  * examples/*: install-stamp no longer depends on phony build target; now
     install-stamp depends on build-stamp instead (#24234).
   * dh_fixperms: applied patch from Herbert Xu <herbert@gondor.apana.org.au>
     to fix bad uses of the find command, so it should now work on packages
@@ -10165,7 +10164,7 @@ debhelper (0.96) unstable; urgency=low
 
 debhelper (0.95) unstable; urgency=low
 
-  * dh_movefiles: move even very strangly named files. (#23775) Unfortunatly,
+  * dh_movefiles: move even very strangely named files. (#23775) Unfortunatly,
     I had to use a temporary file. Oh well..
 
  -- Joey Hess <joeyh@debian.org>  Mon, 22 Jun 1998 17:16:17 -0700
@@ -10369,7 +10368,7 @@ debhelper (0.71) unstable; urgency=low
 
   * dh_makeshlibs: -V flag was broken: if just -V was specified,
     dh_makeshlibs would die. Corrected this.
-  * dh_lib: removed warning if the arguments passed to a debhelper command
+  * Dh_Lib.pm: removed warning if the arguments passed to a debhelper command
     do not apply to the main package. It's been long enough so I'm 100% sure
     no packages use the old behavior.
 
@@ -10377,7 +10376,7 @@ debhelper (0.71) unstable; urgency=low
 
 debhelper (0.70) unstable; urgency=low
 
-  * dh_lib: autoscript(): no longer add the modification date to the
+  * Dh_Lib.pm: autoscript(): no longer add the modification date to the
     comments aurrounding debhelper-added code. I don't think this date was
     gaining us anything, so let's remove it and save some disk space.
 
@@ -10500,7 +10499,7 @@ debhelper (0.55) unstable; urgency=low
 
 debhelper (0.54) unstable; urgency=low
 
-  * dh_lib: no longer call getopt(1) to parse options. I wrote my own
+  * Dh_Lib.pm: no longer call getopt(1) to parse options. I wrote my own
     argument processor in perl.
   * Added long versions of all arguments. TODO: document them.
   * All parameters may now be passed values that include whitespace (ie,
@@ -10560,7 +10559,7 @@ debhelper (0.50) unstable; urgency=low
     and debhelper's behavior has altered.
   * I have grepped debian's source packages, and I'm quite sure this
     is not going to affect any packages currently in debian.
-  * dh_lib: isnative() now caches its return value, which should optimize
+  * Dh_Lib.pm: isnative() now caches its return value, which should optimize
     away several more calls to dpkg-parsechangelog.
   * README: explain a way to embed debhelper generated shell script into a
     perl script.
@@ -10588,7 +10587,7 @@ debhelper (0.36) unstable; urgency=low
 
 debhelper (0.35) unstable; urgency=low
 
-  * dh_lib: use dpkg-parsechangelog instead of parsing it by hand. This
+  * Dh_Lib.pm: use dpkg-parsechangelog instead of parsing it by hand. This
     makes a package build slower (by about 30 seconds, on average), so
     I might remove it or optimize it if too many people yell at me. :-)
   * dh_undocumented.1: note that it really links to undocumented.7.gz.
@@ -10637,7 +10636,7 @@ debhelper (0.30) unstable; urgency=low
 
 debhelper (0.29) unstable; urgency=low
 
-  * dh_lib: don't expand text passed to doit() a second time. This fixes
+  * Dh_Lib.pm: don't expand text passed to doit() a second time. This fixes
     #15624, and hopefully doesn't break anything else.
   * A side effect of this (of interest only to the debhelper programmer) is
     that doit() can no longer handle complex commands now. (ie, pipes, `;',
@@ -10720,7 +10719,7 @@ debhelper (0.18) unstable; urgency=low
   * examples/*: added source, diff targets that just print an error.
   * dh_clean: clean up more files - *.orig, *.rej, *.bak, .*.orig, .*.rej,
     .SUMS, TAGS, and empty files.
-  * dh_lib: doit(): use eval on parameters, instead of directly running
+  * Dh_Lib.pm: doit(): use eval on parameters, instead of directly running
     them. This lets me clean up several nasty areas where I had to echo the
     commands once, and then run them seperatly.
 
@@ -10730,7 +10729,7 @@ debhelper (0.17) unstable; urgency=low
 
   * Added dh_installdirs, automatically creates subdirectories (for
     compatibility with debstd's debian/dirs file.
-  * dh_lib: fixed problem with -P flag.
+  * Dh_Lib.pm: fixed problem with -P flag.
 
  -- Joey Hess <joeyh@debian.org>  Fri,  7 Nov 1997 16:07:11 -0500
 
