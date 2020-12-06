@@ -10,6 +10,11 @@ use v5.24;
 use warnings;
 use utf8;
 
+# Disable unicode_strings for now until a better solution for
+# Debian#971362 comes around.
+no feature 'unicode_strings';
+
+
 use constant {
 	# Lowest compat level supported
 	'MIN_COMPAT_LEVEL' => 5,
