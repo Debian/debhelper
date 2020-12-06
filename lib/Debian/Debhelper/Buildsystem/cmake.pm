@@ -151,6 +151,16 @@ sub configure {
 	}
 }
 
+sub build {
+	my $this=shift;
+	my $target = $this->get_targetbuildsystem;
+	if ($target->NAME eq 'makefile') {
+		# Add VERBOSE=1 for #973029 when not asked to be quiet/terse.
+		push(@_, "VERBOSE=1") if not $dh{QUIET};
+	}
+	return $this->SUPER::build(@_);
+}
+
 sub test {
 	my $this=shift;
 	my $target = $this->get_targetbuildsystem;
@@ -160,7 +170,7 @@ sub test {
 		# -j1). So in order to simulate unlimited parallel, allow to fork a huge
 		# number of threads instead.
 		my $parallel = ($this->get_parallel() > 0) ? $this->get_parallel() : 999;
-		push(@_, "ARGS+=-j$parallel")
+		push(@_, "ARGS+=-j$parallel");
 	}
 	return $this->SUPER::test(@_);
 }
