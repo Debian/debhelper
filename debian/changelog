@@ -22,6 +22,12 @@ debhelper (13.2.2) UNRELEASED; urgency=medium
   * Dh_Lib.pm: Disable "unicode_strings" feature, which caused
     issues with UTF-8 encoded files.  Thanks to Sebastien Bacher
     for reporting the issue.  (Closes: #971362)
+  * dh_installinfo: Work around upstream installing the
+    usr/share/info/dir file.  If seen, dh_installinfo will now
+    tag it as "installed" even though it is not installed.  This
+    avoids promoting the installation of the file by dh_missing
+    only to have lintian tell people to remove it again.
+    (Closes: #971036)
 
   [ Michael Biebl ]
   * autoscripts/postrm-systemd-reload-only: Run daemon-reload on

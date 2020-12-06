@@ -70,7 +70,7 @@ init(options => {
 	"sourcedir=s" => \$dh{SOURCEDIR},
 });
 
-# PROMISE: DH NOOP WITHOUT pkgfile-logged(info) cli-options()
+# PROMISE: DH NOOP WITHOUT pkgfile-logged(info) cli-options() tmp(usr/share/info/dir)
 
 my $default_error_handler = compat(10) ? \&glob_expand_error_handler_reject_nomagic_warn_discard : \&glob_expand_error_handler_reject;
 my $nodocs = is_build_profile_active('nodoc') || get_buildoption('nodoc') ? 1 : 0;
@@ -82,6 +82,7 @@ foreach my $package (getpackages()) {
 	my $tmp=tmpdir($package);
 	my $file=pkgfile($package,"info");
 	my @search_dirs = ('.');
+	my @ignored_files;
 	my $skip_install = process_pkg($package) ? 0 : 1;
 	my $error_handler = $skip_install ? \&glob_expand_error_handler_silently_ignore : $default_error_handler;
 	@search_dirs = ($dh{SOURCEDIR} // '.', default_sourcedir($package)) if not compat(10);
@@ -96,7 +97,19 @@ foreach my $package (getpackages()) {
 		push @info, @ARGV;
 	}
 
-	log_installed_files($package, @info);
+	# Pretend that we handled usr/share/info/dir.  We do not want to install it as it causes
+	# file conflicts between packages and we also do not want dh_missing to drop a bomb on
+	# the user for it.
+	#
+	# See #971036
+	for my $path (@search_dirs) {
+		if ( -e "${path}/usr/share/info/dir" ) {
+			push(@ignored_files, 'usr/share/info/dir');
+			last;
+		}
+	}
+
+	log_installed_files($package, @info, @ignored_files);
 
 	next if $skip_install or $nodocs;
 
