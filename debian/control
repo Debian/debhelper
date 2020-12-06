@@ -37,7 +37,7 @@ Depends: autotools-dev,
          po-debconf,
          ${misc:Depends},
          ${perl:Depends}
-Breaks: dh-systemd (<< 1.38),
+Breaks:
 # To ensure cmake understands -DCMAKE_INSTALL_RUNSTATEDIR=/run as used in compat 11
 # - Can be dropped (with the caveat that cmake packages may behave differently
 #   depending on the version of cmake).
@@ -48,7 +48,6 @@ Breaks: dh-systemd (<< 1.38),
 # The qmake cross wrapper was introduced in 5.9.2+dfsg-5, but got some important
 # fixes in the subsequent uploads. It is only needed for cross-building.
 #        qt5-qmake (<< 5.9.2+dfsg-8),
-Replaces: dh-systemd (<< 1.38)
 Suggests: dh-make
 Provides: ${dh:CompatLevels},
           dh-sequence-dwz,
@@ -77,12 +76,3 @@ Description: debhelper perl modules
  automate common tasks related to building Debian packages.
  .
  This package provides the perl modules used by the scripts in debhelper.
-
-Package: dh-systemd
-Section: oldlibs
-Architecture: all
-Multi-Arch: foreign
-Depends: debhelper (>= 9.20160709),
-         ${misc:Depends},
-Description: debhelper add-on to handle systemd unit files - transitional package
- This package is for transitional purposes and can be removed safely.
