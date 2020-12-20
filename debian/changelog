@@ -101,9 +101,9 @@ debhelper (13.1) unstable; urgency=low
   [ Niels Thykier ]
   * dh_installinitramfs: Remove misleading "in compat 12" as the
     behaviour was unrelated to the compat level.
-  * dh_installinitramfs: Migrate to using declaratively triggering
-    update-initramfs as a noawait trigger (replacing maintscript
-    calls to "update-initramfs -u", which had the same affect).
+  * dh_installinitramfs: Migrate to triggering update-initramfs
+    via activate-noawait trigger (replacing maintscript calls to
+    "update-initramfs -u", which had the same affect).
     (Closes: #822730).
   * dh_installman: Improve error messages and handling of broken
     section numbers.  Notably, the auto-detection no longer picks
@@ -133,21 +133,21 @@ debhelper (13.1) unstable; urgency=low
     to enable more modern features.
   * Dh_Lib.pm: Fix a bug in variable substitution where ${Tab}
     incorrectly expanded to "\b" rather than "\t".
-  * dh_installchangelogs.1: Loosely document which file names that
+  * dh_installchangelogs: Loosely document which file names that
     dh_installchangelogs uses as guesses for finding an upstream
     changelog file.  Thanks to Laurent Bigonville for suggesting
     the change.  (Closes: #933224)
   * Dh_Lib.pm: When setting HOME or XDG_RUNTIME_DIR in compat 13,
     use an absolute path.  Thanks to Dmitry Shachnev for reporting
     the issue.  (Closes: #959731)
-  * dh_installsystemd.1: Copy the description for the
+  * dh_installsystemd: Copy the description for the
     --no-stop-on-upgrade option from dh_installinit.
   * dh_installsystemd: Have --no-start or --no-stop-on-upgrade
     disable --restart-after-upgrade as the documentation says it
     will.  Thanks to Axel Beckert for reporting the issue.
     (Closes: #959678)
   * dh_installinit: Ditto.
-  * dh.1: Explicitly document that hook targets can cause
+  * dh: Explicitly document that hook targets can cause
     complications when they are made unconditional by a makefile
     target and suggest alternatives.  Thanks to Marcin Owsiany for
     reporting this.  (Closes: #645873)
@@ -155,10 +155,10 @@ debhelper (13.1) unstable; urgency=low
     trips bhlc due to a bug in cmake.  Thanks to Nicolas
     Braud-Santoni and "anoteng" for reporting the issue.
     (Closes: #959494)
-  * dh_clean.1: Rephrase the description of dh_clean to avoid
+  * dh_clean: Rephrase the description of dh_clean to avoid
     confusion about when it is run.  Thanks to Hugh McMaster for
     the suggestion.  (Closes: #960110)
-  * dh_missing.1: Update documentation to reflect that the
+  * dh_missing: Update documentation to reflect that the
     --fail-missing option is now the default in compat 13.
     Thanks to Hugh McMaster and Christoph Berg for the report.
     (Closes: #960107, #960697)
@@ -216,7 +216,7 @@ debhelper (13) unstable; urgency=medium
 debhelper (12.10) unstable; urgency=medium
 
   [ Niels Thykier ]
-  * dh_installsystemd.1: Improve documentation about tmpfiles that
+  * dh_installsystemd: Improve documentation about tmpfiles that
     are now handled by dh_installtmpfiles in compat 13.
   * dh_installtmpfiles: Prefer debian/package.tmpfiles over
     debian/package.tmpfile, but accept the old path with a warning.
@@ -668,7 +668,7 @@ debhelper (12.2.3) unstable; urgency=medium
 
 debhelper (12.2.2) unstable; urgency=medium
 
-  * dh_shlibdeps: Remove regex anchor when parsing file(1) to aovid
+  * dh_shlibdeps: Remove regex anchor when parsing file(1) to avoid
     regressions with setuid/setgid binaries.  Thanks to James
     Cowgill for reporting the issue.  (Closes: #932240)
   * dh_strip: Ditto.
@@ -1373,7 +1373,7 @@ debhelper (11.1.5~alpha1) experimental; urgency=medium
 
 debhelper (11.1.4) unstable; urgency=medium
 
-  * qmake.pm/qmake4.pm: Avoid global state in the build systems.
+  * qmake.pm,qmake_qt4.pm: Avoid global state in the build systems.
   * dh_makeshlibs: Fix --no-act, which could still cause writes
     to the shlibs file.  Thanks to Sven Joachim for reporting it.
     (Closes: #888974)
@@ -3252,7 +3252,7 @@ debhelper (9.20150501) unstable; urgency=medium
   * autoscripts/*-emacsen: Apply patch from Paul Wise to check that
     emacs-package-{install,remove} is (still) present before invoking
     it.  (Closes: #736896)
-  * dh_install.1: Document that dh-exec can be used to do renaming
+  * dh_install: Document that dh-exec can be used to do renaming
     and provide a trivial example of how to achieve it.  (Closes: #245554)
   * dh_makeshlibs: Apply patch from Guillem Jover to stop adding
     Pre-Depends on multiarch-support.  The transition is far enough that
