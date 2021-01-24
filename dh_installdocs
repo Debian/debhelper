@@ -424,30 +424,13 @@ foreach my $package (getpackages()) {
 	if (%doc_ids) {
 		install_dir("$tmp/usr/share/doc-base/");
 	}
-	# check for duplicate document ids
-	my %used_doc_ids;
-	for my $fn (keys %doc_ids) {
-		$used_doc_ids{$doc_ids{$fn}}++;
-	}
 	foreach my $fn (keys %doc_ids) {
-		# if this document ID is duplicated, we will install
-		# to usr/share/doc-base/packagename instead of
-		# usr/share/doc-base/doc_id. To allow for multiple
-		# conflicting doc-bases in a single package, we will
-		# install to usr/share/doc-base/packagename-extrabits
-		# if the doc-base file is
-		# packagename.doc-base.extrabits
-		if ($used_doc_ids{$doc_ids{$fn}} > 1) {
-			my $fn_no_docbase = $fn;
-			$fn_no_docbase =~ s/\.doc-base(?:\.(.*))?/
-			    if (defined $1 and length $1) {"-$1"} else {''}/xe;
-			install_file("debian/$fn",
-						 "$tmp/usr/share/doc-base/$fn_no_docbase");
-		}
-		else {
-			install_file("debian/$fn",
-						 "$tmp/usr/share/doc-base/$doc_ids{$fn}");
-		}
+		# To avoid issues with duplicated document IDs, we will always
+		# install to usr/share/doc-base/<packagename>.<doc_id> instead
+		# of just usr/share/doc-base/<packagename> or just
+		# usr/share/doc-base/<doc_id>. See #525821 and #980903.
+		install_file("debian/$fn",
+					 "$tmp/usr/share/doc-base/$package.$doc_ids{$fn}");
 	}
 }
 
