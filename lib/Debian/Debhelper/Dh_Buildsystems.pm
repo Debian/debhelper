@@ -40,6 +40,7 @@ our @THIRD_PARTY_BUILDSYSTEMS = (
 	'gradle',
 	'mkcmake',
 	'bmake',
+	'golang',
 );
 
 my $opt_buildsys;
