@@ -88,6 +88,13 @@ that multiple doc-base files of this style in a single source package
 share the same doc-id, they will be installed to
 usr/share/doc-base/package-* instead of usr/share/doc-base/doc-id.
 
+Please be aware that this deduplication currently only works if
+B<dh_installdocs> is called only once during the package build as
+deduplication is done in memory only. Especially calling
+B<dh_installdocs -p>I<package> in combination with using
+F<debian/>I<package>F<.doc-base.*> files can lead to uninstallable
+packages. See L<https://bugs.debian.org/980903> for details.
+
 =back
 
 =head1 OPTIONS
