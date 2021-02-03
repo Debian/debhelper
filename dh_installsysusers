@@ -95,7 +95,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$has_sysuser = 1;
 		}
 		closedir($dir_fd);
-		addsubstvar($package, "misc:Depends", "systemd | systemd-standalone-sysusers") if $has_sysuser;
+		addsubstvar($package, "misc:Depends", "systemd | systemd-standalone-sysusers | systemd-sysusers")
+			if $has_sysuser;
 	}
 
 }
