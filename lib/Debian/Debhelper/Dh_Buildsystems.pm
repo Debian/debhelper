@@ -38,6 +38,8 @@ our @BUILDSYSTEMS = (
 our @THIRD_PARTY_BUILDSYSTEMS = (
 	'maven',
 	'gradle',
+	'mkcmake',
+	'bmake',
 );
 
 my $opt_buildsys;
