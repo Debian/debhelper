@@ -2,12 +2,13 @@
 # Valery Perrin <valery.perrin.debian@free.fr>, 2005, 2006, 2010, 2011.
 # David Prévot <david@tilapin.org>, 2012-2014.
 # Baptiste Jammet <baptiste@mailoo.org>, 2015-2017, 2019.
+# Jean-Pierre Giraud <jean-pierregiraud@neuf.fr>, 2021.
 msgid ""
 msgstr ""
 "Project-Id-Version: debhelper manpages\n"
-"POT-Creation-Date: 2021-02-22 09:37+0100\n"
-"PO-Revision-Date: 2019-01-18 13:58+0100\n"
-"Last-Translator: Baptiste Jammet <baptiste@mailoo.org>\n"
+"POT-Creation-Date: 2021-01-31 23:36+0100\n"
+"PO-Revision-Date: 2021-02-13 10:02+0100\n"
+"Last-Translator: Jean-Pierre Giraud <jean-pierregiraud@neuf.fr>\n"
 "Language-Team: French <debian-l10n-french@lists.debian.org>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -148,12 +149,6 @@ msgstr ""
 
 #. type: textblock
 #: debhelper.pod:31
-#, fuzzy
-#| msgid ""
-#| "Except where tool explicitly denotes otherwise, all of the debhelper "
-#| "tools assumes that they run from root directory of an unpacked source "
-#| "package.  This is so they can locate find files like F<debian/control> "
-#| "when needed."
 msgid ""
 "Except where the tool explicitly denotes otherwise, all of the debhelper "
 "tools assume that they run from the root directory of an unpacked source "
@@ -177,8 +172,8 @@ msgid ""
 "Here is the list of debhelper commands you can use. See their man pages for "
 "additional documentation."
 msgstr ""
-"Voici la liste des commandes debhelper disponibles. Consulter leurs pages de "
-"manuel respectives pour obtenir des informations complémentaires."
+"Voici la liste des commandes de debhelper disponibles. Consulter leurs pages "
+"de manuel respectives pour obtenir des informations complémentaires."
 
 # type: textblock
 #. type: textblock
@@ -195,7 +190,7 @@ msgstr "Commandes obsolètes"
 #: debhelper.pod:49
 msgid "A few debhelper commands are deprecated and should not be used."
 msgstr ""
-"Quelques commandes debhelper sont obsolètes et ne devraient plus être "
+"Quelques commandes de debhelper sont obsolètes et ne devraient plus être "
 "utilisées."
 
 #. type: textblock
@@ -335,10 +330,8 @@ msgstr ""
 # type: textblock
 #. type: =head2
 #: debhelper.pod:104
-#, fuzzy
-#| msgid "Executable debhelper config files"
 msgid "Substitutions in debhelper config files"
-msgstr "Fichiers de configuration de l'exécutable debhelper."
+msgstr "Substitutions dans les fichiers de configuration de debhelper"
 
 #. type: textblock
 #: debhelper.pod:106
@@ -346,6 +339,9 @@ msgid ""
 "In compatibility level 13 and later, it is possible to use simple "
 "substitutions in debhelper config files for the following tools:"
 msgstr ""
+"À partir du niveau de compatibilité 13, il est possible d'utiliser des "
+"substitutions simples dans les fichiers de configuration de debhelper pour "
+"les outils suivants :"
 
 #. type: =item
 #: debhelper.pod:111 debhelper.pod:115 debhelper.pod:119 debhelper.pod:123
@@ -358,67 +354,67 @@ msgstr "*"
 #. type: textblock
 #: debhelper.pod:113
 msgid "dh_clean"
-msgstr ""
+msgstr "dh_clean"
 
 #. type: textblock
 #: debhelper.pod:117
 msgid "dh_install"
-msgstr ""
+msgstr "dh_install"
 
 #. type: textblock
 #: debhelper.pod:121
 msgid "dh_installcatalogs"
-msgstr ""
+msgstr "dh_installcatalogs"
 
 #. type: textblock
 #: debhelper.pod:125
 msgid "dh_installdeb"
-msgstr ""
+msgstr "dh_installdeb"
 
 #. type: textblock
 #: debhelper.pod:129
 msgid "dh_installdirs"
-msgstr ""
+msgstr "dh_installdirs"
 
 #. type: textblock
 #: debhelper.pod:133
 msgid "dh_installdocs"
-msgstr ""
+msgstr "dh_installdocs"
 
 #. type: textblock
 #: debhelper.pod:137
 msgid "dh_installexamples"
-msgstr ""
+msgstr "dh_installexamples"
 
 #. type: textblock
 #: debhelper.pod:141
 msgid "dh_installinfo"
-msgstr ""
+msgstr "dh_installinfo"
 
 #. type: textblock
 #: debhelper.pod:145
 msgid "dh_installman"
-msgstr ""
+msgstr "dh_installman"
 
 #. type: textblock
 #: debhelper.pod:149
 msgid "dh_installwm"
-msgstr ""
+msgstr "dh_installwm"
 
 #. type: textblock
 #: debhelper.pod:153
 msgid "dh_link"
-msgstr ""
+msgstr "dh_link"
 
 #. type: textblock
 #: debhelper.pod:157
 msgid "dh_missing"
-msgstr ""
+msgstr "dh_missing"
 
 #. type: textblock
 #: debhelper.pod:161
 msgid "dh_ucf"
-msgstr ""
+msgstr "dh_ucf"
 
 #. type: textblock
 #: debhelper.pod:165
@@ -428,6 +424,11 @@ msgid ""
 "(a-zA-Z0-9), hyphens (-), underscores (_), and colons (:).  The first "
 "character must be an alphanumeric."
 msgstr ""
+"Toutes les variables de substitution sont de la forme I<${toto}> et les "
+"accolades sont obligatoires. Les noms de variable sont sensibles à la casse "
+"et sont constitués de caractères alphanumériques (a-zA-Z0-9), tirets (-), "
+"tirets bas (_) et deux points (:). Le premier caractère doit être "
+"alphanumérique."
 
 #. type: textblock
 #: debhelper.pod:170
@@ -435,16 +436,19 @@ msgid ""
 "If you need a literal dollar sign that cannot trigger a substitution, you "
 "can either use the B<${Dollar}> substitution or the sequence B<${}>."
 msgstr ""
+"Si vous avez besoin d'un dollar littéral qui ne déclenche pas une "
+"substitution, il est possible d'utiliser soit la substitution B<${Dollar}> "
+"soit la séquence B<${}>."
 
 #. type: textblock
 #: debhelper.pod:173
 msgid "The following expansions are available:"
-msgstr ""
+msgstr "Les développements suivants sont disponibles :"
 
 #. type: =item
 #: debhelper.pod:177
 msgid "B<DEB_HOST_*>, B<DEB_BUILD_*>, B<DEB_TARGET_*>"
-msgstr ""
+msgstr "B<DEB_HOST_*>, B<DEB_BUILD_*>, B<DEB_TARGET_*>"
 
 #. type: textblock
 #: debhelper.pod:179
@@ -452,6 +456,8 @@ msgid ""
 "Expands to the relevant L<dpkg-architecture(1)> value (similar to I<dpkg-"
 "architecture -qVARIABLE_HERE>)."
 msgstr ""
+"Se développent à la valeur L<dpkg-architecture(1)> adéquate (comme I<dpkg-"
+"architecture -qVARIABLE_HERE>)."
 
 #. type: textblock
 #: debhelper.pod:182
@@ -459,6 +465,8 @@ msgid ""
 "When in doubt, the B<DEB_HOST_*> variant is the one that will work both for "
 "native and cross builds."
 msgstr ""
+"En cas de doute, la variante B<DEB_HOST_*> est celle qui fonctionnera à la "
+"fois pour les constructions natives et croisées"
 
 #. type: textblock
 #: debhelper.pod:185
@@ -467,11 +475,15 @@ msgid ""
 "the environment first before consulting L<dpkg-architecture(1)>.  This is "
 "mostly mentioned for completeness as it will not matter for most cases."
 msgstr ""
+"Pour des raisons de performance, debhelper tentera de résoudre d'abord ces "
+"noms à partir de l'environnement avant de consulter L<dpkg-architecture(1)>. "
+"Celà est mentionné principalement dans un esprit de complétude, car cela n'a "
+"pas d'importance dans la plupart des cas."
 
 #. type: =item
 #: debhelper.pod:190
 msgid "B<Dollar>"
-msgstr ""
+msgstr "B<Dollar>"
 
 #. type: textblock
 #: debhelper.pod:192
@@ -479,6 +491,9 @@ msgid ""
 "Expands to a single literal B<$>-symbol.  This symbol will I<never> be "
 "considered part of a substitution variable.  That is:"
 msgstr ""
+"Se développe en un symbole B<$> littéral unique. Ce symbole ne sera "
+"B<jamais> considéré comme faisant partie d'une variable de substitution. "
+"C'est-à-dire :"
 
 #. type: verbatim
 #: debhelper.pod:195
@@ -490,6 +505,11 @@ msgid ""
 "   ${Dollar}{NO_SUCH_TOKEN}\n"
 "\n"
 msgstr ""
+"   # Déclenche une erreurr\n"
+"   ${NO_SUCH_TOKEN}\n"
+"   # Se développe à la valeur littérale « ${NO_SUCH_TOKEN} »\n"
+"   ${Dollar}{NO_SUCH_TOKEN}\n"
+"\n"
 
 #. type: textblock
 #: debhelper.pod:200
@@ -497,16 +517,20 @@ msgid ""
 "This variable equivalent to the sequence B<${}> and the two can be used "
 "interchangeably."
 msgstr ""
+"Cette variante est l'équivalent de la séquence B<${}> et les deux sont "
+"interchangeables."
 
 #. type: =item
 #: debhelper.pod:203
 msgid "B<Newline>, B<Space>, B<Tab>"
-msgstr ""
+msgstr "B<Newline>, B<Space>, B<Tab>"
 
 #. type: textblock
 #: debhelper.pod:205
 msgid "Expands to a single ASCII newline, space and tab respectively."
 msgstr ""
+"Se développent respectivement en un caractère ASCII saut de ligne, espace et "
+"tabulation."
 
 #. type: textblock
 #: debhelper.pod:207
@@ -514,11 +538,14 @@ msgid ""
 "This can be useful if you need to include a literal whitespace character (e."
 "g. space) where it would otherwise be stripped or used as a separator."
 msgstr ""
+"Cela peut être utile s'il est nécessaire d'inclure un caractère d'espacement "
+"littéral (par exemple une espace) là où il serait autrement dépouillé ou "
+"utilisé comme un séparateur."
 
 #. type: =item
 #: debhelper.pod:211
 msgid "B<< env:I<NAME> >>"
-msgstr ""
+msgstr "B<< env:I<NOM> >>"
 
 #. type: textblock
 #: debhelper.pod:213
@@ -526,6 +553,9 @@ msgid ""
 "Expands to the environment variable I<NAME>.  The environment variable must "
 "be set (but can be set to the empty string)."
 msgstr ""
+"Se développe en la variable d'environnement I<NOM>. La variable "
+"d'environnement doit être réglée (mais elle peut être réglée à une chaîne "
+"vide)."
 
 #. type: textblock
 #: debhelper.pod:218
@@ -534,11 +564,15 @@ msgid ""
 "debhelper sees I<${env:FOO}>, then it will insist that the environment "
 "variable I<FOO> is set (it can be set to the empty string)."
 msgstr ""
+"Notez que toutes les variables doivent se développer à une valeur définie. "
+"Par exemple, si debhelper voit I<${env:TOTO}>, alors, il affirme que la "
+"variable d'environnement I<TOTO> est réglée (elle peut être réglée à une "
+"chaîne vide)."
 
 #. type: =head3
 #: debhelper.pod:222
 msgid "Substitution limits"
-msgstr ""
+msgstr "Contraintes des substitutions"
 
 #. type: textblock
 #: debhelper.pod:224
@@ -548,6 +582,11 @@ msgid ""
 "beyond a certain size (4096 characters or 3x length of the original input - "
 "whichever is bigger)."
 msgstr ""
+"Pour éviter des boucles infinies et un épuisement de ressources, debhelper "
+"s’arrêtera avec une erreur si le texte renferme de nombreuses variables de "
+"substitution (50) ou si elles se développent au-delà d'une certaine taille "
+"(4096 caractères ou trois fois la longueur de l'entrée originale – peu "
+"importe laquelle est la plus grande)."
 
 # type: textblock
 #. type: =head2
@@ -606,20 +645,21 @@ msgid ""
 "Remember to be careful if your generator I<also> provides substitutions as "
 "this can cause unnecessary confusion."
 msgstr ""
+"À partir du niveau de compatibilité 13, la sortie sera sujette à des "
+"substitutions (voir L</Substitutions dans les fichiers de configuration de "
+"debhelper>) lorsque l'outil les prend en charge. N'oubliez d'être prudent si "
+"votre générateur fournit aussi des substitutions parce que cela peut "
+"provoquer des confusions inutiles."
 
 #. type: textblock
 #: debhelper.pod:259
-#, fuzzy
-#| msgid ""
-#| "The output will be used exactly as it is.  Notably, debhelper will I<not> "
-#| "expand wildcards or strip comments in the output."
 msgid ""
 "Otherwise, the output will be used exactly as-is.  Notably, debhelper will "
 "I<not> expand wildcards or strip comments or strip whitespace in the output."
 msgstr ""
-"La sortie sera utilisée exactement telle quelle. En particulier, debhelper "
-"ne développera B<pas> les jokers, ni ne supprimera les commentaires de la "
-"sortie."
+"Autrement, la sortie sera utilisée exactement telle quelle. En particulier, "
+"debhelper ne développera B<pas> les jokers, ni ne supprimera les "
+"commentaires ou les espaces de la sortie."
 
 #. type: textblock
 #: debhelper.pod:265
@@ -945,16 +985,18 @@ msgstr ""
 #: debhelper.pod:378
 msgid "Pass B<none> as I<buildsystem> to disable auto-selection."
 msgstr ""
+"Indique B<none> comme I<buildsystem> pour désactiver la sélection "
+"automatique."
 
 # type: =item
 #. type: =item
 #: debhelper.pod:380
-#, fuzzy
-#| msgid "B<-D>I<directory>, B<--sourcedirectory=>I<directory>"
 msgid ""
 "B<-D>I<directory>, B<--sourcedir=>I<directory>, B<--"
 "sourcedirectory=>I<directory>"
-msgstr "B<-D>I<répertoire>, B<--sourcedirectory=>I<répertoire>"
+msgstr ""
+"B<-D>I<répertoire>, B<--sourcedir=>I<répertoire>, B<--"
+"sourcedirectory=>I<répertoire>"
 
 #. type: textblock
 #: debhelper.pod:382
@@ -975,16 +1017,21 @@ msgid ""
 "can cause errors when this variant is passed to B<dh> (when then passes it "
 "on to all tools)."
 msgstr ""
+"B<Attention> : La variante B<--sourcedir> correspond à une option du même "
+"nom dans B<dh_install> et B<dh_missing>, etc., pour des raisons historiques. "
+"Alors qu'elles ont le même nom, elles ont des objectifs très différents et, "
+"dans certains cas, cela peut provoquer des erreurs quand cette variante est "
+"passée à B<dh> (quand ensuite il le passe à tous les outils)."
 
 # type: =item
 #. type: =item
 #: debhelper.pod:392
-#, fuzzy
-#| msgid "B<-B>[I<directory>], B<--builddirectory=>[I<directory>]"
 msgid ""
 "B<-B>[I<directory>], B<--builddir>[I<=directory>], B<--"
 "builddirectory>[I<=directory>]"
-msgstr "B<-B>[I<répertoire>], B<--builddirectory=>[I<répertoire>]"
+msgstr ""
+"B<-B>[I<répertoire>], B<--builddir=>[I<répertoire>], B<--"
+"builddirectory=>[I<répertoire>]"
 
 #. type: textblock
 #: debhelper.pod:394
@@ -1098,7 +1145,7 @@ msgstr ""
 #. type: =item
 #: debhelper.pod:433
 msgid "B<--reload-all-buildenv-variables>"
-msgstr ""
+msgstr "B<--reload-all-buildenv-variables>"
 
 #. type: textblock
 #: debhelper.pod:435
@@ -1107,6 +1154,9 @@ msgid ""
 "buildflags(1)>) and cache them to avoid having all B<dh_auto_*> tool "
 "recompute them."
 msgstr ""
+"Par défaut, L<dh(1)> calculera plusieurs environnements (par exemple en "
+"utilisant L<dpkg-buildflags(1)>) et les met en cache pour éviter que tous "
+"les outils B<dh_auto_*> les recalculent."
 
 #. type: textblock
 #: debhelper.pod:439
@@ -1117,7 +1167,12 @@ msgid ""
 "but with different B<...FLAGS> options.  A concrete example would be needing "
 "to change the B<-O> parameter in B<CFLAGS> in the second build:"
 msgstr ""
-
+"Lorsque cette option est passée, l'outil réel B<dh_auto_*> ignorera le cache "
+"de L<dh(1)> et déclenchera une reconstruction de ces variables. Cela est "
+"utile dans le cas très rare où le paquet requiert de multiples constructions "
+"mais avec des options B<...FLAGS> différentes. Un exemple concret pourrait "
+"être la nécessité de modifier le paramètre B<-0> dans B<CFLAGS> dans la "
+"seconde construction."
 #. type: verbatim
 #: debhelper.pod:446
 #, no-wrap
@@ -1125,6 +1180,8 @@ msgid ""
 "    export DEB_CFLAGS_MAINT_APPEND=-O3\n"
 "\n"
 msgstr ""
+"    export DEB_CFLAGS_MAINT_APPEND=-O3\n"
+"\n"
 
 #. type: verbatim
 #: debhelper.pod:448
@@ -1134,6 +1191,9 @@ msgid ""
 "        dh $@\n"
 "\n"
 msgstr ""
+"    %:\n"
+"        dh $@\n"
+"\n"
 
 #. type: verbatim
 #: debhelper.pod:451
@@ -1145,6 +1205,11 @@ msgid ""
 "           --reload-all-buildenv-variables -Bbuild-udeb ...\n"
 "\n"
 msgstr ""
+"    override_dh_auto_configure:\n"
+"        dh_auto_configure -Bbuild-deb ...\n"
+"        DEB_CFLAGS_MAINT_APPEND=-Os dh_auto_configure \\\n"
+"           --reload-all-buildenv-variables -Bbuild-udeb ...\n"
+"\n"
 
 #. type: textblock
 #: debhelper.pod:456
@@ -1154,6 +1219,10 @@ msgid ""
 "ignored as L<dh_auto_configure(1)> would use the cached value of B<CFLAGS> "
 "set by L<dh(1)>."
 msgstr ""
+"Sans B<--reload-all-buildenv-variables> dans le second appel à "
+"L<dh_auto_configure(1)>, la modification dans B<DEB_CFLAGS_MAINT_APPEND> "
+"pourrait être ignorée parce que L<dh_auto_configure(1)> pourrait utiliser la "
+"valeur mise en cache de B<CFLAGS> fixée par L<dh(1)>."
 
 #. type: textblock
 #: debhelper.pod:461
@@ -1161,6 +1230,8 @@ msgid ""
 "This option is only available with B<< debhelper (>= 12.7~) >> when the "
 "package uses compatibility level 9 or later."
 msgstr ""
+"Cette option est seulement disponible avec B<< debhelper (>= 12.7~) >> quand "
+"le paquet utilise le niveau de compatibilité 9 ou supérieur."
 
 # type: =item
 #. type: =item
@@ -1736,6 +1807,8 @@ msgid ""
 "B<Retroactively applied to earlier compat levels>: B<dh> no longer accepts "
 "any of these since debhelper/12.4."
 msgstr ""
+"B<Application rétroactive aux niveaux de compatibilité antérieurs> : B<dh> "
+"n'accepte plus aucun de ces paramètres depuis debhelper 12.4."
 
 #. type: textblock
 #: debhelper.pod:732
@@ -1790,8 +1863,8 @@ msgid ""
 "    dh_foo -pmy-pkg\n"
 "\n"
 msgstr ""
-"  override_dh_foo:\n"
-"    dh_foo -pmon_paquet\n"
+"  override_dh_toto:\n"
+"    dh_toto -pmon_paquet\n"
 "\n"
 
 #. type: verbatim
@@ -1803,9 +1876,9 @@ msgid ""
 "    dh_foo --remaining\n"
 "\n"
 msgstr ""
-"  override_dh_bar:\n"
-"    dh_bar\n"
-"    dh_foo --remaining\n"
+"  override_dh_titi:\n"
+"    dh_titi\n"
+"    dh_toto --remaining\n"
 "\n"
 
 #. type: textblock
@@ -1874,8 +1947,8 @@ msgid ""
 "commands not included in debhelper."
 msgstr ""
 "B<Supprimé rétroactivement> : B<dh> ne crée plus le répertoire de "
-"construction du paquet lors de l'omission des commandes debhelper en cours. "
-"Cela n'affectera pas les paquets qui se construisent uniquement avec "
+"construction du paquet lors de l'omission des commandes de debhelper en "
+"cours. Cela n'affectera pas les paquets qui se construisent uniquement avec "
 "debhelper, mais pourrait faire apparaître des bogues dans les commandes qui "
 "ne sont pas incluses avec debhelper."
 
@@ -1900,8 +1973,6 @@ msgstr "v11"
 # type: textblock
 #. type: textblock
 #: debhelper.pod:810
-#, fuzzy
-#| msgid "This mode is deprecated."
 msgid "This mode is discouraged."
 msgstr "Ce mode est déconseillé."
 
@@ -1915,6 +1986,14 @@ msgid ""
 "available in Debian#887904 and L<https://lists.debian.org/debian-"
 "release/2019/04/msg01442.html>."
 msgstr ""
+"Le niveau de compatibilité 11 est déconseillé pour les nouveaux paquets "
+"parce qu'il souffre d'une interaction de fonctionnalités entre "
+"L<dh_installinit> et L<dh_installsystemd> faisant que les services ne "
+"fonctionnent pas correctement dans certains cas. Vous devriez envisager "
+"l'utilisation à la place des modes de compatibilité 10 ou 12. Plus de "
+"détails sur ce problème sont disponibles dans le bogue Debian n° 887904 et "
+"dans le message L<https://lists.debian.org/debian-release/2019/04/msg01442."
+"html>."
 
 # type: textblock
 #. type: textblock
@@ -2226,11 +2305,6 @@ msgstr ""
 
 #. type: textblock
 #: debhelper.pod:973
-#, fuzzy
-#| msgid ""
-#| "If an unversioned dependency in the shlibs file is wanted, this can be "
-#| "obtained by passing B<-VNone>.nstead.  However, please see "
-#| "L<dh_makeshlibs(1)> for the caveat of unversioned dependencies."
 msgid ""
 "If an unversioned dependency in the shlibs file is wanted, this can be "
 "obtained by passing B<-VNone> instead.  However, please see "
@@ -2519,6 +2593,11 @@ msgid ""
 "parameters.  At the same time, B<dh> now optimizes out calls to redundant "
 "B<dh_*> helpers even when passed long command line options."
 msgstr ""
+"Tous les outils dans le style de debhelper basés sur la bibliothèque "
+"debhelper officielle (y compris B<dh> et les outils officiels B<dh_*>) "
+"n'acceptent plus les paramètres de commande abrégés. En même temps, B<dh> "
+"optimise maintenant les appels aux outils redondants B<dh_*> même quand ils "
+"passent de longues options de ligne de commande."
 
 #. type: textblock
 #: debhelper.pod:1126
@@ -2529,6 +2608,12 @@ msgid ""
 "default). If you need them for B<*-indep> targets, you can add an explicit "
 "Build-Depends on B<dh-sequence-elf-tools>."
 msgstr ""
+"Les outils de debhelper liés à ELF (B<dh_dwz>, B<dh_strip>, "
+"B<dh_makeshlibs>, B<dh_shlibdeps>) sont désormais seulement exécutés pour "
+"les paquets dépendant de l'architecture par défaut (c'est-à-dire qu'ils sont "
+"exclus des cibles B<*-indep> et sont passés avec l'option B<-a> par défaut). "
+"Si vous avez besoin d'eux pour des cibles B<*-indep>, vous pouvez ajouter un "
+"Build-Depends explicite à B<dh-sequence-elf-tools>."
 
 #. type: textblock
 #: debhelper.pod:1135
@@ -2537,6 +2622,10 @@ msgid ""
 "package) now runs the upstream-provided test suite automatically.  To "
 "suppress such behavior, override B<dh_auto_test>."
 msgstr ""
+"Le système de construction tiers B<gradle> (issu du paquet B<gradle-debian-"
+"helper>) exécute maintenant la suite de tests fournie par l'amont "
+"automatiquement. Pour supprimer ce type de comportement, surchargez "
+"B<dh_auto_test>."
 
 #. type: textblock
 #: debhelper.pod:1141
@@ -2548,6 +2637,13 @@ msgid ""
 "remove the manpage from F<< debian/I<package>.manpages >> (assuming both "
 "versions are identical)."
 msgstr ""
+"L'outil B<dh_installman> s'interrompt maintenant s'il voit des définitions "
+"contradictoires d'une page de manuel. Cela se produit habituellement si le "
+"système de construction amont installe une version compressée et que le "
+"paquet liste une version non compressée de la page de manuel dans F<< debian/"
+"I<paquet>.manpages >>. La correction la plus simple est de supprimer la page "
+"de manuel de F<< debian/I<paquet>.manpages >> (en considérant que les deux "
+"versions sont identiques)."
 
 #. type: textblock
 #: debhelper.pod:1151
@@ -2556,11 +2652,15 @@ msgid ""
 "common B<XDG_*> variable.  Please see description of the environment "
 "variables in L</ENVIRONMENT> for how this is handled."
 msgstr ""
+"Les outils B<dh_auto_*> réinitialisent désormais les variables "
+"d'environnement B<HOME> et la variable commune B<XDG_*>. Veuillez consulter "
+"la description des variables d'environnement dans L</ENVIRONMENT> pour voir "
+"comment elles sont gérées."
 
 #. type: textblock
 #: debhelper.pod:1155
 msgid "I<This feature changed between debhelper 13 and debhelper 13.2.>"
-msgstr ""
+msgstr "I<Cette fonctionnalité a changé entre debhelper 13 et debhelper 13.2.>"
 
 #. type: textblock
 #: debhelper.pod:1159
@@ -2569,6 +2669,9 @@ msgid ""
 "obsolete command are present in F<debian/rules> (e.g. "
 "B<override_dh_systemd_enable:>)."
 msgstr ""
+"La commande B<dh> produira maintenant une erreur si une cible de réécriture "
+"ou d'accroche pour une commande obsolète est présente dans F<debian/rules> "
+"(par exemple, B<override_dh_systemd_enable:>)."
 
 #. type: textblock
 #: debhelper.pod:1165
@@ -2577,6 +2680,9 @@ msgid ""
 "be reverted to a non-fatal warning by explicitly passing B<--list-missing> "
 "like it was in compat 12."
 msgstr ""
+"La commande B<dh_missing> aura l'option B<--fail-missing> par défaut. Il est "
+"possible de revenir à un avertissement non fatal en passant explicitement "
+"l'option B<--list-missing> comme dans le niveau de compatibilité 12."
 
 #. type: textblock
 #: debhelper.pod:1169
@@ -2586,6 +2692,10 @@ msgid ""
 "by inserting an empty override target in the F<debian/rules> file of the "
 "relevant package.  As an example:"
 msgstr ""
+"Si vous ne voulez pas non plus de l'avertissement, veuillez omettre l'appel "
+"à B<dh_missing>. Si l'automate de commandes B<dh> est utilisé, vous pouvez "
+"faire cela en insérant une cible de réécriture vide dans le fichier F<debian/"
+"rules> du paquet correspondant. Comme dans l’exemple :"
 
 #. type: verbatim
 #: debhelper.pod:1174
@@ -2595,6 +2705,9 @@ msgid ""
 "    override_dh_missing:\n"
 "\n"
 msgstr ""
+"    # Désactive dh_missing\n"
+"    override_dh_missing:\n"
+"\n"
 
 #. type: textblock
 #: debhelper.pod:1179
@@ -2604,6 +2717,10 @@ msgid ""
 "configuration files.  Related functionality in B<dh_installsystemd> is now "
 "disabled."
 msgstr ""
+"L'automate de commandes B<dh> exécute maintenant B<dh_installtmpfiles> dans "
+"la séquence par défaut. B<dh_installtmpfiles> se charge de la gestion des "
+"fichiers de configuration de I<tmpfiles.d>. La fonctionnalité apparentée "
+"dans B<dh_installsystemd> est désormais désactivée."
 
 #. type: textblock
 #: debhelper.pod:1184
@@ -2611,6 +2728,8 @@ msgid ""
 "Note that B<dh_installtmpfiles> responds to F<< debian/I<package>.tmpfiles "
 ">> where B<dh_installsystemd> used a name without the trailing \"s\"."
 msgstr ""
+"Notez que B<dh_installtmpfiles> répond à F<< debian/I<paquet>.tmpfiles >> là "
+"où B<dh_installsystemd> utilisait un nom sans le « s » final."
 
 #. type: textblock
 #: debhelper.pod:1190
@@ -2622,6 +2741,13 @@ msgid ""
 "exec(1)> in general.  If you need filtering, renaming, etc., the package "
 "will still need L<dh-exec(1)>."
 msgstr ""
+"Beaucoup d'outils B<dh_*> prennent en charge un développement de variables "
+"limité au moyen de la syntaxe B<${toto}>. Dans de nombreux cas, cela peut "
+"être utilisé pour référencer des chemins qui contiennent soit des espaces, "
+"soit des valeurs L<dpkg-architecture(1)>. Bien que cela puisse réduire le "
+"besoin de L<dh-exec(1)> dans certains cas, ce B<n'est pas> une alternative à "
+"L<dh-exec(1)> en général. Si un filtrage, un renommage, etc. est "
+"nécessaire, le paquet aura encore besoin de L<dh-exec(1)>."
 
 #. type: textblock
 #: debhelper.pod:1197
@@ -2631,6 +2757,10 @@ msgid ""
 "expansion occurs as a part of the B<filearray> and B<filedoublearray> "
 "functions."
 msgstr ""
+"Veuillez consulter L<Substitutions dans les fichiers de configuration de "
+"debhelper> pour la syntaxe et les variables de substitution disponibles. "
+"Pour ceux qui écrivent des outils B<dh_*>, le développement de substitution "
+"intervient comme élément des fonctions B<filearray> et B<filedoublearray>."
 
 #. type: textblock
 #: debhelper.pod:1204
@@ -2639,6 +2769,10 @@ msgid ""
 "B<dh_auto_test>, B<dh_dwz> and B<dh_strip> when B<DEB_BUILD_OPTIONS> lists "
 "the relevant B<nocheck> / B<nostrip> options."
 msgstr ""
+"L'automate de commandes B<dh> omettra toutes les cibles d'accroche et de "
+"substitution pour B<dh_auto_test>, B<dh_dwz> et B<dh_strip> quand "
+"B<DEB_BUILD_OPTIONS> liste les options B<nocheck> ou B<nostrip> "
+"correspondantes."
 
 #. type: textblock
 #: debhelper.pod:1208
@@ -2648,6 +2782,11 @@ msgid ""
 "from B<override_dh_auto_test> would have to be moved to "
 "B<execute_after_dh_auto_build> or B<execute_before_dh_auto_install>."
 msgstr ""
+"Tout paquet comptant sur ces cibles pour être toujours exécuté devrait "
+"plutôt déplacer la logique correspondante de ces cibles. Par exemple, le "
+"code d’empaquetage non lié aux tests provenant de B<override_dh_auto_test> "
+"devrait avoir été déplacé dans B<execute_after_dh_auto_build> ou "
+"B<execute_before_dh_auto_install>."
 
 #. type: textblock
 #: debhelper.pod:1215
@@ -2657,6 +2796,10 @@ msgid ""
 "installation process. If for some reason you need previous behavior, "
 "override the flag:"
 msgstr ""
+"Le système de construction B<cmake> passe désormais l'option B<-"
+"DCMAKE_SKIP_INSTALL_ALL_DEPENDENCY=ON> à L<cmake(1)> pour accélérer le "
+"processus d'installation automatique. Si pour une raison quelconque vous "
+"avez besoin de revenir au comportement antérieur, réécrivez le paramètre :"
 
 #. type: verbatim
 #: debhelper.pod:1219
@@ -2665,13 +2808,13 @@ msgid ""
 "    dh_auto_configure -- -DCMAKE_SKIP_INSTALL_ALL_DEPENDENCY=OFF ...\n"
 "\n"
 msgstr ""
+"    dh_auto_configure -- -DCMAKE_SKIP_INSTALL_ALL_DEPENDENCY=OFF ...\n"
+"\n"
 
 #. type: =item
 #: debhelper.pod:1223
-#, fuzzy
-#| msgid "v1"
 msgid "v14"
-msgstr "v1"
+msgstr "v14"
 
 #. type: textblock
 #: debhelper.pod:1225 strings-kept-translations.pod:9
@@ -2684,24 +2827,19 @@ msgstr ""
 # type: textblock
 #. type: textblock
 #: debhelper.pod:1227
-#, fuzzy
-#| msgid "Changes from v3 are:"
 msgid "Changes from v13 are:"
-msgstr "Les changements par rapport à la version 3 sont :"
+msgstr "Les changements par rapport à la version 13 sont :"
 
 #. type: textblock
 #: debhelper.pod:1233
-#, fuzzy
-#| msgid ""
-#| "The B<cmake> buildsystem now passes B<-DCMAKE_INSTALL_RUNSTATEDIR=/run> "
-#| "to L<cmake(1)>."
 msgid ""
 "The B<cmake> buildsystem now passes B<-DCMAKE_SKIP_RPATH=ON> and B<-"
 "DCMAKE_BUILD_RPATH_USE_ORIGIN=ON> to L<cmake(1)> to avoid some "
 "reproducibility issues."
 msgstr ""
-"Le système de construction B<cmake> passe maintenant l'option B<-"
-"DCMAKE_INSTALL_RUNSTATEDIR=/run> à L<cmake(1)>."
+"Le système de construction B<cmake> passe maintenant les options B<-"
+"DCMAKE_SKIP_RPATH=ON> et B<-DCMAKE_BUILD_RPATH_USE_ORIGIN=ON> à L<cmake(1)> "
+"pour éviter des problèmes de reproductibilité."
 
 #. type: textblock
 #: debhelper.pod:1237
@@ -2714,17 +2852,22 @@ msgid ""
 "undo the need for B<LD_LIBRARY_PATH> and avoid the reproducibility issues on "
 "Linux, where B<$ORIGIN> is supported by the runtime linkers."
 msgstr ""
+"Cela peut provoquer des problèmes avec l'exécution de binaires directement à "
+"partir des répertoires de construction parce qu'ils pourraient maintenant "
+"requérir une configuration manuelle de B<LD_LIBRARY_PATH>. S'il est "
+"nécessaire de réécrire cette modification, il est recommandé d'essayer de "
+"passer d'abord l'option B<-DCMAKE_SKIP_RPATH=OFF> pour voir si cela corrige "
+"le problème (laissant B<CMAKE_BUILD_RPATH_USE_ORIGIN> à sa nouvelle valeur "
+"par défaut). Cela devrait supprimer la nécessité de B<LD_LIBRARY_PATH> et "
+"éviter les problèmes de reproductibilité dans Linux où B<$ORIGIN> est pris "
+"en charge par les créateurs de liens lors de l'exécution."
 
 #. type: textblock
 #: debhelper.pod:1247
-#, fuzzy
-#| msgid ""
-#| "B<dh_installsystemduser> is now included in the B<dh> standard sequence "
-#| "by default."
 msgid "The tool B<dh_installsysusers> is now included in the default sequence."
 msgstr ""
-"B<dh_installsystemduser> est maintenant inclus par défaut dans la séquence "
-"B<dh> standard."
+"L'outil B<dh_installsysusers> est maintenant inclus dans la séquence par "
+"défaut."
 
 # type: =head1
 #. type: =head1
@@ -3102,27 +3245,21 @@ msgid ""
 "This section describes some of the environment variables that influences the "
 "behaviour of debhelper or which debhelper interacts with."
 msgstr ""
+"Cette section décrit certaines des variables d'environnement qui influencent "
+"le comportement de debhelper ou avec lesquelles debhelper est en interaction."
 
 #. type: textblock
 #: debhelper.pod:1392
-#, fuzzy
-#| msgid ""
-#| "The following environment variables can influence the behavior of "
-#| "debhelper.  It is important to note that these must be actual environment "
-#| "variables in order to function properly (not simply F<Makefile> "
-#| "variables). To specify them properly in F<debian/rules>, be sure to "
-#| "\"B<export>\" them. For example, \"B<export DH_VERBOSE>\"."
 msgid ""
 "It is important to note that these must be actual environment variables in "
 "order to affect the behaviour of debhelper (not simply F<Makefile> "
 "variables).  To specify them properly in F<debian/rules>, be sure to "
 "\"B<export>\" them. For example, \"B<export DH_VERBOSE>\"."
 msgstr ""
-"Les variables d'environnement suivantes peuvent influencer le comportement "
-"de debhelper. Il est important de noter que celles-ci doivent être des "
-"variables existantes pour que cela fonctionne correctement (pas simplement "
-"des variables de F<Makefile>). Pour les définir proprement dans le fichier "
-"F<debian/rules>, assurez vous de les exporter (« B<export> »). Par exemple "
+"Il est important de noter que celles-ci doivent être des variables "
+"existantes pour affecter le comportement de debhelper (pas simplement des "
+"variables de F<Makefile>). Pour les définir proprement dans le fichier "
+"F<debian/rules>, assurez-vous de les exporter (« B<export> »). Par exemple "
 "« B<export DH_VERBOSE> »."
 
 # type: =item
@@ -3209,6 +3346,11 @@ msgid ""
 "command line arguments).  Unfortunately, some third-party provided tools may "
 "not support this variable and will ignore these command line arguments."
 msgstr ""
+"Tous les outils de debhelper analyseront les arguments de la ligne de "
+"commande listés dans cette variable avant toute option de commande (comme "
+"s'ils avaient été ajoutés au début des arguments de la ligne de commande). "
+"Malheureusement, certains outils tiers peuvent ne pas prendre en compte "
+"cette variable et ignoreront ces arguments."
 
 #. type: textblock
 #: debhelper.pod:1430
@@ -3303,7 +3445,7 @@ msgstr ""
 #. type: =item
 #: debhelper.pod:1461
 msgid "B<DH_COLORS>, B<DPKG_COLORS>"
-msgstr ""
+msgstr "B<DH_COLORS>, B<DPKG_COLORS>"
 
 #. type: textblock
 #: debhelper.pod:1463
@@ -3312,6 +3454,9 @@ msgid ""
 "colors in their textual output.  Can be set to \"always\", \"auto\" (the "
 "default), or \"never\"."
 msgstr ""
+"Ces variables peuvent être utilisées pour contrôler comment les commandes de "
+"debhelper peuvent utiliser la couleur dans leurs sorties textuelles. Les "
+"réglages peuvent être « always », « auto » (par défaut) ou « never »."
 
 #. type: textblock
 #: debhelper.pod:1467
@@ -3322,11 +3467,16 @@ msgid ""
 "for debhelper, you can use B<DH_COLORS> instead or in addition to "
 "B<DPKG_COLORS>."
 msgstr ""
+"Notez que B<DPKG_COLOR> affecte aussi un certain nombre d'outils liés à dpkg "
+"et debhelper l'utilise en supposant que vous voulez les même réglages de "
+"couleur pour dpkg et debhelper. Au cas où vous voudriez un autre jeu de "
+"couleurs pour debhelper, vous pouvez utiliser B<DH_COLORS> à la place ou en "
+"plus de B<DPKG_COLORS>."
 
 #. type: =item
 #: debhelper.pod:1473
 msgid "B<NO_COLOR>"
-msgstr ""
+msgstr "B<NO_COLOR>"
 
 #. type: textblock
 #: debhelper.pod:1475
@@ -3335,6 +3485,10 @@ msgid ""
 "B<DPKG_COLORS> are both unset), the presence of this environment variable "
 "cause the default color setting to be \"never\"."
 msgstr ""
+"Si aucune demande explicite de couleur n'a été passée (par exemple, ni "
+"B<DH_COLORS>, ni B<DPKG_COLORS> n'ont été configurées), la présence de cette "
+"variable d'environnement fera que le réglage des couleurs par défaut sera "
+"« never »."
 
 #. type: textblock
 #: debhelper.pod:1479
@@ -3343,6 +3497,9 @@ msgid ""
 "project, the environment variables (such as B<DH_COLORS>) are considered an "
 "explicit request for color."
 msgstr ""
+"Cette variable est définie conformément à L<https://no-color.org/>. Dans ce "
+"projet, les variables d'environnement (comme B<DH_COLORS>) sont considérées "
+"comme une demande explicite de couleur."
 
 #. type: =item
 #: debhelper.pod:1483
@@ -3350,6 +3507,8 @@ msgid ""
 "B<CFLAGS>, B<CPPFLAGS>, B<CXXFLAGS>, B<OBJCFLAGS>, B<OBJCXXFLAGS>, "
 "B<GCJFLAGS>, B<FFLAGS>, B<FCFLAGS>, B<LDFLAGS>"
 msgstr ""
+"B<CFLAGS>, B<CPPFLAGS>, B<CXXFLAGS>, B<OBJCFLAGS>, B<OBJCXXFLAGS>, "
+"B<GCJFLAGS>, B<FFLAGS>, B<FCFLAGS>, B<LDFLAGS>"
 
 #. type: textblock
 #: debhelper.pod:1485
@@ -3361,11 +3520,18 @@ msgid ""
 "B<DEB_BUILD_MAINT_OPTIONS=hardening=all> or B<DEB_CPPFLAGS_MAINT_APPEND=-"
 "DCUSTOM_MACRO=true>) rather than setting the concrete variable directly."
 msgstr ""
+"Par défaut (dans tout niveau de compatibilité non obsolète), debhelper "
+"réglera automatiquement ces paramètres en utilisant L<dpkg-buildflags(1)> "
+"quand ils ne sont pas définis. S'il est nécessaire de changer les paramètres "
+"par défaut, veuillez utiliser les fonctions de L<dpkg-buildflags(1)> pour le "
+"faire (par exemple, B<DEB_BUILD_MAINT_OPTIONS=hardening=all> ou "
+"B<DEB_CPPFLAGS_MAINT_APPEND=-DCUSTOM_MACRO=true>) au lieu de configurer "
+"directement les variables concrètes."
 
 #. type: =item
 #: debhelper.pod:1492
 msgid "B<HOME>, B<XDG_*>"
-msgstr ""
+msgstr "B<HOME>, B<XDG_*>"
 
 #. type: textblock
 #: debhelper.pod:1494
@@ -3377,6 +3543,12 @@ msgid ""
 "variables and B<XDG_RUNTIME_DIR> (except for during B<dh_auto_test>) will be "
 "cleared."
 msgstr ""
+"À partir du niveau de compatibilité 13, ces variables d'environnement sont "
+"réinitialisées avant d'invoquer le système de construction amont à l'aide "
+"des outils B<dh_auto_*>. Les variables B<HOME> (pour tout outil "
+"B<dh_auto_*>) et B<XDG_RUNTIME_DIR> (pour B<dh_auto_test> seulement) seront "
+"réglées dans un répertoire accessible en écriture. Toutes les autres "
+"variables et B<XDG_RUNTIME_DIR> (sauf durant B<dh_auto_test>) seront vidées."
 
 #. type: textblock
 #: debhelper.pod:1500
@@ -3385,14 +3557,15 @@ msgid ""
 "reused between calls to B<dh_auto_*>.  Any content will persist until "
 "explicitly deleted or B<dh_clean>."
 msgstr ""
+"Le répertoire B<HOME> sera créé comme un répertoire vide mais il sera "
+"réutilisé entre les appels à B<dh_auto_*>. Tout son contenu restera jusqu'à "
+"ce qu'il soit explicitement supprimé ou jusqu'à l'exécution de B<dh_clean>."
 
 # type: =item
 #. type: =item
 #: debhelper.pod:1504
-#, fuzzy
-#| msgid "B<DH_OPTIONS>"
 msgid "B<DEB_BUILD_OPTIONS>"
-msgstr "B<DH_OPTIONS>"
+msgstr "B<DEB_BUILD_OPTIONS>"
 
 #. type: textblock
 #: debhelper.pod:1506
@@ -3400,6 +3573,8 @@ msgid ""
 "Please see L</Supported flags in DEB_BUILD_OPTIONS> for this environment "
 "variable."
 msgstr ""
+"Veuillez consulter L</Paramètres pris en charge dans DEB_BUILD_OPTIONS> pour "
+"cet environnement."
 
 #. type: textblock
 #: debhelper.pod:1509
@@ -3410,14 +3585,17 @@ msgid ""
 "disabling the relevant feature directly (e.g. by overriding the concrete "
 "tools)."
 msgstr ""
+"Veuillez noter que cette variable ne devrait B<pas> être modifiée par les "
+"responsables de paquet dans F<debian/rules> pour changer le comportement de "
+"debhelper. Ils devraient plutôt rechercher à désactiver la fonction "
+"correspondante directement (par exemple en surchargeant les outils "
+"spécifiques)."
 
 # type: =item
 #. type: =item
 #: debhelper.pod:1514
-#, fuzzy
-#| msgid "B<DH_OPTIONS>"
 msgid "B<DEB_MAINT_BUILD_OPTIONS>"
-msgstr "B<DH_OPTIONS>"
+msgstr "B<DEB_MAINT_BUILD_OPTIONS>"
 
 #. type: textblock
 #: debhelper.pod:1516
@@ -3425,6 +3603,9 @@ msgid ""
 "This is a dpkg specific environment variable (see e.g. L<dpkg-"
 "buildflags(1)>).  The debhelper tool suite silently ignores it."
 msgstr ""
+"C'est une variable d'environnement spécifique à dpkg (voir par exemple "
+"L<dpkg-buildflags(1)>). La suite d'outils de debhelper l'ignore "
+"silencieusement."
 
 #. type: textblock
 #: debhelper.pod:1519
@@ -3433,11 +3614,14 @@ msgid ""
 "which make some people mistakenly assume that debhelper will also react to "
 "this variable."
 msgstr ""
+"Cela est documenté ici parce qu'elle porte un nom identique à "
+"B<DEB_BUILD_OPTIONS>, ce qui fait que certaines personnes pensent par erreur "
+"que debhelper réagit aussi à cette variable."
 
 #. type: =head2
 #: debhelper.pod:1525
 msgid "Supported flags in DEB_BUILD_OPTIONS"
-msgstr ""
+msgstr "Paramètres pris en charge dans DEB_BUILD_OPTIONS"
 
 #. type: textblock
 #: debhelper.pod:1527
@@ -3445,16 +3629,18 @@ msgid ""
 "The debhelper tool suite reacts to the following flags in "
 "B<DEB_BUILD_OPTIONS>."
 msgstr ""
+"La suite d'outils de debhelper réagit aux paramètres suivants dans "
+"B<DEB_BUILD_OPTIONS>."
 
 #. type: =item
 #: debhelper.pod:1531
 msgid "B<dherroron=obsolete-compat-levels>"
-msgstr ""
+msgstr "B<dherroron=obsolete-compat-levels>"
 
 #. type: textblock
 #: debhelper.pod:1533
 msgid "I<This is a debhelper specific value.>"
-msgstr ""
+msgstr "I<C'est une valeur spécifique à debhelper.>"
 
 #. type: textblock
 #: debhelper.pod:1535
@@ -3463,6 +3649,10 @@ msgid ""
 "debhelper tools will promote deprecation warnings for usage of old soon to "
 "be removed compat levels into errors."
 msgstr ""
+"Quand B<dherroron> est présent et réglé à B<obsolete-compat-levels>, alors "
+"les outils de debhelper présenteront dans les erreurs des alertes sur "
+"l'utilisation des niveaux de compatibilité anciens sur le point d'être "
+"obsolètes"
 
 #. type: textblock
 #: debhelper.pod:1539
@@ -3470,16 +3660,20 @@ msgid ""
 "This is useful for automated checking for code relying on deprecated compat "
 "levels that is scheduled for removal."
 msgstr ""
+"C'est utile pour la vérification automatique de code se basant sur des "
+"niveaux de compatibilité dont la suppression est programmée."
 
 #. type: textblock
 #: debhelper.pod:1542
 msgid "This option is intended for testing purposes; not production builds."
 msgstr ""
+"Cette option est destinée aux tests et non aux constructions pour la "
+"production."
 
 #. type: =item
 #: debhelper.pod:1544
 msgid "B<nostrip>"
-msgstr ""
+msgstr "B<nostrip>"
 
 #. type: textblock
 #: debhelper.pod:1546 debhelper.pod:1569
@@ -3488,6 +3682,9 @@ msgid ""
 "packages built when this is set is therefore not bit-for-bit reproducible "
 "with a regular build in the general case.>"
 msgstr ""
+"I<Cette valeur changera le contenu des paquets .deb en construction. Les "
+"paquets .deb construits avec ce réglage ne seront donc pas reproductibles "
+"bit à bit par rapport à une construction normale en cas général.>"
 
 #. type: textblock
 #: debhelper.pod:1550
@@ -3496,16 +3693,19 @@ msgid ""
 "helpers that either remove, detach or deduplicate debugging symbols in ELF "
 "binaries."
 msgstr ""
+"Cette valeur fera que les outils officiels de debhelper ignoreront les "
+"actions et les outils qui suppriment, détachent ou dédoublent les symboles "
+"de débogage dans les binaires ELF."
 
 #. type: textblock
 #: debhelper.pod:1554
 msgid "This value affects L<dh_dwz(1)> and L<dh_strip(1)>."
-msgstr ""
+msgstr "Cette valeur affecte L<dh_dwz(1)> et L<dh_strip(1)>."
 
 #. type: =item
 #: debhelper.pod:1556
 msgid "B<nocheck>"
-msgstr ""
+msgstr "B<nocheck>"
 
 #. type: textblock
 #: debhelper.pod:1558
@@ -3513,6 +3713,8 @@ msgid ""
 "This value will cause the official debhelper build systems to skip runs of "
 "upstream test suites."
 msgstr ""
+"Cette valeur fera que les systèmes de construction officiels de debhelper "
+"ignoreront l'exécution des suites de tests de l'amont."
 
 #. type: textblock
 #: debhelper.pod:1561
@@ -3521,16 +3723,19 @@ msgid ""
 "B<not> rely on this.  Instead, they can add an empty override target to skip "
 "B<dh_auto_test>."
 msgstr ""
+"Les responsables de paquet cherchant à éviter l'exécution des tests de "
+"l'amont ne devraient B<pas> recourir à cela. Ils peuvent plutôt ajouter une "
+"cible de réécriture vide pour ignorer B<dh_auto_test>."
 
 #. type: textblock
 #: debhelper.pod:1565
 msgid "This value affects L<dh_auto_test(1)>."
-msgstr ""
+msgstr "Cette valeur affecte L<dh_auto_test(1)>."
 
 #. type: =item
 #: debhelper.pod:1567
 msgid "B<nodoc>"
-msgstr ""
+msgstr "B<nodoc>"
 
 #. type: textblock
 #: debhelper.pod:1573
@@ -3540,6 +3745,11 @@ msgid ""
 "Additionally, the tools will also ignore if declared documentation is "
 "\"missing\" on the assumption that the documentation has not been built."
 msgstr ""
+"Cette valeur fera que plusieurs outils de debhelper ignoreront "
+"l'installation de documentation comme les pages de manuel ou la "
+"documentation fournie par l'amont. En plus, les outils ne sauront pas si la "
+"documentation déclarée est « missing » en partant du principe que la "
+"documentation n'a pas été construite."
 
 #. type: textblock
 #: debhelper.pod:1578
@@ -3547,14 +3757,14 @@ msgid ""
 "This value effects tools I<like> L<dh_installdocs(1)>, which I<knows> it is "
 "working with documentation."
 msgstr ""
+"Cette valeur affecte des outils comme L<dh_installdocs(1)> qui B<sait> qu'il "
+"travaille sur la documentation."
 
 # type: =item
 #. type: =item
 #: debhelper.pod:1581
-#, fuzzy
-#| msgid "B<--ddebs>, B<--no-ddebs>"
 msgid "B<noautodbgsym>, B<noddebs>"
-msgstr "B<--ddebs>, B<--no-ddebs>"
+msgstr "B<noautodbgsym>, B<noddebs>"
 
 #. type: textblock
 #: debhelper.pod:1583
@@ -3562,6 +3772,8 @@ msgid ""
 "I<The official name is autodbgsym.  The noddebs variant is accepted for "
 "historical reasons.>"
 msgstr ""
+"I<Le nom officiel est autodbgsym. La variante noddebs est acceptée pour des "
+"raisons historiques.>"
 
 #. type: textblock
 #: debhelper.pod:1586
@@ -3569,19 +3781,19 @@ msgid ""
 "This value causes debhelper to skip the generation of automatically "
 "generated debug symbol packages."
 msgstr ""
+"Cette valeur fait que debhelper ignore la création des paquets de symboles "
+"de débogage générés automatiquement."
 
 #. type: textblock
 #: debhelper.pod:1589
 msgid "This value affects L<dh_strip(1)>."
-msgstr ""
+msgstr "Cette valeur affecte L<dh_strip(1)>."
 
 # type: =item
 #. type: =item
 #: debhelper.pod:1591
-#, fuzzy
-#| msgid "B<--parallel>"
 msgid "B<parallel=N>"
-msgstr "B<--parallel>"
+msgstr "B<parallel=N>"
 
 #. type: textblock
 #: debhelper.pod:1593
@@ -3590,6 +3802,10 @@ msgid ""
 "to parameters like B<--no-parallel> and B<--max-parallel=M>).  Not all "
 "debhelper tools work with parallel tasks and may silently ignore the request."
 msgstr ""
+"Cette valeur à permet debhelper d'utiliser jusqu'à B<N> threads ou processus "
+"(soumis à des paramètres comme B<--no-parallel> et B<--max-parallel=M>). "
+"Tous les outils de debhelper ne fonctionnent pas avec des tâches parallèles "
+"et peuvent ignorer silencieusement la requête."
 
 #. type: textblock
 #: debhelper.pod:1598
@@ -3598,11 +3814,14 @@ msgid ""
 "will attempt to run the underlying upstream build system with that number of "
 "threads."
 msgstr ""
+"Cette valeur affecte de nombreux outils de debhelper et en particulier "
+"B<dh_auto_*> qui tentera d'exécuter le système de construction amont sous-"
+"jacent avec ce nombre de thread."
 
 #. type: =item
 #: debhelper.pod:1602
 msgid "B<terse>"
-msgstr ""
+msgstr "B<terse>"
 
 #. type: textblock
 #: debhelper.pod:1604
@@ -3612,16 +3831,21 @@ msgid ""
 "is subject to the upstream and the debhelper build system supporting such "
 "features."
 msgstr ""
+"Cette valeur fera que les systèmes de construction officiels de debhelper "
+"configurent les constructions de l'amont pour qu'elles soient laconiques "
+"(c'est-à-dire réduisent la verbosité de leurs sorties). Cela est subordonné "
+"à la prise en charge par les systèmes de construction de l'amont et de "
+"debhelper de ces fonctionnalités."
 
 #. type: textblock
 #: debhelper.pod:1609
 msgid "This value affects most B<dh_auto_*> tools."
-msgstr ""
+msgstr "Cette valeur affecte la plupart des outils de B<dh_auto_*>."
 
 #. type: textblock
 #: debhelper.pod:1613
 msgid "Unknown flags are silently ignored."
-msgstr ""
+msgstr "Les paramètres inconnus sont ignorés silencieusement."
 
 #. type: textblock
 #: debhelper.pod:1615
@@ -3630,6 +3854,10 @@ msgid ""
 "may or may not react to the above flags.  This tends to depend on "
 "implementation details of the tool."
 msgstr ""
+"Veuillez noter que les outils tiers dans le style de debhelper ou les "
+"systèmes de construction fournis par des tiers peuvent réagir ou non aux "
+"paramètres ci-dessus. Cela dépend généralement des détails d'implémentation "
+"des outils"
 
 # type: =head1
 #. type: =head1
@@ -3985,17 +4213,11 @@ msgstr ""
 
 #. type: =head1
 #: dh:33
-#, fuzzy
-#| msgid "OVERRIDE TARGETS"
 msgid "OVERRIDE AND HOOK TARGETS"
-msgstr "CIBLES DE RÉÉCRITURE"
+msgstr "CIBLES DE RÉÉCRITURE ET D'ACCROCHE"
 
 #. type: textblock
 #: dh:35
-#, fuzzy
-#| msgid ""
-#| "A F<debian/rules> file using B<dh> can override the command that is run "
-#| "at any step in a sequence, by defining an override target."
 msgid ""
 "A F<debian/rules> file using B<dh> can override the command that is run at "
 "any step in a sequence, by defining an override target.  It is also possible "
@@ -4004,12 +4226,13 @@ msgid ""
 msgstr ""
 "Un fichier F<debian/rules> utilisant B<dh> peut réécrire la commande "
 "exécutée à n'importe quelle étape d'une séquence, en définissant une cible "
-"de réécriture."
+"de réécriture. Il est possible d'injecter une commande avant ou après une "
+"étape sans affecter l'étape elle-même."
 
 #. type: =head2
 #: dh:40
 msgid "Injecting commands before or after a step"
-msgstr ""
+msgstr "Injection de commandes avant ou après une étape"
 
 #. type: textblock
 #: dh:42
@@ -4017,6 +4240,8 @@ msgid ""
 "I<Note>: This feature requires debhelper 12.8 or later plus the package must "
 "use compatibility mode 10 or later."
 msgstr ""
+"I<Note> : Cette fonctionnalité requiert debhelper 12.8 ou plus et le paquet "
+"doit utiliser le mode de compatibilité 10 ou plus."
 
 #. type: textblock
 #: dh:45
@@ -4028,6 +4253,12 @@ msgid ""
 "I<dh_command> and also even if the command is overridden (as described in L</"
 "Overriding a command> below)."
 msgstr ""
+"Pour injecter des commandes avant I<dh_command>, ajoutez une cible nommée "
+"B<execute_before_>I<dh_command> aux fichiers de règles. De la même manière, "
+"si vous voulez injecter des commandes après I<dh_command>, ajoutez la cible "
+"B<execute_after_>I<dh_command>. Les deux cibles peuvent être utilisées pour "
+"la même I<dh_command>, et même si la commande est réécrite (comme décrit "
+"plus loin dans L</Réécriture d'une commande>)."
 
 #. type: textblock
 #: dh:52
@@ -4035,11 +4266,13 @@ msgid ""
 "When these targets are defined, B<dh> will call the targets respectively "
 "before or after it would invoke I<dh_command> (or its override target)."
 msgstr ""
+"Quand ces cibles sont définies, B<dh> appellera les cibles respectivement "
+"avant ou après qu'il invoque I<dh_command> (ou sa cible réécrite)."
 
 #. type: =head2
 #: dh:55
 msgid "Overriding a command"
-msgstr ""
+msgstr "Réécriture d'une commande"
 
 # type: textblock
 #. type: textblock
@@ -4061,29 +4294,21 @@ msgstr ""
 #: dh:63
 msgid "Architecture dependent/independent override and hook targets"
 msgstr ""
+"Cibles de réécriture et d'accroche dépendantes ou indépendantes de "
+"l'architecture"
 
 #. type: textblock
 #: dh:65
-#, fuzzy
-#| msgid ""
-#| "Override targets can also be defined to run only when building "
-#| "architecture dependent or architecture independent packages.  Use targets "
-#| "with names like B<override_>I<dh_command>B<-arch> and "
-#| "B<override_>I<dh_command>B<-indep>.  (Note that to use this feature, you "
-#| "should Build-Depend on debhelper 8.9.7 or above.)"
 msgid ""
 "The override and hook targets can also be defined to run only when building "
 "architecture dependent or architecture independent packages. Use targets "
 "with names like B<override_>I<dh_command>B<-arch> and "
 "B<execute_after>I<dh_command>B<-indep>."
 msgstr ""
-"Les cibles de réécriture peuvent aussi être définies pour n'être exécutées "
-"que lors de la construction de paquets dépendants ou indépendants de "
-"l'architecture. Utilisez des cibles avec des noms comme "
-"B<override_>I<dh_commande>B<-arch> et B<override_>I<dh_commande>B<-indep>. "
-"Nota : pour utiliser cette possibilité, il est nécessaire d'ajouter une "
-"dépendance de construction (Build-Depends) sur la version 8.9.7 ou "
-"supérieure de debhelper."
+"Les cibles de réécriture et d'accroche peuvent aussi être définies pour "
+"n'être exécutées que lors de la construction de paquets dépendants ou "
+"indépendants de l'architecture. Utilisez des cibles avec des noms comme "
+"B<override_>I<dh_commande>B<-arch> et B<execute_after>I<dh_command>B<-indep>."
 
 #. type: textblock
 #: dh:70
@@ -4091,11 +4316,13 @@ msgid ""
 "This feature is available since debhelper 8.9.7 (for override targets)  and "
 "12.8 (for hook targets)."
 msgstr ""
+"Cette fonctionnalité est disponible depuis debhelper 8.9.7 (pour les cibles "
+"de réécriture) et 12.8 pour les cibles d'accroche."
 
 #. type: =head2
 #: dh:73
 msgid "Completely empty targets"
-msgstr ""
+msgstr "Cibles complètement vides"
 
 #. type: textblock
 #: dh:75
@@ -4104,11 +4331,16 @@ msgid ""
 "empty.  This is mostly useful for override targets, where the command will "
 "simply be skipped without the overhead of invoking a dummy target."
 msgstr ""
+"Comme optimisation particulière, B<dh> ignorera une cible si elle est "
+"complètement vide. C'est surtout utile pour les cibles réécrites où la "
+"commande sera simplement ignorée sans la charge de l'invocation d'une cible "
+"factice."
 
 #. type: textblock
 #: dh:79
 msgid "Note that the target has to be completely empty for this to work:"
 msgstr ""
+"Notez que la cible doit être complètement vide pour que cela fonctionne :"
 
 #. type: verbatim
 #: dh:81
@@ -4119,6 +4351,10 @@ msgid ""
 "     override_dh_bar:\n"
 "\n"
 msgstr ""
+"     # Ignorer dh_toto – la bonne façon optimisée\n"
+"     # Mettre ici une raison pour ignorer dh_toto\n"
+"     override_dh_toto:\n"
+"\n"
 
 #. type: verbatim
 #: dh:86
@@ -4130,11 +4366,16 @@ msgid ""
 "        # (these comments causes a dummy target to be run)\n"
 "\n"
 msgstr ""
+"     # Ignorer dh_titi – la façon lente\n"
+"     override_dh_titi:\n"
+"        # Mettre ici une raison pour ignorer dh_titi\n"
+"        # (ces commentaires font qu'une cible factice est exécutée)\n"
+"\n"
 
 #. type: =head2
 #: dh:91
 msgid "Verifying targets are picked up by dh"
-msgstr ""
+msgstr "La vérification des cibles est récupérée par B<dh>"
 
 #. type: textblock
 #: dh:93
@@ -4142,6 +4383,8 @@ msgid ""
 "If you want to confirm that B<dh> has seen an override or a hook target, you "
 "can use the following command as an example:"
 msgstr ""
+"Si vous voulez confirmer que B<dh> a vu une cible de réécriture ou "
+"d'accroche, vous pouvez utiliser la commande suivante comme exemple :"
 
 #. type: verbatim
 #: dh:96
@@ -4155,6 +4398,13 @@ msgid ""
 "         dh_installchangelogs\n"
 "\n"
 msgstr ""
+"    $ dh binary --no-act | grep dh_install | head -n5\n"
+"         dh_installdirs\n"
+"         dh_install\n"
+"         debian/rules execute_after_dh_install\n"
+"         dh_installdocs\n"
+"         dh_installchangelogs\n"
+"\n"
 
 #. type: textblock
 #: dh:103
@@ -4163,6 +4413,9 @@ msgid ""
 "that B<dh> registered a B<execute_after_dh_install> target and would run it "
 "directly after L<dh_install(1)>."
 msgstr ""
+"Le B<debian/rules execute_after_dh_install> dans la sortie signale que B<dh> "
+"a enregistré une cible B<execute_after_dh_install> et devrait l'exécuter "
+"immédiatement après L<dh_install(1)>."
 
 #. type: textblock
 #: dh:107
@@ -4171,11 +4424,14 @@ msgid ""
 "above.  This makes it a bit harder to spot as you are looking for the "
 "omission of a command name.  But otherwise, the principle remains the same."
 msgstr ""
+"Notez que les L</Cibles complètement vides> seront omises dans la liste ci-"
+"dessus. Cela rend un peu plus difficile le repérage lors de la recherche de "
+"l'omission d'un nom de commande. Mais autrement, le principe reste le même."
 
 #. type: =head2
 #: dh:111
 msgid "Caveats with hook targets and makefile conditionals"
-msgstr ""
+msgstr "Mises en garde sur les cibles d'accroche et les conditions de makefile"
 
 #. type: textblock
 #: dh:113
@@ -4186,6 +4442,11 @@ msgid ""
 "when B<dh> calls the hook target later and will assume the answer did not "
 "change."
 msgstr ""
+"Si vous choisissez d'envelopper une cible d'accroche dans des conditions de "
+"makefile, soyez conscient que B<dh> calcule toutes les cibles d'accroche à "
+"l'avance et met en cache le résultat pour cette exécution. En outre, les "
+"conditions seront de nouveau invoquées quand B<dh> appelle la cible "
+"d'accroche plus tard et supposera que la réponse n'a pas changé."
 
 #. type: textblock
 #: dh:119
@@ -4195,6 +4456,10 @@ msgid ""
 "confusing results - especially when L<dh_listpackages(1)> is part of the "
 "conditional."
 msgstr ""
+"L'analyse et la mise en cache se produit B<souvent> avant que B<dh> ne sache "
+"s'il va construire des paquets arch:any (-a) ou/et arch:all (-i) ce qui peut "
+"produire des résultats déconcertants – particulièrement si "
+"L<dh_listpackages(1)> fait partie des conditions."
 
 #. type: textblock
 #: dh:124
@@ -4203,6 +4468,9 @@ msgid ""
 "and then have the \"body\" be partially or completely conditional.  As an "
 "example:"
 msgstr ""
+"La majorité des problèmes peut être évitée en rendant la cible d'accroche "
+"inconditionnelle et ensuite en mettant le « corps » partiellement ou "
+"complètement conditionnel. Par exemple :"
 
 #. type: verbatim
 #: dh:128
@@ -4223,6 +4491,20 @@ msgid ""
 "      endif\n"
 "\n"
 msgstr ""
+"      # SIMPLE : ce qui arrive est bien défini. La cible d'accroche\n"
+"      # est toujours prise en compte. La partie « maybe run this » est\n"
+"      # conditionnelle mais dh_toto est définitivement oublié.\n"
+"      #\n"
+"      # Note : La condition est évaluée « deux fois » où elle influence\n"
+"      # ce qui arrive. Une fois quand dh vérifie quelles cibles\n"
+"      # d'accroche existent et une fois quand la cible d'accroche\n"
+"      # override_dh_toto est exécutée. Si *une* fois, la sortie est\n"
+"      # I<faux>, « maybe run this » est ignoré.\n"
+"      override_dh_toto:\n"
+"      ifneq (...)\n"
+"          maybe run this\n"
+"      endif\n"
+"\n"
 
 #. type: verbatim
 #: dh:142
@@ -4243,6 +4525,20 @@ msgid ""
 "      endif\n"
 "\n"
 msgstr ""
+"      # SIMPLE : cela est aussi bien défini. La cible d'accroche est\n"
+"      # toujours exécutée et dh_titi est ignoré. La partie « may be\n"
+"      # run this » est conditionnelle comme on pourrait s'y attendre.\n"
+"      #\n"
+"      # Note : La condition est encore évaluée plusieurs fois (dans\n"
+"      # différent processus chaque fois). Néanmoins, seule l'évaluation\n"
+"      # qui survient quand la cible d'accroche est exécutée influence ce\n"
+"      # qui arrive.\n"
+"      override_dh_titi:\n"
+"          : # Commande factice pour toujours forcer l'exécution de la cible\n"
+"      ifneq (...)\n"
+"          maybe run this\n"
+"      endif\n"
+"\n"
 
 #. type: verbatim
 #: dh:157
@@ -4263,6 +4559,21 @@ msgid ""
 "      endif\n"
 "\n"
 msgstr ""
+"      # COMPLIQUÉ : Ce cas peut ne pas être trivial et présenter des\n"
+"      # difficultés. À utiliser à vos risques et périls si dh_listpackages\n"
+"      # est dans la condition.\n"
+"      #\n"
+"      # Ici, soit dh_truc est exécuté normalement OU « maybe run this »\n"
+"      # est exécuté à sa place.\n"
+"      #\n"
+"      # Cela devient encore plus compliqué à résoudre si dh a besoin d'itérer\n"
+"      # dans debian/rules parce qu'il y a une cible normale « explicite »\n"
+"      # (par exemple une cible « build-arch: » séparée de « %: »).\n"
+"      ifneq (...)\n"
+"      override_dh_truc:\n"
+"          maybe run this\n"
+"      endif\n"
+"\n"
 
 #. type: textblock
 #: dh:171
@@ -4270,6 +4581,9 @@ msgid ""
 "These recipes are also relevant for conditional dependency targets, which "
 "are often seen in a variant of the following example:"
 msgstr ""
+"Ces recettes sont aussi pertinentes pour des cibles de dépendance "
+"conditionnelles qui sont souvent illustrées par une variante de l'exemple "
+"suivant :"
 
 #. type: verbatim
 #: dh:174
@@ -4282,6 +4596,12 @@ msgid ""
 "      ...\n"
 "\n"
 msgstr ""
+"      COND_TASKS =\n"
+"      ifneq (...)\n"
+"      COND_TASKS += maybe-run-this\n"
+"      endif\n"
+"      ...\n"
+"\n"
 
 #. type: verbatim
 #: dh:180
@@ -4291,6 +4611,9 @@ msgid ""
 "          ...\n"
 "\n"
 msgstr ""
+"      maybe-run-this:\n"
+"          ...\n"
+"\n"
 
 #. type: verbatim
 #: dh:183
@@ -4307,6 +4630,16 @@ msgid ""
 "      override_dh_foo: $(COND_TASKS)\n"
 "\n"
 msgstr ""
+"      # SIMPLE : ce qui arrive est bien défini. Soit les\n"
+"      # $(COND_TASKS) sont ignorées soit elles sont exécutées.\n"
+"      #\n"
+"      # Note : La condition est évaluée « deux fois » où elle influence\n"
+"      # ce qui arrive. Une fois quand dh vérifie quelles cibles\n"
+"      # d'accroche existent et une fois quand la cible d'accroche\n"
+"      # override_dh_toto est exécutée. Si *une* fois, la sortie est\n"
+"      # # I<faux>, $(COND_TASKS) sont ignorées.\n"
+"      override_dh_toto: $(COND_TASKS)\n"
+"\n"
 
 #. type: verbatim
 #: dh:194
@@ -4324,6 +4657,17 @@ msgid ""
 "          : # Dummy command to force the target to always be run\n"
 "\n"
 msgstr ""
+"      # SIMPLE : ceci est aussi bien défini. La cible d'accroche est\n"
+"      # toujours exécutée et dh_titi est ignoré. La partie $(COND_TASKS)\n"
+"      # est conditionnelle comme on pourrait s'y attendre.\n"
+"      #\n"
+"      # Note : La condition est encore évaluée plusieurs fois (dans\n"
+"      # différent processus chaque fois). Néanmoins, seule l'évaluation\n"
+"      # qui survient quand la cible d'accroche est exécutée influence ce\n"
+"      # qui arrive.\n"
+"      override_dh_titi: $(COND_TASKS)\n"
+"          : # Commande factice pour toujours forcer l'exécution de la cible\n"
+"\n"
 
 #. type: verbatim
 #: dh:205
@@ -4337,6 +4681,14 @@ msgid ""
 "      endif\n"
 "\n"
 msgstr ""
+"      # COMPLIQUÉ : ce cas peut ne pas être trivial et présenter des\n"
+"      # difficultés. À utiliser à vos risques et périls si dh_listpackages\n"
+"      # est dans la condition.\n"
+"      #\n"
+"      ifneq (...)\n"
+"      override_dh_truc: $(COND_TASKS)\n"
+"      endif\n"
+"\n"
 
 #. type: textblock
 #: dh:213
@@ -4344,6 +4696,8 @@ msgid ""
 "When in doubt, pick the relevant B<SIMPLE> case in the examples above that "
 "match your need."
 msgstr ""
+"En cas de doute, choisissez le cas B<SIMPLE> qui correspond à vos besoins "
+"parmi les exemples ci-dessus."
 
 # type: =head1
 #. type: =head1
@@ -4389,17 +4743,6 @@ msgstr ""
 
 #. type: textblock
 #: dh:229
-#, fuzzy
-#| msgid ""
-#| "A B<Build-Depends> relation on the package B<dh-sequence->I<addon> "
-#| "implies a B<--with> I<addon>. This avoids the need for an explicit B<--"
-#| "with> in F<debian/rules> that only duplicates what is already declared "
-#| "via the build dependencies in F<debian/control>.  Note that only "
-#| "relations in the B<Build-Depends> field are considered (i.e. B<Build-"
-#| "Depends-Indep> and B<Build-Depends-Arch> are deliberately unsupported).  "
-#| "Please keep in mind that B<dh> insists on \"simple\" relations (e.g. a "
-#| "relation like \"B<dh-sequence->I<addon> | B<some-other-pkg>\" will I<not> "
-#| "imply B<--with> I<addon>)."
 msgid ""
 "A B<Build-Depends> relation on the package B<dh-sequence->I<addon> implies a "
 "B<--with> I<addon>. This avoids the need for an explicit B<--with> in "
@@ -4412,11 +4755,10 @@ msgstr ""
 "Une relation B<Build-Depends> sur le paquet B<dh-sequence->I<rajout> "
 "implique B<--with> I<rajout>. Cela évite un B<--with> explicite dans "
 "F<debian/rules> qui dupliquerait ce qui est écrit dans les dépendances de "
-"construction dans F<debian/control>. Seules les relations décrites dans le "
-"champ B<Build-Depends> sont utilisées (B<Build-Depends-Indep> et B<Build-"
-"Depends-Arch> sont volontairement non pris en charge). Gardez à l'esprit que "
-"B<dh> exige des relations simples (une relation du type « B<dh-sequence-"
-">I<rajout> | B<un-autre-paquet> » n'impliquera I<pas> B<--with> I<rajout>)."
+"construction dans F<debian/control>. La relation peut (depuis 12.5) être "
+"rendue optionnelle au moyen de build-profiles par exemple. Cela permet de "
+"désactiver facilement un rajout qui est utile uniquement avec certains "
+"profils (par exemple pour faciliter l'amorçage)."
 
 #. type: textblock
 #: dh:238
@@ -4426,6 +4768,11 @@ msgid ""
 "Arch>). Such addons are only active in the particular sequence (e.g. "
 "B<binary-indep>) which simplifies dependency management for cross-builds."
 msgstr ""
+"Depuis debhelper 12.5, les I<rajout>s peuvent aussi être activés en mode "
+"« B<indep> seulement » (au moyen de B<Build-Depends-Indep>) ou en mode "
+"« B<arch> seulement » (au moyen de B<Build-Depends-Arch>). Ces rajouts sont "
+"seulement actifs dans la séquence particulière (par exemple B<binary-indep>) "
+"qui simplifie la gestion des dépendances pour les constructions croisées."
 
 #. type: textblock
 #: dh:244
@@ -4437,6 +4784,14 @@ msgid ""
 "only be used via B<Build-Depends> (or manually via F<debian/rules>).  "
 "Currently, such addons can only add commands to sequences."
 msgstr ""
+"Veuillez noter que les I<rajout>s activés avec B<Build-Depends-Indep> ou "
+"B<Build-Depends-Arch> sont soumis à des contraintes supplémentaires pour "
+"s'assurer que le résultat est déterministe même quand le rajout n'est pas "
+"disponible (par exemple pendant le nettoyage). Cela implique que certains "
+"rajouts sont incompatibles avec ces restrictions et ne peuvent être utilisés "
+"qu'avec B<Build-Depends> (ou manuellement avec F<debian/rules>). "
+"Actuellement, ces rajouts peuvent seulement ajouter des commandes à des "
+"séquences."
 
 # type: =item
 #. type: =item
@@ -4463,17 +4818,13 @@ msgstr "Liste tous les rajouts disponibles."
 
 #. type: textblock
 #: dh:262
-#, fuzzy
-#| msgid ""
-#| "When called only with this option, B<dh> can be called from any directory "
-#| "(i.e. it does not need access under files from a source package)."
 msgid ""
 "When called only with this option, B<dh> can be called from any directory (i."
 "e. it does not need access to files from a source package)."
 msgstr ""
 "Lorsqu'il est appelé uniquement avec cette option, B<dh> peut être invoqué "
-"depuis n'importe quel répertoire (c'est-à-dire qu'il ne nécessite aucun "
-"accès à des fichiers d'un paquet source)."
+"depuis n'importe quel répertoire (c'est-à-dire qu'il ne nécessite l'accès à "
+"aucun fichier d'un paquet source)."
 
 #. type: textblock
 #: dh:268
@@ -4647,20 +4998,14 @@ msgstr ""
 # type: verbatim
 #. type: verbatim
 #: dh:327
-#, fuzzy, no-wrap
-#| msgid ""
-#| "\toverride_dh_fixperms:\n"
-#| "\t\tdh_fixperms\n"
-#| "\t\tchmod 4755 debian/foo/usr/bin/foo\n"
-#| "\n"
 msgid ""
 "\t# Example assumes debhelper/12.8 and compat 10+\n"
 "\texecute_after_dh_fixperms:\n"
 "\t\tchmod 4755 debian/foo/usr/bin/foo\n"
 "\n"
 msgstr ""
-"\toverride_dh_fixperms:\n"
-"\t\tdh_fixperms\n"
+"\t# L'exemple suppose debhelper/12.8 et compat 10+\n"
+"\texecute_after_dh_fixperms:\n"
 "\t\tchmod 4755 debian/truc/usr/bin/truc\n"
 "\n"
 
@@ -4670,16 +5015,13 @@ msgid ""
 "If you are on an older debhelper or compatibility level, the above example "
 "would have to be written as."
 msgstr ""
+"Si vous avez une version de debhelper plus ancienne ou un niveau de "
+"compatibilité inférieur, l'exemple ci-dessus devrait être écrit de cette "
+"manière."
 
 # type: verbatim
 #. type: verbatim
 #: dh:338
-#, fuzzy, no-wrap
-#| msgid ""
-#| "\toverride_dh_fixperms:\n"
-#| "\t\tdh_fixperms\n"
-#| "\t\tchmod 4755 debian/foo/usr/bin/foo\n"
-#| "\n"
 msgid ""
 "\t# Older debhelper versions or using compat 9 or lower.\n"
 "\toverride_dh_fixperms:\n"
@@ -4687,6 +5029,8 @@ msgid ""
 "\t\tchmod 4755 debian/foo/usr/bin/foo\n"
 "\n"
 msgstr ""
+"\t# Versions anciennes de debhelper ou avec un niveau\n"
+"\t# de compatibilité 9 ou moins.\n"
 "\toverride_dh_fixperms:\n"
 "\t\tdh_fixperms\n"
 "\t\tchmod 4755 debian/truc/usr/bin/truc\n"
@@ -4931,20 +5275,14 @@ msgstr ""
 # type: verbatim
 #. type: verbatim
 #: dh:420
-#, fuzzy, no-wrap
-#| msgid ""
-#| "\toverride_dh_fixperms:\n"
-#| "\t\tdh_fixperms\n"
-#| "\t\tchmod 4755 debian/foo/usr/bin/foo\n"
-#| "\n"
 msgid ""
 "\t# Example assumes debhelper/12.8 and compat 10+\n"
 "\texecute_after_dh_fixperms-arch:\n"
 "\t\tchmod 4755 debian/foo/usr/bin/foo\n"
 "\n"
 msgstr ""
-"\toverride_dh_fixperms:\n"
-"\t\tdh_fixperms\n"
+"\t# L'exemple suppose debhelper/12.8 et compat 10+\n"
+"\texecute_after_dh_fixperms-arch:\n"
 "\t\tchmod 4755 debian/truc/usr/bin/truc\n"
 "\n"
 
@@ -5012,13 +5350,6 @@ msgstr ""
 # type: textblock
 #. type: textblock
 #: dh:446
-#, fuzzy
-#| msgid ""
-#| "Each time B<dh> is run (in compat 9 or earlier), it examines the log, and "
-#| "finds the last logged command that is in the specified sequence. It then "
-#| "continues with the next command in the sequence. The B<--until>, B<--"
-#| "before>, B<--after>, and B<--remaining> options can override this "
-#| "behavior (though they were removed in compat 10)."
 msgid ""
 "Each time B<dh> is run (in compat 9 or earlier), it examines the log, and "
 "finds the last logged command that is in the specified sequence. It then "
@@ -5026,9 +5357,7 @@ msgid ""
 msgstr ""
 "Chaque fois que B<dh> est exécuté (en v9 ou précédente), il examine le "
 "journal et recherche la dernière commande exécutée dans la séquence "
-"indiquée. Puis il exécute la commande suivante dans cette séquence. Les "
-"options B<--until>, B<--before>, B<--after> et B<--remaining> permettent de "
-"modifier ce comportement (mais ont été supprimées dans la v10)."
+"indiquée. Puis il exécute la commande suivante dans cette séquence."
 
 #. type: textblock
 #: dh:450
@@ -5627,10 +5956,6 @@ msgstr "dh_builddeb - Construire des paquets binaires Debian"
 # type: textblock
 #. type: textblock
 #: dh_builddeb:19
-#, fuzzy
-#| msgid ""
-#| "B<dh_builddeb> [S<I<debhelper options>>] [B<--destdir=>I<directory>] [B<--"
-#| "filename=>I<name>] [S<B<--> I<params>>]"
 msgid ""
 "B<dh_builddeb> [S<I<debhelper options>>] [B<--destdir=>I<directory>] [B<--"
 "filename=>I<name>] [S<B<--> I<params>>]"
@@ -5739,19 +6064,13 @@ msgid ""
 "should be the last step of the B<clean> target and other debhelper commands "
 "generally assume that B<dh_clean> will clean up after them."
 msgstr ""
+"B<dh_clean> est le programme de la suite debhelper chargé du nettoyage. Il "
+"devrait être la dernière étape de la cible B<clean> et les autres commandes "
+"de debhelper présument que B<dh_clean> fera le nettoyage après elles. "
 
 # type: verbatim
 #. type: verbatim
 #: dh_clean:25
-#, fuzzy, no-wrap
-#| msgid ""
-#| "B<dh_clean> is a debhelper program that is responsible for cleaning up after a\n"
-#| "package is built. It removes the package build directories, and removes some\n"
-#| "other files including F<debian/files>, and any detritus left behind by other\n"
-#| "debhelper commands. It also removes common files that should not appear in a\n"
-#| "Debian diff:\n"
-#| "  #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS .deps/* *.P *-stamp\n"
-#| "\n"
 msgid ""
 "It removes the package build directories, and removes some other files including\n"
 "F<debian/files>, and any detritus left behind by other debhelper commands. It\n"
@@ -5759,10 +6078,9 @@ msgid ""
 "  #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS .deps/* *.P *-stamp\n"
 "\n"
 msgstr ""
-"B<dh_clean> est le programme de la suite debhelper chargé du nettoyage, après\n"
-"la construction du paquet. Il supprime les répertoires de construction, ainsi que\n"
-"d'autres fichiers y compris F<debian/files>. Il supprime aussi tous les résidus laissés\n"
-"par les autres commandes de debhelper, ainsi que les dossiers communs qui ne\n"
+"Il supprime les répertoires de construction, ainsi que d'autres fichiers y\n"
+"compris F<debian/files>. Il supprime aussi tous les résidus laissés par les\n"
+"autres commandes de debhelper, ainsi que les dossiers communs qui ne\n"
 "doivent pas apparaître dans un diff Debian :\n"
 "#*# *~ DEADJOE *.orig *.rej *.SUMS TAGS .deps/* *.P *-stamp\n"
 "\n"
@@ -5805,6 +6123,8 @@ msgid ""
 "Supports substitution variables in compat 13 and later as documented in "
 "L<debhelper(7)>."
 msgstr ""
+"Les variables de substitution sont prises en charge  dans les niveaux de "
+"compatibilité 13 et ultérieurs comme documenté dans L<debhelper(7)>."
 
 # type: =item
 #. type: =item
@@ -6045,21 +6365,15 @@ msgstr "B<--dwz-multifile>, B<--no-dwz-multifile>"
 
 #. type: textblock
 #: dh_dwz:32
-#, fuzzy
-#| msgid ""
-#| "Whether L<dwz(1)> should generate a I<multifile> from the ELF binaries in "
-#| "the same package (it does by default).  When enabled, if a package ships "
-#| "at least 2 ELF binaries, B<dh_dwz> will instruct L<dwz(1)> to generate a "
-#| "multifile for the package."
 msgid ""
 "Whether L<dwz(1)> should generate a I<multifile> from the ELF binaries in "
 "the same package.  When enabled, if a package ships at least 2 ELF binaries, "
 "B<dh_dwz> will instruct L<dwz(1)> to generate a multifile for the package."
 msgstr ""
 "Détermine si L<dwz(1)> doit créer un objet I<multifile> à partir des "
-"binaires ELF d'un même paquet (c'est le comportement par défaut). Si oui, "
-"dans un paquet qui fournit au moins 2 binaires ELF, B<dh_dwz> demandera à "
-"L<dwz(1)> de générer un objet I<multifile> pour le paquet."
+"binaires ELF d'un même paquet. Si oui, dans un paquet qui fournit au moins "
+"deux binaires ELF, B<dh_dwz> demandera à L<dwz(1)> de générer un objet "
+"I<multifile> pour le paquet."
 
 #. type: textblock
 #: dh_dwz:37
@@ -6071,6 +6385,13 @@ msgid ""
 "Debian bug #931891).  If B<--dwz-multifile> is passed, then B<dh_dwz> will "
 "abort with an error if L<dwz(1)> does not create a multifile."
 msgstr ""
+"Par défaut, B<dh_dwz> tentera de créer un objet I<multifile> mais continuera "
+"sans si L<dwz(1)> n'en crée pas un (mais se termine néanmoins avec succès). "
+"Cela arrive généralement quand les fichiers de débogage ne contiennent pas "
+"de symboles de débogage (par exemple, en absence de -g passé au compilateur) "
+"ou quand les symboles de débogage sont compressés (voir le bogue Debian n° "
+"931891). Si B<--dwz-multifile> est passé, alors B<dh_dwz> s’interrompra "
+"avec une erreur si L<dwz(1)> ne crée pas un I<multifile>."
 
 #. type: textblock
 #: dh_dwz:45
@@ -6099,6 +6420,9 @@ msgid ""
 "B<udeb> packages.  It will still use B<dwz> to reduce the file size of debug "
 "files if it finds any."
 msgstr ""
+"Note pour les paquets B<udeb> : B<dh_dwz> ne générera jamais de I<multifile> "
+"pour les paquets B<udeb>. Il utilisera toutefois B<dwz> pour réduire la "
+"taille des fichiers de débogage s'il en trouve."
 
 # type: textblock
 #. type: textblock
@@ -6724,6 +7048,7 @@ msgstr ""
 #: dh_install:334
 msgid "Here are some small examples of configuration files for dh_install."
 msgstr ""
+"Voici quelques courts exemples de fichiers de configuration pour dh_install."
 
 #. type: verbatim
 #: dh_install:336
@@ -6733,6 +7058,9 @@ msgid ""
 "    my-prog usr/bin\n"
 "\n"
 msgstr ""
+"    # Installation de mon-prog dans usr/bin (« usr/bin/mon-prog »)\n"
+"    mon-prog usr/bin\n"
+"\n"
 
 #. type: verbatim
 #: dh_install:339
@@ -6743,6 +7071,10 @@ msgid ""
 "    plugins usr/share/my-prog\n"
 "\n"
 msgstr ""
+"    # Installation d'un répertoire de greffons dans usr/share/mon-prog\n"
+"    # (sous « usr/share/mon-prog/plugins/ »\")\n"
+"    plugins usr/share/mon-prog\n"
+"\n"
 
 #. type: verbatim
 #: dh_install:343
@@ -6754,6 +7086,11 @@ msgid ""
 "    my${Space}datafile${Space}with${Space}spaces.txt usr/share/my-prog/data\n"
 "\n"
 msgstr ""
+"    # Installation d'un fichier avec des espaces dans usr/share/mon-prog/data\n"
+"    # (sous « usr/share/my-prog/data/mon_fichier-de-données avec espaces.txt »)\n"
+"    # SUPPOSE COMPAT 13 où les motifs de substitution sont disponibles\n"
+"    my${Space}fichier${Space}with${Space}spaces.txt usr/share/mon-prog/data\n"
+"\n"
 
 #. type: verbatim
 #: dh_install:348
@@ -6764,12 +7101,17 @@ msgid ""
 "    build/output/libfrop*.so.* usr/lib/${DEB_HOST_MULTIARCH}\n"
 "\n"
 msgstr ""
+"    # Installe une bibliothèque dans le répertoire\n"
+"    # de bibliothèques multi-arch\n"
+"    # SUPPOSE COMPAT 13 où les motifs de substitution sont disponibles\n"
+"    build/output/libfrop*.so.* usr/lib/${DEB_HOST_MULTIARCH}\n"
+"\n"
 
 # type: =head1
 #. type: =head1
 #: dh_install:352
 msgid "LIMITATIONS"
-msgstr "LIMITES"
+msgstr "CONTRAINTES"
 
 # type: verbatim
 #. type: textblock
@@ -6876,7 +7218,7 @@ msgstr ""
 "Ce programme ajoute automatiquement des lignes de code aux scripts de "
 "maintenance du paquet pour l'inscription et la radiation des catalogues et "
 "des supercatalogues (sauf si B<-n> est indiqué). Ces lignes de codes sont "
-"insérées dans les scripts de maintenance et dans le fichier B<triggers> par "
+"insérées dans les scripts de maintenance et dans le fichier I<triggers> par "
 "B<dh_installdeb>. Voir L<dh_installdeb(1)> pour obtenir des explications sur "
 "ces lignes de code ajoutées aux scripts de maintenance du paquet."
 
@@ -6983,12 +7325,6 @@ msgstr ""
 # type: textblock
 #. type: textblock
 #: dh_installchangelogs:24
-#, fuzzy
-#| msgid ""
-#| "An upstream F<changelog> file may be specified as an option. If none is "
-#| "specified, B<dh_installchangelogs> may look for files with names that "
-#| "seem likely to be changelogs as described in the next paragraphs "
-#| "(assuming the package is using compatibility level 7 or above)."
 msgid ""
 "An upstream F<changelog> file may be specified as an option. If none is "
 "specified, B<dh_installchangelogs> may look for files with names that seem "
@@ -6997,20 +7333,10 @@ msgstr ""
 "Un journal amont des modifications (upstream F<changelog>) peut être indiqué "
 "en option. Si rien n'est indiqué, B<dh_installchangelogs> cherche des "
 "fichiers portant des noms susceptibles d'être des changelog tel que décrit "
-"dans les paragraphes suivants (à partir de la version 7)."
+"dans les paragraphes suivants."
 
 #. type: textblock
 #: dh_installchangelogs:28
-#, fuzzy
-#| msgid ""
-#| "In non-native packages, B<dh_installchangelogs> will first look for "
-#| "changelog files installed by the upstream build system into F<< usr/share/"
-#| "doc/I<package> >> (of the package build directory) and rename the most "
-#| "likely candidate (if any) to F<< usr/share/doc/I<package>/changelog >>.  "
-#| "Note that B<dh_installchangelogs> does I<not> look into any source "
-#| "directory (such as F<debian/tmp>). Otherwise, B<dh_installchangelogs> (at "
-#| "compatibility level 7 or any later) will look for changelog files in the "
-#| "source directory (e.g. the root or the F<docs> subdirectory)."
 msgid ""
 "In non-native packages, B<dh_installchangelogs> will first look for "
 "changelog files installed by the upstream build system into F<< usr/share/"
@@ -7024,24 +7350,18 @@ msgid ""
 "extensions (such as F<.txt>, F<.md> and F<.rst>)."
 msgstr ""
 "Dans les paquets non natifs, B<dh_installchangelogs> cherchera d'abord des "
-"changelogs installés dans le système de construction amont dans  F<< usr/"
+"changelogs installés dans le système de construction amont dans F<< usr/"
 "share/doc/I<paquet> >> (dans le répertoire de construction du paquet) et "
 "renommera le plus probable en F<< usr/share/doc/I<paquet>/changelog >>. "
 "Veuillez noter que B<dh_installchangelogs> ne cherche I<pas> dans le "
 "répertoire source (comme F<debian/tmp>). Autrement, B<dh_installchangelogs> "
 "(à partir de la version 7) cherchera des fichiers journaux dans le "
-"répertoire source (par exemple la racine ou le sous-répertoire F<docs>)."
+"répertoire source (par exemple, la racine ou le sous-répertoire F<docs>). Il "
+"cherchera F<changelog>, F<changes> et F<history> facultativement avec leurs "
+"extensions courantes (telles que F<.txt>, F<.md> et F<.rst>)."
 
 #. type: textblock
 #: dh_installchangelogs:40
-#, fuzzy
-#| msgid ""
-#| "If the specified upstream changelog is an F<html> file (determined by "
-#| "file extension), it will be installed as F<usr/share/doc/package/"
-#| "changelog.html> instead. If the html changelog is converted to plain "
-#| "text, that variant can be specified as a second upstream changelog file. "
-#| "When no plain text variant is specified, a short F<usr/share/doc/package/"
-#| "changelog> is generated, pointing readers at the html changelog file."
 msgid ""
 "If a changelog file is specified and is an F<html> file (determined by file "
 "extension), it will be installed as F<usr/share/doc/package/changelog.html> "
@@ -7050,12 +7370,12 @@ msgid ""
 "a short F<usr/share/doc/package/changelog> is generated, pointing readers at "
 "the html changelog file."
 msgstr ""
-"Si le fichier changelog amont est un fichier F<html> (d'après son "
-"extension), il sera installé dans F<usr/share/doc/paquet/changelog.html> à "
-"la place. Si le changelog html est converti en texte, cette variante peut "
-"être définie comme un second fichier changelog amont. Lorsqu'aucune variante "
-"texte n'est spécifiée, un court F<usr/share/doc/paquet/changelog> est "
-"généré, dirigeant les lecteurs vers le changelog html."
+"Si un fichier changelog est un fichier F<HTML> (d'après son extension), il "
+"sera installé dans F<usr/share/doc/paquet/changelog.html> à la place. Si le "
+"changelog HTML est converti en texte simple, cette variante peut être "
+"définie comme un second paramètre. Lorsque aucune variante texte simple "
+"n'est spécifiée, un court F<usr/share/doc/paquet/changelog> est généré, "
+"dirigeant les lecteurs vers le changelog HTML."
 
 # type: =item
 #. type: =item
@@ -7304,6 +7624,11 @@ msgid ""
 "to benefit from the shell scripts generated by debhelper commands (including "
 "those from B<dh_installdeb> when it processes I<package>.maintscript files)."
 msgstr ""
+"B<dh_installdeb> réalisera la substitution des items connus du format "
+"B<#TOKEN#>. En général, les scripts voudront inclure l'item B<#DEBHELPER#> "
+"pour bénéficier des scripts de l'interpréteur de commandes générés par les "
+"commandes debhelper (y compris ceux de B<dh_installdeb> quand il traite les "
+"fichiers I<paquet>.maintscript)."
 
 #. type: textblock
 #: dh_installdeb:45
@@ -7311,6 +7636,8 @@ msgid ""
 "The B<#DEBHELPER#> token should be placed on its own line as it is often "
 "replaced by a multi-line shell script."
 msgstr ""
+"L'item B<#DEBHELPER#> devrait être placé sur sa ligne propre parce qu'il est "
+"souvent remplacé par un script multiligne de l'interpréteur de commandes."
 
 # type: =item
 #. type: =item
@@ -7401,9 +7728,9 @@ msgid ""
 "\n"
 msgstr ""
 "    # Correct\n"
-"    rm_conffile /etc/obsolete.conf 0.2~ foo\n"
+"    rm_conffile /etc/obsolete.conf 0.2~ toto\n"
 "    # INCORRECT\n"
-"    rm_conffile /etc/obsolete.conf 0.2~ foo -- \"$@\"\n"
+"    rm_conffile /etc/obsolete.conf 0.2~ toto -- \"$@\"\n"
 "\n"
 
 #. type: textblock
@@ -7448,7 +7775,7 @@ msgstr ""
 #. type: =item
 #: dh_installdeb:104
 msgid "B<-D>I<TOKEN=VALUE>, B<--define> I<TOKEN=VALUE>"
-msgstr ""
+msgstr "B<-D>I<ITEM=VALEUR>, B<--define> I<ITEM=VALEUR>"
 
 #. type: textblock
 #: dh_installdeb:106
@@ -7458,6 +7785,10 @@ msgid ""
 "token names> also applies to tokens defined on the command line.  Invalid "
 "token names will trigger an error."
 msgstr ""
+"Définit les items qui doivent être remplacés dans les scripts du responsable "
+"quand ils sont créés. Veuillez noter que les contraintes décrites dans L</"
+"Restrictions dans les noms d'item> s'appliquent aussi aux items définis en "
+"ligne de commande. Les noms d'item non valables déclencheront une erreur."
 
 #. type: textblock
 #: dh_installdeb:111
@@ -7467,17 +7798,22 @@ msgid ""
 "I<VALUE> is expected to point to a file containing the actual value to "
 "insert."
 msgstr ""
+"Dans un cas simple, ce paramètre fera que B<< #I<ITEM># >> sera remplacé par "
+"I<VALEUR>. Si I<VALEUR> commence par un signe I<@> littéral, alors I<VALEUR> "
+"est censé pointer vers un fichier contenant la valeur réelle à insérer."
 
 #. type: textblock
 #: dh_installdeb:116
 msgid ""
 "An explicit declared token with this parameter will replace built-in tokens."
 msgstr ""
+"Un item déclaré de façon explicite avec ce paramètre remplacera les items "
+"internes."
 
 #. type: textblock
 #: dh_installdeb:119
 msgid "Test examples to aid with the understanding:"
-msgstr ""
+msgstr "Exemples de tests pour aider à mieux comprendre :"
 
 #. type: verbatim
 #: dh_installdeb:121
@@ -7491,6 +7827,13 @@ msgid ""
 "    dh_installdeb --define SIMPLE=direct --define FILEBASED=@some-file\n"
 "\n"
 msgstr ""
+"\tcat >> debian/postinst <<EOF\n"
+"\t#SIMPLE#\n"
+"\t#FILEBASED#\n"
+"\tEOF\n"
+"\techo -n \"valeur_complexe\" > un_fichier\n"
+"    dh_installdeb --define SIMPLE=direct --define FILEBASED=@un_fichier\n"
+"\n"
 
 #. type: textblock
 #: dh_installdeb:128
@@ -7498,6 +7841,8 @@ msgid ""
 "In this example, B<#SIMPLE#> will expand to B<direct> and B<#FILEBASED#> "
 "will expand to B<Complex value>."
 msgstr ""
+"Dans cet exemple, B<#SIMPLE#> sera développé en B<direct> et B<#FILEBASED#> "
+"sera développé en B<valeur_complexe>."
 
 #. type: textblock
 #: dh_installdeb:131
@@ -7507,11 +7852,15 @@ msgid ""
 "different values for the same token.  This is done by prefixing the token "
 "name with B<< pkg.I<package-name>. >>."
 msgstr ""
+"Il est aussi possible de fixer des valeurs spécifiques à un paquet pour un "
+"item donné. Cela est utilisé quand B<dh_installdeb> agit sur plusieurs "
+"paquets qui ont besoin de valeurs distinctes pour le même item. Cela est "
+"obtenu en préfixant le nom de l'item par B<< pkg.I<nom-paquet>. >>."
 
 #. type: textblock
 #: dh_installdeb:136
 msgid "This can be used as in the following example:"
-msgstr ""
+msgstr "Cela peut être utilisé comme dans l'exemple suivant :"
 
 #. type: verbatim
 #: dh_installdeb:138
@@ -7533,6 +7882,21 @@ msgid ""
 "      --define pkg.baz.TOKEN=unique-baz-value\n"
 "\n"
 msgstr ""
+"\tcat >> debian/toto.postinst <<EOF\n"
+"\t# Script pour #PACKAGE#\n"
+"\t#TOKEN#\n"
+"\tEOF\n"
+"\tcat >> debian/titi.postinst <<EOF\n"
+"\t# Script pour #PACKAGE#\n"
+"\t#TOKEN#\n"
+"\tEOF\n"
+"\tcat >> debian/truc.postinst <<EOF\n"
+"\t# Script pour #PACKAGE#\n"
+"\t#TOKEN#\n"
+"\tEOF\n"
+"    dh_installdeb -ptoto -ptiti -ptruc  --define TOKEN=default --define pkg.titi.TOKEN=valeur-unique-titi \\\n"
+"      --define pkg.truc.TOKEN=valeur-unique-truc\n"
+"\n"
 
 #. type: textblock
 #: dh_installdeb:153
@@ -7541,6 +7905,9 @@ msgid ""
 "postinst>, to B<unique-bar-value> in F<debian/bar.postinst> and to B<unique-"
 "baz-value> in F<debian/baz.postinst>."
 msgstr ""
+"Dans cet exemple, B<#TOKEN#> sera développé en B<default> dans F<debian/toto."
+"postinst>, en B<valeur-unique-titi> dans F<debian/titi.postinst> et en "
+"B<valeur-unique-truc> dans F<debian/truc.postinst>."
 
 #. type: textblock
 #: dh_installdeb:157
@@ -7549,11 +7916,15 @@ msgid ""
 "g.  you can refer to B<#pkg.bar.TOKEN#> inside F<debian/foo.postinst> and it "
 "will be replaced by B<unique-bar-value>."
 msgstr ""
+"Notez que les items de B<#pkg.*#> seront visibles dans tous les scripts "
+"actifs. Par exemple, il est possible de faire référence à B<#pkg.titi."
+"TOKEN#> dans F<debian/toto.postinst> et il sera remplacé par B<valeur-unique-"
+"titi>."
 
 #. type: =head1
 #: dh_installdeb:163
 msgid "SUBSTITUTION IN MAINTAINER SCRIPTS"
-msgstr ""
+msgstr "SUBSTITUTION DANS LES SCRIPTS DU RESPONSABLE"
 
 #. type: textblock
 #: dh_installdeb:165
@@ -7561,14 +7932,15 @@ msgid ""
 "The B<dh_installdeb> will automatically replace the following tokens inside "
 "a provided maintainer script (if not replaced via B<-D>/B<--define>):"
 msgstr ""
+"B<dh_installdeb> remplacera automatiquement les items suivants dans un "
+"script fourni par le responsable (s'il n'est pas remplacé au moyen de B<-D> "
+"ou B<--define>) :"
 
 # type: =head1
 #. type: =item
 #: dh_installdeb:170
-#, fuzzy
-#| msgid "DEBHELPER COMMANDS"
 msgid "#DEBHELPER#"
-msgstr "COMMANDES DE DEBHELPER"
+msgstr "#DEBHELPER#"
 
 #. type: textblock
 #: dh_installdeb:172
@@ -7577,11 +7949,15 @@ msgid ""
 "commands.  This includes the snippets generated by B<dh_installdeb> from "
 "I<package>.maintscript file (if present)."
 msgstr ""
+"Cet item est par défaut remplacé par les lignes de code générées par les "
+"commandes de debhelper. Cela comprend les lignes de code générées par "
+"B<dh_installdeb> à partir du fichier I<paquet>.maintscript (s'il est "
+"présent)."
 
 #. type: =item
 #: dh_installdeb:176
 msgid "#DEB_HOST_I<NAME>#, #DEB_BUILD_I<NAME>#, #DEB_TARGET_I<NAME>#"
-msgstr ""
+msgstr "#DEB_HOST_I<NOM>#, #DEB_BUILD_I<NOM>#, #DEB_TARGET_I<NOM>#"
 
 #. type: textblock
 #: dh_installdeb:178
@@ -7591,6 +7967,10 @@ msgid ""
 "#DEB_HOST_I<NAME> >> variant in a script to ensure you get the right value "
 "when cross-building."
 msgstr ""
+"Ces items sont remplacés par leur variable respective venant de L<dpkg-"
+"architecture(1)>. Dans presque tous les cas, vous voudrez utiliser la "
+"variante B<< #DEB_HOST_I<NOM> >> dans un script pour vous assurer d'obtenir "
+"la valeur correcte lors d'une construction croisée."
 
 #. type: textblock
 #: dh_installdeb:183
@@ -7598,11 +7978,13 @@ msgid ""
 "On a best effort, tokens of this pattern that do not match a variable in "
 "L<dpkg-architecture(1)> will be left as-is."
 msgstr ""
+"Dans un souci de qualité, les items avec ce motif qui ne correspondent pas à "
+"une variable de L<dpkg-architecture(1)> seront laissés tels quels."
 
 #. type: =item
 #: dh_installdeb:186
 msgid "#ENV.I<NAME>#"
-msgstr ""
+msgstr "#ENV.I<NOM>#"
 
 #. type: textblock
 #: dh_installdeb:188
@@ -7611,6 +7993,9 @@ msgid ""
 "environment variable.  If the environment variable is unset, the token is "
 "replaced with the empty string."
 msgstr ""
+"Les items de cette forme seront remplacés par la valeur de la variable "
+"d'environnement correspondante. Si la variable d'environnement n'est pas "
+"définie, l'item est remplacé par une chaîne vide."
 
 #. type: textblock
 #: dh_installdeb:193
@@ -7618,11 +8003,13 @@ msgid ""
 "Note that there are limits on which names can be used (see L</Limitations in "
 "token names>)."
 msgstr ""
+"Notez qu'il y a des restrictions sur les noms pouvant être utilisés voir L</"
+"Restrictions dans les noms d'item>)."
 
 #. type: =item
 #: dh_installdeb:196
 msgid "#PACKAGE#"
-msgstr ""
+msgstr "#PACKAGE#"
 
 #. type: textblock
 #: dh_installdeb:198
@@ -7630,17 +8017,21 @@ msgid ""
 "This token is by default replaced by the package name, which will contain "
 "the concrete script."
 msgstr ""
+"Cet item est remplacé par défaut par le nom du paquet qui contiendra le "
+"script réel."
 
 #. type: =head2
 #: dh_installdeb:203
 msgid "Limitations in token names"
-msgstr ""
+msgstr "Restrictions dans les noms d'item"
 
 #. type: textblock
 #: dh_installdeb:205
 msgid ""
 "All tokens intended to be substituted must match the regex: #[A-Za-z0-9_.+]+#"
 msgstr ""
+"Tous les items destinés à être remplacés doivent correspondre à l'expression "
+"rationnelle : #[A-Za-z0-9_.+]+#"
 
 #. type: textblock
 #: dh_installdeb:207
@@ -7649,6 +8040,11 @@ msgid ""
 "script template.  Invalid token names passed to B<-D> or B<--define> will "
 "cause B<dh_installdeb> to reject the command with an error in most cases."
 msgstr ""
+"Les items qui ne correspondent pas à cette expression rationnelle seront "
+"ignorés silencieusement s'ils sont présents dans un modèle de script. Les "
+"noms d'item non valables passés à B<-D> ou B<--define> feront que "
+"B<dh_installdeb> rejettera la commande avec une erreur dans la plupart des "
+"cas."
 
 # type: textblock
 #. type: textblock
@@ -8135,6 +8531,13 @@ msgid ""
 "with using F<debian/>I<package>F<.doc-base.*> files can lead to "
 "uninstallable packages. See L<https://bugs.debian.org/980903> for details."
 msgstr ""
+"Soyez conscient que cette déduplication est uniquement réalisée en mémoire "
+"actuellement, ce qui fait que pour l'instant il ne faut pas que "
+"B<dh_installdocs> soit appelé plus d'une fois pendant la construction du "
+"paquet. L'appel de B<dh_installdocs -p>I<paquet> en combinaison avec "
+"l'utilisation de F<debian/>I<paquet>F<.doc-base.*> peut mener à des paquets "
+"non installables. Voir L<https://bugs.debian.org/980903> pour plus de "
+"détails."
 
 # type: textblock
 #. type: textblock
@@ -9314,25 +9717,17 @@ msgstr ""
 # type: textblock
 #. type: textblock
 #: dh_installinitramfs:24
-#, fuzzy
-#| msgid ""
-#| "If B<dh_installinitramfs> installs or (in compat 12 or later) detects one "
-#| "or more initramfs hooks in the package, then it also automatically "
-#| "generates the F<postinst> and F<postrm> commands needed to interface with "
-#| "the Debian initramfs system.  These commands are inserted into the "
-#| "maintainer scripts by L<dh_installdeb(1)>."
 msgid ""
 "If B<dh_installinitramfs> installs or detects one or more initramfs hooks in "
 "the package, then it also automatically generates the noawait trigger "
 "B<update-initframfs> command needed to interface with the Debian initramfs "
 "system.  This trigger is inserted into the packaging by L<dh_installdeb(1)>."
 msgstr ""
-"Si B<dh_installinitramfs> installe ou (à partir de la version 12) détecte "
-"une ou plusieurs accroches pour initramfs dans le paquet, il produit "
-"automatiquement les lignes de code des scripts de maintenance F<postinst> et "
-"F<postrm> nécessaires à l'interfaçage avec le système initramfs de Debian. "
-"Ces commandes sont insérées dans les scripts de maintenance par "
-"L<dh_installdeb(1)>."
+"Si B<dh_installinitramfs> installe ou détecte une ou plusieurs accroches "
+"pour initramfs dans le paquet, alors il produit aussi automatiquement la "
+"commande d'action différée « noawait » d'B<update-initframfs> nécessaire à "
+"l'interface avec le système initramfs de Debian. Cette action différée "
+"(« trigger ») est insérée dans l'empaquetage par L<dh_installdeb(1)>."
 
 # type: =item
 #. type: =item
@@ -9355,22 +9750,16 @@ msgstr ""
 
 #. type: textblock
 #: dh_installinitramfs:49
-#, fuzzy
-#| msgid ""
-#| "Do not add the \"ldconfig\" trigger even if it seems like the package "
-#| "might need it.  The option is called B<--no-scripts> for historical "
-#| "reasons as B<dh_makeshlibs> would previously generate maintainer scripts "
-#| "that called B<ldconfig>."
 msgid ""
 "Do not add the B<update-initramfs> trigger even if it seems like the package "
 "might need it.  The option is called B<--no-scripts> for historical reasons "
 "as B<dh_installinitramfs> would previously generate maintainer scripts that "
 "called B<update-initramfs -u>."
 msgstr ""
-"N'ajoutez pas l'action différée (« trigger ») même s'il semble que le paquet "
-"en a besoin. L'option est nommée B<--no-scripts> pour des raisons "
-"historiques car B<dh_makeshlibs> générait précédemment un script de "
-"maintenance qui appelait B<ldconfig>."
+"N'ajoutez pas l'action différée (« trigger ») B<update-initramfs> même s'il "
+"semble que le paquet en a besoin. L'option est nommée B<--no-scripts> pour "
+"des raisons historiques, car B<dh_installinitramfs> générait précédemment un "
+"script du responsable qui appelait B<update-initramfs -u>."
 
 #. type: textblock
 #: dh_installinitramfs:54
@@ -9379,24 +9768,23 @@ msgid ""
 "system that is not satisfied by the noawait trigger (e.g. because you need "
 "the extra guarantees and head-aches of a await trigger)."
 msgstr ""
+"Utilisez cette option, si le besoin d'interface au système B<update-"
+"initramfs> n'est pas satisfait par l'action différée « noawait » (par "
+"exemple, parce que vous avez besoin des garanties supplémentaires et des "
+"problèmes d'une action différée « await »)."
 
 # type: textblock
 #. type: textblock
 #: dh_installinitramfs:62
-#, fuzzy
-#| msgid ""
-#| "Note that this command is not idempotent. L<dh_prep(1)> should be called "
-#| "between invocations of this command. Otherwise, it may cause multiple "
-#| "instances of the same text to be added to maintainer scripts."
 msgid ""
 "Note that this command is not idempotent. L<dh_prep(1)> should be called "
 "between invocations of this command. Otherwise, it may cause multiple "
 "instances of the same text to be added to triggers file."
 msgstr ""
-"Nota : Ce programme n'est pas idempotent. Un L<dh_prep(1)> doit être réalisé "
-"entre chaque exécution de ce programme. Sinon, il risque d'y avoir plusieurs "
-"occurrences des mêmes lignes de code dans les scripts de maintenance du "
-"paquet."
+"Nota : Cette commande n'est pas idempotente. L<dh_prep(1)> doit être appelé "
+"entre chaque exécution de cette commande. Sinon, il risque d'y avoir "
+"plusieurs occurrences des mêmes lignes de code ajoutées au fichier "
+"I<triggers>."
 
 # type: textblock
 #. type: textblock
@@ -9570,13 +9958,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_installman:25
-#, fuzzy
-#| msgid ""
-#| "In compat 10 and earlier, this program was primarily for when upstream's "
-#| "build system does not properly install them as a part of its install step "
-#| "(or it does not have an install step).  In compat 11 and later, it "
-#| "supports the same features of L<dh_install(1)> and has the advantage that "
-#| "it respects the B<nodoc> build profile (unlike L<dh_install(1)>)."
 msgid ""
 "In compat 10 and earlier, this program was primarily for when upstream's "
 "build system does not properly install them as a part of its install step "
@@ -9587,10 +9968,11 @@ msgid ""
 msgstr ""
 "Jusqu'au niveau de compatibilité 10, ce programme était utilisé "
 "principalement lorsque le système de construction amont ne les installait "
-"pas correctement lors de la phase d'installation. En version 11 et "
-"postérieures, il prend en charge les mêmes fonctionnalités que "
-"L<dh_install(1)> et a l'avantage de respecter le profil B<nodoc> "
-"(contrairement à L<dh_install(1)>)."
+"pas correctement lors de la phase d'installation (ou n'avait de phase "
+"d'installation). À partir du niveau de compatibilité 11, il prend aussi en "
+"charge le répertoire de recherche par défaut et en plus B<--sourcedir> comme "
+"dh_install(1) et a l'avantage de respecter le profil de construction "
+"B<nodoc> (contrairement à L<dh_install(1)>)."
 
 #. type: textblock
 #: dh_installman:32
@@ -9758,14 +10140,14 @@ msgid ""
 "  # ...\n"
 "\n"
 msgstr ""
-"  doc/man/foo.1\n"
+"  doc/man/toto.1\n"
 "  # Traductions\n"
-"  doc/man/foo.da.1\n"
-"  doc/man/foo.de.1\n"
-"  doc/man/foo.fr.1\n"
+"  doc/man/toto.da.1\n"
+"  doc/man/toto.de.1\n"
+"  doc/man/toto.fr.1\n"
 "  # NB: La ligne suivante est considérée comme une traduction polonaise\n"
-"  # de \"foo.1\" (pas une page de manuel écrite en Perl appelée \"foo.pl\")\n"
-"  doc/man/foo.pl.1\n"
+"  # de \"toto.1\" (pas une page de manuel écrite en Perl appelée toto.pl)\n"
+"  doc/man/toto.pl.1\n"
 "  # ...\n"
 "\n"
 
@@ -10879,6 +11261,13 @@ msgid ""
 "\"libfoo1-udeb\"). Please use the B<--add-udeb> and B<--no-add-udeb> options "
 "below when this auto-detection is insufficient."
 msgstr ""
+"Depuis debhelper 12.3, B<dh_makeshlibs> ajoutera par défaut une ligne "
+"I<udeb> supplémentaire pour les udebs dans le fichier shlibs, quand l'udeb a "
+"le même nom que le fichier deb suivi par le suffixe « -udeb » (par exemple, "
+"si le fichier deb s'appelle « libtoto1 », alors debhelper détectera "
+"automatiquement l'udeb s'il s'appelle « libtoto1-udeb »). Veuillez utiliser "
+"les options B<--add-udeb> et B<--no-add-udeb> ci-dessous quand la détection "
+"automatique est insuffisante."
 
 #. type: textblock
 #: dh_makeshlibs:36
@@ -10890,6 +11279,14 @@ msgid ""
 "the udeb contains library files from multiple regular deb packages or when "
 "the packages do not follow the expected naming convention."
 msgstr ""
+"Si auparavant vous utilisiez B<--add-udeb> et envisagez de migrer vers "
+"l'utilisation de la nouvelle fonctionnalité de détection automatique "
+"de 12.3, n'oubliez pas de vérifier que les fichiers F<DEBIAN/shlibs> "
+"résultants sont conformes aux prévisions. Il y a quelques cas particuliers "
+"connus où la détection automatique est insuffisante. Cela comprend les cas "
+"où l'udeb renferme des fichiers de bibliothèque issus de plusieurs paquets "
+"deb normaux ou quand les paquets ne suivent pas les conventions de nommage "
+"escomptées."
 
 # type: =item
 #. type: =item
@@ -11188,14 +11585,16 @@ msgid ""
 "libraries from multiple deb packages, or when the udeb contains libraries "
 "B<not> present in the deb package."
 msgstr ""
+"Cette option est seulement utile pour les cas spéciaux où debhelper ne peut "
+"pas détecter automatiquement le nom du paquet udeb, où le paquet udeb "
+"contient des bibliothèques issues de plusieurs paquets deb, ou encore quand "
+"le paquet udeb contient des bibliothèques B<absentes> du paquet deb."
 
 # type: =item
 #. type: =item
 #: dh_makeshlibs:169
-#, fuzzy
-#| msgid "B<--add-udeb=>I<udeb>"
 msgid "B<--no-add-udeb>"
-msgstr "B<--add-udeb=>I<udeb>"
+msgstr "B<--no-add-udeb>"
 
 #. type: textblock
 #: dh_makeshlibs:171
@@ -11203,6 +11602,8 @@ msgid ""
 "Do not add any udeb lines to the shlibs file.  This can be used to disable "
 "the default auto-detection of udebs."
 msgstr ""
+"Pas d'ajout de ligne udeb dans le fichier shlibs. Cela peut être utilisé "
+"pour désactiver la détection automatique des paquets udeb."
 
 #. type: textblock
 #: dh_makeshlibs:174
@@ -11212,6 +11613,11 @@ msgid ""
 "for the library was \"overkill\" and the library is embedded in a different "
 "udeb package."
 msgstr ""
+"Cela peut être utile au cas où vous ne voulez pas du tout de fichier shlibs "
+"pour le paquet udeb parce qu'aucun paquet n'en dépendra. Ce peut être, par "
+"exemple, parce que l'ajout d'un paquet udeb pour la bibliothèque était "
+"« exagéré » et que la bibliothèque est incorporée dans un paquet udeb "
+"différent."
 
 # type: textblock
 #. type: textblock
@@ -11235,8 +11641,8 @@ msgid ""
 " libfoobar 1 libfoobar1\n"
 "\n"
 msgstr ""
-"En admettant que le paquet s'appelle F<libtoto1>, cette commande produit un fichier\n"
-"shlibs tel que :\n"
+"En admettant que le paquet s'appelle F<libtoto1>, cette commande produit\n"
+"un fichier shlibs tel que :\n"
 "libtoto 1 libtoto1\n"
 "\n"
 
@@ -11256,7 +11662,8 @@ msgid ""
 " libfoobar 1 libfoobar1 (>= 1.1)\n"
 "\n"
 msgstr ""
-"En admettant que la version actuelle du paquet soit 1.1-3, cette commande produit un fichier shlibs tel que :\n"
+"En admettant que la version actuelle du paquet soit 1.1-3, cette commande\n"
+"produit un fichier shlibs tel que :\n"
 " libtoto 1 libtoto1 (>= 1.1)\n"
 "\n"
 
@@ -11916,19 +12323,14 @@ msgstr ""
 # type: textblock
 #. type: textblock
 #: dh_strip:22
-#, fuzzy
-#| msgid ""
-#| "B<dh_strip> is a debhelper program that is responsible for stripping "
-#| "executables, shared libraries, and static libraries that are not used for "
-#| "debugging."
 msgid ""
 "B<dh_strip> is a debhelper program that is responsible for stripping out "
 "debug symbols in executables, shared libraries, and static libraries that "
 "are not needed during execution."
 msgstr ""
-"B<dh_strip> est le programme de la suite debhelper chargé de dépouiller les "
-"exécutables, les bibliothèques partagées et les bibliothèques statiques qui "
-"ne sont pas utilisés pour la mise au point."
+"B<dh_strip> est le programme de la suite debhelper chargé de dépouiller de "
+"leurs symboles de débogage, qui ne sont pas nécessaires pendant l'exécution, "
+"les exécutables, les bibliothèques partagées et les bibliothèques statiques."
 
 # type: textblock
 #. type: textblock
@@ -12238,16 +12640,12 @@ msgstr "B<dh_testroot> [I<options_de_debhelper>]"
 
 #. type: textblock
 #: dh_testroot:15
-#, fuzzy
-#| msgid ""
-#| "B<dh_testroot> is used to determine if the target is being run with "
-#| "sufficient access under (fake)root."
 msgid ""
 "B<dh_testroot> is used to determine if the target is being run with suffient "
 "access to root(-like) features."
 msgstr ""
 "B<dh_testroot> est utilisé pour déterminer si la cible est exécutée avec des "
-"accès suffisants à (fake)root."
+"accès suffisants aux fonctionnalités de root (ou fakeroot)."
 
 #. type: textblock
 #: dh_testroot:18
@@ -12277,7 +12675,7 @@ msgstr ""
 "Si le constructeur ne prend pas en charge I<Rules-Requires-Root>, il ne "
 "positionnera pas la variable d'environnement I<DEB_RULES_REQUIRES_ROOT>. "
 "Cela conduira B<dh_testroot> (et le reste de debhelper) à considérer que "
-"(fake)root est impliqué."
+"root (ou fakeroot) est impliqué."
 
 #. type: textblock
 #: dh_testroot:30
