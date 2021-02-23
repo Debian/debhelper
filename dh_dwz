@@ -110,7 +110,8 @@ sub testfile {
 	return;
 }
 
-for my $package (@{$dh{DOPACKAGES}}) {
+on_items_in_parallel(\@{$dh{DOPACKAGES}}, sub {
+foreach my $package (@_) {
 	my $tmp = tmpdir($package);
 
 	next if not -d $tmp;
@@ -156,7 +157,7 @@ for my $package (@{$dh{DOPACKAGES}}) {
 		# Make new hardlink.
 		doit('ln', '-f', $target, $hardlink);
 	}
-}
+}});
 
 =head1 SEE ALSO
 
