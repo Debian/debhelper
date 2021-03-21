@@ -36,10 +36,10 @@ sub _unit_check_user_enabled {
 	my $matches;
 
 	my @postinst = read_script($package, 'postinst');
-	# Match exactly one tab character. The "dont-enable" script has
+	# Match exactly two tab character. The "dont-enable" script has
 	# an "enable" line for re-enabling the service if the admin had it
 	# enabled, but we do not want to include that in our count.
-	$matches = grep { m{^\tif deb-systemd-helper( --\w+)* --user was-enabled.*'\Q$unit'} } @postinst;
+	$matches = grep { m{^\t\tif deb-systemd-helper( --\w+)* --user was-enabled.*'\Q$unit'} } @postinst;
 	is($matches, $enabled, "$unit $verb enabled");
 
 	my @postrm = read_script($package, 'postrm');
