@@ -452,25 +452,30 @@ sub load_sequence_addon {
 
 sub check_for_obsolete_commands {
 	my ($full_sequence) = @_;
-	my ($found_obsolete_targets);
+	my ($found_obsolete_targets, $min_compat);
 	for my $command (@{$full_sequence}) {
 		if (exists($Debian::Debhelper::DH::SequenceState::obsolete_command{$command})) {
-			my $addon_name = $Debian::Debhelper::DH::SequenceState::obsolete_command{$command};
+			my $addon_name = $Debian::Debhelper::DH::SequenceState::obsolete_command{$command}[1];
 			error("The addon ${addon_name} claimed that $command was obsolete, but it is not!?");
 		}
 	}
 	for my $command (sort(keys(%Debian::Debhelper::DH::SequenceState::obsolete_command))) {
+		my ($addon_name, $error_compat) = @{$Debian::Debhelper::DH::SequenceState::obsolete_command{$command}};
+		$addon_name = 'debhelper' if $addon_name eq 'root-sequence';
 		for my $prefix (qw(execute_before_ execute_after_ override_)) {
 			for my $suffix ('', '-arch', '-indep') {
 				my $target = "${prefix}${command}${suffix}";
 				if (defined(rules_explicit_target($target))) {
 					$found_obsolete_targets = 1;
-					warning("The target ${target} references a now obsolete command and will not be run!");
+					$min_compat //= $error_compat;
+					$min_compat = $error_compat if $error_compat < $min_compat;
+					warning("The target ${target} references a now obsolete command and will not be run!"
+							. " (Marked by ${addon_name}, will be an error in compat $error_compat)");
 				}
 			}
 		}
 	}
-	if ($found_obsolete_targets and not compat(12)) {
+	if ($found_obsolete_targets and not compat($min_compat - 1)) {
 		error("Aborting due to left over override/hook targets for now removed commands.");
 	}
 	return;

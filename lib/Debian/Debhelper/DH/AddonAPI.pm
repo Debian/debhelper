@@ -210,9 +210,17 @@ sub remove_command_options {
 }
 
 sub declare_command_obsolete {
-	my ($command) = @_;
+	my ($error_compat, $command) = @_;
+	if (not defined($command) and defined($error_compat)) {
+		# Backwards compat - originally this only accepted one command.
+		$command = $error_compat;
+		$error_compat = 13;
+	}
+	if ($error_compat < 13) {
+		error("Minimum error compat is 13 (got ${error_compat} for command: ${command})");
+	}
 	_assert_not_conditional_sequence_addon('declare_command_obsolete');
-	$Debian::Debhelper::DH::SequenceState::obsolete_command{$command} = $DH_INTERNAL_ADDON_NAME;
+	$Debian::Debhelper::DH::SequenceState::obsolete_command{$command} = [$DH_INTERNAL_ADDON_NAME, $error_compat];
 	return 1;
 }
 

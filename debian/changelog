@@ -21,8 +21,16 @@ debhelper (13.4) UNRELEASED; urgency=medium
   * dh_gconf: Remove the command as it does nothing.
     (Closes: #908845)
   * doc/TODO: Remove reference to dh_gconf.
-  * root_sequence.pm: Remove dh_gconf from root sequence.
+  * root_sequence.pm: Remove dh_gconf from root sequence and declare
+    it as obsolete (causing errors from compat 14 if still referenced
+    in hook targets).
   * man/po4a/po4a.cfg: Remove dh_gconf from translations.
+  * AddonAPI.pm: The declare_command_obsolete command now accepts an
+    "$error_compat" parameter to enable addons to choose which compat
+    level that will trigger an error (though it must be minimum 13).
+  * doc/PROGRAMMING: Update docs to reflect API change.
+  * debhelper.pod: Document that referencing dh_gconf in hook targets
+    will cause an error in compat 14.
 
  -- Niels Thykier <niels@thykier.net>  Sun, 21 Mar 2021 09:38:35 +0000
 

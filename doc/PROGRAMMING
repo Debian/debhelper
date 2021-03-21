@@ -474,10 +474,16 @@ remove_command_options($command, $opt1, $opt2, ...)
 
 	Cannot be used in "arch-only"/"indep-only" mode.
 
-declare_command_obsolete($command)
+declare_command_obsolete([$error_compat, ]$command)
 	Declare $command as obsolete, which make dh warn about leftover
 	override / hook targets.  Note that $command MUST NOT be present
 	in the sequence!
+
+	The $error_compat parameter defines the compat level where
+	referencing this command via a hook target will become an error.
+	This must be at least 13 (which is the default if omitted).
+	Be careful with using already closed compat levels as error compat
+	for new commands as it will cause FTBFS.
 
 	Cannot be used in "arch-only"/"indep-only" mode.
 

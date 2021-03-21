@@ -11,7 +11,8 @@ my $include_if_compat_X_or_newer = sub {
 };
 
 my @obsolete_command = (
-	$include_if_compat_X_or_newer->(11, 'dh_systemd_enable', 'dh_systemd_start'),
+	[13, $include_if_compat_X_or_newer->(11, 'dh_systemd_enable', 'dh_systemd_start')],
+	[14, 'dh_gconf'],
 );
 
 my @commands_controlled_by_deb_build_options = (
@@ -98,8 +99,11 @@ _add_sequence('clean', SEQUENCE_NO_SUBSEQUENCES, @bd_minimal, qw{
 	dh_clean
 });
 
-for my $command (@obsolete_command) {
-	declare_command_obsolete($command);
+for my $obsolete_command_spec (@obsolete_command) {
+	my ($error_compat, @cmds) = @{$obsolete_command_spec};
+	for my $command (@cmds) {
+		declare_command_obsolete($error_compat, $command);
+	}
 }
 
 for my $entry (@commands_controlled_by_deb_build_options) {
