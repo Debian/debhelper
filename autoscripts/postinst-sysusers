@@ -1,3 +1,5 @@
 if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
-    systemd-sysusers #CONFILE_BASENAME#
+   if [ -z "${DPKG_ROOT:-}" ] ; then
+      systemd-sysusers #CONFILE_BASENAME#
+   fi
 fi
