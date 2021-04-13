@@ -33,6 +33,12 @@ debhelper (13.4) UNRELEASED; urgency=medium
     will cause an error in compat 14.
   * dh_fixperms: Correct permissions of files beneath usr/libexec to
     be executable.  (Closes: #979401)
+  * dh_installtmpfiles: Only register tmpfiles ending with ".conf" as
+    tmpfiles in /usr/lib/tmpfiles.d and /etc/tmpfiles.d.  This ensures
+    that dh_installtmpfiles gracefully copes with e.g. README files
+    provided by systemd upstream.  (Closes: #986329)
+  * dh_installsystemd: Ditto (but only relevant in compat 12 or
+    earlier)
 
   [ Dominic Hargreaves ]
   * perl_build.pm,perl_makemaker.pm: Make debhelper use the same perl

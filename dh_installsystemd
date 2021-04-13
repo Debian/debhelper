@@ -312,7 +312,7 @@ if (compat(12)) {
 		find({
 			wanted => sub {
 				my $name = $File::Find::name;
-				return unless -f $name;
+				return if not -f $name or not $name =~ m{[.]conf$};
 				push(@tmpfiles, basename($name)); },
 			no_chdir => 1,
 			}, @dirs) if @dirs;
