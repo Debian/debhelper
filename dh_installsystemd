@@ -58,7 +58,7 @@ option.
       debian/I<package>@.timer
 
 If any of those files exists, they are installed into
-F<lib/systemd/system/> in the package build directory.
+F<usr/lib/systemd/system/> in the package build directory.
 
 =item debian/I<package>.tmpfile
 
@@ -249,7 +249,7 @@ sub extract_key {
 sub list_installed_units {
 	my ($tmpdir, $aliases) = @_;
 
-	my $lib_systemd_system = "$tmpdir/lib/systemd/system";
+	my $lib_systemd_system = "$tmpdir/usr/lib/systemd/system";
 	my @installed;
 
 	return unless -d $lib_systemd_system;
@@ -272,12 +272,14 @@ sub list_installed_units {
 }
 
 
-# PROMISE: DH NOOP WITHOUT internal(bug#950723) tmp(lib/systemd/system) tmp(usr/lib/tmpfiles.d) tmp(etc/tmpfiles.d) mount path service socket target tmpfile timer cli-options()
+# PROMISE: DH NOOP WITHOUT internal(bug#950723) tmp(usr/lib/systemd/system) tmp(lib/systemd/system) tmp(usr/lib/tmpfiles.d) tmp(etc/tmpfiles.d) mount path service socket target tmpfile timer cli-options()
 
 
 # Install package maintainer supplied unit files
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmpdir = tmpdir($package);
+
+	merge_dirs("${tmpdir}/lib/systemd", "${tmpdir}/usr/lib/systemd");
 
 	# Intall all unit files in the debian/ directory with names in the
 	# form $package.(service|target|socket|path|timer|mount|tmpfile)
@@ -290,11 +292,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $name = $dh{NAME} // $package;
 
 	for my $type (qw(service target socket path timer)) {
-		install_unit($package, $name, $type, "$tmpdir/lib/systemd/system");
-		install_unit("${package}@", "${name}@", $type, "$tmpdir/lib/systemd/system");
+		install_unit($package, $name, $type, "$tmpdir/usr/lib/systemd/system");
+		install_unit("${package}@", "${name}@", $type, "$tmpdir/usr/lib/systemd/system");
 	}
 
-	install_unit($package, $name, 'mount', "$tmpdir/lib/systemd/system");
+	install_unit($package, $name, 'mount', "$tmpdir/usr/lib/systemd/system");
 	# In compat 13+, this is handled by dh_installtmpfiles
 	install_unit($package, $name, 'tmpfile', "$tmpdir/usr/lib/tmpfiles.d", 'conf') if compat(12);
 }
@@ -363,7 +365,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# Must use while and shift because the loop alters the list.
 	while (@args) {
 		my $unit = shift @args;
-		my $path = "${tmpdir}/lib/systemd/system/${unit}";
+		my $path = "${tmpdir}/usr/lib/systemd/system/${unit}";
 
 		error("Package '$package' does not install unit '$unit'.") unless (-f $path);
 

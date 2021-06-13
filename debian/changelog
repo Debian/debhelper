@@ -57,6 +57,15 @@ debhelper (13.4) UNRELEASED; urgency=medium
   * dh_installinit: Remove usage of autoscripts/postinst-init-restart
   * autoscripts/autoscripts/postinst-systemd-restart: Removed.
   * autoscripts/postinst-init-restart: Removed
+  * dh_installsystemd: Prefer /usr/lib/systemd/ to /lib/systemd.
+    (Closes: #987989)
+  * dh_systemd_enable: Ditto.
+  * dh_systemd_start: Ditto.
+  * dh_installinit: Ditto.
+  * dh_installsystemd: Merge /lib/systemd into /usr/lib/systemd if both
+    are present in the package staging directory (prefering the latter
+    in case of conflicts).  (Closes: #987989)
+  * dh_systemd_enable: Ditto.
 
   [ Dominic Hargreaves ]
   * perl_build.pm,perl_makemaker.pm: Make debhelper use the same perl

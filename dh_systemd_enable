@@ -44,8 +44,8 @@ arguments, e.g. B<dh_systemd_enable quota.service> and B<dh_systemd_enable
 
 =item debian/I<package>.service, debian/I<package>@.service
 
-If this exists, it is installed into lib/systemd/system/I<package>.service (or
-lib/systemd/system/I<package>@.service) in the package build directory.
+If this exists, it is installed into F<<  usr/lib/systemd/system/I<package>.service >> (or
+F<< usr/lib/systemd/system/I<package>@.service >>) in the package build directory.
 
 =item debian/I<package>.tmpfile
 
@@ -55,28 +55,28 @@ by systemd.)
 
 =item debian/I<package>.target, debian/I<package>@.target
 
-If this exists, it is installed into lib/systemd/system/I<package>.target (or
-lib/systemd/system/I<package>@.target) in the package build directory.
+If this exists, it is installed into F<< usr/lib/systemd/system/I<package>.target >> (or
+F<< usr/lib/systemd/system/I<package>@.target >>) in the package build directory.
 
 =item debian/I<package>.socket, debian/I<package>@.socket
 
-If this exists, it is installed into lib/systemd/system/I<package>.socket (or
-lib/systemd/system/I<package>@.socket) in the package build directory.
+If this exists, it is installed into F<< usr/lib/systemd/system/I<package>.socket >> (or
+F<< usr/lib/systemd/system/I<package>@.socket >>) in the package build directory.
 
 =item debian/I<package>.mount
 
-If this exists, it is installed into lib/systemd/system/I<package>.mount
+If this exists, it is installed into F<< usr/lib/systemd/system/I<package>.mount >>
 in the package build directory.
 
 =item debian/I<package>.path, debian/I<package>@.path
 
-If this exists, it is installed into lib/systemd/system/I<package>.path (or
-lib/systemd/system/I<package>@.path) in the package build directory.
+If this exists, it is installed into F<< usr/lib/systemd/system/I<package>.path >> (or
+F<< usr/lib/systemd/system/I<package>@.path >>) in the package build directory.
 
 =item debian/I<package>.timer, debian/I<package>@.timer
 
-If this exists, it is installed into lib/systemd/system/I<package>.timer (or
-lib/systemd/system/I<package>@.timer) in the package build directory.
+If this exists, it is installed into F<< usr/lib/systemd/system/I<package>.timer >> (or
+F<< usr/lib/systemd/system/I<package>@.timer >>) in the package build directory.
 
 =back
 
@@ -142,7 +142,7 @@ sub install_unit {
 	install_file($unit, "${path}/${script}.${installsuffix}");
 }
 
-# PROMISE: DH NOOP WITHOUT tmp(lib/systemd/system) mount path service socket target tmpfile timer
+# PROMISE: DH NOOP WITHOUT tmp(usr/lib/systemd/system) tmp(lib/systemd/system) mount path service socket target tmpfile timer
 
 my %requested_files = map { basename($_) => 1 } @ARGV;
 my %installed_files;
@@ -151,6 +151,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmpdir = tmpdir($package);
 	my @installed_units;
 	my @units;
+
+	merge_dirs("${tmpdir}/lib/systemd", "${tmpdir}/usr/lib/systemd");
 
 	# XXX: This is duplicated in dh_installinit, which is unfortunate.
 	# We do need the service files before running dh_installinit though,
@@ -182,11 +184,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	for my $service_type (qw(service target socket path timer)) {
-		install_unit($package, $script, $service_type, "$tmpdir/lib/systemd/system");
-		install_unit("${package}@", "${script}@", $service_type, "$tmpdir/lib/systemd/system");
+		install_unit($package, $script, $service_type, "$tmpdir/usr/lib/systemd/system");
+		install_unit("${package}@", "${script}@", $service_type, "$tmpdir/usr/lib/systemd/system");
 	}
 
-	install_unit($package, $script, 'mount', "$tmpdir/lib/systemd/system");
+	install_unit($package, $script, 'mount', "$tmpdir/usr/lib/systemd/system");
 	install_unit($package, $script, 'tmpfile', "$tmpdir/usr/lib/tmpfiles.d", 'conf');
 
 	find({
@@ -197,11 +199,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			# adding an alias, e.g. linking smartmontools.service
 			# -> smartd.service.
 			return if -l $name;
-			return unless $name =~ m,^$tmpdir/lib/systemd/system/[^/]+$,;
+			return unless $name =~ m,^$tmpdir/usr/lib/systemd/system/[^/]+$,;
 			push @installed_units, $name;
 		},
 		no_chdir => 1,
-	}, "${tmpdir}/lib/systemd/system") if -d "${tmpdir}/lib/systemd/system";
+	}, "${tmpdir}/usr/lib/systemd/system") if -d "${tmpdir}/usr/lib/systemd/system";
 
 	# Handle either only the unit files which were passed as arguments or
 	# all unit files that are installed in this package.
@@ -223,7 +225,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			if (defined($full)) {
 				$name = $full;
 			} elsif (not exists($requested_files{$base})) {
-				warning(qq|Could not find "$name" in the /lib/systemd/system directory of $package. | .
+				warning(qq|Could not find "$name" in the /usr/lib/systemd/system directory of $package. | .
 					qq|This could be a typo, or using Also= with a service file from another package. | .
 					qq|Please check carefully that this message is harmless.|);
 			} else {
