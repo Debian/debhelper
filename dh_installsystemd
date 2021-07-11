@@ -253,12 +253,12 @@ sub list_installed_units {
 	my @installed;
 
 	return unless -d $lib_systemd_system;
-	opendir(my $dh, "$lib_systemd_system") or error("Cannot opendir($lib_systemd_system): $!");
+	opendir(my $dh, $lib_systemd_system) or error("Cannot opendir($lib_systemd_system): $!");
 
 	foreach my $name (readdir($dh)) {
 		my $path = "$lib_systemd_system/$name";
-		next unless -f $path;
-		if (-l "$path") {
+		next unless -l $path or -f _;
+		if (-l _) {
 			my $dest = basename(readlink($path));
 			$aliases->{$dest} //= [ ];
 			push @{$aliases->{$dest}}, $name;
@@ -419,8 +419,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				$snippet = 'postinst-systemd-restartnostart';
 				$replace->{RESTART_ACTION} = 'try-restart';
 			} else {
-				$snippet = 'postinst-systemd-restart';
-				$replace->{RESTART_ACTION} = 'restart';
+				$snippet = 'postinst-systemd-start';
 			}
 			autoscript($package, 'postinst', $snippet, $replace, \%options);
 		} elsif (!$dh{NO_START}) {

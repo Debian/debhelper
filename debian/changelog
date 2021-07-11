@@ -47,6 +47,16 @@ debhelper (13.4) UNRELEASED; urgency=medium
     requirements (the code was using v5.28 features).  Thanks to
     Sérgio Basto for reporting the issue.
   * dh_missing: Ditto.
+  * autoscripts/postinst-init,autoscripts/postinst-systemd-start: Use
+    "restart" instead of "start" when starting the services.  This
+    ensures a smooth transition from --restart-after-upgrade to
+    --no-restart-after-upgrade in dh_installinit and dh_installsystemd.
+    Thanks to Ryan Tandy for reporting the issue.
+    (Closes: #989155)
+  * dh_installsystemd: Remove usage of autoscripts/postinst-systemd-restart
+  * dh_installinit: Remove usage of autoscripts/postinst-init-restart
+  * autoscripts/autoscripts/postinst-systemd-restart: Removed.
+  * autoscripts/postinst-init-restart: Removed
 
   [ Dominic Hargreaves ]
   * perl_build.pm,perl_makemaker.pm: Make debhelper use the same perl
