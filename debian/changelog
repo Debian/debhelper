@@ -1,8 +1,16 @@
-debhelper (13.4.1) UNRELEASED; urgency=medium
+debhelper (13.4+nmu1) unstable; urgency=high
 
+  [ Sean Whitton ]
+  * Non-maintainer upload.
+  * Replace "use v5.28" with "use v5.24" in Dh_Lib.pm.
+    The change to "use v5.28" in 13.4 broke the test to distinguish 0755
+    from "0755" in the reset_perm_and_owner function, breaking builds.
+    Thanks Adrian Bunk and Ansgar for help isolating the problem.
+
+  [ Niels Thykier ]
   * debian/changelog: Correct bug number in the 13.4 entry.
 
- -- Niels Thykier <niels@thykier.net>  Tue, 17 Aug 2021 16:55:53 +0000
+ -- Sean Whitton <spwhitton@spwhitton.name>  Tue, 17 Aug 2021 13:34:02 -0700
 
 debhelper (13.4) unstable; urgency=medium
 
