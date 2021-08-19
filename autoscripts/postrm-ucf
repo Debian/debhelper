@@ -3,10 +3,10 @@ if [ "$1" = "purge" ]; then
 		rm -f "#UCFDEST#$ext"
 	done
 	
-	if [ -x "`which ucf 2>/dev/null`" ]; then
+	if [ -x "`command -v ucf`" ]; then
 		ucf --purge "#UCFDEST#"
 	fi
-	if [ -x "`which ucfr 2>/dev/null`" ]; then
+	if [ -x "`command -v ucfr`" ]; then
 		ucfr --purge #PACKAGE# "#UCFDEST#"
 	fi
 fi
