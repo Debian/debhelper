@@ -279,7 +279,7 @@ sub list_installed_units {
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmpdir = tmpdir($package);
 
-	merge_dirs("${tmpdir}/lib/systemd", "${tmpdir}/usr/lib/systemd");
+	merge_dirs("${tmpdir}/lib/systemd/system", "${tmpdir}/usr/lib/systemd/system");
 
 	# Intall all unit files in the debian/ directory with names in the
 	# form $package.(service|target|socket|path|timer|mount|tmpfile)
