@@ -3,6 +3,15 @@ debhelper (13.4.1) UNRELEASED; urgency=medium
   [ Clint Adams ]
   * autoscripts/*: Replace `which` with `command -v`.
 
+  [ Simon McVittie ]
+  * dh_installsystemd: Only merge /lib/systemd/system into /usr
+    for now.  (Closes: #992554)
+  * dh_systemd_enable: Ditto.
+
+  [ Johannes Schauer Marin Rodrigues ]
+  * autoscripts/postinst-init-nostart: Call invoke-rc.d when
+    a non-empty DPKG_ROOT is used.  (Closes: #992556)
+
  -- Niels Thykier <niels@thykier.net>  Fri, 20 Aug 2021 05:46:01 +0000
 
 debhelper (13.4+nmu1) unstable; urgency=high
