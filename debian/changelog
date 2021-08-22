@@ -6,6 +6,10 @@ debhelper (13.5) UNRELEASED; urgency=medium
     `remove-on-upgrade` feature from dpkg 1.20.
   * dh_installdeb: Automatically rewrite `rm_conffiles` into the
     new `remove-on-upgrade` feature from dpkg when possible.
+  * cmake.pm: Pass `ARGS+=--verbose` to make when running tests
+    in the cmake+make variant except when "terse" is in
+    DEB_BUILD_OPTIONS.  Thanks to Paul Wise for the suggestion.
+    (Closes: #992623)
 
  -- Niels Thykier <niels@thykier.net>  Sun, 22 Aug 2021 07:13:37 +0000
 

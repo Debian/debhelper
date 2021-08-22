@@ -172,6 +172,7 @@ sub test {
 		# number of threads instead.
 		my $parallel = ($this->get_parallel() > 0) ? $this->get_parallel() : 999;
 		push(@_, "ARGS+=-j$parallel");
+		push(@_, "ARGS+=--verbose") if not get_buildoption("terse");
 	}
 	return $this->SUPER::test(@_);
 }
