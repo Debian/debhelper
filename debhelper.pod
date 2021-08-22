@@ -1056,10 +1056,12 @@ Note the B<--> before the B<--libexecdir> parameter.
 
 =item -
 
-The B<dh_installdeb> tool no longer installs the maintainer provided
-F<conffiles> file.  The file has mostly been obsolete since
-compatibility level 3, where B<dh_installdeb> began to automatically
-compute the resulting F<conffiles> control file.
+B<Retroactively removed in debhelper/13.5>:
+
+The B<dh_installdeb> tool would no longer installs the maintainer provided
+F<conffiles> file as it was deemed unnecessary.  However, the
+B<remove-on-upgrade> from dpkg/1.20 made the file relevant again and
+B<dh_installdeb> now installs it again in compat levels 12+.
 
 =item -
 
