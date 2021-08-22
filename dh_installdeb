@@ -92,6 +92,13 @@ the commands listed in this file to catch common mistakes.  The
 validation is enabled as a warning since compat 10 and as a hard
 error in compat 12.
 
+Where possible, B<dh_installdeb> may choose to rewrite some or all
+of the entries into equivalent features supported in dpkg without
+relying on maintainer scripts at its sole discretion (examples
+include rewriting B<rm_conffile> into dpkg's B<remove-on-upgrade>).
+The minimum requirement for activating this feature is that debhelper
+runs in compat 10 or later.
+
 Supports substitution variables in compat 13 and later as
 documented in L<debhelper(7)>.
 
@@ -249,6 +256,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 	
 	my $maintscriptfile=pkgfile($package, "maintscript");
+	my @special_conffiles_entries;
 	if ($maintscriptfile) {
 		if (compat(9)) {
 			foreach my $line (filedoublearray($maintscriptfile)) {
@@ -277,20 +285,28 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				if (my $validator = $maintscript_validator{$cmd}) {
 					$validator->($package, @{$line});
 				}
+				if ($cmd eq 'rm_conffile') {
+					my $current_conffile = $line->[1];
+					push(@special_conffiles_entries, "remove-on-upgrade ${current_conffile}");
+					addsubstvar($package, "misc:Pre-Depends", "dpkg (>= 1.20.6~)");
+					next;
+				}
 				push(@params, escape_shell(@{$line}) );
 			}
-			foreach my $script (qw{postinst preinst prerm postrm}) {
-				my $subst = sub {
-					my @res;
-					chomp;
-					for my $param (@params) {
-						my $line = $_;
-						$line =~ s{#PARAMS#}{$param}g;
-						push(@res, $line);
-					}
-					$_ = join("\n", @res) . "\n";
-				};
-				autoscript($package, $script, "maintscript-helper", $subst);
+			if (@params) {
+				foreach my $script (qw{postinst preinst prerm postrm}) {
+					my $subst = sub {
+						my @res;
+						chomp;
+						for my $param (@params) {
+							my $line = $_;
+							$line =~ s{#PARAMS#}{$param}g;
+							push(@res, $line);
+						}
+						$_ = join("\n", @res) . "\n";
+					};
+					autoscript($package, $script, "maintscript-helper", $subst);
+				}
 			}
 		}
 	}
@@ -315,6 +331,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	install_triggers($package, $tmp);
+	if (@special_conffiles_entries) {
+		open(my $fd, '>>', "$tmp/DEBIAN/conffiles");
+		for my $line (@special_conffiles_entries) {
+			print {$fd} "${line}\n";
+		}
+		close($fd);
+	}
 
 	# Automatic conffiles registration: If it is in /etc, it is a
 	# conffile.
@@ -324,9 +347,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		if (-z "$tmp/DEBIAN/conffiles") {
 			rm_files("$tmp/DEBIAN/conffiles");
 		}
-		else {
-			reset_perm_and_owner(0644, "$tmp/DEBIAN/conffiles");
-		}
+	}
+
+	if ( -f "$tmp/DEBIAN/conffiles") {
+		reset_perm_and_owner(0644, "$tmp/DEBIAN/conffiles");
 	}
 }
 
