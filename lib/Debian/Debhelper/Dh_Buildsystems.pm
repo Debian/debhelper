@@ -43,7 +43,8 @@ our @THIRD_PARTY_BUILDSYSTEMS = (
 	'golang',
 );
 
-my $opt_buildsys;
+# Visible for dh_assistant's sake; not API for external tools!
+our $opt_buildsys;
 my $opt_sourcedir;
 my $opt_builddir;
 my $opt_list;

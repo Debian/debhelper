@@ -1,0 +1,313 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_assistant - tool for supporting debhelper tools and provide introspection
+
+=cut
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+use JSON::PP ();
+
+=head1 SYNOPSIS
+
+B<dh_assistant> B<I<command>> [S<I<additional options>>]
+
+=head1 DESCRIPTION
+
+B<dh_assistant> is a debhelper program that provides introspection into the
+debhelper stack to assist third-party tools (e.g. linters) or third-party
+debhelper implementations not using the debhelper script API (e.g., because
+they are not written in Perl).
+
+=head1 COMMANDS
+
+The B<dh_assistant> supports the following commands:
+
+=over 4
+
+=item supported-compat-levels (JSON, CRFA)
+
+B<Synopsis>: B<dh_assistant> B<supported-compat-levels>
+
+Outputs information about which compat levels, this build of debhelper knows
+about.
+
+This command accepts no options or arguments.
+
+=item which-build-system (JSON)
+
+B<Synopsis>: B<dh_assistant> B<which-build-system> [S<I<[build step]>>] [S<I<build system options>>]
+
+Output information about which build system would be used for a particular build step.  The build step
+must be one of B<configure>, B<build>, B<test>, B<install> or B<clean> and must be the first argument
+after B<which-build-system> when provided.  If omitted, it defaults to B<configure> as it is the
+most reliable step to use auto-detection on in a clean source directory.  Note that build steps do not
+always agree when using auto-detection - particularly if the B<configure> step has not been run.
+
+Additionally, the B<clean> step can also provide "surprising" results for builds that rely on
+a separate build directory.  In such cases, debhelper will return the first build system that
+uses a separate build directory rather than the one build system that B<configure> would detect.
+This is generally a cosmetic issue as both build systems are all basically a glorified
+B<rm -fr builddir> and more precise detection is functionally irrelevant as far as debhelper is
+concerned.
+
+The option accepts all debhelper build system arguments - i.e., options you can pass to all of
+the B<dh_auto_*> commands plus (for the B<install> step) the B<--destdir> option.  These options
+affect the output and auto-detection in various ways.  Passing B<-S> or B<--buildsystem>
+overrides the auto-detection (as it does for B<dh_auto_*>) but it still provides introspection
+into the chosen build system.
+
+Things that are useful to know about the output:
+
+=over 4
+
+=item *
+
+The key B<build-system> is the build system that would be used by debhelper for the given
+step (with the given options, debhelper compat level, environment variables and the given
+working directory).  When B<-S> and B<--buildsystem> are omitted, this is the result of
+debhelper's auto-detection logic.
+
+The value is valid as a parameter for the B<--buildsystem> option.
+
+The special value B<none> is used to denote that no build system would be used.  This value
+is not present in B<--list> parameter for the B<dh_auto_*> commands, but since debhelper/12.9
+the value is accepted for the B<--buildsystem> option.
+
+Note that auto-detection is subject to limitations in regards to third-party build systems.
+While debhelper I<does> support auto-detecting some third-party build systems, they must be
+installed for the detection to work.  If they are not installed, the detection logic silently
+skips that build system (often resulting in B<build-system> being B<none> in the output).
+
+=item *
+
+The B<build-directory> and B<buildpath> values serve different but related purposes.  The
+B<build-directory> generally mirrors the B<--builddirectory> option where as B<buildpath>
+is the output directory that debhelper will use.  Therefore the former will often be null
+when B<--builddirectory> has not been passed while the latter will generally not be null
+(except when B<build-system> is B<none>).
+
+=item *
+
+The B<dest-directory> (B<--destdir>) is undefined for all build steps except the B<install> build
+step (will be output as null or absent).  For the same reason, B<--destdir> should only be
+passed for B<install> build step.
+
+Note that if not specified, this value is current null by default.
+
+=item *
+
+The B<parallel> value is subject to B<DEB_BUILD_OPTIONS>.  Notably, if that does not include
+the B<parallel> keyword, then B<parallel> field in the output will always be 1.
+
+=item *
+
+Most fields in the output I<can> be null.  Particular if there is no build system is detected
+(or when B<--buildsystem=none>).  Additionally, many of the fields can be null even if there
+is a build system if the build system does not use/set/define that variable.
+
+=back
+
+
+=back
+
+=head2 COMMAND TAGS
+
+Most commands have one or more of the following "tags" associated with them.  Their
+meaning is defined here.
+
+=over 4
+
+=item JSON
+
+The command provides JSON output. See L</JSON OUTPUT> for details.
+
+=item CRFA
+
+I<Mnemonic "Can be Run From Anywhere">
+
+Most commands must be run inside a source package root directory (a directory
+containing F<debian/control>) because debhelper will need the package metadata
+to lookup the information.  Any command with this tag are exempt from this
+requirement and is expected to work regardless of where they are run.
+
+=back
+
+=head1 JSON OUTPUT
+
+Most commands uses JSON format as output.  Consumers need to be aware that:
+
+=over 4
+
+=item *
+
+Additional keys may be added at any time.  For backwards compatibility, the absence
+of a key should in general be interpreted as null unless another default is documented
+or would be "obvious" for that case.
+
+=item *
+
+Many keys can be null/undefined in special cases.  As an example, some information may
+be unavailable when this command is run directly from the debhelper source (git repository).
+
+=back
+
+The output will be prettified when stdout is detected as a terminal.  If
+you need to pipe the output to a pager/file (etc.) and still want it
+prettified, please use an external JSON formatter. An example of this:
+
+     dh_assistant supported-compat-levels | python3 -m json.tool | less
+
+=cut
+
+my $JSON_ENCODER = JSON::PP->new->utf8;
+
+# Prettify if we think the user is reading this.
+$JSON_ENCODER = $JSON_ENCODER->pretty->space_before(0)->canonical if -t STDOUT;
+
+# We never use the log file for this tool
+inhibit_log();
+
+my %COMMANDS = (
+    'help'                    => \&_do_help,
+    '-h'                      => \&_do_help,
+    '--help'                  => \&_do_help,
+    'supported-compat-levels' => \&supported_compat_levels,
+    'which-build-system'      => \&which_build_system,
+);
+
+my ($COMMAND) = shift(@ARGV);
+for my $arg (@ARGV) {
+    if ($arg eq '--help' or $arg eq '-h') {
+        $COMMAND = 'help';
+        last;
+    }
+}
+
+
+sub _do_help {
+    my $me = basename($0);
+    print <<"EOF";
+${me}: Tool for supporting debhelper tools and provide introspection
+
+Usage: ${me} <command> [... addition arguments or options ...]
+
+The following commands are available:
+  help                       Show this help
+  supported-compat-levels    Output information about supported compat levels (JSON, CRFA)
+  which-build-system         Determine which build system will be used (JSON)
+
+
+Command tags:
+
+ * JSON    The command provides JSON output.
+ * CRFA    Command does not need to be run from a package source directory
+           (Mnemonic "Can be Run From Anywhere")
+
+
+Its primary purpose is to provide support for third-party debhelper implementations
+not using the debhelper script API or provide introspection for third-party tools
+(e.g., linters).  Unless stated otherwise, commands must be run inside a source
+package root directory - that is, the directory containing "debian/control".
+
+Most commands use JSON output.  When stdout is a TTY, the JSON will be prettified.
+See the manpage if you want formatting in other cases.
+EOF
+    return;
+}
+
+sub _assert_debian_control_exists {
+    return if -f 'debian/control';
+    require Cwd;
+    my $cwd = Cwd::getcwd();
+    warning("$cwd does not look like a package source directory (expected $cwd/debian/control to exist and be a file)");
+    error("$COMMAND must be run inside a package source directory");
+    return;
+}
+
+sub _output {
+    my ($kvpairs) = @_;
+    print $JSON_ENCODER->encode($kvpairs);
+    return;
+}
+
+sub supported_compat_levels {
+    if (@ARGV) {
+        error("$COMMAND: No arguments supported (please remove everything after the command)");
+    }
+    my %compat_levels = (
+        'MIN_COMPAT_LEVEL'                           => Debian::Debhelper::Dh_Lib::MIN_COMPAT_LEVEL,
+        'LOWEST_NON_DEPRECATED_COMPAT_LEVEL'         => Debian::Debhelper::Dh_Lib::LOWEST_NON_DEPRECATED_COMPAT_LEVEL,
+        'LOWEST_VIRTUAL_DEBHELPER_COMPAT_LEVEL'      => Debian::Debhelper::Dh_Lib::LOWEST_VIRTUAL_DEBHELPER_COMPAT_LEVEL,
+        'MAX_COMPAT_LEVEL'                           => Debian::Debhelper::Dh_Lib::MAX_COMPAT_LEVEL,
+        'HIGHEST_STABLE_COMPAT_LEVEL'                => Debian::Debhelper::Dh_Lib::HIGHEST_STABLE_COMPAT_LEVEL,
+        'MIN_COMPAT_LEVEL_NOT_SCHEDULED_FOR_REMOVAL' => Debian::Debhelper::Dh_Lib::MIN_COMPAT_LEVEL_NOT_SCHEDULED_FOR_REMOVAL,
+    );
+    _output(\%compat_levels);
+    return;
+}
+
+sub which_build_system {
+    my ($opt_buildsys, $destdir);
+    my $first_argv = @ARGV ? $ARGV[0] : '';
+    my %options = (
+        # Emulate dh_auto_install's --destdir
+        "destdir=s" => \$destdir,
+    );
+    _assert_debian_control_exists();
+    require Debian::Debhelper::Dh_Buildsystems;
+    Debian::Debhelper::Dh_Buildsystems::buildsystems_init(options => \%options);
+    my @non_options = grep { !m/^-/ } @ARGV;
+    my $step = @non_options ? $non_options[0] : 'configure';
+    if (@non_options && $first_argv =~ m/^-/) {
+        error("$COMMAND: If the build step is provided, it must be before any options");
+    }
+    if (@non_options > 1) {
+        error("$COMMAND: At most one positional argument is supported");
+    }
+    if (defined($destdir) and $step ne 'install') {
+        warning("$COMMAND: --destdir is not defined for build step \"$step\". Ignoring option")
+    }
+    {
+        no warnings qw(once);
+        $opt_buildsys = $Debian::Debhelper::Dh_Buildsystems::opt_buildsys;
+    }
+    my $build_system = Debian::Debhelper::Dh_Buildsystems::load_buildsystem($opt_buildsys, $step);
+    my %result = (
+        'build-system'       => defined($build_system) ? $build_system->NAME : 'none',
+        'for-build-step'     => $step,
+        'source-directory'   => defined($build_system) ? $build_system->get_sourcedir : undef,
+        'build-directory'    => defined($build_system) ? $build_system->get_builddir : undef,
+        'dest-directory'     => defined($build_system) ? $destdir : undef,
+        'buildpath'          => defined($build_system) ? $build_system->get_buildpath : undef,
+        'parallel'           => defined($build_system) ? $build_system->get_parallel : undef,
+        'upstream-arguments' => $dh{U_PARAMS},
+    );
+    _output(\%result);
+    return;
+}
+
+if (not defined($COMMAND)) {
+    error('Usage: ' . basename($0) . ' <command>');
+}
+my $handler = $COMMANDS{$COMMAND};
+if (not defined($handler)) {
+    warning("Arguments/options must not be the first argument (except for --help)")
+        if $COMMAND =~ m/^-/;
+    error("Unknown command: $COMMAND");
+}
+
+$handler->();
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=cut
+
+1;
