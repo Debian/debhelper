@@ -25,7 +25,7 @@ use constant {
 	# relations for.
 	'LOWEST_VIRTUAL_DEBHELPER_COMPAT_LEVEL' => 9,
 	# Highest compat level permitted
-	'MAX_COMPAT_LEVEL' => 14,
+	'MAX_COMPAT_LEVEL' => 15,
 	# Magic value for xargs
 	'XARGS_INSERT_PARAMS_HERE' => \'<INSERT-HERE>', #'# Hi emacs.
 	# Magic value for debhelper tools to request "current version"

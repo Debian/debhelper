@@ -353,6 +353,7 @@ sub compute_selected_addons {
 	my $sequence_type = sequence_type($sequence_name);
 
 	my %addon_constraints = %{ Debian::Debhelper::Dh_Lib::bd_dh_sequences() };
+	my %explicitly_managed;
 
 	# Inject elf-tools early as other addons rely on their presence and it historically
 	# has been considered a part of the "core" sequence.
@@ -418,13 +419,40 @@ sub compute_selected_addons {
 			error("Invalid request to load the sequence \"root-sequence\": Do not reference it directly");
 		}
 		if ($request =~ s/^[+]//) {
+			# Normalize "_" to "-" in the name.
+			$request =~ tr/_/-/;
 			$flush_disable_cache->() if %disabled_addons;
+			$explicitly_managed{$request} = 1;
 			push(@enabled_addons, $request) if not $enabled{$request}++;
 		} elsif ($request =~ s/^-//) {
+			# Normalize "_" to "-" in the name.
+			$request =~ tr/_/-/;
+			$explicitly_managed{$request} = 1;
 			$disabled_addons{$request} = 1;
 		} else {
 			error("Internal error: Invalid add-on request: $request (Missing +/- prefix)");
 		}
+	}
+
+	if (compat(14, 1) && getpackages() == 1 && !exists($explicitly_managed{'single-binary'})) {
+		if (not compat(13, 1)) {
+			warning("Implicitly activating single-binary dh addon for backwards compatibility.  In compat 14+,");
+			warning("this fallback will *not* happen automatically and dh_auto_install will instead use a");
+			warning("different default for --destdir, which can cause the source to produce an empty binary package");
+			warning();
+			warning('To keep the existing behaviour, please activate the single-binary addon explicitly.');
+			warning('This can be done by adding "dh-sequence-single-binary" to Build-Depends or passing');
+			warning('--with=single-binary to dh.');
+			warning();
+			warning('If you have solved this issue differently (e.g., by passing --destdir explicitly to');
+			warning('dh_auto_install or not using dh_auto_install at all) and want to silence this warning');
+			warning('without activating the addon, you can do that by passing --without=single-binary to dh');
+			warning('to explicitly acknowledge the change.');
+			warning();
+			warning('Please see the description of the "single-binary" in "man dh" for more details of what');
+			warning('it does and why this is changing from implicit behaviour to explicitly opt-in.');
+		}
+		push(@enabled_addons, 'single-binary');
 	}
 
 	$flush_disable_cache->() if %disabled_addons;

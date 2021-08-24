@@ -464,6 +464,30 @@ Obsolete in compat 12 or later.
 
 This is reserved for internal usage.
 
+=item single-binary
+
+A special-purpose addon that makes debhelper run in "single binary" mode.
+
+When active, it will pass B<< --destdir=debian/I<package>/ >> to
+L<dh_auto_install(1)>.  This makes every file "installed" by the upstream
+build system part of the (only) binary package by default without having
+to use other helpers such as L<dh_install(1)>.
+
+The addon will refuse to activate when the source package lists 2 or more
+binary packages in F<debian/control> as a precaution.
+
+Before compat 15. this behaviour was the default when there was only a single
+binary package listed in F<debian/control>.  In compat 15 and later, this
+addon must explicitly be activated for this feature to work.
+
+The rationale for requiring this as an explicit choice is that if it is
+implicit then debhelper will silently change behaviour on adding a new
+binary package.  This has caused many RC bugs when maintainers renamed
+a binary and added transitional packages with the intention of supporting
+seamless upgrades.  The result would often be two empty binary packages that
+were uploaded to archive with users frustrated as their "upgrade" removed
+their programs.
+
 =item systemd (obsolete)
 
 Adds L<dh_systemd_enable(1)> and L<dh_systemd_start(1)> to the sequence in

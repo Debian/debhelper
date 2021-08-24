@@ -13,6 +13,26 @@ debhelper (13.5) UNRELEASED; urgency=medium
   * python_support.pm: Remove obsolete dh addon.  It did nothing
     but warning and nothing used it anymore.
   * dh: Document debhelper provided dh addon sequences.
+  * single_binary.pm: New dh addon ("single-binary") that explicitly
+    activates the "single binary" work flow, where dh_auto_install
+    uses debian/<pkg> as default --destdir when there is only a
+    single binary package.  It will error out if used in a
+    source package building multiple binary packages.
+  * dh: Activate "single-binary" addon by default in compat levels
+    up to and including compat 14 when the source package only lists
+    one binary package in debian/control.  In compat 14, emit a warning
+    when this happens implicitly requesting users to explicitly enable
+    or disable the addon for single binary source packages to avoid
+    surprises in compat 15.
+  * dh_auto_install: In compat 15, remove special-case default for
+    --destdir for single binary source packages.  If the previous
+    default is desired, please use the "single-binary" dh addon or
+    explicitly pass --destdir to dh_auto_install.
+    (Closes: #971432)
+  * debian/control: Provide dh-sequence-single-binary.
+  * debhelper.pod: Document the dh_auto_install will change behaviour
+    in compat 15 for single binary packages and dh will warning about
+    that in compat 14.
 
  -- Niels Thykier <niels@thykier.net>  Sun, 22 Aug 2021 07:13:37 +0000
 

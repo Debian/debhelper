@@ -1254,6 +1254,46 @@ Use of the B<dh_gconf> command in override and hook targets now causes
 an error.  The B<dh_gconf> command has been a no-op for years and was
 removed in debhelper 13.4.
 
+=item -
+
+The B<dh> sequencer will warn if the B<single-binary> addon is implicitly activated to
+warn maintainers of the pending compat 15 change in B<dh_auto_install>.
+
+Maintainers are urged to either explicitly activate the B<single-binary> addon to
+preserve the existing behaviour (e.g., by adding B<dh-sequence-single-binary> to
+Build-Depends), or explicitly passing B<--destdir> to B<dh_auto_install> if used and
+then passing B<--without single-binary> to B<dh> (the latter to silence the warning).
+
+The rationale for this change to avoid "surprises" when adding a second binary package
+later.  Previously, debhelper would silently change behaviour often resulting in empty
+binary packages being uploaded to the archive by mistake. With the new behaviour,
+the B<single-binary> addon will detect the mismatch and warn the maintainer of what is
+about to happen.
+
+=back
+
+=item v15
+
+This compatibility level is still open for development; use with caution.
+
+Changes from v14 are:
+
+=over 8
+
+=item -
+
+The B<dh_auto_install> tool no longer defaults to B<< --destdir=debian/I<package> >>
+for source packages only producing a single binary.  If this behaviour is wanted,
+the package should explicitly activate the B<single-binary> dh addon (e.g., by adding
+B<dh-sequence-single-binary> to B<Build-Depends>) or pass B<--destdir> to
+B<dh_auto_install>.
+
+The rationale for this change to avoid "surprises" when adding a second binary package
+later.  Previously, debhelper would silently change behaviour often resulting in empty
+binary packages being uploaded to the archive by mistake. With the new behaviour,
+the B<single-binary> addon will detect the mismatch and warn the maintainer of what is
+about to happen.
+
 =back
 
 =back
