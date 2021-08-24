@@ -421,6 +421,56 @@ when building only documentation.
 	execute_after_dh_fixperms-arch:
 		chmod 4755 debian/foo/usr/bin/foo
 
+=head1 DEBHELPER PROVIDED DH ADDONS
+
+The primary purpose of B<dh> addons is to provide easy integration with
+third-party provided features for debhelper.  However, debhelper itself
+also provide a few sequences that can be useful in some cases.  These
+are documented in this list:
+
+=over 4
+
+=item build-stamp
+
+A special addon for controlling whether B<dh> (in compat 10 or later)
+will create stamp files to tell whether the build target has been run
+successfully. See L</INTERNALS> for more details.
+
+This addon is active by default but can disabled by using
+B<dh $@ --without build-stamp>
+
+=item dwz (obsolete)
+
+Adds L<dh_dwz(1)> to the sequence in compat level 11 or below.  Obsolete
+in compat 12 or later.
+
+=item elf-tools
+
+This addon adds tools related to ELF files to the sequence such as
+L<dh_strip(1)> and L<dh_shlibdeps(1)>
+
+This addon is I<conditionally> active by default for architecture
+specific packages - that is, it is skipped for arch:all packages.
+In the special case where you need these tools to work on arch:all
+packages, you can use B<--with elf-tools> to activate it
+unconditionally.
+
+=item installinitramfs (obsolete)
+
+Adds L<dh_installinitramfs(1)> to the sequence in compat level 11 or below.
+Obsolete in compat 12 or later.
+
+=item root-sequence (internal)
+
+This is reserved for internal usage.
+
+=item systemd (obsolete)
+
+Adds L<dh_systemd_enable(1)> and L<dh_systemd_start(1)> to the sequence in
+compat level 10 or below.  Obsolete in compat 11 or later.
+
+=back
+
 =head1 INTERNALS
 
 If you're curious about B<dh>'s internals, here's how it works under the hood.
