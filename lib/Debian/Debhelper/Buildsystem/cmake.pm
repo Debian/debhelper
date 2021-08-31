@@ -8,7 +8,7 @@ package Debian::Debhelper::Buildsystem::cmake;
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(%dh compat dpkg_architecture_value error is_cross_compiling);
+use Debian::Debhelper::Dh_Lib qw(%dh compat dpkg_architecture_value error is_cross_compiling get_buildoption);
 use parent qw(Debian::Debhelper::Buildsystem);
 
 my @STANDARD_CMAKE_FLAGS = qw(
