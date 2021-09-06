@@ -753,12 +753,31 @@ sub run_through_command_sequence {
 				push(@cmd_options, @{$command_opts->{$command}})
 					if exists($command_opts->{$command});
 				push(@cmd_options, @opts);
-				run_sequence_command_and_exit_on_failure($command, @cmd_options);
+				run_sequence_command_and_exit_on_failure($command, _remove_dup_pkg_options(@cmd_options));
 			}
 		}
 
 		run_hook_target("execute_after_${command}", 10, $command, \@full_todo, @opts);
 	}
+}
+
+sub _remove_dup_pkg_options {
+	my (@options) = @_;
+	my @filtered_options;
+	my $arch = 0;
+	my $indep = 0;
+	for my $option (@options) {
+		if ($option eq '-a' or $option eq '--arch') {
+			next if $arch;
+			$arch = 1;
+		}
+		if ($option eq '-i' or $option eq '--indep') {
+			next if $indep;
+			$indep = 1;
+		}
+		push(@filtered_options, $option);
+	}
+	return @filtered_options;
 }
 
 
