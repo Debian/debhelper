@@ -148,7 +148,6 @@ qw(
 	is_empty_dir
 	reset_perm_and_owner
 	log_installed_files
-	merge_dirs
 
 	filearray
 	filedoublearray
@@ -2966,27 +2965,6 @@ sub _internal_optional_file_args {
 		$_disable_file_seccomp = $consider_disabling_seccomp;
 	}
 	return('--no-sandbox') if $_disable_file_seccomp;
-	return;
-}
-
-# Useful for merging "foo" into "usr/foo"
-sub merge_dirs {
-	my ($source, $target) = @_;
-	return if not -e $source;
-	error("Attempted to merge \"$source\" into \"$target\" but \"$source\" is not a directory")
-		if not -d _;
-
-	if (-e $target) {
-		error("Attempted to merge \"$source\" into \"$target\" but \"$target\" is not a directory")
-			if not -d _;
-		# We copy from target into source (to override on clashes) and
-		# then have source replace target.
-		my @paths = glob_expand([$target], \&glob_expand_error_handler_silently_ignore, '*');
-		xargs(\@paths, 'cp', '--reflink=auto', '-a', XARGS_INSERT_PARAMS_HERE, $source);
-		doit('rm', '-fr', $target);
-	}
-	install_dir(dirname($target));
-	doit('mv', '-f', $source, $target);
 	return;
 }
 
