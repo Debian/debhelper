@@ -285,7 +285,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				if (my $validator = $maintscript_validator{$cmd}) {
 					$validator->($package, @{$line});
 				}
-				if ($cmd eq 'rm_conffile') {
+				if (0) {  # Disabled for now: #994919 + #994903
 					my $current_conffile = $line->[1];
 					push(@special_conffiles_entries, "remove-on-upgrade ${current_conffile}");
 					addsubstvar($package, "misc:Pre-Depends", "dpkg (>= 1.20.6~)");
