@@ -258,6 +258,8 @@ sub which_build_system {
         "destdir=s" => \$destdir,
     );
     _assert_debian_control_exists();
+    # We never want the build system initialization to modify anything (e.g. create "HOME")
+    $dh{NO_ACT} = 1;
     require Debian::Debhelper::Dh_Buildsystems;
     Debian::Debhelper::Dh_Buildsystems::buildsystems_init(options => \%options);
     my @non_options = grep { !m/^-/ } @ARGV;
