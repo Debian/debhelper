@@ -884,6 +884,8 @@ my $compat_from_bd;
 {
 	my $check_pending_removals = get_buildoption('dherroron', '') eq 'obsolete-compat-levels' ? 1 : 0;
 	my $warned_compat = $ENV{DH_INTERNAL_TESTSUITE_SILENT_WARNINGS} ? 1 : 0;
+	my $declared_compat;
+	my $delared_compat_source;
 	my $c;
 
 	# Used mainly for testing
@@ -892,51 +894,71 @@ my $compat_from_bd;
 		undef $compat_from_bd;
 	}
 
-	sub compat {
-		my $num=shift;
-		my $nowarn=shift;
+	sub _load_compat_info {
+		my ($nowarn) = @_;
 
 		getpackages() if not defined($compat_from_bd);
-	
-		if (! defined $c) {
-			$c=1;
-			if (-e 'debian/compat') {
-				open(my $compat_in, '<', "debian/compat") || error "debian/compat: $!";
-				my $l=<$compat_in>;
-				close($compat_in);
-				if (! defined $l || ! length $l) {
-					error("debian/compat must contain a positive number (found an empty first line)");
 
-				}
-				else {
-					chomp $l;
-					my $new_compat = $l;
-					$new_compat =~ s/^\s*+//;
-					$new_compat =~ s/\s*+$//;
-					if ($new_compat !~ m/^\d+$/) {
-						error("debian/compat must contain a positive number (found: \"${new_compat}\")");
-					}
-					if (defined($compat_from_bd) and $compat_from_bd != -1) {
-						warning("Please specify the debhelper compat level exactly once.");
-						warning(" * debian/compat requests compat ${new_compat}.");
-						warning(" * debian/control requests compat ${compat_from_bd} via \"debhelper-compat (= ${compat_from_bd})\"");
-						warning();
-						warning("Hint: If you just added a build-dependency on debhelper-compat, then please remember to remove debian/compat");
-						warning();
-						error("debhelper compat level specified both in debian/compat and via build-dependency on debhelper-compat");
-					}
-					$c = $new_compat;
-				}
-			} elsif ($compat_from_bd != -1) {
-				$c = $compat_from_bd;
-			} elsif (not $nowarn) {
-				error("Please specify the compatibility level in debian/compat");
-			}
+		$c=1;
+		if (-e 'debian/compat') {
+			open(my $compat_in, '<', "debian/compat") || error "debian/compat: $!";
+			my $l=<$compat_in>;
+			close($compat_in);
+			if (! defined $l || ! length $l) {
+				error("debian/compat must contain a positive number (found an empty first line)");
 
-			if (defined $ENV{DH_COMPAT}) {
-				$c=$ENV{DH_COMPAT};
 			}
+			else {
+				chomp $l;
+				my $new_compat = $l;
+				$new_compat =~ s/^\s*+//;
+				$new_compat =~ s/\s*+$//;
+				if ($new_compat !~ m/^\d+$/) {
+					error("debian/compat must contain a positive number (found: \"${new_compat}\")");
+				}
+				if (defined($compat_from_bd) and $compat_from_bd != -1) {
+					warning("Please specify the debhelper compat level exactly once.");
+					warning(" * debian/compat requests compat ${new_compat}.");
+					warning(" * debian/control requests compat ${compat_from_bd} via \"debhelper-compat (= ${compat_from_bd})\"");
+					warning();
+					warning("Hint: If you just added a build-dependency on debhelper-compat, then please remember to remove debian/compat");
+					warning();
+					error("debhelper compat level specified both in debian/compat and via build-dependency on debhelper-compat");
+				}
+				$c = $new_compat;
+			}
+			$delared_compat_source = 'debian/compat';
+		} elsif ($compat_from_bd != -1) {
+			$c = $compat_from_bd;
+			$delared_compat_source = "Build-Depends: debhelper-compat (= $c)";
+		} elsif (not $nowarn) {
+			error("Please specify the compatibility level in debian/compat or via Build-Depends: debhelper-compat (= X)");
 		}
+
+		$declared_compat = int($c);
+
+		if (defined $ENV{DH_COMPAT}) {
+			my $override = $ENV{DH_COMPAT};
+			error("The environment variable DH_COMPAT must be a positive integer")
+				if $override ne q{} and $override !~ m/^\d+$/;
+			$c=int($ENV{DH_COMPAT}) if $override ne q{};
+		}
+	}
+
+	sub get_compat_info {
+		if (not $c) {
+			_load_compat_info(1);
+		}
+		return ($c, $declared_compat, $delared_compat_source);
+	}
+
+	sub compat {
+		my ($num, $nowarn) = @_;
+
+		if (not $c) {
+			_load_compat_info($nowarn);
+		}
+
 		if (not $nowarn) {
 			if ($c < MIN_COMPAT_LEVEL) {
 				error("Compatibility levels before ${\MIN_COMPAT_LEVEL} are no longer supported (level $c requested)");

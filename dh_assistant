@@ -26,9 +26,54 @@ they are not written in Perl).
 
 The B<dh_assistant> supports the following commands:
 
+=head2 active-compat-level (JSON)
+
+B<Synopsis>: B<dh_assistant> B<active-compat-levels>
+
+Outputs information about which compat level the package is using.
+
+For packages without valid debhelper compatibility information (whether missing, ambiguous,
+not supported or simply invalid), this command operates on a "best effort" basis and may abort
+when error instead of providing data.
+
+The returned JSON dictionary contains the following key-value pairs:
+
 =over 4
 
-=item supported-compat-levels (JSON, CRFA)
+=item active-compat-level
+
+The compat level that debhelper will be using.  This is the same as B<DH_COMPAT> when present
+or else B<declared-compat-level>.  This can be B<null> when no compat level can be detected.
+
+=item declared-compat-level
+
+The compat level that the package declared as its default compat level.  This can be B<null>
+if the package does not declare any compat level at all.
+
+=item declared-compat-level-source
+
+Defines how the compat level was declared.  This is null (for the same reason as
+B<declared-compat-level>) or one of:
+
+=over 4
+
+=item debian/compat
+
+The compatibility level was declared in the first line F<debian/compat> file.
+
+=item Build-Depends: debhelper-compat (= <C>)
+
+The compatibility was declared in the F<debian/control> via a build dependency on the
+B<< debhelper-compat (= <C>) >> package in the B<Build-Depends> field.  In the output,
+the B<C> is replaced by the actual compatibility level.  A full example value would be:
+
+   Build-Depends: debhelper-compat (= 13)
+
+=back
+
+=back
+
+=head2 supported-compat-levels (JSON, CRFA)
 
 B<Synopsis>: B<dh_assistant> B<supported-compat-levels>
 
@@ -37,9 +82,9 @@ about.
 
 This command accepts no options or arguments.
 
-=item which-build-system (JSON)
+=head2 which-build-system (JSON)
 
-B<Synopsis>: B<dh_assistant> B<which-build-system> [S<I<[build step]>>] [S<I<build system options>>]
+B<Synopsis>: B<dh_assistant> B<which-build-system> [S<I<build step>>] [S<I<build system options>>]
 
 Output information about which build system would be used for a particular build step.  The build step
 must be one of B<configure>, B<build>, B<test>, B<install> or B<clean> and must be the first argument
@@ -96,7 +141,7 @@ The B<dest-directory> (B<--destdir>) is undefined for all build steps except the
 step (will be output as null or absent).  For the same reason, B<--destdir> should only be
 passed for B<install> build step.
 
-Note that if not specified, this value is current null by default.
+Note that if not specified, this value is currently null by default.
 
 =item *
 
@@ -108,9 +153,6 @@ the B<parallel> keyword, then B<parallel> field in the output will always be 1.
 Most fields in the output I<can> be null.  Particular if there is no build system is detected
 (or when B<--buildsystem=none>).  Additionally, many of the fields can be null even if there
 is a build system if the build system does not use/set/define that variable.
-
-=back
-
 
 =back
 
@@ -175,6 +217,7 @@ my %COMMANDS = (
     'help'                    => \&_do_help,
     '-h'                      => \&_do_help,
     '--help'                  => \&_do_help,
+    'active-compat-level'     => \&active_compat_level,
     'supported-compat-levels' => \&supported_compat_levels,
     'which-build-system'      => \&which_build_system,
 );
@@ -197,6 +240,7 @@ Usage: ${me} <command> [... addition arguments or options ...]
 
 The following commands are available:
   help                       Show this help
+  active-compat-level        Output information about which compat level is declared/active (JSON)
   supported-compat-levels    Output information about supported compat levels (JSON, CRFA)
   which-build-system         Determine which build system will be used (JSON)
 
@@ -231,6 +275,25 @@ sub _assert_debian_control_exists {
 sub _output {
     my ($kvpairs) = @_;
     print $JSON_ENCODER->encode($kvpairs);
+    return;
+}
+
+sub active_compat_level {
+    if (@ARGV) {
+        error("$COMMAND: No arguments supported (please remove everything after the command)");
+    }
+    _assert_debian_control_exists();
+    my ($active_compat, $declared_compat, $declared_compat_source) = Debian::Debhelper::Dh_Lib::get_compat_info();
+    if (not defined($declared_compat_source)) {
+        $declared_compat = undef;
+        $active_compat = undef if not exists($ENV{DH_COMPAT});
+    }
+    my %compat_info = (
+        'active-compat-level'          => $active_compat,
+        'declared-compat-level'        => $declared_compat,
+        'declared-compat-level-source' => $declared_compat_source,
+    );
+    _output(\%compat_info);
     return;
 }
 
