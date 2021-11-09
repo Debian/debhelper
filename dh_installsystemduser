@@ -19,10 +19,10 @@ B<dh_installsystemduser> [S<I<debhelper options>>] [B<--no-enable>] [B<--name=>I
 =head1 DESCRIPTION
 
 B<dh_installsystemduser> finds the systemd user instance service files
-installed by a package and generates F<postinst>, and F<prerm> code
-blocks for enabling and disabling the corresponding systemd user
-instance services, when the package is installed, updated, or
-removed. These snippets are added to the maintainer scripts by
+installed by a package and generates F<preinst>, F<postinst>, and F<prerm>
+code blocks for enabling, disabling, starting, stopping, and restarting the
+corresponding systemd user instance services, when the package is installed,
+updated, or removed. These snippets are added to the maintainer scripts by
 L<dh_installdeb(1)>.
 
 L<deb-systemd-helper(1)> is used to enable and disable the systemd
@@ -190,7 +190,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 # Generate postinst and prerm code blocks to enable and disable units
 foreach my $package (@{$dh{DOPACKAGES}}) {
-    my (@args, @enable_units, %aliases);
+    my (@args, @start_units, @enable_units, %aliases);
 
 	my $tmpdir = tmpdir($package);
 	my @units = list_installed_user_units($tmpdir, \%aliases);
@@ -240,9 +240,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		push @args, $_ for grep { !$seen{$_}++ } extract_key($path, 'Also');
 
 		push @enable_units, $name if contains_install_section($path);
+		push @start_units, $name;
 	}
 
 	@enable_units = map { quote($_) } sort(uniq(@enable_units));
+	@start_units = map { quote($_) } sort(uniq(@start_units));
 
 	if (@enable_units) {
 		# The generated maintainer script code blocks use the --user
@@ -254,6 +256,24 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			autoscript($package, 'postinst', $postinst, { 'UNITFILE' => $unit });
 		}
 		autoscript($package, 'postrm', 'postrm-systemd-user', { 'UNITFILES' => join(' ', @enable_units) });
+	}
+
+	if (@start_units and not compat(13)) {
+		# The generated maintainer script code blocks use the --user
+		# option that was added to deb-systemd-invoke in version 1.61.
+		addsubstvar($package, 'misc:Depends', 'init-system-helpers', ">= 1.61~");
+
+		my %options = ('snippet-order' => 'service');
+
+		# restart service after install/upgrade
+		autoscript($package, 'postinst', 'postinst-systemd-user-restart', { 'UNITFILES' => join(' ', @start_units) }, \%options);
+
+		# stop service after removal
+		autoscript($package, 'prerm', 'prerm-systemd-user-stop', { 'UNITFILES' => join(' ', @start_units) }, \%options);
+
+		# Run this with "default" order so it is always after other
+		# service related autosnippets.
+		autoscript($package, 'postrm', 'postrm-systemd-user-reload-only', { 'UNITFILES' => join(' ', @start_units) });
 	}
 }
 
