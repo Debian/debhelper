@@ -5,10 +5,10 @@
 # Américo Monteiro <a_monteiro@gmx.com>, 2014 to 2021.
 msgid ""
 msgstr ""
-"Project-Id-Version: debhelper 13.3.2\n"
+"Project-Id-Version: debhelper 13.5.2\n"
 "Report-Msgid-Bugs-To: debhelper@packages.debian.org\n"
 "POT-Creation-Date: 2021-08-30 19:48+0000\n"
-"PO-Revision-Date: 2021-02-01 14:37+0000\n"
+"PO-Revision-Date: 2021-11-27 20:57+0000\n"
 "Last-Translator: Américo Monteiro <a_monteiro@gmx.com>\n"
 "Language-Team: Portuguese <>\n"
 "Language: pt\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 2.0\n"
+"X-Generator: Lokalize 20.12.0\n"
 
 #. type: =head1
 #: debhelper.pod:3 debhelper-obsolete-compat.pod:1 dh:3 dh_auto_build:3
@@ -2361,11 +2361,10 @@ msgstr "Note o B<--> antes do parâmetro B<--libexecdir>."
 #. type: textblock
 #: debhelper.pod:1059
 msgid "B<Retroactively removed in debhelper/13.5>:"
-msgstr ""
+msgstr "B<Retroativamente removido em debhelper/13.5>:"
 
 #. type: textblock
 #: debhelper.pod:1061
-#, fuzzy
 #| msgid ""
 #| "The B<dh_installdeb> tool no longer installs the maintainer provided "
 #| "F<conffiles> file.  The file has mostly been obsolete since compatibility "
@@ -2377,10 +2376,11 @@ msgid ""
 "upgrade> from dpkg/1.20 made the file relevant again and B<dh_installdeb> "
 "now installs it again in compat levels 12+."
 msgstr ""
-"A ferramenta B<dh_installdeb> não mais instala o ficheiro F<conffiles> "
-"fornecido pelo maintainer. O ficheiro torneou-se maioritariamente obsoleto "
-"desde o nível de compatibilidade 3, onde B<dh_installdeb> começo a computar "
-"automaticamente o ficheiro de controle F<conffiles> resultante."
+"A ferramenta B<dh_installdeb> não iria mais instalar o ficheiro F<conffiles> "
+"fornecido pelo responsável pois isso foi considerado desnecessário. No "
+"entanto, o B<remove-on-upgrade> do dpkg/1.20 tornou o ficheiro relevante "
+"de novo e B<dh_installdeb> agora instala-o nos níveis de compatibilidade "
+"12+."
 
 #. type: textblock
 #: debhelper.pod:1068
@@ -2766,6 +2766,9 @@ msgid ""
 "error.  The B<dh_gconf> command has been a no-op for years and was removed "
 "in debhelper 13.4."
 msgstr ""
+"Usar o comando B<dh_gconf> em alvos de sobreposição e hook agora causa um "
+"erro. O comando B<dh_gconf> foi um não-operativo durante anos e foi removido "
+"no debhelper 13.4."
 
 #. type: textblock
 #: debhelper.pod:1259
@@ -2774,6 +2777,9 @@ msgid ""
 "activated to warn maintainers of the pending compat 15 change in "
 "B<dh_auto_install>."
 msgstr ""
+"O sequenciador B<dh> irá avisar se o addon B<single-binary> for activado "
+"implicitamente para avisar os maintainers da pendente alteração na "
+"compatibilidade 15 em B<dh_auto_install>."
 
 #. type: textblock
 #: debhelper.pod:1262
@@ -2784,6 +2790,11 @@ msgid ""
 "B<dh_auto_install> if used and then passing B<--without single-binary> to "
 "B<dh> (the latter to silence the warning)."
 msgstr ""
+"Maintainers são incentivados a ou activar explicitamente o addon "
+"B<single-binary> para preservar o comportamento existente (ex. ao adicionar "
+"<dh-sequence-single-binary> a Build-Depends), ou passar explicitamente "
+"B<--destdir> a B<dh_auto_install> se usado e depois passar B<--without "
+"single-binary> a B<dh> (a última para silenciar o aviso)."
 
 #. type: textblock
 #: debhelper.pod:1267 debhelper.pod:1291
@@ -2794,20 +2805,24 @@ msgid ""
 "mistake. With the new behaviour, the B<single-binary> addon will detect the "
 "mismatch and warn the maintainer of what is about to happen."
 msgstr ""
+"A razão para esta alteração é evitar \"surpresas\" ao adicionar um segundo "
+"pacote binário mais tarde. Anteriormente, o debhelper iria em silêncio "
+"alterar o comportamento muitas vezes resultado em pacotes binários vazios "
+"a serem enviados para o arquivo por engano. Com o novo comportamento, o "
+"addon B<single-binary> irá detectar a discrepância e avisar o maintainer "
+"do que está prestes a acontecer."
 
 #. type: =item
 #: debhelper.pod:1275
-#, fuzzy
 #| msgid "v5"
 msgid "v15"
-msgstr "v5"
+msgstr "v15"
 
 #. type: textblock
 #: debhelper.pod:1279
-#, fuzzy
 #| msgid "Changes from v4 are:"
 msgid "Changes from v14 are:"
-msgstr "As alterações a partir de v4 são:"
+msgstr "As alterações a partir de v14 são:"
 
 #. type: textblock
 #: debhelper.pod:1285
@@ -2818,6 +2833,12 @@ msgid ""
 "binary> dh addon (e.g., by adding B<dh-sequence-single-binary> to B<Build-"
 "Depends>) or pass B<--destdir> to B<dh_auto_install>."
 msgstr ""
+"A ferramenta B<dh_auto_install> já não usa por predefinição "
+"B<< --destdir=debian/I<package> >> para pacotes fonte que apenas produzem "
+"um único binário. Se este comportamento é desejado, o pacote deve activar "
+"explicitamente o addon do dh B<single-binary> (ex. ao adicionar "
+"B<dh-sequence-single-binary> a B<Build-Depends>) ou passar B<--destdir> "
+"a B<dh_auto_install>."
 
 #. type: =head1
 #: debhelper.pod:1301 dh_auto_test:48 dh_dwz:69 dh_installcatalogs:67
@@ -4422,7 +4443,8 @@ msgid ""
 "      #\n"
 "      # And it gets even more complicated to reason about if dh needs to\n"
 "      # recurse into debian/rules because you have an \"explicit\"\n"
-"      # standard target (e.g. a \"build-arch:\" target separate from \"%:\").\n"
+"      # standard target (e.g. a \"build-arch:\" target separate from \""
+"%:\").\n"
 "      ifneq (...)\n"
 "      override_dh_baz:\n"
 "          maybe run this\n"
@@ -4437,7 +4459,8 @@ msgstr ""
 "      #\n"
 "      # And it gets even more complicated to reason about if dh needs to\n"
 "      # recurse into debian/rules because you have an \"explicit\"\n"
-"      # standard target (e.g. a \"build-arch:\" target separate from \"%:\").\n"
+"      # standard target (e.g. a \"build-arch:\" target separate from \""
+"%:\").\n"
 "      ifneq (...)\n"
 "      override_dh_baz:\n"
 "          maybe run this\n"
@@ -5119,10 +5142,9 @@ msgstr ""
 
 #. type: =head1
 #: dh:424
-#, fuzzy
 #| msgid "DEBHELPER COMMANDS"
 msgid "DEBHELPER PROVIDED DH ADDONS"
-msgstr "COMANDOS DO DEBHELPER"
+msgstr "ADDONS DH FORNECIDOS PELO DEBHELPER"
 
 #. type: textblock
 #: dh:426
@@ -5132,11 +5154,15 @@ msgid ""
 "provide a few sequences that can be useful in some cases.  These are "
 "documented in this list:"
 msgstr ""
+"O objetivo principal dos addons do B<dh> é fornecer integração fácil com "
+"funcionalidades fornecidas por terceiros para o debhelper. No entanto, o "
+"próprio debhelper também fornece algumas sequências que podem ser úteis "
+"em alguns casos. Estas estão documentadas nesta lista:"
 
 #. type: =item
 #: dh:433
 msgid "build-stamp"
-msgstr ""
+msgstr "build-stamp"
 
 #. type: textblock
 #: dh:435
@@ -5145,21 +5171,24 @@ msgid ""
 "create stamp files to tell whether the build target has been run "
 "successfully. See L</INTERNALS> for more details."
 msgstr ""
+"Um addon especial para controlar se B<dh> (em compatibilidade 10 ou "
+"posterior) irá criar ficheiros stamp para dizer se o alvo de compilação "
+"correu com sucesso. Veja L</INTERNOS> para mais detalhes."
 
 #. type: textblock
 #: dh:439
-#, fuzzy
 #| msgid "The previous behaviour can restored by using B<--with build-stamp>"
 msgid ""
 "This addon is active by default but can disabled by using B<dh $@ --without "
 "build-stamp>"
 msgstr ""
-"O comportamento anterior pode ser restaurado ao usar B<--with build-stamp>"
+"Este addon está activo por predefinição mas pode ser desactivado ao usar "
+"B<dh $@ --without build-stamp>"
 
 #. type: =item
 #: dh:442
 msgid "dwz (obsolete)"
-msgstr ""
+msgstr "dwz (obsoleto)"
 
 #. type: textblock
 #: dh:444
@@ -5167,11 +5196,13 @@ msgid ""
 "Adds L<dh_dwz(1)> to the sequence in compat level 11 or below.  Obsolete in "
 "compat 12 or later."
 msgstr ""
+"Adiciona L<dh_dwz(1)> à sequência em compatibilidade 11 ou inferior. "
+"Obsoleto compatibilidade 12 ou posterior."
 
 #. type: =item
 #: dh:447
 msgid "elf-tools"
-msgstr ""
+msgstr "elf-tools"
 
 #. type: textblock
 #: dh:449
@@ -5179,6 +5210,8 @@ msgid ""
 "This addon adds tools related to ELF files to the sequence such as "
 "L<dh_strip(1)> and L<dh_shlibdeps(1)>"
 msgstr ""
+"Este addon adiciona ferramentas relativas a ficheiros ELF à sequência tal "
+"como L<dh_strip(1)> e L<dh_shlibdeps(1)>"
 
 #. type: textblock
 #: dh:452
@@ -5188,11 +5221,16 @@ msgid ""
 "case where you need these tools to work on arch:all packages, you can use "
 "B<--with elf-tools> to activate it unconditionally."
 msgstr ""
+"Este addon está activo I<condicionalmente> por predefinição para pacotes "
+"específicos de arquitectura - isto é, é saltado para pacotes arch:all. Num "
+"caso especial que você precise destas ferramentas a funcionar em pacotes "
+"arch:all, você pode usar B<--with elf-tools> para o activar "
+"incondicionalmente."
 
 #. type: =item
 #: dh:458
 msgid "installinitramfs (obsolete)"
-msgstr ""
+msgstr "installinitramfs (obsoleto)"
 
 #. type: textblock
 #: dh:460
@@ -5200,27 +5238,30 @@ msgid ""
 "Adds L<dh_installinitramfs(1)> to the sequence in compat level 11 or below.  "
 "Obsolete in compat 12 or later."
 msgstr ""
+"Adiciona L<dh_installinitramfs(1)> à sequência em compatibilidade 11 ou "
+"inferior. Obsoleto compatibilidade 12 ou posterior."
 
 #. type: =item
 #: dh:463
 msgid "root-sequence (internal)"
-msgstr ""
+msgstr "root-sequence (interno)"
 
 #. type: textblock
 #: dh:465
 msgid "This is reserved for internal usage."
-msgstr ""
+msgstr "Isto está reservado para uso interno."
 
 #. type: =item
 #: dh:467
 msgid "single-binary"
-msgstr ""
+msgstr "single-binary"
 
 #. type: textblock
 #: dh:469
 msgid ""
 "A special-purpose addon that makes debhelper run in \"single binary\" mode."
 msgstr ""
+"Um addon de objetivo-especial que faz o debhelper em modo \"binário único\"."
 
 #. type: textblock
 #: dh:471
@@ -5230,6 +5271,11 @@ msgid ""
 "build system part of the (only) binary package by default without having to "
 "use other helpers such as L<dh_install(1)>."
 msgstr ""
+"Quando activo, irá passar B<< --destdir=debian/I<package>/ >> ao "
+"L<dh_auto_install(1)>. Isto faz com que todos os ficheiros \"instalados\" "
+"pelo sistema de compilação do autor façam parte do (único) pacote binário "
+"por predefinição sem ter que se usar outros ajudantes como o "
+"L<dh_install(1)>."
 
 #. type: textblock
 #: dh:476
@@ -5237,6 +5283,8 @@ msgid ""
 "The addon will refuse to activate when the source package lists 2 or more "
 "binary packages in F<debian/control> as a precaution."
 msgstr ""
+"Como precaução o addon irá recusar activar-se quando o pacote fonte listar "
+"2 ou mais pacotes binários em F<debian/control>."
 
 #. type: textblock
 #: dh:479
@@ -5245,6 +5293,10 @@ msgid ""
 "single binary package listed in F<debian/control>.  In compat 15 and later, "
 "this addon must explicitly be activated for this feature to work."
 msgstr ""
+"Antes da compatibilidade 15, este comportamento era o predefinido quando "
+"havia apenas um único pacote binário listado em F<debian/control>. Em "
+"compatibilidade 15 e posterior, este addon tem de ser activado "
+"explicitamente para que esta funcionalidade funcione."
 
 #. type: textblock
 #: dh:483
@@ -5257,11 +5309,18 @@ msgid ""
 "were uploaded to archive with users frustrated as their \"upgrade\" removed "
 "their programs."
 msgstr ""
+"A razão para se requerer isto como uma escolha explícita é que se fosse "
+"implícita então o debhelper iria mudar o comportamento em silêncio ao se "
+"adicionar um novo pacote binário. Isto causou muitos bugs RC quando os "
+"maintainers renomeavam um binário e adicionavam pacotes de transição com a "
+"intenção de suportar actualizações perfeitas. O resultado era muitas vezes "
+"dois pacotes binários vazios que eram enviados para o arquivo com os "
+"utilizadores frustrados pois a sua \"actualização\" removeu os seus programas."
 
 #. type: =item
 #: dh:491
 msgid "systemd (obsolete)"
-msgstr ""
+msgstr "systemd (obsoleto)"
 
 #. type: textblock
 #: dh:493
@@ -5269,6 +5328,9 @@ msgid ""
 "Adds L<dh_systemd_enable(1)> and L<dh_systemd_start(1)> to the sequence in "
 "compat level 10 or below.  Obsolete in compat 11 or later."
 msgstr ""
+"Adiciona L<dh_systemd_enable(1)> e L<dh_systemd_start(1)> à sequência em "
+"nível de compatibilidade 10 ou inferior. Obsoleto em compatibilidade 11 "
+"ou posterior."
 
 #. type: =head1
 #: dh:498
@@ -5625,10 +5687,15 @@ msgid ""
 "the B<single-binary> addon for L<dh(1)> is activated, then it will pass an "
 "explicit B<< --destdir=debian/I<package>/ >> to B<dh_auto_install>."
 msgstr ""
+"Em compatibilidade 15 ou posterior, B<dh_auto_install> irá usar F<debian/tmp> "
+"como B<--destdir> predefinida e deve ser movida de lá para o directório de "
+"compilação de pacote apropriado usando L<dh_install(1)> ou ferramentas "
+"semelhantes. Contudo, se o addon B<single-binary> para L<dh(1)> estiver "
+"activo, então irá passar um B<< --destdir=debian/I<package>/ >> explícito "
+"para B<dh_auto_install>."
 
 #. type: textblock
 #: dh_auto_install:38
-#, fuzzy
 #| msgid ""
 #| "Unless B<--destdir> option is specified, the files are installed into "
 #| "debian/I<package>/ if there is only one binary package. In the multiple "
@@ -5642,11 +5709,12 @@ msgid ""
 "installed into F<debian/tmp/>, and should be moved from there to the "
 "appropriate package build directory using L<dh_install(1)> or similar tools."
 msgstr ""
-"A menos que a opção B<--destdir> seja especificada, os ficheiros são "
-"instalados e, debian/I<pacote>/ se existir apenas um pacote binário. No caso "
-"de pacote de múltiplos binários, em vez disso os ficheiros são instalados em "
+"Para níveis de compatibilidade anteriores então a menos que a opção "
+"B<--destdir> seja especificada, os ficheiros são instalados em "
+"debian/I<pacote>/ se existir apenas um pacote binário. No caso de pacote "
+"de múltiplos binários, em vez disso os ficheiros são instalados em "
 "F<debian/tmp/>, e deverão ser movidos daí para o directório apropriado de "
-"compilação de pacote usando o L<dh_install(1)>."
+"compilação de pacote usando o L<dh_install(1)> ou ferramentas semelhantes."
 
 #. type: textblock
 #: dh_auto_install:44
@@ -5995,14 +6063,18 @@ msgstr ""
 #: dh_clean:25
 #, no-wrap
 msgid ""
-"It removes the package build directories, and removes some other files including\n"
-"F<debian/files>, and any detritus left behind by other debhelper commands. It\n"
+"It removes the package build directories, and removes some other files"
+" including\n"
+"F<debian/files>, and any detritus left behind by other debhelper commands."
+" It\n"
 "also removes common files that should not appear in a Debian diff:\n"
 "  #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS .deps/* *.P *-stamp\n"
 "\n"
 msgstr ""
-"Remove os directórios de compilação do pacote, e remove mais alguns ficheiros incluindo\n"
-"F<debian/files>, e quaisquer detritos deixados por outros comandos debhelper. Também\n"
+"Remove os directórios de compilação do pacote, e remove mais alguns ficheiros"
+" incluindo\n"
+"F<debian/files>, e quaisquer detritos deixados por outros comandos debhelper."
+" Também\n"
 "remove ficheiros comuns que não deveriam aparecer num diff de Debian:\n"
 "  #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS .deps/* *.P *-stamp\n"
 "\n"
@@ -7373,6 +7445,10 @@ msgid ""
 "by debhelper (the maintainer should not list there as debhelper assumes it "
 "should handle that part)."
 msgstr ""
+"este ficheiro será instalado no directório F<DEBIAN>. O ficheiro fornecido "
+"será enriquecido pelo debhelper para incluir todos os B<conffiles> "
+"auto-detetados pelo debhelper (o responsável deve estar listado lá pois o "
+"debhelper assume que deve lidar com essa parte.)"
 
 #. type: textblock
 #: dh_installdeb:64
@@ -7380,6 +7456,8 @@ msgid ""
 "This file is primarily useful for using \"special\" entries such as the B<< "
 "remove-on-upgrade >> feature from dpkg."
 msgstr ""
+"Este ficheiro é principalmente útil para usar entradas \"especiais\" tais "
+"como a funcionalidade B<< remove-on-upgrade >> do dpkg."
 
 #. type: =item
 #: dh_installdeb:67
@@ -7465,6 +7543,12 @@ msgid ""
 "B<rm_conffile> into dpkg's B<remove-on-upgrade>).  The minimum requirement "
 "for activating this feature is that debhelper runs in compat 10 or later."
 msgstr ""
+"Onde possível, o B<dh_installdeb> pode escolher rescrever algumas ou todas "
+"as entradas em funcionalidades equivalentes suportadas no dpkg sem se apoiar "
+"nos scripts do maintainer scripts  a seu exclusivo critério (exemplos "
+"incluem rescrever B<rm_conffile> em B<remove-on-upgrade> do dpkg). O "
+"requerimento mínimo para activar esta funcionalidade é que o debhelper "
+"corra  em compatibilidade 10 ou posterior."
 
 #. type: =item
 #: dh_installdeb:111
@@ -7573,7 +7657,8 @@ msgid ""
 "\t# Script for #PACKAGE#\n"
 "\t#TOKEN#\n"
 "\tEOF\n"
-"    dh_installdeb -pfoo -pbar -pbaz  --define TOKEN=default --define pkg.bar.TOKEN=unique-bar-value \\\n"
+"    dh_installdeb -pfoo -pbar -pbaz  --define TOKEN=default --define"
+" pkg.bar.TOKEN=unique-bar-value \\\n"
 "      --define pkg.baz.TOKEN=unique-baz-value\n"
 "\n"
 msgstr ""
@@ -7589,7 +7674,8 @@ msgstr ""
 "\t# Script for #PACKAGE#\n"
 "\t#TOKEN#\n"
 "\tEOF\n"
-"    dh_installdeb -pfoo -pbar -pbaz  --define TOKEN=default --define pkg.bar.TOKEN=unique-bar-value \\\n"
+"    dh_installdeb -pfoo -pbar -pbaz  --define TOKEN=default --define"
+" pkg.bar.TOKEN=unique-bar-value \\\n"
 "      --define pkg.baz.TOKEN=unique-baz-value\n"
 "\n"
 
@@ -11754,10 +11840,12 @@ msgstr ""
 #: dh_strip:100
 #, no-wrap
 msgid ""
-"  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< 2.1-3~)'\n"
+"  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<<"
+" 2.1-3~)'\n"
 "\n"
 msgstr ""
-"  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< 2.1-3~)'\n"
+"  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<<"
+" 2.1-3~)'\n"
 "\n"
 
 #. type: =item
