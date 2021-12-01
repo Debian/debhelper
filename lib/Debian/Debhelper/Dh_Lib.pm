@@ -193,6 +193,7 @@ qw(
 qw(
 	open_gz
 	get_source_date_epoch
+	get_non_binnmu_date_epoch
 	deprecated_functionality
 ),
 	# Special-case functionality (e.g. tool specific), debhelper(-core) functionality and deprecated functions
@@ -2446,25 +2447,58 @@ sub cross_command {
 # variable and returns the computed value.
 sub get_source_date_epoch {
 	return $ENV{SOURCE_DATE_EPOCH} if exists($ENV{SOURCE_DATE_EPOCH});
-	eval { require Dpkg::Changelog::Debian };
-	if ($@) {
-		warning "unable to set SOURCE_DATE_EPOCH: $@";
+	_parse_non_binnmu_date_epoch();
+	return $ENV{SOURCE_DATE_EPOCH};
+}
+
+{
+	my $_non_binnmu_date_epoch;
+
+	# Needed for dh_strip_nondeterminism - not exported by default because it is not likely
+	# to be useful beyond that one helper.
+	sub get_non_binnmu_date_epoch {
+		return $_non_binnmu_date_epoch if defined($_non_binnmu_date_epoch);
+		_parse_non_binnmu_date_epoch();
+		return $_non_binnmu_date_epoch;
+	}
+
+	sub _parse_non_binnmu_date_epoch {
+		eval { require Dpkg::Changelog::Debian };
+		if ($@) {
+			warning "unable to set SOURCE_DATE_EPOCH: $@";
+			return;
+		}
+		eval { require Time::Piece };
+		if ($@) {
+			warning "unable to set SOURCE_DATE_EPOCH: $@";
+			return;
+		}
+
+		my $changelog = Dpkg::Changelog::Debian->new(range => {"count" => 2});
+		$changelog->load("debian/changelog");
+
+		my $first_entry = $changelog->[0];
+		my $non_binnmu_entry = $first_entry;
+		my $optional_fields = $first_entry->get_optional_fields();
+		my $first_tt = $first_entry->get_timestamp();
+		$first_tt =~ s/\s*\([^\)]+\)\s*$//; # Remove the optional timezone codename
+		my $first_timestamp = Time::Piece->strptime($first_tt, "%a, %d %b %Y %T %z")->epoch;
+		my $non_binnmu_timestamp = $first_timestamp;
+		if (exists($optional_fields->{'Binary-Only'}) and lc($optional_fields->{'Binary-Only'}) eq 'yes') {
+			$non_binnmu_entry = $changelog->[1];
+			my $non_binnmu_options = $non_binnmu_entry->get_optional_fields();
+			if (exists($non_binnmu_options->{'Binary-Only'}) and lc($non_binnmu_options->{'Binary-Only'}) eq 'yes') {
+				error("internal error: Could not locate the first non-binnmu entry in the change (assumed it would be the second entry)");
+			}
+			my $non_binnmu_tt = $non_binnmu_entry->get_timestamp();
+			$non_binnmu_tt =~ s/\s*\([^\)]+\)\s*$//; # Remove the optional timezone codename
+			$non_binnmu_timestamp = Time::Piece->strptime($non_binnmu_tt, "%a, %d %b %Y %T %z")->epoch();
+		}
+
+		$ENV{SOURCE_DATE_EPOCH} = $first_timestamp if not exists($ENV{SOURCE_DATE_EPOCH});
+		$_non_binnmu_date_epoch = $non_binnmu_timestamp;
 		return;
 	}
-	eval { require Time::Piece };
-	if ($@) {
-		warning "unable to set SOURCE_DATE_EPOCH: $@";
-		return;
-	}
-
-	my $changelog = Dpkg::Changelog::Debian->new(range => {"count" => 1});
-	$changelog->load("debian/changelog");
-
-	my $tt = @{$changelog}[0]->get_timestamp();
-	$tt =~ s/\s*\([^\)]+\)\s*$//; # Remove the optional timezone codename
-	my $timestamp = Time::Piece->strptime($tt, "%a, %d %b %Y %T %z");
-
-	return $ENV{SOURCE_DATE_EPOCH} = $timestamp->epoch();
 }
 
 # Setup the build ENV by setting dpkg-buildflags (via set_buildflags()) plus
