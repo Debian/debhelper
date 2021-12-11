@@ -529,8 +529,6 @@ sub _format_cmdline {
 	my (@cmd) = @_;
 	my $options = ref($cmd[0]) ? shift(@cmd) : {};
 	my $cmd_line = escape_shell(@cmd);
-	use Carp qw(confess);
-	confess("??") if ref($options) ne 'HASH';
 	if (defined(my $update_env = $options->{update_env})) {
 		my $need_env = 0;
 		my @params;
