@@ -31,6 +31,8 @@ cron scripts.
 
 =item debian/I<package>.cron.monthly
 
+=item debian/I<package>.cron.yearly
+
 =item debian/I<package>.cron.hourly
 
 =item debian/I<package>.cron.d
@@ -56,11 +58,11 @@ as the package name.
 
 init();
 
-# PROMISE: DH NOOP WITHOUT cron.hourly cron.daily cron.weekly cron.monthly cron.d cli-options()
+# PROMISE: DH NOOP WITHOUT cron.hourly cron.daily cron.weekly cron.monthly cron.yearly cron.d cli-options()
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
-	foreach my $type (qw{hourly daily weekly monthly}) {
+	foreach my $type (qw{hourly daily weekly monthly yearly}) {
 		my $cron=pkgfile($package,"cron.$type");
 		if ($cron) {
 			install_dir("$tmp/etc/cron.$type");
