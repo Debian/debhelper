@@ -137,4 +137,4 @@ install:
 	install -m 0644 lib/Debian/Debhelper/DH/*.pm $(DESTDIR)$(PERLLIBDIR)/DH
 
 test: version
-	MAKEFLAGS= HARNESS_OPTIONS=j$(TEST_JOBS) ./run perl -MTest::Harness -e 'runtests grep { ! /CVS/ && ! /\.svn/ && -f && -x && m/\.t$$/ } @ARGV' t/* t/*/*
+	MAKEFLAGS= prove -lrj$(TEST_JOBS) --timer t
