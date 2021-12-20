@@ -88,8 +88,6 @@ This mode is deprecated.
 
 =item v5
 
-This is the lowest supported compatibility level.
-
 Changes from v4 are:
 
 =over 8
@@ -110,6 +108,68 @@ B<dh_installdocs> skips installing empty files.
 =item -
 
 B<dh_install> errors out if wildcards expand to nothing.
+
+=back
+
+=item v6
+
+Changes from v5 are:
+
+=over 8
+
+=item -
+
+Commands that generate maintainer script fragments will order the
+fragments in reverse order for the F<prerm> and F<postrm> scripts.
+
+=item -
+
+B<dh_installwm> will install a slave manpage link for F<x-window-manager.1.gz>,
+if it sees the man page in F<usr/share/man/man1> in the package build
+directory.
+
+=item -
+
+B<dh_builddeb> did not previously delete everything matching
+B<DH_ALWAYS_EXCLUDE>, if it was set to a list of things to exclude, such as
+B<CVS:.svn:.git>. Now it does.
+
+=item -
+
+B<dh_installman> allows overwriting existing man pages in the package build
+directory. In previous compatibility levels it silently refuses to do this.
+
+=back
+
+This mode is deprecated.
+
+=item v7
+
+This is the lowest supported compatibility level.
+
+Changes from v6 are:
+
+=over 8
+
+=item -
+
+B<dh_install>, will fall back to looking for files in F<debian/tmp> if it doesn't
+find them in the current directory (or wherever you tell it look using
+B<--sourcedir>). This allows B<dh_install> to interoperate with B<dh_auto_install>,
+which installs to F<debian/tmp>, without needing any special parameters.
+
+=item -
+
+B<dh_clean> will read F<debian/clean> and delete files listed there.
+
+=item -
+
+B<dh_clean> will delete toplevel F<*-stamp> files.
+
+=item -
+
+B<dh_installchangelogs> will guess at what file is the upstream changelog if
+none is specified.
 
 =back
 

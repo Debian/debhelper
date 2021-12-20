@@ -17,7 +17,7 @@ no feature 'unicode_strings';
 
 use constant {
 	# Lowest compat level supported
-	'MIN_COMPAT_LEVEL' => 5,
+	'MIN_COMPAT_LEVEL' => 7,
 	# Lowest compat level that does *not* cause deprecation
 	# warnings
 	'LOWEST_NON_DEPRECATED_COMPAT_LEVEL' => 10,
@@ -54,7 +54,7 @@ use constant {
 	'DBGSYM_PACKAGE_TYPE' => DEFAULT_PACKAGE_TYPE,
 	# Lowest compat level supported that is not scheduled for removal.
 	# - Set to MIN_COMPAT_LEVEL when there are no pending compat removals.
-	'MIN_COMPAT_LEVEL_NOT_SCHEDULED_FOR_REMOVAL' => 7,
+	'MIN_COMPAT_LEVEL_NOT_SCHEDULED_FOR_REMOVAL' => MIN_COMPAT_LEVEL,
 };
 
 
