@@ -59,8 +59,8 @@ sub _unit_check_user_started {
 	$matches = grep { m{deb-systemd-invoke --user restart.*'\Q$unit'} } @postinst;
 	is($matches, $started, "$unit $verb started");
 
-	my @postrm = read_script($package, 'postrm');
-	$matches = grep { m{deb-systemd-invoke --user stop.*'\Q$unit'} } @postrm;
+	my @prerm = read_script($package, 'prerm');
+	$matches = grep { m{deb-systemd-invoke --user stop.*'\Q$unit'} } @prerm;
 	is($matches, $started, "$unit $verb stopped");
 }
 
@@ -70,14 +70,20 @@ sub is_started { _unit_check_user_started(@_, 1); }
 sub isnt_started { _unit_check_user_started(@_, 0); }
 
 each_compat_subtest {
+	my ($compat) = @_;
 	make_path('debian/foo/usr/lib/systemd/user/');
 	install_file('debian/foo.user.service', 'debian/foo/usr/lib/systemd/user/bar.service');
 	ok(run_dh_tool('dh_installsystemduser'));
 	ok(-e 'debian/foo/usr/lib/systemd/user/foo.service');
 	is_enabled('foo', 'foo.service');
 	is_enabled('foo', 'bar.service');
-	is_started('foo', 'foo.service');
-	is_started('foo', 'bar.service');
+	if ($compat > 13) {
+		is_started('foo', 'foo.service');
+		is_started('foo', 'bar.service');
+	} else {
+		isnt_started('foo', 'foo.service');
+		isnt_started('foo', 'bar.service');
+	}
 	ok(run_dh_tool('dh_clean'));
 
 	ok(run_dh_tool('dh_installsystemduser'));
@@ -85,8 +91,13 @@ each_compat_subtest {
 	ok(! -e 'debian/foo/usr/lib/systemd/user/baz.service');
 	is_enabled('foo', 'foo.service');
 	isnt_enabled('foo', 'baz.service');
-	is_started('foo', 'foo.service');
-	isnt_started('foo', 'baz.service');
+	if ($compat > 13) {
+		is_started('foo', 'foo.service');
+		isnt_started('foo', 'baz.service');
+	} else {
+		isnt_started('foo', 'bar.service');
+		isnt_started('foo', 'baz.service');
+	}
 	ok(run_dh_tool('dh_clean'));
 
 	ok(run_dh_tool('dh_installsystemduser', '--name', 'baz'));
@@ -94,7 +105,12 @@ each_compat_subtest {
 	ok(-e 'debian/foo/usr/lib/systemd/user/baz.service');
 	isnt_enabled('foo', 'foo.service');
 	is_enabled('foo', 'baz.service');
-	isnt_started('foo', 'foo.service');
-	is_started('foo', 'baz.service');
+	if ($compat > 13) {
+		isnt_started('foo', 'foo.service');
+		is_started('foo', 'baz.service');
+	} else {
+		isnt_started('foo', 'foo.service');
+		isnt_started('foo', 'baz.service');
+	}
 	ok(run_dh_tool('dh_clean'));
 };
