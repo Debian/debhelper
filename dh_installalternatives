@@ -99,8 +99,11 @@ sub _parse_alternative_and_generate_maintscript {
 	if (index($link_name, '/') > -1) {
 		error(qq{Invalid link name "${link_name}" in "${alternatives_file}": Must not contain slash});
 	}
-	if ( ! -f "${tmpdir}/${impl_path}") {
-		error(qq{Alternative "${impl_path}" for "${link_name}" in ${alternatives_file} does not exist in ${tmpdir}});
+	if ( ! -l "${tmpdir}/${impl_path}" or -d _) {
+		error(qq{Alternative "${impl_path}" for "${link_name}" in ${alternatives_file} does not exist in ${tmpdir} or is a directory});
+	}
+	if ($link_name eq $impl_path) {
+		error(qq{The link name cannot be the same as the implementation path "${link_name}" (in "${alternatives_file}")});
 	}
 
 	$maintscript_options{'RM_OPTIONS'} = "--remove ${link_name} ${impl_path}";
@@ -133,9 +136,14 @@ sub _parse_alternative_and_generate_maintscript {
 					. qq{ for "${link_name}" in "${alternatives_file}"});
 				$error_with_def = 1;
 			}
+			if ($dlink_name eq $dimpl_path) {
+				warning(qq{The link name cannot be the same as the implementation path for "${dlink_name}"}
+						. qq{ in "${alternatives_file}"});
+				$error_with_def = 1;
+			}
 			if ($trailing) {
 				warning(qq{Trailing information for dependent link "${dlink_name}" for "${link_name}"}
-					. qq{ in "${alternatives_file}"}) if $trailing;
+					. qq{ in "${alternatives_file}"});
 				warning("Dependent links must consist of exactly 3 space-separated values");
 				$error_with_def = 1;
 			}
