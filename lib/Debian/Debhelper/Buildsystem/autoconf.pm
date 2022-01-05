@@ -8,7 +8,7 @@ package Debian::Debhelper::Buildsystem::autoconf;
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(%dh dpkg_architecture_value sourcepackage compat);
+use Debian::Debhelper::Dh_Lib qw(%dh dpkg_architecture_value get_buildoption sourcepackage compat);
 use parent qw(Debian::Debhelper::Buildsystem::makefile);
 
 sub DESCRIPTION {
@@ -85,7 +85,13 @@ sub configure {
 
 sub test {
 	my $this=shift;
+
+	my $parallel = $this->get_parallel();
+	my @autotest;
+	push @autotest, "-j$parallel";
+	push @autotest, "--verbose" if not get_buildoption("terse");
 	$this->make_first_existing_target(['test', 'check'],
+		"TESTSUITEFLAGS=@autotest",
 		"VERBOSE=1", @_);
 }
 
