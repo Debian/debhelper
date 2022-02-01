@@ -370,7 +370,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				if ($dh{RESTART_AFTER_UPGRADE}) {
 					# update-rc.d, and restart (or
 					# start if new install) script
-					autoscript($package, 'postinst', 'postinst-init',
+					autoscript($package, 'postinst', 'postinst-init-restart',
 						{
 							'SCRIPT' => $script, 'INITPARMS' => $params, 'ERROR_HANDLER' => $dh{ERROR_HANDLER},
 							'INVOKE_RCD_PARAMS' => $update_rcd_params,

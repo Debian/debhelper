@@ -246,7 +246,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			$snippet = 'postinst-systemd-restartnostart';
 			$restart_action = 'try-restart';
 		} else {
-			$snippet = 'postinst-systemd-start';
+			$snippet = 'postinst-systemd-restart';
+			$restart_action = 'restart';
 		}
 		$sd_autoscript->("postinst", $snippet, $restart_action);
 	} elsif (!$dh{NO_START}) {
