@@ -46,7 +46,7 @@ sub unit_is_started {
 	$num_stops = $num_stops // $num_starts;
 	my @postinst_snippets = find_script($package, 'postinst');
 	@output=`cat @postinst_snippets` if @postinst_snippets;
-	$matches = grep { m{deb-systemd-invoke restart .*'\Q$unit\E.service'} } @output;
+	$matches = grep { m{deb-systemd-invoke \$_dh_action .*'\Q$unit\E.service'} } @output;
 	ok($matches == $num_starts) or diag("$unit appears to have been started $matches times (expected $num_starts)");
 	my @prerm_snippets = find_script($package, 'prerm');
 	@output=`cat @prerm_snippets` if @prerm_snippets;
@@ -188,7 +188,7 @@ each_compat_subtest {
 	ok(run_dh_tool('dh_installsystemd', '--no-restart-after-upgrade'));
 	my @foo_postinst = find_script('foo', 'postinst');
 	ok(@foo_postinst);
-	my $matches = @foo_postinst ? grep { m{deb-systemd-invoke restart .*foo.service} } `cat @foo_postinst` : -1;
+	my $matches = @foo_postinst ? grep { m{deb-systemd-invoke start .*foo.service} } `cat @foo_postinst` : -1;
 	ok($matches == 1);
 	ok(run_dh_tool('dh_clean'));
 

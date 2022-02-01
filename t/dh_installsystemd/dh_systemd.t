@@ -38,7 +38,7 @@ sub unit_is_started {
 	my $matches;
 	$num_stops = $num_stops // $num_starts;
 	@output=`cat debian/$package.postinst.debhelper`;
-	$matches = grep { m{deb-systemd-invoke restart .*'\Q$unit\E.service'} } @output;
+	$matches = grep { m{deb-systemd-invoke \$_dh_action .*'\Q$unit\E.service'} } @output;
 	ok($matches == $num_starts) or diag("$unit appears to have been started $matches times (expected $num_starts)");
 	@output=`cat debian/$package.prerm.debhelper`;
 	$matches = grep { m{deb-systemd-invoke stop .*'\Q$unit\E.service'} } @output;
@@ -110,7 +110,7 @@ each_compat_from_x_to_and_incl_y_subtest(10, 10, sub {
 	make_path('debian/foo/lib/systemd/system/');
 	install_file('debian/foo.service', 'debian/foo/lib/systemd/system/foo.service');
 	ok(run_dh_tool('dh_systemd_start', '--no-restart-after-upgrade'));
-	my $matches = grep { m{deb-systemd-invoke restart .*foo.service} } `cat debian/foo.postinst.debhelper`;
+        my $matches = grep { m{deb-systemd-invoke start .*foo.service} } `cat debian/foo.postinst.debhelper`;
 	ok($matches == 1);
 	ok(run_dh_tool('dh_clean'));
 
