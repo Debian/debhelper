@@ -428,13 +428,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			autoscript($package, 'postinst', 'postinst-systemd-start', $replace, \%options);
 		}
 
-		if ($dh{R_FLAG} || $dh{RESTART_AFTER_UPGRADE}) {
-			# stop service only on remove
-			autoscript($package, 'prerm', 'prerm-systemd-restart', $replace, \%options);
-		} elsif (!$dh{NO_START}) {
-			# always stop service
-			autoscript($package, 'prerm', 'prerm-systemd', $replace, \%options);
-		}
+		# stop service before upgrade, if requested
+		autoscript($package, 'preinst', 'preinst-systemd-stop', $replace, \%options)
+			unless ($dh{R_FLAG} || $dh{RESTART_AFTER_UPGRADE});
+
+		# stop service only on remove
+		autoscript($package, 'prerm', 'prerm-systemd-restart', $replace, \%options)
+			unless ($dh{NO_START});
 
 		# Run this with "default" order so it is always after other
 		# service related autosnippets.

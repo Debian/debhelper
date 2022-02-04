@@ -366,45 +366,30 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		}	
 		
 		if (! $dh{NOSCRIPTS}) {
+			my $replace = {
+				'SCRIPT' => $script,
+				'INITPARMS' => $params,
+				'ERROR_HANDLER' => $dh{ERROR_HANDLER},
+				'INVOKE_RCD_PARAMS' => $update_rcd_params,
+			};
+
 			if (! $dh{NO_START}) {
 				if ($dh{RESTART_AFTER_UPGRADE}) {
 					# update-rc.d, and restart (or
 					# start if new install) script
-					autoscript($package, 'postinst', 'postinst-init-restart',
-						{
-							'SCRIPT' => $script, 'INITPARMS' => $params, 'ERROR_HANDLER' => $dh{ERROR_HANDLER},
-							'INVOKE_RCD_PARAMS' => $update_rcd_params,
-						},
-						\%snippet_options);
+					autoscript($package, 'postinst', 'postinst-init-restart', $replace, \%snippet_options);
 				}
 				else {
 					# update-rc.d, and start script
-					autoscript($package, 'postinst', 'postinst-init',
-						{
-							'SCRIPT' => $script, 'INITPARMS' => $params, 'ERROR_HANDLER' => $dh{ERROR_HANDLER},
-							'INVOKE_RCD_PARAMS' => $update_rcd_params,
-						},
-						\%snippet_options);
+					autoscript($package, 'postinst', 'postinst-init', $replace, \%snippet_options);
 				}
-			
-				if ($dh{R_FLAG} || $dh{RESTART_AFTER_UPGRADE}) {
-					# stops script only on remove
-					autoscript($package, 'prerm', 'prerm-init-norestart',
-						{
-							'SCRIPT' => $script, 'ERROR_HANDLER' => $dh{ERROR_HANDLER},
-							'INVOKE_RCD_PARAMS' => $update_rcd_params,
-						},
-						\%snippet_options);
-				}
-				else {
-					# always stops script
-					autoscript($package, 'prerm', 'prerm-init',
-						{
-							'SCRIPT' => $script, 'ERROR_HANDLER' => $dh{ERROR_HANDLER},
-							'INVOKE_RCD_PARAMS' => $update_rcd_params,
-						},
-						\%snippet_options);
-				}
+
+				autoscript($package, 'preinst', 'preinst-init-stop', $replace, \%snippet_options)
+					unless ($dh{R_FLAG} || $dh{RESTART_AFTER_UPGRADE});
+
+				# stops script only on remove
+				autoscript($package, 'prerm', 'prerm-init-norestart', $replace, \%snippet_options);
+
 				# The --skip-systemd-native option requires
 				# init-system-helpers (>= 1.54) and since we need it
 				# from prerm we need init-system-helpers to have been
@@ -414,9 +399,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			}
 			else {
 				# just update-rc.d
-				autoscript($package,"postinst", "postinst-init-nostart",
-					{ 'SCRIPT' => $script, 'INITPARMS' => $params, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} },
-					\%snippet_options);
+				autoscript($package,"postinst", "postinst-init-nostart", $replace, \%snippet_options);
 			}
 
 			# removes rc.d links
