@@ -1,7 +1,7 @@
 inst=/etc/menu-methods/#PACKAGE#
 if [ -f $inst ]; then
 	chmod a+x $inst
-	if [ -x "`command -v update-menus`" ]; then
+	if [ -x "`command -v update-menus`" ] && [ -x "$DPKG_ROOT`command -v update-menus`" ]; then
 		update-menus
 	fi
 fi
