@@ -1215,6 +1215,14 @@ about to happen.
 The B<dh_installalternatives> tool will now be run after B<dh_link> rather than after
 B<dh_installinitramfs> in the default B<dh> sequence.
 
+=item -
+
+The B<dh_installpam> tool will now install PAM configuration files under
+F<< /usr/lib/pam.d/I<package> >> instead of F<< /etc/pam.d/I<package> >>.
+
+Please consider using the "rm_conffile" feature from
+L<dh_installdeb(1)> to ensure the proper removal of previous PAM files.
+
 =back
 
 =item v15

@@ -27,7 +27,11 @@ files used by PAM into package build directories.
 
 =item debian/I<package>.pam
 
-Installed into etc/pam.d/I<package> in the package build directory.
+Installed into usr/lib/pam.d/I<package> in the package build directory.
+
+Until compatibility level 14 this file was installed under
+etc/pam.d/I<package>. Please consider using the "rm_conffile" feature from
+L<dh_installdeb(1)> to ensure the proper removal of previous PAM files.
 
 =back
 
@@ -38,7 +42,7 @@ Installed into etc/pam.d/I<package> in the package build directory.
 =item B<--name=>I<name>
 
 Look for files named debian/I<package>.I<name>.pam and install them as
-etc/pam.d/I<name>, instead of using the usual files and installing them
+usr/lib/pam.d/I<name>, instead of using the usual files and installing them
 using the package name.
 
 =back
@@ -53,9 +57,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $pam=pkgfile($package,"pam");
 
+	my $pamd_dir="/usr/lib/pam.d";
+	if (compat(13)) {
+		$pamd_dir="/etc/pam.d";
+	}
+
 	if ($pam ne '') {
-		install_dir("$tmp/etc/pam.d");
-		install_file($pam,"$tmp/etc/pam.d/".pkgfilename($package));
+		install_dir("$tmp/$pamd_dir");
+		install_file($pam,"$tmp/$pamd_dir/".pkgfilename($package));
 	}
 }
 
