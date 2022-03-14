@@ -1,10 +1,33 @@
 debhelper (13.6.1) unstable; urgency=medium
 
+  [ Niels Thykier ]
   * dh_installalternatives: Improve validation of alternative files to
     catch some "obvious" copy-waste mistakes.
   * dh: Invoke dh_installalternatives after dh_link in compat 14 or
     later. Thanks to Colin Watson for the suggestion.
     (Closes: #1002800)
+
+  [ Guillem Jover ]
+  * autoconf.pm: Add support for autotest test suites by passing the
+    TESTSUITEFLAGS environment variable to `make test`.
+
+  [ Dave Jones ]
+  * Rewrite handling of stop services to use the `preint` when using
+    --no-restart-after-upgrade.  This fixes a regression caused by
+    the fix for #989155.  (Closes: #994204)
+
+  [ Johannes Schauer Marin Rodrigues ]
+  * dh_installmenu: Respect DPKG_ROOT when checking for update-menus.
+    Note this implementation assumes update-menus is present both
+    inside and outside the chroot to activate.  If it is absent on
+    either side, the update-menus call is skipped.
+
+  [ Gioele Barabucci ]
+  * dh_installsysusers: Invoke systemd-sysusers even when DPKG_ROOT
+    is set (relying on `--root`).
+  * dh_installpam: In compat 14, install pam snippets into
+    `/usr/lib/pam.d` instead of `/etc/pam.d`.  Remember to remove
+    (now) obsolete conffiles when you bump to compat 14.
 
  -- Niels Thykier <niels@thykier.net>  Mon, 20 Dec 2021 12:55:03 +0000
 
