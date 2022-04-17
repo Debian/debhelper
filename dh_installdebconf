@@ -73,11 +73,114 @@ Do not modify F<postrm> script.
 
 Pass the params to B<po2debconf>.
 
+=item B<-D>I<TOKEN=VALUE>, B<--define> I<TOKEN=VALUE>
+
+Define tokens to be replaced inside the maintainer scripts when
+it is generated.  Please note that the limitations described in
+L</Limitations in token names> also applies to tokens defined
+on the command line.  Invalid token names will trigger an error.
+
+In the simple case, this parameter will cause B<< #I<TOKEN># >>
+to be replaced by I<VALUE>.  If I<VALUE> starts with a literal
+I<@>-sign, then I<VALUE> is expected to point to a file
+containing the actual value to insert.
+
+An explicit declared token with this parameter will replace built-in
+tokens.
+
+Test examples to aid with the understanding:
+
+	cat >> debian/config <<EOF
+	#SIMPLE#
+	#FILEBASED#
+	EOF
+	echo -n "Complex value" > some-file
+    dh_installdeb --define SIMPLE=direct --define FILEBASED=@some-file
+
+In this example, B<#SIMPLE#> will expand to B<direct> and B<#FILEBASED#>
+will expand to B<Complex value>.
+
+It is also possible to set package-specific values for a given
+token.  This is useful when B<dh_installdebconf> is acting on multiple
+packages that need different values for the same token.  This is
+done by prefixing the token name with B<< pkg.I<package-name>. >>.
+
+This can be used as in the following example:
+
+	cat >> debian/foo.config <<EOF
+	# Script for #PACKAGE#
+	#TOKEN#
+	EOF
+	cat >> debian/bar.config <<EOF
+	# Script for #PACKAGE#
+	#TOKEN#
+	EOF
+	cat >> debian/baz.config <<EOF
+	# Script for #PACKAGE#
+	#TOKEN#
+	EOF
+    dh_installdebconf -pfoo -pbar -pbaz  --define TOKEN=default --define pkg.bar.TOKEN=unique-bar-value \
+      --define pkg.baz.TOKEN=unique-baz-value
+
+In this example, B<#TOKEN#> will expand to B<default> in F<debian/foo.config>,
+to B<unique-bar-value> in F<debian/bar.v> and to B<unique-baz-value>
+in F<debian/baz.config>.
+
+Note that the B<#pkg.*#> tokens will be visible in all scripts acted on.  E.g.
+you can refer to B<#pkg.bar.TOKEN#> inside F<debian/foo.config> and it will
+be replaced by B<unique-bar-value>.
+
 =back
+
+=head1 SUBSTITUTION IN MAINTAINER SCRIPTS
+
+The B<dh_installdebconf> will automatically replace the following tokens
+inside a provided maintainer script (if not replaced via B<-D>/B<--define>):
+
+=over 4
+
+=item #DEB_HOST_I<NAME>#, #DEB_BUILD_I<NAME>#, #DEB_TARGET_I<NAME>#
+
+These tokens are replaced with the respective variable from
+L<dpkg-architecture(1)>.  In almost all cases, you will want
+use the B<< #DEB_HOST_I<NAME> >> variant in a script to ensure
+you get the right value when cross-building.
+
+On a best effort, tokens of this pattern that do not match
+a variable in L<dpkg-architecture(1)> will be left as-is.
+
+=item #ENV.I<NAME>#
+
+These tokens of this form will be replaced with value of the
+corresponding environment variable.  If the environment
+variable is unset, the token is replaced with the empty
+string.
+
+Note that there are limits on which names can be used (see
+L</Limitations in token names>).
+
+=item #PACKAGE#
+
+This token is by default replaced by the package name, which will contain
+the concrete script.
+
+=back
+
+=head2 Limitations in token names
+
+All tokens intended to be substituted must match the regex: #[A-Za-z0-9_.+]+#
+
+Tokens that do not match that regex will be silently ignored if found in the
+script template.  Invalid token names passed to B<-D> or B<--define> will
+cause B<dh_installdebconf> to reject the command with an error in most cases.
 
 =cut
 
-init();
+my %PROVIDED_SUBST;
+
+init(options => {
+	'define|D=s%' => \%PROVIDED_SUBST,
+});
 
 my @extraparams;
 if (defined($dh{U_PARAMS})) {
@@ -94,7 +197,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	install_dir("$tmp/DEBIAN");
 
 	if (! is_udeb($package)) {
-		debhelper_script_subst($package, "config");
+		# Install debian scripts.
+		my $package_subst = debhelper_script_per_package_subst($package, \%PROVIDED_SUBST);
+		debhelper_script_subst($package, "config", $package_subst);
 	}
 	
 	if ($templates ne '') {

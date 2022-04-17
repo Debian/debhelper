@@ -312,7 +312,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	# Install debian scripts.
-	my $package_subst = per_package_subst($package, \%PROVIDED_SUBST);
+	my $package_subst = debhelper_script_per_package_subst($package, \%PROVIDED_SUBST);
 	foreach my $script (qw{postinst preinst prerm postrm}) {
 		debhelper_script_subst($package, $script, $package_subst);
 	}
@@ -414,23 +414,6 @@ sub _maybe_error {
 	} else {
 		error($msg);
 	}
-}
-
-sub per_package_subst {
-	my ($package, $provided_subst) = @_;
-	my %vars = %{$provided_subst};
-	$vars{'PACKAGE'} = $package if not exists($vars{'PACKAGE'});
-	for my $var (keys(%{$provided_subst})) {
-		if ($var !~ $Debian::Debhelper::Dh_Lib::MAINTSCRIPT_TOKEN_REGEX) {
-			warning("User defined token ${var} does not match ${Debian::Debhelper::Dh_Lib::MAINTSCRIPT_TOKEN_REGEX}");
-			error("Invalid provided token ${var}: It cannot be substituted as it does not follow the token name rules");
-		}
-		if ($var =~ m/^pkg[.]\Q${package}\E[.](.+)$/) {
-			my $new_key = $1;
-			$vars{$new_key} = $provided_subst->{$var};
-		}
-	}
-	return \%vars;
 }
 
 =head1 SEE ALSO

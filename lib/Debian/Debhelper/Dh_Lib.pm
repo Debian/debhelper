@@ -203,6 +203,7 @@ qw(
 	write_log
 	commit_override_log
 	debhelper_script_subst
+	debhelper_script_per_package_subst
 	is_make_jobserver_unavailable
 	clean_jobserver_makeflags
 	set_buildflags
@@ -2205,6 +2206,24 @@ sub _substitution_generator {
 		return $value;
 	};
 }
+
+sub debhelper_script_per_package_subst {
+	my ($package, $provided_subst) = @_;
+	my %vars = %{$provided_subst};
+	$vars{'PACKAGE'} = $package if not exists($vars{'PACKAGE'});
+	for my $var (keys(%{$provided_subst})) {
+		if ($var !~ $Debian::Debhelper::Dh_Lib::MAINTSCRIPT_TOKEN_REGEX) {
+			warning("User defined token ${var} does not match ${Debian::Debhelper::Dh_Lib::MAINTSCRIPT_TOKEN_REGEX}");
+			error("Invalid provided token ${var}: It cannot be substituted as it does not follow the token name rules");
+		}
+		if ($var =~ m/^pkg[.]\Q${package}\E[.](.+)$/) {
+			my $new_key = $1;
+			$vars{$new_key} = $provided_subst->{$var};
+		}
+	}
+	return \%vars;
+}
+
 
 # Handles #DEBHELPER# substitution in a script; also can generate a new
 # script from scratch if none exists but there is a .debhelper file for it.
