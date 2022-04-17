@@ -1354,68 +1354,82 @@ sub generated_file {
 	return $path;
 }
 
+sub _update_substvar {
+	my ($substvar_file, $update_logic, $insert_logic) = @_;
+	my @lines;
+	my $changed = 0;
+	if ( -f $substvar_file) {
+		open(my $in, '<', $substvar_file) // error("open($substvar_file): $!");
+		while (my $line = <$in>) {
+			chomp($line);
+			my $orig_value = $line;
+			my $updated_value = $update_logic->($line);
+			$changed ||= !defined($updated_value) || $orig_value ne $updated_value;
+			push(@lines, $updated_value) if defined($updated_value);
+		}
+		close($in);
+	}
+	my $len = scalar(@lines);
+	push(@lines, $insert_logic->()) if $insert_logic;
+	$changed ||= $len != scalar(@lines);
+	if ($changed) {
+		open(my $out, '>', "${substvar_file}.new") // error("open(${substvar_file}.new, \"w\"): $!");
+		for my $line (@lines) {
+			print {$out} "$line\n";
+		}
+		close($out) // error("close(${substvar_file}.new): $!");
+		rename_path("${substvar_file}.new", $substvar_file);
+	}
+	return;
+}
+
 # Removes a whole substvar line.
 sub delsubstvar {
-	my $package=shift;
-	my $substvar=shift;
+	my ($package, $substvar) = @_;
+	my $ext = pkgext($package);
+	my $substvarfile = "debian/${ext}substvars";
 
-	my $ext=pkgext($package);
-	my $substvarfile="debian/${ext}substvars";
-
-	if (-e $substvarfile) {
-		complex_doit("grep -a -s -v '^${substvar}=' $substvarfile > $substvarfile.new || true");
-		rename_path("${substvarfile}.new", $substvarfile);
-	}
+	return _update_substvar($substvarfile, sub {
+		my ($line) = @_;
+		return $line if $line !~ m/^\Q${substvar}\E[?]?=/;
+		return;
+	});
 }
 				
 # Adds a dependency on some package to the specified
 # substvar in a package's substvar's file.
 sub addsubstvar {
-	my $package=shift;
-	my $substvar=shift;
-	my $deppackage=shift;
-	my $verinfo=shift;
-	my $remove=shift;
-
-	my $ext=pkgext($package);
-	my $substvarfile="debian/${ext}substvars";
-	my $str=$deppackage;
-	$str.=" ($verinfo)" if defined $verinfo && length $verinfo;
-
-	# Figure out what the line will look like, based on what's there
-	# now, and what we're to add or remove.
-	my $line="";
-	if (-e $substvarfile) {
-		my %items;
-		open(my $in, '<', $substvarfile) || error "read $substvarfile: $!";
-		while (<$in>) {
-			chomp;
-			if (/^\Q$substvar\E=(.*)/) {
-				%items = map { $_ => 1} split(", ", $1);
-				
-				last;
-			}
+	my ($package, $substvar, $deppackage, $verinfo, $remove) = @_;
+	my ($present);
+	my $ext = pkgext($package);
+	my $substvarfile = "debian/${ext}substvars";
+	my $str = $deppackage;
+	$str .= " ($verinfo)" if defined $verinfo && length $verinfo;
+	my $update_logic = sub {
+		my ($line) = @_;
+		return $line if $line !~ m/^\Q${substvar}\E([?]?=)(.*)/;
+		my $assignment_type = $1;
+		my %items = map { $_ => 1 } split(", ", $2);
+		$present = 1;
+		if ($remove) {
+			# Unchanged; we can avoid rewriting the file.
+			return $line if not exists($items{$str});
+			delete($items{$str});
+			my $replacement = join(", ", sort(keys(%items)));
+			return "${substvar}${assignment_type}${replacement}" if $replacement ne '';
+			return;
 		}
-		close($in);
-		if (! $remove) {
-			$items{$str}=1;
-		}
-		else {
-			delete $items{$str};
-		}
-		$line=join(", ", sort keys %items);
-	}
-	elsif (! $remove) {
-		$line=$str;
-	}
+		# Unchanged; we can avoid rewriting the file.
+		return $line if %items and exists($items{$str});
 
-	if (length $line) {
-		complex_doit("(grep -a -s -v ${substvar} $substvarfile; echo ".escape_shell("${substvar}=$line").") > $substvarfile.new");
-		rename_path("$substvarfile.new", $substvarfile);
-	}
-	else {
-		delsubstvar($package,$substvar);
-	}
+		$items{$str} = 1;
+		return "${substvar}${assignment_type}" . join(", ", sort(keys(%items)));
+	};
+	my $insert_logic = sub {
+		return ("${substvar}=${str}") if not $present;
+		return;
+	};
+	return _update_substvar($substvarfile, $update_logic, $insert_logic);
 }
 
 sub _glob_expand_error_default_msg {
