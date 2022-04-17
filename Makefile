@@ -65,7 +65,7 @@ LANGS=
 LANG_TARGETS =
 endif
 
-build: $(LANG_TARGETS) version debhelper.7 debhelper-obsolete-compat.7 $(MANPAGES)
+build: $(LANG_TARGETS) version debhelper.7 debhelper-compat-upgrade-checklist.7 debhelper-obsolete-compat.7 $(MANPAGES)
 
 
 po4a-stamp:
@@ -85,6 +85,9 @@ translated-%-stamp: po4a-stamp
 			$(MAKEMANLIST) `find $$dir -type f -maxdepth 1 -name "dh_*.pod" | LC_ALL=C sort` | \
 			$(POD2MAN) $(POD2MAN_FLAGS) --name="debhelper" --section=7 > debhelper.$$lang.7; \
 	fi; \
+	if [ -e $$dir/debhelper-compat-upgrade-checklist.pod ]; then \
+		$(POD2MAN) $(POD2MAN_FLAGS) --name="debhelper" --section=7 $$dir/debhelper-compat-upgrade-checklist.pod > debhelper-compat-upgrade-checklist.$$lang.7; \
+	fi ; \
 	if [ -e $$dir/debhelper-obsolete-compat.pod ]; then \
 		$(POD2MAN) $(POD2MAN_FLAGS) --name="debhelper" --section=7 $$dir/debhelper-obsolete-compat.pod > debhelper-obsolete-compat.$$lang.7; \
 	fi
@@ -105,7 +108,7 @@ debhelper.7: debhelper.pod
 		$(MAKEMANLIST) $(COMMANDS) | \
 		$(POD2MAN) $(POD2MAN_FLAGS) --name="debhelper" --section=7  > $@
 
-debhelper-obsolete-compat.7: debhelper-obsolete-compat.pod
+%.7: %.pod
 	$(POD2MAN) $(POD2MAN_FLAGS) --name="debhelper" --section=7 $^ > $@
 
 clean:
