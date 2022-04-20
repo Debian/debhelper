@@ -99,8 +99,12 @@ sub _parse_alternative_and_generate_maintscript {
 	if (index($link_name, '/') > -1) {
 		error(qq{Invalid link name "${link_name}" in "${alternatives_file}": Must not contain slash});
 	}
-	if ( ! -l "${tmpdir}/${impl_path}" or -d _) {
-		error(qq{Alternative "${impl_path}" for "${link_name}" in ${alternatives_file} does not exist in ${tmpdir} or is a directory});
+	my $actual_impl_path = "${tmpdir}/${impl_path}";
+	if ( ! -l $actual_impl_path && ! -e _) {
+		error(qq{Alternative "${impl_path}" for "${link_name}" in ${alternatives_file} does not exist in ${tmpdir}});
+	}
+	if ( -d $actual_impl_path) {
+		error(qq{Alternative "${impl_path}" for "${link_name}" in ${alternatives_file} is a directory});
 	}
 	if ($link_name eq $impl_path) {
 		error(qq{The link name cannot be the same as the implementation path "${link_name}" (in "${alternatives_file}")});
