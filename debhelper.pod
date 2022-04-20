@@ -497,7 +497,7 @@ should use F<debian/compat> (or, if only for selected commands, B<DH_COMPAT>).
 
 Prior versions of debhelper required specifying the compatibility level in the
 file F<debian/compat>, and current debhelper still supports this for backward
-compatibility. To use the that method, the F<debian/compat> file should contain
+compatibility. To use this method, the F<debian/compat> file should contain
 the compatibility level as a single number, and no other content. If you
 specify the compatibility level by this method, your package will also need a
 versioned build dependency on a version of the debhelper package equal to (or
@@ -507,17 +507,17 @@ F<debian/control> has:
 
   Build-Depends: debhelper (>= #RECOMMENDED_COMPAT#~)
 
-Note that you must use either the the build-dependency on debhelper-compat or
+Note that you must use either the build-dependency on debhelper-compat or
 the F<debian/compat> file. Whenever possible, the debhelper-compat
 build-dependency is recommended.
 
 If needed be, the B<DH_COMPAT> environment variable can be used to override
 the compat level for a given command.  The feature is mostly useful for
-temporarily either upgrading a few commands to a new compat level or keep a
-few commands on a lower compat level.  The feature is best using sparingly
-as it effectively introduces special-cases into the F<debian/rules> file
-that may be surprising to maintainers or reviewers (or, in the long term,
-to yourself).
+either temporarily upgrading a few commands to a new compat level or
+keeping a few commands on a lower compat level.  The feature is best used
+sparingly as it effectively introduces special-cases into the
+F<debian/rules> file that may be surprising to maintainers or reviewers
+(or, in the long term, to yourself).
 
 Unless otherwise indicated, all debhelper documentation assumes that you
 are using the most recent compatibility level, and in most cases does not
