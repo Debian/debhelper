@@ -151,7 +151,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 		# no need to depend on an un-versioned perl-base -- it's
 		# essential
-		addsubstvar($package, "perl:Depends", $perlarch, $length)
+		addsubstvar($package, "perl:Depends", $perlarch, $version)
 			if $perl ne 'perl-base' || length($version);
 
 		# add perlapi-<ver> for XS modules and other modules
