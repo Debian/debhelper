@@ -1991,7 +1991,7 @@ sub _parse_debian_control {
 				$package_types{$package} = _strip_spaces($field_values{'package-type'} // 'deb');
 				$package_arches{$package} = $arch;
 				$package_multiarches{$package} = _strip_spaces($field_values{'multi-arch'} // '');
-				$package_sections{$package} = _strip_spaces($field_values{'section'} // $source_section);;
+				$package_sections{$package} = _strip_spaces($field_values{'section'} // $source_section);
 				$package_cross_type{$package} = $cross_type;
 				push(@{$packages_by_type{'all-listed-in-control-file'}}, $package);
 
