@@ -1764,6 +1764,7 @@ sub getpackages {
 
 sub _strip_spaces {
 	my ($v) = @_;
+	return undef if not defined($v);
 	$v =~ s/^\s++//;
 	$v =~ s/\s++$//;
 	return $v;
