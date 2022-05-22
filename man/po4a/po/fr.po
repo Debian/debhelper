@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: debhelper manpages\n"
-"POT-Creation-Date: 2022-04-20 06:18+0000\n"
+"POT-Creation-Date: 2022-05-22 08:41+0200\n"
 "PO-Revision-Date: 2021-02-13 10:02+0100\n"
 "Last-Translator: Jean-Pierre Giraud <jean-pierregiraud@neuf.fr>\n"
 "Language-Team: French <debian-l10n-french@lists.debian.org>\n"
@@ -2431,7 +2431,7 @@ msgstr ""
 
 # type: =head1
 #. type: =head1
-#: debhelper.pod:900 debhelper-compat-upgrade-checklist.pod:755
+#: debhelper.pod:900 debhelper-compat-upgrade-checklist.pod:747
 #: debhelper-obsolete-compat.pod:178 dh:807 dh_auto_build:53 dh_auto_clean:55
 #: dh_auto_configure:58 dh_auto_install:103 dh_auto_test:64 dh_bugfiles:133
 #: dh_builddeb:182 dh_clean:189 dh_compress:243 dh_dwz:162 dh_fixperms:164
@@ -2691,12 +2691,12 @@ msgstr "Les changements par rapport à la version 7 sont :"
 #: debhelper-compat-upgrade-checklist.pod:643
 #: debhelper-compat-upgrade-checklist.pod:654
 #: debhelper-compat-upgrade-checklist.pod:672
-#: debhelper-compat-upgrade-checklist.pod:686
-#: debhelper-compat-upgrade-checklist.pod:692
-#: debhelper-compat-upgrade-checklist.pod:698
-#: debhelper-compat-upgrade-checklist.pod:714
-#: debhelper-compat-upgrade-checklist.pod:719
-#: debhelper-compat-upgrade-checklist.pod:737 debhelper-obsolete-compat.pod:43
+#: debhelper-compat-upgrade-checklist.pod:678
+#: debhelper-compat-upgrade-checklist.pod:684
+#: debhelper-compat-upgrade-checklist.pod:690
+#: debhelper-compat-upgrade-checklist.pod:706
+#: debhelper-compat-upgrade-checklist.pod:711
+#: debhelper-compat-upgrade-checklist.pod:729 debhelper-obsolete-compat.pod:43
 #: debhelper-obsolete-compat.pod:48 debhelper-obsolete-compat.pod:52
 #: debhelper-obsolete-compat.pod:66 debhelper-obsolete-compat.pod:71
 #: debhelper-obsolete-compat.pod:76 debhelper-obsolete-compat.pod:81
@@ -3963,7 +3963,7 @@ msgstr "v14"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:666
-#: debhelper-compat-upgrade-checklist.pod:731 strings-kept-translations.pod:9
+#: debhelper-compat-upgrade-checklist.pod:723 strings-kept-translations.pod:9
 msgid ""
 "This compatibility level is still open for development; use with caution."
 msgstr ""
@@ -3978,38 +3978,21 @@ msgstr "Les changements par rapport à la version 13 sont :"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:674
+#, fuzzy
+#| msgid ""
+#| "The B<cmake> buildsystem now passes B<-DCMAKE_SKIP_RPATH=ON> and B<-"
+#| "DCMAKE_BUILD_RPATH_USE_ORIGIN=ON> to L<cmake(1)> to avoid some "
+#| "reproducibility issues."
 msgid ""
-"The B<cmake> buildsystem now passes B<-DCMAKE_SKIP_RPATH=ON> and B<-"
-"DCMAKE_BUILD_RPATH_USE_ORIGIN=ON> to L<cmake(1)> to avoid some "
-"reproducibility issues."
+"The B<cmake> buildsystem now passes B<-DCMAKE_BUILD_RPATH_USE_ORIGIN=ON> to "
+"L<cmake(1)> to avoid some reproducibility issues."
 msgstr ""
 "Le système de construction B<cmake> passe maintenant les options B<-"
 "DCMAKE_SKIP_RPATH=ON> et B<-DCMAKE_BUILD_RPATH_USE_ORIGIN=ON> à L<cmake(1)> "
 "pour éviter des problèmes de reproductibilité."
 
 #. type: textblock
-#: debhelper-compat-upgrade-checklist.pod:678
-msgid ""
-"This can cause issues with running binaries directly from the build "
-"directories as they might now require a manually set B<LD_LIBRARY_PATH>.  If "
-"you need to override this change, we recommend that you try to pass the B<-"
-"DCMAKE_SKIP_RPATH=OFF> option first to see if that fixes the problem "
-"(leaving B<CMAKE_BUILD_RPATH_USE_ORIGIN> at its new default).  This should "
-"undo the need for B<LD_LIBRARY_PATH> and avoid the reproducibility issues on "
-"Linux, where B<$ORIGIN> is supported by the runtime linkers."
-msgstr ""
-"Cela peut provoquer des problèmes avec l'exécution de binaires directement à "
-"partir des répertoires de construction parce qu'ils pourraient maintenant "
-"requérir une configuration manuelle de B<LD_LIBRARY_PATH>. S'il est "
-"nécessaire de réécrire cette modification, il est recommandé d'essayer de "
-"passer d'abord l'option B<-DCMAKE_SKIP_RPATH=OFF> pour voir si cela corrige "
-"le problème (laissant B<CMAKE_BUILD_RPATH_USE_ORIGIN> à sa nouvelle valeur "
-"par défaut). Cela devrait supprimer la nécessité de B<LD_LIBRARY_PATH> et "
-"éviter les problèmes de reproductibilité dans Linux où B<$ORIGIN> est pris "
-"en charge par les créateurs de liens lors de l'exécution."
-
-#. type: textblock
-#: debhelper-compat-upgrade-checklist.pod:688
+#: debhelper-compat-upgrade-checklist.pod:680
 msgid ""
 "The tool B<dh_installsysusers> is now included in the default sequence. It "
 "will cause units to be automatically started on installation, restarted on "
@@ -4018,7 +4001,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper-compat-upgrade-checklist.pod:694
+#: debhelper-compat-upgrade-checklist.pod:686
 msgid ""
 "Use of the B<dh_gconf> command in override and hook targets now causes an "
 "error.  The B<dh_gconf> command has been a no-op for years and was removed "
@@ -4026,7 +4009,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper-compat-upgrade-checklist.pod:700
+#: debhelper-compat-upgrade-checklist.pod:692
 msgid ""
 "The B<dh> sequencer will warn if the B<single-binary> addon is implicitly "
 "activated to warn maintainers of the pending compat 15 change in "
@@ -4034,7 +4017,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper-compat-upgrade-checklist.pod:703
+#: debhelper-compat-upgrade-checklist.pod:695
 msgid ""
 "Maintainers are urged to either explicitly activate the B<single-binary> "
 "addon to preserve the existing behaviour (e.g., by adding B<dh-sequence-"
@@ -4044,8 +4027,8 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper-compat-upgrade-checklist.pod:708
-#: debhelper-compat-upgrade-checklist.pod:745
+#: debhelper-compat-upgrade-checklist.pod:700
+#: debhelper-compat-upgrade-checklist.pod:737
 msgid ""
 "The rationale for this change to avoid \"surprises\" when adding a second "
 "binary package later.  Previously, debhelper would silently change behaviour "
@@ -4055,21 +4038,21 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper-compat-upgrade-checklist.pod:716
+#: debhelper-compat-upgrade-checklist.pod:708
 msgid ""
 "The B<dh_installalternatives> tool will now be run after B<dh_link> rather "
 "than after B<dh_installinitramfs> in the default B<dh> sequence."
 msgstr ""
 
 #. type: textblock
-#: debhelper-compat-upgrade-checklist.pod:721
+#: debhelper-compat-upgrade-checklist.pod:713
 msgid ""
 "The B<dh_installpam> tool will now install PAM configuration files under "
 "F<< /usr/lib/pam.d/I<package> >> instead of F<< /etc/pam.d/I<package> >>."
 msgstr ""
 
 #. type: textblock
-#: debhelper-compat-upgrade-checklist.pod:724
+#: debhelper-compat-upgrade-checklist.pod:716
 #, fuzzy
 #| msgid ""
 #| "In compatibility level 11, this file will trigger an error with a "
@@ -4088,7 +4071,7 @@ msgstr ""
 "fichiers upstart."
 
 #. type: =item
-#: debhelper-compat-upgrade-checklist.pod:729
+#: debhelper-compat-upgrade-checklist.pod:721
 #, fuzzy
 #| msgid "v5"
 msgid "v15"
@@ -4096,14 +4079,14 @@ msgstr "v5"
 
 # type: textblock
 #. type: textblock
-#: debhelper-compat-upgrade-checklist.pod:733
+#: debhelper-compat-upgrade-checklist.pod:725
 #, fuzzy
 #| msgid "Changes from v4 are:"
 msgid "Changes from v14 are:"
 msgstr "Les changements par rapport à la version 4 sont :"
 
 #. type: textblock
-#: debhelper-compat-upgrade-checklist.pod:739
+#: debhelper-compat-upgrade-checklist.pod:731
 msgid ""
 "The B<dh_auto_install> tool no longer defaults to B<< --destdir=debian/"
 "I<package> >> for source packages only producing a single binary.  If this "
@@ -4114,14 +4097,14 @@ msgstr ""
 
 # type: textblock
 #. type: =item
-#: debhelper-compat-upgrade-checklist.pod:759
+#: debhelper-compat-upgrade-checklist.pod:751
 #, fuzzy
 #| msgid "L<debhelper(7)>"
 msgid "L<debhelper-obsolete-compat(7)>"
 msgstr "L<debhelper(7)>"
 
 #. type: textblock
-#: debhelper-compat-upgrade-checklist.pod:761
+#: debhelper-compat-upgrade-checklist.pod:753
 msgid ""
 "Upgrading from a (now) obsolete compatibility level? This document covers "
 "the upgrade checklist up to the earliest supported level."
@@ -4129,7 +4112,7 @@ msgstr ""
 
 # type: textblock
 #. type: textblock
-#: debhelper-compat-upgrade-checklist.pod:764 debhelper-obsolete-compat.pod:180
+#: debhelper-compat-upgrade-checklist.pod:756 debhelper-obsolete-compat.pod:180
 #: dh:809 dh_auto_build:55 dh_auto_clean:57 dh_auto_configure:60
 #: dh_auto_install:105 dh_auto_test:66 dh_builddeb:184 dh_clean:191
 #: dh_compress:245 dh_dwz:164 dh_fixperms:166 dh_gencontrol:210 dh_install:379
@@ -4147,7 +4130,7 @@ msgid "L<debhelper(7)>"
 msgstr "L<debhelper(7)>"
 
 #. type: textblock
-#: debhelper-compat-upgrade-checklist.pod:766
+#: debhelper-compat-upgrade-checklist.pod:758
 msgid ""
 "General information about the debhelper framework. This document also covers "
 "how to declare your chosen debhelper compat level."
@@ -4155,19 +4138,19 @@ msgstr ""
 
 # type: =head1
 #. type: =head1
-#: debhelper-compat-upgrade-checklist.pod:771 debhelper-obsolete-compat.pod:182
+#: debhelper-compat-upgrade-checklist.pod:763 debhelper-obsolete-compat.pod:182
 #: dh_installinit:419 dh_systemd_enable:285 dh_systemd_start:284
 msgid "AUTHORS"
 msgstr "AUTEURS"
 
 #. type: textblock
-#: debhelper-compat-upgrade-checklist.pod:773 debhelper-obsolete-compat.pod:184
+#: debhelper-compat-upgrade-checklist.pod:765 debhelper-obsolete-compat.pod:184
 #: dh_dwz:170 dh_installinitramfs:101
 msgid "Niels Thykier <niels@thykier.net>"
 msgstr "Niels Thykier <niels@thykier.net>"
 
 #. type: textblock
-#: debhelper-compat-upgrade-checklist.pod:775 debhelper-obsolete-compat.pod:186
+#: debhelper-compat-upgrade-checklist.pod:767 debhelper-obsolete-compat.pod:186
 msgid "Joey Hess"
 msgstr "Joey Hess"
 
@@ -13796,6 +13779,27 @@ msgid "This compatibility level is open for beta testing; changes may occur."
 msgstr ""
 "Ce niveau de compatibilité est en phase de test ; des changements peuvent "
 "encore survenir."
+
+#~ msgid ""
+#~ "This can cause issues with running binaries directly from the build "
+#~ "directories as they might now require a manually set B<LD_LIBRARY_PATH>.  "
+#~ "If you need to override this change, we recommend that you try to pass "
+#~ "the B<-DCMAKE_SKIP_RPATH=OFF> option first to see if that fixes the "
+#~ "problem (leaving B<CMAKE_BUILD_RPATH_USE_ORIGIN> at its new default).  "
+#~ "This should undo the need for B<LD_LIBRARY_PATH> and avoid the "
+#~ "reproducibility issues on Linux, where B<$ORIGIN> is supported by the "
+#~ "runtime linkers."
+#~ msgstr ""
+#~ "Cela peut provoquer des problèmes avec l'exécution de binaires "
+#~ "directement à partir des répertoires de construction parce qu'ils "
+#~ "pourraient maintenant requérir une configuration manuelle de "
+#~ "B<LD_LIBRARY_PATH>. S'il est nécessaire de réécrire cette modification, "
+#~ "il est recommandé d'essayer de passer d'abord l'option B<-"
+#~ "DCMAKE_SKIP_RPATH=OFF> pour voir si cela corrige le problème (laissant "
+#~ "B<CMAKE_BUILD_RPATH_USE_ORIGIN> à sa nouvelle valeur par défaut). Cela "
+#~ "devrait supprimer la nécessité de B<LD_LIBRARY_PATH> et éviter les "
+#~ "problèmes de reproductibilité dans Linux où B<$ORIGIN> est pris en charge "
+#~ "par les créateurs de liens lors de l'exécution."
 
 #~ msgid ""
 #~ "The tool B<dh_installsysusers> is now included in the default sequence."
