@@ -69,7 +69,7 @@ Here are some guidelines that may be useful:
    costs.
 
  * Helpers / tools should generally *do the right thing* by default
-   (subject to backwards compatibility).  If most people neeed some
+   (subject to backwards compatibility).  If most people need some
    particular option to make the tool work for them, then the default
    should be changed (again, subject to backwards compatibility).
 
