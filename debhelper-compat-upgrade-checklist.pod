@@ -671,17 +671,9 @@ Changes from v13 are:
 
 =item -
 
-The B<cmake> buildsystem now passes B<-DCMAKE_SKIP_RPATH=ON>
-and B<-DCMAKE_BUILD_RPATH_USE_ORIGIN=ON> to L<cmake(1)> to avoid some reproducibility
-issues.
-
-This can cause issues with running binaries directly from the build directories
-as they might now require a manually set B<LD_LIBRARY_PATH>.  If you need to
-override this change, we recommend that you try to pass the
-B<-DCMAKE_SKIP_RPATH=OFF> option first to see if that fixes the problem (leaving
-B<CMAKE_BUILD_RPATH_USE_ORIGIN> at its new default).  This should undo the need for
-B<LD_LIBRARY_PATH> and avoid the reproducibility issues on Linux, where B<$ORIGIN>
-is supported by the runtime linkers.
+The B<cmake> buildsystem now passes
+B<-DCMAKE_BUILD_RPATH_USE_ORIGIN=ON> to L<cmake(1)> to avoid some
+reproducibility issues.
 
 =item -
 
