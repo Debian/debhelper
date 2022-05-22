@@ -2,13 +2,13 @@
 # Copyright (C) 2014 The debhelper's copyright holder.
 # This file is distributed under the same license as the debhelper package.
 #
-# Américo Monteiro <a_monteiro@gmx.com>, 2014 to 2021.
+# Américo Monteiro <a_monteiro@gmx.com>, 2014 to 2022.
 msgid ""
 msgstr ""
-"Project-Id-Version: debhelper 13.5.2\n"
+"Project-Id-Version: debhelper 13.7.1\n"
 "Report-Msgid-Bugs-To: debhelper@packages.debian.org\n"
 "POT-Creation-Date: 2022-04-20 06:18+0000\n"
-"PO-Revision-Date: 2021-11-27 20:57+0000\n"
+"PO-Revision-Date: 2022-05-18 22:57+0100\n"
 "Last-Translator: Américo Monteiro <a_monteiro@gmx.com>\n"
 "Language-Team: Portuguese <>\n"
 "Language: pt\n"
@@ -1247,7 +1247,6 @@ msgstr ""
 
 #. type: textblock
 #: debhelper.pod:494
-#, fuzzy
 #| msgid ""
 #| "Note that debhelper does not provide debhelper-compat for experimental or "
 #| "beta compatibility levels; packages experimenting with those "
@@ -1260,11 +1259,11 @@ msgid ""
 msgstr ""
 "Note que o debhelper não fornece debhelper-compat para os níveis de "
 "compatibilidade experimental ou beta; os pacotes que experimentem com esses "
-"níveis de compatibilidade devem usar F<debian/compat> ou B<DH_COMPAT>."
+"níveis de compatibilidade devem usar F<debian/compat> ou, se apenas para "
+"comandos selecionados, B<DH_COMPAT>."
 
 #. type: textblock
 #: debhelper.pod:498
-#, fuzzy
 #| msgid ""
 #| "Prior versions of debhelper required specifying the compatibility level "
 #| "in the file F<debian/compat>, and current debhelper still supports this "
@@ -1290,16 +1289,15 @@ msgid ""
 msgstr ""
 "As versões anteriores do debhelper requeriam o nível de compatibilidade "
 "especificado no ficheiro F<debian/compat>, e o debhelper actual ainda "
-"suporta isto para compatibilidade com as versões anteriores, apesar de um "
-"pacote não poder especificar um nível de compatibilidade via múltiplos "
-"métodos de uma vez. Para usar este método, F<debian/compat> deve conter o "
-"nível de compatibilidade como um número singular, e nenhum outro conteúdo. "
-"Se você especificar o nível de compatibilidade neste método, o seu pacote "
-"vai também precisar duma dependência de compilação baseada em versão de uma "
-"versão do pacote debhelper igual (ou superior) ao nível de compatibilidade "
-"que o seu pacote usa. Assim, se você especificar o nível de compatibilidade "
-"#RECOMMENDED_COMPAT# em F<debian/compat>, assegure-se que F<debian/control> "
-"tem:"
+"suporta isto para compatibilidade com as versões anteriores  Para usar este "
+"método, o ficheiro F<debian/compat> deve conter o nível de compatibilidade "
+"como um número singular, e nenhum outro conteúdo. Se você especificar o "
+"nível de compatibilidade neste método, o seu pacote vai também precisar duma "
+"dependência de compilação baseada em versão de uma versão do pacote "
+"debhelper igual (ou superior) ao nível de compatibilidade que o seu pacote "
+"usa. Assim, se você especificar o nível de compatibilidade "
+"#RECOMMENDED_COMPAT# em F<debian/compat>, assegure-se que "
+"F<debian/control> contém:"
 
 #. type: verbatim
 #: debhelper.pod:508
@@ -1318,6 +1316,9 @@ msgid ""
 "the F<debian/compat> file. Whenever possible, the debhelper-compat build-"
 "dependency is recommended."
 msgstr ""
+"Note que você usar ou build-dependency em debhelper-compat ou o ficheiro "
+"F<debian/compat>. Sempre que possível, é recomendado a build-dependency "
+"do debhelper-compat."
 
 #. type: textblock
 #: debhelper.pod:514
@@ -1330,6 +1331,14 @@ msgid ""
 "that may be surprising to maintainers or reviewers (or, in the long term, to "
 "yourself)."
 msgstr ""
+"Se necessário, a variável de ambiente B<DH_COMPAT> pode ser usada para "
+"sobrepor o nível de compatibilidade para um dado comando. Esta funcionalidade "
+"é maioritariamente útil seja para actualizar temporariamente alguns comandos "
+"para um novo nível de compatibilidade ou manter alguns comandos num nível "
+"de compatibilidade inferior. Esta funcionalidade é melhor ser usada com "
+"moderação pois introduz efectivamente casos-especiais no ficheiro "
+"F<debian/rules> que podem ser surpreendentes para maintainers ou revisores "
+"(ou, a longo prazo, para si)."
 
 #. type: textblock
 #: debhelper.pod:522
@@ -1358,6 +1367,8 @@ msgid ""
 "The list of supported compatibility levels and the related upgrade check "
 "list has moved to L<debhelper-compat-list(7)>."
 msgstr ""
+"A lista dos níveis de compatibilidade suportados e a lista de verificação "
+"de actualizações relacionadas foi movida para L<debhelper-compat-list(7)>."
 
 #. type: =head1
 #: debhelper.pod:534 dh_auto_test:48 dh_dwz:69 dh_installcatalogs:67
@@ -2327,13 +2338,15 @@ msgstr "VEJA TAMBÉM"
 #. type: =item
 #: debhelper.pod:904
 msgid "L<debhelper-compat-upgrade-checklist(7)>"
-msgstr ""
+msgstr "L<debhelper-compat-upgrade-checklist(7)>"
 
 #. type: textblock
 #: debhelper.pod:906
 msgid ""
 "List of supported compat levels and an upgrade checklist for each of them."
 msgstr ""
+"Lista de níveis de compatibilidade suportados e uma lista de verificação de "
+"actualização para cada um deles."
 
 #. type: =item
 #: debhelper.pod:908
@@ -2391,15 +2404,14 @@ msgstr "Joey Hess <joeyh@debian.org>"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:5
-#, fuzzy
 #| msgid ""
 #| "debhelper-obsolete-compat - List of no longer supported compat levels"
 msgid ""
 "debhelper-compat-upgrade-checklist - Upgrade checklist for supported "
 "debhelper compat levels"
 msgstr ""
-"debhelper-obsolete-compat - Lista dos níveis de compatibilidade não mais "
-"suportados"
+"debhelper-compat-upgrade-checklist - Actualiza a lista de verificação para "
+"níveis de compatibilidade do debhelper suportados."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:9
@@ -2407,6 +2419,9 @@ msgid ""
 "This document is an upgrade checklist of all the supported debhelper compat "
 "levels. It also lists all the support debhelper compat levels."
 msgstr ""
+"Este documento é uma lista de verificação de actualização para todos os "
+"níveis de compatibilidade do debhelper suportados. Também lista todos os "
+"níveis de compatibilidade de debhelper suportados."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:12
@@ -2414,10 +2429,11 @@ msgid ""
 "Information about how to declare the compat level is in L<debhelper(7)/"
 "COMPATIBILITY LEVELS>."
 msgstr ""
+"Informação sobre como declarar os níveis de compatibilidade está em "
+"L<debhelper(7)/NÍVEIS DE COMPATIBILIDADE>."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:14
-#, fuzzy
 #| msgid ""
 #| "If you are upgrading from an earlier compatibility level, please review "
 #| "L<debhelper-obsolete-compat(7)>."
@@ -2425,15 +2441,15 @@ msgid ""
 "If you are upgrading from a (now) obsolete compat level, then please refer "
 "to L<debhelper-obsolete-compat(7)>."
 msgstr ""
-"Se você está a actualizar a partir de um nível de compatibilidade anterior, "
-"por favor reveja L<debhelper-obsolete-compat(7)>."
+"Se você está a actualizar a partir de um nível de compatibilidade (agora) "
+"obsoleto, então por favor consulte L<debhelper-obsolete-compat(7)>."
 
 #. type: =head2
 #: debhelper-compat-upgrade-checklist.pod:19
-#, fuzzy
 #| msgid "This is the lowest supported compatibility level."
 msgid "Upgrade checklist for supported compatibility levels"
-msgstr "Este é o nível de compatibilidade mais baixo suportado."
+msgstr ""
+"Actualizar lista de verificação para os níveis de compatibilidade suportados."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:21
@@ -3845,6 +3861,10 @@ msgid ""
 "upgrade and stopped on removal for every systemd user instance running on "
 "the system."
 msgstr ""
+"A ferramenta B<dh_installsysusers> está agora incluída na sequência "
+"predefinida. Irá fazer com que unidades sejam arrancadas automaticamente na "
+"instalação, reiniciadas na actualização e paradas na remoção para cada "
+"instância de utilizador de systemd a correr no sistema."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:694
@@ -3906,6 +3926,8 @@ msgid ""
 "The B<dh_installalternatives> tool will now be run after B<dh_link> rather "
 "than after B<dh_installinitramfs> in the default B<dh> sequence."
 msgstr ""
+"A ferramenta B<dh_installalternatives> irá agora correr após B<dh_link> em "
+"vez de após B<dh_installinitramfs> na sequência predefinida do B<dh>."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:721
@@ -3913,10 +3935,12 @@ msgid ""
 "The B<dh_installpam> tool will now install PAM configuration files under "
 "F<< /usr/lib/pam.d/I<package> >> instead of F<< /etc/pam.d/I<package> >>."
 msgstr ""
+"A ferramenta B<dh_installpam> irá agora instalar ficheiros de configuração "
+"do PAM sob F<< /usr/lib/pam.d/I<package> >> em vez de "
+"F<< /etc/pam.d/I<package> >>."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:724
-#, fuzzy
 #| msgid ""
 #| "In compatibility level 11, this file will trigger an error with a "
 #| "reminder about ensuring the proper removal of the upstart file in the "
@@ -3927,11 +3951,9 @@ msgid ""
 "Please consider using the \"rm_conffile\" feature from L<dh_installdeb(1)> "
 "to ensure the proper removal of previous PAM files."
 msgstr ""
-"Em nível de compatibilidade 11, este ficheiro irá disparar um erro com uma "
-"lembrança para assegurar a remoção apropriada do ficheiro upstart na versão "
-"anterior do pacote. Por favor consider usar a funcionalidade \"rm_conffile\" "
-"do L<dh_installdeb(1)> para assegurar a remoção apropriada de ficheiros "
-"upstart anteriores."
+"Por favor considere usar a funcionalidade \"rm_conffile\" de "
+"L<dh_installdeb(1)> para assegurar a remoção apropriada dos ficheiros "
+"PAM anteriores."
 
 #. type: =item
 #: debhelper-compat-upgrade-checklist.pod:729
@@ -3970,6 +3992,9 @@ msgid ""
 "Upgrading from a (now) obsolete compatibility level? This document covers "
 "the upgrade checklist up to the earliest supported level."
 msgstr ""
+"A actualizar a partir de um nível de compatibilidade (agora) obsoleto? "
+"Este documento a lista de verificação de actualização até ao nível suportado "
+"mais recente."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:764 debhelper-obsolete-compat.pod:180
@@ -3995,6 +4020,8 @@ msgid ""
 "General information about the debhelper framework. This document also covers "
 "how to declare your chosen debhelper compat level."
 msgstr ""
+"Informação geral acerca da estrutura do debhelper. Este documento também "
+"cobre como declarar o seu nível de compatibilidade debhelper escolhido."
 
 #. type: =head1
 #: debhelper-compat-upgrade-checklist.pod:771 debhelper-obsolete-compat.pod:182
@@ -4660,7 +4687,8 @@ msgid ""
 "      #\n"
 "      # And it gets even more complicated to reason about if dh needs to\n"
 "      # recurse into debian/rules because you have an \"explicit\"\n"
-"      # standard target (e.g. a \"build-arch:\" target separate from \"%:\").\n"
+"      # standard target (e.g. a \"build-arch:\" target separate from \""
+"%:\").\n"
 "      ifneq (...)\n"
 "      override_dh_baz:\n"
 "          maybe run this\n"
@@ -4675,7 +4703,8 @@ msgstr ""
 "      #\n"
 "      # And it gets even more complicated to reason about if dh needs to\n"
 "      # recurse into debian/rules because you have an \"explicit\"\n"
-"      # standard target (e.g. a \"build-arch:\" target separate from \"%:\").\n"
+"      # standard target (e.g. a \"build-arch:\" target separate from \""
+"%:\").\n"
 "      ifneq (...)\n"
 "      override_dh_baz:\n"
 "          maybe run this\n"
@@ -6271,14 +6300,18 @@ msgstr ""
 #: dh_clean:25
 #, no-wrap
 msgid ""
-"It removes the package build directories, and removes some other files including\n"
-"F<debian/files>, and any detritus left behind by other debhelper commands. It\n"
+"It removes the package build directories, and removes some other files"
+" including\n"
+"F<debian/files>, and any detritus left behind by other debhelper commands."
+" It\n"
 "also removes common files that should not appear in a Debian diff:\n"
 "  #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS .deps/* *.P *-stamp\n"
 "\n"
 msgstr ""
-"Remove os directórios de compilação do pacote, e remove mais alguns ficheiros incluindo\n"
-"F<debian/files>, e quaisquer detritos deixados por outros comandos debhelper. Também\n"
+"Remove os directórios de compilação do pacote, e remove mais alguns ficheiros"
+" incluindo\n"
+"F<debian/files>, e quaisquer detritos deixados por outros comandos debhelper."
+" Também\n"
 "remove ficheiros comuns que não deveriam aparecer num diff de Debian:\n"
 "  #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS .deps/* *.P *-stamp\n"
 "\n"
@@ -7866,7 +7899,8 @@ msgid ""
 "\t# Script for #PACKAGE#\n"
 "\t#TOKEN#\n"
 "\tEOF\n"
-"    dh_installdeb -pfoo -pbar -pbaz  --define TOKEN=default --define pkg.bar.TOKEN=unique-bar-value \\\n"
+"    dh_installdeb -pfoo -pbar -pbaz  --define TOKEN=default --define"
+" pkg.bar.TOKEN=unique-bar-value \\\n"
 "      --define pkg.baz.TOKEN=unique-baz-value\n"
 "\n"
 msgstr ""
@@ -7882,7 +7916,8 @@ msgstr ""
 "\t# Script for #PACKAGE#\n"
 "\t#TOKEN#\n"
 "\tEOF\n"
-"    dh_installdeb -pfoo -pbar -pbaz  --define TOKEN=default --define pkg.bar.TOKEN=unique-bar-value \\\n"
+"    dh_installdeb -pfoo -pbar -pbaz  --define TOKEN=default --define"
+" pkg.bar.TOKEN=unique-bar-value \\\n"
 "      --define pkg.baz.TOKEN=unique-baz-value\n"
 "\n"
 
@@ -8162,7 +8197,7 @@ msgstr "Passa os params para B<po2debconf>."
 
 #. type: verbatim
 #: dh_installdebconf:93
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid ""
 #| "\tcat >> debian/postinst <<EOF\n"
 #| "\t#SIMPLE#\n"
@@ -8180,7 +8215,7 @@ msgid ""
 "    dh_installdeb --define SIMPLE=direct --define FILEBASED=@some-file\n"
 "\n"
 msgstr ""
-"\tcat >> debian/postinst <<EOF\n"
+"\tcat >> debian/config <<EOF\n"
 "\t#SIMPLE#\n"
 "\t#FILEBASED#\n"
 "\tEOF\n"
@@ -8190,7 +8225,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_installdebconf:103
-#, fuzzy
 #| msgid ""
 #| "It is also possible to set package-specific values for a given token.  "
 #| "This is useful when B<dh_installdeb> is acting on multiple packages that "
@@ -8203,13 +8237,13 @@ msgid ""
 "name with B<< pkg.I<package-name>. >>."
 msgstr ""
 "É também possível definir valores específicos-de-pacote para um dado token. "
-"Isto é útil quando B<dh_installdeb> está a actuar em múltiplos pacotes que "
-"precisam de valores diferentes para o mesmo token. Isto é feito ao prefixar "
-"o nome do token com B<< pkg.I<nome-do-pacote>. >>."
+"Isto é útil quando B<dh_installdebconf> está a actuar em múltiplos pacotes "
+"que precisam de valores diferentes para o mesmo token. Isto é feito ao "
+"prefixar o nome do token com B<< pkg.I<nome-do-pacote>. >>."
 
 #. type: verbatim
 #: dh_installdebconf:110
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid ""
 #| "\tcat >> debian/foo.postinst <<EOF\n"
 #| "\t# Script for #PACKAGE#\n"
@@ -8239,29 +8273,30 @@ msgid ""
 "\t# Script for #PACKAGE#\n"
 "\t#TOKEN#\n"
 "\tEOF\n"
-"    dh_installdebconf -pfoo -pbar -pbaz  --define TOKEN=default --define pkg.bar.TOKEN=unique-bar-value \\\n"
+"    dh_installdebconf -pfoo -pbar -pbaz  --define TOKEN=default --define"
+" pkg.bar.TOKEN=unique-bar-value \\\n"
 "      --define pkg.baz.TOKEN=unique-baz-value\n"
 "\n"
 msgstr ""
-"\tcat >> debian/foo.postinst <<EOF\n"
+"\tcat >> debian/foo.config <<EOF\n"
 "\t# Script for #PACKAGE#\n"
 "\t#TOKEN#\n"
 "\tEOF\n"
-"\tcat >> debian/bar.postinst <<EOF\n"
+"\tcat >> debian/bar.config <<EOF\n"
 "\t# Script for #PACKAGE#\n"
 "\t#TOKEN#\n"
 "\tEOF\n"
-"\tcat >> debian/baz.postinst <<EOF\n"
+"\tcat >> debian/baz.config <<EOF\n"
 "\t# Script for #PACKAGE#\n"
 "\t#TOKEN#\n"
 "\tEOF\n"
-"    dh_installdeb -pfoo -pbar -pbaz  --define TOKEN=default --define pkg.bar.TOKEN=unique-bar-value \\\n"
+"    dh_installdebconf -pfoo -pbar -pbaz  --define TOKEN=default --define"
+" pkg.bar.TOKEN=unique-bar-value \\\n"
 "      --define pkg.baz.TOKEN=unique-baz-value\n"
 "\n"
 
 #. type: textblock
 #: dh_installdebconf:125
-#, fuzzy
 #| msgid ""
 #| "In this example, B<#TOKEN#> will expand to B<default> in F<debian/foo."
 #| "postinst>, to B<unique-bar-value> in F<debian/bar.postinst> and to "
@@ -8272,12 +8307,11 @@ msgid ""
 "value> in F<debian/baz.config>."
 msgstr ""
 "Neste exemplo, B<#TOKEN#> irá expandir para B<default> em F<debian/foo."
-"postinst>, para B<unique-bar-value> em F<debian/bar.postinst> e para "
-"B<unique-baz-value> em F<debian/baz.postinst>."
+"config>, para B<unique-bar-value> em F<debian/bar.v> e para "
+"B<unique-baz-value> em F<debian/baz.config>."
 
 #. type: textblock
 #: dh_installdebconf:129
-#, fuzzy
 #| msgid ""
 #| "Note that the B<#pkg.*#> tokens will be visible in all scripts acted on.  "
 #| "E.g.  you can refer to B<#pkg.bar.TOKEN#> inside F<debian/foo.postinst> "
@@ -8289,11 +8323,10 @@ msgid ""
 msgstr ""
 "Note que os tokens B<#pkg.*#> irão ser visíveis em todos os scripts que "
 "actuem. Ex, você pode referir a B<#pkg.bar.TOKEN#> dentro de F<debian/foo."
-"postinst> e ele será substituído por B<unique-bar-value>."
+"config> e ele será substituído por B<unique-bar-value>."
 
 #. type: textblock
 #: dh_installdebconf:137
-#, fuzzy
 #| msgid ""
 #| "The B<dh_installdeb> will automatically replace the following tokens "
 #| "inside a provided maintainer script (if not replaced via B<-D>/B<--"
@@ -8302,13 +8335,12 @@ msgid ""
 "The B<dh_installdebconf> will automatically replace the following tokens "
 "inside a provided maintainer script (if not replaced via B<-D>/B<--define>):"
 msgstr ""
-"O B<dh_installdeb> irá substituir automaticamente os seguintes tokens dentro "
-"de um script disponibilizado pelo maintainer (se não for substituído via B<-"
-"D>/B<--define>):"
+"O B<dh_installdebconf> irá substituir automaticamente os seguintes tokens "
+"dentro de um script disponibilizado pelo maintainer (se não for substituído "
+"via B<-D>/B<--define>):"
 
 #. type: textblock
 #: dh_installdebconf:173
-#, fuzzy
 #| msgid ""
 #| "Tokens that do not match that regex will be silently ignored if found in "
 #| "the script template.  Invalid token names passed to B<-D> or B<--define> "
@@ -8321,8 +8353,8 @@ msgid ""
 msgstr ""
 "Tokens que não correspondam a esse regex serão ignorados em silêncio se "
 "encontrados no script modelo. Nomes de token inválidos passados a B<-D> ou "
-"B<--define> irão causar que o B<dh_installdeb> rejeite o comando com um erro "
-"na maioria dos casos."
+"B<--define> irão causar que o B<dh_installdebconf> rejeite o comando com um "
+"erro na maioria dos casos."
 
 #. type: textblock
 #: dh_installdirs:5
@@ -10447,7 +10479,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_installpam:32
-#, fuzzy
 #| msgid ""
 #| "In compatibility level 11, this file will trigger an error with a "
 #| "reminder about ensuring the proper removal of the upstart file in the "
@@ -10459,15 +10490,13 @@ msgid ""
 "I<package>. Please consider using the \"rm_conffile\" feature from "
 "L<dh_installdeb(1)> to ensure the proper removal of previous PAM files."
 msgstr ""
-"Em nível de compatibilidade 11, este ficheiro irá disparar um erro com uma "
-"lembrança para assegurar a remoção apropriada do ficheiro upstart na versão "
-"anterior do pacote. Por favor consider usar a funcionalidade \"rm_conffile\" "
-"do L<dh_installdeb(1)> para assegurar a remoção apropriada de ficheiros "
-"upstart anteriores."
+"Ate ao nível de compatibilidade 14 este ficheiro era instalado sob etc/pam.d/"
+"I<pacote>. Por favor considere usar a funcionalidade \"rm_conffile\" do "
+"L<dh_installdeb(1)> para assegurar a remoção apropriada dos ficheiros "
+"PAM anteriores."
 
 #. type: textblock
 #: dh_installpam:44
-#, fuzzy
 #| msgid ""
 #| "Look for files named debian/I<package>.I<name>.pam and install them as "
 #| "etc/pam.d/I<name>, instead of using the usual files and installing them "
@@ -10478,7 +10507,7 @@ msgid ""
 "using the package name."
 msgstr ""
 "Procura ficheiros chamados debian/I<pacote>.I<nome>.pam e instala-os como "
-"etc/pam.d/I<nome>, em vez de usar os ficheiros habituais e de os instalar "
+"usr/lib/pam.d/I<nome>, em vez de usar os ficheiros habituais e de os instalar "
 "usando o nome do pacote."
 
 #. type: textblock
@@ -12236,10 +12265,12 @@ msgstr ""
 #: dh_strip:100
 #, no-wrap
 msgid ""
-"  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< 2.1-3~)'\n"
+"  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<<"
+" 2.1-3~)'\n"
 "\n"
 msgstr ""
-"  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< 2.1-3~)'\n"
+"  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<<"
+" 2.1-3~)'\n"
 "\n"
 
 #. type: =item
