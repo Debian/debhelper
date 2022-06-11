@@ -29,6 +29,7 @@ if (has_man_db_tool('man') || has_man_db_tool('man-recode')) {
 our @TEST_DH_EXTRA_TEMPLATE_FILES = (qw(
     manpage-uncompressed.pod
     manpage-compressed.pod
+    libmanpage.so.1.2.3.pod
 ));
 
 each_compat_subtest {
@@ -36,16 +37,18 @@ each_compat_subtest {
 	if (! -d 'generated-manpages') {
 		# Static data that can be reused.  Generate only in the first test
 		make_path('generated-manpages');
-		for my $basename (qw(manpage-uncompressed manpage-compressed)) {
+		for my $basename (qw(manpage-uncompressed manpage-compressed libmanpage.so.1.2.3)) {
 			doit('pod2man', '--utf8', '-c', 'Debhelper', '-r', '1.0', "${basename}.pod",
 				 "generated-manpages/${basename}.1");
 		}
 		doit('gzip', '-9n', 'generated-manpages/manpage-compressed.1');
 	}
     ok(run_dh_tool('dh_installman', 'generated-manpages/manpage-uncompressed.1',
-				   'generated-manpages/manpage-compressed.1.gz'));
+				   'generated-manpages/manpage-compressed.1.gz',
+				   'generated-manpages/libmanpage.so.1.2.3.1'));
     ok(-e 'debian/debhelper/usr/share/man/man1/manpage-uncompressed.1');
     ok(-e 'debian/debhelper/usr/share/man/man1/manpage-compressed.1');
+    ok(-e 'debian/debhelper/usr/share/man/man1/libmanpage.so.1.2.3.1');
     remove_tree('debian/debhelper', 'debian/tmp', 'debian/.debhelper');
 };
 
@@ -54,7 +57,7 @@ each_compat_subtest {
 	if (! -d 'generated-manpages') {
 		# Static data that can be reused.  Generate only in the first test
 		make_path('generated-manpages');
-		for my $basename (qw(manpage-uncompressed manpage-compressed)) {
+		for my $basename (qw(manpage-uncompressed manpage-compressed libmanpage.so.1.2.3)) {
 			doit('pod2man', '--utf8', '-c', 'Debhelper', '-r', '1.0', "${basename}.pod",
 				 "generated-manpages/${basename}.1");
 		}
@@ -63,9 +66,11 @@ each_compat_subtest {
 	install_dir('debian/debhelper/usr/share/man/man1');
 	install_file('generated-manpages/manpage-uncompressed.1', 'debian/debhelper/usr/share/man/man1/manpage-uncompressed.1');
 	install_file('generated-manpages/manpage-compressed.1.gz', 'debian/debhelper/usr/share/man/man1/manpage-compressed.1.gz');
+	install_file('generated-manpages/libmanpage.so.1.2.3.1', 'debian/debhelper/usr/share/man/man1/libmanpage.so.1.2.3.1');
     ok(run_dh_tool('dh_installman'));
     ok(-e 'debian/debhelper/usr/share/man/man1/manpage-uncompressed.1');
     ok(-e 'debian/debhelper/usr/share/man/man1/manpage-compressed.1');
+    ok(-e 'debian/debhelper/usr/share/man/man1/libmanpage.so.1.2.3.1');
     remove_tree('debian/debhelper', 'debian/tmp', 'debian/.debhelper');
 };
 

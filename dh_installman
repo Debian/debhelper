@@ -236,6 +236,10 @@ on_items_in_parallel(\@all_packages, sub {
 					# language code to the filename, so detect that and
 					# redirect to appropriate directory, stripping the code.
 					($langcode) = $basename =~ m/\.([a-z][a-z](?:_[A-Z][A-Z])?)\.(?:[1-9]|man)/;
+					# Avoid false positives such as /usr/share/man/man8/libnss_myhostname.so.2.8
+					if (defined $langcode && $langcode eq 'so' && $basename =~ /^lib.*\.so(\.[0-9]+)*$/) {
+						$langcode = '';
+					}
 				}
 			} elsif ($dh{LANGUAGE} ne 'C') {
 				$langcode = $dh{LANGUAGE};
