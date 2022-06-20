@@ -4,10 +4,10 @@ Priority: optional
 Maintainer: Debhelper Maintainers <debhelper@packages.debian.org>
 Uploaders: Niels Thykier <niels@thykier.net>,
 Build-Depends: dpkg-dev (>= 1.18.0~),
+               libtest-pod-perl <pkg.debhelper.ci>,
+               man-db <pkg.debhelper.ci>,
                perl:any,
                po4a,
-               man-db <pkg.debhelper.ci>,
-               libtest-pod-perl <pkg.debhelper.ci>,
 Rules-Requires-Root: no
 Standards-Version: 4.6.1
 Testsuite: autopkgtest-pkg-perl
@@ -31,12 +31,12 @@ Depends: autotools-dev,
          dpkg-dev (>= 1.18.2~),
          dwz (>= 0.12.20190711),
          file (>= 3.23),
+         libdebhelper-perl (= ${source:Version}),
          libdpkg-perl (>= 1.17.14),
          man-db,
-         libdebhelper-perl (= ${source:Version}),
          po-debconf,
          ${misc:Depends},
-         ${perl:Depends}
+         ${perl:Depends},
 Breaks:
 # To ensure cmake understands -DCMAKE_INSTALL_RUNSTATEDIR=/run as used in compat 11
 # - Can be dropped (with the caveat that cmake packages may behave differently
@@ -48,13 +48,13 @@ Breaks:
 # The qmake cross wrapper was introduced in 5.9.2+dfsg-5, but got some important
 # fixes in the subsequent uploads. It is only needed for cross-building.
 #        qt5-qmake (<< 5.9.2+dfsg-8),
-Suggests: dh-make
-Provides: ${dh:CompatLevels},
-          dh-sequence-dwz,
+Suggests: dh-make,
+Provides: dh-sequence-dwz,
           dh-sequence-elf-tools,
           dh-sequence-installinitramfs,
           dh-sequence-single-binary,
           dh-sequence-systemd,
+          ${dh:CompatLevels},
 Multi-Arch: foreign
 Description: helper programs for debian/rules
  A collection of programs that can be used in a debian/rules file to
@@ -68,9 +68,9 @@ Package: libdebhelper-perl
 Section: perl
 Architecture: all
 Depends: ${misc:Depends},
-         ${perl:Depends}
-Replaces: debhelper (<< 12.6~)
-Breaks: debhelper (<< 12.6~)
+         ${perl:Depends},
+Replaces: debhelper (<< 12.6~),
+Breaks: debhelper (<< 12.6~),
 Multi-Arch: foreign
 Description: debhelper perl modules
  A collection of programs that can be used in a debian/rules file to
