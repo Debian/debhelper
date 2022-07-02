@@ -70,8 +70,7 @@ the package build directory. Only used in compat levels 10 and below.
 =item debian/I<package>.tmpfile
 
 If this exists, it is installed into usr/lib/tmpfiles.d/I<package>.conf in the
-package build directory. (The tmpfiles.d mechanism is currently only used
-by systemd.) Only used in compat levels 10 and below.
+package build directory. Only used in compat levels 10 and below.
 
 =back
 
@@ -346,6 +345,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			# happen as people migrate to dh_installsystemd.
 			autoscript($package,"postinst", "postinst-init-tmpfiles",
 				"s,#TMPFILES#," . join(" ", sort @tmpfiles).",g");
+			addsubstvar($package, "misc:Depends", 'systemd | systemd-tmpfiles');
 		}
 	}
 

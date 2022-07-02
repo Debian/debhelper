@@ -118,6 +118,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	if (@tmpfiles) {
 		autoscript($package, 'postinst', 'postinst-init-tmpfiles', { 'TMPFILES' => join(' ', uniq(sort(@tmpfiles))) });
+		addsubstvar($package, "misc:Depends", 'systemd | systemd-tmpfiles');
 	}
 }
 
