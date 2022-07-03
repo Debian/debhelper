@@ -134,6 +134,30 @@ sub test {
 	return 1;
 }
 
+sub install {
+	my $this = shift;
+	my $target = $this->get_targetbuildsystem;
+
+	eval {
+		if (compat(13) or $target->NAME ne 'ninja') {
+			$target->install(@_);
+		} else {
+			# In compat 14 with meson+ninja, we prefer using "meson test"
+			# over "ninja test"
+			my %options = (
+				update_env => {
+					'LC_ALL' => 'C.UTF-8',
+				}
+			);
+			if ($this->get_parallel() > 0) {
+				$options{update_env}{MESON_TESTTHREADS} = $this->get_parallel();
+			}
+			$this->doit_in_builddir(\%options, 'meson', 'install', @_);
+		}
+	};
+	return 1;
+}
+
 
 
 1

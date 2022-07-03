@@ -715,6 +715,13 @@ F<< /usr/lib/pam.d/I<package> >> instead of F<< /etc/pam.d/I<package> >>.
 Please consider using the "rm_conffile" feature from
 L<dh_installdeb(1)> to ensure the proper removal of previous PAM files.
 
+=item -
+
+The B<meson+ninja> build system now uses B<meson install> instead of
+B<ninja install> in the L<dh_auto_install(1)> call.  Any override of
+B<dh_auto_install> that passes extra parameters to the upstream build
+system should be reviewed.
+
 =back
 
 =item v15
