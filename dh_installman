@@ -210,7 +210,7 @@ on_items_in_parallel(\@all_packages, sub {
 			close($fd);
 			# Failing that, we can try to get it from the filename.
 			if (!$section) {
-				($section) = $basename =~ m/\.([1-9]\S*)/;
+				($section) = $basename =~ m/\.([1-9]\w*)$/;
 			}
 
 			# Now get the numeric component of the section.
