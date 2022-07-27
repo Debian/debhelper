@@ -228,7 +228,7 @@ sub parseopts {
 		@ARGV_extra=split_options_string($ENV{DH_OPTIONS});
 		my $ret=getoptions(\@ARGV_extra, %params);
 		if (!$ret) {
-			warning("warning: ignored unknown options in DH_OPTIONS");
+			warning("ignored unknown options in DH_OPTIONS");
 		}
 	}
 
