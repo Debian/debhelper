@@ -1426,7 +1426,7 @@ sub addsubstvar {
 		return "${substvar}${assignment_type}" . join(", ", sort(keys(%items)));
 	};
 	my $insert_logic = sub {
-		return ("${substvar}=${str}") if not $present;
+		return ("${substvar}=${str}") if not $present and not $remove;
 		return;
 	};
 	return _update_substvar($substvarfile, $update_logic, $insert_logic);
