@@ -9,12 +9,13 @@ dh_installchangelogs - install changelogs into package build directories
 use strict;
 use warnings;
 use Debian::Debhelper::Dh_Lib;
+use Time::Piece;
 
 our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
-B<dh_installchangelogs> [S<I<debhelper options>>] [B<-k>] [B<-X>I<item>] [I<upstream>]
+B<dh_installchangelogs> [S<I<debhelper options>>] [B<-k>] [B<-X>I<item>] [B<--no-trim>] [I<upstream>]
 
 =head1 DESCRIPTION
 
@@ -43,6 +44,10 @@ instead. If the html changelog is converted to plain text, that variant
 can be specified as a second parameter. When no plain text variant is
 specified, a short F<usr/share/doc/package/changelog> is generated,
 pointing readers at the html changelog file.
+
+B<debchange>-style Debian changelogs are trimmed to include only
+entries more recent than the release date of I<oldstable>.
+This behavior can be disabled by passing the B<--no-trim> option.
 
 =head1 FILES
 
@@ -87,6 +92,11 @@ filename from being installed.
 
 Note that directory name of the changelog is also part of the match.
 
+=item B<--no-trim>
+
+Install the full changelog, not its trimmed version that includes only
+recent entries.
+
 =item I<upstream>
 
 Install this file as the upstream changelog.
@@ -95,62 +105,16 @@ Install this file as the upstream changelog.
 
 =cut
 
-# For binNMUs the first changelog entry is written into an extra file to
-# keep the packages coinstallable.
-sub install_binNMU_changelog {
-	my ($package, $input_fn, $changelog_name)=@_;
-
-	open (my $input, "<", $input_fn);
-	my $line=<$input>;
-	if (defined $line && $line =~ /\A\S.*;.*\bbinary-only=yes/) {
-		my $mask=umask 0022;
-
-		my @stat=stat $input_fn or error("could not stat $input_fn: $!");
-		my $tmp=tmpdir($package);
-		my $output_fn="$tmp/usr/share/doc/$package/$changelog_name";
-		open my $output, ">", $output_fn
-			or error("could not open $output_fn for writing: $!");
-		my $arch=package_binary_arch($package);
-		my $output_fn_binary="$output_fn.$arch";
-		open my $output_binary, ">", $output_fn_binary
-			or error("could not open $output_fn_binary for writing: $!");
-
-		do {
-			print {$output_binary} $line
-				or error("Could not write to $output_fn_binary: $!");
-		} while(defined($line=<$input>) && $line !~ /\A\S/);
-		close $output_binary or error("Couldn't close $output_fn_binary: $!");
-		utime $stat[8], $stat[9], $output_fn_binary;
-
-		do {
-			print {$output} $line
-				or error("Could not write to $output_fn: $!");
-		} while(defined($line=<$input>));
-
-		close $input or error("Couldn't close $input_fn: $!");
-		close $output or error("Couldn't close $output_fn: $!");
-		utime $stat[8], $stat[9], $output_fn;
-
-		if (should_use_root()) {
-			chown(0, 0, $output_fn, $output_fn_binary) or error("chown: $!");
-		}
-
-		umask $mask;
-
-		return 1;
-	}
-	else {
-		close $input;
-		return 0;
-	}
-}
-
 init(options => {
 	'keep|k'  => \$dh{K_FLAG},
+	'no-trim' => \$dh{NO_TRIM},
 });
 
 my $news_name="NEWS.Debian";
 my $changelog_name="changelog.Debian";
+
+use constant CUTOFF_DATE_STR => "2019-07-06"; # oldstable = Debian 10 Buster
+use constant CUTOFF_DATE => Time::Piece->strptime(CUTOFF_DATE_STR, "%Y-%m-%d");
 
 my $explicit_changelog = @ARGV ? 1 : 0;
 my $default_upstream = $ARGV[0];
@@ -190,6 +154,106 @@ sub find_changelog {
 		}
 	}
 	return;
+}
+
+sub install_debian_changelog {
+	my ($changelog, $package, $arch, $tmp) = @_;
+
+	if ($dh{NO_TRIM}) {
+		# Install the whole changelog.
+		install_file($changelog, "$tmp/usr/share/doc/$package/$changelog_name");
+		return;
+	}
+
+	local $ENV{LC_ALL} = "C.UTF-8";
+
+	my $changelog_trimmed = "$changelog.trimmed.debhelper";
+	my $changelog_binnmu = "$changelog.binnmu.debhelper";
+
+	open(my $log1, "<", $changelog) or error("Cannot open($changelog): $!");
+	open(my $log2, ">", $changelog_trimmed) or error("Cannot open($changelog_trimmed): $!");
+
+	my $error_in_changelog = 0;
+	my $is_binnmu = 0;
+	my $entry = "";
+	my $entry_num = 0;
+	while (my $line=<$log1>) {
+		$entry .= $line;
+
+		# Identify binNUM packages by binary-only=yes in the first line of the changelog.
+		if (($. == 1) && ($line =~ /\A\S.*;.*\bbinary-only=yes/)) {
+			$is_binnmu = 1;
+		}
+
+		# Get out of binNMU mode once we are in the second entry (and throw away one empty line).
+		if ($is_binnmu && ($entry_num eq 1)) {
+			$is_binnmu = 0;
+			$entry_num = 0;
+			$entry = "";
+			next;
+		}
+
+		if ($line =~ /^\s*--\s+.*?\s+<[^>]*>\s+(?<timestamp>.*)$/) {
+			if ($is_binnmu && ($entry_num eq 0)) {
+				# For binNMUs the first changelog entry is written into an extra file to
+				# keep the packages coinstallable.
+				open(my $log_binnum, ">", $changelog_binnmu) or error("Cannot open($changelog_binnmu): $!");
+				print($log_binnum $entry) or error("Cannot write($changelog_binnmu): $!");
+				close($log_binnum) or error("Cannot close($changelog_binnmu): $!");
+
+				# Continue processing the rest of the changelog.
+				$entry = "";
+				$entry_num++;
+				next;
+			}
+
+			my $timestamp = $+{timestamp};
+			$timestamp =~ s/^[A-Za-z]+, +//;
+
+			my $entry_time;
+			eval { $entry_time = Time::Piece->strptime($timestamp, '%d %b %Y %T %z') };
+			if (! defined $entry_time) {
+				$error_in_changelog = 1;
+				warning("Could not parse timestamp '$timestamp'. $changelog will not be trimmed.");
+				truncate($log2, 0) or error("Cannot truncate($changelog_trimmed): $!");
+				last;
+			}
+
+			# Stop processing the changelog if we reached the cut-off date and at least one entry has been added.
+			if (($entry_time < CUTOFF_DATE) && ($entry_num >= 1)) {
+				last;
+			}
+
+			# Append entry to trimmed changelog.
+			print($log2 $entry) or error("Cannot write($changelog_trimmed): $!");
+			$entry = "";
+			$entry_num++;
+		}
+	}
+	# If the whole changelog has not been read, then it has been trimmed.
+	my $has_been_trimmed = !eof($log1);
+
+	close($log1) or error("Cannot close($changelog): $!");
+	close($log2) or error("Cannot close($changelog_trimmed): $!");
+
+	if ($error_in_changelog) {
+		# If the changelog could not be trimmed, fall back to the full changelog.
+		warning("$changelog could not be trimmed. The full changelog will be installed.");
+		$changelog_trimmed = $changelog;
+	} elsif ($has_been_trimmed) {
+		# Otherwise add a comment stating that this changelog has been trimmed.
+		my $note = "\n";
+		$note .= "# Older entries have been removed from this changelog.\n";
+		$note .= "# To read the complete changelog use `apt changelog $package`.\n";
+		open(my $log2, ">>", $changelog_trimmed) or error("Cannot open($changelog_trimmed): $!");
+		print($log2 $note) or error("Cannot write($changelog_trimmed): $!");
+		close($log2) or error("Cannot close($changelog_trimmed): $!");
+	}
+
+	install_file($changelog_trimmed, "$tmp/usr/share/doc/$package/$changelog_name");
+	if (-s $changelog_binnmu) {
+		install_file($changelog_binnmu, "$tmp/usr/share/doc/$package/$changelog_name.$arch");
+	}
 }
 
 on_pkgs_in_parallel {
@@ -249,10 +313,8 @@ on_pkgs_in_parallel {
 		install_dir("$tmp/usr/share/doc/$package");
 
 		if (! $dh{NO_ACT}) {
-			if (! install_binNMU_changelog($package, $changelog, $changelog_name)) {
-				install_file($changelog,
-							 "$tmp/usr/share/doc/$package/$changelog_name");
-			}
+			my $arch = package_binary_arch($package);
+			install_debian_changelog($changelog, $package, $arch, $tmp);
 		}
 
 		if (-e $news) {
