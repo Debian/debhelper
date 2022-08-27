@@ -10,6 +10,12 @@ debhelper (13.9) unstable; urgency=medium
   * Dh_Lib.pm: Fix in addsubstvar where a value was added when
     it should not have been.  (Closes: #1015263)
 
+  [ Johannes Schauer Marin Rodrigues ]
+  * autoscripts/postinst-init-tmpfiles: Only pass `--root` to sytemd
+    when `DPKG_ROOT` is present (as `--root=/` is different from
+    omitting `--root` entirely).
+  * autoscripts/postinst-sysusers: Ditto
+
  -- Niels Thykier <niels@thykier.net>  Sun, 14 Aug 2022 12:34:54 +0000
 
 debhelper (13.8) unstable; urgency=medium
