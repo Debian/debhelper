@@ -345,7 +345,6 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			# happen as people migrate to dh_installsystemd.
 			autoscript($package,"postinst", "postinst-init-tmpfiles",
 				"s,#TMPFILES#," . join(" ", sort @tmpfiles).",g");
-			addsubstvar($package, "misc:Depends", 'systemd | systemd-tmpfiles');
 		}
 	}
 

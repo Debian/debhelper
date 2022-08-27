@@ -319,7 +319,6 @@ if (compat(12)) {
 
 		if (@tmpfiles) {
 			autoscript($package, 'postinst', 'postinst-init-tmpfiles', { 'TMPFILES' => join(' ', sort @tmpfiles) });
-			addsubstvar($package, "misc:Depends", 'systemd | systemd-tmpfiles');
 		}
 	}
 }
