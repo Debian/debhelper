@@ -1,14 +1,6 @@
-debhelper (13.9) unstable; urgency=medium
-
-  [ Gioele Barabucci ]
-  * d/control: Provide dh-sequence-installsysusers.
-
-  [ Andreas Hübner ]
-  * debhelper.pod: Add missing word "variables".
+debhelper (13.9.1) UNRELEASED; urgency=medium
 
   [ Niels Thykier ]
-  * Dh_Lib.pm: Fix in addsubstvar where a value was added when
-    it should not have been.  (Closes: #1015263)
   * autoscripts/postinst-init-tmpfiles: Re-instate runtime check
     before running `systemd-tmpfiles`. However, explicitly check
     for `systemd-tmpfiles` rather than asserting the system was
@@ -21,10 +13,24 @@ debhelper (13.9) unstable; urgency=medium
   * dh_installinit: Ditto.
 
   [ Johannes Schauer Marin Rodrigues ]
-  * autoscripts/postinst-init-tmpfiles: Only pass `--root` to sytemd
+  * autoscripts/postinst-init-tmpfiles: Only pass `--root` to systemd
     when `DPKG_ROOT` is present (as `--root=/` is different from
     omitting `--root` entirely).
   * autoscripts/postinst-sysusers: Ditto
+
+ -- Niels Thykier <niels@thykier.net>  Tue, 30 Aug 2022 14:57:22 +0000
+
+debhelper (13.9) unstable; urgency=medium
+
+  [ Gioele Barabucci ]
+  * d/control: Provide dh-sequence-installsysusers.
+
+  [ Andreas Hübner ]
+  * debhelper.pod: Add missing word "variables".
+
+  [ Niels Thykier ]
+  * Dh_Lib.pm: Fix in addsubstvar where a value was added when
+    it should not have been.  (Closes: #1015263)
 
  -- Niels Thykier <niels@thykier.net>  Sun, 14 Aug 2022 12:34:54 +0000
 
