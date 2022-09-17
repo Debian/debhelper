@@ -45,9 +45,10 @@ can be specified as a second parameter. When no plain text variant is
 specified, a short F<usr/share/doc/package/changelog> is generated,
 pointing readers at the html changelog file.
 
-B<debchange>-style Debian changelogs are trimmed to include only
+The B<debchange>-style Debian changelogs are trimmed to include only
 entries more recent than the release date of I<oldstable>.
-This behavior can be disabled by passing the B<--no-trim> option.
+No trimming will be perfomermed if the B<--no-trim> option is passed or
+if the B<DEB_BUILD_OPTIONS> environment variable contains B<notrimdch>.
 
 =head1 FILES
 
@@ -159,7 +160,7 @@ sub find_changelog {
 sub install_debian_changelog {
 	my ($changelog, $package, $arch, $tmp) = @_;
 
-	if ($dh{NO_TRIM}) {
+	if ($dh{NO_TRIM} || get_buildoption("notrimdch")) {
 		# Install the whole changelog.
 		install_file($changelog, "$tmp/usr/share/doc/$package/$changelog_name");
 		return;

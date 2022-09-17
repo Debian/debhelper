@@ -859,6 +859,16 @@ Additionally, the tools will also ignore if declared documentation is
 This value effects tools I<like> L<dh_installdocs(1)>, which I<knows>
 it is working with documentation.
 
+=item B<notrimdch>
+
+I<This value will change the content of the debs being built.  The .deb
+packages built when this is set is therefore not bit-for-bit reproducible
+with a regular build in the general case.>
+
+This value will cause L<dh_installchangelogs(1)> to act as if it
+had been passed the B<--no-trim> option, forcing it to forgo removing
+older entries from changelogs.
+
 =item B<noautodbgsym>, B<noddebs>
 
 I<The official name is noautodbgsym.  The noddebs variant is accepted

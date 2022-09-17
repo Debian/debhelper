@@ -89,7 +89,7 @@ sub dates_in_lines {
 	return @lines_dates;
 }
 
-plan(tests => 6);
+plan(tests => 8);
 
 # Test changelog with only recent entries (< oldstable)
 my $years_after_cutoff = 2;
@@ -203,6 +203,43 @@ each_compat_subtest {
 	cmp_ok(@comments, ">=", 1);
 
 	is(@entries_nmu, 1);
+};
+
+# Test changelog with both recent and old entries + --no-trim
+$years_after_cutoff = 1;
+$years_of_changelog = 4;
+install_changelog($years_after_cutoff, $years_of_changelog);
+each_compat_subtest {
+	my @lines_orig = changelog_lines_pkg();
+	ok(run_dh_tool("dh_installchangelogs", "--no-trim"));
+	my @lines = changelog_lines_installed();
+	my @entries = dates_in_lines(@lines);
+	my @entries_old = grep { $_ < CUTOFF_DATE } @entries;
+	my @comments = grep(/^#/, @lines);
+
+	is(@lines, @lines_orig);
+	cmp_ok(@entries, ">", 1);
+	cmp_ok(@entries_old, ">", 1);
+	is(@comments, 0);
+};
+
+# Test changelog with both recent and old entries + notrimdch
+$years_after_cutoff = 1;
+$years_of_changelog = 4;
+install_changelog($years_after_cutoff, $years_of_changelog);
+each_compat_subtest {
+	my @lines_orig = changelog_lines_pkg();
+	$ENV{DEB_BUILD_OPTIONS} = "notrimdch";
+	ok(run_dh_tool("dh_installchangelogs"));
+	my @lines = changelog_lines_installed();
+	my @entries = dates_in_lines(@lines);
+	my @entries_old = grep { $_ < CUTOFF_DATE } @entries;
+	my @comments = grep(/^#/, @lines);
+
+	is(@lines, @lines_orig);
+	cmp_ok(@entries, ">", 1);
+	cmp_ok(@entries_old, ">", 1);
+	is(@comments, 0);
 };
 
 unlink("${\TEST_DIR}/debian/changelog");
