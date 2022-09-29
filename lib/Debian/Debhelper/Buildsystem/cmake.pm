@@ -8,7 +8,7 @@ package Debian::Debhelper::Buildsystem::cmake;
 
 use strict;
 use warnings;
-use Debian::Debhelper::Dh_Lib qw(%dh compat dpkg_architecture_value error is_cross_compiling get_buildoption);
+use Debian::Debhelper::Dh_Lib qw(%dh compat dpkg_architecture_value error is_cross_compiling get_buildoption print_and_doit);
 use parent qw(Debian::Debhelper::Buildsystem);
 
 my @STANDARD_CMAKE_FLAGS = qw(
@@ -176,6 +176,27 @@ sub test {
 		unshift(@_, "ARGS+=--verbose") if not get_buildoption("terse");
 	}
 	return $this->SUPER::test(@_);
+}
+
+sub install {
+	my $this = shift;
+	my $target = $this->get_targetbuildsystem;
+
+	if (compat(13)) {
+		$target->install(@_);
+	} else {
+		# In compat 14 `cmake --install` is preferred to `make install`,
+		# see https://bugs.debian.org/1020732
+		my $destdir = shift;
+		my %options = (
+			update_env => {
+				'LC_ALL'  => 'C.UTF-8',
+				'DESTDIR' => $destdir,
+			}
+		);
+		print_and_doit(\%options, 'cmake', '--install', $this->get_buildpath, @_);
+	}
+	return 1;
 }
 
 1
