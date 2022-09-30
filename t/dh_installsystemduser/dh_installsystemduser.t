@@ -41,10 +41,6 @@ sub _unit_check_user_enabled {
 	# enabled, but we do not want to include that in our count.
 	$matches = grep { m{^\t\tif deb-systemd-helper( --\w+)* --user was-enabled.*'\Q$unit'} } @postinst;
 	is($matches, $enabled, "$unit $verb enabled");
-
-	my @postrm = read_script($package, 'postrm');
-	$matches = grep { m{deb-systemd-helper( --\w+)* --user mask.*'\Q$unit'} } @postrm;
-	is($matches, $enabled, "$unit $verb masked");
 }
 
 sub _unit_check_user_started {
