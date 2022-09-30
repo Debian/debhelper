@@ -18,19 +18,15 @@ our @TEST_DH_EXTRA_TEMPLATE_FILES = (qw(
 plan(tests => 1);
 
 sub unit_is_enabled {
-	my ($package, $unit, $num_enables, $num_masks) = @_;
+	my ($package, $unit, $num_enables) = @_;
 	my @output;
 	my $matches;
-	$num_masks = $num_masks // $num_enables;
 	@output=`cat debian/$package.postinst.debhelper`;
 	# Match exactly one tab; the "dont-enable" script has an "enable"
 	# line for re-enabling the service if the admin had it enabled.
 	# But we do not want to include that in our count.
 	$matches = grep { m{^\tif deb-systemd-helper .* was-enabled .*'\Q$unit\E\.service'} } @output;
 	ok($matches == $num_enables) or diag("$unit appears to have been enabled $matches times (expected $num_enables)");
-	@output=`cat debian/$package.postrm.debhelper`;
-	$matches = grep { m{deb-systemd-helper mask.*'\Q$unit\E\.service'} } @output;
-	ok($matches == $num_masks) or diag("$unit appears to have been masked $matches times (expected $num_masks)");
 }
 sub unit_is_started {
 	my ($package, $unit, $num_starts, $num_stops) = @_;
@@ -101,7 +97,7 @@ each_compat_from_x_to_and_incl_y_subtest(10, 10, sub {
 	ok(run_dh_tool('dh_systemd_start'));
 	ok(-e "debian/foo/lib/systemd/system/foo.service");
 	ok(-e "debian/foo.postinst.debhelper");
-	unit_is_enabled('foo', 'foo', 0, 1); # Disabled units are still masked on removal
+	unit_is_enabled('foo', 'foo', 0);
 	unit_is_started('foo', 'foo', 1, 1);
 	unit_is_enabled('foo', 'foo2', 1);
 	unit_is_started('foo', 'foo2', 1);

@@ -22,10 +22,9 @@ sub write_file {
 }
 
 sub unit_is_enabled {
-	my ($package, $unit, $num_enables, $num_masks) = @_;
+	my ($package, $unit, $num_enables) = @_;
 	my @output;
 	my $matches;
-	$num_masks = $num_masks // $num_enables;
 	my @postinst_snippets = find_script($package, 'postinst');
 	@output=`cat @postinst_snippets` if @postinst_snippets;
 	# Match exactly one tab; the "dont-enable" script has an "enable"
@@ -33,10 +32,6 @@ sub unit_is_enabled {
 	# But we do not want to include that in our count.
 	$matches = grep { m{^\tif deb-systemd-helper .* was-enabled .*'\Q$unit\E\.service'} } @output;
 	ok($matches == $num_enables) or diag("$unit appears to have been enabled $matches times (expected $num_enables)");
-	my @postrm_snippets = find_script($package, 'postrm');
-	@output=`cat @postrm_snippets` if @postrm_snippets;
-	$matches = grep { m{deb-systemd-helper mask.*'\Q$unit\E\.service'} } @output;
-	ok($matches == $num_masks) or diag("$unit appears to have been masked $matches times (expected $num_masks)");
 }
 
 sub unit_is_started {
@@ -178,7 +173,7 @@ each_compat_subtest {
 	ok(run_dh_tool('dh_installsystemd', '-p', 'foo', 'foo2.service'));
 	ok(-e 'debian/foo/lib/systemd/system/foo.service');
 	ok(find_script('foo', 'postinst'));
-	unit_is_enabled('foo', 'foo', 0, 1); # Disabled units are still masked on removal
+	unit_is_enabled('foo', 'foo', 0);
 	unit_is_started('foo', 'foo', 1, 1);
 	unit_is_enabled('foo', 'foo2', 1);
 	unit_is_started('foo', 'foo2', 1);
