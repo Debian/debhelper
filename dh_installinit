@@ -371,6 +371,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				'ERROR_HANDLER' => $dh{ERROR_HANDLER},
 				'INVOKE_RCD_PARAMS' => $update_rcd_params,
 			};
+			autoscript($package, 'preinst', 'preinst-init-chmod', $replace, \%snippet_options);
 
 			if (! $dh{NO_START}) {
 				if ($dh{RESTART_AFTER_UPGRADE}) {
