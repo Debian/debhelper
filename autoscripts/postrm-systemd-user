@@ -1,12 +1,5 @@
-if [ "$1" = "remove" ]; then
-	if [ -z "${DPKG_ROOT:-}" ] && [ -x "/usr/bin/deb-systemd-helper" ] ; then
-		deb-systemd-helper --user mask #UNITFILES# >/dev/null || true
-	fi
-fi
-
 if [ "$1" = "purge" ]; then
 	if [ -z "${DPKG_ROOT:-}" ] && [ -x "/usr/bin/deb-systemd-helper" ] ; then
 		deb-systemd-helper --user purge #UNITFILES# >/dev/null || true
-		deb-systemd-helper --user unmask #UNITFILES# >/dev/null || true
 	fi
 fi
