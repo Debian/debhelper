@@ -138,20 +138,18 @@ sub install {
 	my $this = shift;
 	my $target = $this->get_targetbuildsystem;
 
-	eval {
-		if (compat(13) or $target->NAME ne 'ninja') {
-			$target->install(@_);
-		} else {
-			# In compat 14 with meson+ninja, we prefer using "meson install"
-			# over "ninja install"
-			my %options = (
-				update_env => {
-					'LC_ALL' => 'C.UTF-8',
-				}
-			);
-			$this->doit_in_builddir(\%options, 'meson', 'install', @_);
-		}
-	};
+	if (compat(13) or $target->NAME ne 'ninja') {
+		$target->install(@_);
+	} else {
+		# In compat 14 with meson+ninja, we prefer using "meson install"
+		# over "ninja install"
+		my %options = (
+			update_env => {
+				'LC_ALL' => 'C.UTF-8',
+			}
+		);
+		$this->doit_in_builddir(\%options, 'meson', 'install', @_);
+	}
 	return 1;
 }
 
