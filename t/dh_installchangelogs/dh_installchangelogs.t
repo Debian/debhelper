@@ -1,6 +1,8 @@
 #!/usr/bin/perl
+
 use strict;
 use warnings;
+use POSIX qw(locale_h);
 use Test::More;
 use Time::Piece;
 use Time::Seconds qw(ONE_MONTH ONE_YEAR);
@@ -14,6 +16,9 @@ our @TEST_DH_EXTRA_TEMPLATE_FILES = (qw(
     debian/changelog
     debian/control
 ));
+
+# Force Time::Piece to generate dch-compliant timestamps (i.e. in English).
+setlocale(LC_ALL, "C.UTF-8");
 
 use constant CUTOFF_DATE_STR => "2019-07-06"; # oldstable = Debian 10 Buster
 use constant CUTOFF_DATE => Time::Piece->strptime(CUTOFF_DATE_STR, "%Y-%m-%d");
