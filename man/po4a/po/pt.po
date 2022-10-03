@@ -5,10 +5,10 @@
 # Américo Monteiro <a_monteiro@gmx.com>, 2014 to 2022.
 msgid ""
 msgstr ""
-"Project-Id-Version: debhelper 13.7.1\n"
+"Project-Id-Version: debhelper 13.9.1\n"
 "Report-Msgid-Bugs-To: debhelper@packages.debian.org\n"
 "POT-Creation-Date: 2022-08-14 14:05+0000\n"
-"PO-Revision-Date: 2022-05-18 22:57+0100\n"
+"PO-Revision-Date: 2022-09-05 22:19+0100\n"
 "Last-Translator: Américo Monteiro <a_monteiro@gmx.com>\n"
 "Language-Team: Portuguese <>\n"
 "Language: pt\n"
@@ -1081,7 +1081,6 @@ msgstr "B<--reload-all-buildenv-variables>"
 
 #. type: textblock
 #: debhelper.pod:435
-#, fuzzy
 #| msgid ""
 #| "By default, L<dh(1)> will compute several environment (e.g. by using "
 #| "L<dpkg-buildflags(1)>) and cache them to avoid having all B<dh_auto_*> "
@@ -1091,9 +1090,9 @@ msgid ""
 "using L<dpkg-buildflags(1)>) and cache them to avoid having all B<dh_auto_*> "
 "tool recompute them."
 msgstr ""
-"Por predefinição, o L<dh(1)> irá computar vários ambientes (ex. ao usar "
-"L<dpkg-buildflags(1)>) e guarda-los em cache para evitar que todas as "
-"ferramentas B<dh_auto_*> os recompute."
+"Por predefinição, o L<dh(1)> irá computar várias variáveis de ambiente "
+"(ex. ao usar L<dpkg-buildflags(1)>) e guarda-los em cache para evitar que "
+"todas as ferramentas B<dh_auto_*> os recompute."
 
 #. type: textblock
 #: debhelper.pod:439
@@ -3808,7 +3807,6 @@ msgstr "As alterações a partir de v13 são:"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:674
-#, fuzzy
 #| msgid ""
 #| "The B<cmake> buildsystem now passes B<-DCMAKE_SKIP_RPATH=ON> and B<-"
 #| "DCMAKE_BUILD_RPATH_USE_ORIGIN=ON> to L<cmake(1)> to avoid some "
@@ -3817,13 +3815,12 @@ msgid ""
 "The B<cmake> buildsystem now passes B<-DCMAKE_BUILD_RPATH_USE_ORIGIN=ON> to "
 "L<cmake(1)> to avoid some reproducibility issues."
 msgstr ""
-"O sistema de compilação B<cmake> agora passa B<-DCMAKE_SKIP_RPATH=ON> e B<-"
-"DCMAKE_BUILD_RPATH_USE_ORIGIN=ON> a L<cmake(1)> para evitar alguns problemas "
-"de reprodutibilidade."
+"O sistema de compilação B<cmake> agora passa "
+"B<-DCMAKE_BUILD_RPATH_USE_ORIGIN=ON> a L<cmake(1)> para evitar alguns "
+"problemas de reprodutibilidade."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:680
-#, fuzzy
 #| msgid ""
 #| "The tool B<dh_installsysusers> is now included in the default sequence."
 msgid ""
@@ -3831,7 +3828,8 @@ msgid ""
 "helper tool will process systemd sysusers files."
 msgstr ""
 "A ferramenta B<dh_installsysusers> está agora incluída na sequência "
-"predefinida."
+"predefinida. Esta ferramenta de ajuda irá processar ficheiros sysusers do "
+"systemd."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:685
@@ -3918,7 +3916,6 @@ msgstr ""
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:720
-#, fuzzy
 #| msgid ""
 #| "The B<meson+ninja> build system now uses B<meson test> instead of B<ninja "
 #| "test> when running the test suite.  Any override of B<dh_auto_test> that "
@@ -3930,11 +3927,10 @@ msgid ""
 "B<dh_auto_install> that passes extra parameters to the upstream build system "
 "should be reviewed."
 msgstr ""
-"O sistema de compilação B<meson+ninja> agora usa B<meson test> em vez de "
-"B<ninja test> quando corre a suite de testes. Qualquer sobreposição de "
-"B<dh_auto_test> que passe parâmetros extra ao testador original do autor "
-"deve ser revista, pois o B<meson test> não é compatível em linha de comandos "
-"com o B<ninja test>."
+"O sistema de compilação B<meson+ninja> agora usa B<meson install> em vez de "
+"B<ninja install> na chamada a L<dh_auto_install(1)>. Qualquer sobreposição "
+"de B<dh_auto_install> que passe parâmetros extra ao sistema de compilação "
+"do autor deve ser revista."
 
 #. type: =item
 #: debhelper-compat-upgrade-checklist.pod:727
@@ -4668,7 +4664,8 @@ msgid ""
 "      #\n"
 "      # And it gets even more complicated to reason about if dh needs to\n"
 "      # recurse into debian/rules because you have an \"explicit\"\n"
-"      # standard target (e.g. a \"build-arch:\" target separate from \"%:\").\n"
+"      # standard target (e.g. a \"build-arch:\" target separate from \""
+"%:\").\n"
 "      ifneq (...)\n"
 "      override_dh_baz:\n"
 "          maybe run this\n"
@@ -4683,7 +4680,8 @@ msgstr ""
 "      #\n"
 "      # And it gets even more complicated to reason about if dh needs to\n"
 "      # recurse into debian/rules because you have an \"explicit\"\n"
-"      # standard target (e.g. a \"build-arch:\" target separate from \"%:\").\n"
+"      # standard target (e.g. a \"build-arch:\" target separate from \""
+"%:\").\n"
 "      ifneq (...)\n"
 "      override_dh_baz:\n"
 "          maybe run this\n"
@@ -6279,14 +6277,18 @@ msgstr ""
 #: dh_clean:25
 #, no-wrap
 msgid ""
-"It removes the package build directories, and removes some other files including\n"
-"F<debian/files>, and any detritus left behind by other debhelper commands. It\n"
+"It removes the package build directories, and removes some other files"
+" including\n"
+"F<debian/files>, and any detritus left behind by other debhelper commands."
+" It\n"
 "also removes common files that should not appear in a Debian diff:\n"
 "  #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS .deps/* *.P *-stamp\n"
 "\n"
 msgstr ""
-"Remove os directórios de compilação do pacote, e remove mais alguns ficheiros incluindo\n"
-"F<debian/files>, e quaisquer detritos deixados por outros comandos debhelper. Também\n"
+"Remove os directórios de compilação do pacote, e remove mais alguns ficheiros"
+" incluindo\n"
+"F<debian/files>, e quaisquer detritos deixados por outros comandos debhelper."
+" Também\n"
 "remove ficheiros comuns que não deveriam aparecer num diff de Debian:\n"
 "  #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS .deps/* *.P *-stamp\n"
 "\n"
@@ -7874,7 +7876,8 @@ msgid ""
 "\t# Script for #PACKAGE#\n"
 "\t#TOKEN#\n"
 "\tEOF\n"
-"    dh_installdeb -pfoo -pbar -pbaz  --define TOKEN=default --define pkg.bar.TOKEN=unique-bar-value \\\n"
+"    dh_installdeb -pfoo -pbar -pbaz  --define TOKEN=default --define"
+" pkg.bar.TOKEN=unique-bar-value \\\n"
 "      --define pkg.baz.TOKEN=unique-baz-value\n"
 "\n"
 msgstr ""
@@ -7890,7 +7893,8 @@ msgstr ""
 "\t# Script for #PACKAGE#\n"
 "\t#TOKEN#\n"
 "\tEOF\n"
-"    dh_installdeb -pfoo -pbar -pbaz  --define TOKEN=default --define pkg.bar.TOKEN=unique-bar-value \\\n"
+"    dh_installdeb -pfoo -pbar -pbaz  --define TOKEN=default --define"
+" pkg.bar.TOKEN=unique-bar-value \\\n"
 "      --define pkg.baz.TOKEN=unique-baz-value\n"
 "\n"
 
@@ -8217,7 +8221,8 @@ msgid ""
 "\t# Script for #PACKAGE#\n"
 "\t#TOKEN#\n"
 "\tEOF\n"
-"    dh_installdebconf -pfoo -pbar -pbaz  --define TOKEN=default --define pkg.bar.TOKEN=unique-bar-value \\\n"
+"    dh_installdebconf -pfoo -pbar -pbaz  --define TOKEN=default --define"
+" pkg.bar.TOKEN=unique-bar-value \\\n"
 "      --define pkg.baz.TOKEN=unique-baz-value\n"
 "\n"
 msgstr ""
@@ -8233,7 +8238,8 @@ msgstr ""
 "\t# Script for #PACKAGE#\n"
 "\t#TOKEN#\n"
 "\tEOF\n"
-"    dh_installdebconf -pfoo -pbar -pbaz  --define TOKEN=default --define pkg.bar.TOKEN=unique-bar-value \\\n"
+"    dh_installdebconf -pfoo -pbar -pbaz  --define TOKEN=default --define"
+" pkg.bar.TOKEN=unique-bar-value \\\n"
 "      --define pkg.baz.TOKEN=unique-baz-value\n"
 "\n"
 
@@ -9320,7 +9326,6 @@ msgstr "debian/I<pacote>.tmpfile"
 
 #. type: textblock
 #: dh_installinit:72
-#, fuzzy
 #| msgid ""
 #| "If this exists, it is installed into F<< lib/systemd/system/I<package>."
 #| "service >> in the package build directory. Only used in compat levels 10 "
@@ -9329,8 +9334,8 @@ msgid ""
 "If this exists, it is installed into usr/lib/tmpfiles.d/I<package>.conf in "
 "the package build directory. Only used in compat levels 10 and below."
 msgstr ""
-"Se isto existir, é instalado em F<< lib/systemd/system/I<pacote>.service >> "
-"no directório de compilação do pacote. Apenas usado nos níveis de "
+"Se isto existir, é instalado em usr/lib/tmpfiles.d/I<pacote>.conf no "
+"directório de compilação do pacote. Apenas usado nos níveis de "
 "compatibilidade 10 e inferiores."
 
 #. type: textblock
@@ -11496,7 +11501,6 @@ msgstr "B<-x>, B<--include-conffiles>"
 
 #. type: textblock
 #: dh_md5sums:37
-#, fuzzy
 #| msgid ""
 #| "Include conffiles in the md5sums list. Note that this information is "
 #| "redundant since it is included elsewhere in Debian packages."
@@ -11505,8 +11509,8 @@ msgid ""
 "redundant since it is included in F</var/lib/dpkg/status> in Debian packages."
 msgstr ""
 "Inclui ficheiros de configuração na lista de md5sums. Note que esta "
-"informação é redundante pois isso está incluído noutro local nos pacotes "
-"Debian."
+"informação é redundante pois isso está incluído em F</var/lib/dpkg/status> "
+"nos pacotes Debian."
 
 #. type: textblock
 #: dh_md5sums:42
@@ -12187,10 +12191,12 @@ msgstr ""
 #: dh_strip:100
 #, no-wrap
 msgid ""
-"  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< 2.1-3~)'\n"
+"  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<<"
+" 2.1-3~)'\n"
 "\n"
 msgstr ""
-"  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< 2.1-3~)'\n"
+"  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<<"
+" 2.1-3~)'\n"
 "\n"
 
 #. type: =item
@@ -12576,7 +12582,6 @@ msgstr ""
 
 #. type: textblock
 #: dh_systemd_enable:52
-#, fuzzy
 #| msgid ""
 #| "If this exists, it is installed into etc/init.d/I<package> in the package "
 #| "build directory."
@@ -12584,8 +12589,8 @@ msgid ""
 "If this exists, it is installed into usr/lib/tmpfiles.d/I<package>.conf in "
 "the package build directory."
 msgstr ""
-"Se isto existir, é instalado em etc/init.d/I<pacote> no directório de "
-"compilação do pacote."
+"Se isto existir, está instalado em usr/lib/tmpfiles.d/I<pacote>.conf no "
+"directório de compilação do pacote."
 
 #. type: =item
 #: dh_systemd_enable:55
@@ -12790,7 +12795,7 @@ msgid ""
 "F<prerm>, and start it again in the F<postinst>."
 msgstr ""
 "Nos níveis de compatibilidade anteriores a predefinição era parar o ficheiro "
-"unit no F<prerm>, e arrancá-lo de novo no F<postinst>.t>."
+"unit no F<prerm>, e arranca-lo de novo no F<postinst>.t>."
 
 #. type: textblock
 #: dh_systemd_start:59
