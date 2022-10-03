@@ -1,3 +1,47 @@
+debhelper (13.10) UNRELEASED; urgency=medium
+
+  [ Luca Boccassi ]
+  * Install `installsysusers` sequence (to match the provide).
+
+  [ Gioele Barabucci ]
+  * dh_installchangelogs: Trim old Debian changelog entries
+    automatically.  Distributions can disable this by using
+    `DEB_BUILD_OPTIONS=notrimdch`.
+  * dh_installchangelogs.t: Force locale to be `C.UTF-8` to
+    avoid generating invalid changelog entries under
+    non-default locales.
+
+  [ Andrea Pappacoda ]
+  * meson.pm: Stop providing `MESON_TESTTHREADS` environment
+    variable for the install target.  Said variable only
+    applies for testing.
+  * cmake.pm: Use `cmake --install` in compat 14.
+    (Closes: #1020732)
+  * docs/PROGRAMMING{,.md}: Rewrite PROGRAMMING into markdown.
+
+  [ Michael Biebl ]
+  * dh_installsystemduser: Stop masking user units on package
+    removal.  They should never have been masked in the first
+    place.  See #1021027.
+  * dh_installinit: Remove executable bit of init scripts on
+    package removal (via preinst).  Related to #1021027.
+  * dh_installsystemd: Stop masking system units on package
+    removal.  This is no longer necessary with the init scripts
+    getting their exec bit cleared on package removal.
+    (Closes: #1021027)
+
+  [ Niels Thykier ]
+  * Dh_Lib.pm: Add `package_type` as a function (extracted
+    from `is_udeb`).
+  * Dh_Getopt.pm: Fix duplicated `warning` in output for a
+    particular warning.
+
+  [ Translations ]
+  * Update Portuguese translation (Américo Monteiro)
+    (Closes: #1019231)
+
+ -- Niels Thykier <niels@thykier.net>  Mon, 03 Oct 2022 06:02:58 +0000
+
 debhelper (13.9.1) unstable; urgency=medium
 
   [ Niels Thykier ]
@@ -17,10 +61,6 @@ debhelper (13.9.1) unstable; urgency=medium
     when `DPKG_ROOT` is present (as `--root=/` is different from
     omitting `--root` entirely).
   * autoscripts/postinst-sysusers: Ditto
-
-  [ Translations ]
-  * Update Portuguese translation (Américo Monteiro)
-    (Closes: #1019231)
 
  -- Niels Thykier <niels@thykier.net>  Tue, 30 Aug 2022 15:24:43 +0000
 
