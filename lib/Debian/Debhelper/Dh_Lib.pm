@@ -1374,7 +1374,7 @@ sub _update_substvar {
 	my $len = scalar(@lines);
 	push(@lines, $insert_logic->()) if $insert_logic;
 	$changed ||= $len != scalar(@lines);
-	if ($changed) {
+	if ($changed && !$dh{NO_ACT}) {
 		open(my $out, '>', "${substvar_file}.new") // error("open(${substvar_file}.new, \"w\"): $!");
 		for my $line (@lines) {
 			print {$out} "$line\n";
