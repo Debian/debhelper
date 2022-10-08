@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: debhelper 9.20141107\n"
-"POT-Creation-Date: 2022-08-14 14:05+0000\n"
+"POT-Creation-Date: 2022-10-08 19:54+0200\n"
 "PO-Revision-Date: 2016-09-17 20:45+0900\n"
 "Last-Translator: Hideki Yamane <henrich@debian.org>\n"
 "Language-Team: Debian JP Project <debian-doc@debian.or.jp>\n"
@@ -46,7 +46,7 @@ msgstr "debhelper - debhelper 関連ツール群"
 #: dh_auto_configure:16 dh_auto_install:18 dh_auto_test:16 dh_bugfiles:15
 #: dh_builddeb:17 dh_clean:15 dh_compress:17 dh_dwz:16 dh_fixperms:16
 #: dh_gencontrol:16 dh_icons:16 dh_install:15 dh_installcatalogs:17
-#: dh_installchangelogs:15 dh_installcron:15 dh_installdeb:15
+#: dh_installchangelogs:16 dh_installcron:15 dh_installdeb:15
 #: dh_installdebconf:15 dh_installdirs:15 dh_installdocs:17
 #: dh_installemacsen:15 dh_installexamples:17 dh_installifupdown:15
 #: dh_installinfo:15 dh_installinit:16 dh_installinitramfs:15
@@ -54,7 +54,7 @@ msgstr "debhelper - debhelper 関連ツール群"
 #: dh_installmanpages:16 dh_installmenu:15 dh_installmime:15
 #: dh_installmodules:16 dh_installpam:15 dh_installppp:15 dh_installudev:15
 #: dh_installwm:15 dh_installxfonts:15 dh_link:16 dh_lintian:15
-#: dh_listpackages:15 dh_makeshlibs:15 dh_md5sums:16 dh_movefiles:15 dh_perl:17
+#: dh_listpackages:15 dh_makeshlibs:15 dh_md5sums:16 dh_movefiles:15 dh_perl:18
 #: dh_prep:15 dh_shlibdeps:17 dh_strip:16 dh_testdir:15 dh_testroot:9
 #: dh_usrlocal:19 dh_systemd_enable:16 dh_systemd_start:17
 msgid "SYNOPSIS"
@@ -74,7 +74,7 @@ msgstr ""
 #: dh_auto_build:20 dh_auto_clean:20 dh_auto_configure:20 dh_auto_install:22
 #: dh_auto_test:20 dh_bugfiles:19 dh_builddeb:21 dh_clean:19 dh_compress:21
 #: dh_dwz:20 dh_fixperms:20 dh_gencontrol:20 dh_icons:20 dh_install:19
-#: dh_installcatalogs:21 dh_installchangelogs:19 dh_installcron:19
+#: dh_installcatalogs:21 dh_installchangelogs:20 dh_installcron:19
 #: dh_installdeb:19 dh_installdebconf:19 dh_installdirs:19 dh_installdocs:21
 #: dh_installemacsen:19 dh_installexamples:21 dh_installifupdown:19
 #: dh_installinfo:19 dh_installinit:20 dh_installinitramfs:19
@@ -82,7 +82,7 @@ msgstr ""
 #: dh_installmanpages:20 dh_installmenu:19 dh_installmime:19
 #: dh_installmodules:20 dh_installpam:19 dh_installppp:19 dh_installudev:19
 #: dh_installwm:19 dh_installxfonts:19 dh_link:20 dh_lintian:19
-#: dh_listpackages:19 dh_makeshlibs:19 dh_md5sums:20 dh_movefiles:19 dh_perl:21
+#: dh_listpackages:19 dh_makeshlibs:19 dh_md5sums:20 dh_movefiles:19 dh_perl:22
 #: dh_prep:19 dh_shlibdeps:21 dh_strip:20 dh_testdir:19 dh_testroot:13
 #: dh_usrlocal:23 dh_systemd_enable:20 dh_systemd_start:21
 msgid "DESCRIPTION"
@@ -586,19 +586,33 @@ msgstr "B<-v>, B<--verbose>"
 
 #. type: textblock
 #: debhelper.pod:277
+#, fuzzy
+#| msgid ""
+#| "Verbose mode: show all commands that modify the package build directory."
+msgid "Verbose mode: show commands that modify the package build directory."
+msgstr ""
+"冗長出力モード。パッケージビルドディレクトリを変更するようなコマンドを全て表"
+"示します。"
+
+#. type: textblock
+#: debhelper.pod:279
+#, fuzzy
+#| msgid ""
+#| "Verbose mode: show all commands that modify the package build directory."
 msgid ""
-"Verbose mode: show all commands that modify the package build directory."
+"Note that verbose mode may also output other \"internal\" commands that do "
+"not directly affect the package build directory."
 msgstr ""
 "冗長出力モード。パッケージビルドディレクトリを変更するようなコマンドを全て表"
 "示します。"
 
 #. type: =item
-#: debhelper.pod:279 dh:266
+#: debhelper.pod:282 dh:307
 msgid "B<--no-act>"
 msgstr "B<--no-act>"
 
 #. type: textblock
-#: debhelper.pod:281
+#: debhelper.pod:284
 msgid ""
 "Do not really do anything. If used with -v, the result is that the command "
 "will output what it would have done."
@@ -607,12 +621,12 @@ msgstr ""
 "行うかが出力されます。"
 
 #. type: =item
-#: debhelper.pod:284
+#: debhelper.pod:287
 msgid "B<-a>, B<--arch>"
 msgstr "B<-a>, B<--arch>"
 
 #. type: textblock
-#: debhelper.pod:286
+#: debhelper.pod:289
 msgid ""
 "Act on architecture dependent packages that should be built for the "
 "B<DEB_HOST_ARCH> architecture."
@@ -621,22 +635,22 @@ msgstr ""
 "るように動作します。"
 
 #. type: =item
-#: debhelper.pod:289
+#: debhelper.pod:292
 msgid "B<-i>, B<--indep>"
 msgstr "B<-i>, B<--indep>"
 
 #. type: textblock
-#: debhelper.pod:291
+#: debhelper.pod:294
 msgid "Act on all architecture independent packages."
 msgstr "全てのアーキテクチャ非依存パッケージに対して処理を行います。"
 
 #. type: =item
-#: debhelper.pod:293
+#: debhelper.pod:296
 msgid "B<-p>I<package>, B<--package=>I<package>"
 msgstr "B<-p>I<package>, B<--package=>I<package>"
 
 #. type: textblock
-#: debhelper.pod:295
+#: debhelper.pod:298
 msgid ""
 "Act on the package named I<package>. This option may be specified multiple "
 "times to make debhelper operate on a given set of packages."
@@ -645,29 +659,29 @@ msgstr ""
 "debhelper に処理させる際には、繰り返し列挙して指定してください。"
 
 #. type: =item
-#: debhelper.pod:298
+#: debhelper.pod:301
 msgid "B<-s>, B<--same-arch>"
 msgstr "B<-s>, B<--same-arch>"
 
 #. type: textblock
-#: debhelper.pod:300
+#: debhelper.pod:303
 msgid "Deprecated alias of B<-a>."
 msgstr "廃止された B<-a> のエイリアスです。"
 
 #. type: textblock
-#: debhelper.pod:302 dh_install:80 dh_install:89
+#: debhelper.pod:305 dh_install:80 dh_install:89
 #, fuzzy
 #| msgid "The option is removed in compat 11."
 msgid "This option is removed in compat 12."
 msgstr "このオプションは互換性レベル 11 で廃止されています。"
 
 #. type: =item
-#: debhelper.pod:304
+#: debhelper.pod:307
 msgid "B<-N>I<package>, B<--no-package=>I<package>"
 msgstr "B<-N>I<package>, B<--no-package=>I<package>"
 
 #. type: textblock
-#: debhelper.pod:306
+#: debhelper.pod:309
 msgid ""
 "Do not act on the specified package even if an B<-a>, B<-i>, or B<-p> option "
 "lists the package as one that should be acted on."
@@ -676,12 +690,12 @@ msgstr ""
 "指定されているパッケージについては処理を行わないようにします。"
 
 #. type: =item
-#: debhelper.pod:309
+#: debhelper.pod:312
 msgid "B<--remaining-packages>"
 msgstr "B<--remaining-packages>"
 
 #. type: textblock
-#: debhelper.pod:311
+#: debhelper.pod:314
 msgid ""
 "Do not act on the packages which have already been acted on by this "
 "debhelper command earlier (i.e. if the command is present in the package "
@@ -696,12 +710,12 @@ msgstr ""
 "び出し、デフォルト設定による処理を行うという事ができます。"
 
 #. type: =item
-#: debhelper.pod:317
+#: debhelper.pod:320
 msgid "B<-P>I<tmpdir>, B<--tmpdir=>I<tmpdir>"
 msgstr "B<-P>I<tmpdir>, B<--tmpdir=>I<tmpdir>"
 
 #. type: textblock
-#: debhelper.pod:319
+#: debhelper.pod:322
 msgid ""
 "Use I<tmpdir> for package build directory. The default is debian/I<package>"
 msgstr ""
@@ -709,12 +723,12 @@ msgstr ""
 "debian/I<package> ディレクトリが使われます。"
 
 #. type: =item
-#: debhelper.pod:321
+#: debhelper.pod:324
 msgid "B<--mainpackage=>I<package>"
 msgstr "B<--mainpackage=>I<package>"
 
 #. type: textblock
-#: debhelper.pod:323
+#: debhelper.pod:326
 msgid ""
 "This little-used option changes the package which debhelper considers the "
 "\"main package\", that is, the first one listed in F<debian/control>, and "
@@ -727,12 +741,12 @@ msgstr ""
 "F<debian/foo> ファイルが使われるようになります。"
 
 #. type: =item
-#: debhelper.pod:328
+#: debhelper.pod:331
 msgid "B<-O=>I<option>|I<bundle>"
 msgstr "B<-O=>I<option>|I<bundle>"
 
 #. type: textblock
-#: debhelper.pod:330
+#: debhelper.pod:333
 msgid ""
 "This is used by L<dh(1)> when passing user-specified options to all the "
 "commands it runs. If the command supports the specified option or option "
@@ -746,12 +760,12 @@ msgstr ""
 "オプションは無視されます。"
 
 #. type: =head1
-#: debhelper.pod:337
+#: debhelper.pod:340
 msgid "COMMON DEBHELPER OPTIONS"
 msgstr "DEBHELPER の共通オプション"
 
 #. type: textblock
-#: debhelper.pod:339
+#: debhelper.pod:342
 msgid ""
 "The following command line options are supported by some debhelper "
 "programs.  See the man page of each program for a complete explanation of "
@@ -762,24 +776,24 @@ msgstr ""
 "man ページを参照してください。"
 
 #. type: =item
-#: debhelper.pod:345
+#: debhelper.pod:348
 msgid "B<-n>"
 msgstr "B<-n>"
 
 #. type: textblock
-#: debhelper.pod:347
+#: debhelper.pod:350
 msgid "Do not modify F<postinst>, F<postrm>, etc. scripts."
 msgstr "F<postinst>, F<postrm> 等のスクリプトに変更を加えません。"
 
 #. type: =item
-#: debhelper.pod:349 dh_compress:56 dh_dwz:56 dh_installchangelogs:83
-#: dh_installdocs:109 dh_installexamples:80 dh_link:78 dh_makeshlibs:154
+#: debhelper.pod:352 dh_compress:56 dh_dwz:56 dh_installchangelogs:89
+#: dh_installdocs:109 dh_installexamples:84 dh_link:78 dh_makeshlibs:154
 #: dh_md5sums:40 dh_shlibdeps:34 dh_strip:42
 msgid "B<-X>I<item>, B<--exclude=>I<item>"
 msgstr "B<-X>I<item>, B<--exclude=>I<item>"
 
 #. type: textblock
-#: debhelper.pod:351
+#: debhelper.pod:354
 #, fuzzy
 #| msgid ""
 #| "Exclude an item from processing. This option may be used multiple times, "
@@ -795,14 +809,14 @@ msgstr ""
 "されたテキストが含まれるファイルはすべて除外されます。"
 
 #. type: =item
-#: debhelper.pod:355 dh_bugfiles:57 dh_compress:63 dh_installdirs:49
-#: dh_installdocs:104 dh_installexamples:48 dh_installinfo:45 dh_installman:90
+#: debhelper.pod:358 dh_bugfiles:57 dh_compress:63 dh_installdirs:49
+#: dh_installdocs:104 dh_installexamples:52 dh_installinfo:45 dh_installman:90
 #: dh_installwm:55 dh_link:73
 msgid "B<-A>, B<--all>"
 msgstr "B<-A>, B<--all>"
 
 #. type: textblock
-#: debhelper.pod:357
+#: debhelper.pod:360
 msgid ""
 "Makes files or other items that are specified on the command line take "
 "effect in ALL packages acted on, not just the first."
@@ -811,12 +825,12 @@ msgstr ""
 "ジだけでなく全パッケージに対して処理を行います。"
 
 #. type: =head1
-#: debhelper.pod:362
+#: debhelper.pod:365
 msgid "BUILD SYSTEM OPTIONS"
 msgstr "ビルドシステム用オプション"
 
 #. type: textblock
-#: debhelper.pod:364
+#: debhelper.pod:367
 msgid ""
 "The following command line options are supported by all of the "
 "B<dh_auto_>I<*> debhelper programs. These programs support a variety of "
@@ -834,12 +848,12 @@ msgstr ""
 "す。"
 
 #. type: =item
-#: debhelper.pod:373
+#: debhelper.pod:376
 msgid "B<-S>I<buildsystem>, B<--buildsystem=>I<buildsystem>"
 msgstr "B<-S>I<buildsystem>, B<--buildsystem=>I<buildsystem>"
 
 #. type: textblock
-#: debhelper.pod:375
+#: debhelper.pod:378
 msgid ""
 "Force use of the specified I<buildsystem>, instead of trying to auto-select "
 "one which might be applicable for the package."
@@ -848,12 +862,12 @@ msgstr ""
 "で指定したビルドシステムを強制的に使用します。"
 
 #. type: textblock
-#: debhelper.pod:378
+#: debhelper.pod:381
 msgid "Pass B<none> as I<buildsystem> to disable auto-selection."
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:380
+#: debhelper.pod:383
 #, fuzzy
 #| msgid "B<-D>I<directory>, B<--sourcedirectory=>I<directory>"
 msgid ""
@@ -862,7 +876,7 @@ msgid ""
 msgstr "B<-D>I<directory>, B<--sourcedirectory=>I<directory>"
 
 #. type: textblock
-#: debhelper.pod:382
+#: debhelper.pod:385
 msgid ""
 "Assume that the original package source tree is at the specified "
 "I<directory> rather than the top level directory of the Debian source "
@@ -872,7 +886,7 @@ msgstr ""
 "リではなく、I<directory> で指定した場所にあると仮定します。"
 
 #. type: textblock
-#: debhelper.pod:386
+#: debhelper.pod:389
 msgid ""
 "B<Warning>: The B<--sourcedir> variant matches a similar named option in "
 "B<dh_install> and B<dh_missing> (etc.) for historical reasons.  While they "
@@ -882,7 +896,7 @@ msgid ""
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:392
+#: debhelper.pod:395
 #, fuzzy
 #| msgid "B<-B>[I<directory>], B<--builddirectory=>[I<directory>]"
 msgid ""
@@ -891,7 +905,7 @@ msgid ""
 msgstr "B<-B>[I<directory>], B<--builddirectory=>[I<directory>]"
 
 #. type: textblock
-#: debhelper.pod:394
+#: debhelper.pod:397
 msgid ""
 "Enable out of source building and use the specified I<directory> as the "
 "build directory. If I<directory> parameter is omitted, a default build "
@@ -902,7 +916,7 @@ msgstr ""
 "はデフォルトのビルドディレクトリが利用されます。"
 
 #. type: textblock
-#: debhelper.pod:398
+#: debhelper.pod:401
 msgid ""
 "If this option is not specified, building will be done in source by default "
 "unless the build system requires or prefers out of source tree building.  In "
@@ -915,7 +929,7 @@ msgstr ""
 "されていなくてもデフォルトのビルドディレクトリが使用されます。"
 
 #. type: textblock
-#: debhelper.pod:403
+#: debhelper.pod:406
 msgid ""
 "If the build system prefers out of source tree building but still allows in "
 "source building, the latter can be re-enabled by passing a build directory "
@@ -927,12 +941,12 @@ msgstr ""
 "ドを行うようにできます。"
 
 #. type: =item
-#: debhelper.pod:407
+#: debhelper.pod:410
 msgid "B<--parallel>, B<--no-parallel>"
 msgstr "B<--parallel>, B<--no-parallel>"
 
 #. type: textblock
-#: debhelper.pod:409
+#: debhelper.pod:412
 msgid ""
 "Control whether parallel builds should be used if underlying build system "
 "supports them.  The number of parallel jobs is controlled by the "
@@ -945,7 +959,7 @@ msgstr ""
 "ル、4.9.1章>)。ビルドシステム固有の制限に影響を受ける場合もあります。"
 
 #. type: textblock
-#: debhelper.pod:415
+#: debhelper.pod:418
 msgid ""
 "If neither option is specified, debhelper currently defaults to B<--"
 "parallel> in compat 10 (or later) and B<--no-parallel> otherwise."
@@ -956,7 +970,7 @@ msgstr ""
 
 # FIXME: typo: unnecessary
 #. type: textblock
-#: debhelper.pod:418
+#: debhelper.pod:421
 msgid ""
 "As an optimization, B<dh> will try to avoid passing these options to "
 "subprocesses, if they are unnecessary and the only options passed.  Notably "
@@ -969,12 +983,12 @@ msgstr ""
 "ない (またはこの値が 1 である) 場合に起こります。"
 
 #. type: =item
-#: debhelper.pod:423
+#: debhelper.pod:426
 msgid "B<--max-parallel=>I<maximum>"
 msgstr "B<--max-parallel=>I<maximum>"
 
 #. type: textblock
-#: debhelper.pod:425
+#: debhelper.pod:428
 msgid ""
 "This option implies B<--parallel> and allows further limiting the number of "
 "jobs that can be used in a parallel build. If the package build is known to "
@@ -987,7 +1001,7 @@ msgstr ""
 "を指定できます。"
 
 #. type: textblock
-#: debhelper.pod:430
+#: debhelper.pod:433
 msgid ""
 "Notably, setting the maximum to 1 is effectively the same as using B<--no-"
 "parallel>."
@@ -996,12 +1010,12 @@ msgstr ""
 "す。"
 
 #. type: =item
-#: debhelper.pod:433
+#: debhelper.pod:436
 msgid "B<--reload-all-buildenv-variables>"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:435
+#: debhelper.pod:438
 msgid ""
 "By default, L<dh(1)> will compute several environment variables (e.g. by "
 "using L<dpkg-buildflags(1)>) and cache them to avoid having all B<dh_auto_*> "
@@ -1009,7 +1023,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:439
+#: debhelper.pod:442
 msgid ""
 "When passing this option, the concrete B<dh_auto_*> tool will ignore the "
 "cache from L<dh(1)> and retrigger a rebuild of these variables.  This is "
@@ -1019,7 +1033,7 @@ msgid ""
 msgstr ""
 
 #. type: verbatim
-#: debhelper.pod:446
+#: debhelper.pod:449
 #, no-wrap
 msgid ""
 "    export DEB_CFLAGS_MAINT_APPEND=-O3\n"
@@ -1027,7 +1041,7 @@ msgid ""
 msgstr ""
 
 #. type: verbatim
-#: debhelper.pod:448
+#: debhelper.pod:451
 #, no-wrap
 msgid ""
 "    %:\n"
@@ -1036,7 +1050,7 @@ msgid ""
 msgstr ""
 
 #. type: verbatim
-#: debhelper.pod:451
+#: debhelper.pod:454
 #, no-wrap
 msgid ""
 "    override_dh_auto_configure:\n"
@@ -1047,7 +1061,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:456
+#: debhelper.pod:459
 msgid ""
 "Without B<--reload-all-buildenv-variables> in the second call to "
 "L<dh_auto_configure(1)>, the change in B<DEB_CFLAGS_MAINT_APPEND> would be "
@@ -1056,19 +1070,19 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:461
+#: debhelper.pod:464
 msgid ""
 "This option is only available with B<< debhelper (>= 12.7~) >> when the "
 "package uses compatibility level 9 or later."
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:464 dh:258
+#: debhelper.pod:467 dh:299
 msgid "B<--list>, B<-l>"
 msgstr "B<--list>, B<-l>"
 
 #. type: textblock
-#: debhelper.pod:466
+#: debhelper.pod:469
 msgid ""
 "List all build systems supported by debhelper on this system. The list "
 "includes both default and third party build systems (marked as such). Also "
@@ -1082,12 +1096,12 @@ msgstr ""
 "示します。"
 
 #. type: =head1
-#: debhelper.pod:473
+#: debhelper.pod:476
 msgid "COMPATIBILITY LEVELS"
 msgstr "互換性レベル"
 
 #. type: textblock
-#: debhelper.pod:475
+#: debhelper.pod:478
 #, fuzzy
 #| msgid ""
 #| "From time to time, major non-backwards-compatible changes need to be made "
@@ -1115,7 +1129,7 @@ msgstr ""
 "ルは F<debian/compat> ファイルで指定され、このファイルは必須となっています。"
 
 #. type: textblock
-#: debhelper.pod:482
+#: debhelper.pod:485
 #, fuzzy
 #| msgid ""
 #| "Tell debhelper what compatibility level to use by writing a number to "
@@ -1129,7 +1143,7 @@ msgstr ""
 "えます。例えば、v#RECOMMENDED_COMPAT# モードを使うには次の様にします:"
 
 #. type: verbatim
-#: debhelper.pod:486
+#: debhelper.pod:489
 #, fuzzy, no-wrap
 #| msgid ""
 #| "  Build-Depends: debhelper (>= #RECOMMENDED_COMPAT#)\n"
@@ -1142,7 +1156,7 @@ msgstr ""
 "\n"
 
 #. type: textblock
-#: debhelper.pod:488
+#: debhelper.pod:491
 msgid ""
 "This also serves as an appropriate versioned build dependency on a "
 "sufficient version of the debhelper package, so you do not need to specify a "
@@ -1152,7 +1166,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:494
+#: debhelper.pod:497
 msgid ""
 "Note that debhelper does not provide debhelper-compat for experimental or "
 "beta compatibility levels; packages experimenting with those compatibility "
@@ -1161,7 +1175,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:498
+#: debhelper.pod:501
 msgid ""
 "Prior versions of debhelper required specifying the compatibility level in "
 "the file F<debian/compat>, and current debhelper still supports this for "
@@ -1175,7 +1189,7 @@ msgid ""
 msgstr ""
 
 #. type: verbatim
-#: debhelper.pod:508
+#: debhelper.pod:511
 #, fuzzy, no-wrap
 #| msgid ""
 #| "  Build-Depends: debhelper (>= #RECOMMENDED_COMPAT#)\n"
@@ -1188,7 +1202,7 @@ msgstr ""
 "\n"
 
 #. type: textblock
-#: debhelper.pod:510
+#: debhelper.pod:513
 msgid ""
 "Note that you must use either the build-dependency on debhelper-compat or "
 "the F<debian/compat> file. Whenever possible, the debhelper-compat build-"
@@ -1196,7 +1210,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:514
+#: debhelper.pod:517
 msgid ""
 "If needed be, the B<DH_COMPAT> environment variable can be used to override "
 "the compat level for a given command.  The feature is mostly useful for "
@@ -1208,7 +1222,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:522
+#: debhelper.pod:525
 msgid ""
 "Unless otherwise indicated, all debhelper documentation assumes that you are "
 "using the most recent compatibility level, and in most cases does not "
@@ -1223,22 +1237,22 @@ msgstr ""
 "す。"
 
 #. type: =head2
-#: debhelper.pod:529
+#: debhelper.pod:532
 #, fuzzy
 #| msgid "This is the lowest supported compatibility level."
 msgid "Supported compatibility levels"
 msgstr "これはサポートされている最低限の互換性レベルです。"
 
 #. type: textblock
-#: debhelper.pod:531
+#: debhelper.pod:534
 msgid ""
 "The list of supported compatibility levels and the related upgrade check "
 "list has moved to L<debhelper-compat-upgrade-checklist(7)>."
 msgstr ""
 
 #. type: =head1
-#: debhelper.pod:534 dh_auto_test:48 dh_dwz:69 dh_installcatalogs:67
-#: dh_installdocs:202 dh_installemacsen:75 dh_installexamples:92
+#: debhelper.pod:537 dh_auto_test:48 dh_dwz:69 dh_installcatalogs:67
+#: dh_installdocs:202 dh_installemacsen:75 dh_installexamples:96
 #: dh_installinit:204 dh_installinitramfs:60 dh_installman:131
 #: dh_installmodules:57 dh_installudev:50 dh_installwm:66 dh_installxfonts:40
 #: dh_movefiles:67 dh_strip:119 dh_usrlocal:60 dh_systemd_enable:103
@@ -1247,12 +1261,12 @@ msgid "NOTES"
 msgstr "付記"
 
 #. type: =head2
-#: debhelper.pod:536
+#: debhelper.pod:539
 msgid "Multiple binary package support"
 msgstr "複数のバイナリパッケージのサポート"
 
 #. type: textblock
-#: debhelper.pod:538
+#: debhelper.pod:541
 msgid ""
 "If your source package generates more than one binary package, debhelper "
 "programs will default to acting on all binary packages when run. If your "
@@ -1271,7 +1285,7 @@ msgstr ""
 "indep ターゲットで生成する必要がある為です。"
 
 #. type: textblock
-#: debhelper.pod:546
+#: debhelper.pod:549
 msgid ""
 "To facilitate this, as well as give you more control over which packages are "
 "acted on by debhelper programs, all debhelper programs accept the B<-a>, B<-"
@@ -1286,7 +1300,7 @@ msgstr ""
 "ルに列挙されたすべてのパッケージに対して処理を行います。"
 
 #. type: textblock
-#: debhelper.pod:552
+#: debhelper.pod:555
 msgid ""
 "First, any package whose B<Architecture> field in B<debian/control> does not "
 "match the B<DEB_HOST_ARCH> architecture will be excluded (L<Debian Policy, "
@@ -1297,7 +1311,7 @@ msgstr ""
 "5.6.8 章>)。"
 
 #. type: textblock
-#: debhelper.pod:556
+#: debhelper.pod:559
 msgid ""
 "Also, some additional packages may be excluded based on the contents of the "
 "B<DEB_BUILD_PROFILES> environment variable and B<Build-Profiles> fields in "
@@ -1310,12 +1324,12 @@ msgstr ""
 "ます。"
 
 #. type: =head3
-#: debhelper.pod:561
+#: debhelper.pod:564
 msgid "Interaction between package selections and Build-Profiles"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:563
+#: debhelper.pod:566
 msgid ""
 "Build-Profiles affect which packages are included in the package selections "
 "mechanisms in debhelper.  Generally, the package selections are described "
@@ -1325,19 +1339,19 @@ msgid ""
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:571
+#: debhelper.pod:574
 msgid "-a/--arch, -i/--indep OR no selection options (a raw \"dh_X\" call)"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:573
+#: debhelper.pod:576
 msgid ""
 "The package disabled by Build-Profiles is silently excluded from the "
 "selection."
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:576
+#: debhelper.pod:579
 msgid ""
 "Note you will receive a warning if I<all> packages related to these "
 "selections are disabled.  In that case, it generally does not make sense to "
@@ -1345,31 +1359,31 @@ msgid ""
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:580
+#: debhelper.pod:583
 #, fuzzy
 #| msgid "B<-N>I<package>, B<--no-package=>I<package>"
 msgid "-N I<package> / --no-package I<package>"
 msgstr "B<-N>I<package>, B<--no-package=>I<package>"
 
 #. type: textblock
-#: debhelper.pod:582
+#: debhelper.pod:585
 msgid "The option is accepted and effectively does nothing."
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:584
+#: debhelper.pod:587
 #, fuzzy
 #| msgid "B<-p>I<package>, B<--package=>I<package>"
 msgid "-p I<package> / --package I<package>"
 msgstr "B<-p>I<package>, B<--package=>I<package>"
 
 #. type: textblock
-#: debhelper.pod:586
+#: debhelper.pod:589
 msgid "The option is accepted, but debhelper will not act on the package."
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:590
+#: debhelper.pod:593
 msgid ""
 "Note that it does not matter whether a package is enabled or disabled by "
 "default."
@@ -1377,12 +1391,12 @@ msgstr ""
 
 # note: it should be "Debian maintainer scripts"?
 #. type: =head2
-#: debhelper.pod:593
+#: debhelper.pod:596
 msgid "Automatic generation of Debian install scripts"
 msgstr "メンテナスクリプトの自動生成"
 
 #. type: textblock
-#: debhelper.pod:595
+#: debhelper.pod:598
 msgid ""
 "Some debhelper commands will automatically generate parts of Debian "
 "maintainer scripts. If you want these automatically generated things "
@@ -1398,7 +1412,7 @@ msgstr ""
 "へ置換されます。"
 
 #. type: textblock
-#: debhelper.pod:602
+#: debhelper.pod:605
 msgid ""
 "If a script does not exist at all and debhelper needs to add something to "
 "it, then debhelper will create the complete script."
@@ -1407,7 +1421,7 @@ msgstr ""
 "ある場合、debhelper はスクリプトを一式生成します。"
 
 #. type: textblock
-#: debhelper.pod:605
+#: debhelper.pod:608
 msgid ""
 "All debhelper commands that automatically generate code in this way let it "
 "be disabled by the -n parameter (see above)."
@@ -1416,7 +1430,7 @@ msgstr ""
 "の自動生成を行わないようにできます (上記参照)。"
 
 #. type: textblock
-#: debhelper.pod:608
+#: debhelper.pod:611
 msgid ""
 "Note that the inserted code will be shell code, so you cannot directly use "
 "it in a Perl script. If you would like to embed it into a Perl script, here "
@@ -1428,7 +1442,7 @@ msgstr ""
 "例を挙げます ($1, $2 等は set コマンドにより設定される事に注意):"
 
 #. type: verbatim
-#: debhelper.pod:613
+#: debhelper.pod:616
 #, no-wrap
 msgid ""
 "  my $temp=\"set -e\\nset -- @ARGV\\n\" . << 'EOF';\n"
@@ -1460,12 +1474,12 @@ msgstr ""
 "\n"
 
 #. type: =head2
-#: debhelper.pod:626
+#: debhelper.pod:629
 msgid "Automatic generation of miscellaneous dependencies."
 msgstr "様々な依存関係の自動生成"
 
 #. type: textblock
-#: debhelper.pod:628
+#: debhelper.pod:631
 msgid ""
 "Some debhelper commands may make the generated package need to depend on "
 "some other packages. For example, if you use L<dh_installdebconf(1)>, your "
@@ -1484,7 +1498,7 @@ msgstr ""
 "ます。"
 
 #. type: textblock
-#: debhelper.pod:636
+#: debhelper.pod:639
 msgid ""
 "All commands of this type, besides documenting what dependencies may be "
 "needed on their man pages, will automatically generate a substvar called "
@@ -1498,7 +1512,7 @@ msgstr ""
 "ります。"
 
 #. type: textblock
-#: debhelper.pod:641
+#: debhelper.pod:644
 msgid ""
 "This is entirely independent of the standard B<${shlibs:Depends}> generated "
 "by L<dh_makeshlibs(1)>, and the B<${perl:Depends}> generated by "
@@ -1511,12 +1525,12 @@ msgstr ""
 "合は、これらを使わないようにすることも可能です。"
 
 #. type: =head2
-#: debhelper.pod:646
+#: debhelper.pod:649
 msgid "Package build directories"
 msgstr "パッケージビルドディレクトリ"
 
 #. type: textblock
-#: debhelper.pod:648
+#: debhelper.pod:651
 msgid ""
 "By default, all debhelper programs assume that the temporary directory used "
 "for assembling the tree of files in a package is debian/I<package>."
@@ -1525,7 +1539,7 @@ msgstr ""
 "まとめる一時ディレクトリとして debian/I<package> ディレクトリを使用します。"
 
 #. type: textblock
-#: debhelper.pod:651
+#: debhelper.pod:654
 msgid ""
 "Sometimes, you might want to use some other temporary directory. This is "
 "supported by the B<-P> flag. For example, \"B<dh_installdocs -Pdebian/"
@@ -1544,12 +1558,12 @@ msgstr ""
 "ます。"
 
 #. type: =head2
-#: debhelper.pod:659
+#: debhelper.pod:662
 msgid "udebs"
 msgstr "udeb パッケージについて"
 
 #. type: textblock
-#: debhelper.pod:661
+#: debhelper.pod:664
 msgid ""
 "Debhelper includes support for udebs. To create a udeb with debhelper, add "
 "\"B<Package-Type: udeb>\" to the package's stanza in F<debian/control>.  "
@@ -1566,19 +1580,19 @@ msgstr ""
 "いたものです。"
 
 #. type: =head1
-#: debhelper.pod:668
+#: debhelper.pod:671
 msgid "ENVIRONMENT"
 msgstr "環境変数"
 
 #. type: textblock
-#: debhelper.pod:670
+#: debhelper.pod:673
 msgid ""
 "This section describes some of the environment variables that influences the "
 "behaviour of debhelper or which debhelper interacts with."
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:673
+#: debhelper.pod:676
 #, fuzzy
 #| msgid ""
 #| "The following environment variables can influence the behavior of "
@@ -1599,33 +1613,38 @@ msgstr ""
 "す。"
 
 #. type: =item
-#: debhelper.pod:680
+#: debhelper.pod:683
 msgid "B<DH_VERBOSE>"
 msgstr "B<DH_VERBOSE>"
 
 #. type: textblock
-#: debhelper.pod:682
+#: debhelper.pod:685
 msgid ""
-"Set to B<1> to enable verbose mode. Debhelper will output every command it "
-"runs. Also enables verbose build logs for some build systems like autoconf."
+"Set to a non-empty value to enable verbose mode.  Please see the B<-v> / B<--"
+"verbose> option for details."
 msgstr ""
-"B<1> を指定すると冗長出力モードになります。debhelper は動作する全てのコマンド"
-"について出力を行うようになります。また、autoconf のようなビルドシステムについ"
-"ても冗長出力されたビルドログを有効にします。"
 
 #. type: =item
-#: debhelper.pod:685
+#: debhelper.pod:688
 msgid "B<DH_QUIET>"
 msgstr "B<DH_QUIET>"
 
 #. type: textblock
-#: debhelper.pod:687
+#: debhelper.pod:690
+#, fuzzy
+#| msgid ""
+#| "Set to B<1> to enable quiet mode. Debhelper will not output commands "
+#| "calling the upstream build system nor will dh print which subcommands are "
+#| "called and depending on the upstream build system might make that more "
+#| "quiet, too.  This makes it easier to spot important messages but makes "
+#| "the output quite useless as buildd log.  Ignored if DH_VERBOSE is also "
+#| "set."
 msgid ""
-"Set to B<1> to enable quiet mode. Debhelper will not output commands calling "
-"the upstream build system nor will dh print which subcommands are called and "
-"depending on the upstream build system might make that more quiet, too.  "
-"This makes it easier to spot important messages but makes the output quite "
-"useless as buildd log.  Ignored if DH_VERBOSE is also set."
+"Set to a non-empty value to enable quiet mode. Debhelper will not output "
+"commands calling the upstream build system nor will dh print which "
+"subcommands are called and depending on the upstream build system might make "
+"that more quiet, too.  This makes it easier to spot important messages but "
+"makes the output quite useless as buildd log."
 msgstr ""
 "quiet モードを有効にするには B<1> を指定して下さい。debhelperは upstream のビ"
 "ルドシステムの呼び出しコマンドや、dh がどのサブコマンドが呼び出されたのかも出"
@@ -1634,13 +1653,18 @@ msgstr ""
 "めて使い物にならなくなります。DH_VERBOSE が同時にセットされていると無視されま"
 "す。"
 
+#. type: textblock
+#: debhelper.pod:696
+msgid "Ignored if DH_VERBOSE is also set or B<-v> / B<--verbose> is passed."
+msgstr ""
+
 #. type: =item
-#: debhelper.pod:694
+#: debhelper.pod:698
 msgid "B<DH_COMPAT>"
 msgstr "B<DH_COMPAT>"
 
 #. type: textblock
-#: debhelper.pod:696
+#: debhelper.pod:700
 #, fuzzy
 #| msgid ""
 #| "Temporarily specifies what compatibility level debhelper should run at, "
@@ -1654,22 +1678,22 @@ msgstr ""
 "のです。こちらを指定すると F<debian/compat> の値を上書きします。"
 
 #. type: =item
-#: debhelper.pod:700
+#: debhelper.pod:704
 msgid "B<DH_NO_ACT>"
 msgstr "B<DH_NO_ACT>"
 
 #. type: textblock
-#: debhelper.pod:702
+#: debhelper.pod:706
 msgid "Set to B<1> to enable no-act mode."
 msgstr "B<1> に設定すると、何もしない (no-act) モードになります。"
 
 #. type: =item
-#: debhelper.pod:704
+#: debhelper.pod:708
 msgid "B<DH_OPTIONS>"
 msgstr "B<DH_OPTIONS>"
 
 #. type: textblock
-#: debhelper.pod:706
+#: debhelper.pod:710
 msgid ""
 "All debhelper tools will parse command line arguments listed in this "
 "variable before any command option (as if they had been prepended to the "
@@ -1678,7 +1702,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:711
+#: debhelper.pod:715
 msgid ""
 "When using L<dh(1)>, it can be passed options that will be passed on to each "
 "debhelper command, which is generally better than using DH_OPTIONS."
@@ -1688,12 +1712,12 @@ msgstr ""
 "法です。"
 
 #. type: =item
-#: debhelper.pod:714
+#: debhelper.pod:718
 msgid "B<DH_ALWAYS_EXCLUDE>"
 msgstr "B<DH_ALWAYS_EXCLUDE>"
 
 #. type: textblock
-#: debhelper.pod:716
+#: debhelper.pod:720
 msgid ""
 "If set, this adds the value the variable is set to to the B<-X> options of "
 "all commands that support the B<-X> option. Moreover, B<dh_builddeb> will "
@@ -1705,7 +1729,7 @@ msgstr ""
 "チするもの全部を B<rm -rf> するようになります。"
 
 #. type: textblock
-#: debhelper.pod:720
+#: debhelper.pod:724
 msgid ""
 "This can be useful if you are doing a build from a CVS source tree, in which "
 "case setting B<DH_ALWAYS_EXCLUDE=CVS> will prevent any CVS directories from "
@@ -1722,7 +1746,7 @@ msgstr ""
 "ようとも効果を発揮するようになります。"
 
 #. type: textblock
-#: debhelper.pod:727
+#: debhelper.pod:731
 msgid ""
 "Multiple things to exclude can be separated with colons, as in "
 "B<DH_ALWAYS_EXCLUDE=CVS:.svn>"
@@ -1731,14 +1755,14 @@ msgstr ""
 "コロンで区切ってください。"
 
 #. type: =item
-#: debhelper.pod:730
+#: debhelper.pod:734
 #, fuzzy
 #| msgid "B<DH_OPTIONS>"
 msgid "B<DH_EXTRA_ADDONS>"
 msgstr "B<DH_OPTIONS>"
 
 #. type: textblock
-#: debhelper.pod:732
+#: debhelper.pod:736
 msgid ""
 "If set, this adds the specified dh addons to be run in the appropriate "
 "places in the sequence of commands. This is equivalent to specifying the "
@@ -1747,7 +1771,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:737
+#: debhelper.pod:741
 msgid ""
 "This is intended to be used by downstreams or specific local configurations "
 "that require a debhelper addon to be run during multiple builds without "
@@ -1756,12 +1780,12 @@ msgid ""
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:742
+#: debhelper.pod:746
 msgid "B<DH_COLORS>, B<DPKG_COLORS>"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:744
+#: debhelper.pod:748
 msgid ""
 "These variables can be used to control whether debhelper commands should use "
 "colors in their textual output.  Can be set to \"always\", \"auto\" (the "
@@ -1769,7 +1793,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:748
+#: debhelper.pod:752
 msgid ""
 "Note that B<DPKG_COLOR> also affects a number of dpkg related tools and "
 "debhelper uses it on the assumption that you want the same color setting for "
@@ -1779,12 +1803,12 @@ msgid ""
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:754
+#: debhelper.pod:758
 msgid "B<NO_COLOR>"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:756
+#: debhelper.pod:760
 msgid ""
 "If no explicit request for color has been given (e.g. B<DH_COLORS> and "
 "B<DPKG_COLORS> are both unset), the presence of this environment variable "
@@ -1792,7 +1816,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:760
+#: debhelper.pod:764
 msgid ""
 "The variable is defined according to L<https://no-color.org/>.  In this "
 "project, the environment variables (such as B<DH_COLORS>) are considered an "
@@ -1800,14 +1824,14 @@ msgid ""
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:764
+#: debhelper.pod:768
 msgid ""
 "B<CFLAGS>, B<CPPFLAGS>, B<CXXFLAGS>, B<OBJCFLAGS>, B<OBJCXXFLAGS>, "
 "B<GCJFLAGS>, B<FFLAGS>, B<FCFLAGS>, B<LDFLAGS>"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:766
+#: debhelper.pod:770
 msgid ""
 "By default (in any non-deprecated compat level), debhelper will "
 "automatically set these flags by using L<dpkg-buildflags(1)>, when they are "
@@ -1818,12 +1842,12 @@ msgid ""
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:773
+#: debhelper.pod:777
 msgid "B<HOME>, B<XDG_*>"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:775
+#: debhelper.pod:779
 msgid ""
 "In compat 13 and later, these environment variables are reset before "
 "invoking the upstream build system via the B<dh_auto_*> helpers.  The "
@@ -1834,7 +1858,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:781
+#: debhelper.pod:785
 msgid ""
 "The B<HOME> directory will be created as an empty directory but it will be "
 "reused between calls to B<dh_auto_*>.  Any content will persist until "
@@ -1842,21 +1866,21 @@ msgid ""
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:785
+#: debhelper.pod:789
 #, fuzzy
 #| msgid "B<DH_OPTIONS>"
 msgid "B<DEB_BUILD_OPTIONS>"
 msgstr "B<DH_OPTIONS>"
 
 #. type: textblock
-#: debhelper.pod:787
+#: debhelper.pod:791
 msgid ""
 "Please see L</Supported flags in DEB_BUILD_OPTIONS> for this environment "
 "variable."
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:790
+#: debhelper.pod:794
 msgid ""
 "Please note that this variable should I<not> be altered by package "
 "maintainers inside F<debian/rules> to change the behaviour of debhelper.  "
@@ -1866,21 +1890,21 @@ msgid ""
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:795
+#: debhelper.pod:799
 #, fuzzy
 #| msgid "B<DH_OPTIONS>"
 msgid "B<DEB_BUILD_MAINT_OPTIONS>"
 msgstr "B<DH_OPTIONS>"
 
 #. type: textblock
-#: debhelper.pod:797
+#: debhelper.pod:801
 msgid ""
 "This is a dpkg specific environment variable (see e.g. L<dpkg-"
 "buildflags(1)>).  The debhelper tool suite silently ignores it."
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:800
+#: debhelper.pod:804
 msgid ""
 "It is documented here because it has a similar name to B<DEB_BUILD_OPTIONS>, "
 "which make some people mistakenly assume that debhelper will also react to "
@@ -1888,29 +1912,29 @@ msgid ""
 msgstr ""
 
 #. type: =head2
-#: debhelper.pod:806
+#: debhelper.pod:810
 msgid "Supported flags in DEB_BUILD_OPTIONS"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:808
+#: debhelper.pod:812
 msgid ""
 "The debhelper tool suite reacts to the following flags in "
 "B<DEB_BUILD_OPTIONS>."
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:812
+#: debhelper.pod:816
 msgid "B<dherroron=obsolete-compat-levels>"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:814
+#: debhelper.pod:818
 msgid "I<This is a debhelper specific value.>"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:816
+#: debhelper.pod:820
 msgid ""
 "When B<dherroron> is present and set to B<obsolete-compat-levels>, then "
 "debhelper tools will promote deprecation warnings for usage of old soon to "
@@ -1918,24 +1942,24 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:820
+#: debhelper.pod:824
 msgid ""
 "This is useful for automated checking for code relying on deprecated compat "
 "levels that is scheduled for removal."
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:823
+#: debhelper.pod:827
 msgid "This option is intended for testing purposes; not production builds."
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:825
+#: debhelper.pod:829
 msgid "B<nostrip>"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:827 debhelper.pod:850
+#: debhelper.pod:831 debhelper.pod:854 debhelper.pod:868
 msgid ""
 "I<This value will change the content of the debs being built.  The .deb "
 "packages built when this is set is therefore not bit-for-bit reproducible "
@@ -1943,7 +1967,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:831
+#: debhelper.pod:835
 msgid ""
 "This value will cause the official debhelper tools will skip actions and "
 "helpers that either remove, detach or deduplicate debugging symbols in ELF "
@@ -1951,24 +1975,24 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:835
+#: debhelper.pod:839
 msgid "This value affects L<dh_dwz(1)> and L<dh_strip(1)>."
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:837
+#: debhelper.pod:841
 msgid "B<nocheck>"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:839
+#: debhelper.pod:843
 msgid ""
 "This value will cause the official debhelper build systems to skip runs of "
 "upstream test suites."
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:842
+#: debhelper.pod:846
 msgid ""
 "Package maintainers looking to avoid running the upstream tests should "
 "B<not> rely on this.  Instead, they can add an empty override target to skip "
@@ -1976,17 +2000,17 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:846
+#: debhelper.pod:850
 msgid "This value affects L<dh_auto_test(1)>."
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:848
+#: debhelper.pod:852
 msgid "B<nodoc>"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:854
+#: debhelper.pod:858
 msgid ""
 "This value will cause several debhelper tools to skip installation of "
 "documentation such as manpages or upstream provided documentation.  "
@@ -1995,45 +2019,58 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:859
+#: debhelper.pod:863
 msgid ""
 "This value effects tools I<like> L<dh_installdocs(1)>, which I<knows> it is "
 "working with documentation."
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:862
+#: debhelper.pod:866
+msgid "B<notrimdch>"
+msgstr ""
+
+#. type: textblock
+#: debhelper.pod:872
+msgid ""
+"This value will cause L<dh_installchangelogs(1)> to act as if it had been "
+"passed the B<--no-trim> option, forcing it to forgo removing older entries "
+"from changelogs."
+msgstr ""
+
+#. type: =item
+#: debhelper.pod:876
 #, fuzzy
 #| msgid "B<--ddebs>, B<--no-ddebs>"
 msgid "B<noautodbgsym>, B<noddebs>"
 msgstr "B<--ddebs>, B<--no-ddebs>"
 
 #. type: textblock
-#: debhelper.pod:864
+#: debhelper.pod:878
 msgid ""
 "I<The official name is noautodbgsym.  The noddebs variant is accepted for "
 "historical reasons.>"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:867
+#: debhelper.pod:881
 msgid ""
 "This value causes debhelper to skip the generation of automatically "
 "generated debug symbol packages."
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:870
+#: debhelper.pod:884
 msgid "This value affects L<dh_strip(1)>."
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:872
+#: debhelper.pod:886
 msgid "B<parallel=N>"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:874
+#: debhelper.pod:888
 msgid ""
 "This value enables debhelper to use up to B<N> threads or processes (subject "
 "to parameters like B<--no-parallel> and B<--max-parallel=M>).  Not all "
@@ -2041,7 +2078,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:879
+#: debhelper.pod:893
 msgid ""
 "This value affects many debhelper tools.  Most notably B<dh_auto_*>, which "
 "will attempt to run the underlying upstream build system with that number of "
@@ -2049,12 +2086,12 @@ msgid ""
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:883
+#: debhelper.pod:897
 msgid "B<terse>"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:885
+#: debhelper.pod:899
 msgid ""
 "This value will cause the official debhelper build systems to configure "
 "upstream builds to be terse (i.e. reduce verbosity in their output).  This "
@@ -2063,17 +2100,20 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:890
-msgid "This value affects most B<dh_auto_*> tools."
+#: debhelper.pod:904
+msgid ""
+"This value affects most B<dh_auto_*> tools directly. For commands provided "
+"by the debhelper package, it also causes the tools to act like the "
+"B<DH_QUIET> environment variable was non-empty."
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:894
+#: debhelper.pod:910
 msgid "Unknown flags are silently ignored."
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:896
+#: debhelper.pod:912
 msgid ""
 "Note third-party debhelper-like tools or third-party provided build systems "
 "may or may not react to the above flags.  This tends to depend on "
@@ -2081,82 +2121,82 @@ msgid ""
 msgstr ""
 
 #. type: =head1
-#: debhelper.pod:900 debhelper-compat-upgrade-checklist.pod:753
-#: debhelper-obsolete-compat.pod:178 dh:807 dh_auto_build:53 dh_auto_clean:55
+#: debhelper.pod:916 debhelper-compat-upgrade-checklist.pod:753
+#: debhelper-obsolete-compat.pod:178 dh:872 dh_auto_build:53 dh_auto_clean:55
 #: dh_auto_configure:58 dh_auto_install:103 dh_auto_test:64 dh_bugfiles:133
 #: dh_builddeb:182 dh_clean:189 dh_compress:243 dh_dwz:162 dh_fixperms:164
 #: dh_gencontrol:208 dh_icons:75 dh_install:377 dh_installcatalogs:128
-#: dh_installchangelogs:300 dh_installcron:80 dh_installdeb:419
+#: dh_installchangelogs:363 dh_installcron:80 dh_installdeb:419
 #: dh_installdebconf:233 dh_installdirs:131 dh_installdocs:437
-#: dh_installemacsen:138 dh_installexamples:178 dh_installifupdown:72
+#: dh_installemacsen:138 dh_installexamples:182 dh_installifupdown:72
 #: dh_installinfo:123 dh_installinit:413 dh_installinitramfs:91
 #: dh_installlogcheck:81 dh_installlogrotate:53 dh_installman:421
 #: dh_installmanpages:198 dh_installmenu:88 dh_installmime:63
 #: dh_installmodules:109 dh_installpam:71 dh_installppp:68 dh_installudev:102
 #: dh_installwm:132 dh_installxfonts:90 dh_link:166 dh_lintian:60
 #: dh_listpackages:34 dh_makeshlibs:456 dh_md5sums:118 dh_movefiles:161
-#: dh_perl:174 dh_prep:70 dh_shlibdeps:204 dh_strip:435 dh_testdir:62
+#: dh_perl:188 dh_prep:70 dh_shlibdeps:204 dh_strip:435 dh_testdir:62
 #: dh_testroot:93 dh_usrlocal:136 dh_systemd_enable:280 dh_systemd_start:280
 msgid "SEE ALSO"
 msgstr "参照"
 
 #. type: =item
-#: debhelper.pod:904
+#: debhelper.pod:920
 msgid "L<debhelper-compat-upgrade-checklist(7)>"
 msgstr ""
 
 #. type: textblock
-#: debhelper.pod:906
+#: debhelper.pod:922
 msgid ""
 "List of supported compat levels and an upgrade checklist for each of them."
 msgstr ""
 
 #. type: =item
-#: debhelper.pod:908
+#: debhelper.pod:924
 msgid "F</usr/share/doc/debhelper/examples/>"
 msgstr "F</usr/share/doc/debhelper/examples/>"
 
 #. type: textblock
-#: debhelper.pod:910
+#: debhelper.pod:926
 msgid "A set of example F<debian/rules> files that use debhelper."
 msgstr ""
 "debhelper を使うときの F<debian/rules> ファイルの例が格納されています。"
 
 #. type: =item
-#: debhelper.pod:912
+#: debhelper.pod:928
 msgid "L<http://joeyh.name/code/debhelper/>"
 msgstr "L<http://joeyh.name/code/debhelper/>"
 
 #. type: textblock
-#: debhelper.pod:914
+#: debhelper.pod:930
 msgid "Debhelper web site."
 msgstr "Debhelper の Web サイトです。"
 
 #. type: =head1
-#: debhelper.pod:918 dh:813 dh_auto_build:59 dh_auto_clean:61
+#: debhelper.pod:934 dh:878 dh_auto_build:59 dh_auto_clean:61
 #: dh_auto_configure:64 dh_auto_install:109 dh_auto_test:70 dh_bugfiles:141
 #: dh_builddeb:188 dh_clean:195 dh_compress:249 dh_dwz:168 dh_fixperms:170
 #: dh_gencontrol:214 dh_icons:81 dh_install:383 dh_installcatalogs:134
-#: dh_installchangelogs:306 dh_installcron:86 dh_installdeb:425
+#: dh_installchangelogs:369 dh_installcron:86 dh_installdeb:425
 #: dh_installdebconf:239 dh_installdirs:137 dh_installdocs:443
-#: dh_installemacsen:145 dh_installexamples:184 dh_installifupdown:78
+#: dh_installemacsen:145 dh_installexamples:188 dh_installifupdown:78
 #: dh_installinfo:129 dh_installinitramfs:99 dh_installlogcheck:87
 #: dh_installlogrotate:59 dh_installman:427 dh_installmanpages:204
 #: dh_installmenu:96 dh_installmime:69 dh_installmodules:115 dh_installpam:77
 #: dh_installppp:74 dh_installudev:108 dh_installwm:138 dh_installxfonts:96
 #: dh_link:172 dh_lintian:68 dh_listpackages:40 dh_makeshlibs:462
-#: dh_md5sums:124 dh_movefiles:167 dh_perl:180 dh_prep:76 dh_shlibdeps:210
+#: dh_md5sums:124 dh_movefiles:167 dh_perl:194 dh_prep:76 dh_shlibdeps:210
 #: dh_strip:441 dh_testdir:68 dh_testroot:99 dh_usrlocal:142
 msgid "AUTHOR"
 msgstr "作者"
 
 #. type: textblock
-#: debhelper.pod:920 dh:815 dh_auto_build:61 dh_auto_clean:63
+#: debhelper.pod:936 dh:880 dh_auto_build:61 dh_auto_clean:63
 #: dh_auto_configure:66 dh_auto_install:111 dh_auto_test:72 dh_builddeb:190
 #: dh_clean:197 dh_compress:251 dh_fixperms:172 dh_gencontrol:216
-#: dh_install:385 dh_installchangelogs:308 dh_installcron:88 dh_installdeb:427
+#: dh_install:385 dh_installchangelogs:371 dh_installcron:88 dh_installdeb:427
 #: dh_installdebconf:241 dh_installdirs:139 dh_installdocs:445
-#: dh_installemacsen:147 dh_installexamples:186 dh_installifupdown:80
+#: dh_installemacsen:147 dh_installexamples:190 dh_installifupdown:80
 #: dh_installinfo:131 dh_installinit:421 dh_installlogrotate:61
 #: dh_installman:429 dh_installmanpages:206 dh_installmenu:98 dh_installmime:71
 #: dh_installmodules:117 dh_installpam:79 dh_installppp:76 dh_installudev:110
@@ -3468,7 +3508,8 @@ msgstr ""
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:720
 msgid ""
-"The B<meson+ninja> build system now uses B<meson install> instead of B<ninja "
+"The B<meson+ninja> and B<cmake> build systems now use B<meson install> and "
+"B<cmake --install>, respectively, instead of B<ninja install> and B<make "
 "install> in the L<dh_auto_install(1)> call.  Any override of "
 "B<dh_auto_install> that passes extra parameters to the upstream build system "
 "should be reviewed."
@@ -3514,17 +3555,17 @@ msgstr ""
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:762 debhelper-obsolete-compat.pod:180
-#: dh:809 dh_auto_build:55 dh_auto_clean:57 dh_auto_configure:60
+#: dh:874 dh_auto_build:55 dh_auto_clean:57 dh_auto_configure:60
 #: dh_auto_install:105 dh_auto_test:66 dh_builddeb:184 dh_clean:191
 #: dh_compress:245 dh_dwz:164 dh_fixperms:166 dh_gencontrol:210 dh_install:379
-#: dh_installcatalogs:130 dh_installchangelogs:302 dh_installcron:82
+#: dh_installcatalogs:130 dh_installchangelogs:365 dh_installcron:82
 #: dh_installdeb:421 dh_installdebconf:235 dh_installdirs:133
-#: dh_installdocs:439 dh_installexamples:180 dh_installifupdown:74
+#: dh_installdocs:439 dh_installexamples:184 dh_installifupdown:74
 #: dh_installinfo:125 dh_installlogcheck:83 dh_installlogrotate:55
 #: dh_installman:423 dh_installmanpages:200 dh_installmime:65
 #: dh_installmodules:111 dh_installpam:73 dh_installppp:70 dh_installudev:104
 #: dh_installwm:134 dh_installxfonts:92 dh_link:168 dh_listpackages:36
-#: dh_makeshlibs:458 dh_md5sums:120 dh_movefiles:163 dh_perl:176 dh_prep:72
+#: dh_makeshlibs:458 dh_md5sums:120 dh_movefiles:163 dh_perl:190 dh_prep:72
 #: dh_strip:437 dh_testdir:64 dh_testroot:95 dh_usrlocal:138
 #: dh_systemd_start:282
 msgid "L<debhelper(7)>"
@@ -3982,17 +4023,18 @@ msgstr ""
 #: dh:75
 msgid ""
 "As a special optimization, B<dh> will skip a target if it is completely "
-"empty.  This is mostly useful for override targets, where the command will "
-"simply be skipped without the overhead of invoking a dummy target."
+"empty and does not depend on any other target.  This is mostly useful for "
+"override targets, where the command will simply be skipped without the "
+"overhead of invoking a dummy target."
 msgstr ""
 
 #. type: textblock
-#: dh:79
+#: dh:80
 msgid "Note that the target has to be completely empty for this to work:"
 msgstr ""
 
 #. type: verbatim
-#: dh:81
+#: dh:82
 #, no-wrap
 msgid ""
 "     # Skip dh_bar - the good and optimized way\n"
@@ -4002,7 +4044,7 @@ msgid ""
 msgstr ""
 
 #. type: verbatim
-#: dh:86
+#: dh:87
 #, no-wrap
 msgid ""
 "     # Skip dh_foo - the slow way\n"
@@ -4013,19 +4055,84 @@ msgid ""
 msgstr ""
 
 #. type: =head2
-#: dh:91
+#: dh:92
 msgid "Verifying targets are picked up by dh"
 msgstr ""
 
 #. type: textblock
-#: dh:93
+#: dh:94
 msgid ""
-"If you want to confirm that B<dh> has seen an override or a hook target, you "
+"As of debhelper 13.10, you can use L<dh_assistant(1)> to see which override "
+"and hook targets will be seen by B<dh>.  Here is an example run of "
+"L<dh_assistant(1)> along with its output:"
+msgstr ""
+
+#. type: verbatim
+#: dh:98
+#, no-wrap
+msgid ""
+"    $ dh_assistant detect-hook-targets\n"
+"    {\n"
+"       \"commands-not-in-path\": [\n"
+"          \"dh_foo\"\n"
+"       ],\n"
+"       \"hook-targets\": [\n"
+"          {\n"
+"             \"command\": \"dh_strip_nondeterminism\",\n"
+"             \"is-empty\": true,\n"
+"             \"package-section-param\": null,\n"
+"             \"target-name\": \"override_dh_strip_nondeterminism\"\n"
+"          },\n"
+"          {\n"
+"             \"command\": \"dh_foo\",\n"
+"             \"is-empty\": false,\n"
+"             \"package-section-param\": \"-a\",\n"
+"             \"target-name\": \"override_dh_foo-arch\"\n"
+"          }\n"
+"       ]\n"
+"    }\n"
+"\n"
+msgstr ""
+
+#. type: textblock
+#: dh:119
+msgid ""
+"The B<commands-not-in-path> is useful for spotting mistakes in the hook "
+"target names.  A non-empty value implies one of more hook targets are "
+"related to a command that is either not installed or no command with that "
+"name exists at all.  It is generally worth double checking these."
+msgstr ""
+
+#. type: textblock
+#: dh:124
+msgid ""
+"Additionally, the B<is-empty> attribute for each hook target can be used for "
+"seeing whether a hook target triggers the L</Completely empty targets> "
+"optimization."
+msgstr ""
+
+#. type: textblock
+#: dh:127
+msgid ""
+"If you are interested in the other attributes, please read the "
+"L<dh_assistant(1)> for the details."
+msgstr ""
+
+#. type: =head3
+#: dh:130
+msgid ""
+"Verifying targets are picked up by dh (when debhelper is older than 13.10)"
+msgstr ""
+
+#. type: textblock
+#: dh:134
+msgid ""
+"On older versions of debhelper, you have to use B<dh> with B<--no-act>.  You "
 "can use the following command as an example:"
 msgstr ""
 
 #. type: verbatim
-#: dh:96
+#: dh:137
 #, no-wrap
 msgid ""
 "    $ dh binary --no-act | grep dh_install | head -n5\n"
@@ -4038,7 +4145,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh:103
+#: dh:144
 msgid ""
 "The B<debian/rules execute_after_dh_install> in the output, which signals "
 "that B<dh> registered a B<execute_after_dh_install> target and would run it "
@@ -4046,7 +4153,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh:107
+#: dh:148
 msgid ""
 "Note that L</Completely empty targets> will be omitted in the listing "
 "above.  This makes it a bit harder to spot as you are looking for the "
@@ -4054,12 +4161,12 @@ msgid ""
 msgstr ""
 
 #. type: =head2
-#: dh:111
+#: dh:152
 msgid "Caveats with hook targets and makefile conditionals"
 msgstr ""
 
 #. type: textblock
-#: dh:113
+#: dh:154
 msgid ""
 "If you choose to wrap a hook target in makefile conditionals, please be "
 "aware that B<dh> computes all the hook targets a head of time and caches the "
@@ -4069,7 +4176,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh:119
+#: dh:160
 msgid ""
 "The parsing and caching I<often> happens before B<dh> knows whether it will "
 "build arch:any (-a) or/and arch:all (-i) packages, which can produce "
@@ -4078,7 +4185,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh:124
+#: dh:165
 msgid ""
 "Most of the problems can be avoided by making the hook target unconditional "
 "and then have the \"body\" be partially or completely conditional.  As an "
@@ -4086,7 +4193,7 @@ msgid ""
 msgstr ""
 
 #. type: verbatim
-#: dh:128
+#: dh:169
 #, no-wrap
 msgid ""
 "      # SIMPLE: It is well-defined what happens.  The hook target\n"
@@ -4106,7 +4213,7 @@ msgid ""
 msgstr ""
 
 #. type: verbatim
-#: dh:142
+#: dh:183
 #, no-wrap
 msgid ""
 "      # SIMPLE: This is also well-defined.  The hook target is always\n"
@@ -4126,7 +4233,7 @@ msgid ""
 msgstr ""
 
 #. type: verbatim
-#: dh:157
+#: dh:198
 #, no-wrap
 msgid ""
 "      # COMPLICATED: This case can be non-trivial and have sharp edges.\n"
@@ -4146,14 +4253,14 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh:171
+#: dh:212
 msgid ""
 "These recipes are also relevant for conditional dependency targets, which "
 "are often seen in a variant of the following example:"
 msgstr ""
 
 #. type: verbatim
-#: dh:174
+#: dh:215
 #, no-wrap
 msgid ""
 "      COND_TASKS =\n"
@@ -4165,7 +4272,7 @@ msgid ""
 msgstr ""
 
 #. type: verbatim
-#: dh:180
+#: dh:221
 #, no-wrap
 msgid ""
 "      maybe-run-this:\n"
@@ -4174,7 +4281,7 @@ msgid ""
 msgstr ""
 
 #. type: verbatim
-#: dh:183
+#: dh:224
 #, no-wrap
 msgid ""
 "      # SIMPLE: It is well-defined what happens.  Either the\n"
@@ -4190,7 +4297,7 @@ msgid ""
 msgstr ""
 
 #. type: verbatim
-#: dh:194
+#: dh:235
 #, no-wrap
 msgid ""
 "      # SIMPLE: This is also well-defined.  The hook target is always\n"
@@ -4207,7 +4314,7 @@ msgid ""
 msgstr ""
 
 #. type: verbatim
-#: dh:205
+#: dh:246
 #, no-wrap
 msgid ""
 "      # COMPLICATED: This case can be non-trivial and have sharp edges.\n"
@@ -4220,36 +4327,36 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh:213
+#: dh:254
 msgid ""
 "When in doubt, pick the relevant B<SIMPLE> case in the examples above that "
 "match your need."
 msgstr ""
 
 #. type: =head1
-#: dh:216 dh_auto_build:32 dh_auto_clean:33 dh_auto_configure:35
+#: dh:257 dh_auto_build:32 dh_auto_clean:33 dh_auto_configure:35
 #: dh_auto_install:52 dh_auto_test:34 dh_bugfiles:53 dh_builddeb:34 dh_clean:49
 #: dh_compress:52 dh_dwz:26 dh_fixperms:40 dh_gencontrol:38 dh_icons:33
-#: dh_install:69 dh_installcatalogs:56 dh_installchangelogs:71
+#: dh_install:69 dh_installcatalogs:56 dh_installchangelogs:77
 #: dh_installcron:45 dh_installdeb:107 dh_installdebconf:64 dh_installdirs:45
-#: dh_installdocs:100 dh_installemacsen:56 dh_installexamples:44
+#: dh_installdocs:100 dh_installemacsen:56 dh_installexamples:48
 #: dh_installifupdown:42 dh_installinfo:41 dh_installinit:77
 #: dh_installinitramfs:43 dh_installlogcheck:45 dh_installlogrotate:25
 #: dh_installman:86 dh_installmanpages:43 dh_installmenu:44
 #: dh_installmodules:41 dh_installpam:38 dh_installppp:38 dh_installudev:34
 #: dh_installwm:41 dh_link:69 dh_makeshlibs:67 dh_md5sums:31 dh_movefiles:41
-#: dh_perl:34 dh_prep:29 dh_shlibdeps:30 dh_strip:38 dh_testdir:26
+#: dh_perl:35 dh_prep:29 dh_shlibdeps:30 dh_strip:38 dh_testdir:26
 #: dh_usrlocal:50 dh_systemd_enable:82 dh_systemd_start:33
 msgid "OPTIONS"
 msgstr "オプション"
 
 #. type: =item
-#: dh:220
+#: dh:261
 msgid "B<--with> I<addon>[B<,>I<addon> ...]"
 msgstr "B<--with> I<addon>[B<,>I<addon> ...]"
 
 #. type: textblock
-#: dh:222
+#: dh:263
 msgid ""
 "Add the debhelper commands specified by the given addon to appropriate "
 "places in the sequence of commands that is run. This option can be repeated "
@@ -4265,7 +4372,7 @@ msgstr ""
 "に、一連のアドオン用インターフェースについてのドキュメントがあります。"
 
 #. type: textblock
-#: dh:229
+#: dh:270
 msgid ""
 "A B<Build-Depends> relation on the package B<dh-sequence->I<addon> implies a "
 "B<--with> I<addon>. This avoids the need for an explicit B<--with> in "
@@ -4277,7 +4384,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh:238
+#: dh:279
 msgid ""
 "Since debhelper 12.5, addons can also be activated in B<indep>-only mode "
 "(via B<Build-Depends-Indep>) or B<arch>-only mode (via B<Build-Depends-"
@@ -4286,7 +4393,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh:244
+#: dh:285
 msgid ""
 "Please note that addons activated via B<Build-Depends-Indep> or B<Build-"
 "Depends-Arch> are subject to additional limitations to ensure the result is "
@@ -4297,12 +4404,12 @@ msgid ""
 msgstr ""
 
 #. type: =item
-#: dh:252
+#: dh:293
 msgid "B<--without> I<addon>"
 msgstr "B<--without> I<addon>"
 
 #. type: textblock
-#: dh:254
+#: dh:295
 msgid ""
 "The inverse of B<--with>, disables using the given addon. This option can be "
 "repeated more than once, or multiple addons to disable can be listed, "
@@ -4312,19 +4419,19 @@ msgstr ""
 "し指定することもできますし、アドオン名をカンマ区切りで指定もできます。"
 
 #. type: textblock
-#: dh:260
+#: dh:301
 msgid "List all available addons."
 msgstr "利用可能なアドオン一覧を表示する。"
 
 #. type: textblock
-#: dh:262
+#: dh:303
 msgid ""
 "When called only with this option, B<dh> can be called from any directory (i."
 "e. it does not need access to files from a source package)."
 msgstr ""
 
 #. type: textblock
-#: dh:268
+#: dh:309
 msgid ""
 "Prints commands that would run for a given sequence, but does not run them."
 msgstr ""
@@ -4332,7 +4439,7 @@ msgstr ""
 "は実行しません。"
 
 #. type: textblock
-#: dh:270
+#: dh:311
 msgid ""
 "Note that dh normally skips running commands that it knows will do nothing.  "
 "With --no-act, the full list of commands in a sequence is printed."
@@ -4342,7 +4449,7 @@ msgstr ""
 "て出力します。"
 
 #. type: textblock
-#: dh:275
+#: dh:316
 msgid ""
 "Other options passed to B<dh> are passed on to each command it runs. This "
 "can be used to set an option like B<-v> or B<-X> or B<-N>, as well as for "
@@ -4353,13 +4460,13 @@ msgstr ""
 "た、他の特別なオプションについても同様となります。"
 
 #. type: =head1
-#: dh:279 dh_install:332 dh_installdocs:191 dh_installman:117 dh_link:91
+#: dh:320 dh_install:332 dh_installdocs:191 dh_installman:117 dh_link:91
 #: dh_makeshlibs:185 dh_shlibdeps:78
 msgid "EXAMPLES"
 msgstr "使用例"
 
 #. type: textblock
-#: dh:281
+#: dh:322
 msgid ""
 "To see what commands are included in a sequence, without actually doing "
 "anything:"
@@ -4367,7 +4474,7 @@ msgstr ""
 "コマンドを実際には動作させず、一連の動作でどのコマンドが実行されるかを見る:"
 
 #. type: verbatim
-#: dh:284
+#: dh:325
 #, no-wrap
 msgid ""
 "\tdh binary-arch --no-act\n"
@@ -4377,7 +4484,7 @@ msgstr ""
 "\n"
 
 #. type: textblock
-#: dh:286
+#: dh:327
 msgid ""
 "This is a very simple rules file, for packages where the default sequences "
 "of commands work with no additional options."
@@ -4386,7 +4493,7 @@ msgstr ""
 "ション無しでデフォルトのコマンド群が呼び出されます。"
 
 #. type: verbatim
-#: dh:289 dh:296 dh:310 dh:323 dh:334 dh:392 dh:403
+#: dh:330 dh:337 dh:351 dh:364 dh:375 dh:433 dh:444
 #, no-wrap
 msgid ""
 "\t#!/usr/bin/make -f\n"
@@ -4400,7 +4507,7 @@ msgstr ""
 "\n"
 
 #. type: textblock
-#: dh:293
+#: dh:334
 msgid ""
 "Often you'll want to pass an option to a specific debhelper command. The "
 "easy way to do with is by adding an override target for that command."
@@ -4409,7 +4516,7 @@ msgstr ""
 "行う方法は、そのコマンドへ override を追加することです。"
 
 #. type: verbatim
-#: dh:300
+#: dh:341
 #, fuzzy, no-wrap
 #| msgid ""
 #| "\toverride_dh_strip:\n"
@@ -4425,7 +4532,7 @@ msgstr ""
 "\t\n"
 
 #. type: verbatim
-#: dh:303
+#: dh:344
 #, no-wrap
 msgid ""
 "\toverride_dh_auto_configure:\n"
@@ -4437,7 +4544,7 @@ msgstr ""
 "\n"
 
 #. type: textblock
-#: dh:306
+#: dh:347
 msgid ""
 "Sometimes the automated L<dh_auto_configure(1)> and L<dh_auto_build(1)> "
 "can't guess what to do for a strange package. Here's how to avoid running "
@@ -4449,7 +4556,7 @@ msgstr ""
 "を実行させる方法を示します。 "
 
 #. type: verbatim
-#: dh:314
+#: dh:355
 #, no-wrap
 msgid ""
 "\toverride_dh_auto_configure:\n"
@@ -4461,7 +4568,7 @@ msgstr ""
 "\n"
 
 #. type: verbatim
-#: dh:317
+#: dh:358
 #, no-wrap
 msgid ""
 "\toverride_dh_auto_build:\n"
@@ -4473,7 +4580,7 @@ msgstr ""
 "\n"
 
 #. type: textblock
-#: dh:320
+#: dh:361
 msgid ""
 "Another common case is wanting to do something manually before or after a "
 "particular debhelper command is run."
@@ -4482,7 +4589,7 @@ msgstr ""
 "したい場合があります。"
 
 #. type: verbatim
-#: dh:327
+#: dh:368
 #, fuzzy, no-wrap
 #| msgid ""
 #| "\toverride_dh_fixperms:\n"
@@ -4501,14 +4608,14 @@ msgstr ""
 "\n"
 
 #. type: textblock
-#: dh:331
+#: dh:372
 msgid ""
 "If you are on an older debhelper or compatibility level, the above example "
 "would have to be written as."
 msgstr ""
 
 #. type: verbatim
-#: dh:338
+#: dh:379
 #, fuzzy, no-wrap
 #| msgid ""
 #| "\toverride_dh_fixperms:\n"
@@ -4528,7 +4635,7 @@ msgstr ""
 "\n"
 
 #. type: textblock
-#: dh:343
+#: dh:384
 #, fuzzy
 #| msgid ""
 #| "Python tools are not run by dh by default, due to the continual change in "
@@ -4543,7 +4650,7 @@ msgstr ""
 "を実行します)。ここでは、B<dh_python2> をどのようにして使うかを示します。"
 
 #. type: verbatim
-#: dh:346
+#: dh:387
 #, no-wrap
 msgid ""
 "\t#!/usr/bin/make -f\n"
@@ -4557,7 +4664,7 @@ msgstr ""
 "\n"
 
 #. type: textblock
-#: dh:350
+#: dh:391
 msgid ""
 "Here is how to force use of Perl's B<Module::Build> build system, which can "
 "be necessary if debhelper wrongly detects that the package uses MakeMaker."
@@ -4567,7 +4674,7 @@ msgstr ""
 "必要となります。"
 
 #. type: verbatim
-#: dh:354
+#: dh:395
 #, no-wrap
 msgid ""
 "\t#!/usr/bin/make -f\n"
@@ -4581,7 +4688,7 @@ msgstr ""
 "\n"
 
 #. type: textblock
-#: dh:358
+#: dh:399
 msgid ""
 "Here is an example of overriding where the B<dh_auto_>I<*> commands find the "
 "package's source, for a package where the source is located in a "
@@ -4592,7 +4699,7 @@ msgstr ""
 "す。"
 
 #. type: verbatim
-#: dh:362
+#: dh:403
 #, no-wrap
 msgid ""
 "\t#!/usr/bin/make -f\n"
@@ -4606,7 +4713,7 @@ msgstr ""
 "\n"
 
 #. type: textblock
-#: dh:366
+#: dh:407
 msgid ""
 "And here is an example of how to tell the B<dh_auto_>I<*> commands to build "
 "in a subdirectory, which will be removed on B<clean>."
@@ -4616,7 +4723,7 @@ msgstr ""
 "になります:"
 
 #. type: verbatim
-#: dh:369
+#: dh:410
 #, no-wrap
 msgid ""
 "\t#!/usr/bin/make -f\n"
@@ -4630,7 +4737,7 @@ msgstr ""
 "\n"
 
 #. type: textblock
-#: dh:373
+#: dh:414
 msgid ""
 "If your package can be built in parallel, please either use compat 10 or "
 "pass B<--parallel> to dh. Then B<dpkg-buildpackage -j> will work."
@@ -4639,7 +4746,7 @@ msgstr ""
 "parallel> を指定して下さい。すると B<dpkg-buildpackage -j> が有効になります。"
 
 #. type: verbatim
-#: dh:376
+#: dh:417
 #, no-wrap
 msgid ""
 "\t#!/usr/bin/make -f\n"
@@ -4653,7 +4760,7 @@ msgstr ""
 "\n"
 
 #. type: textblock
-#: dh:380
+#: dh:421
 msgid ""
 "If your package cannot be built reliably while using multiple threads, "
 "please pass B<--no-parallel> to dh (or the relevant B<dh_auto_>I<*> command):"
@@ -4662,7 +4769,7 @@ msgstr ""
 "連する B<dh_auto_>I<*> コマンド)に B<--no-parallel> を指定して下さい。"
 
 #. type: verbatim
-#: dh:385
+#: dh:426
 #, no-wrap
 msgid ""
 "\t#!/usr/bin/make -f\n"
@@ -4676,7 +4783,7 @@ msgstr ""
 "\n"
 
 #. type: textblock
-#: dh:389
+#: dh:430
 msgid ""
 "Here is a way to prevent B<dh> from running several commands that you don't "
 "want it to run, by defining empty override targets for each command."
@@ -4686,7 +4793,7 @@ msgstr ""
 "とにより行います。"
 
 #. type: verbatim
-#: dh:396
+#: dh:437
 #, no-wrap
 msgid ""
 "\t# Commands not to run:\n"
@@ -4698,7 +4805,7 @@ msgstr ""
 "\n"
 
 #. type: textblock
-#: dh:399
+#: dh:440
 msgid ""
 "A long build process for a separate documentation package can be separated "
 "out using architecture independent overrides.  These will be skipped when "
@@ -4710,7 +4817,7 @@ msgstr ""
 "パッケージのビルドが省略されます。"
 
 #. type: verbatim
-#: dh:407
+#: dh:448
 #, no-wrap
 msgid ""
 "\toverride_dh_auto_build-indep:\n"
@@ -4722,7 +4829,7 @@ msgstr ""
 "\n"
 
 #. type: verbatim
-#: dh:410
+#: dh:451
 #, no-wrap
 msgid ""
 "\t# No tests needed for docs\n"
@@ -4734,7 +4841,7 @@ msgstr ""
 "\n"
 
 #. type: verbatim
-#: dh:413
+#: dh:454
 #, no-wrap
 msgid ""
 "\toverride_dh_auto_install-indep:\n"
@@ -4746,7 +4853,7 @@ msgstr ""
 "\n"
 
 #. type: textblock
-#: dh:416
+#: dh:457
 msgid ""
 "Adding to the example above, suppose you need to chmod a file, but only when "
 "building the architecture dependent package, as it's not present when "
@@ -4757,7 +4864,7 @@ msgstr ""
 "行しないとしたらどうなるでしょうか。"
 
 #. type: verbatim
-#: dh:420
+#: dh:461
 #, fuzzy, no-wrap
 #| msgid ""
 #| "\toverride_dh_fixperms:\n"
@@ -4776,14 +4883,14 @@ msgstr ""
 "\n"
 
 #. type: =head1
-#: dh:424
+#: dh:465
 #, fuzzy
 #| msgid "DEBHELPER COMMANDS"
 msgid "DEBHELPER PROVIDED DH ADDONS"
 msgstr "DEBHELPER コマンド"
 
 #. type: textblock
-#: dh:426
+#: dh:467
 msgid ""
 "The primary purpose of B<dh> addons is to provide easy integration with "
 "third-party provided features for debhelper.  However, debhelper itself also "
@@ -4792,12 +4899,12 @@ msgid ""
 msgstr ""
 
 #. type: =item
-#: dh:433
+#: dh:474
 msgid "build-stamp"
 msgstr ""
 
 #. type: textblock
-#: dh:435
+#: dh:476
 msgid ""
 "A special addon for controlling whether B<dh> (in compat 10 or later)  will "
 "create stamp files to tell whether the build target has been run "
@@ -4805,7 +4912,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh:439
+#: dh:480
 #, fuzzy
 #| msgid "The previous behaviour can restored by using B<--with build-stamp>"
 msgid ""
@@ -4814,31 +4921,31 @@ msgid ""
 msgstr "B<--with build-stamp> を使えば以前の動作に戻すことが出来ます。"
 
 #. type: =item
-#: dh:442
+#: dh:483
 msgid "dwz (obsolete)"
 msgstr ""
 
 #. type: textblock
-#: dh:444
+#: dh:485
 msgid ""
 "Adds L<dh_dwz(1)> to the sequence in compat level 11 or below.  Obsolete in "
 "compat 12 or later."
 msgstr ""
 
 #. type: =item
-#: dh:447
+#: dh:488
 msgid "elf-tools"
 msgstr ""
 
 #. type: textblock
-#: dh:449
+#: dh:490
 msgid ""
 "This addon adds tools related to ELF files to the sequence such as "
 "L<dh_strip(1)> and L<dh_shlibdeps(1)>"
 msgstr ""
 
 #. type: textblock
-#: dh:452
+#: dh:493
 msgid ""
 "This addon is I<conditionally> active by default for architecture specific "
 "packages - that is, it is skipped for arch:all packages.  In the special "
@@ -4847,40 +4954,40 @@ msgid ""
 msgstr ""
 
 #. type: =item
-#: dh:458
+#: dh:499
 msgid "installinitramfs (obsolete)"
 msgstr ""
 
 #. type: textblock
-#: dh:460
+#: dh:501
 msgid ""
 "Adds L<dh_installinitramfs(1)> to the sequence in compat level 11 or below.  "
 "Obsolete in compat 12 or later."
 msgstr ""
 
 #. type: =item
-#: dh:463
+#: dh:504
 msgid "root-sequence (internal)"
 msgstr ""
 
 #. type: textblock
-#: dh:465
+#: dh:506
 msgid "This is reserved for internal usage."
 msgstr ""
 
 #. type: =item
-#: dh:467
+#: dh:508
 msgid "single-binary"
 msgstr ""
 
 #. type: textblock
-#: dh:469
+#: dh:510
 msgid ""
 "A special-purpose addon that makes debhelper run in \"single binary\" mode."
 msgstr ""
 
 #. type: textblock
-#: dh:471
+#: dh:512
 msgid ""
 "When active, it will pass B<< --destdir=debian/I<package>/ >> to "
 "L<dh_auto_install(1)>.  This makes every file \"installed\" by the upstream "
@@ -4889,14 +4996,14 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh:476
+#: dh:517
 msgid ""
 "The addon will refuse to activate when the source package lists 2 or more "
 "binary packages in F<debian/control> as a precaution."
 msgstr ""
 
 #. type: textblock
-#: dh:479
+#: dh:520
 msgid ""
 "Before compat 15. this behaviour was the default when there was only a "
 "single binary package listed in F<debian/control>.  In compat 15 and later, "
@@ -4904,7 +5011,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh:483
+#: dh:524
 msgid ""
 "The rationale for requiring this as an explicit choice is that if it is "
 "implicit then debhelper will silently change behaviour on adding a new "
@@ -4916,24 +5023,24 @@ msgid ""
 msgstr ""
 
 #. type: =item
-#: dh:491
+#: dh:532
 msgid "systemd (obsolete)"
 msgstr ""
 
 #. type: textblock
-#: dh:493
+#: dh:534
 msgid ""
 "Adds L<dh_systemd_enable(1)> and L<dh_systemd_start(1)> to the sequence in "
 "compat level 10 or below.  Obsolete in compat 11 or later."
 msgstr ""
 
 #. type: =head1
-#: dh:498
+#: dh:539
 msgid "INTERNALS"
 msgstr "内部動作"
 
 #. type: textblock
-#: dh:500
+#: dh:541
 msgid ""
 "If you're curious about B<dh>'s internals, here's how it works under the "
 "hood."
@@ -4942,7 +5049,7 @@ msgstr ""
 "を記載します。"
 
 #. type: textblock
-#: dh:502
+#: dh:543
 #, fuzzy
 #| msgid ""
 #| "In compat 10 (or later), B<dh> creates a stamp file F<debian/debhelper-"
@@ -4967,7 +5074,7 @@ msgstr ""
 "ます。"
 
 #. type: textblock
-#: dh:510
+#: dh:551
 #, fuzzy
 #| msgid ""
 #| "In compat 10 (or later), B<dh> creates a stamp file F<debian/debhelper-"
@@ -4990,7 +5097,7 @@ msgstr ""
 "ます。"
 
 #. type: textblock
-#: dh:515
+#: dh:556
 msgid ""
 "In compat 9 or earlier, each debhelper command will record when it's "
 "successfully run in F<debian/package.debhelper.log>. (Which B<dh_clean> "
@@ -5004,7 +5111,7 @@ msgstr ""
 "かります。"
 
 #. type: textblock
-#: dh:520
+#: dh:561
 #, fuzzy
 #| msgid ""
 #| "Each time B<dh> is run (in compat 9 or earlier), it examines the log, and "
@@ -5024,7 +5131,7 @@ msgstr ""
 "互換性レベル 10 ではこれらは削除されています)。"
 
 #. type: textblock
-#: dh:524
+#: dh:565
 msgid ""
 "A sequence can also run dependent targets in debian/rules.  For example, the "
 "\"binary\" sequence runs the \"install\" target."
@@ -5034,7 +5141,7 @@ msgstr ""
 "と、\"install\" ターゲットも実行されます。"
 
 #. type: textblock
-#: dh:527
+#: dh:568
 msgid ""
 "B<dh> uses the B<DH_INTERNAL_OPTIONS> environment variable to pass "
 "information through to debhelper commands that are run inside override "
@@ -5047,7 +5154,7 @@ msgstr ""
 "おり、どの時点でも debhelper コマンドの動作に影響を与えます。"
 
 #. type: textblock
-#: dh:532
+#: dh:573
 msgid ""
 "Commands in the B<build-indep>, B<install-indep> and B<binary-indep> "
 "sequences are passed the B<-i> option to ensure they only work on "
@@ -5062,19 +5169,19 @@ msgstr ""
 "れ、アーキテクチャ依存パッケージにのみ確実に作用するように動作します。 "
 
 #. type: textblock
-#: dh:811 dh_auto_build:57 dh_auto_clean:59 dh_auto_configure:62
+#: dh:876 dh_auto_build:57 dh_auto_clean:59 dh_auto_configure:62
 #: dh_auto_install:107 dh_auto_test:68 dh_bugfiles:139 dh_builddeb:186
 #: dh_clean:193 dh_compress:247 dh_dwz:166 dh_fixperms:168 dh_gencontrol:212
-#: dh_icons:79 dh_install:381 dh_installchangelogs:304 dh_installcron:84
+#: dh_icons:79 dh_install:381 dh_installchangelogs:367 dh_installcron:84
 #: dh_installdeb:423 dh_installdebconf:237 dh_installdirs:135
-#: dh_installdocs:441 dh_installemacsen:143 dh_installexamples:182
+#: dh_installdocs:441 dh_installemacsen:143 dh_installexamples:186
 #: dh_installifupdown:76 dh_installinfo:127 dh_installinit:417
 #: dh_installinitramfs:97 dh_installlogrotate:57 dh_installman:425
 #: dh_installmanpages:202 dh_installmenu:94 dh_installmime:67
 #: dh_installmodules:113 dh_installpam:75 dh_installppp:72 dh_installudev:106
 #: dh_installwm:136 dh_installxfonts:94 dh_link:170 dh_lintian:64
 #: dh_listpackages:38 dh_makeshlibs:460 dh_md5sums:122 dh_movefiles:165
-#: dh_perl:178 dh_prep:74 dh_shlibdeps:208 dh_strip:439 dh_testdir:66
+#: dh_perl:192 dh_prep:74 dh_shlibdeps:208 dh_strip:439 dh_testdir:66
 #: dh_testroot:97 dh_usrlocal:140
 msgid "This program is a part of debhelper."
 msgstr "このプログラムは debhelper の一部です。"
@@ -5472,7 +5579,7 @@ msgstr ""
 
 #. type: =head1
 #: dh_bugfiles:25 dh_clean:33 dh_compress:35 dh_install:40
-#: dh_installcatalogs:39 dh_installchangelogs:47 dh_installcron:24
+#: dh_installcatalogs:39 dh_installchangelogs:53 dh_installcron:24
 #: dh_installdeb:25 dh_installdebconf:37 dh_installdirs:28 dh_installdocs:40
 #: dh_installemacsen:30 dh_installexamples:31 dh_installifupdown:25
 #: dh_installinfo:28 dh_installinit:41 dh_installinitramfs:30
@@ -5736,7 +5843,7 @@ msgstr ""
 
 #. type: textblock
 #: dh_clean:44 dh_install:59 dh_installcatalogs:51 dh_installdeb:102
-#: dh_installdirs:40 dh_installdocs:48 dh_installexamples:39 dh_installinfo:36
+#: dh_installdirs:40 dh_installdocs:48 dh_installexamples:43 dh_installinfo:36
 #: dh_installman:81 dh_installwm:36 dh_link:64
 msgid ""
 "Supports substitution variables in compat 13 and later as documented in "
@@ -5744,7 +5851,7 @@ msgid ""
 msgstr ""
 
 #. type: =item
-#: dh_clean:53 dh_installchangelogs:75
+#: dh_clean:53 dh_installchangelogs:81
 msgid "B<-k>, B<--keep>"
 msgstr "B<-k>, B<--keep>"
 
@@ -5908,7 +6015,7 @@ msgstr ""
 "ル全てを圧縮します。"
 
 #. type: =item
-#: dh_compress:68 dh_installdocs:184 dh_installexamples:85 dh_installinfo:60
+#: dh_compress:68 dh_installdocs:184 dh_installexamples:89 dh_installinfo:60
 #: dh_installmanpages:47 dh_movefiles:58 dh_testdir:30
 msgid "I<file> ..."
 msgstr "I<file> ..."
@@ -5919,7 +6026,7 @@ msgid "Add these files to the list of files to compress."
 msgstr "これらファイルを圧縮対象のファイルとして追加します。"
 
 #. type: =head1
-#: dh_compress:74 dh_perl:64 dh_strip:133 dh_usrlocal:66
+#: dh_compress:74 dh_perl:65 dh_strip:133 dh_usrlocal:66
 msgid "CONFORMS TO"
 msgstr "確認すべき事"
 
@@ -6400,7 +6507,7 @@ msgid ""
 msgstr ""
 
 #. type: =item
-#: dh_install:91 dh_installdirs:62 dh_installdocs:114 dh_installexamples:53
+#: dh_install:91 dh_installdirs:62 dh_installdocs:114 dh_installexamples:57
 #: dh_installinfo:50 dh_installman:100 dh_movefiles:45
 msgid "B<--sourcedir=>I<dir>"
 msgstr "B<--sourcedir=>I<dir>"
@@ -6692,16 +6799,20 @@ msgstr ""
 "dh_installchangelogs - ビルドディレクトリに changelog をインストールする"
 
 #. type: textblock
-#: dh_installchangelogs:17
+#: dh_installchangelogs:18
+#, fuzzy
+#| msgid ""
+#| "B<dh_installchangelogs> [S<I<debhelper options>>] [B<-k>] [B<-X>I<item>] "
+#| "[I<upstream>]"
 msgid ""
 "B<dh_installchangelogs> [S<I<debhelper options>>] [B<-k>] [B<-X>I<item>] "
-"[I<upstream>]"
+"[B<--no-trim>] [I<upstream>]"
 msgstr ""
 "B<dh_installchangelogs> [S<I<debhelper options>>] [B<-k>] [B<-X>I<item>] "
 "[I<upstream>]"
 
 #. type: textblock
-#: dh_installchangelogs:21
+#: dh_installchangelogs:22
 msgid ""
 "B<dh_installchangelogs> is a debhelper program that is responsible for "
 "installing changelogs into package build directories."
@@ -6710,7 +6821,7 @@ msgstr ""
 "トールを担当する debhelper コマンドです。"
 
 #. type: textblock
-#: dh_installchangelogs:24
+#: dh_installchangelogs:25
 #, fuzzy
 #| msgid ""
 #| "An upstream F<changelog> file may be specified as an option. If none is "
@@ -6726,7 +6837,7 @@ msgstr ""
 "行きます (これは互換レベル v7 以上で行われます)。"
 
 #. type: textblock
-#: dh_installchangelogs:28
+#: dh_installchangelogs:29
 msgid ""
 "In non-native packages, B<dh_installchangelogs> will first look for "
 "changelog files installed by the upstream build system into F<< usr/share/"
@@ -6741,7 +6852,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh_installchangelogs:40
+#: dh_installchangelogs:41
 #, fuzzy
 msgid ""
 "If a changelog file is specified and is an F<html> file (determined by file "
@@ -6756,28 +6867,37 @@ msgstr ""
 "ストールされます。html changelog が平文テキストに変換されると、亜種は２番め"
 "の upstream changelog ファイルとして指定できます。平文ではない"
 
+#. type: textblock
+#: dh_installchangelogs:48
+msgid ""
+"The B<debchange>-style Debian changelogs are trimmed to include only entries "
+"more recent than the release date of I<oldstable>.  No trimming will be "
+"perfomermed if the B<--no-trim> option is passed or if the "
+"B<DEB_BUILD_OPTIONS> environment variable contains B<notrimdch>."
+msgstr ""
+
 #. type: =item
-#: dh_installchangelogs:51
+#: dh_installchangelogs:57
 msgid "F<debian/changelog>"
 msgstr "F<debian/changelog>"
 
 #. type: =item
-#: dh_installchangelogs:53
+#: dh_installchangelogs:59
 msgid "F<debian/NEWS>"
 msgstr "F<debian/NEWS>"
 
 #. type: =item
-#: dh_installchangelogs:55
+#: dh_installchangelogs:61
 msgid "debian/I<package>.changelog"
 msgstr "debian/I<package>.changelog"
 
 #. type: =item
-#: dh_installchangelogs:57
+#: dh_installchangelogs:63
 msgid "debian/I<package>.NEWS"
 msgstr "debian/I<package>.NEWS"
 
 #. type: textblock
-#: dh_installchangelogs:59
+#: dh_installchangelogs:65
 msgid ""
 "Automatically installed into usr/share/doc/I<package>/ in the package build "
 "directory."
@@ -6786,7 +6906,7 @@ msgstr ""
 "I<package>/ 配下に自動的にインストールされます。"
 
 #. type: textblock
-#: dh_installchangelogs:62
+#: dh_installchangelogs:68
 msgid ""
 "Use the package specific name if I<package> needs a different F<NEWS> or "
 "F<changelog> file."
@@ -6795,7 +6915,7 @@ msgstr ""
 "は、パッケージ固有の名前を指定してください。"
 
 #. type: textblock
-#: dh_installchangelogs:65
+#: dh_installchangelogs:71
 msgid ""
 "The F<changelog> file is installed with a name of changelog for native "
 "packages, and F<changelog.Debian> for non-native packages.  The F<NEWS> file "
@@ -6806,7 +6926,7 @@ msgstr ""
 "ルされます。F<NEWS> は必ず F<NEWS.Debian> の名前でインストールされます。"
 
 #. type: textblock
-#: dh_installchangelogs:77
+#: dh_installchangelogs:83
 #, fuzzy
 msgid ""
 "Keep the original name of the upstream changelog. This will be accomplished "
@@ -6823,7 +6943,7 @@ msgstr ""
 "利かもしれません。"
 
 #. type: textblock
-#: dh_installchangelogs:85
+#: dh_installchangelogs:91
 msgid ""
 "Exclude upstream F<changelog> files that contain I<item> anywhere in their "
 "filename from being installed."
@@ -6832,17 +6952,31 @@ msgstr ""
 "トール候補から除外します。"
 
 #. type: textblock
-#: dh_installchangelogs:88
+#: dh_installchangelogs:94
 msgid "Note that directory name of the changelog is also part of the match."
 msgstr ""
 
 #. type: =item
-#: dh_installchangelogs:90
+#: dh_installchangelogs:96
+#, fuzzy
+#| msgid "B<--no-start>"
+msgid "B<--no-trim>"
+msgstr "B<--no-start>"
+
+#. type: textblock
+#: dh_installchangelogs:98
+msgid ""
+"Install the full changelog, not its trimmed version that includes only "
+"recent entries."
+msgstr ""
+
+#. type: =item
+#: dh_installchangelogs:101
 msgid "I<upstream>"
 msgstr "I<upstream>"
 
 #. type: textblock
-#: dh_installchangelogs:92
+#: dh_installchangelogs:103
 msgid "Install this file as the upstream changelog."
 msgstr ""
 "このファイルを開発元 (upstream) の changelog としてインストールします。"
@@ -7834,7 +7968,7 @@ msgstr ""
 "これには doc-base のファイルも含む点に注意ください。"
 
 #. type: textblock
-#: dh_installdocs:116 dh_installexamples:55 dh_installinfo:52 dh_installman:102
+#: dh_installdocs:116 dh_installexamples:59 dh_installinfo:52 dh_installman:102
 msgid ""
 "Look in the specified directory for files to be installed.  This option "
 "requires compat 11 or later (it is silently ignored in compat 10 or earlier)."
@@ -7860,14 +7994,14 @@ msgstr ""
 "F<debian/tmp> へファイルを探しに行く為です。"
 
 #. type: =item
-#: dh_installdocs:124 dh_installexamples:63
+#: dh_installdocs:124 dh_installexamples:67
 #, fuzzy
 #| msgid "B<--mainpackage=>I<package>"
 msgid "B<--doc-main-package=>I<main-package>"
 msgstr "B<--mainpackage=>I<package>"
 
 #. type: textblock
-#: dh_installdocs:126 dh_installexamples:65
+#: dh_installdocs:126 dh_installexamples:69
 msgid ""
 "Set the main package for a documentation package.  This is used to install "
 "the documentation of the documentation package in F<< /usr/share/doc/I<main-"
@@ -7875,7 +8009,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh_installdocs:131 dh_installexamples:70
+#: dh_installdocs:131 dh_installexamples:74
 msgid ""
 "In compat 11 (or later), this option is only useful if debhelper's auto-"
 "detection of the main package is wrong.  The option can also be used to "
@@ -8199,7 +8333,16 @@ msgstr ""
 "インストールする予定の例を示すファイルもしくは、ディレクトリを指定します。"
 
 #. type: textblock
-#: dh_installexamples:50
+#: dh_installexamples:39
+msgid ""
+"If upstream provides an F<examples> directory, you will often want to use "
+"B<examples/*> rather than B<examples> in this file.  The latter would create "
+"F<< /usr/share/doc/I<package>/examples/examples >>, which is rarely what you "
+"want."
+msgstr ""
+
+#. type: textblock
+#: dh_installexamples:54
 #, fuzzy
 msgid ""
 "Install any files specified by command line parameters in ALL packages acted "
@@ -8209,7 +8352,7 @@ msgstr ""
 "イルをインストールします。"
 
 #. type: textblock
-#: dh_installexamples:58
+#: dh_installexamples:62
 #, fuzzy
 #| msgid ""
 #| "Note that this is not the same as the B<--sourcedirectory> option used by "
@@ -8228,7 +8371,7 @@ msgstr ""
 "F<debian/tmp> へファイルを探しに行く為です。"
 
 #. type: textblock
-#: dh_installexamples:75
+#: dh_installexamples:79
 msgid ""
 "This option cannot be used when B<dh_installexamples> is instructed to act "
 "on multiple packages.  If you need this option, you will generally need to "
@@ -8236,7 +8379,7 @@ msgid ""
 msgstr ""
 
 #. type: textblock
-#: dh_installexamples:82
+#: dh_installexamples:86
 msgid ""
 "Exclude files that contain I<item> anywhere in their filename from being "
 "installed."
@@ -8245,7 +8388,7 @@ msgstr ""
 "します。"
 
 #. type: textblock
-#: dh_installexamples:87
+#: dh_installexamples:91
 msgid ""
 "Install these files (or directories) as examples into the first package "
 "acted on. (Or into all packages if B<-A> is specified.)"
@@ -8255,7 +8398,7 @@ msgstr ""
 "パッケージに対してインストールを行います)。"
 
 #. type: textblock
-#: dh_installexamples:94
+#: dh_installexamples:98
 msgid ""
 "Note that B<dh_installexamples> will happily copy entire directory "
 "hierarchies if you ask it to (similar to B<cp -a>). If it is asked to "
@@ -10812,14 +10955,14 @@ msgstr ""
 "dh_perl - Perlへの依存関係を検討し、MakeMaker 実行後に生成したものを消去する"
 
 #. type: textblock
-#: dh_perl:19
+#: dh_perl:20
 msgid "B<dh_perl> [S<I<debhelper options>>] [B<-d>] [S<I<library dirs> ...>]"
 msgstr ""
 "B<dh_perl> [S<I<debhelper オプション>>] [B<-d>] [S<I<ライブラリディレクトリ"
 "> ...>]"
 
 #. type: textblock
-#: dh_perl:23
+#: dh_perl:24
 msgid ""
 "B<dh_perl> is a debhelper program that is responsible for generating the "
 "B<${perl:Depends}> substitutions and adding them to substvars files."
@@ -10828,7 +10971,7 @@ msgstr ""
 "ファイルの情報を付け加える役目の debhelper プログラムです。"
 
 #. type: textblock
-#: dh_perl:26
+#: dh_perl:27
 msgid ""
 "The program will look at Perl scripts and modules in your package, and will "
 "use this information to generate a dependency on B<perl> or B<perlapi>. The "
@@ -10841,7 +10984,7 @@ msgstr ""
 "に置き換えられます。"
 
 #. type: textblock
-#: dh_perl:31
+#: dh_perl:32
 msgid ""
 "B<dh_perl> also cleans up empty directories that MakeMaker can generate when "
 "installing Perl modules."
@@ -10850,12 +10993,12 @@ msgstr ""
 "した空のディレクトリを削除します。"
 
 #. type: =item
-#: dh_perl:38
+#: dh_perl:39
 msgid "B<-d>"
 msgstr "B<-d>"
 
 #. type: textblock
-#: dh_perl:40
+#: dh_perl:41
 msgid ""
 "In some specific cases you may want to depend on B<perl-base> rather than "
 "the full B<perl> package. If so, you can pass the -d option to make "
@@ -10868,7 +11011,7 @@ msgstr ""
 "が含まれるようなパッケージのみで必要です。"
 
 #. type: textblock
-#: dh_perl:45
+#: dh_perl:46
 msgid ""
 "Note that this flag may cause no dependency on B<perl-base> to be generated "
 "at all. B<perl-base> is Essential, so its dependency can be left out, unless "
@@ -10880,12 +11023,12 @@ msgstr ""
 "base> の特定のバージョンに依存が特に必要な場合はその限りではありません。"
 
 #. type: =item
-#: dh_perl:49
+#: dh_perl:50
 msgid "B<-V>"
 msgstr "B<-V>"
 
 #. type: textblock
-#: dh_perl:51
+#: dh_perl:52
 msgid ""
 "By default, scripts and architecture independent modules don't depend on any "
 "specific version of B<perl>. The B<-V> option causes the current version of "
@@ -10898,12 +11041,12 @@ msgstr ""
 "ン) を、パッケージの依存情報として設定します。"
 
 #. type: =item
-#: dh_perl:55
+#: dh_perl:56
 msgid "I<library dirs>"
 msgstr "I<library dirs>"
 
 #. type: textblock
-#: dh_perl:57
+#: dh_perl:58
 msgid ""
 "If your package installs Perl modules in non-standard directories, you can "
 "make B<dh_perl> check those directories by passing their names on the "
@@ -10916,17 +11059,17 @@ msgstr ""
 "のコマンドは F<vendorlib> と F<vendorarch> ディレクトリのみを確認します。"
 
 #. type: textblock
-#: dh_perl:66
+#: dh_perl:67
 msgid "Debian policy, version 3.8.3"
 msgstr "Debian ポリシー バージョン 3.8.3"
 
 #. type: textblock
-#: dh_perl:68
+#: dh_perl:69
 msgid "Perl policy, version 1.20"
 msgstr "Perl ポリシー バージョン 1.20"
 
 #. type: textblock
-#: dh_perl:182
+#: dh_perl:196
 msgid "Brendan O'Dea <bod@debian.org>"
 msgstr "Brendan O'Dea <bod@debian.org>"
 
@@ -11956,6 +12099,15 @@ msgstr ""
 #: strings-kept-translations.pod:7
 msgid "This compatibility level is open for beta testing; changes may occur."
 msgstr "この互換性レベルはベータテスト中です。変更が加わります。"
+
+#~ msgid ""
+#~ "Set to B<1> to enable verbose mode. Debhelper will output every command "
+#~ "it runs. Also enables verbose build logs for some build systems like "
+#~ "autoconf."
+#~ msgstr ""
+#~ "B<1> を指定すると冗長出力モードになります。debhelper は動作する全てのコマ"
+#~ "ンドについて出力を行うようになります。また、autoconf のようなビルドシステ"
+#~ "ムについても冗長出力されたビルドログを有効にします。"
 
 #, fuzzy
 #~ msgid ""
