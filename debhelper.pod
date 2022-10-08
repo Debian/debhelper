@@ -274,7 +274,10 @@ The following command line options are supported by all debhelper programs.
 
 =item B<-v>, B<--verbose>
 
-Verbose mode: show all commands that modify the package build directory.
+Verbose mode: show commands that modify the package build directory.
+
+Note that verbose mode may also output other "internal" commands that do not
+directly affect the package build directory.
 
 =item B<--no-act>
 
@@ -679,17 +682,18 @@ example, "B<export DH_VERBOSE>".
 
 =item B<DH_VERBOSE>
 
-Set to B<1> to enable verbose mode. Debhelper will output every command it
-runs. Also enables verbose build logs for some build systems like autoconf.
+Set to a non-empty value to enable verbose mode.  Please see the B<-v> / B<--verbose>
+option for details.
 
 =item B<DH_QUIET>
 
-Set to B<1> to enable quiet mode. Debhelper will not output commands calling
+Set to a non-empty value to enable quiet mode. Debhelper will not output commands calling
 the upstream build system nor will dh print which subcommands are called
 and depending on the upstream build system might make that more quiet, too.
 This makes it easier to spot important messages but makes the output quite
 useless as buildd log.
-Ignored if DH_VERBOSE is also set.
+
+Ignored if DH_VERBOSE is also set or B<-v> / B<--verbose> is passed.
 
 =item B<DH_COMPAT>
 
@@ -897,7 +901,9 @@ upstream builds to be terse (i.e. reduce verbosity in their output).
 This is subject to the upstream and the debhelper build system
 supporting such features.
 
-This value affects most B<dh_auto_*> tools.
+This value affects most B<dh_auto_*> tools directly. For commands
+provided by the debhelper package, it also causes the tools to act like
+the B<DH_QUIET> environment variable was non-empty.
 
 =back
 
