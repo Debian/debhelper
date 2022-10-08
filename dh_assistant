@@ -156,6 +156,93 @@ is a build system if the build system does not use/set/define that variable.
 
 =back
 
+=head2 detect-hook-targets (JSON)
+
+B<Synopsis>: B<dh_assistant> B<detect-hook-targets>
+
+Detects possible override targets and hook targets that L<dh(1)> might use (provided that the
+relevant command is in the sequence).
+
+The detection is based on scanning the rules file for any target that I<might look> like a hook
+target and can therefore list targets that are in fact not hook targets (or are but will never
+be triggered for other reasons).
+
+The detection uses a similar logic for scanning the rules file and is therefore subject to
+makefile conditionals (i.e., the truth value of makefile conditionals can change whether a hook
+target is visible in the output of this command).  In theory, you would have to setup up the
+environment to look like it would during a build for getting the most accurate output.  Though,
+a lot of packages will not have conditional hook targets, so the "out of the box" behaviour
+will work well in most cases.
+
+The output looks something like this:
+
+    {
+       "commands-not-in-path": [
+          "dh_foo"
+       ],
+       "hook-targets": [
+          {
+             "command": "dh_strip_nondeterminism",
+             "is-empty": true,
+             "package-section-param": null,
+             "target-name": "override_dh_strip_nondeterminism"
+          },
+          {
+             "command": "dh_foo",
+             "is-empty": false,
+             "package-section-param": "-a",
+             "target-name": "override_dh_foo-arch"
+          }
+       ]
+    }
+
+In more details:
+
+=over 4
+
+=item commands-not-in-path
+
+This attribute lists all the commands related to hook targets, which B<dh_assistant> could B<not>
+find in PATH.  These are usually caused by either the command not being installed on the system
+where B<dh_assistant> is run or by the command not existing at all.
+
+If you are using this command to verify an hook target is present, please double check that the
+command is spelled correctly.
+
+=item hook-targets
+
+List over hook targets found along with additional information about them.
+
+=over 4
+
+=item command
+
+Attribute that lists which command this hook target is related too.
+
+=item target-name
+
+The actual target name detected in the F<debian/rules> file.
+
+=item is-empty
+
+A boolean that determines whether L<dh(1)> will optimize the hook out at runtime (see "Completely empty targets" in
+L<dh(1)>). Note that empty override targets will still cause L<dh(1)>  to skip the original command.
+
+=item package-section-param
+
+This attribute defines what package selection parameter should be passed to B<dh_*> commands used
+in the hook target.  It can either be B<-a>, B<-i> or (if no parameter should be used) C<null>.
+
+=back
+
+=back
+
+In the output, each hook target is associated with a B<is-empty> boolean. This boolean determines
+whether L<dh(1)> will optimize the hook out at runtime. Note that empty override targets will
+still cause L<dh(1)>  to skip the original command.
+
+This command accepts no options or arguments.
+
 =head2 COMMAND TAGS
 
 Most commands have one or more of the following "tags" associated with them.  Their
@@ -220,6 +307,7 @@ my %COMMANDS = (
     'active-compat-level'     => \&active_compat_level,
     'supported-compat-levels' => \&supported_compat_levels,
     'which-build-system'      => \&which_build_system,
+    'detect-hook-targets'     => \&detect_hook_targets,
 );
 
 my ($COMMAND) = shift(@ARGV);
@@ -243,6 +331,7 @@ The following commands are available:
   active-compat-level        Output information about which compat level is declared/active (JSON)
   supported-compat-levels    Output information about supported compat levels (JSON, CRFA)
   which-build-system         Determine which build system will be used (JSON)
+  detect-hook-targets        Detect and output possible override and hook targets (JSON)
 
 
 Command tags:
@@ -353,6 +442,48 @@ sub which_build_system {
     );
     _output(\%result);
     return;
+}
+
+sub _in_path {
+    my ($cmd) = @_;
+    for my $dir (split(':', $ENV{PATH})) {
+        return 1 if -x "${dir}/${cmd}";
+    }
+    return 0;
+}
+
+sub detect_hook_targets {
+    if (@ARGV) {
+        error("$COMMAND: No arguments supported (please remove everything after the command)");
+    }
+    _assert_debian_control_exists();
+    require Debian::Debhelper::SequencerUtil;
+    Debian::Debhelper::SequencerUtil::rules_explicit_target('does-not-matter');
+    my ($explicit_targets, %result, @targets, @unverifiable_commands, %seen_cmds);
+    {
+        no warnings qw(once);
+        $explicit_targets = \%Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS;
+    }
+    while (my ($target, $non_empty) = each(%{$explicit_targets})) {
+        next if $target !~ m{^(?:execute_before_|execute_after_|override_)(\S+?)(-indep|-arch)?$};
+        my ($command, $archness) = ($1, $2);
+        my $param;
+        if ($archness) {
+            $param = ($archness eq '-arch') ? '-a' : '-i' ;
+        }
+        my $target_info = {
+            'target-name'           => $target,
+            'command'               => $command,
+            'package-section-param' => $param,
+            'is-empty'              => $non_empty ? JSON::PP::false : JSON::PP::true,
+        };
+        push(@targets, $target_info);
+        push(@unverifiable_commands, $command) if not exists($seen_cmds{$command}) and not _in_path($command);
+        $seen_cmds{$command} = 1;
+    }
+    $result{'hook-targets'} = \@targets;
+    $result{'commands-not-in-path'} = \@unverifiable_commands;
+    _output(\%result);
 }
 
 if (not defined($COMMAND)) {

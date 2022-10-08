@@ -72,8 +72,9 @@ and 12.8 (for hook targets).
 
 =head2 Completely empty targets
 
-As a special optimization, B<dh> will skip a target if it is completely empty.
-This is mostly useful for override targets, where the command will simply be
+As a special optimization, B<dh> will skip a target if it is
+completely empty and does not depend on any other target.  This is
+mostly useful for override targets, where the command will simply be
 skipped without the overhead of invoking a dummy target.
 
 Note that the target has to be completely empty for this to work:
@@ -90,8 +91,48 @@ Note that the target has to be completely empty for this to work:
 
 =head2 Verifying targets are picked up by dh
 
-If you want to confirm that B<dh> has seen an override or a hook target, you
-can use the following command as an example:
+As of debhelper 13.10, you can use L<dh_assistant(1)> to see which override
+and hook targets will be seen by B<dh>.  Here is an example run of L<dh_assistant(1)>
+along with its output:
+
+    $ dh_assistant detect-hook-targets
+    {
+       "commands-not-in-path": [
+          "dh_foo"
+       ],
+       "hook-targets": [
+          {
+             "command": "dh_strip_nondeterminism",
+             "is-empty": true,
+             "package-section-param": null,
+             "target-name": "override_dh_strip_nondeterminism"
+          },
+          {
+             "command": "dh_foo",
+             "is-empty": false,
+             "package-section-param": "-a",
+             "target-name": "override_dh_foo-arch"
+          }
+       ]
+    }
+
+The B<commands-not-in-path> is useful for spotting mistakes in the hook target
+names.  A non-empty value implies one of more hook targets are related to a command
+that is either not installed or no command with that name exists at all.  It is
+generally worth double checking these.
+
+Additionally, the B<is-empty> attribute for each hook target can be used for seeing
+whether a hook target triggers the L</Completely empty targets> optimization.
+
+If you are interested in the other attributes, please read the L<dh_assistant(1)>
+for the details.
+
+=head3 Verifying targets are picked up by dh (when debhelper is older than 13.10)
+
+
+
+On older versions of debhelper, you have to use B<dh> with B<--no-act>.
+You can use the following command as an example:
 
     $ dh binary --no-act | grep dh_install | head -n5
          dh_installdirs
