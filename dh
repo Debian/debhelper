@@ -750,6 +750,9 @@ if (! exists($Debian::Debhelper::DH::SequenceState::sequences{$sequence})) {
 
 parse_dh_cmd_options(@ARGV_orig);
 
+_hoist_profile_into_dbo('nodoc');
+_hoist_profile_into_dbo('nocheck');
+
 # Figure out at what point in the sequence to start for each package.
 my (%logged, %startpoint, $completed_sequences);
 
@@ -844,6 +847,14 @@ sub reject_obsolete_params {
 	}
 }
 
+sub _hoist_profile_into_dbo {
+	my ($name) = @_;
+	if (is_build_profile_active($name) && !get_buildoption($name)) {
+		$ENV{'DEB_BUILD_OPTIONS'} //= '';
+		$ENV{'DEB_BUILD_OPTIONS'} .= ' ' . $name;
+		warning("Copying ${name} into DEB_BUILD_OPTIONS: It was in DEB_BUILD_PROFILES and but not in DEB_BUILD_OPTIONS");
+	}
+}
 
 =head1 SEE ALSO
 

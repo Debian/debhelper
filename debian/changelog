@@ -38,6 +38,12 @@ debhelper (13.10) UNRELEASED; urgency=medium
   * dh_assistant: Provide a new `detect-hook-targets` command.
   * dh: Recommend using `dh_assistant detect-hook-targets` for
     checking whether hook targets are correct.
+  * dh: Hoist `nodoc` and `nocheck` from `DEB_BUILD_PROFILES`
+    into `DEB_BUILD_OPTIONS` when they are present in the former
+    and absent in the latter.  Emit a warning when doing so to
+    aid the user, so they know why this does not work when they
+    are later building a package that does not use dh.
+    (Closes: #979401)
 
   [ Translations ]
   * Update Portuguese translation (Américo Monteiro)
