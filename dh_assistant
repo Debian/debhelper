@@ -237,13 +237,50 @@ in the hook target.  It can either be B<-a>, B<-i> or (if no parameter should be
 
 =back
 
-In the output, each hook target is associated with a B<is-empty> boolean. This boolean determines
-whether L<dh(1)> will optimize the hook out at runtime. Note that empty override targets will
-still cause L<dh(1)>  to skip the original command.
-
 This command accepts no options or arguments.
 
-=head2 COMMAND TAGS
+=head2 log-installed-files
+
+B<Synopsis>: B<dh_assistant> B<< -pI<pkg> >> I<[--on-behalf-of-cmd=dh_foo]> B<path ...>
+
+Mark one or more paths as installed for a given package.  This is useful for telling L<dh_missing(1)> that the
+paths have been installed manually.
+
+The B<--on-behalf-of-cmd> option can be used by third-party tools to have B<dh_assistant> list them as the
+installer of the provided paths.  The convention is to use the basename of the tool itself as its name
+(e.g. B<dh_install>).
+
+Please keep in mind that:
+
+=over 4
+
+=item *
+
+B<No> glob or substitution expansion is done by B<dh_assistant> on the provided paths.  If you want to use globs,
+have the shell perform the expansion first.
+
+=item *
+
+Paths must be given as relative to the source root directory (e.g., F<debian/tmp/...>)
+
+=item *
+
+You I<can> provide a directory.  If you do, the directory and anything recursively below it will be considered
+as installed.  Note that it is fine to provide the directory even if paths inside of it has been excluded as long
+as the directory is fully "covered".
+
+=item *
+
+Do not worry about providing the same filename twice in different invocations to B<dh_assistant> due to B<-arch> /
+B<-indep> overrides.  While it will be recorded multiple internally, L<dh_missing(1)> will deduplicate when it
+parses the records.
+
+=back
+
+Note this command only I<marks> paths as installed. It does not actually install them - the caller should ensure
+that the paths are in fact handled (or installed).
+
+=head1 COMMAND TAGS
 
 Most commands have one or more of the following "tags" associated with them.  Their
 meaning is defined here.
@@ -308,6 +345,7 @@ my %COMMANDS = (
     'supported-compat-levels' => \&supported_compat_levels,
     'which-build-system'      => \&which_build_system,
     'detect-hook-targets'     => \&detect_hook_targets,
+    'log-installed-files'     => \&log_installed_files_cmd,
 );
 
 my ($COMMAND) = shift(@ARGV);
@@ -332,13 +370,15 @@ The following commands are available:
   supported-compat-levels    Output information about supported compat levels (JSON, CRFA)
   which-build-system         Determine which build system will be used (JSON)
   detect-hook-targets        Detect and output possible override and hook targets (JSON)
-
+  log-installed-files        Mark one or more paths as "installed" so dh_missing is aware (BLD)
 
 Command tags:
 
  * JSON    The command provides JSON output.
  * CRFA    Command does not need to be run from a package source directory
            (Mnemonic "Can be Run From Anywhere")
+ * BLD     The command is intended to be used as a part of a package build.
+           It may leave artifacts behind that will need a dh_clean invocation to remove.
 
 
 Its primary purpose is to provide support for third-party debhelper implementations
@@ -484,6 +524,33 @@ sub detect_hook_targets {
     $result{'hook-targets'} = \@targets;
     $result{'commands-not-in-path'} = \@unverifiable_commands;
     _output(\%result);
+}
+
+sub log_installed_files_cmd {
+    my $on_behalf_of = 'manually-via-dh_assistant';
+    init(
+        options => {
+            'on-behalf-of-cmd=s' => \$on_behalf_of,
+        },
+        inhibit_log => 1,
+    );
+    if (index($on_behalf_of, '/') >= 0) {
+        error('The value for --on-behalf-of-cmd must not contain slashes');
+    }
+    if (@{$dh{DOPACKAGES}} != 1) {
+        error('The log-installed-files command must act on exactly one package (use -p<pkg> to define which)');
+    }
+    my $package = $dh{DOPACKAGES}[0];
+    for my $arg (@ARGV) {
+        $arg =~ tr:/:/:s;
+        if (! -e $arg) {
+            warning("The path ${arg} does not exist - double check it is correct. Note: it will recorded anyway.");
+        }
+    }
+    log_installed_files({
+        'package'   => $package,
+        'tool_name' => $on_behalf_of,
+    }, @ARGV);
 }
 
 if (not defined($COMMAND)) {

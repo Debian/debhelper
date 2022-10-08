@@ -2820,8 +2820,14 @@ sub log_installed_files {
 	my ($package, @patterns) = @_;
 
 	return if $dh{NO_ACT};
+	my $tool = $TOOL_NAME;
+	if (ref($package) eq 'HASH') {
+		my $options = $package;
+		$tool = $options->{'tool_name'} // error('Missing mandatory "tool_name" option for log_installed_files');
+		$package = $options->{'package'} // error('Missing mandatory "package" option for log_installed_files');
+	}
 
-	my $log = generated_file($package, 'installed-by-' . $TOOL_NAME);
+	my $log = generated_file($package, 'installed-by-' . $tool);
 	open(my $fh, '>>', $log) or error("open $log: $!");
 	for my $src (@patterns) {
 		print $fh "$src\n";

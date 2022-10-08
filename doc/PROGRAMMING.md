@@ -620,7 +620,27 @@ here is what you do:
     to that version, debhelper will wrongly optimize your helper out.
 - Consider using `dh_installman` or `dh_installexamples` as examples.
 
-### Other helpers
+### Other helpers - via dh_assistant log-installed-files
+
+This process requires debhelper/13.10 or later.
+
+- The helper must compile a list of files it would have installed for
+  each package (even packages that are not acted on).  The file list
+  should be relative to the source package root (e.g.
+  `debian/tmp/usr/bin/bar`).
+  - This list can also contain directories.  They will be flagged as
+    installed along with their content (recursively).
+- Invoke `dh_assistant log-installed-files --on-behalf-of-cmd=${HELPER_NAME} -p${package} ${PATHS}`
+  - Invoking `dh_assistant` when your tool has no paths to log is
+    still recommended to let dh_missing that your tool had nothing
+    to record.
+  - Prefer calling `dh_assistant log-installed-files` *exactly once*
+    per package per invocation of your tool as this is what it is
+    optimized for.
+- If your helper has a PROMISE, it must use `pkgfile-logged(<file>)`
+  for its config files (see [#867246]).
+
+### Other helpers - manually
 
 - The helper must compile a list of files it would have installed for
   each package (even packages that are not acted on).  The file list
