@@ -11,6 +11,7 @@ use warnings;
 use Config;
 use File::Find;
 use Debian::Debhelper::Dh_Lib;
+use constant DISTRO_PERL => $^X;
 
 our $VERSION = DH_BUILTIN_VERSION;
 
@@ -128,10 +129,15 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		return unless -f and (-x _ or /\.pl$/);
 
 		return unless open(my $fd, '<', $_);
-		if (read($fd, local $_, 32) and m%^#!\s*(/usr/bin/perl|/usr/bin/env\s+perl)\s%) {
+		my $path = $_;
+		my $rewrite_shbang = 0;
+		if (read($fd, local $_, 32) and m%^#!\s*(/usr/bin/perl|${\DISTRO_PERL}|/usr/bin/env\s+perl)\s%) {
+			my $actual_perl = $1;
 			$deps |= PROGRAM;
+			$rewrite_shbang = 1 if ($actual_perl ne DISTRO_PERL);
 		}
 		close($fd);
+		rewrite_shbang($path) if $rewrite_shbang;
 	};
 	find({
 		wanted => $check_script,
@@ -169,6 +175,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				"$dir");
 		}
 	}
+}
+
+sub rewrite_shbang {
+	my ($file) = @_;
+	doit($^X, '-p', '-i', '-e',
+		's{#!\s*(/usr/bin/perl|' . quotemeta(DISTRO_PERL) . '|/usr/bin/env\s+perl)}{#! ' . DISTRO_PERL . '} if ($. == 1);',
+		$file);
+	return;
 }
 
 =head1 SEE ALSO
