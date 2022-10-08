@@ -753,6 +753,19 @@ parse_dh_cmd_options(@ARGV_orig);
 _hoist_profile_into_dbo('nodoc');
 _hoist_profile_into_dbo('nocheck');
 
+if (is_cross_compiling() && !get_buildoption('nocheck') && !get_buildoption('crossbuildcanrunhostbinaries')) {
+	warning('Running tests during cross-builds is not supported in the general case (except for special cases or by');
+	warning('using emulation)');
+	warning('If the build fails, please consider rebuilding with DEB_BUILD_OPTIONS=nocheck.');
+	if (!is_build_profile_active('cross')) {
+		warning('Additionally, you might have to set the "cross" profile.  For dpkg-buildpackage, you do this by');
+		warning('passing the -Pcross option. Check the documentation of your build tool for how to set');
+		warning('DEB_BUILD_PROFILES if you use another build tool that does not auto-configure cross-building for you');
+	}
+	warning('If you have setup the relevant support for running cross-compiled binaries and want to silence this');
+	warning('warning, please use DEB_BUILD_OPTIONS=crossbuildcanrunhostbinaries')
+}
+
 # Figure out at what point in the sequence to start for each package.
 my (%logged, %startpoint, $completed_sequences);
 

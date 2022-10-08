@@ -44,6 +44,13 @@ debhelper (13.10) UNRELEASED; urgency=medium
     aid the user, so they know why this does not work when they
     are later building a package that does not use dh.
     (Closes: #979401)
+  * dh: Provide a warning when cross building an `nocheck` is
+    absent from `DEB_BUILD_OPTIONS` to cross builders, who are
+    not experienced with Debian's requirements for
+    cross-building.  The warning also recommends activating the
+    `cross` build profile and provides a way to disable the
+    warning without using `nocheck` (for the special case, where
+    people have a system that can run host binaries).
 
   [ Translations ]
   * Update Portuguese translation (Américo Monteiro)
