@@ -2662,7 +2662,7 @@ sub _executable_dh_config_file_failed {
 	# The interpreter did not like the file for some reason.
 	# Lets check if the maintainer intended it to be
 	# executable.
-	if (not is_so_or_exec_elf_file($source) and not _has_shbang_line($source)) {
+	if (not is_so_or_exec_elf_file($source) and not _has_shebang_line($source)) {
 		warning("${source} is marked executable but does not appear to an executable config.");
 		warning();
 		warning("If ${source} is intended to be an executable config file, please ensure it can");
@@ -2877,7 +2877,7 @@ sub is_so_or_exec_elf_file {
 	return 1;
 }
 
-sub _has_shbang_line {
+sub _has_shebang_line {
 	my ($file) = @_;
 	open(my $fd, '<', $file) or error("open $file: $!");
 	my $line = <$fd>;

@@ -130,14 +130,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 		return unless open(my $fd, '<', $_);
 		my $path = $_;
-		my $rewrite_shbang = 0;
+		my $rewrite_shebang = 0;
 		if (read($fd, local $_, 32) and m%^#!\s*(/usr/bin/perl|${\DISTRO_PERL}|/usr/bin/env\s+perl)\s%) {
 			my $actual_perl = $1;
 			$deps |= PROGRAM;
-			$rewrite_shbang = 1 if ($actual_perl ne DISTRO_PERL);
+			$rewrite_shebang = 1 if ($actual_perl ne DISTRO_PERL);
 		}
 		close($fd);
-		rewrite_shbang($path) if $rewrite_shbang;
+		rewrite_shebang($path) if $rewrite_shebang;
 	};
 	find({
 		wanted => $check_script,
@@ -177,7 +177,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 }
 
-sub rewrite_shbang {
+sub rewrite_shebang {
 	my ($file) = @_;
 	doit($^X, '-p', '-i', '-e',
 		's{#!\s*(/usr/bin/perl|' . quotemeta(DISTRO_PERL) . '|/usr/bin/env\s+perl)}{#! ' . DISTRO_PERL . '} if ($. == 1);',
