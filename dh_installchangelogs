@@ -168,8 +168,8 @@ sub install_debian_changelog {
 
 	local $ENV{LC_ALL} = "C.UTF-8";
 
-	my $changelog_trimmed = "$changelog.trimmed.debhelper";
-	my $changelog_binnmu = "$changelog.binnmu.debhelper";
+	my $changelog_trimmed = generated_file($package, "dh_installchangelogs.dch.trimmed");
+	my $changelog_binnmu = generated_file($package, "dh_installchangelogs.dch.binnmu");
 
 	open(my $log1, "<", $changelog) or error("Cannot open($changelog): $!");
 	open(my $log2, ">", $changelog_trimmed) or error("Cannot open($changelog_trimmed): $!");
