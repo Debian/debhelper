@@ -87,16 +87,21 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	if (! $dh{NOSCRIPTS} && ($sysusers ne '' || -d $sysusers_targetdir)) {
-		my $has_sysuser = 0;
+		my @sysusers_files;
 		opendir(my $dir_fd, $sysusers_targetdir) or error("opendir(${sysusers_targetdir}) failed: $!");
 		while (defined(my $entry = readdir($dir_fd))) {
 			next if $entry eq '.' or $entry eq '..' or $entry !~ m{[.]conf$};
-			autoscript($package, 'postinst', 'postinst-sysusers', { 'CONFILE_BASENAME' => $entry });
-			$has_sysuser = 1;
+			push @sysusers_files, $entry;
 		}
 		closedir($dir_fd);
-		addsubstvar($package, "misc:Depends", "systemd | systemd-standalone-sysusers | systemd-sysusers")
-			if $has_sysuser;
+
+		next if @sysusers_files == 0;
+
+		# Sort list of files so postinst content doesn't change if readdir's output is not stable
+		@sysusers_files = sort @sysusers_files;
+		# Generate a single systemd-sysusers invocation and just pass all detected files together
+		autoscript($package, 'postinst', 'postinst-sysusers', { 'CONFILE_BASENAME' => "@sysusers_files" });
+		addsubstvar($package, "misc:Depends", "systemd | systemd-standalone-sysusers | systemd-sysusers");
 	}
 
 }
