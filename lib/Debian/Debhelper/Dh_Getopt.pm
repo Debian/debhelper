@@ -11,7 +11,7 @@ use warnings;
 use Debian::Debhelper::Dh_Lib;
 use Getopt::Long;
 
-my (%exclude_package, %internal_excluded_package, %explicitly_reqested_packages, %profile_enabled_packages,
+my (%exclude_package, %internal_excluded_package, %explicitly_requested_packages, %profile_enabled_packages,
 	$profile_excluded_pkg);
 
 sub showhelp {
@@ -44,7 +44,7 @@ sub AddPackage { my($option,$value)=@_;
 	elsif ($option eq 'p' or $option eq 'package') {
 		assert_opt_is_known_package($value, '-p/--package');
 		%profile_enabled_packages = map { $_ => 1 } getpackages('both') if not %profile_enabled_packages;
-		$explicitly_reqested_packages{$value} = 1;
+		$explicitly_requested_packages{$value} = 1;
 		# Silently ignore packages that are not enabled by the
 		# profile.
 		if (exists($profile_enabled_packages{$value})) {
@@ -73,7 +73,8 @@ sub ExcludePackage {
 }
 
 # Add another item to the exclude list.
-sub AddExclude { my($option,$value)=@_;
+sub AddExclude {
+	my($option,$value)=@_;
 	push @{$dh{EXCLUDE}},$value;
 }
 
@@ -272,9 +273,7 @@ sub parseopts {
 	# Remove excluded packages from the list of packages to act on.
 	# Also unique the list, in case some options were specified that
 	# added a package to it twice.
-	my @package_list;
-	my $package;
-	my %packages_seen;
+	my (@package_list, $package, %packages_seen);
 	foreach $package (@{$dh{DOPACKAGES}}) {
 		if (defined($dh{EXCLUDE_LOGGED}) &&
 		    grep { $_ eq basename($0) } load_log($package)) {
@@ -292,16 +291,16 @@ sub parseopts {
 	if (! defined $dh{DOPACKAGES} || ! @{$dh{DOPACKAGES}}) {
 		if (! $dh{BLOCK_NOOP_WARNINGS}) {
 			my %archs;
-			if (%explicitly_reqested_packages) {
+			if (%explicitly_requested_packages) {
 				# Avoid sending a confusing error message when debhelper must exclude a package given via -p.
 				# This commonly happens due to Build-Profiles or/and when build only a subset of the packages
 				# (e.g. dpkg-buildpackage -A vs. -B vs. none of the options)
-				for my $pkg (sort(keys(%explicitly_reqested_packages))) {
+				for my $pkg (sort(keys(%explicitly_requested_packages))) {
 					if (exists($internal_excluded_package{$pkg}) or not exists($profile_enabled_packages{$pkg})) {
-						delete($explicitly_reqested_packages{$pkg});
+						delete($explicitly_requested_packages{$pkg});
 					}
 				}
-				if (not %explicitly_reqested_packages) {
+				if (not %explicitly_requested_packages) {
 					warning('All requested packages have been excluded'
 						. ' (e.g. via a Build-Profile or due to architecture restrictions).');
 					exit(0);
@@ -317,11 +316,11 @@ sub parseopts {
 	}
 
 	if (defined $dh{U_PARAMS}) {
-	        # Split the U_PARAMS up into an array.
-        	my $u=$dh{U_PARAMS};
-        	undef $dh{U_PARAMS};
-                push @{$dh{U_PARAMS}}, split(/\s+/,$u);
-        }
+		# Split the U_PARAMS up into an array.
+		my $u=$dh{U_PARAMS};
+		undef $dh{U_PARAMS};
+		push @{$dh{U_PARAMS}}, split(/\s+/,$u);
+	}
 
 	# Anything left in @ARGV is options that appeared after a --
 	# These options are added to the U_PARAMS array, while the
