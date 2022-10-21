@@ -276,7 +276,7 @@ sub parseopts {
 	my (@package_list, $package, %packages_seen);
 	foreach $package (@{$dh{DOPACKAGES}}) {
 		if (defined($dh{EXCLUDE_LOGGED}) &&
-		    grep { $_ eq basename($0) } load_log($package)) {
+		    grep { $_ eq $Debian::Debhelper::Dh_Lib::TOOL_NAME } load_log($package)) {
 			$exclude_package{$package}=1;
 		}
 		if (! $exclude_package{$package}) {
