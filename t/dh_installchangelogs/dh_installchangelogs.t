@@ -22,6 +22,7 @@ setlocale(LC_ALL, "C.UTF-8");
 
 use constant CUTOFF_DATE_STR => "2019-07-06"; # oldstable = Debian 10 Buster
 use constant CUTOFF_DATE => Time::Piece->strptime(CUTOFF_DATE_STR, "%Y-%m-%d");
+use constant MIN_NUM_ENTRIES => 4;
 
 sub install_changelog {
 	my ($latest_offset_years, $num_years, $is_binnmu) = @_;
@@ -40,6 +41,7 @@ sub install_changelog {
 		print($fd $nmu_entry);
 	}
 
+	# Add one entry every three months ~= four per year.
 	my $entry_date = $entry_date_first;
 	while ($entry_date > $entry_date_stop) {
 		my $entry = entry_text($entry_date, 0);
@@ -141,8 +143,8 @@ each_compat_subtest {
 	my @comments = grep(/^#/, @lines);
 
 	cmp_ok(@lines, "<", @lines_orig);
-	is(@entries, 1);
-	is(@entries_old, 1);
+	is(@entries, MIN_NUM_ENTRIES);
+	is(@entries_old, MIN_NUM_ENTRIES);
 	cmp_ok(@comments, ">=", 1);
 };
 
@@ -202,9 +204,9 @@ each_compat_subtest {
 	my @entries_nmu = dates_in_lines(changelog_lines_binnmu());
 	my @comments = grep(/^#/, @lines);
 
-	is(@entries, 1);
+	is(@entries, MIN_NUM_ENTRIES);
 	is($entries[0], $entries_orig[1]);
-	is(@entries_old, 1);
+	is(@entries_old, MIN_NUM_ENTRIES);
 	cmp_ok(@comments, ">=", 1);
 
 	is(@entries_nmu, 1);

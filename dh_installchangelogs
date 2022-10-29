@@ -116,6 +116,7 @@ my $changelog_name="changelog.Debian";
 
 use constant CUTOFF_DATE_STR => "2019-07-06"; # oldstable = Debian 10 Buster
 use constant CUTOFF_DATE => Time::Piece->strptime(CUTOFF_DATE_STR, "%Y-%m-%d");
+use constant MIN_NUM_ENTRIES => 4;
 
 my $explicit_changelog = @ARGV ? 1 : 0;
 my $default_upstream = $ARGV[0];
@@ -220,8 +221,9 @@ sub install_debian_changelog {
 				last;
 			}
 
-			# Stop processing the changelog if we reached the cut-off date and at least one entry has been added.
-			if (($entry_time < CUTOFF_DATE) && ($entry_num >= 1)) {
+			# Stop processing the changelog if we reached the cut-off date and
+			# at least MIN_NUM_ENTRIES entries have been added.
+			if (($entry_time < CUTOFF_DATE) && ($entry_num >= MIN_NUM_ENTRIES)) {
 				last;
 			}
 
