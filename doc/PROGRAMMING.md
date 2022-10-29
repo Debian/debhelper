@@ -216,8 +216,9 @@ The following keys are also set in the `%dh` hash when you call `init()`:
   for allowing debhelper programs to have configuration files in the
   `debian/` directory, so there can be one config file per binary
   package. The convention is that the files are named
-  `debian/package.filename`, and `debian/filename` is also allowable for
-  the `$dh{MAINPACKAGE}`. If the file does not exist, nothing is returned.
+  `debian/package.filename`, and (until compat 15) `debian/filename`
+  is also allowable for the `$dh{MAINPACKAGE}`. If the file does not
+  exist, nothing is returned.
 
   If the *entire* behavior of a command, when run without any special
   options, is determined by the existence of 1 or more pkgfiles,

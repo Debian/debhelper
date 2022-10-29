@@ -351,9 +351,9 @@ foreach my $package (getpackages()) {
 	}
 
 	# .Debian is correct, according to policy, but I'm easy.
-	my $readme_debian=pkgfile($package,'README.Debian');
+	my $readme_debian=pkgfile($package,'README.Debian', $package eq $dh{MAINPACKAGE} ? 1 : 0);
 	if (! $readme_debian) {
-		$readme_debian=pkgfile($package,'README.debian');
+		$readme_debian=pkgfile($package,'README.debian', $package eq $dh{MAINPACKAGE} ? 1 : 0);
 	}
 	if (! $link_doc && $readme_debian && ! excludefile($readme_debian)) {
 		ensure_docdir($package);
@@ -361,7 +361,7 @@ foreach my $package (getpackages()) {
 					 "$tmp/usr/share/doc/$package/README.Debian");
 	}
 
-	my $todo=pkgfile($package,'TODO');
+	my $todo=pkgfile($package, 'TODO', $package eq $dh{MAINPACKAGE} ? 1 : 0);
 	if (! $link_doc && $todo && ! excludefile($todo)) {
 		ensure_docdir($package);
 		if (isnative($package)) {
@@ -380,10 +380,7 @@ foreach my $package (getpackages()) {
 		# Support debian/package.copyright, but if not present, fall
 		# back on debian/copyright for all packages, not just the 
 		# main binary package.
-		my $copyright=pkgfile($package,'copyright');
-		if (! $copyright && -e "debian/copyright") {
-			$copyright="debian/copyright";
-		}
+		my $copyright = pkgfile($package, 'copyright', 1);
 		if ($copyright && ! excludefile($copyright)) {
 			ensure_docdir($package);
 			install_file($copyright,

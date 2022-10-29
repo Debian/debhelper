@@ -76,13 +76,17 @@ Generally, these files will list files to act on, one file per line. Some
 programs in debhelper use pairs of files and destinations or slightly more
 complicated formats.
 
-Note for the first (or only) binary package listed in
-F<debian/control>, debhelper will use F<debian/foo> when there's no
-F<debian/I<package>.foo> file.  However, it is often a good idea to keep
-the F<I<package>.> prefix as it is more explicit.  The primary exception
-to this are files that debhelper by default installs in every binary
-package when it does not have a package prefix (such as
-F<debian/copyright> or F<debian/changelog>).
+Note if there is only one binary package listed in F<debian/control>, then
+debhelper will use F<debian/foo> when there's no F<debian/I<package>.foo> file.
+In compat levels before compat 15, this fallback also occurs for the first
+binary package listed in F<debian/control> when there are multiple binary
+packages. However, it is often a good idea to keep the F<I<package>.> prefix
+as it is more explicit and also required when upgrading to compat 15.
+
+Additionally, there are some special cases where debhelper will always
+fallback to a prefix-less version.  These are cases such as F<debian/copyright>
+and F<debian/changelog>, where the files are generally used and needed for all
+binary packages.
 
 In some rare cases, you may want to have different versions of these files
 for different architectures or OSes. If files named debian/I<package>.foo.I<ARCH>
@@ -335,6 +339,9 @@ process the rest of packages with default settings.
 Use I<tmpdir> for package build directory. The default is debian/I<package>
 
 =item B<--mainpackage=>I<package>
+
+B<Deprecated>: This option has no practical use in compat 15 or later as the
+behaviour it affects is removed in compat 15.
 
 This little-used option changes the package which debhelper considers the
 "main package", that is, the first one listed in F<debian/control>, and the

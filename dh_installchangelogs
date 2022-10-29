@@ -306,8 +306,8 @@ on_pkgs_in_parallel {
 		next if is_udeb($package);
 	
 		my $tmp=tmpdir($package);
-		my $changelog=pkgfile($package,"changelog");
-		my $news=pkgfile($package,"NEWS");
+		my $changelog = pkgfile($package, 'changelog', 1);
+		my $news = pkgfile($package, 'NEWS', 1);
 		my $upstream_changelog;
 		my ($upstream_changelog_text, $upstream_changelog_html);
 		my $changelog_from_tmp_dir = 0;
@@ -327,13 +327,6 @@ on_pkgs_in_parallel {
 				$upstream_changelog = $default_upstream;
 				$upstream_changelog_text = $upstream_changelog;
 			}
-		}
-
-		if (!$changelog) {
-			$changelog="debian/changelog";
-		}
-		if (!$news) {
-			$news="debian/NEWS";
 		}
 
 		if (! -e $changelog) {

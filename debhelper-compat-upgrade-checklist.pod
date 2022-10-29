@@ -44,6 +44,18 @@ binary packages being uploaded to the archive by mistake. With the new behaviour
 the B<single-binary> addon will detect the mismatch and warn the maintainer of what is
 about to happen.
 
+=item -
+
+It is now an error to use package-less versions of debhelper configuration files
+when there are 2 or more binary packages listed in F<debian/control> in
+most cases.  Legacy files should be renamed to F<< debian/I<package>.foo >>
+(from F<debian/foo>) where I<package> is the first binary package listed in
+F<debian/control>.
+
+The primary exception to this change are files such as F<debian/changelog>,
+F<debian/NEWS>, and F<debian/copyright>, where the same file is used for all
+packages by default.  These cases will remain unchanged.
+
 =back
 
 =item v14
@@ -171,6 +183,20 @@ packages that are B<Essential: yes>.
 
 Note due to the B<dh_gencontrol> change above, any package using B<dh_gencontrol>
 will not have to do anything for this migration.
+
+=item -
+
+It now triggers a warning to use package-less versions of debhelper configuration
+files when there are 2 or more binary packages listed in F<debian/control> in
+most cases.  Legacy files should be renamed to F<< debian/I<package>.foo >>
+(from F<debian/foo>) where I<package> is the first binary package listed in
+F<debian/control>.
+
+The primary exception to this change are files such as F<debian/changelog>,
+F<debian/NEWS>, and F<debian/copyright>, where the same file is used for all
+packages by default.  These cases will remain unchanged.
+
+In compat 15 (or later), this is changed to an error.
 
 =back
 

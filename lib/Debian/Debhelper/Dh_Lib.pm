@@ -1061,19 +1061,21 @@ sub default_sourcedir {
 #   * debian/package.filename.hostarch
 #   * debian/package.filename.hostos
 #   * debian/package.filename
-#   * debian/filename (if the package is the main package)
+#   * debian/filename (if the package is the main package and compat < 15)
 # If --name was specified then the files
 # must have the name after the package name:
 #   * debian/package.name.filename.hostarch
 #   * debian/package.name.filename.hostos
 #   * debian/package.name.filename
-#   * debian/name.filename (if the package is the main package)
+#   * debian/name.filename (if the package is the main package and compat < 15)
 
 {
 	my %_check_expensive;
 
 	sub pkgfile {
-		my ($package, $filename) = @_;
+		# NB: $nameless_variant_handling is an implementation-detail; third-party packages
+		# should not rely on it.
+		my ($package, $filename, $nameless_variant_handling) = @_;
 		my (@try, $check_expensive);
 
 		if (not exists($_check_expensive{$filename})) {
@@ -1128,8 +1130,16 @@ sub default_sourcedir {
 					);
 			}
 			push(@try, "debian/$package.$filename");
-			if ($package eq $dh{MAINPACKAGE}) {
-				push @try, "debian/$filename";
+			if ($nameless_variant_handling or (not defined($nameless_variant_handling) and $package eq $dh{MAINPACKAGE})) {
+				my $nameless_variant = "debian/$filename";
+				push(@try, $nameless_variant);
+				if (getpackages() > 1 and not $nameless_variant_handling and not compat(13) and -f $nameless_variant) {
+					warning('The use of prefix-less debhelper config files is deprecated.');
+					warning("Please rename \"${nameless_variant}\" to \"debian/$dh{MAINPACKAGE}.${filename}\"");
+					error("Prefix-less debhelper config files is not supported in compat 15 and later")
+						if not compat(14);
+					warning('Prefix-less debhelper config files will trigger an error in compat 15 or later');
+				}
 			}
 		}
 		foreach my $file (@try) {
@@ -1179,7 +1189,7 @@ sub isnative {
 	}
 
 	# Make sure we look at the correct changelog.
-	my $isnative_changelog = pkgfile($package,"changelog");
+	my $isnative_changelog = pkgfile($package, 'changelog', 0);
 	if (! $isnative_changelog) {
 		$isnative_changelog = "debian/changelog";
 		$cache_key = '_source';
