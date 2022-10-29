@@ -18,96 +18,33 @@ changes.
 
 =over 4
 
-=item v1
+=item v7
 
-This is the original debhelper compatibility level, and so it is the default
-one. In this mode, debhelper will use F<debian/tmp> as the package tree
-directory for the first binary package listed in the control file, while using
-debian/I<package> for all other packages listed in the F<control> file.
+This is the lowest supported compatibility level.
 
-This mode is deprecated.
-
-=item v2
-
-In this mode, debhelper will consistently use debian/I<package>
-as the package tree directory for every package that is built.
-
-This mode is deprecated.
-
-=item v3
-
-This mode works like v2, with the following additions:
+Changes from v6 are:
 
 =over 8
 
 =item -
 
-Debhelper config files support globbing via B<*> and B<?>, when appropriate. To
-turn this off and use those characters raw, just prefix with a backslash.
+B<dh_install>, will fall back to looking for files in F<debian/tmp> if it doesn't
+find them in the current directory (or wherever you tell it look using
+B<--sourcedir>). This allows B<dh_install> to interoperate with B<dh_auto_install>,
+which installs to F<debian/tmp>, without needing any special parameters.
 
 =item -
 
-B<dh_makeshlibs> makes the F<postinst> and F<postrm> scripts call B<ldconfig>.
+B<dh_clean> will read F<debian/clean> and delete files listed there.
 
 =item -
 
-Every file in F<etc/> is automatically flagged as a conffile by B<dh_installdeb>.
-
-=back
-
-This mode is deprecated.
-
-=item v4
-
-Changes from v3 are:
-
-=over 8
+B<dh_clean> will delete toplevel F<*-stamp> files.
 
 =item -
 
-B<dh_makeshlibs -V> will not include the Debian part of the version number in
-the generated dependency line in the shlibs file.
-
-=item -
-
-You are encouraged to put the new B<${misc:Depends}> into F<debian/control> to
-supplement the B<${shlibs:Depends}> field.
-
-=item -
-
-B<dh_fixperms> will make all files in F<bin/> directories and in F<etc/init.d>
-executable.
-
-=item -
-
-B<dh_link> will correct existing links to conform with policy.
-
-=back
-
-This mode is deprecated.
-
-=item v5
-
-Changes from v4 are:
-
-=over 8
-
-=item -
-
-Comments are ignored in debhelper config files.
-
-=item -
-
-B<dh_strip --dbg-package> now specifies the name of a package to put debugging
-symbols in, not the packages to take the symbols from.
-
-=item -
-
-B<dh_installdocs> skips installing empty files.
-
-=item -
-
-B<dh_install> errors out if wildcards expand to nothing.
+B<dh_installchangelogs> will guess at what file is the upstream changelog if
+none is specified.
 
 =back
 
@@ -143,35 +80,98 @@ directory. In previous compatibility levels it silently refuses to do this.
 
 This mode is deprecated.
 
-=item v7
+=item v5
 
-This is the lowest supported compatibility level.
-
-Changes from v6 are:
+Changes from v4 are:
 
 =over 8
 
 =item -
 
-B<dh_install>, will fall back to looking for files in F<debian/tmp> if it doesn't
-find them in the current directory (or wherever you tell it look using
-B<--sourcedir>). This allows B<dh_install> to interoperate with B<dh_auto_install>,
-which installs to F<debian/tmp>, without needing any special parameters.
+Comments are ignored in debhelper config files.
 
 =item -
 
-B<dh_clean> will read F<debian/clean> and delete files listed there.
+B<dh_strip --dbg-package> now specifies the name of a package to put debugging
+symbols in, not the packages to take the symbols from.
 
 =item -
 
-B<dh_clean> will delete toplevel F<*-stamp> files.
+B<dh_installdocs> skips installing empty files.
 
 =item -
 
-B<dh_installchangelogs> will guess at what file is the upstream changelog if
-none is specified.
+B<dh_install> errors out if wildcards expand to nothing.
 
 =back
+
+=item v4
+
+Changes from v3 are:
+
+=over 8
+
+=item -
+
+B<dh_makeshlibs -V> will not include the Debian part of the version number in
+the generated dependency line in the shlibs file.
+
+=item -
+
+You are encouraged to put the new B<${misc:Depends}> into F<debian/control> to
+supplement the B<${shlibs:Depends}> field.
+
+=item -
+
+B<dh_fixperms> will make all files in F<bin/> directories and in F<etc/init.d>
+executable.
+
+=item -
+
+B<dh_link> will correct existing links to conform with policy.
+
+=back
+
+This mode is deprecated.
+
+=item v3
+
+This mode works like v2, with the following additions:
+
+=over 8
+
+=item -
+
+Debhelper config files support globbing via B<*> and B<?>, when appropriate. To
+turn this off and use those characters raw, just prefix with a backslash.
+
+=item -
+
+B<dh_makeshlibs> makes the F<postinst> and F<postrm> scripts call B<ldconfig>.
+
+=item -
+
+Every file in F<etc/> is automatically flagged as a conffile by B<dh_installdeb>.
+
+=back
+
+This mode is deprecated.
+
+=item v2
+
+In this mode, debhelper will consistently use debian/I<package>
+as the package tree directory for every package that is built.
+
+This mode is deprecated.
+
+=item v1
+
+This is the original debhelper compatibility level, and so it is the default
+one. In this mode, debhelper will use F<debian/tmp> as the package tree
+directory for the first binary package listed in the control file, while using
+debian/I<package> for all other packages listed in the F<control> file.
+
+This mode is deprecated.
 
 =back
 
