@@ -488,6 +488,35 @@ sub print_and_doit_noerror {
 	goto \&_doit;
 }
 
+sub _post_fork_setup_and_exec {
+	my ($close_stdin, $options, @cmd) = @_;
+	if (defined($options)) {
+		if (defined(my $dir = $options->{chdir})) {
+			if ($dir ne '.') {
+				chdir($dir) or error("chdir(\"${dir}\") failed: $!");
+			}
+		}
+		if ($close_stdin) {
+			open(STDIN, '<', '/dev/null') or error("redirect STDIN failed: $!");
+		}
+		if (defined(my $output = $options->{stdout})) {
+			open(STDOUT, '>', $output) or error("redirect STDOUT failed: $!");
+		}
+		if (defined(my $update_env = $options->{update_env})) {
+			while (my ($k, $v) = each(%{$update_env})) {
+				if (defined($v)) {
+					$ENV{$k} = $v;
+				} else {
+					delete($ENV{$k});
+				}
+			}
+		}
+	}
+	# Force execvp call to avoid shell.  Apparently, even exec can
+	# involve a shell if you don't do this.
+	exec { $cmd[0] } @cmd or error('exec (for cmd: ' . escape_shell(@cmd) . ") failed: $!");
+}
+
 sub _doit {
 	my (@cmd) = @_;
 	my $options = ref($cmd[0]) ? shift(@cmd) : undef;
@@ -501,29 +530,7 @@ sub _doit {
 	return 1 if $dh{NO_ACT};
 	my $pid = fork() // error("fork(): $!");
 	if (not $pid) {
-		if (defined($options)) {
-			if (defined(my $dir = $options->{chdir})) {
-				if ($dir ne '.') {
-					chdir($dir) or error("chdir(\"${dir}\") failed: $!");
-				}
-			}
-			open(STDIN, '<', '/dev/null') or error("redirect STDIN failed: $!");
-			if (defined(my $output = $options->{stdout})) {
-				open(STDOUT, '>', $output) or error("redirect STDOUT failed: $!");
-			}
-			if (defined(my $update_env = $options->{update_env})) {
-				while (my ($k, $v) = each(%{$update_env})) {
-					if (defined($v)) {
-						$ENV{$k} = $v;
-					} else {
-						delete($ENV{$k});
-					}
-				}
-			}
-		}
-		# Force execvp call to avoid shell.  Apparently, even exec can
-		# involve a shell if you don't do this.
-		exec { $cmd[0] } @cmd;
+		_post_fork_setup_and_exec(1, $options, @cmd) // error("Assertion error: sub should not return!");
 	}
 	return waitpid($pid, 0) == $pid && $? == 0;
 }
@@ -562,8 +569,12 @@ sub _format_cmdline {
 
 sub qx_cmd {
 	my (@cmd) = @_;
+	my $options = ref($cmd[0]) ? shift(@cmd) : undef;
 	my ($output, @output);
-	open(my $fd, '-|', @cmd) or error('fork+exec (' . escape_shell(@cmd) . "): $!");
+	my $pid = open(my $fd, '-|') // error('fork (for cmd: ' . escape_shell(@cmd) . ") failed: $!");
+	if ($pid == 0) {
+		_post_fork_setup_and_exec(0, $options, @cmd) // error("Assertion error: sub should not return!");
+	}
 	if (wantarray) {
 		@output = <$fd>;
 	} else {
