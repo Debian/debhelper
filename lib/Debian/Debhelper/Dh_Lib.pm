@@ -1243,8 +1243,7 @@ sub autoscript {
 		}
 	}
 
-	if (-e $outfile && ($script eq 'postrm' || $script eq 'prerm')
-	   && !compat(5)) {
+	if (-e $outfile && ($script eq 'postrm' || $script eq 'prerm')) {
 		# Add fragments to top so they run in reverse order when removing.
 		if (not defined($sed) or ref($sed)) {
 			verbose_print("[META] Prepend autosnippet \"$filename\" to $script [${outfile}.new]");

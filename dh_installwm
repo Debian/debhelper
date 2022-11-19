@@ -109,13 +109,11 @@ WM:		foreach my $wm (@wm) {
 			autoscript($package,"prerm","prerm-wm", { 'WM' => $wm });
 
 			my $wmman;
-			if (! compat(5)) {
-				foreach my $ext (".1", ".1x") {
-					$wmman="/usr/share/man/man1/".basename($wm).$ext;
-					if (-e "$tmp$wmman" || -e "$tmp$wmman.gz") {
-						autoscript($package,"postinst","postinst-wm", { 'WM' => $wm, 'WMMAN' => "${wmman}.gz" , 'PRIORITY' => $dh{PRIORITY} });
-						next WM;
-					}
+			foreach my $ext (".1", ".1x") {
+				$wmman="/usr/share/man/man1/".basename($wm).$ext;
+				if (-e "$tmp$wmman" || -e "$tmp$wmman.gz") {
+					autoscript($package,"postinst","postinst-wm", { 'WM' => $wm, 'WMMAN' => "${wmman}.gz" , 'PRIORITY' => $dh{PRIORITY} });
+					next WM;
 				}
 			}
 			if (not compat(9) and not $nodocs) {
