@@ -1,3 +1,34 @@
+debhelper (13.11) unstable; urgency=medium
+
+  [ Gioele Barabucci ]
+  * dh_installchangelogs: Ensure that at least four old entries are preserved
+    (Closes: #1021467)
+
+  [ Andrea Pappacoda ]
+  * meson.pm: Use `meson setup` in the configure step rather than just `meson`.
+
+  [ Niels Thykier ]
+  * Put newest compat level first in documentation
+  * Rename debhelper config files to include package name
+  * dh_installdebconf: Fix typo in manual page
+  * Dh_Lib.pm: `qx_cmd` support env/chdir changes like `doit` (Closes: #1016354)
+  * Remove obsolete compat checks in the code
+  * dh_dwz: Ensure dwz multifile is owned by root:root when root should be used
+  * dh_builddeb: Always pass `--root-owner-group` to `dpkg-deb` for dbgsym packages.
+  * Dh_Lib.pm: Provide `mkdirs` to create (non-package) directories.
+  * Dh_Lib.pm: Make `install_dir` chown created directories when root should be
+    used for debhelper's own commands.  This fixes #1024261 for packages that only
+    use debhelper itself. However, third-party debhelper tools may still cause
+    packages with incorrect ownership for now if they are run after `dh_fixperms`
+    (or `dh_fixperms` is omitted).
+  * Dh_Lib.pm: Ensure `install_{file,prog,lib}` uses chown when root should be used.
+    Previously, they would skip the `chown` call and rely on `dh_fixperms`
+    or `dpkg-deb` to fix the ownership.  However, that could cause issues
+    when the helper was run after `dh_fixperms` and install files that
+    `dpkg-deb` would not reset ownership of.
+
+ -- Niels Thykier <niels@thykier.net>  Sun, 20 Nov 2022 20:02:12 +0000
+
 debhelper (13.10.1) unstable; urgency=medium
 
   * Team upload.
