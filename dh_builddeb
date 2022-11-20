@@ -107,6 +107,8 @@ sub build_and_rename_deb {
 my @items;
 my @dpkg_options;
 push(@dpkg_options, '--root-owner-group') if not should_use_root();
+my @dbgsym_dpkg_options = ('--root-owner-group');
+
 
 for my $package (@{$dh{DOPACKAGES}}) {
 	push(@items, [$package, 0]);
@@ -131,7 +133,7 @@ on_items_in_parallel(\@items, sub {
 
 		if ($dbgsym) {
 			my $dbgsym_tmpdir = dbgsym_tmpdir($package);
-			my @cmd = ("dpkg-deb", @dpkg_options, @{$dh{U_PARAMS}},
+			my @cmd = ("dpkg-deb", @dbgsym_dpkg_options, @{$dh{U_PARAMS}},
 				"--build", $dbgsym_tmpdir);
 			if (DBGSYM_PACKAGE_TYPE eq DEFAULT_PACKAGE_TYPE) {
 				doit(@cmd, $dh{DESTDIR});
