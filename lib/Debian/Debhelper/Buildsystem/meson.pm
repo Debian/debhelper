@@ -94,7 +94,7 @@ sub configure {
 		my %options = (
 			update_env => { LC_ALL => 'C.UTF-8'},
 		);
-		$this->doit_in_builddir(\%options, "meson", $this->get_source_rel2builddir(), @opts, @_);
+		$this->doit_in_builddir(\%options, "meson", "setup", $this->get_source_rel2builddir(), @opts, @_);
 	};
 	if ($@) {
 		if (-e $this->get_buildpath("meson-logs/meson-log.txt")) {
