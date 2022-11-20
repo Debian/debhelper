@@ -44,7 +44,7 @@ use Debian::Debhelper::Dh_Lib qw(!dirname);
 our @EXPORT = qw(
     each_compat_up_to_and_incl_subtest each_compat_subtest
     each_compat_from_and_above_subtest run_dh_tool
-    create_empty_file readlines
+    create_empty_file readlines copy_file
     error find_script non_deprecated_compat_levels
     each_compat_from_x_to_and_incl_y_subtest
 );
@@ -53,6 +53,13 @@ our ($TEST_DH_COMPAT);
 
 my $START_DIR = getcwd();
 my $TEST_DIR;
+
+
+sub copy_file {
+	my ($src, $dest, $mode) = @_;
+	$mode //= 0644;
+	return Debian::Debhelper::Dh_Lib::_install_file_to_path(0, $mode, $src, $dest);
+}
 
 sub run_dh_tool {
     my (@cmd) = @_;
@@ -100,7 +107,7 @@ sub _prepare_test_root {
             debian/changelog
         );
         for my $file (@files) {
-            install_file($file, "${dir}/${file}");
+            copy_file($file, "${dir}/${file}");
         }
         if (@::TEST_DH_EXTRA_TEMPLATE_FILES) {
             my $test_dir = ($TEST_DIR //= dirname($0));
@@ -111,7 +118,7 @@ sub _prepare_test_root {
                     my $install_dir = dirname($file);
                     mkdirs($install_dir);
                 }
-                install_file("${actual_dir}/${file}", "${dir}/${file}");
+                copy_file("${actual_dir}/${file}", "${dir}/${file}");
             }
         }
     }

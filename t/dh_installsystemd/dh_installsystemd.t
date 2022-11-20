@@ -106,7 +106,7 @@ each_compat_subtest {
 	ok(run_dh_tool('dh_clean'));
 
 	make_path('debian/foo/lib/systemd/system/');
-	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
+	copy_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
 	ok(run_dh_tool('dh_installsystemd'));
 	ok(-e 'debian/foo/lib/systemd/system/foo.service');
 	ok(find_script('foo', 'postinst'));
@@ -119,7 +119,7 @@ each_compat_subtest {
 
 	# lib -> usr/lib (if we ever support that)
 	make_path('debian/foo/lib/systemd/system/');
-	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
+	copy_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
 	ok(run_dh_tool('dh_installsystemd'));
 	ok(-e 'debian/foo/lib/systemd/system/foo2.service');
 	ok(find_script('foo', 'postinst'));
@@ -132,8 +132,8 @@ each_compat_subtest {
 	# lib -> usr/lib with both no-empty (if we ever suport that)
 	make_path('debian/foo/lib/systemd/system/');
 	make_path('debian/foo/lib/systemd/system/');
-	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
-	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/bar.service');
+	copy_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
+	copy_file('debian/foo2.service', 'debian/foo/lib/systemd/system/bar.service');
 	ok(run_dh_tool('dh_installsystemd'));
 	ok(-e 'debian/foo/lib/systemd/system/bar.service');
 	ok(-e 'debian/foo/lib/systemd/system/foo2.service');
@@ -145,7 +145,7 @@ each_compat_subtest {
 	ok(run_dh_tool('dh_clean'));
 
 	make_path('debian/foo/lib/systemd/system/');
-	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
+	copy_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
 	ok(run_dh_tool('dh_installsystemd', '--no-start'));
 	ok(-e 'debian/foo/lib/systemd/system/foo.service');
 	ok(find_script('foo', 'postinst'));
@@ -156,7 +156,7 @@ each_compat_subtest {
 	ok(run_dh_tool('dh_clean'));
 
 	make_path('debian/foo/lib/systemd/system/');
-	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
+	copy_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
 	ok(run_dh_tool('dh_installsystemd', '-p', 'foo', '--no-start', 'foo.service'));
 	ok(run_dh_tool('dh_installsystemd', '-p', 'foo', 'foo2.service'));
 	ok(-e 'debian/foo/lib/systemd/system/foo.service');
@@ -168,7 +168,7 @@ each_compat_subtest {
 	ok(run_dh_tool('dh_clean'));
 
 	make_path('debian/foo/lib/systemd/system/');
-	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
+	copy_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
 	ok(run_dh_tool('dh_installsystemd', '-p', 'foo', '--no-enable', 'foo.service'));
 	ok(run_dh_tool('dh_installsystemd', '-p', 'foo', 'foo2.service'));
 	ok(-e 'debian/foo/lib/systemd/system/foo.service');
@@ -189,7 +189,7 @@ each_compat_subtest {
 
 	# Quoting #764730
 	make_path('debian/foo/lib/systemd/system/');
-	install_file('debian/foo.service', 'debian/foo/lib/systemd/system/foo\x2dfuse.service');
+	copy_file('debian/foo.service', 'debian/foo/lib/systemd/system/foo\x2dfuse.service');
 	ok(run_dh_tool('dh_installsystemd'));
 	unit_is_enabled('foo', 'foo\x2dfuse', 1);
 	unit_is_started('foo', 'foo\x2dfuse', 1);
@@ -197,7 +197,7 @@ each_compat_subtest {
 
 	# --name flag #870768
 	make_path('debian/foo/lib/systemd/system/');
-	install_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
+	copy_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
 	ok(run_dh_tool('dh_installsystemd', '--name=foo'));
 	unit_is_enabled('foo', 'foo', 1);
 	unit_is_started('foo', 'foo', 1);
@@ -211,7 +211,7 @@ each_compat_subtest {
 	ok(run_dh_tool('dh_clean'));
 
 	make_path('debian/foo/lib/systemd/system/');
-	install_file('debian/foo.service', 'debian/foo/lib/systemd/system/target.service');
+	copy_file('debian/foo.service', 'debian/foo/lib/systemd/system/target.service');
 	make_symlink_raw_target('target.service', 'debian/foo/lib/systemd/system/source.service');
 	ok(run_dh_tool('dh_installsystemd'));
 	unit_is_enabled('foo', 'foo', 1);
@@ -224,7 +224,7 @@ each_compat_subtest {
 each_compat_up_to_and_incl_subtest(11, sub {
 	make_path('debian/foo/lib/systemd/system/');
 	make_path('debian/foo/etc/init.d/');
-	install_file('debian/foo.service', 'debian/foo/lib/systemd/system/target.service');
+	copy_file('debian/foo.service', 'debian/foo/lib/systemd/system/target.service');
 	make_symlink_raw_target('target.service', 'debian/foo/lib/systemd/system/source.service');
 	write_file('debian/foo/etc/init.d/source', '# something');
 	ok(run_dh_tool('dh_installsystemd'));
@@ -241,7 +241,7 @@ each_compat_up_to_and_incl_subtest(11, sub {
 each_compat_from_and_above_subtest(12, sub {
 	make_path('debian/foo/lib/systemd/system/');
 	make_path('debian/foo/etc/init.d/');
-	install_file('debian/foo.service', 'debian/foo/lib/systemd/system/target.service');
+	copy_file('debian/foo.service', 'debian/foo/lib/systemd/system/target.service');
 	make_symlink_raw_target('target.service', 'debian/foo/lib/systemd/system/source.service');
 	write_file('debian/foo/etc/init.d/source', '# something');
 	ok(run_dh_tool('dh_installsystemd'));

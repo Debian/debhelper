@@ -36,7 +36,7 @@ each_compat_from_and_above_subtest(11, sub {
 	ok(run_dh_tool('dh_clean'));
 
 	make_path(qw(debian/foo/lib/systemd/system/ debian/bar debian/baz));
-	install_file('debian/foo.service', 'debian/foo/lib/systemd/system/foo.service');
+	copy_file('debian/foo.service', 'debian/foo/lib/systemd/system/foo.service');
 	ok(run_dh_tool('dh_installinit'));
 	ok(!find_script('foo', 'postinst'));
 	ok(run_dh_tool('dh_clean'));

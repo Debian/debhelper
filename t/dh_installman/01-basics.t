@@ -77,11 +77,11 @@ each_compat_subtest {
 	}
 	mkdirs('debian/debhelper/usr/share/man/man1');
 	mkdirs('debian/debhelper/usr/share/man/man3');
-	install_file('generated-manpages/manpage-uncompressed.1', 'debian/debhelper/usr/share/man/man1/manpage-uncompressed.1');
-	install_file('generated-manpages/manpage-compressed.1.gz', 'debian/debhelper/usr/share/man/man1/manpage-compressed.1.gz');
-	install_file('generated-manpages/manpage-perl.3perl', 'debian/debhelper/usr/share/man/man3/manpage-perl.3perl');
-	install_file('generated-manpages/libmanpage.so.1.2.3.1', 'debian/debhelper/usr/share/man/man1/libmanpage.so.1.2.3.1');
-	install_file('libmanpage.so.9.2.3', 'debian/debhelper/usr/share/man/man3/libmanpage.so.9.2.3');
+	copy_file('generated-manpages/manpage-uncompressed.1', 'debian/debhelper/usr/share/man/man1/manpage-uncompressed.1');
+	copy_file('generated-manpages/manpage-compressed.1.gz', 'debian/debhelper/usr/share/man/man1/manpage-compressed.1.gz');
+	copy_file('generated-manpages/manpage-perl.3perl', 'debian/debhelper/usr/share/man/man3/manpage-perl.3perl');
+	copy_file('generated-manpages/libmanpage.so.1.2.3.1', 'debian/debhelper/usr/share/man/man1/libmanpage.so.1.2.3.1');
+	copy_file('libmanpage.so.9.2.3', 'debian/debhelper/usr/share/man/man3/libmanpage.so.9.2.3');
     ok(run_dh_tool('dh_installman'));
     ok(-e 'debian/debhelper/usr/share/man/man1/manpage-uncompressed.1');
     ok(-e 'debian/debhelper/usr/share/man/man1/manpage-compressed.1');

@@ -631,40 +631,46 @@ sub error_exitcode {
 {
 	my $_loaded = 0;
 	sub install_file {
-		unshift(@_, 0644);
+		unshift(@_, 1, 0644);
 		goto \&_install_file_to_path;
 	}
 
 	sub install_prog {
-		unshift(@_, 0755);
+		unshift(@_, 1, 0755);
 		goto \&_install_file_to_path;
 	}
 	sub install_lib {
-		unshift(@_, 0644);
+		unshift(@_, 1, 0644);
 		goto \&_install_file_to_path;
 	}
 
 	sub _install_file_to_path {
-		my ($mode, $source, $dest) = @_;
+		my ($consider_using_root, $mode, $source, $dest) = @_;
 		if (not $_loaded) {
 			$_loaded++;
 			require File::Copy;
 		}
-		verbose_print(sprintf('install -p -m%04o %s', $mode, escape_shell($source, $dest)))
-			if $dh{VERBOSE};
+		my $use_root = !$consider_using_root && should_use_root();
+		if ($dh{VERBOSE}) {
+			my $install_opts = $use_root ? '-o 0 -g 0 ' : '';
+			verbose_print(sprintf('install -p %s-m%04o %s', $install_opts, $mode, escape_shell($source, $dest)))
+		}
 		return 1 if $dh{NO_ACT};
 		# "install -p -mXXXX foo bar" silently discards broken
 		# symlinks to install the file in place.  File::Copy does not,
 		# so emulate it manually.  (#868204)
 		if ( -l $dest and not -e $dest and not unlink($dest) and $! != ENOENT) {
-			error("unlink $dest failed: $!");
+			error("unlink(\"$dest\") failed: $!");
 		}
-		File::Copy::copy($source, $dest) or error("copy($source, $dest): $!");
-		chmod($mode, $dest) or error("chmod($mode, $dest): $!");
+		File::Copy::copy($source, $dest) or error("copy(\"$source\", \"$dest\"): $!");
+		chmod($mode, $dest) or error("chmod($mode, \"$dest\"): $!");
+		if ($use_root) {
+			chown(0, 0, $dest) or error("chown(0, 0, \"$dest\") failed: $!");
+		}
 		my (@stat) = stat($source);
 		error("stat($source): $!") if not @stat;
 		utime($stat[8], $stat[9], $dest)
-			or error(sprintf("utime(%d, %d, %s): $!", $stat[8] , $stat[9], $dest));
+			or error(sprintf("utime(%d, %d, \"%s\"): $!", $stat[8] , $stat[9], $dest));
 		return 1;
 	}
 }
