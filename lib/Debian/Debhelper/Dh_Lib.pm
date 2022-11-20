@@ -2743,7 +2743,7 @@ sub install_dh_config_file {
 		# Set the mtime (and atime) to ensure reproducibility.
 		utime($sstat[9], $sstat[9], $target);
 	} else {
-		_install_file_to_path($mode, $source, $target);
+		_install_file_to_path(1, $mode, $source, $target);
 	}
 	return 1;
 }
