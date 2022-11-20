@@ -40,7 +40,7 @@ each_compat_subtest {
 
     remove_tree('debian/debhelper/a/b/c');
 
-    install_dir('debian/debhelper/a/b/c');
+    mkdirs('debian/debhelper/a/b/c');
 
     test_invalid('../../wow', 'a');
     # This is a can be made valid but at the moment we do not support

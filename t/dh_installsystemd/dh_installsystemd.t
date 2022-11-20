@@ -14,7 +14,7 @@ sub write_file {
 	my ($path, $content) = @_;
 
 	my $dir = dirname($path);
-	install_dir($dir);
+	mkdirs($dir);
 
 	open(my $fd, '>>', $path) or error("open($path) failed: $!");
 	print {$fd} $content . '\n';

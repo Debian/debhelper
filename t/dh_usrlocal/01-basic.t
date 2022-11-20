@@ -43,7 +43,7 @@ sub perform_test {
 
 	rm_files(@scripts);
 	remove_tree('debian/debhelper');
-	install_dir(map { "debian/debhelper/$_" } @{$install_dirs});
+	mkdirs(map { "debian/debhelper/$_" } @{$install_dirs});
 
 	ok(run_dh_tool('dh_usrlocal'));
 

@@ -75,8 +75,8 @@ each_compat_subtest {
 			'generated-manpages/manpage-perl.3perl');
 		doit('gzip', '-9n', 'generated-manpages/manpage-compressed.1');
 	}
-	install_dir('debian/debhelper/usr/share/man/man1');
-	install_dir('debian/debhelper/usr/share/man/man3');
+	mkdirs('debian/debhelper/usr/share/man/man1');
+	mkdirs('debian/debhelper/usr/share/man/man3');
 	install_file('generated-manpages/manpage-uncompressed.1', 'debian/debhelper/usr/share/man/man1/manpage-uncompressed.1');
 	install_file('generated-manpages/manpage-compressed.1.gz', 'debian/debhelper/usr/share/man/man1/manpage-compressed.1.gz');
 	install_file('generated-manpages/manpage-perl.3perl', 'debian/debhelper/usr/share/man/man3/manpage-perl.3perl');

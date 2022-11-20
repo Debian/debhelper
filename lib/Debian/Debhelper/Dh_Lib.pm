@@ -134,6 +134,7 @@ qw(
 qw(
 	basename
 	dirname
+	mkdirs
 	install_file
 	install_prog
 	install_lib
@@ -668,28 +669,52 @@ sub error_exitcode {
 	}
 }
 
-sub install_dir {
-	my @to_create = grep { not -d $_ } @_;
-	return if not @to_create;
+
+sub _mkdirs {
+	my ($maybe_chown, @dirs) = @_;
+	return if not @dirs;
+	my $do_chown = !$maybe_chown && should_use_root();
+	if ($do_chown) {
+		# Use the real install for the case that requires root.  The error handling
+		# of File::Path for this case seems a bit too fragile for my liking.
+		# (E.g., chown failures are carp warnings rather than hard errors and
+		# intercepting them via the error parameter does not seem to work so well)
+		doit('install', '-m0755', '-o', '0', '-g', '0', '-d', @dirs);
+		return;
+	}
+	if (not $maybe_chown && $dh{VERBOSE}) {
+		verbose_print(sprintf('install -m0755 -d %s', escape_shell(@dirs)));
+	}
+	return 1 if $dh{NO_ACT};
 	state $_loaded;
 	if (not $_loaded) {
 		$_loaded++;
 		require File::Path;
 	}
-	verbose_print(sprintf('install -d %s', escape_shell(@to_create)))
-		if $dh{VERBOSE};
-	return 1 if $dh{NO_ACT};
+	my %opts = (
+		# install -d uses 0755 (no umask), make_path uses 0777 (& umask) by default.
+		# Since we claim to run install -d, then ensure the mode is correct.
+		'chmod' => 0755,
+	);
 	eval {
-		File::Path::make_path(@to_create, {
-			# install -d uses 0755 (no umask), make_path uses 0777 (& umask) by default.
-			# Since we claim to run install -d, then ensure the mode is correct.
-			'chmod' => 0755,
-		});
+		File::Path::make_path(@dirs, \%opts);
 	};
 	if (my $err = "$@") {
 		$err =~ s/\s+at\s+\S+\s+line\s+\d+\.?\n//;
 		error($err);
 	}
+	return;
+}
+
+sub mkdirs {
+	my @to_create = grep { not -d $_ } @_;
+	return _mkdirs(0, @to_create);
+}
+
+sub install_dir {
+	my @dirs = @_;
+	my $maybe_chown = (defined($main::VERSION) && $main::VERSION eq DH_BUILTIN_VERSION) ? 1 : 0;
+	return _mkdirs($maybe_chown, @dirs);
 }
 
 sub rename_path {
@@ -1362,7 +1387,7 @@ sub generated_file {
 	my $dir = "debian/.debhelper/generated/${package}";
 	my $path = "${dir}/${filename}";
 	$mkdirs //= 1;
-	install_dir($dir) if $mkdirs;
+	mkdirs($dir) if $mkdirs;
 	return $path;
 }
 
@@ -2576,7 +2601,7 @@ sub setup_home_and_xdg_dirs {
 		XDG_DATA_DIRS
 		XDG_RUNTIME_DIR
 	);
-	install_dir(@paths);
+	mkdirs(@paths);
 	for my $envname (@clear_env) {
 		delete($ENV{$envname});
 	}
@@ -2722,7 +2747,7 @@ sub restore_file_on_clean {
 	my $bucket_index = 'debian/.debhelper/bucket/index';
 	my $bucket_dir = 'debian/.debhelper/bucket/files';
 	my $checksum;
-	install_dir($bucket_dir);
+	mkdirs($bucket_dir);
 	if ($file =~ m{^/}) {
 		error("restore_file_on_clean requires a path relative to the package dir");
 	}

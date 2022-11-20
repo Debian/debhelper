@@ -378,12 +378,19 @@ The following keys are also set in the `%dh` hash when you call `init()`:
   be executed instead and its output will be used to generate the
   `$dest` file.
 
-- `install_dir(@dirs)`
+- `install_dir(@dirs)` / `mkdirs(@dirs)`
 
   Create the directories denoted by the paths in `@dirs` and all
   parent entries as well (as needed).  It uses mode 0755.
   If a directory listed in `@dirs` already exists, the function
   silently skips that directory (similar to `mkdir -p`).
+
+  The `install_dir` function should be used for directories
+  installed in a final package while `mkdirs` should be used
+  for other directories.  The difference is that `install_dir`
+  will attempt to chown the directory to `root:root` if required
+  whereas `mkdirs` will not.  The `mkdirs` function requires
+  `debhelper (>= 13.11~)`.
 
 - `install_file($src, $dest)`
 

@@ -251,7 +251,7 @@ sub write_buildid_file {
 	my ($package, $build_ids) = @_;
 	my $dir = "debian/.debhelper/${package}";
 	my $path = "${dir}/dbgsym-build-ids";
-	install_dir($dir);
+	mkdirs($dir);
 	open(my $fd, '>>', $path) or error("open $path failed: $!");
 	print {$fd} join(q{ }, sort(@{$build_ids})) . ' ';
 	close($fd) or error("close $path failed: $!");

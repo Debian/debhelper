@@ -109,7 +109,7 @@ sub _prepare_test_root {
             for my $file (@::TEST_DH_EXTRA_TEMPLATE_FILES) {
                 if (index($file, '/') > -1) {
                     my $install_dir = dirname($file);
-                    install_dir($install_dir);
+                    mkdirs($install_dir);
                 }
                 install_file("${actual_dir}/${file}", "${dir}/${file}");
             }
