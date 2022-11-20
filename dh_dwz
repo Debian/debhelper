@@ -135,13 +135,14 @@ foreach my $package (@_) {
 		doit('dwz', @dwz_options, @{$dh{U_PARAMS}}, '--', @{$unique_files});
 		if ( -f "${tmp}/${m}") {
 			doit($objcopy, '--compress-debug-sections', "${tmp}/${m}");
+			reset_perm_and_owner(0644, "${tmp}/${m}");
 		} else {
 			error("dwz failed to create a multifile as requested") if $create_multifile ne 'auto';
 			warning("No dwz multifile created, but not explicitly requested either so ignoring it.");
 			warning("Common issues include no debug information at all (missing -g) and");
 			warning("compressed debug information (#931891).");
 			# Clean up after ourselves to avoid leaving empty directories in packages
-			doit('rmdir', '-p', '--ignore-fail-on-non-empty', "${tmp}/usr/lib/debug/.dwz/${ma_dir}");
+			doit('rmdir', '-p', '--ignore-fail-on-non-empty', "${tmp}/${dwz_dir}");
 		}
 	} else {
 		xargs($unique_files, 'dwz', @{$dh{U_PARAMS}}, '--');
