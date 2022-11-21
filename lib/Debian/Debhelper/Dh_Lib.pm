@@ -2723,15 +2723,14 @@ sub _executable_dh_config_file_failed {
 # the package.  Under compat 9+ it may execute the file and use its
 # output instead.
 #
-# install_dh_config_file(SOURCE, TARGET[, MODE])
+# install_dh_config_file(SOURCE, TARGET)
 sub install_dh_config_file {
-	my ($source, $target, $mode) = @_;
-	$mode = 0644 if not defined($mode);
+	my ($source, $target) = @_;
 
 	if (!compat(8) and -x $source) {
 		my @sstat = stat(_) || error("cannot stat $source: $!");
 		open(my $tfd, '>', $target) || error("cannot open $target: $!");
-		chmod($mode, $tfd) || error("cannot chmod $target: $!");
+		chmod(0644, $tfd) || error("cannot chmod $target: $!");
 		open(my $sfd, '-|', $source) || error("cannot run $source: $!");
 		while (my $line = <$sfd>) {
 			print ${tfd} $line;
@@ -2743,7 +2742,7 @@ sub install_dh_config_file {
 		# Set the mtime (and atime) to ensure reproducibility.
 		utime($sstat[9], $sstat[9], $target);
 	} else {
-		_install_file_to_path(1, $mode, $source, $target);
+		install_file($source, $target);
 	}
 	return 1;
 }

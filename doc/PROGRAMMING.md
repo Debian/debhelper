@@ -371,9 +371,9 @@ The following keys are also set in the `%dh` hash when you call `init()`:
   `$src`. If `$tmp` is given, then `$tmp` will be prefixed to `$dest`
   when creating the actual symlink.
 
-- `install_dh_config_file($src, $dest[, $mode])`
+- `install_dh_config_file($src, $dest)`
 
-  Installs `$src` into `$dest` with `$mode` (defaults to 0644).
+  Installs `$src` into `$dest` using mode 0644.
   If compat is 9 (or later) and `$src` is executable, `$src` will
   be executed instead and its output will be used to generate the
   `$dest` file.
