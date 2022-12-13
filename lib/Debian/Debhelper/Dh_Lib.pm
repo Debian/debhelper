@@ -2674,7 +2674,7 @@ sub get_buildoption {
 		} elsif ($opt =~ m/^dherroron=(\S*)$/ && $wanted eq 'dherroron') {
 			my $value = $1;
 			if ($value ne 'obsolete-compat-levels') {
-				warning("Unknown value \"${value}\" as parameter for \"dherrron\" seen in DEB_BUILD_OPTIONS");
+				warning("Unknown value \"${value}\" as parameter for \"dherroron\" seen in DEB_BUILD_OPTIONS");
 			}
 			return $value;
 		} elsif ($opt eq $wanted) {
