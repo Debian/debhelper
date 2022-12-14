@@ -1,3 +1,20 @@
+debhelper (13.11.2) unstable; urgency=medium
+
+  [ Niels Thykier ]
+  * Dh_Lib.pm: Remove unused third parameter from install_dh_config_file
+  * makefile.pm: Provide hook for subclasses to reuse cross-build support
+    (Closes: #1024296)
+  * Dh_Lib.pm: Revert change where `install_{file,prog,lib}` would use chown.
+    The problem that prompted this change was not caused by debhelper but
+    by fakeroot (#1024544) and the change in debhelper would not even
+    function as a work around in this case.  Accordingly, the extra
+    complexity is not worth it and has been reverted.
+
+  [ Jakub Wilk ]
+  * Dh_Lib.pm: Fix typo in warning message about dherroron
+
+ -- Niels Thykier <niels@thykier.net>  Wed, 14 Dec 2022 20:32:18 +0000
+
 debhelper (13.11.1) unstable; urgency=medium
 
   * Team upload.
