@@ -1442,6 +1442,19 @@ sub addsubstvar {
 	my $substvarfile = "debian/${ext}substvars";
 	my $str = $deppackage;
 	$str .= " ($verinfo)" if defined $verinfo && length $verinfo;
+
+	if (not defined($deppackage) and not $remove) {
+		error("Bug in helper: Must provide a value for addsubstvar (or set the remove flag, but then use delsubstvar instead)")
+	}
+
+	if (defined($str) and $str =~ m/[\n]/) {
+		$str =~ s/\n/\\n/g;
+		# Per #1026014
+		warning('Unescaped newlines in the value of a substvars can cause broken substvars files (see #1025714).');
+		warning("Hint: If you really need a newline character, provide it as \"\${Newline}\".");
+		error("Bug in helper: The substvar must not contain a raw newline character (${substvar}=${str})");
+	}
+
 	my $update_logic = sub {
 		my ($line) = @_;
 		return $line if $line !~ m/^\Q${substvar}\E([?]?=)(.*)/;
