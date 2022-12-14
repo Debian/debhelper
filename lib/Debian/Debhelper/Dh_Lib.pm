@@ -679,7 +679,7 @@ sub error_exitcode {
 sub _mkdirs {
 	my ($maybe_chown, @dirs) = @_;
 	return if not @dirs;
-	my $do_chown = $maybe_chown && should_use_root();
+	my $do_chown = !$maybe_chown && should_use_root();
 	if ($do_chown) {
 		# Use the real install for the case that requires root.  The error handling
 		# of File::Path for this case seems a bit too fragile for my liking.
