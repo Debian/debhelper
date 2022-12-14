@@ -142,11 +142,17 @@ sub check_auto_buildable {
 	return 0;
 }
 
+sub _should_inject_cross_build_tools {
+	my ($this) = @_;
+	return ref($this) eq 'Debian::Debhelper::Buildsystem::makefile';
+}
+
+
 sub build {
 	my $this=shift;
 	if (not $this->_is_targetbuildsystem
-			and ref($this) eq 'Debian::Debhelper::Buildsystem::makefile'
-			and is_cross_compiling()) {
+			and is_cross_compiling()
+			and $this->_should_inject_cross_build_tools) {
 		# Only inject build tools variables during cross-compile when
 		# makefile is the explicit *main* build system.
 		for my $var (sort(keys(%DEB_DEFAULT_TOOLS))) {
