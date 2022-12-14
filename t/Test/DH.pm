@@ -58,7 +58,7 @@ my $TEST_DIR;
 sub copy_file {
 	my ($src, $dest, $mode) = @_;
 	$mode //= 0644;
-	return Debian::Debhelper::Dh_Lib::_install_file_to_path(0, $mode, $src, $dest);
+	return Debian::Debhelper::Dh_Lib::_install_file_to_path($mode, $src, $dest);
 }
 
 sub run_dh_tool {
