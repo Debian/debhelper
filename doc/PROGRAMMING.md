@@ -89,7 +89,7 @@ results; programs can use them later. These variables are elements of the
 `%dh` hash.
 
 | switch              | variable        | description                                                                                                                                                                                                                      |
-| ------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|---------------------|-----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `-v`                | `VERBOSE`       | should the program verbosely output what it is doing?                                                                                                                                                                            |
 | `--no-act`          | `NO_ACT`        | should the program not actually do anything?                                                                                                                                                                                     |
 | `-i`,`-a`,`-p`,`-N` | `DOPACKAGES`    | a space delimited list of the binary packages to act on (in `Dh_Lib.pm`, this is an array)                                                                                                                                       |
@@ -361,9 +361,10 @@ The following keys are also set in the `%dh` hash when you call `init()`:
   *must* be a real regular file.  Dirs, devices and symlinks
   (and everything else) *cannot* be restored by this.
   If `$file` is passed multiple times (e.g. from different programs)
-  only the first version is stored.  
+  only the first version is stored.
   CAVEAT: This *cannot* undo arbitrary "rm -fr"'ing.  The dir,
-  which is/was in `$file`, must be present when `dh_clean` is called.
+  which the `$file` is/was in, must be present when `dh_clean` is
+  called.
 
 - `make_symlink($src, $dest, $tmp)`
 
@@ -664,7 +665,7 @@ This process requires debhelper/13.10 or later.
   times (once with `-a` and once with `-i`).  It is completely fine if this
   leaves duplicate entries as dh_missing will deduplicate these.
 - If your helper has a PROMISE, it must use `pkgfile-logged(<file>)`
-  for its config files (see [#867246]).  
+  for its config files (see [#867246]).
   CAVEAT: This requires a dependency on "debhelper (>= 10.2.5)".  Prior
   to that version, debhelper will wrongly optimize your helper out.
 
