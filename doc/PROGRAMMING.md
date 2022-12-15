@@ -387,10 +387,9 @@ The following keys are also set in the `%dh` hash when you call `init()`:
 
   The `install_dir` function should be used for directories
   installed in a final package while `mkdirs` should be used
-  for other directories.  The difference is that `install_dir`
-  will attempt to chown the directory to `root:root` if required
-  whereas `mkdirs` will not.  The `mkdirs` function requires
-  `debhelper (>= 13.11~)`.
+  for other directories.  The difference is related to whether
+  the change will be shown via -v/--verbose or not.  The
+  `mkdirs` function requires `debhelper (>= 13.11~)`.
 
 - `install_file($src, $dest)`
 

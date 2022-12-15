@@ -671,18 +671,9 @@ sub error_exitcode {
 
 
 sub _mkdirs {
-	my ($maybe_chown, @dirs) = @_;
+	my ($log, @dirs) = @_;
 	return if not @dirs;
-	my $do_chown = !$maybe_chown && should_use_root();
-	if ($do_chown) {
-		# Use the real install for the case that requires root.  The error handling
-		# of File::Path for this case seems a bit too fragile for my liking.
-		# (E.g., chown failures are carp warnings rather than hard errors and
-		# intercepting them via the error parameter does not seem to work so well)
-		doit('install', '-m0755', '-o', '0', '-g', '0', '-d', @dirs);
-		return;
-	}
-	if (not $maybe_chown && $dh{VERBOSE}) {
+	if ($log && $dh{VERBOSE}) {
 		verbose_print(sprintf('install -m0755 -d %s', escape_shell(@dirs)));
 	}
 	return 1 if $dh{NO_ACT};
@@ -713,8 +704,7 @@ sub mkdirs {
 
 sub install_dir {
 	my @dirs = @_;
-	my $maybe_chown = (defined($main::VERSION) && $main::VERSION eq DH_BUILTIN_VERSION) ? 1 : 0;
-	return _mkdirs($maybe_chown, @dirs);
+	return _mkdirs(1, @dirs);
 }
 
 sub rename_path {
