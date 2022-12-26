@@ -136,6 +136,7 @@ sub test {
 
 sub install {
 	my $this = shift;
+	my ($destdir) = @_;
 	my $target = $this->get_targetbuildsystem;
 
 	if (compat(13) or $target->NAME ne 'ninja') {
@@ -148,7 +149,7 @@ sub install {
 				'LC_ALL' => 'C.UTF-8',
 			}
 		);
-		$this->doit_in_builddir(\%options, 'meson', 'install', @_);
+		$this->doit_in_builddir(\%options, 'meson', 'install', '--destdir', $destdir);
 	}
 	return 1;
 }
