@@ -135,12 +135,11 @@ sub test {
 }
 
 sub install {
-	my $this = shift;
-	my ($destdir) = @_;
+	my ($this, $destdir, @args) = @_;
 	my $target = $this->get_targetbuildsystem;
 
 	if (compat(13) or $target->NAME ne 'ninja') {
-		$target->install(@_);
+		$target->install($destdir, @args);
 	} else {
 		# In compat 14 with meson+ninja, we prefer using "meson install"
 		# over "ninja install"
@@ -149,7 +148,7 @@ sub install {
 				'LC_ALL' => 'C.UTF-8',
 			}
 		);
-		$this->doit_in_builddir(\%options, 'meson', 'install', '--destdir', $destdir);
+		$this->doit_in_builddir(\%options, 'meson', 'install', '--destdir', $destdir, @args);
 	}
 	return 1;
 }
