@@ -28,6 +28,13 @@ and generates F<postinst> code blocks for activating the tmpfiles.d
 configuration when the package is installed. These snippets are added
 to the maintainer scripts by L<dh_installdeb(1)>.
 
+In compat 14+, tmpfiles.d files are copied into the F<postrm> script, and
+they are used with systemd-tmpfiles --remove after the package is removed
+and --purge when the package is purged. This allows one to use the
+tmpfiles.d mechanism to clean up files that are no longer needed after a
+package has been removed/purged. Can be disabled with --no-remove and/or
+--no-purge.
+
 
 =head1 OPTIONS
 
@@ -38,6 +45,14 @@ to the maintainer scripts by L<dh_installdeb(1)>.
 This option controls both a prefix used for lookng up maintainer provided
 tmpfiles.d configuration files (those mentioned in the L</FILES> section)
 and also the base name used for the installed version of the file.
+
+=item B<--no-remove>
+
+Do not call systemd-tmpfiles --remove when the package is removed.
+
+=item B<--no-purge>
+
+Do not call systemd-tmpfiles --purge when the package is purged.
 
 =back
 
@@ -66,7 +81,10 @@ maintainer scripts.
 
 =cut
 
-init();
+init(options => {
+	"no-remove" => \$dh{NO_REMOVE},
+	"no-purge" => \$dh{NO_PURGE},
+});
 
 sub uniq {
 	my %seen;
@@ -105,19 +123,57 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmpdir = tmpdir($package);
 	my @tmpfiles;
+	my @purge;
+	my @remove;
 
 	my @dirs = grep { -d } map { "${tmpdir}/$_" } qw(usr/lib/tmpfiles.d etc/tmpfiles.d);
 
 	find({
 		wanted => sub {
+			my $lines;
 			my $name = $File::Find::name;
 			return if not -f $name or not $name =~ m{[.]conf$};
-			push(@tmpfiles, basename($name)); },
+			push(@tmpfiles, basename($name));
+
+			# We copy the needed lines to the postrm, as the tmpfiles.d files
+			# will be gone by the time the remove/purge postscript is run.
+			if (! compat(13) && (! $dh{NO_PURGE} || ! $dh{NO_REMOVE})) {
+				open(my $fd, '<', $name) or error("open($name) failed: $!");
+				{
+					local $/;
+					$lines = <$fd>;
+				}
+				close($fd);
+
+				chomp $lines;
+
+				if ($lines) {
+					if (! $dh{NO_PURGE}) {
+						push(@purge, $lines);
+					}
+					if (! $dh{NO_REMOVE}) {
+						push(@remove, $lines);
+					}
+				}
+			}
+		},
 		no_chdir => 1,
 	}, @dirs) if @dirs;
 
 	if (@tmpfiles) {
 		autoscript($package, 'postinst', 'postinst-init-tmpfiles', { 'TMPFILES' => join(' ', uniq(sort(@tmpfiles))) });
+	}
+
+	if (@remove) {
+		autoscript($package, 'postrm', 'postrm-init-tmpfiles-remove', {
+			'TMPFILES_REMOVE' => join("\n", @remove),
+		});
+	}
+
+	if (@purge) {
+		autoscript($package, 'postrm', 'postrm-init-tmpfiles-purge', {
+			'TMPFILES_PURGE' => join("\n", @purge),
+		});
 	}
 }
 

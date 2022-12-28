@@ -1,0 +1,7 @@
+if [ -x "$(command -v systemd-tmpfiles)" ]; then
+	if [ "$1" = "remove" ]; then
+		systemd-tmpfiles ${DPKG_ROOT:+--root="$DPKG_ROOT"} --remove - >/dev/null <<TMPFILES_EOF || true
+#TMPFILES_REMOVE#
+TMPFILES_EOF
+	fi
+fi

@@ -1,0 +1,7 @@
+if [ -x "$(command -v systemd-tmpfiles)" ]; then
+	if [ "$1" = "purge" ] && systemd-tmpfiles --help | grep -q "\-\-purge"; then
+		systemd-tmpfiles ${DPKG_ROOT:+--root="$DPKG_ROOT"} --purge - >/dev/null <<TMPFILES_EOF || true
+#TMPFILES_PURGE#
+TMPFILES_EOF
+	fi
+fi
