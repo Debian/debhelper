@@ -38,7 +38,7 @@ the package should explicitly activate the B<single-binary> dh addon (e.g., by a
 B<dh-sequence-single-binary> to B<Build-Depends>) or pass B<--destdir> to
 B<dh_auto_install>.
 
-The rationale for this change to avoid "surprises" when adding a second binary package
+The rationale for this change is to avoid "surprises" when adding a second binary package
 later.  Previously, debhelper would silently change behaviour often resulting in empty
 binary packages being uploaded to the archive by mistake. With the new behaviour,
 the B<single-binary> addon will detect the mismatch and warn the maintainer of what is
@@ -81,7 +81,7 @@ preserve the existing behaviour (e.g., by adding B<dh-sequence-single-binary> to
 Build-Depends), or explicitly passing B<--destdir> to B<dh_auto_install> if used and
 then passing B<--without single-binary> to B<dh> (the latter to silence the warning).
 
-The rationale for this change to avoid "surprises" when adding a second binary package
+The rationale for this change is to avoid "surprises" when adding a second binary package
 later.  Previously, debhelper would silently change behaviour often resulting in empty
 binary packages being uploaded to the archive by mistake. With the new behaviour,
 the B<single-binary> addon will detect the mismatch and warn the maintainer of what is
@@ -534,7 +534,7 @@ Changes from v9 are:
 
 =item -
 
-B<dh_installinit> will no longer install a file named debian/I<package>
+B<dh_installinit> will no longer installs a file named debian/I<package>
 as an init script.
 
 =item -
