@@ -9,6 +9,10 @@
 # We disable autoreconf to avoid build-depending on it (it does
 # nothing for debhelper and it keeps the set of B-D smaller)
 
+ifneq (,$(filter pkg.debhelper.nonls,$(DEB_BUILD_PROFILES)))
+export USE_NLS=no
+endif
+
 PERL ?= perl
 
 %:
