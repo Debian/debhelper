@@ -135,6 +135,10 @@ sub configure {
 		$ENV{CXXFLAGS} .= ' ' . $ENV{CPPFLAGS};
 	}
 
+	if (get_buildoption("nocheck") && ! compat(13)) {
+		push(@flags, "-DBUILD_TESTING:BOOL=OFF");
+	}
+
 	$this->mkdir_builddir();
 	eval { 
 		$this->doit_in_builddir("cmake", @flags, @_, $this->get_source_rel2builddir());
