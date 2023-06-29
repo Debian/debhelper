@@ -865,7 +865,7 @@ sub _hoist_profile_into_dbo {
 	if (is_build_profile_active($name) && !get_buildoption($name)) {
 		$ENV{'DEB_BUILD_OPTIONS'} //= '';
 		$ENV{'DEB_BUILD_OPTIONS'} .= ' ' . $name;
-		warning("Copying ${name} into DEB_BUILD_OPTIONS: It was in DEB_BUILD_PROFILES and but not in DEB_BUILD_OPTIONS");
+		warning("Copying ${name} into DEB_BUILD_OPTIONS: It was in DEB_BUILD_PROFILES but not in DEB_BUILD_OPTIONS");
 	}
 }
 
