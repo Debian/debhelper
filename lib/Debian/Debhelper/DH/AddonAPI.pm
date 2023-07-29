@@ -167,7 +167,7 @@ sub add_command {
 }
 sub add_command_at_end {
 	my ($command, $sequence) = @_;
-	_assert_not_conditional_sequence_addon('add_command');
+	_assert_not_conditional_sequence_addon('add_command_at_end');
 	_register_cmd_added_by_addon($command);
 	if (not exists($Debian::Debhelper::DH::SequenceState::sequences{$sequence})) {
 		_add_sequence($sequence, SEQUENCE_NO_SUBSEQUENCES, _seq_cmd($command));
