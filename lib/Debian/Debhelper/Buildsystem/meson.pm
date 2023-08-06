@@ -48,6 +48,14 @@ sub new {
 	return $this;
 }
 
+sub _get_meson_env {
+	my $update_env = {
+		LC_ALL => 'C.UTF-8',
+	};
+	$update_env->{DEB_PYTHON_INSTALL_LAYOUT} = 'deb' unless $ENV{DEB_PYTHON_INSTALL_LAYOUT};
+	return $update_env;
+}
+
 sub configure {
 	my $this=shift;
 
@@ -92,7 +100,7 @@ sub configure {
 	$this->mkdir_builddir();
 	eval {
 		my %options = (
-			update_env => { LC_ALL => 'C.UTF-8'},
+			update_env => _get_meson_env(),
 		);
 		$this->doit_in_builddir(\%options, "meson", "setup", $this->get_source_rel2builddir(), @opts, @_);
 	};
@@ -115,9 +123,7 @@ sub test {
 			# In compat 13 with meson+ninja, we prefer using "meson test"
 			# over "ninja test"
 			my %options = (
-				update_env => {
-					'LC_ALL' => 'C.UTF-8',
-				}
+				update_env => _get_meson_env(),
 			);
 			if ($this->get_parallel() > 0) {
 				$options{update_env}{MESON_TESTTHREADS} = $this->get_parallel();
@@ -144,9 +150,7 @@ sub install {
 		# In compat 14 with meson+ninja, we prefer using "meson install"
 		# over "ninja install"
 		my %options = (
-			update_env => {
-				'LC_ALL' => 'C.UTF-8',
-			}
+			update_env => _get_meson_env(),
 		);
 		$this->doit_in_builddir(\%options, 'meson', 'install', '--destdir', $destdir, @args);
 	}

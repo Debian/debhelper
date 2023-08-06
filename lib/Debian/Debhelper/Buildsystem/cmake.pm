@@ -79,6 +79,12 @@ sub new {
 	return $this;
 }
 
+sub _get_cmake_env {
+	my $update_env = {};
+	$update_env->{DEB_PYTHON_INSTALL_LAYOUT} = 'deb' unless $ENV{DEB_PYTHON_INSTALL_LAYOUT};
+	return $update_env;
+}
+
 sub configure {
 	my $this=shift;
 	# Standard set of cmake flags
@@ -141,7 +147,10 @@ sub configure {
 
 	$this->mkdir_builddir();
 	eval { 
-		$this->doit_in_builddir("cmake", @flags, @_, $this->get_source_rel2builddir());
+		my %options = (
+			update_env => _get_cmake_env(),
+		);
+		$this->doit_in_builddir(\%options, "cmake", @flags, @_, $this->get_source_rel2builddir());
 	};
 	if (my $err = $@) {
 		if (-e $this->get_buildpath("CMakeCache.txt")) {
@@ -196,6 +205,7 @@ sub install {
 			update_env => {
 				'LC_ALL'  => 'C.UTF-8',
 				'DESTDIR' => $destdir,
+				%{ _get_cmake_env() },
 			}
 		);
 		print_and_doit(\%options, 'cmake', '--install', $this->get_buildpath, @_);
