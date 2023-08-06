@@ -296,6 +296,7 @@ sub buildsystems_do {
 				TMPDIR  => 1,
 				CLEANUP => 1,
 			);
+			chmod(0700, $xdg_runtime_dir->dirname) or error("chmod(0700, $xdg_runtime_dir) failed: $!");
 			$ENV{'XDG_RUNTIME_DIR'} = $xdg_runtime_dir->dirname;
 		}
 		eval {
