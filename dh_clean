@@ -1,0 +1,199 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_clean - clean up package build directories
+
+=cut
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_clean> [S<I<debhelper options>>] [B<-k>] [B<-d>] [B<-X>I<item>] [S<I<path> ...>]
+
+=head1 DESCRIPTION
+
+B<dh_clean> is a debhelper program that is responsible for cleaning up.  It should
+be the last step of the B<clean> target and other debhelper commands generally
+assume that B<dh_clean> will clean up after them.
+
+It removes the package build directories, and removes some other files including
+F<debian/files>, and any detritus left behind by other debhelper commands. It
+also removes common files that should not appear in a Debian diff:
+  #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS .deps/* *.P *-stamp
+
+It does not run "make clean" to clean up after the build process. Use
+L<dh_auto_clean(1)> to do things like that.
+
+=head1 FILES
+
+=over 4
+
+=item F<debian/clean>
+
+Can list other paths to be removed.
+
+Note that directories listed in this file B<must> end with a trailing
+slash.  Any content in these directories will be removed as well.
+
+Supports substitution variables in compat 13 and later as
+documented in L<debhelper(7)>.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-k>, B<--keep>
+
+This is deprecated, use L<dh_prep(1)> instead.
+
+The option is removed in compat 12.
+
+=item B<-d>, B<--dirs-only>
+
+Only clean the package build directories, do not clean up any other files
+at all.
+
+=item B<-X>I<item> B<--exclude=>I<item>
+
+Exclude files that contain I<item> anywhere in their filename from being
+deleted, even if they would normally be deleted. You may use this option
+multiple times to build up a list of things to exclude.
+
+=item I<path> ...
+
+Delete these I<path>s too.
+
+Note that directories passed as arguments B<must> end with a trailing
+slash.  Any content in these directories will be removed as well.
+
+=back
+
+=cut
+
+init(options => {
+		'dirs-only' => \$dh{D_FLAG},
+		'keep|k' => \$dh{K_FLAG},
+	},
+	inhibit_log => 1,
+);
+
+if ($dh{K_FLAG}) {
+	deprecated_functionality('dh_clean -k is deprecated; use dh_prep instead',
+							 12,
+							 'The -k option is not supported in compat 12; use dh_prep instead');
+}
+
+# Remove the debhelper stamp file
+rm_files('debian/debhelper-build-stamp') if not $dh{D_FLAG};
+
+my (@clean_files, @clean_dirs, %seen);
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $ext=pkgext($package);
+	my $source_dir = default_sourcedir($package);
+
+	if (! $dh{D_FLAG}) {
+		push(@clean_files, "debian/${ext}substvars")
+			unless excludefile("debian/${ext}substvars");
+		
+		# These are all debhelper temp files, and so it is safe to 
+		# wildcard them.
+		my @temp = glob("debian/$ext*.debhelper");
+		push(@clean_files, @temp);
+	}
+	
+	push(@clean_dirs , "${tmp}/")
+		unless excludefile($tmp);
+	push(@clean_dirs, "${source_dir}/")
+	    if (not $seen{$source_dir}++ and not excludefile($source_dir));
+}
+
+
+if (not $dh{D_FLAG}) {
+	# Restore all files in our bucket (before we delete said bucket)
+	restore_all_files(1);
+
+	# Remove internal state data
+	doit('rm', '-rf', 'debian/.debhelper/');
+}
+
+
+# Remove all debhelper logs.
+if (! $dh{D_FLAG} && ! $dh{K_FLAG}) {
+	my @logs = glob('debian/*.debhelper.log');
+	rm_files(@logs) if @logs;
+}
+
+if (! $dh{D_FLAG}) {
+	if (@ARGV) {
+		push(@clean_files, grep { !m@/$@ } @ARGV);
+		push(@clean_dirs, grep { m@/$@ } @ARGV);
+	}
+
+	if (! $dh{K_FLAG}) {
+		if (!compat(6) && -e "debian/clean") {
+			my @clean=grep {
+				! excludefile($_)
+			# Silently ignore missing files - for all we know, dh_clean is run before
+			# they have been created.
+			} filearray('debian/clean', ["."], \&glob_expand_error_handler_silently_ignore);
+			push(@clean_files, grep { !m@/$@ } @clean);
+			push(@clean_dirs, grep { m@/$@ } @clean);
+		}
+
+		push(@clean_files, 'debian/files')
+			unless excludefile("debian/files");
+	}
+}
+
+xargs(\@clean_files, 'rm', '-f', '--') if @clean_files;
+xargs(\@clean_dirs, 'rm', '-fr', '--') if @clean_dirs;
+
+if (! $dh{D_FLAG}) {
+	# See if some files that would normally be deleted are excluded.
+	my $find_options='';
+	if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
+		$find_options="! \\( $dh{EXCLUDE_FIND} \\) -a";
+	}
+
+	# vcs directories that should not have their contents cleaned
+	# (plus the internal "quilt" directory)
+	my $vcs_dirs=join " -o ", map { "-path .\\*/" . $_ }
+		(".git", ".svn", ".bzr", ".hg", "CVS", '.pc', '_darcs');
+
+	# Remove other temp files.
+	complex_doit("find . $find_options \\( \\( \\
+		\\( $vcs_dirs \\) -prune -o -type f -a \\
+	        \\( -name '#*#' -o -name '.*~' -o -name '*~' -o -name DEADJOE \\
+		 -o -name '*.orig' -o -name '*.rej' -o -name '*.bak' \\
+		 -o -name '.*.orig' -o -name .*.rej -o -name '.SUMS' \\
+		 -o -name TAGS -o \\( -path '*/.deps/*' -a -name '*.P' \\) \\
+		\\) -exec rm -f {} + \\) -o \\
+		\\( -type d -a -name autom4te.cache -prune -exec rm -rf {} + \\) \\)");
+}
+
+if (!compat(6) && !$dh{K_FLAG}) {
+	my @stamp_files = glob('*-stamp');
+	rm_files(@stamp_files) if @stamp_files;
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

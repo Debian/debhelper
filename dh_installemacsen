@@ -1,0 +1,149 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_installemacsen - register an Emacs add on package
+
+=cut
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_installemacsen> [S<I<debhelper options>>] [B<-n>] [B<--priority=>I<n>] [B<--flavor=>I<foo>]
+
+=head1 DESCRIPTION
+
+B<dh_installemacsen> is a debhelper program that is responsible for installing
+files used by the Debian B<emacsen-common> package into package build
+directories.
+
+It also automatically generates the F<preinst> F<postinst> and F<prerm>
+commands needed to register a package as an Emacs add on package. The commands
+are added to the maintainer scripts by B<dh_installdeb>. See
+L<dh_installdeb(1)> for an explanation of how this works.
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.emacsen-compat
+
+Installed into F<usr/lib/emacsen-common/packages/compat/package> in the
+package build directory.
+
+=item debian/I<package>.emacsen-install
+
+Installed into F<usr/lib/emacsen-common/packages/install/package> in the
+package build directory.
+
+=item debian/I<package>.emacsen-remove
+
+Installed into F<usr/lib/emacsen-common/packages/remove/package> in the
+package build directory.
+
+=item debian/I<package>.emacsen-startup
+
+Installed into etc/emacs/site-start.d/50I<package>.el in the package
+build directory. Use B<--priority> to use a different priority than 50.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-n>, B<--no-scripts>
+
+Do not modify F<postinst>/F<prerm> scripts.
+
+=item B<--priority=>I<n>
+
+Sets the priority number of a F<site-start.d> file. Default is 50.
+
+=item B<--flavor=>I<foo>
+
+Sets the flavor a F<site-start.d> file will be installed in. Default is
+B<emacs>, alternatives include B<xemacs> and B<emacs20>.
+
+=back
+
+=head1 NOTES
+
+Note that this command is not idempotent. L<dh_prep(1)> should be called
+between invocations of this command. Otherwise, it may cause multiple
+instances of the same text to be added to maintainer scripts.
+
+=cut
+
+init(options => {
+	"flavor=s" => \$dh{FLAVOR},
+	"priority=s" => \$dh{PRIORITY},
+});
+
+if (! defined $dh{PRIORITY}) {
+	$dh{PRIORITY}=50;
+}
+if (! defined $dh{FLAVOR}) {
+	$dh{FLAVOR}='emacs';
+}
+
+# PROMISE: DH NOOP WITHOUT emacsen-common emacsen-install emacsen-remove emacsen-startup cli-options()
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+
+	my $emacsen_compat=pkgfile($package,"emacsen-compat");
+	my $emacsen_install=pkgfile($package,"emacsen-install");
+	my $emacsen_remove=pkgfile($package,"emacsen-remove");
+	my $emacsen_startup=pkgfile($package,"emacsen-startup");
+
+	if ($emacsen_compat ne '') {
+		install_dir("$tmp/usr/lib/emacsen-common/packages/compat");
+		install_file($emacsen_compat,
+					 "$tmp/usr/lib/emacsen-common/packages/compat/$package");
+	}
+
+	if ($emacsen_install ne '') {
+		install_dir("$tmp/usr/lib/emacsen-common/packages/install");
+		install_prog($emacsen_install,"$tmp/usr/lib/emacsen-common/packages/install/$package");
+	}
+
+	if ($emacsen_remove ne '') {
+		install_dir("$tmp/usr/lib/emacsen-common/packages/remove");
+		install_prog("$emacsen_remove","$tmp/usr/lib/emacsen-common/packages/remove/$package");
+	}
+
+	if ($emacsen_startup ne '') {
+		install_dir("$tmp/etc/$dh{FLAVOR}/site-start.d/");
+		install_file($emacsen_startup,"$tmp/etc/$dh{FLAVOR}/site-start.d/$dh{PRIORITY}$package.el");
+	}
+
+	if ($emacsen_install ne '' || $emacsen_remove ne '') {
+		if (! $dh{NOSCRIPTS}) {
+			autoscript($package,"preinst","preinst-emacsen",
+				{ 'PACKAGE' => $package });
+			autoscript($package,"postinst","postinst-emacsen",
+				{ 'PACKAGE' => $package });
+			autoscript($package,"prerm","prerm-emacsen",
+				{ 'PACKAGE' => $package });
+		}
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+L</usr/share/doc/emacsen-common/debian-emacs-policy.gz>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

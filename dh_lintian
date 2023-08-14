@@ -1,0 +1,72 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_lintian - install lintian override files into package build directories
+
+=cut
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_lintian> [S<I<debhelper options>>]
+
+=head1 DESCRIPTION
+
+B<dh_lintian> is a debhelper program that is responsible for installing
+override files used by lintian into package build directories.
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.lintian-overrides
+
+Installed into usr/share/lintian/overrides/I<package> in the package
+build directory. This file is used to suppress erroneous lintian
+diagnostics.
+
+=item F<debian/source/lintian-overrides>
+
+These files are not installed, but will be scanned by lintian to provide
+overrides for the source package.
+
+=back
+
+=cut
+
+init();
+
+# PROMISE: DH NOOP WITHOUT lintian-overrides cli-options()
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	next if is_udeb($package);
+
+	my $tmp=tmpdir($package);
+	my $or_dir = "$tmp/usr/share/lintian/overrides";
+	my $overrides=pkgfile($package,"lintian-overrides");
+
+	if ($overrides ne '') {
+		install_dir($or_dir);
+		install_dh_config_file($overrides, "$or_dir/$package");
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+L<lintian(1)>
+
+=head1 AUTHOR
+
+Steve Robbins <smr@debian.org>
+
+=cut

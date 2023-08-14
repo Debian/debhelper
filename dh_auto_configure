@@ -1,0 +1,68 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_auto_configure - automatically configure a package prior to building
+
+=cut
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+use Debian::Debhelper::Dh_Buildsystems;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_auto_configure> [S<I<build system options>>] [S<I<debhelper options>>] [S<B<--> I<params>>]
+
+=head1 DESCRIPTION
+
+B<dh_auto_configure> is a debhelper program that tries to automatically
+configure a package prior to building. It does so by running the
+appropriate command for the build system it detects the package uses.
+For example, it looks for and runs a F<./configure> script, F<Makefile.PL>,
+F<Build.PL>, or F<cmake>. A standard set of parameters is determined and passed
+to the program that is run. Some build systems, such as make, do not
+need a configure step; for these B<dh_auto_configure> will exit without
+doing anything.
+
+This is intended to work for about 90% of packages. If it doesn't work,
+you're encouraged to skip using B<dh_auto_configure> at all, and just run
+F<./configure> or its equivalent manually.
+
+=head1 OPTIONS
+
+See L<debhelper(7)/B<BUILD SYSTEM OPTIONS>> for a list of common build
+system selection and control options.
+
+=over 4
+
+=item B<--> I<params>
+
+Pass I<params> to the program that is run, after the parameters that
+B<dh_auto_configure> usually passes. For example:
+
+  dh_auto_configure -- --with-foo --enable-bar
+
+=back
+
+=cut
+
+# PROMISE: DH NOOP WITHOUT cli-options(BUILDSYSTEM) buildsystem(configure)
+
+buildsystems_init();
+buildsystems_do();
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

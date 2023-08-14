@@ -1,0 +1,176 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_link - create symlinks in package build directories
+
+=cut
+
+use strict;
+use warnings;
+use File::Find;
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_link> [S<I<debhelper options>>] [B<-A>] [B<-X>I<item>] [S<I<source destination> ...>]
+
+=head1 DESCRIPTION
+
+B<dh_link> is a debhelper program that creates symlinks in package build
+directories.
+
+B<dh_link> accepts a list of pairs of source and destination
+files. The source files are the already existing files that will be
+symlinked from (called B<target> by L<ln(1)>). The destination files
+are the symlinks that will be created (called B<link name> by
+L<ln(1)>). There B<must> be an equal number of source and destination
+files specified.
+
+Be sure you B<do> specify the absolute path to both the source and
+destination files (unlike you would do if you were using something
+like L<ln(1)>).  Please note that the leading slash is optional.
+
+B<dh_link> will generate symlinks that comply with Debian policy - absolute
+when policy says they should be absolute, and relative links with as short
+a path as possible. It will also create any subdirectories it needs to put
+the symlinks in.
+
+Any pre-existing destination files will be replaced with symlinks.
+
+B<dh_link> also scans the package build tree for existing symlinks which do not
+conform to Debian policy, and corrects them (v4 or later).
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.links
+
+Lists pairs of source and destination files to be symlinked. Each pair
+should be put on its own line, with the source and destination separated by
+whitespace.
+
+In each pair the source file (called B<target> by L<ln(1)>) comes
+first and is followed by the destination file (called B<link name> by
+L<ln(1)>). Thus the pairs of source and destination files in each line
+are given in the same order as they would be given to L<ln(1)>.
+
+In contrast to L<ln(1)>, source and destination paths must be absolute
+(the leading slash is optional).
+
+Supports substitution variables in compat 13 and later as
+documented in L<debhelper(7)>.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-A>, B<--all>
+
+Create any links specified by command line parameters in ALL packages
+acted on, not just the first.
+
+=item B<-X>I<item>, B<--exclude=>I<item>
+
+Exclude symlinks that contain I<item> anywhere in their filename from
+being corrected to comply with Debian policy.
+
+=item I<source destination> ...
+
+Create a file named I<destination> as a link to a file named I<source>. Do
+this in the package build directory of the first package acted on.
+(Or in all packages if B<-A> is specified.)
+
+=back
+
+=head1 EXAMPLES
+
+ dh_link usr/share/man/man1/foo.1 usr/share/man/man1/bar.1
+
+Make F<bar.1> be a symlink to F<foo.1>
+
+ dh_link var/lib/foo usr/lib/foo \
+   usr/share/man/man1/foo.1 usr/share/man/man1/bar.1
+
+Make F</usr/lib/foo/> be a link to F</var/lib/foo/>, and F<bar.1> be a symlink to
+the F<foo.1>
+
+ var/lib/foo usr/lib/foo
+ usr/share/man/man1/foo.1 usr/share/man/man1/bar.1
+
+Same as above but as content for a debian/I<package>.links file.
+
+=cut
+
+init();
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $file=pkgfile($package,"links");
+
+	my @links;
+	if ($file) {
+		@links=filearray($file);
+	}
+
+	# Make sure it has pairs of symlinks and destinations. If it
+	# doesn't, $#links will be _odd_ (not even, -- it's zero-based).
+	if (int($#links/2) eq $#links/2) {
+		error("$file lists a link without a destination.");
+	}
+
+	if (($package eq $dh{FIRSTPACKAGE} || $dh{PARAMS_ALL}) && @ARGV) {
+		push @links, @ARGV;
+	}
+
+	# Same test as above, including arguments this time.
+	if (int($#links/2) eq $#links/2) {
+		error("parameters list a link without a destination.");
+	}
+
+	# If there is a temp dir already
+	if (-e $tmp) {
+		# Scan for existing links and add them to @links, so they
+		# are recreated policy conformant.
+		find(
+			sub {
+				return unless -l;
+				return if excludefile($_);
+				my $dir=$File::Find::dir;
+				$dir=~s/^\Q$tmp\E//;
+				my $target = readlink($_);
+				if ($target=~/^\//) {
+					push @links, $target;
+				}
+				else {
+					push @links, "$dir/$target";
+				}
+				push @links, "$dir/$_";
+				
+			},
+			$tmp);
+	}
+	
+	while (@links) {
+		my $dest=pop @links;
+		my $src=pop @links;
+		make_symlink($dest, $src, $tmp);
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

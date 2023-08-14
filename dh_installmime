@@ -1,0 +1,73 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_installmime - install mime files into package build directories
+
+=cut
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_installmime> [S<I<debhelper options>>]
+
+=head1 DESCRIPTION
+
+B<dh_installmime> is a debhelper program that is responsible for installing
+mime files into package build directories.
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.mime
+
+Installed into usr/lib/mime/packages/I<package> in the package build
+directory.
+
+=item debian/I<package>.sharedmimeinfo
+
+Installed into /usr/share/mime/packages/I<package>.xml in the package build
+directory.
+
+=back
+
+=cut
+
+init();
+
+# PROMISE: DH NOOP WITHOUT mime sharedmimeinfo cli-options()
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+
+	my $mime=pkgfile($package,"mime");
+	if ($mime ne '') {
+		install_dir("$tmp/usr/lib/mime/packages");
+		install_file($mime, "$tmp/usr/lib/mime/packages/$package");
+	}
+	
+	my $sharedmimeinfo=pkgfile($package,"sharedmimeinfo");
+	if ($sharedmimeinfo ne '') {
+		install_dir("$tmp/usr/share/mime/packages");
+		install_file($sharedmimeinfo,
+					 "$tmp/usr/share/mime/packages/$package.xml");
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

@@ -1,0 +1,882 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh - debhelper command sequencer
+
+=cut
+
+use strict;
+use warnings;
+use constant {
+	'UNSKIPPABLE_CLI_OPTIONS_BUILD_SYSTEM' => q(-S|--buildsystem|-D|--sourcedir(?:ectory)?|-B|--builddir(?:ectory)?),
+	'BUILD_STAMP_FILE'                     => 'debian/debhelper-build-stamp',
+};
+use Debian::Debhelper::Dh_Lib;
+use Debian::Debhelper::Sequence;
+use Debian::Debhelper::SequencerUtil;
+use Debian::Debhelper::DH::SequenceState ();
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh> I<sequence> [B<--with> I<addon>[B<,>I<addon> ...]] [B<--list>] [S<I<debhelper options>>]
+
+=head1 DESCRIPTION
+
+B<dh> runs a sequence of debhelper commands. The supported I<sequence>s
+correspond to the targets of a F<debian/rules> file: B<build-arch>,
+B<build-indep>, B<build>, B<clean>, B<install-indep>, B<install-arch>,
+B<install>, B<binary-arch>, B<binary-indep>, and B<binary>.
+
+=head1 OVERRIDE AND HOOK TARGETS
+
+A F<debian/rules> file using B<dh> can override the command that is run
+at any step in a sequence, by defining an override target.  It is also
+possible to inject a command before or after any step without affecting
+the step itself.
+
+=head2 Injecting commands before or after a step
+
+I<Note>: This feature requires debhelper 12.8 or later plus the package must
+use compatibility mode 10 or later.
+
+To inject commands before I<dh_command>, add a target named
+B<execute_before_>I<dh_command> to the rules files.  Similarly, if you
+want to inject commands after I<dh_command>, add the target
+B<execute_after_>I<dh_command>.  Both targets can be used for the same
+I<dh_command> and also even if the command is overridden (as described in
+L</Overriding a command> below).
+
+When these targets are defined, B<dh> will call the targets respectively
+before or after it would invoke I<dh_command> (or its override target).
+
+=head2 Overriding a command
+
+To override I<dh_command>, add a target named B<override_>I<dh_command> to
+the rules file. When it would normally run I<dh_command>, B<dh> will
+instead call that target. The override target can then run the command with
+additional options, or run entirely different commands instead. See
+examples below.
+
+=head2 Architecture dependent/independent override and hook targets
+
+The override and hook targets can also be defined to run only
+when building architecture dependent or architecture independent
+packages. Use targets with names like B<override_>I<dh_command>B<-arch>
+and B<execute_after_>I<dh_command>B<-indep>.
+
+This feature is available since debhelper 8.9.7 (for override targets)
+and 12.8 (for hook targets).
+
+=head2 Completely empty targets
+
+As a special optimization, B<dh> will skip a target if it is
+completely empty and does not depend on any other target.  This is
+mostly useful for override targets, where the command will simply be
+skipped without the overhead of invoking a dummy target.
+
+Note that the target has to be completely empty for this to work:
+
+     # Skip dh_bar - the good and optimized way
+     # Some rationale for skipping dh_bar goes here
+     override_dh_bar:
+
+
+     # Skip dh_foo - the slow way
+     override_dh_foo:
+        # Some rationale for skipping dh_foo goes here
+        # (these comments causes a dummy target to be run)
+
+=head2 Verifying targets are picked up by dh
+
+As of debhelper 13.10, you can use L<dh_assistant(1)> to see which override
+and hook targets will be seen by B<dh>.  Here is an example run of L<dh_assistant(1)>
+along with its output:
+
+    $ dh_assistant detect-hook-targets
+    {
+       "commands-not-in-path": [
+          "dh_foo"
+       ],
+       "hook-targets": [
+          {
+             "command": "dh_strip_nondeterminism",
+             "is-empty": true,
+             "package-section-param": null,
+             "target-name": "override_dh_strip_nondeterminism"
+          },
+          {
+             "command": "dh_foo",
+             "is-empty": false,
+             "package-section-param": "-a",
+             "target-name": "override_dh_foo-arch"
+          }
+       ]
+    }
+
+The B<commands-not-in-path> is useful for spotting mistakes in the hook target
+names.  A non-empty value implies one of more hook targets are related to a command
+that is either not installed or no command with that name exists at all.  It is
+generally worth double checking these.
+
+Additionally, the B<is-empty> attribute for each hook target can be used for seeing
+whether a hook target triggers the L</Completely empty targets> optimization.
+
+If you are interested in the other attributes, please read the L<dh_assistant(1)>
+for the details.
+
+=head3 Verifying targets are picked up by dh (when debhelper is older than 13.10)
+
+
+
+On older versions of debhelper, you have to use B<dh> with B<--no-act>.
+You can use the following command as an example:
+
+    $ dh binary --no-act | grep dh_install | head -n5
+         dh_installdirs
+         dh_install
+         debian/rules execute_after_dh_install
+         dh_installdocs
+         dh_installchangelogs
+
+The B<debian/rules execute_after_dh_install> in the output, which signals
+that B<dh> registered a B<execute_after_dh_install> target and would
+run it directly after L<dh_install(1)>.
+
+Note that L</Completely empty targets> will be omitted in the listing above.
+This makes it a bit harder to spot as you are looking for the omission of
+a command name.  But otherwise, the principle remains the same.
+
+=head2 Caveats with hook targets and makefile conditionals
+
+If you choose to wrap a hook target in makefile conditionals, please
+be aware that B<dh> computes all the hook targets a head of time and
+caches the result for that run.  Furthermore, the conditionals will be
+invoked again when B<dh> calls the hook target later and will assume
+the answer did not change.
+
+The parsing and caching I<often> happens before B<dh> knows whether it
+will build arch:any (-a) or/and arch:all (-i) packages, which can
+produce confusing results - especially when L<dh_listpackages(1)> is
+part of the conditional.
+
+Most of the problems can be avoided by making the hook target
+unconditional and then have the "body" be partially or completely
+conditional.  As an example:
+
+      # SIMPLE: It is well-defined what happens.  The hook target
+      # is always considered.  The "maybe run this" bit is
+      # conditional but dh_foo is definitely skipped.
+      #
+      # Note: The conditional is evaluated "twice" where its
+      # influences what happens.  Once when dh check which hook
+      # targets exist and once when the override_dh_foo hook target
+      # is run.  If *either* times return false, "maybe run this"
+      # is skipped.
+      override_dh_foo:
+      ifneq (...)
+          maybe run this
+      endif
+
+      # SIMPLE: This is also well-defined.  The hook target is always
+      # run and dh_bar is skipped.  The "maybe run this" bit is
+      # conditional as one might expect.
+      #
+      # Note: The conditional is still evaluated multiple times (in
+      # different process each time).  However, only the evaluation
+      # that happens when the hook target is run influences what
+      # happens.
+      override_dh_bar:
+          : # Dummy command to force the target to always be run
+      ifneq (...)
+          maybe run this
+      endif
+
+
+      # COMPLICATED: This case can be non-trivial and have sharp edges.
+      # Use at your own peril if dh_listpackages in the conditional.
+      #
+      # Here, either dh_baz is run normally OR "maybe run this" is run
+      # instead.
+      #
+      # And it gets even more complicated to reason about if dh needs to
+      # recurse into debian/rules because you have an "explicit"
+      # standard target (e.g. a "build-arch:" target separate from "%:").
+      ifneq (...)
+      override_dh_baz:
+          maybe run this
+      endif
+
+These recipes are also relevant for conditional dependency targets,
+which are often seen in a variant of the following example:
+
+      COND_TASKS =
+      ifneq (...)
+      COND_TASKS += maybe-run-this
+      endif
+      ...
+
+      maybe-run-this:
+          ...
+
+      # SIMPLE: It is well-defined what happens.  Either the
+      # $(COND_TASKS) are skipped or run.
+      #
+      # Note: The conditional is evaluated "twice" where its
+      # influences what happens.  Once when dh check which hook
+      # targets exist and once when the override_dh_foo hook target
+      # is run.  If *either* times return false, $(COND_TASKS)
+      # is skipped.
+      override_dh_foo: $(COND_TASKS)
+
+
+      # SIMPLE: This is also well-defined.  The hook target is always
+      # run and dh_bar is skipped.  The $(COND_TASKS) bit is
+      # conditional as one might expect.
+      #
+      # Note: The conditional is still evaluated multiple times (in
+      # different process each time).  However, only the evaluation
+      # that happens when the hook target is run influences what
+      # happens.
+      override_dh_bar: $(COND_TASKS)
+          : # Dummy command to force the target to always be run
+
+      # COMPLICATED: This case can be non-trivial and have sharp edges.
+      # Use at your own peril if dh_listpackages in the conditional.
+      #
+      ifneq (...)
+      override_dh_baz: $(COND_TASKS)
+      endif
+
+
+When in doubt, pick the relevant B<SIMPLE> case in the examples above
+that match your need.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--with> I<addon>[B<,>I<addon> ...]
+
+Add the debhelper commands specified by the given addon to appropriate places
+in the sequence of commands that is run. This option can be repeated more
+than once, or multiple addons can be listed, separated by commas.
+This is used when there is a third-party package that provides
+debhelper commands. See the F<PROGRAMMING> file for documentation about
+the sequence addon interface.
+
+A B<Build-Depends> relation on the package B<dh-sequence->I<addon>
+implies a B<--with> I<addon>. This avoids the need for an explicit
+B<--with> in F<debian/rules> that only duplicates what is already
+declared via the build dependencies in F<debian/control>.  The
+relation can (since 12.5) be made optional via e.g.
+build-profiles.  This enables you to easily disable an addon that
+is only useful with certain profiles (e.g. to facilitate
+bootstrapping).
+
+Since debhelper 12.5, addons can also be activated in B<indep>-only
+mode (via B<Build-Depends-Indep>) or B<arch>-only mode (via
+B<Build-Depends-Arch>). Such addons are only active in the particular
+sequence (e.g. B<binary-indep>) which simplifies dependency
+management for cross-builds.
+
+Please note that addons activated via B<Build-Depends-Indep> or
+B<Build-Depends-Arch> are subject to additional limitations to
+ensure the result is deterministic even when the addon is
+unavailable (e.g. during clean).  This implies that some addons
+are incompatible with these restrictions and can only be used via
+B<Build-Depends> (or manually via F<debian/rules>).  Currently,
+such addons can only add commands to sequences.
+
+=item B<--without> I<addon>
+
+The inverse of B<--with>, disables using the given addon. This option
+can be repeated more than once, or multiple addons to disable can be
+listed, separated by commas.
+
+=item B<--list>, B<-l>
+
+List all available addons.
+
+When called only with this option, B<dh> can be called from any
+directory (i.e. it does not need access to files from a source
+package).
+
+=item B<--no-act>
+
+Prints commands that would run for a given sequence, but does not run them.
+
+Note that dh normally skips running commands that it knows will do nothing.
+With --no-act, the full list of commands in a sequence is printed.
+
+=back
+
+Other options passed to B<dh> are passed on to each command it runs. This
+can be used to set an option like B<-v> or B<-X> or B<-N>, as well as for more
+specialised options.
+
+=head1 EXAMPLES
+
+To see what commands are included in a sequence, without actually doing
+anything:
+
+	dh binary-arch --no-act
+
+This is a very simple rules file, for packages where the default sequences of
+commands work with no additional options.
+
+	#!/usr/bin/make -f
+	%:
+		dh $@
+
+Often you'll want to pass an option to a specific debhelper command. The
+easy way to do with is by adding an override target for that command.
+
+	#!/usr/bin/make -f
+	%:
+		dh $@
+
+	override_dh_strip:
+		dh_strip -Xfoo
+
+	override_dh_auto_configure:
+		dh_auto_configure -- --with-foo --disable-bar
+
+Sometimes the automated L<dh_auto_configure(1)> and L<dh_auto_build(1)>
+can't guess what to do for a strange package. Here's how to avoid running
+either and instead run your own commands.
+
+	#!/usr/bin/make -f
+	%:
+		dh $@
+
+	override_dh_auto_configure:
+		./mondoconfig
+
+	override_dh_auto_build:
+		make universe-explode-in-delight
+
+Another common case is wanting to do something manually before or
+after a particular debhelper command is run.
+
+	#!/usr/bin/make -f
+	%:
+		dh $@
+
+	# Example assumes debhelper/12.8 and compat 10+
+	execute_after_dh_fixperms:
+		chmod 4755 debian/foo/usr/bin/foo
+
+If you are on an older debhelper or compatibility level, the above
+example would have to be written as.
+
+	#!/usr/bin/make -f
+	%:
+		dh $@
+
+	# Older debhelper versions or using compat 9 or lower.
+	override_dh_fixperms:
+		dh_fixperms
+		chmod 4755 debian/foo/usr/bin/foo
+
+Python tools are not run by dh by default, due to the continual change
+in that area. Here is how to use B<dh_python2>.
+
+	#!/usr/bin/make -f
+	%:
+		dh $@ --with python2
+
+Here is how to force use of Perl's B<Module::Build> build system,
+which can be necessary if debhelper wrongly detects that the package
+uses MakeMaker.
+
+	#!/usr/bin/make -f
+	%:
+		dh $@ --buildsystem=perl_build
+
+Here is an example of overriding where the B<dh_auto_>I<*> commands find
+the package's source, for a package where the source is located in a
+subdirectory.
+
+	#!/usr/bin/make -f
+	%:
+		dh $@ --sourcedirectory=src
+
+And here is an example of how to tell the B<dh_auto_>I<*> commands to build
+in a subdirectory, which will be removed on B<clean>.
+
+	#!/usr/bin/make -f
+	%:
+		dh $@ --builddirectory=build
+
+If your package can be built in parallel, please either use compat 10 or
+pass B<--parallel> to dh. Then B<dpkg-buildpackage -j> will work.
+
+	#!/usr/bin/make -f
+	%:
+		dh $@ --parallel
+
+If your package cannot be built reliably while using multiple threads,
+please pass B<--no-parallel> to dh (or the relevant B<dh_auto_>I<*>
+command):
+
+
+	#!/usr/bin/make -f
+	%:
+		dh $@ --no-parallel
+
+Here is a way to prevent B<dh> from running several commands that you don't
+want it to run, by defining empty override targets for each command.
+
+	#!/usr/bin/make -f
+	%:
+		dh $@
+
+	# Commands not to run:
+	override_dh_auto_test override_dh_compress override_dh_fixperms:
+
+A long build process for a separate documentation package can
+be separated out using architecture independent overrides.
+These will be skipped when running build-arch and binary-arch sequences.
+
+	#!/usr/bin/make -f
+	%:
+		dh $@
+
+	override_dh_auto_build-indep:
+		$(MAKE) -C docs
+
+	# No tests needed for docs
+	override_dh_auto_test-indep:
+
+	override_dh_auto_install-indep:
+		$(MAKE) -C docs install
+
+Adding to the example above, suppose you need to chmod a file, but only
+when building the architecture dependent package, as it's not present
+when building only documentation.
+
+	# Example assumes debhelper/12.8 and compat 10+
+	execute_after_dh_fixperms-arch:
+		chmod 4755 debian/foo/usr/bin/foo
+
+=head1 DEBHELPER PROVIDED DH ADDONS
+
+The primary purpose of B<dh> addons is to provide easy integration with
+third-party provided features for debhelper.  However, debhelper itself
+also provide a few sequences that can be useful in some cases.  These
+are documented in this list:
+
+=over 4
+
+=item build-stamp
+
+A special addon for controlling whether B<dh> (in compat 10 or later)
+will create stamp files to tell whether the build target has been run
+successfully. See L</INTERNALS> for more details.
+
+This addon is active by default but can disabled by using
+B<dh $@ --without build-stamp>
+
+=item dwz (obsolete)
+
+Adds L<dh_dwz(1)> to the sequence in compat level 11 or below.  Obsolete
+in compat 12 or later.
+
+=item elf-tools
+
+This addon adds tools related to ELF files to the sequence such as
+L<dh_strip(1)> and L<dh_shlibdeps(1)>
+
+This addon is I<conditionally> active by default for architecture
+specific packages - that is, it is skipped for arch:all packages.
+In the special case where you need these tools to work on arch:all
+packages, you can use B<--with elf-tools> to activate it
+unconditionally.
+
+=item installinitramfs (obsolete)
+
+Adds L<dh_installinitramfs(1)> to the sequence in compat level 11 or below.
+Obsolete in compat 12 or later.
+
+=item root-sequence (internal)
+
+This is reserved for internal usage.
+
+=item single-binary
+
+A special-purpose addon that makes debhelper run in "single binary" mode.
+
+When active, it will pass B<< --destdir=debian/I<package>/ >> to
+L<dh_auto_install(1)>.  This makes every file "installed" by the upstream
+build system part of the (only) binary package by default without having
+to use other helpers such as L<dh_install(1)>.
+
+The addon will refuse to activate when the source package lists 2 or more
+binary packages in F<debian/control> as a precaution.
+
+Before compat 15. this behaviour was the default when there was only a single
+binary package listed in F<debian/control>.  In compat 15 and later, this
+addon must explicitly be activated for this feature to work.
+
+The rationale for requiring this as an explicit choice is that if it is
+implicit then debhelper will silently change behaviour on adding a new
+binary package.  This has caused many RC bugs when maintainers renamed
+a binary and added transitional packages with the intention of supporting
+seamless upgrades.  The result would often be two empty binary packages that
+were uploaded to archive with users frustrated as their "upgrade" removed
+their programs.
+
+=item systemd (obsolete)
+
+Adds L<dh_systemd_enable(1)> and L<dh_systemd_start(1)> to the sequence in
+compat level 10 or below.  Obsolete in compat 11 or later.
+
+=back
+
+=head1 INTERNALS
+
+If you're curious about B<dh>'s internals, here's how it works under the hood.
+
+In compat 10 (or later), B<dh> creates a stamp file
+F<debian/debhelper-build-stamp> after the build step(s) are complete
+to avoid re-running them.  It is possible to avoid the stamp file by
+passing B<--without=build-stamp> to B<dh>.  This makes "no clean"
+builds behave more like what some people expect at the expense of
+possibly running the build and test twice (the second time as root or
+under L<fakeroot(1)>).
+
+Inside an override target, B<dh_*> commands will create a log file
+F<debian/package.debhelper.log> to keep track of which packages the
+command(s) have been run for.  These log files are then removed once
+the override target is complete.
+
+In compat 9 or earlier, each debhelper command will record
+when it's successfully run in F<debian/package.debhelper.log>. (Which
+B<dh_clean> deletes.) So B<dh> can tell which commands have already
+been run, for which packages, and skip running those commands again.
+
+Each time B<dh> is run (in compat 9 or earlier), it examines the log,
+and finds the last logged command that is in the specified
+sequence. It then continues with the next command in the sequence.
+
+A sequence can also run dependent targets in debian/rules.  For
+example, the "binary" sequence runs the "install" target.
+
+B<dh> uses the B<DH_INTERNAL_OPTIONS> environment variable to pass information
+through to debhelper commands that are run inside override targets. The
+contents (and indeed, existence) of this environment variable, as the name
+might suggest, is subject to change at any time.
+
+Commands in the B<build-indep>, B<install-indep> and B<binary-indep>
+sequences are passed the B<-i> option to ensure they only work on
+architecture independent packages, and commands in the B<build-arch>,
+B<install-arch> and B<binary-arch> sequences are passed the B<-a>
+option to ensure they only work on architecture dependent packages.
+
+=cut
+
+# Stash this away before init modifies it.
+my @ARGV_orig=@ARGV;
+my (@addons, @addon_requests);
+
+# Reset umask to 0022 per #944691
+umask(0022);
+
+init(options => {
+		"until=s" => \$dh{UNTIL},
+		"after=s" => \$dh{AFTER},
+		"before=s" => \$dh{BEFORE},
+		"remaining" => \$dh{REMAINING},
+		"with=s" => sub {
+			my ($option, $value) = @_;
+			push(@addon_requests, map { "+${_}" } split(",", $value));
+		},
+		"without=s" => sub {
+			my ($option, $value) = @_;
+			push(@addon_requests, map { "-${_}" } split(",", $value));
+		},
+		"l" => \&list_addons,
+		"list" => \&list_addons,
+	},
+	# Disable complaints about unknown options; they are passed on to
+	# the debhelper commands.
+	ignore_unknown_options => 1,
+	# Bundling does not work well since there are unknown options.
+	bundling => 0,
+	internal_parse_dh_sequence_info => 1,
+	inhibit_log => 1,
+);
+set_buildflags();
+reject_obsolete_params();
+
+# If make is using a jobserver, but it is not available
+# to this process, clean out MAKEFLAGS. This avoids
+# ugly warnings when calling make.
+if (is_make_jobserver_unavailable()) {
+	clean_jobserver_makeflags();
+}
+
+# Process the sequence parameter.
+my $sequence;
+if (! compat(7)) {
+	# From v8, the sequence is the very first parameter.
+	$sequence=shift @ARGV_orig;
+	if (defined $sequence && $sequence=~/^-/) {
+		error "Unknown sequence $sequence (options should not come before the sequence)";
+	}
+}
+else {
+	# Before v8, the sequence could be at any position in the parameters,
+	# so was what was left after parsing.
+	$sequence=shift;
+	if (defined $sequence) {
+		@ARGV_orig=grep { $_ ne $sequence } @ARGV_orig;
+	}
+}
+if (! defined $sequence) {
+	error "specify a sequence to run";
+}
+# make -B causes the rules file to be run as a target.
+# Also support completely empty override targets.
+# Note: it's not safe to use rules_explicit_target before this check,
+# since it causes dh to be run.
+if ($sequence eq 'debian/rules' ||
+    $sequence =~ /^override_dh_/ ||
+    $sequence =~ /^execute_(?:after|before)_dh_/ ||
+    $sequence eq DUMMY_TARGET) {
+	exit 0;
+}
+
+
+load_sequence_addon('root-sequence', SEQUENCE_TYPE_BOTH);
+
+
+sub list_addons {
+	my %addons;
+
+	for my $inc (@INC) {
+		require File::Spec;
+		my $path = File::Spec->catdir($inc, "Debian/Debhelper/Sequence");
+		if (-d $path) {
+			for my $module_path (glob "$path/*.pm") {
+				my $name = basename($module_path);
+				$name =~ s/\.pm$//;
+				$name =~ s/_/-/g;
+				next if $name eq 'root-sequence';
+				$addons{$name} = 1;
+			}
+		}
+	}
+
+	for my $name (sort keys %addons) {
+		print "$name\n";
+	}
+
+	exit 0;
+}
+
+
+# The list of all packages that can be acted on.
+my @packages=@{$dh{DOPACKAGES}};
+my @arch_packages = getpackages("arch");
+my @indep_packages = getpackages("indep");
+my %sequence2packages = (
+	'build-arch'   => \@arch_packages,
+	'install-arch' => \@arch_packages,
+	'binary-arch'  => \@arch_packages,
+
+	'build-indep'   => \@indep_packages,
+	'install-indep' => \@indep_packages,
+	'binary-indep'  => \@indep_packages,
+
+	'clean'   => \@packages,
+	'build'   => \@packages,
+	'install' => \@packages,
+	'binary'  => \@packages,
+);
+
+my $sequence_unpack_flags = 0;
+
+if ($sequence eq 'build-arch' ||
+    $sequence eq 'install-arch' ||
+    $sequence eq 'binary-arch') {
+	push(@Debian::Debhelper::DH::SequenceState::options, "-a");
+	# as an optimisation, remove from the list any packages
+	# that are not arch dependent
+	@packages = @{$sequence2packages{$sequence}};
+}
+elsif ($sequence eq 'build-indep' ||
+       $sequence eq 'install-indep' ||
+       $sequence eq 'binary-indep') {
+	push(@Debian::Debhelper::DH::SequenceState::options, "-i");
+	# ditto optimisation for arch indep
+	@packages = @{$sequence2packages{$sequence}};
+}
+
+if (not @arch_packages) {
+	$sequence_unpack_flags = FLAG_OPT_SOURCE_BUILDS_NO_ARCH_PACKAGES;
+} elsif (not @indep_packages) {
+	$sequence_unpack_flags = FLAG_OPT_SOURCE_BUILDS_NO_INDEP_PACKAGES;
+}
+
+@addons = compute_selected_addons($sequence, @addon_requests);
+
+# Load addons, which can modify sequences.
+foreach my $addon (@addons) {
+	my $addon_name = $addon->{'name'};
+	my $addon_type = $addon->{'addon-type'};
+	load_sequence_addon($addon_name, $addon_type);
+}
+
+if (%Debian::Debhelper::DH::SequenceState::commands_added_by_addon) {
+	while (my ($cmd, $addon) = each(%Debian::Debhelper::DH::SequenceState::commands_added_by_addon)) {
+		my $addon_type = $addon->{'addon-type'};
+		if ($addon_type eq 'indep') {
+			unshift(@{$Debian::Debhelper::DH::SequenceState::command_opts{$cmd}}, '-i');
+		} elsif ($addon_type eq 'arch') {
+			unshift(@{$Debian::Debhelper::DH::SequenceState::command_opts{$cmd}}, '-a');
+		}
+	}
+}
+
+
+if (! exists($Debian::Debhelper::DH::SequenceState::sequences{$sequence})) {
+	error("Unknown sequence $sequence (choose from: ".
+		join(" ", sort(keys(%Debian::Debhelper::DH::SequenceState::sequences))).")");
+}
+
+parse_dh_cmd_options(@ARGV_orig);
+
+_hoist_profile_into_dbo('nodoc');
+_hoist_profile_into_dbo('nocheck');
+
+if (is_cross_compiling() && !get_buildoption('nocheck') && !get_buildoption('crossbuildcanrunhostbinaries')) {
+	warning('Running tests during cross-builds is not supported in the general case (except for special cases or by');
+	warning('using emulation)');
+	warning('If the build fails, please consider rebuilding with DEB_BUILD_OPTIONS=nocheck.');
+	if (!is_build_profile_active('cross')) {
+		warning('Additionally, you might have to set the "cross" profile.  For dpkg-buildpackage, you do this by');
+		warning('passing the -Pcross option. Check the documentation of your build tool for how to set');
+		warning('DEB_BUILD_PROFILES if you use another build tool that does not auto-configure cross-building for you');
+	}
+	warning('If you have setup the relevant support for running cross-compiled binaries and want to silence this');
+	warning('warning, please use DEB_BUILD_OPTIONS=crossbuildcanrunhostbinaries')
+}
+
+# Figure out at what point in the sequence to start for each package.
+my (%logged, %startpoint, $completed_sequences);
+
+$completed_sequences = _check_for_completed_sequences(\%sequence2packages);
+
+# In compat <= 8, the sequences are always inlined (those versions do not
+# recurse into debian/rules anyway).  In compat 9+, we never inline an
+# existing rules target.
+my ($rules_targets, $full_sequence) = unpack_sequence(\%Debian::Debhelper::DH::SequenceState::sequences,
+														$sequence,
+														(!compat(8) ? 0 : 1),
+														$completed_sequences,
+														$sequence_unpack_flags,
+														);
+check_for_obsolete_commands($full_sequence);
+
+%startpoint = compute_starting_point_in_sequences(\@packages, $full_sequence, \%logged);
+
+for my $rules_command (@{$rules_targets}) {
+	my $rules_target = extract_rules_target_name($rules_command)
+		// error("Internal error: $rules_command was not a rules target!?");
+	# Don't pass DH_ environment variables, since this is
+	# a fresh invocation of debian/rules and any sub-dh commands.
+	delete($ENV{DH_INTERNAL_OPTIONS});
+	delete($ENV{DH_INTERNAL_OVERRIDE});
+	run_sequence_command_and_exit_on_failure("debian/rules", $rules_target);
+	my $override_packages = $sequence2packages{$rules_target} // \@packages;
+	for my $package (@{$override_packages}) {
+		my (undef, $seq) = unpack_sequence(\%Debian::Debhelper::DH::SequenceState::sequences, $rules_target, 1);
+		COMMAND: for my $c (reverse(@{$seq})) {
+			for my $j (0 .. $#{$full_sequence}) {
+				if ($c eq $full_sequence->[$j]) {
+					# Unfortunately, we do not guarantee any order
+					# between the run targets.  Assuming e.g.
+					# "install-arch" and "build" are opaque targets
+					# then we could process "install-arch" first and
+					# then "build".  In this case, it is important
+					# that we do not "reset" the starting point for
+					# "arch" packages.  Otherwise, we might repeat
+					# part of the "install-arch" sequence when we
+					# should not.
+					$startpoint{$package} = $j + 1 if $j + 1 > $startpoint{$package};
+					last COMMAND;
+				}
+			}
+		}
+	}
+}
+
+run_through_command_sequence($full_sequence, \%startpoint, \%logged,
+	\@Debian::Debhelper::DH::SequenceState::options,
+	\@packages, \@arch_packages, \@indep_packages);
+
+
+sub _check_for_completed_sequences {
+	my ($sequence2packages) = @_;
+	my (%completed, %stamp_file_content);
+	if ( -f BUILD_STAMP_FILE and not compat(9)) {
+		open(my $fd, '<', BUILD_STAMP_FILE) or error("open(${\BUILD_STAMP_FILE}, ro) failed: $!");
+		while (my $line = <$fd>) {
+			chomp($line);
+			$stamp_file_content{$line} = 1;
+		}
+		close($fd);
+		my $build_indep_target_done = 1;
+		my $build_arch_target_done = 1;
+		for my $pkg (@{$sequence2packages->{'build-arch'}}) {
+			if (not $stamp_file_content{$pkg}) {
+				$build_arch_target_done = 0;
+				last;
+			}
+		}
+		for my $pkg (@{$sequence2packages->{'build-indep'}}) {
+			if (not $stamp_file_content{$pkg}) {
+				$build_indep_target_done = 0;
+				last;
+			}
+		}
+		$completed{'build-arch'} = 1 if $build_arch_target_done;
+		$completed{'build-indep'} = 1 if $build_indep_target_done;
+		$completed{'build'} = 1 if $build_indep_target_done and $build_arch_target_done;
+	}
+	return \%completed;
+}
+
+
+sub reject_obsolete_params {
+	foreach my $deprecated ('until', 'after', 'before', 'remaining') {
+		if (defined $dh{uc $deprecated}) {
+			error("The --$deprecated option is not supported any longer (#932537). Use override targets instead.");
+		}
+	}
+}
+
+sub _hoist_profile_into_dbo {
+	my ($name) = @_;
+	if (is_build_profile_active($name) && !get_buildoption($name)) {
+		$ENV{'DEB_BUILD_OPTIONS'} //= '';
+		$ENV{'DEB_BUILD_OPTIONS'} .= ' ' . $name;
+		warning("Copying ${name} into DEB_BUILD_OPTIONS: It was in DEB_BUILD_PROFILES but not in DEB_BUILD_OPTIONS");
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

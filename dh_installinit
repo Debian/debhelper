@@ -1,0 +1,427 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_installinit - install service init files into package build directories
+
+=cut
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+use File::Find;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_installinit> [S<I<debhelper options>>] [B<--name=>I<name>] [B<-n>] [B<-R>] [B<-r>] [B<-d>] [S<B<--> I<params>>]
+
+=head1 DESCRIPTION
+
+B<dh_installinit> is a debhelper program that is responsible for
+installing init scripts with associated defaults files.  In
+compatibility levels up to and including 10, B<dh_installinit> will
+also install some systemd related files provided by the debian
+packaging (see the L</FILES> section below).  In compatibility levels
+up to and including 11, B<dh_installinit> will also handle upstart
+jobs provided in the debian packaging (see the L</FILES> for more
+information on this as well).
+
+It also automatically generates the F<postinst> and F<postrm> and F<prerm>
+commands needed to set up the symlinks in F</etc/rc*.d/> to start and stop
+the init scripts.
+
+In compat 10 or earlier: If a package only ships a systemd service
+file and no sysvinit script is provided, you may want to exclude the
+call to dh_installinit for that package (e.g. via B<-N>).  Otherwise,
+you may get warnings from lintian about init.d scripts not being
+included in the package.
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.init
+
+If this exists, it is installed into etc/init.d/I<package> in the package
+build directory.
+
+=item debian/I<package>.default
+
+If this exists, it is installed into etc/default/I<package> in the package
+build directory.
+
+=item debian/I<package>.upstart
+
+In compatibility level 11, this file will trigger an error with a reminder
+about ensuring the proper removal of the upstart file in the previous package
+version.  Please consider using the "rm_conffile" feature from
+L<dh_installdeb(1)> to ensure the proper removal of previous upstart files.
+
+In compatibility level 10, if this file exists, it is installed into
+etc/init/I<package>.conf in the package build directory.
+
+=item debian/I<package>.service
+
+If this exists, it is installed into F<< lib/systemd/system/I<package>.service >> in
+the package build directory. Only used in compat levels 10 and below.
+
+=item debian/I<package>.tmpfile
+
+If this exists, it is installed into usr/lib/tmpfiles.d/I<package>.conf in the
+package build directory. Only used in compat levels 10 and below.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-n>, B<--no-scripts>
+
+Do not modify F<postinst>/F<postrm>/F<prerm> scripts.
+
+=item B<-o>, B<--only-scripts>
+
+Only modify F<postinst>/F<postrm>/F<prerm> scripts, do not actually install
+any init script, default files, upstart job or systemd service file. May be
+useful if the file is shipped and/or installed by upstream in a way that
+doesn't make it easy to let B<dh_installinit> find it.
+
+B<Caveat>: This will bypass all the regular checks and
+I<unconditionally> modify the scripts.  You will almost certainly want
+to use this with B<-p> to limit, which packages are affected by the
+call.  Example:
+
+ override_dh_installinit:
+	dh_installinit -pfoo --only-scripts
+	dh_installinit --remaining
+
+=item B<-R>, B<--restart-after-upgrade>
+
+Do not stop the init script until after the package upgrade has been
+completed.  This is the default behaviour in compat 10.
+
+In early compat levels, the default was to stop the script in the
+F<prerm>, and starts it again in the F<postinst>.
+
+This can be useful for daemons that should not have a possibly long
+downtime during upgrade. But you should make sure that the daemon will not
+get confused by the package being upgraded while it's running before using
+this option.
+
+=item B<--no-restart-after-upgrade>
+
+Undo a previous B<--restart-after-upgrade> (or the default of compat
+10).  If no other options are given, this will cause the service to be
+stopped in the F<prerm> script and started again in the F<postinst>
+script.
+
+=item B<-r>, B<--no-stop-on-upgrade>, B<--no-restart-on-upgrade>
+
+Do not stop init script on upgrade.  This has the side-effect of not
+restarting the service as a part of the upgrade.
+
+If you want to restart the service with minimal downtime, please use
+B<--restart-after-upgrade> (default in compat 10 or later).  If you want
+the service to be restarted but be stopped during the upgrade, then please
+use B<--no-restart-after-upgrade> (note the "after-upgrade").
+
+Note that the B<--no-restart-on-upgrade> alias is deprecated and will
+be removed in compat 12.  This is to avoid confusion with the
+B<--no-restart-after-upgrade> option.  The B<--no-stop-on-upgrade>
+variant was introduced in debhelper 10.2 (included in Debian stretch).
+
+=item B<--no-start>
+
+Do not start the init script on install or upgrade, or stop it on removal.
+Only call B<update-rc.d>. Useful for rcS scripts.
+
+=item B<--no-enable>
+
+Disable the init script on purge, but do not enable them on install.
+This implies a versioned dependency on B<< init-system-helpers (E<gt>=
+1.51) >> as it is the first (functional) version that supports
+B<< update-rc.d E<lt>scriptE<gt> defaults-disabled >>.
+
+B<Note> that this option does not affect whether the services are
+started.  Please remember to also use B<--no-start> if the service
+should not be started.
+
+Cannot be combined with B<-u>I<params>,
+B<--update-rcd-params=>I<params>, or B<--> I<params>.
+
+=item B<-d>, B<--remove-d>
+
+Remove trailing B<d> from the name of the package, and use the result for the
+filename the upstart job file is installed as in F<etc/init/> , and for the
+filename the init script is installed as in etc/init.d and the default file
+is installed as in F<etc/default/>. This may be useful for daemons with names
+ending in B<d>. (Note: this takes precedence over the B<--init-script> parameter
+described below.)
+
+=item B<-u>I<params> B<--update-rcd-params=>I<params>
+
+=item B<--> I<params>
+
+Pass I<params> to L<update-rc.d(8)>. If not specified, B<defaults> (or
+B<defaults-disabled> with B<--no-enable>) will be passed to
+L<update-rc.d(8)>.
+
+Cannot be combined with B<--no-enable>.
+
+=item B<--name=>I<name>
+
+Install the init script (and default file) as well as upstart job file
+using the filename I<name> instead of the default filename, which is
+the package name. When this parameter is used, B<dh_installinit> looks
+for and installs files named F<debian/package.name.init>,
+F<debian/package.name.default> and F<debian/package.name.upstart>
+instead of the usual F<debian/package.init>, F<debian/package.default> and
+F<debian/package.upstart>.
+
+=item B<--init-script=>I<scriptname>
+
+Use I<scriptname> as the filename the init script is installed as in
+F<etc/init.d/> (and also use it as the filename for the defaults file, if it
+is installed). If you use this parameter, B<dh_installinit> will look to see
+if a file in the F<debian/> directory exists that looks like
+F<package.scriptname> and if so will install it as the init script in
+preference to the files it normally installs.
+
+This parameter is deprecated, use the B<--name> parameter instead. This
+parameter is incompatible with the use of upstart jobs.
+
+=item B<--error-handler=>I<function>
+
+Call the named shell I<function> if running the init script fails. The
+function should be provided in the F<prerm> and F<postinst> scripts, before the
+B<#DEBHELPER#> token.
+
+=back
+
+=head1 NOTES
+
+Note that this command is not idempotent. L<dh_prep(1)> should be called
+between invocations of this command. Otherwise, it may cause multiple
+instances of the same text to be added to maintainer scripts.
+
+=cut
+
+$dh{RESTART_AFTER_UPGRADE} = '';
+$dh{NO_START} = '';
+
+init(options => {
+	"r" => \$dh{R_FLAG},
+	'no-stop-on-upgrade' => \$dh{R_FLAG},
+	"no-restart-on-upgrade" => sub {
+		$dh{R_FLAG} = 1;
+		deprecated_functionality("--no-restart-on-upgrade has been renamed to --no-stop-on-upgrade",
+								 12);
+	},
+	"no-start" => \$dh{NO_START},
+	"R|restart-after-upgrade!" => \$dh{RESTART_AFTER_UPGRADE},
+	"init-script=s" => \$dh{INIT_SCRIPT},
+	"update-rcd-params=s", => \$dh{U_PARAMS},
+	"remove-d" => \$dh{D_FLAG},
+	"no-enable" => \$dh{NO_ENABLE},
+});
+
+if ($dh{RESTART_AFTER_UPGRADE} eq '') {
+	$dh{RESTART_AFTER_UPGRADE} = 1 if not defined($dh{R_FLAG}) and $dh{NO_START} eq '';
+}
+
+# PROMISE: DH NOOP WITHOUT service tmpfile default upstart init init.d tmp(usr/lib/tmpfiles.d) tmp(etc/tmpfiles.d) cli-options(--init-script|-d|--remove-d|-o|--only-scripts)
+
+my %snippet_options = ('snippet-order' => 'service');
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+
+	# Figure out what filename to install it as.
+	my $script;
+	my $scriptsrc;
+	my $jobfile=$package;
+	if (defined $dh{NAME}) {
+		$jobfile=$script=$scriptsrc=$dh{NAME};
+	}
+	elsif ($dh{D_FLAG}) {
+		# -d on the command line sets D_FLAG. We will 
+		# remove a trailing 'd' from the package name and 
+		# use that as the name.
+		$script=$package;
+		if ($script=~m/(.*)d$/) {
+			$jobfile=$script=$1;
+		}
+		else {
+			warning("\"$package\" has no final d' in its name, but -d was specified.");
+		}
+		$scriptsrc=$script;
+	}       
+	elsif ($dh{INIT_SCRIPT}) {
+		$script=$dh{INIT_SCRIPT};
+		$scriptsrc=$script;
+	}
+	else {
+		$script=$package;
+		if (compat(9)) {
+			$scriptsrc=$script;
+		}
+		else {
+			$scriptsrc="init";
+		}
+	}       
+
+	my $service='';
+	$service=pkgfile($package,"service") if compat(10);
+	if ($service ne '' && ! $dh{ONLYSCRIPTS}) {
+		my $path="$tmp/lib/systemd/system";
+		install_dir($path);
+		install_file($service, "$path/$script.service");
+	}
+
+	my $tmpfile='';
+	$tmpfile=pkgfile($package,"tmpfile") if compat(10);
+	if ($tmpfile ne '' && ! $dh{ONLYSCRIPTS}) {
+		my $path="$tmp/usr/lib/tmpfiles.d";
+		install_dir($path);
+		install_file($tmpfile, "$path/$script.conf");
+	}
+
+	my $job=pkgfile($package,"upstart");
+	if ($job ne '' and not compat(11)) {
+		isnative($package); # For the side-effect of setting $dh{VERSION}
+		warning("Detected an upstart file; these are no longer supported by dh_installinit in compat 11");
+		warning("Please ensure a proper removal by adding a \"rm_conffile\" line in debian/<pkg>.maintscript");
+		warning("Example maintscript line:");
+		warning("     rm_conffile /etc/init/${jobfile}.conf $dh{VERSION}");
+		warning("(Note: the example is a best-effort guess and it is not always correct! Please verify before use)");
+		warning("see \"man dh_installdeb\" for more information about the maintscript file");
+		warning("");
+		error("upstart jobs are no longer supported!  Please remove $job and check if you need to add a conffile removal");
+	}
+	if ($job ne '' && ! $dh{ONLYSCRIPTS}) {
+		install_dir("$tmp/etc/init");
+		install_file($job, "$tmp/etc/init/$jobfile.conf");
+	}
+
+	my $default=pkgfile($package,'default');
+	if ($default ne '' && ! $dh{ONLYSCRIPTS}) {
+		install_dir("$tmp/etc/default");
+		install_file($default, "$tmp/etc/default/$script");
+	}
+
+	my $init=pkgfile($package,$scriptsrc) || pkgfile($package,"init") ||
+		pkgfile($package,"init.d");
+
+	if ($init ne '' && ! $dh{ONLYSCRIPTS}) {
+		install_dir("$tmp/etc/init.d");
+		install_prog($init,"$tmp/etc/init.d/$script");
+	}
+
+	if ($dh{INIT_SCRIPT} && $job ne '' && $init ne '') {
+		error("Can't use --init-script with an upstart job");
+	}
+
+	if (compat(10) && !$dh{NOSCRIPTS}) {
+		# Include postinst-init-tmpfiles if the package ships any files
+		# in /usr/lib/tmpfiles.d or /etc/tmpfiles.d
+		my @tmpfiles;
+		find({
+			wanted => sub {
+				my $name = $File::Find::name;
+				return unless -f $name;
+				$name =~ s/^\Q$tmp\E//g;
+				if ($name =~ m,^/usr/lib/tmpfiles\.d/, ||
+					$name =~ m,^/etc/tmpfiles\.d/,) {
+					push(@tmpfiles, basename($name));
+				}
+			},
+			no_chdir => 1,
+		}, $tmp);
+		if (@tmpfiles > 0) {
+			# Not migrated to hashref based autoscripts.  This will
+			# happen as people migrate to dh_installsystemd.
+			autoscript($package,"postinst", "postinst-init-tmpfiles",
+				"s,#TMPFILES#," . join(" ", sort @tmpfiles).",g");
+		}
+	}
+
+	if ($service ne '' || $job ne '' || $init ne '' || $dh{ONLYSCRIPTS}) {
+		# This is set by the -u "foo" command line switch, it's
+		# the parameters to pass to update-rc.d. If not set,
+		# we have to say "defaults".
+		my $params = 'defaults';
+		my $update_rcd_params = compat(11) ? '' : '--skip-systemd-native ';
+		if ($dh{NO_ENABLE}) {
+			$params = 'defaults-disabled';
+			addsubstvar($package, "misc:Depends", "init-system-helpers (>= 1.51)");
+		}
+
+		if (defined($dh{U_PARAMS}) and @{$dh{U_PARAMS}}) {
+			error("--no-enable and -- params/-u/--update-rcd-params/ are mutually exclusive") if $dh{NO_ENABLE};
+			$params=join(' ',@{$dh{U_PARAMS}});
+		}	
+		
+		if (! $dh{NOSCRIPTS}) {
+			my $replace = {
+				'SCRIPT' => $script,
+				'INITPARMS' => $params,
+				'ERROR_HANDLER' => $dh{ERROR_HANDLER},
+				'INVOKE_RCD_PARAMS' => $update_rcd_params,
+			};
+			autoscript($package, 'preinst', 'preinst-init-chmod', $replace, \%snippet_options);
+
+			if (! $dh{NO_START}) {
+				if ($dh{RESTART_AFTER_UPGRADE}) {
+					# update-rc.d, and restart (or
+					# start if new install) script
+					autoscript($package, 'postinst', 'postinst-init-restart', $replace, \%snippet_options);
+				}
+				else {
+					# update-rc.d, and start script
+					autoscript($package, 'postinst', 'postinst-init', $replace, \%snippet_options);
+				}
+
+				autoscript($package, 'preinst', 'preinst-init-stop', $replace, \%snippet_options)
+					unless ($dh{R_FLAG} || $dh{RESTART_AFTER_UPGRADE});
+
+				# stops script only on remove
+				autoscript($package, 'prerm', 'prerm-init-norestart', $replace, \%snippet_options);
+
+				# The --skip-systemd-native option requires
+				# init-system-helpers (>= 1.54) and since we need it
+				# from prerm we need init-system-helpers to have been
+				# unpacked before the package is being unpacked.
+				addsubstvar($package, 'misc:Pre-Depends', 'init-system-helpers (>= 1.54~)')
+					if $update_rcd_params !~ m/^\s*$/;
+			}
+			else {
+				# just update-rc.d
+				autoscript($package,"postinst", "postinst-init-nostart", $replace, \%snippet_options);
+			}
+
+			# removes rc.d links
+			autoscript($package,"postrm","postrm-init",
+				{ 'SCRIPT' => $script, 'ERROR_HANDLER' => $dh{ERROR_HANDLER} },
+				\%snippet_options);
+		}
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>, L<dh_installsystemd(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHORS
+
+Joey Hess <joeyh@debian.org>
+
+Steve Langasek <steve.langasek@canonical.com>
+
+Michael Stapelberg <stapelberg@debian.org>
+
+=cut

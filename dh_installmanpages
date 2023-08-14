@@ -1,0 +1,208 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_installmanpages - old-style man page installer (deprecated)
+
+=cut
+
+use strict;
+use warnings;
+use File::Find;
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_installmanpages> [S<I<debhelper options>>] [S<I<file> ...>]
+
+=head1 DESCRIPTION
+
+B<dh_installmanpages> is a debhelper program that is responsible for
+automatically installing man pages into F<usr/share/man/>
+in package build directories.
+
+This is a DWIM-style program, with an interface unlike the rest of
+debhelper. It is deprecated, and you are encouraged to use
+L<dh_installman(1)> instead.
+
+B<dh_installmanpages> scans the current directory and all subdirectories for
+filenames that look like man pages. (Note that only real files are looked
+at; symlinks are ignored.) It uses L<file(1)> to verify that the files are
+in the correct format. Then, based on the files' extensions, it installs 
+them into the correct man directory.
+
+All filenames specified as parameters will be skipped by B<dh_installmanpages>.
+This is useful if by default it installs some man pages that you do not
+want to be installed.
+
+After the man page installation step, B<dh_installmanpages> will check to see
+if any of the man pages are F<.so> links. If so, it changes them to symlinks.
+
+=head1 OPTIONS
+
+=over 4
+
+=item I<file> ...
+
+Do not install these files as man pages, even if they look like valid man
+pages.
+
+=back
+
+=head1 BUGS
+
+B<dh_installmanpages> will install the man pages it finds into B<all> packages
+you tell it to act on, since it can't tell what package the man
+pages belong in. This is almost never what you really want (use B<-p> to work
+around this, or use the much better L<dh_installman(1)> program instead).
+
+Files ending in F<.man> will be ignored.
+
+Files specified as parameters that contain spaces in their filenames will
+not be processed properly.
+
+=cut
+
+warning("This program is deprecated, switch to dh_installman.");
+
+init();
+
+# Check if a file is a man page, for use by File::Find.
+my @manpages;
+my @allpackages;
+sub find_man {
+	# Does its filename look like a man page?
+	# .ex files are examples installed by deb-make,
+	# we don't want those, or .in files, which are
+	# from configure, nor do we want CVS .#* files.
+	if (! (-f $_ && /^.*\.[1-9].*$/ && ! /\.(ex|in)$/ && ! /^\.#/)) {
+		return;
+	}
+	
+	# It's not in a tmp directory is it?
+	if ($File::Find::dir=~m:debian/.*tmp.*:) {
+		return;
+	}
+	foreach my $dir (@allpackages) {
+		if ($File::Find::dir=~m:debian/\Q$dir\E:) {
+			return;
+		}
+	}
+	
+	# And file does think it's a real man page?
+	my $type=`file -z $_`;
+	if ($type !~ m/:.*roff/) {
+		return;
+	}
+
+	# Good enough.
+	push @manpages,"$File::Find::dir/$_";
+}
+
+# Check if a file is a .so man page, for use by File::Find.
+my @sofiles;
+my @sodests;
+sub find_so_man {
+	# The -s test is because a .so file tends to be small. We don't want
+	# to open every man page. 1024 is arbitrary.
+	if (! -f $_ || -s $_ > 1024) {
+		return;
+	}
+
+	# Test first line of file for the .so thing.
+	open(my $fd, '<', $_);
+	my $l = <$fd>;
+	close($fd);
+	if ($l=~m/\.so\s+(.*)/) {
+		my $solink=$1;
+		# This test is here to prevent links like ... man8/../man8/foo.8
+		if (basename($File::Find::dir) eq
+		    dirname($solink)) {
+			$solink=basename($solink);
+		}
+		else {
+			$solink="../$solink";
+		}
+	
+		push @sofiles,"$File::Find::dir/$_";
+		push @sodests,$solink;
+	}
+}
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	next if is_udeb($package);
+
+	my $tmp=tmpdir($package);
+
+	# Find all filenames that look like man pages.
+	@manpages=();
+	@allpackages=getpackages() if not @allpackages;
+	find(\&find_man,'.'); # populates @manpages
+	
+	foreach my $page (@manpages) {
+		$page=~s:^\./::; # just for looks
+		
+		my $basename=basename($page);
+		
+		# Skip all files listed on command line.
+		my $install=1;
+		foreach my $skip (@ARGV) {
+			# Look at basename of what's on connect line
+			# for backwards compatibility.
+			if ($basename eq basename($skip)) {
+				$install=undef;
+				last;
+			}
+		}
+		
+		if ($install) {
+			my $extdir="share";
+			
+			my ($section)=$basename=~m/\.([1-9])/;
+			
+			my $destdir="$tmp/usr/$extdir/man/man$section/";
+			
+			# Handle translated man pages.
+			my $instname=$basename;
+			my ($langcode)=$basename=~m/\.([a-z][a-z])\.([1-9])/;
+			if (defined $langcode && $langcode ne '') {
+				$destdir="$tmp/usr/$extdir/man/$langcode/man$section/";
+				$instname=~s/\.$langcode\./\./;
+			}
+
+			$destdir=~tr:/:/:s; # just for looks
+
+			if (! -e "$destdir/$basename" && !-l "$destdir/$basename") {
+				install_dir($destdir);
+				install_file($page,$destdir.$instname);
+			}
+		}
+	}
+
+	# Now the .so conversion.
+	@sofiles=@sodests=();
+	foreach my $dir (qw{usr/share/man}) {
+		if (-e "$tmp/$dir") {
+			find(\&find_so_man, "$tmp/$dir");
+		}
+	}
+	foreach my $sofile (@sofiles) {
+		my $sodest=shift(@sodests);
+		doit "rm","-f",$sofile;
+		doit "ln","-sf",$sodest,$sofile;
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

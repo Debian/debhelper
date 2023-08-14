@@ -1,0 +1,84 @@
+#!/usr/bin/perl
+
+# Emulate autoconf behaviour and do some checks
+
+use strict;
+use warnings;
+
+my @OPTIONS=qw(
+   ^--build=.*$
+   ^--prefix=/usr$
+   ^--includedir=\$\{prefix\}/include$
+   ^--mandir=\$\{prefix\}/share/man$
+   ^--infodir=\$\{prefix\}/share/info$
+   ^--sysconfdir=/etc$
+   ^--localstatedir=/var$
+   ^--libdir=\$\{prefix\}/lib/.*$
+   ^--disable-option-checking$
+   ^--disable-silent-rules$
+   ^--disable-maintainer-mode$
+   ^--disable-dependency-tracking$
+);
+
+# Not always passed (e.g. --libexecdir is skipped in compat 12)
+my @OPTIONAL_ARGUMENTS = qw(
+   ^--libexecdir=\$\{prefix\}/lib/.*$
+);
+
+# Verify if all command line arguments were passed
+my @options = map { { regex => qr/$_/,
+                      str => $_,
+                      found => 0 } } @OPTIONS;
+push(@options, map { { regex => qr/$_/,
+                      str => $_,
+                      found => 1 } } @OPTIONAL_ARGUMENTS);
+my @extra_args;
+ARGV_LOOP: foreach my $arg (@ARGV) {
+	foreach my $opt (@options) {
+		if ($arg =~ $opt->{regex}) {
+			$opt->{found} = 1;
+			next ARGV_LOOP;
+		}
+	}
+	# Extra / unrecognized argument
+	push @extra_args, $arg;
+}
+
+my @notfound = grep { ! $_->{found} and $_ } @options;
+if (@notfound) {
+	print STDERR "Error: the following default options were NOT passed\n";
+	print STDERR "  ", $_->{str}, "\n" foreach (@notfound);
+	exit 1;
+}
+
+# Create a simple Makefile
+open(MAKEFILE, ">", "Makefile");
+print MAKEFILE <<EOF;
+CONFIGURE := $0
+all: stamp_configure \$(CONFIGURE)
+	\@echo Package built > stamp_build
+
+# Tests if dh_auto_test executes 'check' target if 'test' does not exist
+check: \$(CONFIGURE) stamp_build
+	\@echo VERBOSE=\$(VERBOSE) > stamp_test
+
+install: stamp_build
+	\@echo DESTDIR=\$(DESTDIR) > stamp_install
+
+# Tests whether dh_auto_clean executes distclean but does not touch
+# this target
+clean:
+	echo "This should not have been executed" >&2 && exit 1
+
+distclean:
+	\@rm -f stamp_* Makefile
+
+.PHONY: all check install clean distclean
+EOF
+close MAKEFILE;
+
+open(STAMP, ">", "stamp_configure");
+print STAMP $_, "\n" foreach (@extra_args);
+close STAMP;
+
+exit 0;

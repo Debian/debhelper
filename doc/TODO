@@ -1,0 +1,21 @@
+v10:
+
+* escaping in config files (for whitespace)?
+
+Deprecated:
+
+* dh_installmanpages.
+* dh_movefiles. I won't hold my breath. Have not added deprecation
+  docs or message yet.
+* dh_installinit --init-script (make it warn)
+* dh_clean -k
+* -s flag, not formally deprecated yet; remove eventually
+* -u flag; add a warning on use and remove eventually
+* delsubstvar() and the last parameter to addsubstvar that makes it remove
+  a string are not used in debhelper itself, but have been left in the
+  library in case other things use them. Deprecate and remove.
+* debian/compress files
+
+Also, grep the entire archive for all dh_* command lines,
+and check to see what other switches are not being used, and maybe remove
+some of them. 

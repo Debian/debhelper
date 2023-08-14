@@ -1,0 +1,5 @@
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
+	if [ -x "/etc/init.d/#SCRIPT#" ]; then
+		update-rc.d #SCRIPT# #INITPARMS# >/dev/null || #ERROR_HANDLER#
+	fi
+fi

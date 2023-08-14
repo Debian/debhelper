@@ -1,0 +1,17 @@
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
+	if [ -z "${DPKG_ROOT:-}" ]; then
+		if deb-systemd-helper --user debian-installed #UNITFILE# ; then
+			# The following line should be removed in trixie or trixie+1
+			deb-systemd-helper --user unmask #UNITFILE# >/dev/null || true
+
+			if deb-systemd-helper --quiet --user was-enabled #UNITFILE# ; then
+				# Create new symlinks, if any.
+				deb-systemd-helper --user enable #UNITFILE# >/dev/null || true
+			fi
+		fi
+
+		# Update the statefile to add new symlinks (if any), which need to be cleaned
+		# up on purge. Also remove old symlinks.
+		deb-systemd-helper --user update-state #UNITFILE# >/dev/null || true
+	fi
+fi

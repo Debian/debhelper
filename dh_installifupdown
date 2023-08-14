@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_installifupdown - install if-up and if-down hooks
+
+=cut
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_installifupdown> [S<I<debhelper options>>] [B<--name=>I<name>]
+
+=head1 DESCRIPTION
+
+B<dh_installifupdown> is a debhelper program that is responsible for installing
+F<if-up>, F<if-down>, F<if-pre-up>, and F<if-post-down> hook scripts into package build
+directories.
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.if-up
+
+=item debian/I<package>.if-down
+
+=item debian/I<package>.if-pre-up
+
+=item debian/I<package>.if-post-down
+
+These files are installed into etc/network/if-*.d/I<package> in
+the package build directory.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--name=>I<name>
+
+Look for files named F<debian/package.name.if-*> and install them as
+F<etc/network/if-*/name>, instead of using the usual files and installing them
+as the package name.
+
+=back
+
+=cut
+
+init();
+
+# PROMISE: DH NOOP WITHOUT if-pre-up if-up if-down if-post-down cli-options()
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+
+	foreach my $script (qw(pre-up up down post-down)) {
+		my $file=pkgfile($package, "if-$script");
+		if ($file ne '') {
+			install_dir("$tmp/etc/network/if-$script.d");
+			install_prog($file,"$tmp/etc/network/if-$script.d/".pkgfilename($package));
+		}
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

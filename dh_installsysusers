@@ -1,0 +1,115 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dh_installsysusers - install and integrates systemd sysusers files
+
+=cut
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_installsysusers> [S<I<debhelper options>>]
+
+=head1 DESCRIPTION
+
+B<dh_installsysusers> is a debhelper program that is responsible for
+installing package maintainer supplied systemd sysusers files.
+
+It also finds the systemd sysusers files installed in a package and
+generates relevant integration snippets for enabling the users on
+installation.  These snippets are added to the package by
+L<dh_installdeb(1)>.
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.sysusers
+
+If the file exist, it will be installed as
+F<< /usr/lib/sysusers.d/I<package>.conf >>.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--name=>I<name>
+
+When this parameter is used, B<dh_installsysusers> looks for and
+installs files named debian/I<package>.I<name>.sysusers instead
+of the usual debian/I<package>.sysusers.
+
+Furthermore, the file is installed as F<< /usr/lib/sysusers.d/I<name>.conf >>
+rather than F<< /usr/lib/sysusers.d/I<package>.conf >>.
+
+=back
+
+=head1 NOTES
+
+This command is not idempotent. L<dh_prep(1)> should be called between
+invocations of this command (with the same arguments). Otherwise, it
+may cause multiple instances of the same text to be added to
+maintainer scripts.
+
+=cut
+
+init();
+
+
+# PROMISE: DH NOOP WITHOUT pkgfile(sysusers) tmp(usr/lib/sysusers.d) cli-options()
+
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmpdir = tmpdir($package);
+	my $sysusers = pkgfile($package,"sysusers");
+	my $sysusers_targetdir = "${tmpdir}/usr/lib/sysusers.d";
+	my $target = $dh{NAME} // $package;
+	my $typoed_name = pkgfile($package, "sysuser");
+
+	if ($sysusers eq '' and $typoed_name ne '') {
+		# Warn people in case they typo this as much as I did.
+		my $correct_name = $typoed_name;
+		$correct_name =~ s{^(?:.*[./])\Ksysuser}{sysusers};
+		warning("Possible typo in ${typoed_name} (expected ${correct_name}): File has been ignored");
+	}
+
+	if ($sysusers ne '') {
+		install_dir($sysusers_targetdir);
+		install_file($sysusers, "${sysusers_targetdir}/${target}.conf");
+	}
+
+	if (! $dh{NOSCRIPTS} && ($sysusers ne '' || -d $sysusers_targetdir)) {
+		my @sysusers_files;
+		opendir(my $dir_fd, $sysusers_targetdir) or error("opendir(${sysusers_targetdir}) failed: $!");
+		while (defined(my $entry = readdir($dir_fd))) {
+			next if $entry eq '.' or $entry eq '..' or $entry !~ m{[.]conf$};
+			push @sysusers_files, $entry;
+		}
+		closedir($dir_fd);
+
+		next if @sysusers_files == 0;
+
+		# Sort list of files so postinst content doesn't change if readdir's output is not stable
+		@sysusers_files = sort @sysusers_files;
+		# Generate a single systemd-sysusers invocation and just pass all detected files together
+		autoscript($package, 'postinst', 'postinst-sysusers', { 'CONFILE_BASENAME' => "@sysusers_files" });
+		addsubstvar($package, "misc:Depends", "systemd | systemd-standalone-sysusers | systemd-sysusers");
+	}
+
+}
+
+
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+=cut

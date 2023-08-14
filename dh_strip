@@ -1,0 +1,445 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_strip - strip executables, shared libraries, and some static libraries
+
+=cut
+
+use strict;
+use warnings;
+use File::Find;
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_strip> [S<I<debhelper options>>] [B<-X>I<item>] [B<--dbg-package=>I<package>] [B<--keep-debug>]
+
+=head1 DESCRIPTION
+
+B<dh_strip> is a debhelper program that is responsible for stripping
+out debug symbols in executables, shared libraries, and static
+libraries that are not needed during execution.
+
+This program examines your package build directories and works out what
+to strip on its own. It uses L<file(1)> and file permissions and filenames
+to figure out what files are shared libraries (F<*.so>), executable binaries,
+and static (F<lib*.a>) and debugging libraries (F<lib*_g.a>, F<debug/*.so>), and
+strips each as much as is possible. (Which is not at all for debugging
+libraries.) In general it seems to make very good guesses, and will do the
+right thing in almost all cases.
+
+Since it is very hard to automatically guess if a file is a
+module, and hard to determine how to strip a module, B<dh_strip> does not
+currently deal with stripping binary modules such as F<.o> files.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-X>I<item>, B<--exclude=>I<item>
+
+Exclude files that contain I<item> anywhere in their filename from being
+stripped. You may use this option multiple times to build up a list of
+things to exclude.
+
+=item B<--dbg-package=>I<package>
+
+B<This option is a now special purpose option that you normally do not
+need>.  In most cases, there should be little reason to use this
+option for new source packages as debhelper automatically generates
+debug packages ("dbgsym packages").  B<If you have a manual
+--dbg-package> that you want to replace with an automatically
+generated debug symbol package, please see the B<--dbgsym-migration>
+option.
+
+Causes B<dh_strip> to save debug symbols stripped from the packages it acts on
+as independent files in the package build directory of the specified debugging
+package.
+
+For example, if your packages are libfoo and foo and you want to include a
+I<foo-dbg> package with debugging symbols, use B<dh_strip --dbg-package=>I<foo-dbg>.
+
+This option implies B<--no-automatic-dbgsym> and I<cannot> be used
+with B<--automatic-dbgsym> or B<--dbgsym-migration>.
+
+=item B<-k>, B<--keep-debug>
+
+B<This option is a now special purpose option that you normally do not
+need>.  In most cases, there should be little reason to use this
+option for new source packages as debhelper automatically generates
+debug packages ("dbgsym packages").  B<If you have a manual
+--dbg-package> that you want to replace with an automatically
+generated debug symbol package, please see the B<--dbgsym-migration>
+option.
+
+Debug symbols will be retained, but split into an independent
+file in F<usr/lib/debug/> in the package build directory. B<--dbg-package>
+is easier to use than this option, but this option is more flexible.
+
+This option implies B<--no-automatic-dbgsym> and I<cannot> be used
+with B<--automatic-dbgsym>.
+
+=item B<--dbgsym-migration=>I<package-relation>
+
+This option is used to migrate from a manual "-dbg" package (created
+with B<--dbg-package>) to an automatic generated debug symbol
+package. This option should describe a valid B<Replaces>- and
+B<Breaks>-relation, which will be added to the debug symbol package to
+avoid file conflicts with the (now obsolete) -dbg package.
+
+This option implies B<--automatic-dbgsym> and I<cannot> be used with
+B<--keep-debug>, B<--dbg-package> or B<--no-automatic-dbgsym>.
+
+Examples:
+
+  dh_strip --dbgsym-migration='libfoo-dbg (<< 2.1-3~)'
+
+  dh_strip --dbgsym-migration='libfoo-tools-dbg (<< 2.1-3~), libfoo2-dbg (<< 2.1-3~)'
+
+=item B<--automatic-dbgsym>, B<--no-automatic-dbgsym>
+
+Control whether B<dh_strip> should be creating debug symbol packages
+when possible.
+
+The default is to create debug symbol packages.
+
+=item B<--ddebs>, B<--no-ddebs>
+
+Historical name for B<--automatic-dbgsym> and B<--no-automatic-dbgsym>.
+
+=item B<--ddeb-migration=>I<package-relation>
+
+Historical name for B<--dbgsym-migration>.
+
+=back
+
+=head1 NOTES
+
+If the B<DEB_BUILD_OPTIONS> environment variable contains B<nostrip>,
+nothing will be stripped, in accordance with Debian policy (section
+10.1 "Binaries").  This will also inhibit the automatic creation of
+debug symbol packages.
+
+The automatic creation of debug symbol packages can also be prevented
+by adding B<noautodbgsym> to the B<DEB_BUILD_OPTIONS> environment
+variable.  However, B<dh_strip> will still add debuglinks to ELF
+binaries when this flag is set.  This is to ensure that the regular
+deb package will be identical with and without this flag (assuming it
+is otherwise "bit-for-bit" reproducible).
+
+=head1 CONFORMS TO
+
+Debian policy, version 3.0.1
+
+=cut
+
+init(options => {
+	'keep-debug|keep|k'  => \$dh{K_FLAG},
+	'dbgsym-migration=s' => \$dh{MIGRATE_DBGSYM},
+	'automatic-dbgsym!'  => \$dh{ENABLE_DBGSYM},
+    # Deprecated variants
+	'ddeb-migration=s'   => \$dh{MIGRATE_DBGSYM},
+	'ddebs!'             => \$dh{ENABLE_DBGSYM},
+
+});
+
+if ($dh{MIGRATE_DBGSYM}) {
+	error("--keep-debug and --dbgsym-migration are mutually exclusive") if ($dh{K_FLAG});
+	error("--dbg-package and --dbgsym-migration are mutually exclusive") if ($dh{DEBUGPACKAGE});
+}
+
+if ($dh{ENABLE_DBGSYM}) {
+	error("--keep-debug and explicit --automatic-dbgsym are mutually exclusive") if ($dh{K_FLAG});
+	error("--dbg-package and explicit --automatic-dbgsym are mutually exclusive") if ($dh{DEBUGPACKAGE});
+}
+
+$dh{ENABLE_DBGSYM} = 1 if not defined($dh{ENABLE_DBGSYM});
+
+if ($dh{MIGRATE_DBGSYM} and not $dh{ENABLE_DBGSYM}) {
+	error("--dbgsym-migration and --no-automatic-dbgsym are mutually exclusive");
+}
+
+# This variable can be used to turn off stripping (see Policy).
+exit 0 if (get_buildoption('nostrip'));
+
+my $no_auto_dbgsym = 0;
+$no_auto_dbgsym = 1 if get_buildoption('noautodbgsym') or get_buildoption('noddebs');
+
+# Check if a file is an elf binary, shared library, or static library,
+# for use by File::Find. It'll fill the 3 first arrays with anything
+# it finds.  The @build_ids will be the collected build-ids (if any)
+my (@shared_libs, @executables, @static_libs, @build_ids, %file_output);
+sub testfile {
+	my $fn = $_;
+	return if -l $fn; # Always skip symlinks.
+	
+	# See if we were asked to exclude this file.
+	# Note that we have to test on the full filename, including directory.
+	if (excludefile($fn)) {
+		$File::Find::prune = 1 if -d _;
+		return;
+	}
+	# Ignore the .../debug/.build-id/ directory.  It is not really helpful
+	# to strip debug symbols.
+	$File::Find::prune = 1 if -d _ && index($fn, '/debug/.build-id/') > -1;
+	return if -d _;
+
+	# Is it a debug library in a debug subdir?
+	return if $fn=~m{debug/.*\.so};
+	return if $fn=~m{/guile/.*\.go$};
+
+	# Exploit the previous stat call to get the $mode, so we can check
+	# later if it is executable or not.
+	#
+	# NB: compat() can issue a stat, so we /should/ do this now
+	my (undef, undef, $mode, undef) = stat(_);
+
+	if (compat(10)) {
+		# In compat 10 and earlier, we used filenames and file(1)
+
+		# Does its filename look like a shared library?
+		#  - *.cmxs are OCaml native code shared libraries
+		#  - *.node are also native ELF binaries (for node-js)
+		if ($fn =~ m/\.(?:so.*?|cmxs|node)$/) {
+			# Ok, do the expensive test.
+			my $type = get_file_type($fn, 1);
+			if ($type =~ m/ELF.*shared/) {
+				push @shared_libs, $fn;
+				return;
+			}
+		}
+
+		# -x is not good enough for this test
+		if ($mode & 0111) {
+			# Ok, expensive test.
+			my $type = get_file_type($fn, 1);
+			if ($type =~ m/ELF.*(executable|shared)/) {
+				push(@executables, $fn);
+				return;
+			}
+		}
+	} else {
+		# In compat 11, we check the ELF header manually (because bulking file(1) is a pain and
+		# it is too slow otherwise)
+
+		if (is_so_or_exec_elf_file($fn)) {
+			# -x is not good enough for this test
+			if ($mode & 0111) {
+				push(@executables, $fn);
+			} else {
+				push(@shared_libs, $fn);
+			}
+			return;
+		}
+	}
+	# Is it a static library, and not a debug library?
+	if ($fn =~ m/\/lib[^\/]*\.a$/ && $fn !~ m/.*_g\.a$/) {
+		# Is it a binary file, or something else (maybe a linker
+		# script on Hurd, for example? I don't use file, because
+		# file returns a variety of things on static libraries.
+		if (-B $fn) {
+			push @static_libs, $fn;
+			return;
+		}
+	}
+}
+
+sub write_buildid_file {
+	my ($package, $build_ids) = @_;
+	my $dir = "debian/.debhelper/${package}";
+	my $path = "${dir}/dbgsym-build-ids";
+	install_dir($dir);
+	open(my $fd, '>>', $path) or error("open $path failed: $!");
+	print {$fd} join(q{ }, sort(@{$build_ids})) . ' ';
+	close($fd) or error("close $path failed: $!");
+}
+
+# I could just use `file $_[0]`, but this is safer
+sub get_file_type {
+	my ($file, $cache_ok) = @_;
+	return $file_output{$file} if $cache_ok && $file_output{$file};
+	my @file_args = Debian::Debhelper::Dh_Lib::_internal_optional_file_args();
+	my @cmdline = ('file', @file_args, '--brief', '-e', 'apptype', '-e', 'ascii', '-e', 'encoding', '-e', 'cdf',
+				   '-e', 'compress', '-e', 'tar', '--', $file);
+
+	open(my $fd, '-|', @cmdline) // error("cannot fork+exec file: $!");
+	my $type = <$fd>;
+	close($fd) || error_exitcode(escape_shell(@cmdline));
+
+	error("file(1) gave no result for $file!?") if (not $type) ;
+	return $file_output{$file} = $type;
+}
+
+sub make_debug {
+	my ($objcopy, $file, $tmp, $desttmp, $use_build_id) = @_;
+	my ($debug_path, $debug_build_id);
+
+	# Don't try to copy debug symbols out if the file is already
+	# stripped.
+	#
+	# Disable caching for non-build-id based extractions.
+	# Unfortunately, it breaks when there are hardlinks to the same
+	# ELF files.
+	my $file_info = get_file_type($file, $use_build_id ? 1 : 0);
+	return unless $file_info =~ /not stripped/;
+
+	if ($use_build_id) {
+		if ($file_info =~ m/BuildID\[sha1]\s*=\s*([0-9a-f]{2})([0-9a-f]+)/ or
+			  `LC_ALL=C readelf -n $file`=~ /^\s+Build ID: ([0-9a-f]{2})([0-9a-f]+)$/m) {
+			$debug_path=$desttmp."/usr/lib/debug/.build-id/$1/$2.debug";
+			$debug_build_id="${1}${2}";
+			push(@build_ids, $debug_build_id);
+		} else {
+			# For dbgsyms, we need build-id (else it will not be
+			# co-installable).
+			warning("Could not find the BuildID in $file");
+			return if $use_build_id > 1;
+		}
+	}
+	if (not $debug_path) {
+		# Either not using build_id OR no build-id available
+		my ($base_file)=$file=~/^\Q$tmp\E(.*)/;
+		$debug_path=$desttmp."/usr/lib/debug/".$base_file;
+	}
+	install_dir(dirname($debug_path));
+	if (compat(8) && $use_build_id < 2) {
+		doit($objcopy, "--only-keep-debug", $file, $debug_path);
+	}
+	else {
+		# Compat 9 OR a dbgsym package.
+		doit($objcopy, "--only-keep-debug", "--compress-debug-sections", $file, $debug_path) unless -e $debug_path;
+	}
+
+	# No reason for this to be executable.
+	reset_perm_and_owner(0644, $debug_path);
+	return $debug_path;
+}
+
+sub attach_debug {
+	my ($objcopy, $file, $debug_path) = @_;
+	doit($objcopy, "--add-gnu-debuglink", $debug_path, $file);
+}
+
+my %all_packages = map { $_ => 1 } getpackages();
+
+sub process_packages {
+	foreach my $package (@_) {
+		my $tmp=tmpdir($package);
+		my $objcopy = cross_command($package, "objcopy");
+		my $strip = cross_command($package, "strip");
+
+		# Support for keeping the debugging symbols in a detached file.
+		my $keep_debug=$dh{K_FLAG};
+		my $debugtmp=$tmp;
+		my $use_build_id = compat(8) ? 0 : 1;
+		if ($dh{DEBUGPACKAGE}) {
+			$keep_debug=1;
+			my $debugpackage=$dh{DEBUGPACKAGE};
+			error("debug package $debugpackage is not listed in the control file") if (!$all_packages{$debugpackage});
+			$debugtmp=tmpdir($debugpackage);
+		}
+		# Temporary workaround: Do not build dbgsym packages for udebs as
+		# dpkg-gencontrol and dpkg-deb does not agree on the file
+		# extension.
+		if ($dh{ENABLE_DBGSYM} and not $keep_debug and not package_is_arch_all($package) and not is_udeb($package)) {
+			# Avoid creating a dbgsym that would clash with a registered
+			# package or looks like a manual -dbg package.
+			if (not $all_packages{"${package}-dbgsym"} and $package !~ m/-dbg(?:sym)?$/) {
+				$debugtmp = dbgsym_tmpdir($package);
+				$keep_debug = 1;
+				$use_build_id = 2;
+			}
+		}
+		%file_output=@shared_libs=@executables=@static_libs=();
+		find({
+			wanted => \&testfile,
+			no_chdir => 1,
+		}, $tmp);
+
+		foreach (@shared_libs) {
+			my $debug_path = make_debug($objcopy, $_, $tmp, $debugtmp, $use_build_id) if $keep_debug;
+			# Note that all calls to strip on shared libs
+			# *must* include the --strip-unneeded.
+			doit($strip, "--remove-section=.comment", "--remove-section=.note", "--strip-unneeded", $_);
+			attach_debug($objcopy, $_, $debug_path) if defined $debug_path;
+		}
+
+		foreach (@executables) {
+			my $debug_path = make_debug($objcopy, $_, $tmp, $debugtmp, $use_build_id) if $keep_debug;
+			doit($strip, "--remove-section=.comment", "--remove-section=.note", $_);
+			attach_debug($objcopy, $_, $debug_path) if defined $debug_path;
+		}
+
+		foreach (@static_libs) {
+			# NB: The short variant (-D) is broken in Jessie
+			# (binutils/2.25-3)
+			doit($strip, '--strip-debug', '--remove-section=.comment',
+				 '--remove-section=.note', '--enable-deterministic-archives',
+				  '-R', '.gnu.lto_*', '-R', '.gnu.debuglto_*',
+				  '-N', '__gnu_lto_slim', '-N', '__gnu_lto_v1',
+				  $_);
+		}
+		if (-d "$tmp/usr/lib/debug/.dwz" and ($use_build_id > 1 or ($dh{DEBUGPACKAGE} and $dh{DEBUGPACKAGE} ne $package))) {
+			my @files = glob_expand(["$tmp/usr/lib/debug/.dwz"], \&glob_expand_error_handler_reject, '*');
+			install_dir("$debugtmp/usr/lib/debug/.dwz");
+			xargs(\@files, 'cp', '--reflink=auto', "-a", XARGS_INSERT_PARAMS_HERE, "$debugtmp/usr/lib/debug/.dwz");
+			doit('rm', '-fr', "$tmp/usr/lib/debug/.dwz");
+			doit('rmdir', '-p', '--ignore-fail-on-non-empty', "$tmp/usr/lib/debug");
+		}
+
+		if ($no_auto_dbgsym and $use_build_id > 1) {
+			# When DEB_BUILD_OPTIONS contains noautodbgsym, remove the
+			# dbgsym dir and clear the build-ids.
+			#
+			# Note we have to extract the dbg symbols as usual, since
+			# attach_debug (objcopy --add-gnu-debuglink) requires the dbg
+			# file to exist.
+			doit('rm', '-fr', $debugtmp);
+			@build_ids = ();
+		}
+		if ($use_build_id > 1 and -d $debugtmp) {
+			my $dbgsym_docdir = "${debugtmp}/usr/share/doc";
+			my $doc_symlink = "${dbgsym_docdir}/${package}-dbgsym";
+			if ( not -l $doc_symlink and not -e _ ) {
+				install_dir($dbgsym_docdir);
+				make_symlink_raw_target($package, $doc_symlink);
+			}
+			if ($dh{MIGRATE_DBGSYM}) {
+				my $path = "debian/.debhelper/${package}/dbgsym-migration";
+				open(my $fd, '>', $path) or error("open $path failed: $!");
+				print {$fd} "$dh{MIGRATE_DBGSYM}\n";
+				close($fd) or error("close $path failed: $!");
+			}
+		}
+		if ($use_build_id > 1 and @build_ids) {
+			write_buildid_file($package, \@build_ids);
+			@build_ids = ();
+		}
+	}
+	if (@build_ids and $dh{DEBUGPACKAGE}) {
+		write_buildid_file($dh{DEBUGPACKAGE}, \@build_ids);
+	}
+}
+
+if ($dh{DEBUGPACKAGE}) {
+	# Non-deterministic issues with --dbg-package and parallelism (see
+	# #872007).  Analysis and patches welcome for this case.
+	process_packages(@{$dh{DOPACKAGES}});
+} else {
+	on_pkgs_in_parallel(\&process_packages);
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

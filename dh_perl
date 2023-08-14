@@ -1,0 +1,198 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_perl - calculates Perl dependencies and cleans up after MakeMaker
+
+=cut
+
+use strict;
+use warnings;
+use Config;
+use File::Find;
+use Debian::Debhelper::Dh_Lib;
+use constant DISTRO_PERL => $^X;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_perl> [S<I<debhelper options>>] [B<-d>] [S<I<library dirs> ...>]
+
+=head1 DESCRIPTION
+
+B<dh_perl> is a debhelper program that is responsible for generating
+the B<${perl:Depends}> substitutions and adding them to substvars files.
+
+The program will look at Perl scripts and modules in your package,
+and will use this information to generate a dependency on B<perl> or
+B<perlapi>. The dependency will be substituted into your package's F<control>
+file wherever you place the token B<${perl:Depends}>.
+
+B<dh_perl> also cleans up empty directories that MakeMaker can generate when
+installing Perl modules.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-d>
+
+In some specific cases you may want to depend on B<perl-base> rather than the
+full B<perl> package. If so, you can pass the -d option to make B<dh_perl> generate
+a dependency on the correct base package. This is only necessary for some
+packages that are included in the base system.
+
+Note that this flag may cause no dependency on B<perl-base> to be generated at
+all. B<perl-base> is Essential, so its dependency can be left out, unless a
+versioned dependency is needed.
+
+=item B<-V>
+
+By default, scripts and architecture independent modules don't depend
+on any specific version of B<perl>. The B<-V> option causes the current
+version of the B<perl> (or B<perl-base> with B<-d>) package to be specified.
+
+=item I<library dirs>
+
+If your package installs Perl modules in non-standard
+directories, you can make B<dh_perl> check those directories by passing their
+names on the command line. It will only check the F<vendorlib> and F<vendorarch>
+directories by default.
+
+=back
+
+=head1 CONFORMS TO
+
+Debian policy, version 3.8.3
+
+Perl policy, version 1.20
+
+=cut
+
+init();
+
+my $vendorlib = substr $Config{vendorlib}, 1;
+my $vendorarch = substr $Config{vendorarch}, 1;
+if (is_cross_compiling()) {
+	my $incdir = perl_cross_incdir();
+	$vendorarch = substr qx/perl -I$incdir -MConfig -e 'print \$Config{vendorarch}'/, 1
+		if defined $incdir;
+}
+
+# Cleaning the paths given on the command line
+foreach (@ARGV) {
+	s#/$##;
+	s#^/##;
+}
+
+my $perl = 'perl';
+# If -d is given, then the dependency is on perl-base rather than perl.
+$perl .= '-base' if $dh{D_FLAG};
+
+# dependency types
+use constant PROGRAM   => 1;
+use constant PM_MODULE => 2;
+use constant XS_MODULE => 4;
+use constant ARCHDEP_MODULE => 8;
+
+use constant MA_ANY_INCOMPATIBLE_TYPES => ~(PROGRAM | PM_MODULE);
+
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+
+	next unless -d $tmp;
+
+	# Check also for alternate locations given on the command line
+	my @dirs = grep -d, map "$tmp/$_", $vendorlib, $vendorarch, @ARGV;
+
+	# Look for perl modules and check where they are installed
+	my $deps = 0;
+	find sub {
+		return unless -f;
+		$deps |= PM_MODULE if /\.pm$/;
+		$deps |= XS_MODULE if /\.so$/;
+		$deps |= ARCHDEP_MODULE
+			if $File::Find::dir =~ /\Q$vendorarch\E/;
+	}, @dirs if @dirs;
+
+	# find scripts
+	$tmp =~ tr:/:/:s;
+	$tmp =~ s{[^/]\K/$}{};
+	my $usd_dir = "$tmp/usr/share/doc";
+	my $check_script = sub {
+		if ($_ eq $usd_dir) {
+			$File::Find::prune = 1 if -d $_;
+			return;
+		}
+		return unless -f and (-x _ or /\.pl$/);
+
+		return unless open(my $fd, '<', $_);
+		my $path = $_;
+		my $rewrite_shebang = 0;
+		if (read($fd, local $_, 32) and m%^#!\s*(/usr/bin/perl|${\DISTRO_PERL}|/usr/bin/env\s+perl)\s%) {
+			my $actual_perl = $1;
+			$deps |= PROGRAM;
+			$rewrite_shebang = 1 if ($actual_perl ne DISTRO_PERL);
+		}
+		close($fd);
+		rewrite_shebang($path) if $rewrite_shebang;
+	};
+	find({
+		wanted => $check_script,
+		no_chdir => 1,
+	}, $tmp);
+
+	if ($deps) {
+		my $version="";
+		if ($deps & XS_MODULE or $dh{V_FLAG_SET}) {
+			($version) = qx_cmd('dpkg', '-s', $perl) =~ /^Version:\s*(\S+)/m
+				unless $version;
+			$version = ">= $version";
+		}
+
+		my $perlarch = $perl;
+		$perlarch .= ':any' if (($deps & MA_ANY_INCOMPATIBLE_TYPES) == 0) and not $dh{V_FLAG_SET};
+
+		# no need to depend on an un-versioned perl-base -- it's
+		# essential
+		addsubstvar($package, "perl:Depends", $perlarch, $version)
+			if $perl ne 'perl-base' || length($version);
+
+		# add perlapi-<ver> for XS modules and other modules
+		# installed into vendorarch
+		addsubstvar($package, "perl:Depends",
+			"perlapi-" . ($Config{debian_abi} || $Config{version}))
+			if $deps & ( XS_MODULE | ARCHDEP_MODULE );
+	}
+
+	# MakeMaker always makes lib and share dirs, but typically
+	# only one directory is installed into.
+	foreach my $dir ("$tmp/$vendorlib", "$tmp/$vendorarch") {
+		if (-d $dir) {
+			doit("rmdir", "--ignore-fail-on-non-empty", "--parents",
+				"$dir");
+		}
+	}
+}
+
+sub rewrite_shebang {
+	my ($file) = @_;
+	doit($^X, '-p', '-i', '-e',
+		's{#!\s*(/usr/bin/perl|' . quotemeta(DISTRO_PERL) . '|/usr/bin/env\s+perl)}{#! ' . DISTRO_PERL . '} if ($. == 1);',
+		$file);
+	return;
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Brendan O'Dea <bod@debian.org>
+
+=cut

@@ -1,0 +1,103 @@
+#!/usr/bin/perl
+
+=encoding UTF-8
+
+=head1 NAME
+
+dh_testroot - ensure that a package is built with necessary level of root permissions
+
+=head1 SYNOPSIS
+
+B<dh_testroot> [S<I<debhelper options>>]
+
+=head1 DESCRIPTION
+
+B<dh_testroot> is used to determine if the target is being run with
+suffient access to root(-like) features.
+
+The definition of sufficient access depends on whether the builder
+(the tool invoking the F<debian/rules> target) supports the
+I<Rules-Requires-Root> (R³) field.  If the builder supports R³, then
+it will set the environment variable I<DEB_RULES_REQUIRES_ROOT> and
+B<dh_testroot> will validate that the builder followed the minimum
+requirements for the given value of I<DEB_RULES_REQUIRES_ROOT>.
+
+If the builder does not support I<Rules-Requires-Root>, then it will
+not set the I<DEB_RULES_REQUIRES_ROOT> environment variable.  This
+will in turn make B<dh_testroot> (and the rest of debhelper) fall back
+to assuming that (fake)root is implied.
+
+The following is a summary of how B<dh_testroot> behaves based on the
+I<DEB_RULES_REQUIRES_ROOT> environment variable (leading and trailing
+whitespace in the variable is ignored).
+
+=over 4
+
+=item -
+
+If unset, or set to C<binary-targets>, then B<dh_testroot> asserts
+that it is run as root or under L<fakeroot(1)>.
+
+=item -
+
+If set to C<no>, then B<dh_testroot> returns successfully (without
+performing any additional checks).
+
+=item -
+
+If set to any other value than the above, then B<dh_testroot> asserts
+that it is either run as root (or under L<fakeroot(1)>) or the builder
+has provided the B<DEB_GAIN_ROOT_CMD> environment variable (e.g. via
+dpkg-buildpackage -r).
+
+=back
+
+Please note that B<dh_testroot> does I<not> read the
+I<Rules-Requires-Root> field.  Which implies that B<dh_testroot> may
+produce incorrect result if the builder lies in
+I<DEB_RULES_REQUIRES_ROOT>.  On the flip side, it also enables things
+like testing for what will happen when I<DEB_RULES_REQUIRES_ROOT> is
+set to a given value.
+
+=cut
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+inhibit_log();
+
+my $requirements = Debian::Debhelper::Dh_Lib::root_requirements();
+
+if (! -f 'debian/control') {
+	warning('dh_testroot must be called from the source root');
+}
+
+# PROMISE: DH NOOP WITHOUT internal(rrr)
+
+# By declaration; nothing requires root and this command must be a no-op in that case.
+exit 0 if $requirements eq 'none';
+# The builder /can/ choose to ignore the requirements and just call us as root.
+# If so, we do not bother checking the requirements any further.
+exit 0 if $< == 0;
+if ($requirements eq 'legacy-root') {
+	error("You must run this as root (or use fakeroot).");
+} else {
+	my $env = $ENV{DEB_GAIN_ROOT_CMD};
+	error("Package needs targeted root but builder has not provided a gain-root command via \${DEB_GAIN_ROOT_CMD}")
+		if not $env;
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

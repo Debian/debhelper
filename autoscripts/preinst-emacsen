@@ -1,0 +1,5 @@
+if ( [ "$1" = "install" ] || [ "$1" = "upgrade" ] ) \
+	&& [ -e /var/lib/emacsen-common/state/package/installed/emacsen-common -a -x /usr/lib/emacsen-common/emacs-package-install ]
+then
+	/usr/lib/emacsen-common/emacs-package-install --preinst #PACKAGE#
+fi

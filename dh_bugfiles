@@ -1,0 +1,145 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_bugfiles - install bug reporting customization files into package build directories
+
+=cut
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_bugfiles> [B<-A>] [S<I<debhelper options>>]
+
+=head1 DESCRIPTION
+
+B<dh_bugfiles> is a debhelper program that is responsible for installing
+bug reporting customization files (bug scripts and/or bug control files
+and/or presubj files) into package build directories.
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.bug-script
+
+This is the script to be run by the bug reporting program for generating a bug
+report template. This file is installed as F<usr/share/bug/package> in the
+package build directory if no other types of bug reporting customization
+files are going to be installed for the package in question. Otherwise,
+this file is installed as F<usr/share/bug/package/script>. Finally, the
+installed script is given execute permissions.
+
+=item debian/I<package>.bug-control
+
+It is the bug control file containing some directions for the bug reporting
+tool. This file is installed as F<usr/share/bug/package/control> in the
+package build directory.
+
+=item debian/I<package>.bug-presubj
+
+The contents of this file are displayed to the user by the bug reporting
+tool before allowing the user to write a bug report on the package to the
+Debian Bug Tracking System. This file is installed as
+F<usr/share/bug/package/presubj> in the package build directory.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-A>, B<--all>
+
+Install F<debian/bug-*> files to ALL packages acted on when respective
+F<debian/package.bug-*> files do not exist. Normally, F<debian/bug-*> will
+be installed to the first package only.
+
+=back
+
+=cut
+
+init();
+
+# Types of bug files this debhelper program handles.
+# Hash value is the name of the pkgfile of the respective
+# type.
+my %bugfile_types = (
+	"script" => "bug-script",
+	"control" => "bug-control",
+	"presubj" => "bug-presubj",
+);
+# PROMISE: DH NOOP WITHOUT bug-script bug-control bug-presubj cli-options()
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	next if is_udeb($package);
+
+	my $tmp=tmpdir($package);
+	my $p_dir="${tmp}/usr/share/bug";
+	my $dir="${p_dir}/$package";
+	
+	# Gather information which bug files are available for the
+	# package in question
+	my %bugfiles=();
+	while (my ($type, $pkgfilename) = each(%bugfile_types)) {
+		my $file=pkgfile($package,$pkgfilename);
+		if ($file) {
+			$bugfiles{$type}=$file;
+		}
+		elsif (-f "debian/$pkgfilename" && $dh{PARAMS_ALL}) {
+			$bugfiles{$type}="debian/$pkgfilename";
+		}
+	}
+	
+	# If there is only a bug script to install, install it as
+	# usr/share/bug/$package (unless this path is a directory)
+	if (! -d $dir && scalar(keys(%bugfiles)) == 1 && exists $bugfiles{script}) {
+		install_dir($p_dir);
+		install_prog($bugfiles{script}, $dir);
+	}
+	elsif (scalar(keys(%bugfiles)) > 0) {
+		if (-f $dir) {
+			# Move usr/share/bug/$package to usr/share/bug/$package/script
+			rename_path($dir, "${dir}.tmp");
+			install_dir($dir);
+			rename_path("${dir}.tmp", "$dir/script");
+		}
+		else {
+			install_dir($dir);
+		}
+		while (my ($type, $srcfile) = each(%bugfiles)) {
+			if ($type eq 'script') {
+				install_prog($srcfile, "$dir/$type");
+			} else {
+				install_file($srcfile, "$dir/$type");
+			}
+		}
+	}
+	
+	# Ensure that the bug script is executable
+	if (-f $dir) {
+		reset_perm_and_owner(0755, $dir);
+	}
+	elsif (-f "$dir/script") {
+		reset_perm_and_owner(0755, "$dir/script");
+	}
+}
+
+=head1 SEE ALSO
+
+F</usr/share/doc/reportbug/README.developers.gz>
+
+L<debhelper(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Modestas Vainius <modestas@vainius.eu>
+
+=cut

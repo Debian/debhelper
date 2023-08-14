@@ -1,0 +1,6 @@
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ]; then
+	update-alternatives --install /usr/bin/x-window-manager \
+		x-window-manager #WM# #PRIORITY# \
+		--slave /usr/share/man/man1/x-window-manager.1.gz \
+		x-window-manager.1.gz #WMMAN#
+fi

@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_installppp - install ppp ip-up and ip-down files
+
+=cut
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_installppp> [S<I<debhelper options>>] [B<--name=>I<name>]
+
+=head1 DESCRIPTION
+
+B<dh_installppp> is a debhelper program that is responsible for installing
+ppp ip-up and ip-down scripts into package build directories.
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.ppp.ip-up
+
+Installed into etc/ppp/ip-up.d/I<package> in the package build directory. 
+
+=item debian/I<package>.ppp.ip-down
+
+Installed into etc/ppp/ip-down.d/I<package> in the package build directory.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--name=>I<name>
+
+Look for files named F<debian/package.name.ppp.ip-*> and install them as
+F<etc/ppp/ip-*/name>, instead of using the usual files and installing them
+as the package name.
+
+=back
+
+=cut
+
+init();
+
+# PROMISE: DH NOOP WITHOUT ppp.ip-up ppp.ip-down cli-options()
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	
+	foreach my $script (qw(up down)) {
+		my $file=pkgfile($package, "ppp.ip-$script");
+		if ($file ne '') {
+			install_dir("$tmp/etc/ppp/ip-$script.d");
+			install_prog($file,"$tmp/etc/ppp/ip-$script.d/".pkgfilename($package));
+		}
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

@@ -1,0 +1,288 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dh_installsystemduser - install systemd unit files
+
+=cut
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_installsystemduser> [S<I<debhelper options>>] [B<--no-enable>] [B<--name=>I<name>] [S<I<unit file> ...>]
+
+=head1 DESCRIPTION
+
+B<dh_installsystemduser> finds the systemd user instance service files
+installed by a package and generates F<preinst>, F<postinst>, and F<prerm>
+code blocks for enabling, disabling, starting, stopping, and restarting the
+corresponding systemd user instance services, when the package is installed,
+updated, or removed. These snippets are added to the maintainer scripts by
+L<dh_installdeb(1)>.
+
+L<deb-systemd-helper(1)> is used to enable and disable the systemd
+units, thus it is not necessary that the machine actually runs systemd
+during package installation time, enabling happens on all machines.
+
+B<dh_installsystemduser> operates on all user instance unit files
+installed by a package. For only generating blocks for specific unit
+files, pass them as arguments. Specific unit files can be excluded
+from processing using the B<-X> common L<debhelper(1)> option.
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.user.path,
+      debian/I<package>@.user.path,
+      debian/I<package>.user.service,
+      debian/I<package>@.user.service,
+      debian/I<package>.user.socket,
+      debian/I<package>@.user.socket,
+      debian/I<package>.user.target,
+      debian/I<package>@.user.target,
+      debian/I<package>.user.timer,
+      debian/I<package>@.user.timer
+
+If any of those files exists, they are installed into
+F<usr/lib/systemd/user/> in the package build directory removing the
+F<.user> file name part.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--name=>I<name>
+
+Install the service file as I<name.service> instead of the default
+filename I<package.service>. When this parameter is used,
+B<dh_installsystemd> looks for and installs files named
+F<debian/package.name.user.service> instead of the usual
+F<debian/package.user.service>.  Moreover, maintainer scripts are only
+generated for units that match the given I<name>.
+
+=item B<--no-enable>
+
+Disable the service(s) on purge, but do not enable them on install.
+
+=back
+
+=head1 NOTES
+
+This command is not idempotent. L<dh_prep(1)> should be called between
+invocations of this command (with the same arguments). Otherwise, it
+may cause multiple instances of the same text to be added to
+maintainer scripts.
+
+=cut
+
+# PROMISE: DH NOOP WITHOUT internal(bug#950723) tmp(usr/lib/systemd/user) user.service
+
+init(options => {
+	"no-enable" => \$dh{NO_ENABLE},
+});
+
+sub quote {
+	# Add single quotes around the argument.
+	return '\'' . $_[0] . '\'';
+}
+
+sub uniq {
+	my %seen;
+	return grep { !$seen{$_}++ } @_;
+}
+
+sub contains_install_section {
+	my ($unit_path) = @_;
+
+	open(my $fh, '<', $unit_path) or error("Cannot open($unit_path) to check for [Install]: $!");
+
+	while (my $line = <$fh>) {
+		chomp($line);
+		return 1 if $line =~ /^\s*\[Install\]$/i;
+	}
+	close($fh);
+	return 0;
+}
+
+sub install_user_unit {
+	my ($package, $name, $suffix, $path) = @_;
+	my $unit = pkgfile($package, "user.$suffix");
+	return if $unit eq '';
+
+	install_dir($path);
+	install_file($unit, "$path/$name.$suffix");
+}
+
+# Extracts the directive values from a unit file. Handles repeated
+# directives in the same unit file. Assumes values can only be
+# composed of lists of unit names. This is good enough for the 'Also='
+# and 'Alias=' directives handled here.
+sub extract_key {
+	my ($unit_path, $key) = @_;
+	my @values;
+
+	open(my $fh, '<', $unit_path) or error("Cannot open($unit_path): $!");
+
+	while (my $line = <$fh>) {
+		chomp($line);
+
+		# Since unit names can't have whitespace in systemd, simply
+		# use split and strip any leading/trailing quotes. See
+		# systemd-escape(1) for examples of valid unit names.
+		if ($line =~ /^\s*$key=(.+)$/i) {
+			for my $value (split(/\s+/, $1)) {
+				$value =~ s/^(["'])(.*)\g1$/$2/;
+				push @values, $value;
+			}
+		}
+	}
+
+	close($fh);
+	return @values;
+}
+
+sub list_installed_user_units {
+	my ($tmpdir, $aliases) = @_;
+
+	my $lib_systemd_user = "$tmpdir/usr/lib/systemd/user";
+	my @installed;
+
+	return unless -d $lib_systemd_user;
+	opendir(my $dh, $lib_systemd_user) or error("Cannot opendir($lib_systemd_user): $!");
+
+	foreach my $name (readdir($dh)) {
+		my $path = "$lib_systemd_user/$name";
+		next unless -f $path;
+		if (-l $path) {
+			my $dest = basename(readlink($path));
+			$aliases->{$dest} //= [ ];
+			push @{$aliases->{$dest}}, $name;
+		} else {
+			push @installed, $name;
+		}
+	}
+
+	closedir($dh);
+	return @installed;
+}
+
+# Install package maintainer provided unit files.
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmpdir = tmpdir($package);
+
+	# unit file name
+	my $name = $dh{NAME} // $package;
+
+	my $path = "$tmpdir/usr/lib/systemd/user";
+	for my $type (qw(service target socket path timer)) {
+		install_user_unit($package, $name, $type, $path);
+		install_user_unit("${package}@", "${name}@", $type, $path);
+	}
+}
+
+# Generate postinst and prerm code blocks to enable and disable units
+foreach my $package (@{$dh{DOPACKAGES}}) {
+    my (@args, @start_units, @enable_units, %aliases);
+
+	my $tmpdir = tmpdir($package);
+	my @units = list_installed_user_units($tmpdir, \%aliases);
+
+	# Handle either only the unit files which were passed as arguments
+	# or all unit files that are installed in this package.
+	if (@ARGV) {
+		@args = @ARGV;
+	}
+	elsif ($dh{NAME}) {
+		# Treat --name flag as if the corresponding units were passed
+		# in the command line.
+		@args = grep /(^|\/)$dh{NAME}\.(service|target|socket|path|timer)$/, @units;
+	}
+	else {
+		@args = @units;
+	}
+
+	# Support excluding units via the -X debhelper common option.
+	foreach my $x (@{$dh{EXCLUDE}}) {
+		@args = grep !/(^|\/)$x$/, @args;
+	}
+
+	# This hash prevents us from looping forever in the following
+	# while loop.  An actual real-world example of such a loop is
+	# systemd's systemd-readahead-drop.service, which contains
+	# Also=systemd-readahead-collect.service, and that file in turn
+	# contains Also=systemd-readahead-drop.service, thus forming an
+	# endless loop.
+	my %seen;
+
+	# Must use while and shift because the loop alters the list.
+	while (@args) {
+		my $name = shift @args;
+		my $path = "${tmpdir}/usr/lib/systemd/user/${name}";
+
+		error("User unit file \"$name\" not found in package \"$package\".") if ! -f $path;
+
+		# Skip template service files. Enabling or disabling those
+		# services without specifying the instance is not useful.
+		next if ($name =~ /\@/);
+
+		# Handle all unit files specified via Also= explicitly. This
+		# is not necessary for enabling, but for disabling, as we
+		# cannot read the unit file when disabling as it has already
+		# been deleted.
+		push @args, $_ for grep { !$seen{$_}++ } extract_key($path, 'Also');
+
+		push @enable_units, $name if contains_install_section($path);
+		push @start_units, $name;
+	}
+
+	@enable_units = map { quote($_) } sort(uniq(@enable_units));
+	@start_units = map { quote($_) } sort(uniq(@start_units));
+
+	if (@enable_units) {
+		# The generated maintainer script code blocks use the --user
+		# option that was added to deb-systemd-helper in version 1.52.
+		addsubstvar($package, 'misc:Depends', 'init-system-helpers', ">= 1.52");
+
+		my $postinst = $dh{NO_ENABLE} ? 'postinst-systemd-user-dont-enable' : 'postinst-systemd-user-enable';
+		foreach my $unit (@enable_units) {
+			autoscript($package, 'postinst', $postinst, { 'UNITFILE' => $unit });
+		}
+		autoscript($package, 'postrm', 'postrm-systemd-user', { 'UNITFILES' => join(' ', @enable_units) });
+	}
+
+	if (@start_units and not compat(13)) {
+		# The generated maintainer script code blocks use the --user
+		# option that was added to deb-systemd-invoke in version 1.61.
+		addsubstvar($package, 'misc:Depends', 'init-system-helpers', ">= 1.61~");
+
+		my %options = ('snippet-order' => 'service');
+
+		# restart service after install/upgrade
+		autoscript($package, 'postinst', 'postinst-systemd-user-restart', { 'UNITFILES' => join(' ', @start_units) }, \%options);
+
+		# stop service after removal
+		autoscript($package, 'prerm', 'prerm-systemd-user-stop', { 'UNITFILES' => join(' ', @start_units) }, \%options);
+
+		# Run this with "default" order so it is always after other
+		# service related autosnippets.
+		autoscript($package, 'postrm', 'postrm-systemd-user-reload-only', { 'UNITFILES' => join(' ', @start_units) });
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>, L<dh_installsystemd(1)>, L<deb-systemd-helper(1)>
+
+=head1 AUTHORS
+
+pkg-systemd-maintainers@lists.alioth.debian.org
+
+=cut

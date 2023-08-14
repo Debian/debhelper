@@ -1,0 +1,214 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_shlibdeps - calculate shared library dependencies
+
+=cut
+
+use strict;
+use warnings;
+use Cwd;
+use File::Find;
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_shlibdeps> [S<I<debhelper options>>] [B<-L>I<package>] [B<-l>I<directory>] [B<-X>I<item>] [S<B<--> I<params>>]
+
+=head1 DESCRIPTION
+
+B<dh_shlibdeps> is a debhelper program that is responsible for calculating
+shared library dependencies for packages.
+
+This program is merely a wrapper around L<dpkg-shlibdeps(1)> that calls it
+once for each package listed in the F<control> file, passing it
+a list of ELF executables and shared libraries it has found.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-X>I<item>, B<--exclude=>I<item>
+
+Exclude files that contain F<item> anywhere in their filename from being
+passed to B<dpkg-shlibdeps>. This will make their dependencies be ignored.
+This may be useful in some situations, but use it with caution. This option
+may be used more than once to exclude more than one thing.
+
+=item B<--> I<params>
+
+Pass I<params> to L<dpkg-shlibdeps(1)>.
+
+=item B<-u>I<params>, B<--dpkg-shlibdeps-params=>I<params>
+
+This is another way to pass I<params> to L<dpkg-shlibdeps(1)>.
+It is deprecated; use B<--> instead.
+
+=item B<-l>I<directory>[B<:>I<directory> ...]
+
+With recent versions of B<dpkg-shlibdeps>, this option is generally not
+needed.
+
+It tells B<dpkg-shlibdeps> (via its B<-l> parameter), to look for private
+package libraries in the specified directory (or directories -- separate
+with colons). With recent
+versions of B<dpkg-shlibdeps>, this is mostly only useful for packages that
+build multiple flavors of the same library, or other situations where
+the library is installed into a directory not on the regular library search
+path.
+
+=item B<-L>I<package>, B<--libpackage=>I<package>
+
+With recent versions of B<dpkg-shlibdeps>, this option is generally not
+needed, unless your package builds multiple flavors of the same library
+or is relying on F<debian/shlibs.local> for an internal library.
+
+It tells B<dpkg-shlibdeps> (via its B<-S> parameter) to look first in the package
+build directory for the specified package, when searching for libraries,
+symbol files, and shlibs files.
+
+If needed, this can be passed multiple times with different package
+names.
+
+=back
+
+=head1 EXAMPLES
+
+Suppose that your source package produces libfoo1, libfoo-dev, and
+libfoo-bin binary packages. libfoo-bin links against libfoo1, and should
+depend on it. In your rules file, first run B<dh_makeshlibs>, then B<dh_shlibdeps>:
+
+	dh_makeshlibs
+	dh_shlibdeps
+
+This will have the effect of generating automatically a shlibs file for
+libfoo1, and using that file and the libfoo1 library in the
+F<debian/libfoo1/usr/lib> directory to calculate shared library dependency
+information.
+
+If a libbar1 package is also produced, that is an alternate build of
+libfoo, and is installed into F</usr/lib/bar/>, you can make libfoo-bin depend
+on libbar1 as follows:
+
+	dh_shlibdeps -Llibbar1 -l/usr/lib/bar
+	
+=cut
+
+init(options => {
+	"L|libpackage=s@" => \$dh{LIBPACKAGE},
+	"dpkg-shlibdeps-params=s" => \$dh{U_PARAMS},
+	"l=s" => \$dh{L_PARAMS},
+});
+
+if (defined $dh{V_FLAG}) {
+	warning("You probably wanted to pass -V to dh_makeshlibs, it has no effect on dh_shlibdeps");
+}
+
+on_pkgs_in_parallel {
+	my $is_non_statically_linked_elf_file = sub {
+		my ($file) = @_;
+		my @file_args = Debian::Debhelper::Dh_Lib::_internal_optional_file_args();
+		my $ff = qx_cmd('file', @file_args, '--brief', '-e', 'apptype', '-e', 'ascii',
+						'-e', 'encoding', '-e', 'cdf', '-e', 'compress', '-e', 'tar', '--', $file);
+		return 1 if $ff =~ m/ELF/ && $ff !~ /statically linked/;
+		return 0;
+	};
+
+	foreach my $package (@_) {
+		my $tmp=tmpdir($package);
+		my $ext=pkgext($package);
+		my (@filelist);
+
+		# Generate a list of ELF binaries in the package, ignoring any
+		# we were told to exclude.
+		my $find_options='';
+		if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
+			$find_options="! \\( $dh{EXCLUDE_FIND} \\)";
+		}
+		next if not -d $tmp;
+		if (compat(10)) {
+			foreach my $file (split(/\n/, `find $tmp -type f \\( -perm /111 -or -name "*.so*" -or -name "*.cmxs" -or -name "*.node" \\) $find_options -print`)) {
+				# Prune directories that contain separated debug symbols.
+				# CAVEAT: There are files in /usr/lib/debug that are not detached debug symbols,
+				# which should be processed.  (see #865982)
+				next if $file =~ m!^\Q$tmp\E/usr/lib/debug/(lib|lib64|usr|bin|sbin|opt|dev|emul|\.build-id)/!;
+				# TODO this is slow, optimize. Ie, file can run once on
+				# multiple files..
+				if ($is_non_statically_linked_elf_file->($file)) {
+					push @filelist, $file;
+				}
+			}
+		} else {
+			my $find_elf_files = sub {
+				my $fn = $_;
+				return if -l $fn; # Ignore symlinks
+				# See if we were asked to exclude this file.
+				# Note that we have to test on the full filename, including directory.
+				if (excludefile($fn)) {
+					$File::Find::prune = 1 if -d _;
+					return;
+				}
+				if (-d _) {
+					# Prune directories that contain separated debug symbols.
+					# CAVEAT: There are files in /usr/lib/debug that are not detached debug symbols,
+					# which should be processed.  (see #865982)
+					if ($fn =~ m!^\Q$tmp\E/usr/lib/debug/(lib|lib64|usr|bin|sbin|opt|dev|emul|\.build-id)/!) {
+						$File::Find::prune = 1;
+					}
+					return;
+				}
+
+				return if not -f _;
+				return if not is_so_or_exec_elf_file($fn);
+				# TODO this is slow, optimize. Ie, file can run once on
+				# multiple files..
+				if ($is_non_statically_linked_elf_file->($fn)) {
+					push(@filelist, $fn);
+				}
+			};
+			find({
+					wanted => $find_elf_files,
+					no_chdir => 1,
+			}, $tmp);
+		}
+
+		if (@filelist) {
+			my @opts;
+
+			# dpkg-shlibdeps expects this directory to exist
+			install_dir("$tmp/DEBIAN");
+
+			if (defined($dh{LIBPACKAGE})) {
+				@opts = map { '-S' . tmpdir($_) } @{$dh{LIBPACKAGE}};
+			}
+
+			push @opts, "-tudeb" if is_udeb($package);
+
+			if ($dh{L_PARAMS}) {
+				foreach (split(/:/, $dh{L_PARAMS})) {
+					# Force the path absolute.
+					my $libdir = m:^/: ? $_ : "/$_";
+					push @opts, "-l$libdir";
+				}
+			}
+
+			doit("dpkg-shlibdeps","-Tdebian/${ext}substvars",
+				@opts,@{$dh{U_PARAMS}},@filelist);
+		}
+	}
+};
+
+=head1 SEE ALSO
+
+L<debhelper(7)>, L<dpkg-shlibdeps(1)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

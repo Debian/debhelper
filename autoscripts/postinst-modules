@@ -1,0 +1,5 @@
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
+	if [ -e /boot/System.map-#KVERS# ]; then
+		depmod -a -F /boot/System.map-#KVERS# #KVERS# || true
+	fi
+fi

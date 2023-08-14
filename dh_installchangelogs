@@ -1,0 +1,375 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_installchangelogs - install changelogs into package build directories
+
+=cut
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+use Time::Piece;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_installchangelogs> [S<I<debhelper options>>] [B<-k>] [B<-X>I<item>] [B<--no-trim>] [I<upstream>]
+
+=head1 DESCRIPTION
+
+B<dh_installchangelogs> is a debhelper program that is responsible for
+installing changelogs into package build directories.
+
+An upstream F<changelog> file may be specified as an option. If none
+is specified, B<dh_installchangelogs> may look for files with names
+that seem likely to be changelogs as described in the next paragraphs.
+
+In non-native packages, B<dh_installchangelogs> will first look for
+changelog files installed by the upstream build system into F<<
+usr/share/doc/I<package> >> (of the package build directory) and
+rename the most likely candidate (if any) to F<<
+usr/share/doc/I<package>/changelog >>.  Note that
+B<dh_installchangelogs> does I<not> look into any source directory
+(such as F<debian/tmp>). Otherwise, B<dh_installchangelogs> (at
+compatibility level 7 or any later) will look for changelog files in
+the source directory (e.g. the root or the F<docs> subdirectory).  It
+will look for F<changelog>, F<changes> and F<history> optionally with
+common extensions (such as F<.txt>, F<.md> and F<.rst>).
+
+If a changelog file is specified and is an F<html> file (determined by file
+extension), it will be installed as F<usr/share/doc/package/changelog.html>
+instead. If the html changelog is converted to plain text, that variant
+can be specified as a second parameter. When no plain text variant is
+specified, a short F<usr/share/doc/package/changelog> is generated,
+pointing readers at the html changelog file.
+
+The B<debchange>-style Debian changelogs are trimmed to include only
+entries more recent than the release date of I<oldstable>.
+No trimming will be performed if the B<--no-trim> option is passed or
+if the B<DEB_BUILD_OPTIONS> environment variable contains B<notrimdch>.
+
+=head1 FILES
+
+=over 4
+
+=item F<debian/changelog>
+
+=item F<debian/NEWS>
+
+=item debian/I<package>.changelog
+
+=item debian/I<package>.NEWS
+
+Automatically installed into usr/share/doc/I<package>/
+in the package build directory.
+
+Use the package specific name if I<package> needs a different
+F<NEWS> or F<changelog> file.
+
+The F<changelog> file is installed with a name of changelog
+for native packages, and F<changelog.Debian> for non-native packages.
+The F<NEWS> file is always installed with a name of F<NEWS.Debian>.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-k>, B<--keep>
+
+Keep the original name of the upstream changelog. This will be accomplished
+by installing the upstream changelog as F<changelog>, and making a symlink from
+that to the original name of the F<changelog> file. This can be useful if the
+upstream changelog has an unusual name, or if other documentation in the
+package refers to the F<changelog> file.
+
+=item B<-X>I<item>, B<--exclude=>I<item>
+
+Exclude upstream F<changelog> files that contain I<item> anywhere in their
+filename from being installed.
+
+Note that directory name of the changelog is also part of the match.
+
+=item B<--no-trim>
+
+Install the full changelog, not its trimmed version that includes only
+recent entries.
+
+=item I<upstream>
+
+Install this file as the upstream changelog.
+
+=back
+
+=cut
+
+init(options => {
+	'keep|k'  => \$dh{K_FLAG},
+	'no-trim' => \$dh{NO_TRIM},
+});
+
+my $news_name="NEWS.Debian";
+my $changelog_name="changelog.Debian";
+
+use constant CUTOFF_DATE_STR => "2019-07-06"; # oldstable = Debian 10 Buster
+use constant CUTOFF_DATE => Time::Piece->strptime(CUTOFF_DATE_STR, "%Y-%m-%d");
+use constant MIN_NUM_ENTRIES => 4;
+
+my $explicit_changelog = @ARGV ? 1 : 0;
+my $default_upstream = $ARGV[0];
+my $default_upstream_text=$default_upstream;
+my $default_upstream_html;
+if (! defined($default_upstream)) {
+	if (! isnative($dh{MAINPACKAGE}) && !compat(6)) {
+		foreach my $dir (qw{. doc docs}) {
+			my $changelog = find_changelog($dir);
+			if ($changelog) {
+				$default_upstream = $changelog;
+				$default_upstream_text = $default_upstream;
+				last;
+			}
+		}
+	}
+	if (isnative($dh{MAINPACKAGE})) {
+		$changelog_name='changelog';
+	}
+}
+elsif ($default_upstream=~m/\.html?$/i) {
+	$default_upstream_html=$default_upstream;
+	$default_upstream_text=$ARGV[1];
+}
+
+sub find_changelog {
+	my ($dir) = @_;
+	my @files=sort glob("$dir/*");
+	foreach my $suffix ('', qw(.txt .md .rst)) {
+		foreach my $name (qw{changelog changes history}) {
+			my @matches=grep {
+				lc basename($_) eq "$name$suffix" && -f $_ && -s _ && ! excludefile($_)
+			} @files;
+			if (@matches) {
+				return shift(@matches);
+			}
+		}
+	}
+	return;
+}
+
+sub install_debian_changelog {
+	my ($changelog, $package, $arch, $tmp) = @_;
+
+	if ($dh{NO_TRIM} || get_buildoption("notrimdch")) {
+		# Install the whole changelog.
+		install_file($changelog, "$tmp/usr/share/doc/$package/$changelog_name");
+		return;
+	}
+
+	local $ENV{LC_ALL} = "C.UTF-8";
+
+	my $changelog_trimmed = generated_file($package, "dh_installchangelogs.dch.trimmed");
+	my $changelog_binnmu = generated_file($package, "dh_installchangelogs.dch.binnmu");
+
+	open(my $log1, "<", $changelog) or error("Cannot open($changelog): $!");
+	open(my $log2, ">", $changelog_trimmed) or error("Cannot open($changelog_trimmed): $!");
+
+	my $error_in_changelog = 0;
+	my $is_binnmu = 0;
+	my $entry = "";
+	my $entry_num = 0;
+	while (my $line=<$log1>) {
+		$entry .= $line;
+
+		# Identify binNUM packages by binary-only=yes in the first line of the changelog.
+		if (($. == 1) && ($line =~ /\A\S.*;.*\bbinary-only=yes/)) {
+			$is_binnmu = 1;
+		}
+
+		# Get out of binNMU mode once we are in the second entry (and throw away one empty line).
+		if ($is_binnmu && ($entry_num eq 1)) {
+			$is_binnmu = 0;
+			$entry_num = 0;
+			$entry = "";
+			next;
+		}
+
+		if ($line =~ /^\s*--\s+.*?\s+<[^>]*>\s+(?<timestamp>.*)$/) {
+			if ($is_binnmu && ($entry_num eq 0)) {
+				# For binNMUs the first changelog entry is written into an extra file to
+				# keep the packages coinstallable.
+				open(my $log_binnum, ">", $changelog_binnmu) or error("Cannot open($changelog_binnmu): $!");
+				print($log_binnum $entry) or error("Cannot write($changelog_binnmu): $!");
+				close($log_binnum) or error("Cannot close($changelog_binnmu): $!");
+
+				# Continue processing the rest of the changelog.
+				$entry = "";
+				$entry_num++;
+				next;
+			}
+
+			my $timestamp = $+{timestamp};
+			$timestamp =~ s/^[A-Za-z]+, +//;
+
+			my $entry_time;
+			eval { $entry_time = Time::Piece->strptime($timestamp, '%d %b %Y %T %z') };
+			if (! defined $entry_time) {
+				$error_in_changelog = 1;
+				warning("Could not parse timestamp '$timestamp'. $changelog will not be trimmed.");
+				truncate($log2, 0) or error("Cannot truncate($changelog_trimmed): $!");
+				last;
+			}
+
+			# Stop processing the changelog if we reached the cut-off date and
+			# at least MIN_NUM_ENTRIES entries have been added.
+			if (($entry_time < CUTOFF_DATE) && ($entry_num >= MIN_NUM_ENTRIES)) {
+				last;
+			}
+
+			# Append entry to trimmed changelog.
+			print($log2 $entry) or error("Cannot write($changelog_trimmed): $!");
+			$entry = "";
+			$entry_num++;
+		}
+	}
+	# If the whole changelog has not been read, then it has been trimmed.
+	my $has_been_trimmed = !eof($log1);
+
+	close($log1) or error("Cannot close($changelog): $!");
+	close($log2) or error("Cannot close($changelog_trimmed): $!");
+
+	if ($error_in_changelog) {
+		# If the changelog could not be trimmed, fall back to the full changelog.
+		warning("$changelog could not be trimmed. The full changelog will be installed.");
+		$changelog_trimmed = $changelog;
+	} elsif ($has_been_trimmed) {
+		# Otherwise add a comment stating that this changelog has been trimmed.
+		my $note = "\n";
+		$note .= "# Older entries have been removed from this changelog.\n";
+		$note .= "# To read the complete changelog use `apt changelog $package`.\n";
+		open(my $log2, ">>", $changelog_trimmed) or error("Cannot open($changelog_trimmed): $!");
+		print($log2 $note) or error("Cannot write($changelog_trimmed): $!");
+		close($log2) or error("Cannot close($changelog_trimmed): $!");
+	}
+
+	install_file($changelog_trimmed, "$tmp/usr/share/doc/$package/$changelog_name");
+	if (-s $changelog_binnmu) {
+		install_file($changelog_binnmu, "$tmp/usr/share/doc/$package/$changelog_name.$arch");
+	}
+}
+
+on_pkgs_in_parallel {
+	foreach my $package (@_) {
+		next if is_udeb($package);
+	
+		my $tmp=tmpdir($package);
+		my $changelog=pkgfile($package,"changelog");
+		my $news=pkgfile($package,"NEWS");
+		my $upstream_changelog;
+		my ($upstream_changelog_text, $upstream_changelog_html);
+		my $changelog_from_tmp_dir = 0;
+
+		if ($explicit_changelog) {
+			$upstream_changelog = $default_upstream;
+			$upstream_changelog_text = $default_upstream_text;
+			$upstream_changelog_html = $default_upstream_html;
+		} else {
+			# Check if the upstream build system provided a
+			# changelog
+			$upstream_changelog = find_changelog("${tmp}/usr/share/doc/${package}");
+			if ($upstream_changelog) {
+				$upstream_changelog_text = $upstream_changelog;
+				$changelog_from_tmp_dir = 1;
+			} else {
+				$upstream_changelog = $default_upstream;
+				$upstream_changelog_text = $upstream_changelog;
+			}
+		}
+
+		if (!$changelog) {
+			$changelog="debian/changelog";
+		}
+		if (!$news) {
+			$news="debian/NEWS";
+		}
+
+		if (! -e $changelog) {
+			error("could not find changelog $changelog");
+		}
+
+		# If it is a symlink to a documentation directory from the same
+		# source package, then don't do anything. Think multi-binary
+		# packages that depend on each other and want to link doc dirs.
+		if (-l "$tmp/usr/share/doc/$package") {
+			my $linkval=readlink("$tmp/usr/share/doc/$package");
+			my %allpackages=map { $_ => 1 } getpackages();
+			if ($allpackages{basename($linkval)}) {
+				next;
+			}
+			# Even if the target doesn't seem to be a doc dir from the
+			# same source package, don't do anything if it's a dangling
+			# symlink.
+			next unless -d "$tmp/usr/share/doc/$package";
+		}
+
+		install_dir("$tmp/usr/share/doc/$package");
+
+		if (! $dh{NO_ACT}) {
+			my $arch = package_binary_arch($package);
+			install_debian_changelog($changelog, $package, $arch, $tmp);
+		}
+
+		if (-e $news) {
+			install_file($news, "$tmp/usr/share/doc/$package/$news_name");
+		}
+
+		if (defined($upstream_changelog)) {
+			my $link_to;
+			my $base="$tmp/usr/share/doc/$package";
+			if (defined($upstream_changelog_text)) {
+				if ($changelog_from_tmp_dir and not $dh{K_FLAG}) {
+					# mv (unless if it is the same file)
+					rename_path($upstream_changelog_text, "$base/changelog")
+						if basename($upstream_changelog_text) ne 'changelog';
+					reset_perm_and_owner(0644, "$base/changelog");
+				} else {
+					install_file($upstream_changelog_text, "$base/changelog");
+				}
+				$link_to='changelog';
+			}
+			if (defined($upstream_changelog_html)) {
+				if ($changelog_from_tmp_dir and not $dh{K_FLAG}) {
+					# mv (unless if it is the same file)
+					rename_path($upstream_changelog_html, "$base/changelog.html")
+						if basename($upstream_changelog_text) ne 'changelog.html';
+					reset_perm_and_owner(0644, "$base/changelog.html");
+				} else {
+					install_file($upstream_changelog_html,"$base/changelog.html");
+				}
+				$link_to='changelog.html';
+				if (! defined($upstream_changelog_text)) {
+					complex_doit("echo 'See changelog.html.gz' > $base/changelog");
+					reset_perm_and_owner(0644,"$base/changelog");
+				}
+			}
+			if ($dh{K_FLAG}) {
+				# Install symlink to original name of the upstream changelog file.
+				# Use basename in case original file was in a subdirectory or something.
+				doit('ln', '-sf', $link_to, "$tmp/usr/share/doc/$package/".basename($upstream_changelog));
+			}
+		}
+	}
+};
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut

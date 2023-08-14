@@ -1,0 +1,112 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_installudev - install udev rules files
+
+=cut
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_installudev> [S<I<debhelper options>>] [B<-n>] [B<--name=>I<name>] [B<--priority=>I<priority>]
+
+=head1 DESCRIPTION
+
+B<dh_installudev> is a debhelper program that is responsible for
+installing B<udev> rules files.
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.udev
+
+Installed into F<lib/udev/rules.d/> in the package build directory.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--name=>I<name>
+
+When this parameter is used, B<dh_installudev> looks for and
+installs files named debian/I<package>.I<name>.udev instead of the usual
+debian/I<package>.udev.
+
+=item B<--priority=>I<priority>
+
+Sets the priority the file. Default is 60.
+
+=back
+
+=head1 NOTES
+
+Note that this command is not idempotent. L<dh_prep(1)> should be called
+between invocations of this command. Otherwise, it may cause multiple
+instances of the same text to be added to maintainer scripts.
+
+=cut
+
+init(options => {
+	"priority=s" => \$dh{PRIORITY},
+});
+
+# The priority used to look like z60_;
+# we need to calculate that old value to handle
+# conffile moves correctly.
+my $old_priority=$dh{PRIORITY};
+
+# In case a caller still uses the `z` prefix, remove it.
+if (defined $dh{PRIORITY}) {
+	$dh{PRIORITY}=~s/^z//;
+}
+
+if (! defined $dh{PRIORITY}) {
+	$dh{PRIORITY}="60";
+	$old_priority="z60";
+}
+if ($dh{PRIORITY}) {
+	$dh{PRIORITY}.="-";
+	$old_priority.="_";
+}
+
+# PROMISE: DH NOOP WITHOUT udev cli-options()
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp=tmpdir($package);
+	my $rules_file=pkgfile($package,"udev");
+	my $filename=basename($rules_file);
+	if ($filename eq 'udev') {
+		$filename = "$package.udev";
+	}
+	$filename=~s/\.udev$/.rules/;
+	if (defined $dh{NAME}) {
+		$filename="$dh{NAME}.rules";
+	}
+
+	if ($rules_file) {
+		my $rule="/lib/udev/rules.d/$dh{PRIORITY}$filename";
+		install_dir("$tmp/lib/udev/rules.d");
+		install_file($rules_file, "${tmp}${rule}");
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Joey Hess <joeyh@debian.org>
+
+=cut
