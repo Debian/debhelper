@@ -1,0 +1,3 @@
+if [ -z "${DPKG_ROOT:-}" ] && [ "$1" = remove ] && [ -d /run/systemd/system ] ; then
+	deb-systemd-invoke --user stop #UNITFILES# >/dev/null || true
+fi

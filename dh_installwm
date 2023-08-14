@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,7 +7,10 @@ dh_installwm - register a window manager
 =cut
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
@@ -18,8 +21,9 @@ B<dh_installwm> [S<I<debhelper options>>] [B<-n>] [B<--priority=>I<n>] [S<I<wm> 
 B<dh_installwm> is a debhelper program that is responsible for
 generating the F<postinst> and F<prerm> commands that register a window manager
 with L<update-alternatives(8)>. The window manager's man page is also 
-registered as a slave symlink (in v6 mode and up), if it is found in 
-F<usr/share/man/man1/> in the package build directory.
+registered as a slave symlink (in v6 mode and up).  It must be installed in
+F<usr/share/man/man1/> in the package build directory prior to calling
+B<dh_installwm>.  In compat 9 and earlier, the manpage was optional.
 
 =head1 FILES
 
@@ -28,6 +32,9 @@ F<usr/share/man/man1/> in the package build directory.
 =item debian/I<package>.wm
 
 List window manager programs to register.
+
+Supports substitution variables in compat 13 and later as
+documented in L<debhelper(7)>.
 
 =back
 
@@ -41,9 +48,14 @@ Set the priority of the window manager. Default is 20, which is too low for
 most window managers; see the Debian Policy document for instructions on
 calculating the correct value.
 
-=item B<-n>, B<--noscripts>
+=item B<-n>, B<--no-scripts>
 
 Do not modify F<postinst>/F<prerm> scripts. Turns this command into a no-op.
+
+=item B<-A>, B<--all>
+
+Modify scripts for window managers specified by command line
+parameters in ALL packages acted on, not just the first.
 
 =item I<wm> ...
 
@@ -59,7 +71,9 @@ instances of the same text to be added to maintainer scripts.
 
 =cut
 
-init();
+init(options => {
+	"priority=s" => \$dh{PRIORITY},
+});
 
 if (! defined $dh{PRIORITY}) {
         $dh{PRIORITY}=20;
@@ -73,7 +87,9 @@ if (@ARGV) {
 	}
 }
 
-# PROMISE: DH NOOP WITHOUT wm
+my $nodocs = is_build_profile_active('nodoc') || get_buildoption('nodoc') ? 1 : 0;
+
+# PROMISE: DH NOOP WITHOUT wm cli-options()
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
@@ -90,19 +106,23 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	if (! $dh{NOSCRIPTS}) {
 WM:		foreach my $wm (@wm) {
-			autoscript($package,"prerm","prerm-wm","s:#WM#:$wm:");
+			autoscript($package,"prerm","prerm-wm", { 'WM' => $wm });
 
 			my $wmman;
-			if (! compat(5)) {
-				foreach my $ext (".1", ".1x") {
-					$wmman="/usr/share/man/man1/".basename($wm).$ext;
-					if (-e "$tmp$wmman" || -e "$tmp$wmman.gz") {
-						autoscript($package,"postinst","postinst-wm","s:#WM#:$wm:;s:#WMMAN#:$wmman.gz:;s/#PRIORITY#/$dh{PRIORITY}/",);
-						next WM;
-					}
+			foreach my $ext (".1", ".1x") {
+				$wmman="/usr/share/man/man1/".basename($wm).$ext;
+				if (-e "$tmp$wmman" || -e "$tmp$wmman.gz") {
+					autoscript($package,"postinst","postinst-wm", { 'WM' => $wm, 'WMMAN' => "${wmman}.gz" , 'PRIORITY' => $dh{PRIORITY} });
+					next WM;
 				}
 			}
-			autoscript($package,"postinst","postinst-wm-noman","s:#WM#:$wm:;s/#PRIORITY#/$dh{PRIORITY}/",);
+			if (not compat(9) and not $nodocs) {
+				error("no manpage found (creating an x-window-manager alternative requires a slave symlink for the manpage)");
+			} else {
+				warning("no manpage found (creating an x-window-manager alternative requires a slave symlink for the manpage)");
+			}
+			# Reaching this code means a broken package will be produced.
+			autoscript($package,"postinst","postinst-wm-noman", { 'WM' => $wm, 'PRIORITY' => $dh{PRIORITY} });
 		}
 	}
 }

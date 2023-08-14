@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,7 +7,10 @@ dh_installppp - install ppp ip-up and ip-down files
 =cut
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
@@ -48,7 +51,7 @@ as the package name.
 
 init();
 
-# PROMISE: DH NOOP WITHOUT ppp.ip-up ppp.ip-down
+# PROMISE: DH NOOP WITHOUT ppp.ip-up ppp.ip-down cli-options()
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
@@ -56,10 +59,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	foreach my $script (qw(up down)) {
 		my $file=pkgfile($package, "ppp.ip-$script");
 		if ($file ne '') {
-			if (! -d "$tmp/etc/ppp/ip-$script.d") {
-				doit("install","-d","$tmp/etc/ppp/ip-$script.d");
-			}
-			doit("install","-p","-m755",$file,"$tmp/etc/ppp/ip-$script.d/".pkgfilename($package));
+			install_dir("$tmp/etc/ppp/ip-$script.d");
+			install_prog($file,"$tmp/etc/ppp/ip-$script.d/".pkgfilename($package));
 		}
 	}
 }

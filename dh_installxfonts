@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,7 +7,10 @@ dh_installxfonts - register X fonts
 =cut
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
@@ -46,7 +49,7 @@ way.
 
 init();
 
-# PROMISE: DH NOOP WITHOUT tmp(usr/share/fonts/X11)
+# PROMISE: DH NOOP WITHOUT tmp(usr/share/fonts/X11) cli-options()
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
@@ -62,10 +65,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (@fontdirs) {
 		# Figure out what commands the postinst and postrm will need 
 		# to call.
-		my @cmds;
-		my @cmds_postinst;
-		my @cmds_postrm;
-		foreach my $f (@fontdirs) {
+		my (@cmds, @cmds_postinst, @cmds_postrm);
+		# Sort items for reproducible binary package contents.
+		foreach my $f (sort @fontdirs) {
 			# This must come before update-fonts-dir.
 			push @cmds, "update-fonts-scale $f"
 				if -f "$tmp/etc/X11/fonts/$f/$package.scale";
@@ -73,14 +75,13 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 			if (-f "$tmp/etc/X11/fonts/$f/$package.alias") {
 				push @cmds_postinst, "update-fonts-alias --include /etc/X11/fonts/$f/$package.alias $f";
 				push @cmds_postrm, "update-fonts-alias --exclude /etc/X11/fonts/$f/$package.alias $f";
-				addsubstvar($package, "misc:Depends", "xfonts-utils (>= 1:7.5+2)");
 			}
 		}
 
 		autoscript($package, "postinst", "postinst-xfonts",
-			"s:#CMDS#:".join(";", @cmds, @cmds_postinst).":");
+			{ 'CMDS' => join(";", @cmds, @cmds_postinst) });
 		autoscript($package, "postrm", "postrm-xfonts",
-			"s:#CMDS#:".join(";", @cmds, @cmds_postrm).":");
+			{ 'CMDS' => join(";", @cmds, @cmds_postrm) });
 
 		addsubstvar($package, "misc:Depends", "xfonts-utils");
 	}

@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+=encoding UTF-8
+
 =head1 NAME
 
 dh_usrlocal - migrate usr/local directories to maintainer scripts
@@ -11,6 +13,8 @@ use strict;
 use Debian::Debhelper::Dh_Lib;
 use File::Find;
 use File::stat;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
@@ -29,18 +33,25 @@ snippets are inserted into the maintainer scripts by B<dh_installdeb>. See
 L<dh_installdeb(1)> for an explanation of debhelper maintainer script
 snippets.
 
-If the directories found in the build tree have unusual owners, groups, or
-permissions, then those values will be preserved in the directories made by
-the F<postinst> script. However, as a special exception, if a directory is owned
-by root.root, it will be treated as if it is owned by root.staff and is mode
-2775. This is useful, since that is the group and mode policy recommends for
-directories in F</usr/local>.
+When the I<DEB_RULES_REQUIRES_ROOT> environment variable is not (effectively)
+I<binary-targets>, the directories in F</usr/local> will be handled as if
+they were owned by root:root (see below).
+
+When the I<DEB_RULES_REQUIRES_ROOT> environment variable has an effective value of
+I<binary-targets>, the owners, groups and permissions will be
+preserved with the sole exception where the directory is owned by root:root.
+
+If a directory is owned by root:root, then ownership will be determined
+at install time.  The ownership and permission bits will either be root:root
+mode 0755 or root:staff mode 02775.  The actual choice depends on whether
+the system has F</etc/staff-group-for-usr-local> (as documented in the Debian
+Policy Manual §9.1.2 since version 4.1.4)
 
 =head1 OPTIONS
 
 =over 4
 
-=item B<-n>, B<--noscripts>
+=item B<-n>, B<--no-scripts>
 
 Do not modify F<postinst>/F<prerm> scripts.
 
@@ -60,55 +71,64 @@ Debian policy, version 2.2
 
 init();
 
-# PROMISE: DH NOOP WITHOUT tmp(usr/local)
+# PROMISE: DH NOOP WITHOUT tmp(usr/local) cli-options()
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp = tmpdir($package);
 
 	if (-d "$tmp/usr/local") {
 		my (@dirs, @justdirs);
-		find({bydepth => 1,
-		      no_chdir => 1,
-		      wanted => sub {
-			my $fn = $File::Find::name;
-			if (-d $fn) {
-				my $stat = stat $fn;
-				my $user = getpwuid $stat->uid;
-				my $group = getgrgid $stat->gid;
-				my $mode = sprintf "%04lo", ($stat->mode & 07777);
-
-				if ($stat->uid == 0 && $stat->gid == 0) {
-					$group = 'staff';
-					$mode = '2775';
-				}
-
-				$fn =~ s!^\Q$tmp\E!!;
-				return if $fn eq '/usr/local';
-				
-				# @dirs is in parents-first order for dir creation...
-				unshift @dirs, "$fn $mode $user $group";
-				# ...whereas @justdirs is depth-first for removal.
-				push @justdirs, $fn;
-				doit("rmdir $_");
-			}
-			else {
-				warning("$fn is not a directory");
-			}
+		find({no_chdir => 1,
+		      preprocess => sub {
+				  # Ensure a reproducible traversal.
+				  return sort @_;
+		      },
+		      postprocess => sub {
+				  # Uninstall, unless a direct child of /usr/local.
+				  $_ = $File::Find::dir;
+				  s!^\Q$tmp\E!!;
+				  push @justdirs, $_ if m!/usr/local/.*/!;
+				  # Remove a directory after its childs.
+				  doit('rmdir', $File::Find::dir);
+		      },
+			  wanted => sub {
+				  # rmdir would fail later anyways.
+				  error("${File::Find::name} is not a directory")
+					  if not -d $File::Find::name;
+				  # Install directory before its childs.
+				  my $fn = $File::Find::name;
+				  $fn =~ s!^\Q$tmp\E!!;
+				  return if $fn eq '/usr/local';
+				  # Detect some obvious cases of "this will not end
+				  # well".  We rely on what "while read dir ... ; do"
+				  # can handle for correctness.
+				  if ($fn =~ m{[\s!'"\$()*#;<>?@\[\]\\`|]}) {
+					  error("Cannot generate a correct shell script for $fn due to shell metacharacters");
+				  }
+				  if (should_use_root()) {
+					  my $stat = stat $File::Find::dir;
+					  if ($stat->uid == 0 && $stat->gid == 0) {
+						  # Figure out the ownership and permission at runtime
+						  # (required by Policy 9.1.2)
+						  push(@dirs, "$fn default");
+					  } else {
+						  my $user = getpwuid $stat->uid;
+						  my $group = getgrgid $stat->gid;
+						  my $mode = sprintf "%04lo", ($stat->mode & 07777);
+						  push @dirs, "$fn $mode $user $group";
+					  }
+				  } else {
+					  # Figure out the ownership and permission at runtime
+					  # (required by Policy 9.1.2)
+					  push(@dirs, "$fn default");
+				  }
 		      }}, "$tmp/usr/local");
-		doit("rmdir $tmp/usr/local");
-	
-		my $bs = "\\";     # A single plain backslash
-		my $ebs = $bs x 2; # Escape the backslash from the shell
-		# This constructs the body of a 'sed' c\ expression which
-		# is parsed by the shell in double-quotes
-		my $dirs = join("$ebs\n", @dirs);
-		pop @justdirs; # don't remove directories directly in /usr/local
-		my $justdirs = join("$ebs\n", @justdirs);
+
 		if (! $dh{NOSCRIPTS}) { 
 			autoscript($package,"postinst", "postinst-usrlocal",
-				   "/#DIRS#/ c${ebs}\n${dirs}");
+					   { 'DIRS' => join ("\n", @dirs)}) if @dirs;
 			autoscript($package,"prerm", "prerm-usrlocal",
-				   "/#JUSTDIRS#/ c${ebs}\n${justdirs}") if length $justdirs;
+					   { 'JUSTDIRS' => join ("\n", @justdirs)}) if @justdirs;
 		}
 	}
 }

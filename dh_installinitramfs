@@ -1,0 +1,103 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_installinitramfs - install initramfs hooks and setup maintscripts
+
+=cut
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_installinitramfs> [S<B<debhelper options>>] [B<-n>]
+
+=head1 DESCRIPTION
+
+B<dh_installinitramfs> is a debhelper program that is responsible for
+installing Debian package provided initramfs hooks.
+
+If B<dh_installinitramfs> installs or detects one or more initramfs
+hooks in the package, then it also automatically generates the noawait
+trigger B<update-initframfs> command needed to interface with the
+Debian initramfs system.  This trigger is inserted into the
+packaging by L<dh_installdeb(1)>.
+
+=head1 FILES
+
+=over 4
+
+=item debian/I<package>.initramfs-hook
+
+Assumed to be an initramfs hook that will be installed into F<<
+usr/share/initramfs-tools/hooks/I<package> >> in the package build
+directory. See B<HOOK SCRIPTS> in L<initramfs-tools(8)> for more
+information about initramfs hooks.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-n>, B<--no-scripts>
+
+Do not add the B<update-initramfs> trigger even if it seems like the package
+might need it.  The option is called B<--no-scripts> for historical
+reasons as B<dh_installinitramfs> would previously generate maintainer
+scripts that called B<update-initramfs -u>.
+
+Use this option, if you need to interface with the B<update-initramfs>
+system that is not satisfied by the noawait trigger (e.g. because you need
+the extra guarantees and head-aches of a await trigger).
+
+=back
+
+=head1 NOTES
+
+Note that this command is not idempotent. L<dh_prep(1)> should be called
+between invocations of this command. Otherwise, it may cause multiple
+instances of the same text to be added to triggers file.
+
+=cut
+
+init();
+
+# PROMISE: DH NOOP WITHOUT initramfs-hook tmp(usr/share/initramfs-tools/hooks) cli-options()
+
+foreach my $package (@{$dh{DOPACKAGES}}) {
+	my $tmp = tmpdir($package);
+	my $hook_script = pkgfile($package, 'initramfs-hook');
+	my $has_hooks;
+	my $hook_dir = "${tmp}/usr/share/initramfs-tools/hooks";
+
+	if ($hook_script ne '') {
+		install_dir($hook_dir);
+		install_prog($hook_script, "${hook_dir}/${package}");
+		$has_hooks = 1;
+	} elsif (-d $hook_dir and not is_empty_dir($hook_dir)) {
+		$has_hooks = 1;
+	}
+
+	if ($has_hooks && ! $dh{NOSCRIPTS}) {
+		autotrigger($package, 'activate-noawait', 'update-initramfs');
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+L<update-initramfs(8)>
+L<initramfs-tools(8)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Niels Thykier <niels@thykier.net>
+
+=cut

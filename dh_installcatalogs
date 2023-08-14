@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,9 +7,12 @@ dh_installcatalogs - install and register SGML Catalogs
 =cut
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib;
 
-my $sgmlbasever = "1.26+nmu2";
+our $VERSION = DH_BUILTIN_VERSION;
+
+my $sgmlbasever = "1.28";
 
 =head1 SYNOPSIS
 
@@ -25,9 +28,10 @@ F</etc/sgml/I<package>.cat>.
 
 This command automatically adds maintainer script snippets for
 registering and unregistering the catalogs and supercatalogs (unless
-B<-n> is used). These snippets are inserted into the maintainer scripts
-by B<dh_installdeb>; see L<dh_installdeb(1)> for an explanation of
-Debhelper maintainer script snippets.
+B<-n> is used). These snippets are inserted into the maintainer
+scripts and the B<triggers> file by B<dh_installdeb>; see
+L<dh_installdeb(1)> for an explanation of Debhelper maintainer script
+snippets.
 
 A dependency on B<sgml-base> will be added to B<${misc:Depends}>, so be
 sure your package uses that variable in F<debian/control>.
@@ -44,15 +48,19 @@ catalog resides in the source tree, and I<dest> indicates the destination
 location for the catalog under the package build area. I<dest> should
 start with F</usr/share/sgml/>.
 
+Supports substitution variables in compat 13 and later as
+documented in L<debhelper(7)>.
+
 =back
 
 =head1 OPTIONS
 
 =over 4
 
-=item B<-n>, B<--noscripts>
+=item B<-n>, B<--no-scripts>
 
-Do not modify F<postinst>/F<postrm>/F<prerm> scripts.
+Do not modify F<postinst>/F<postrm>/F<prerm> scripts nor add an
+activation trigger.
 
 =back
 
@@ -66,7 +74,7 @@ multiple instances of the same text to be added to maintainer scripts.
 
 init();
 
-# PROMISE: DH NOOP WITHOUT sgmlcatalogs
+# PROMISE: DH NOOP WITHOUT sgmlcatalogs cli-options()
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmpdir = tmpdir($package);
@@ -79,38 +87,36 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		foreach my $line (filedoublearray($sgmlcatlistfile)) {
 			my $source = $line->[0];
 			my $dest = $line->[1];
-	                my $fulldest = "$tmpdir/$dest"; 
+			my $fulldest = "$tmpdir/$dest";
 			$fulldest =~ s|//|/|g; # beautification
 	
 			if (! -d dirname($fulldest)) {
-				doit("install","-d","-m755",$tmpdir."/".dirname($dest));
+				# Ensure the parent exist
+				install_dir($tmpdir."/".dirname($dest));
 			}
 
-			doit("install","-p","-m644",$source,$fulldest);
-	
+			install_file($source,$fulldest);
+
 			push(@sgmlinstalled,$dest);
 		}
 	}
 	if (@sgmlinstalled) {
 		addsubstvar($package, "misc:Depends", "sgml-base", ">= $sgmlbasever");
 
-		if (! -d "$tmpdir/etc/sgml") {
-			doit("install","-d","-m755","$tmpdir/etc/sgml");
-		}
+		install_dir("$tmpdir/etc/sgml");
 
 		my $centralcat = "/etc/sgml/$package.cat";
 
-		open(CENTRALCAT, ">", "$tmpdir$centralcat") || error("failed to write to $tmpdir$centralcat");
+		open(my $fd, ">", "$tmpdir$centralcat") || error("failed to write to $tmpdir$centralcat");
 		foreach my $sgmldest (@sgmlinstalled) {
-			print CENTRALCAT "CATALOG " . $sgmldest . "\n";
+			print {$fd} "CATALOG " . $sgmldest . "\n";
 		}
-		close CENTRALCAT;
+		close($fd) or error("close $tmpdir$centralcat: $!");
 
 		if (! $dh{NOSCRIPTS}) {
-			autoscript($package, "preinst", "preinst-sgmlcatalog",
-				   "s%#CENTRALCAT#%$centralcat%g;");
+			autotrigger($package, "activate-await", "update-sgmlcatalog");
 			autoscript($package, "postrm", "postrm-sgmlcatalog",
-				   "s%#CENTRALCAT#%$centralcat%g;");
+				   { 'CENTRALCAT' => $centralcat });
 		}
 	}
 	else {

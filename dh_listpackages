@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,7 +7,10 @@ dh_listpackages - list binary packages debhelper will act on
 =cut
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
@@ -20,11 +23,12 @@ packages debhelper commands will act on. If you pass it some options, it
 will change the list to match the packages other debhelper commands would
 act on if passed the same options.
 
+Packages are listed in the order they appear in F<debian/control>.
+
 =cut
 
 $dh{BLOCK_NOOP_WARNINGS}=1;
-init();
-inhibit_log();
+init(inhibit_log => 1);
 print join("\n",@{$dh{DOPACKAGES}})."\n";
 
 =head1 SEE ALSO

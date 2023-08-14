@@ -7,13 +7,10 @@ export PATH
 
 # Ensure that builds are self-hosting, which means I have to use the .pm
 # files in this package, not any that may be on the system.
-export PERL5LIB=$(pwd)
+export PERL5LIB=$(pwd)/lib
 
 # If any automatic script generation is done in building this package, 
 # be sure to use the new templates from this package.
-export DH_AUTOSCRIPTDIR=$(pwd)/autoscripts
+export DH_DATAFILES=$(pwd)
 
-prog=$1
-shift 1
-
-exec $prog "$@"
+exec "$@"

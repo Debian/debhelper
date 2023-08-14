@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,7 +7,10 @@ dh_installlogrotate - install logrotate config files
 =cut
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
@@ -35,17 +38,15 @@ as the package name.
 
 init();
 
-# PROMISE: DH NOOP WITHOUT logrotate
+# PROMISE: DH NOOP WITHOUT logrotate cli-options()
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $file=pkgfile($package,"logrotate");
 
 	if ($file) {
-		if (! -d "$tmp/etc/logrotate.d") {
-			doit("install","-o",0,"-g",0,"-d","$tmp/etc/logrotate.d");
-		}
-		doit("install","-m",644,$file,"$tmp/etc/logrotate.d/".pkgfilename($package));
+		install_dir("$tmp/etc/logrotate.d");
+		install_file($file,"$tmp/etc/logrotate.d/".pkgfilename($package));
 	}
 }
 

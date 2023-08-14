@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,11 +7,14 @@ dh_ucf - register configuration files with ucf
 =cut
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
-B<dh_ucf> [S<I<debhelper options>>] [B<-n>]
+B<dh_ucf> [S<I<debhelper options>>] [B<-A>] [B<-n>] [S<I<file> ...>]
 
 =head1 DESCRIPTION
 
@@ -32,15 +35,28 @@ while the destination is typically a file in /etc/.
 
 A dependency on ucf will be generated in B<${misc:Depends}>.
 
+Supports substitution variables in compat 13 and later as
+documented in L<debhelper(7)>.
+
 =back
 
 =head1 OPTIONS
 
 =over 4
 
-=item B<-n>, B<--noscripts>
+=item B<-A>, B<--all>
+
+Install all files specified by command line parameters in ALL packages
+acted on.
+
+=item B<-n>, B<--no-scripts>
 
 Do not modify F<postinst>/F<postrm> scripts. Turns this command into a no-op.
+
+=item I<file> ...
+
+Install these info files into the first package acted on. (Or in
+all packages if B<-A> is specified).
 
 =back
 
@@ -54,10 +70,9 @@ instances of the same text to be added to maintainer scripts.
 
 init();
 
-# PROMISE: DH NOOP WITHOUT ucf
+# PROMISE: DH NOOP WITHOUT ucf cli-options()
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
-	my $tmp=tmpdir($package);
 	my $file=pkgfile($package,"ucf");
 
 	my @ucf;
@@ -76,8 +91,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		foreach my $set (@ucf) {
 			my $src = $set->[0];
 			my $dest = $set->[1];
-			autoscript($package,"postinst","postinst-ucf","s:#UCFSRC#:$src:;s:#UCFDEST#:$dest:;s/#PACKAGE#/$package/",);
-			autoscript($package,"postrm","postrm-ucf","s:#UCFDEST#:$dest:;s/#PACKAGE#/$package/");
+			autoscript($package,"postinst","postinst-ucf","s:#UCFSRC#:$src:g;s:#UCFDEST#:$dest:g;s/#PACKAGE#/$package/g",);
+			autoscript($package,"postrm","postrm-ucf","s:#UCFDEST#:$dest:g;s/#PACKAGE#/$package/g");
 		}
 	}
 }

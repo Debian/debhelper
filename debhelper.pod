@@ -1,10 +1,12 @@
+=encoding UTF-8
+
 =head1 NAME
 
 debhelper - the debhelper tool suite
 
 =head1 SYNOPSIS
 
-B<dh_>I<*> [B<-v>] [B<-a>] [B<-i>] [B<-s>] [B<--no-act>] [B<-p>I<package>] [B<-N>I<package>] [B<-P>I<tmpdir>]
+B<dh_>I<*> [B<-v>] [B<-a>] [B<-i>] [B<--no-act>] [B<-p>I<package>] [B<-N>I<package>] [B<-P>I<tmpdir>]
 
 =head1 DESCRIPTION
 
@@ -25,6 +27,11 @@ the sample rules files and edit it by hand. Or you can try the B<dh-make>
 package, which contains a L<dh_make|dh_make(1)> command that partially
 automates the process. For a more gentle introduction, the B<maint-guide> Debian 
 package contains a tutorial about making your first package using debhelper.
+
+Except where the tool explicitly denotes otherwise, all of the debhelper
+tools assume that they run from the root directory of an unpacked source
+package.  This is so they can locate find files like F<debian/control>
+when needed.
 
 =head1 DEBHELPER COMMANDS
 
@@ -71,7 +78,11 @@ complicated formats.
 
 Note for the first (or only) binary package listed in
 F<debian/control>, debhelper will use F<debian/foo> when there's no
-F<debian/package.foo> file.
+F<debian/I<package>.foo> file.  However, it is often a good idea to keep
+the F<I<package>.> prefix as it is more explicit.  The primary exception
+to this are files that debhelper by default installs in every binary
+package when it does not have a package prefix (such as
+F<debian/copyright> or F<debian/changelog>).
 
 In some rare cases, you may want to have different versions of these files
 for different architectures or OSes. If files named debian/I<package>.foo.I<ARCH>
@@ -88,10 +99,172 @@ You can also put comments in these files; lines beginning with B<#> are
 ignored.
 
 The syntax of these files is intentionally kept very simple to make them
-easy to read, understand, and modify. If you prefer power and complexity,
-you can make the file executable, and write a program that outputs
-whatever content is appropriate for a given situation. When you do so,
-the output is not further processed to expand wildcards or strip comments.
+easy to read, understand, and modify.
+
+=head2 Substitutions in debhelper config files
+
+In compatibility level 13 and later, it is possible to use simple
+substitutions in debhelper config files for the following tools:
+
+=over 4
+
+=item *
+
+dh_clean
+
+=item *
+
+dh_install
+
+=item *
+
+dh_installcatalogs
+
+=item *
+
+dh_installdeb
+
+=item *
+
+dh_installdirs
+
+=item *
+
+dh_installdocs
+
+=item *
+
+dh_installexamples
+
+=item *
+
+dh_installinfo
+
+=item *
+
+dh_installman
+
+=item *
+
+dh_installwm
+
+=item *
+
+dh_link
+
+=item *
+
+dh_missing
+
+=item *
+
+dh_ucf
+
+=back
+
+All substitution variables are of the form I<${foo}> and the braces
+are mandatory.  Variable names are case-sensitive and consist of
+alphanumerics (a-zA-Z0-9), hyphens (-), underscores (_), and colons (:).
+The first character must be an alphanumeric.
+
+If you need a literal dollar sign that cannot trigger a substitution,
+you can either use the B<${Dollar}> substitution or the sequence B<${}>.
+
+The following expansions are available:
+
+=over 4
+
+=item B<DEB_HOST_*>, B<DEB_BUILD_*>, B<DEB_TARGET_*>
+
+Expands to the relevant L<dpkg-architecture(1)> value (similar to
+I<dpkg-architecture -qVARIABLE_HERE>).
+
+When in doubt, the B<DEB_HOST_*> variant is the one that will work both
+for native and cross builds.
+
+For performance reasons, debhelper will attempt to resolve these
+names from the environment first before consulting
+L<dpkg-architecture(1)>.  This is mostly mentioned for completeness
+as it will not matter for most cases.
+
+=item B<Dollar>
+
+Expands to a single literal B<$>-symbol.  This symbol will I<never>
+be considered part of a substitution variable.  That is:
+
+   # Triggers an error
+   ${NO_SUCH_TOKEN}
+   # Expands to the literal value "${NO_SUCH_TOKEN}"
+   ${Dollar}{NO_SUCH_TOKEN}
+
+This variable equivalent to the sequence B<${}> and the two can be
+used interchangeably.
+
+=item B<Newline>, B<Space>, B<Tab>
+
+Expands to a single ASCII newline, space and tab respectively.
+
+This can be useful if you need to include a literal whitespace
+character (e.g. space) where it would otherwise be stripped or
+used as a separator.
+
+=item B<< env:I<NAME> >>
+
+Expands to the environment variable I<NAME>.  The environment
+variable must be set (but can be set to the empty string).
+
+=back
+
+Note that all variables must expand to a defined value.  As an example,
+if debhelper sees I<${env:FOO}>, then it will insist that the environment
+variable I<FOO> is set (it can be set to the empty string).
+
+=head3 Substitution limits
+
+To avoid infinite loops and resource exhaustion, debhelper will stop
+with an error if the text contains many substitution variables (50) or
+they expand beyond a certain size (4096 characters or 3x length of
+the original input - whichever is bigger).
+
+=head2 Executable debhelper config files
+
+If you need additional flexibility, many of the debhelper tools
+(e.g. L<dh_install(1)>) support executing a config file as a script.
+
+To use this feature, simply mark the config file as executable
+(e.g. B<< chmod +x debian/I<package>.install >>) and the tool will
+attempt to execute it and use the output of the script.  In many
+cases, you can use L<dh-exec(1)> as interpreter of the config file to
+retain most of the original syntax while getting the additional
+flexibility you need.
+
+
+When using executable debhelper config files, please be aware of the
+following:
+
+=over 4
+
+=item *
+
+The executable config file B<must> exit with success (i.e. its return
+code should indicate success).
+
+=item *
+
+In compatibility level 13+, the output will be subject to substitutions
+(see L</Substitutions in debhelper config files>) where the tool
+support these.  Remember to be careful if your generator I<also> provides
+substitutions as this can cause unnecessary confusion.
+
+Otherwise, the output will be used exactly as-is.  Notably, debhelper
+will I<not> expand wildcards or strip comments or strip whitespace
+in the output.
+
+=back
+
+If you need the package to build on a file system where you cannot
+disable the executable bit, then you can use L<dh-exec(1)> and its
+B<strip-output> script.
 
 =head1 SHARED DEBHELPER OPTIONS
 
@@ -101,7 +274,10 @@ The following command line options are supported by all debhelper programs.
 
 =item B<-v>, B<--verbose>
 
-Verbose mode: show all commands that modify the package build directory.
+Verbose mode: show commands that modify the package build directory.
+
+Note that verbose mode may also output other "internal" commands that do not
+directly affect the package build directory.
 
 =item B<--no-act>
 
@@ -111,7 +287,7 @@ will output what it would have done.
 =item B<-a>, B<--arch>
 
 Act on architecture dependent packages that should be built for the
-build architecture.
+B<DEB_HOST_ARCH> architecture.
 
 =item B<-i>, B<--indep>
 
@@ -124,8 +300,9 @@ times to make debhelper operate on a given set of packages.
 
 =item B<-s>, B<--same-arch>
 
-This used to be a smarter version of the B<-a> flag, but the B<-a> flag is now
-equally smart.
+Deprecated alias of B<-a>.
+
+This option is removed in compat 12.
 
 =item B<-N>I<package>, B<--no-package=>I<package>
 
@@ -139,16 +316,6 @@ command earlier (i.e. if the command is present in the package debhelper log).
 For example, if you need to call the command with special options only for a
 couple of binary packages, pass this option to the last call of the command to
 process the rest of packages with default settings. 
-
-=item B<--ignore=>I<file>
-
-Ignore the specified file. This can be used if F<debian/> contains a debhelper
-config file that a debhelper command should not act on. Note that
-F<debian/compat>, F<debian/control>, and F<debian/changelog> can't be ignored, but
-then, there should never be a reason to ignore those files.
-
-For example, if upstream ships a F<debian/init> that you don't want
-B<dh_installinit> to install, use B<--ignore=debian/init>
 
 =item B<-P>I<tmpdir>, B<--tmpdir=>I<tmpdir>
 
@@ -185,7 +352,7 @@ Do not modify F<postinst>, F<postrm>, etc. scripts.
 =item B<-X>I<item>, B<--exclude=>I<item>
 
 Exclude an item from processing. This option may be used multiple times,
-to exclude more than one thing. The \fIitem\fR is typically part of a
+to exclude more than one thing. The I<item> is typically part of a
 filename, and any file containing the specified text will be excluded.
 
 =item B<-A>, B<--all>
@@ -211,13 +378,21 @@ B<dh_auto_>I<*> programs.
 Force use of the specified I<buildsystem>, instead of trying to auto-select
 one which might be applicable for the package.
 
-=item B<-D>I<directory>, B<--sourcedirectory=>I<directory>
+Pass B<none> as I<buildsystem> to disable auto-selection.
+
+=item B<-D>I<directory>, B<--sourcedir=>I<directory>, B<--sourcedirectory=>I<directory>
 
 Assume that the original package source tree is at the specified
 I<directory> rather than the top level directory of the Debian
 source package tree.
 
-=item B<-B>[I<directory>], B<--builddirectory=>[I<directory>]
+B<Warning>: The B<--sourcedir> variant matches a similar named option in
+B<dh_install> and B<dh_missing> (etc.) for historical reasons.  While they
+have a similar name, they have very distinct purposes and in some cases
+it can cause errors when this variant is passed to B<dh> (when then passes
+it on to all tools).
+
+=item B<-B>[I<directory>], B<--builddir>[I<=directory>], B<--builddirectory>[I<=directory>]
 
 Enable out of source building and use the specified I<directory> as the build
 directory. If I<directory> parameter is omitted, a default build directory
@@ -232,15 +407,21 @@ If the build system prefers out of source tree building but still
 allows in source building, the latter can be re-enabled by passing a build
 directory path that is the same as the source directory path.
 
-=item B<--parallel>
+=item B<--parallel>, B<--no-parallel>
 
-Enable parallel builds if underlying build system supports them.
-The number of parallel jobs is controlled by the
-B<DEB_BUILD_OPTIONS> environment variable (L<Debian Policy, section 4.9.1>) at
-build time. It might also be subject to a build system specific limit.
+Control whether parallel builds should be used if underlying build
+system supports them.  The number of parallel jobs is controlled by
+the B<DEB_BUILD_OPTIONS> environment variable (L<Debian Policy,
+section 4.9.1>) at build time. It might also be subject to a build
+system specific limit.
 
-If this option is not specified, debhelper currently defaults to not
-allowing parallel package builds.
+If neither option is specified, debhelper currently defaults to
+B<--parallel> in compat 10 (or later) and B<--no-parallel> otherwise.
+
+As an optimization, B<dh> will try to avoid passing these options to
+subprocesses, if they are unnecessary and the only options passed.
+Notably this happens when B<DEB_BUILD_OPTIONS> does not have a
+I<parallel> parameter (or its value is 1).
 
 =item B<--max-parallel=>I<maximum>
 
@@ -248,6 +429,40 @@ This option implies B<--parallel> and allows further limiting the number of
 jobs that can be used in a parallel build. If the package build is known to
 only work with certain levels of concurrency, you can set this to the maximum
 level that is known to work, or that you wish to support.
+
+Notably, setting the maximum to 1 is effectively the same as using
+B<--no-parallel>.
+
+=item B<--reload-all-buildenv-variables>
+
+By default, L<dh(1)> will compute several environment variables (e.g. by
+using L<dpkg-buildflags(1)>) and cache them to avoid having all B<dh_auto_*>
+tool recompute them.
+
+When passing this option, the concrete B<dh_auto_*> tool will ignore
+the cache from L<dh(1)> and retrigger a rebuild of these variables.
+This is useful in the very rare case where the package need to do
+multiple builds but with different B<...FLAGS> options.  A concrete
+example would be needing to change the B<-O> parameter in B<CFLAGS> in
+the second build:
+
+    export DEB_CFLAGS_MAINT_APPEND=-O3
+
+    %:
+        dh $@
+
+    override_dh_auto_configure:
+        dh_auto_configure -Bbuild-deb ...
+        DEB_CFLAGS_MAINT_APPEND=-Os dh_auto_configure \
+           --reload-all-buildenv-variables -Bbuild-udeb ...
+
+Without B<--reload-all-buildenv-variables> in the second call to
+L<dh_auto_configure(1)>, the change in B<DEB_CFLAGS_MAINT_APPEND>
+would be ignored as L<dh_auto_configure(1)> would use the cached value
+of B<CFLAGS> set by L<dh(1)>.
+
+This option is only available with B<< debhelper (>= 12.7~) >> when
+the package uses compatibility level 9 or later.
 
 =item B<--list>, B<-l>
 
@@ -263,20 +478,49 @@ is manually specified with the B<--buildsystem> option.
 From time to time, major non-backwards-compatible changes need to be made
 to debhelper, to keep it clean and well-designed as needs change and its
 author gains more experience. To prevent such major changes from breaking
-existing packages, the concept of debhelper compatibility levels was 
-introduced. You tell debhelper which compatibility level it should use, and
+existing packages, the concept of debhelper compatibility levels was
+introduced. You must tell debhelper which compatibility level it should use, and
 it modifies its behavior in various ways.
 
-Tell debhelper what compatibility level to use by writing a number to
-F<debian/compat>. For example, to turn on v9 mode:
+In current debhelper, you can specify the compatibility level in
+F<debian/control> by adding a Build-Depends on the debhelper-compat package.
+For example, to use v#RECOMMENDED_COMPAT# mode, ensure F<debian/control> has:
 
-  % echo 9 > debian/compat
+  Build-Depends: debhelper-compat (= #RECOMMENDED_COMPAT#)
 
-Your package will also need a versioned build dependency on a version of
-debhelper equal to (or greater than) the compatibility level your package
-uses. So for compatibility level 9, ensure debian/control has:
+This also serves as an appropriate versioned build dependency on a sufficient
+version of the debhelper package, so you do not need to specify a separate
+versioned build dependency on the debhelper package unless you need a specific
+point release of debhelper (such as for the introduction of a new feature or
+bugfix within a compatibility level).
 
-  Build-Depends: debhelper (>= 9)
+Note that debhelper does not provide debhelper-compat for experimental or beta
+compatibility levels; packages experimenting with those compatibility levels
+should use F<debian/compat> (or, if only for selected commands, B<DH_COMPAT>).
+
+Prior versions of debhelper required specifying the compatibility level in the
+file F<debian/compat>, and current debhelper still supports this for backward
+compatibility. To use this method, the F<debian/compat> file should contain
+the compatibility level as a single number, and no other content. If you
+specify the compatibility level by this method, your package will also need a
+versioned build dependency on a version of the debhelper package equal to (or
+greater than) the compatibility level your package uses. So, if you specify
+compatibility level #RECOMMENDED_COMPAT# in F<debian/compat>, ensure
+F<debian/control> has:
+
+  Build-Depends: debhelper (>= #RECOMMENDED_COMPAT#~)
+
+Note that you must use either the build-dependency on debhelper-compat or
+the F<debian/compat> file. Whenever possible, the debhelper-compat
+build-dependency is recommended.
+
+If needed be, the B<DH_COMPAT> environment variable can be used to override
+the compat level for a given command.  The feature is mostly useful for
+either temporarily upgrading a few commands to a new compat level or
+keeping a few commands on a lower compat level.  The feature is best used
+sparingly as it effectively introduces special-cases into the
+F<debian/rules> file that may be surprising to maintainers or reviewers
+(or, in the long term, to yourself).
 
 Unless otherwise indicated, all debhelper documentation assumes that you
 are using the most recent compatibility level, and in most cases does not
@@ -285,270 +529,10 @@ if you are not using the most recent compatibility level, you're advised to
 read below for notes about what is different in earlier compatibility
 levels.
 
-These are the available compatibility levels:
+=head2 Supported compatibility levels
 
-=over 4
-
-=item v1
-
-This is the original debhelper compatibility level, and so it is the default
-one. In this mode, debhelper will use F<debian/tmp> as the package tree
-directory for the first binary package listed in the control file, while using
-debian/I<package> for all other packages listed in the F<control> file.
-
-This mode is deprecated.
-
-=item v2
-
-In this mode, debhelper will consistently use debian/I<package>
-as the package tree directory for every package that is built.
-
-This mode is deprecated.
-
-=item v3
-
-This mode works like v2, with the following additions:
-
-=over 8
-
-=item -
-
-Debhelper config files support globbing via B<*> and B<?>, when appropriate. To
-turn this off and use those characters raw, just prefix with a backslash.
-
-=item -
-
-B<dh_makeshlibs> makes the F<postinst> and F<postrm> scripts call B<ldconfig>.
-
-=item -
-
-Every file in F<etc/> is automatically flagged as a conffile by B<dh_installdeb>.
-
-=back
-
-This mode is deprecated.
-
-=item v4
-
-Changes from v3 are:
-
-=over 8
-
-=item -
-
-B<dh_makeshlibs -V> will not include the Debian part of the version number in
-the generated dependency line in the shlibs file.
-
-=item -
-
-You are encouraged to put the new B<${misc:Depends}> into F<debian/control> to
-supplement the B<${shlibs:Depends}> field.
-
-=item -
-
-B<dh_fixperms> will make all files in F<bin/> directories and in F<etc/init.d>
-executable.
-
-=item -
-
-B<dh_link> will correct existing links to conform with policy.
-
-=back
-
-This mode is deprecated.
-
-=item v5
-
-Changes from v4 are:
-
-=over 8
-
-=item -
-
-Comments are ignored in debhelper config files.
-
-=item -
-
-B<dh_strip --dbg-package> now specifies the name of a package to put debugging
-symbols in, not the packages to take the symbols from.
-
-=item -
-
-B<dh_installdocs> skips installing empty files.
-
-=item -
-
-B<dh_install> errors out if wildcards expand to nothing.
-
-=back
-
-=item v6
-
-Changes from v5 are:
-
-=over 8
-
-=item -
-
-Commands that generate maintainer script fragments will order the
-fragments in reverse order for the F<prerm> and F<postrm> scripts.
-
-=item -
-
-B<dh_installwm> will install a slave manpage link for F<x-window-manager.1.gz>,
-if it sees the man page in F<usr/share/man/man1> in the package build
-directory.
-
-=item -
-
-B<dh_builddeb> did not previously delete everything matching
-B<DH_ALWAYS_EXCLUDE>, if it was set to a list of things to exclude, such as
-B<CVS:.svn:.git>. Now it does.
-
-=item -
-
-B<dh_installman> allows overwriting existing man pages in the package build
-directory. In previous compatibility levels it silently refuses to do this.
-
-=back
-
-=item v7
-
-Changes from v6 are:
-
-=over 8
-
-=item -
-
-B<dh_install>, will fall back to looking for files in F<debian/tmp> if it doesn't
-find them in the current directory (or wherever you tell it look using
-B<--sourcedir>). This allows B<dh_install> to interoperate with B<dh_auto_install>,
-which installs to F<debian/tmp>, without needing any special parameters.
-
-=item -
-
-B<dh_clean> will read F<debian/clean> and delete files listed there.
-
-=item -
-
-B<dh_clean> will delete toplevel F<*-stamp> files.
-
-=item -
-
-B<dh_installchangelogs> will guess at what file is the upstream changelog if
-none is specified.
-
-=back
-
-=item v8
-
-Changes from v7 are:
-
-=over 8
-
-=item -
-
-Commands will fail rather than warning when they are passed unknown options.
-
-=item -
-
-B<dh_makeshlibs> will run B<dpkg-gensymbols> on all shared libraries that it
-generates shlibs files for. So B<-X> can be used to exclude libraries.
-Also, libraries in unusual locations that B<dpkg-gensymbols> would not
-have processed before will be passed to it, a behavior change that 
-can cause some packages to fail to build.
-
-=item -
-
-B<dh> requires the sequence to run be specified as the first parameter, and
-any switches come after it. Ie, use "B<dh $@ --foo>", not "B<dh --foo $@>".
-
-=item -
-
-B<dh_auto_>I<*> prefer to use Perl's B<Module::Build> in preference to F<Makefile.PL>.
-
-=back
-
-=item v9
-
-This is the recommended mode of operation.
-
-Changes from v8 are:
-
-=over 8
-
-=item - 
-
-Multiarch support. In particular, B<dh_auto_configure> passes
-multiarch directories to autoconf in --libdir and --libexecdir.
-
-=item -
-
-dh is aware of the usual dependencies between targets in debian/rules.
-So, "dh binary" will run any build, build-arch, build-indep, install,
-etc targets that exist in the rules file. There's no need to define an
-explicit binary target with explicit dependencies on the other targets.
-
-=item -
-
-B<dh_strip> compresses debugging symbol files to reduce the installed
-size of -dbg packages.
-
-=item -
-
-B<dh_auto_configure> does not include the source package name
-in --libexecdir when using autoconf.
-
-=item -
-
-B<dh> does not default to enabling --with=python-support
-
-=item -
-
-All of the B<dh_auto_>I<*> debhelper programs and B<dh> set
-environment variables listed by B<dpkg-buildflags>, unless
-they are already set.
-
-=item -
-
-B<dh_auto_configure> passes B<dpkg-buildflags> CFLAGS, CPPFLAGS, and
-LDFLAGS to perl F<Makefile.PL> and F<Build.PL>
-
-=item -
-
-B<dh_strip> puts separated debug symbols in a location based on their
-build-id.
-
-=item -
-
-Executable debhelper config files are run and their output used as the
-configuration.
-
-=back
-
-=item v10
-
-This compatibility level is still open for development; use with caution.
-
-Changes from v9 are:
-
-=item -
-
-B<dh_installinit> will no longer install a file named debian/I<package>
-as an init script.
-
-=over 8
-
-=item -
-
-B<dh> no longer creates the package build directory when skipping
-running debhelper commands. This will not affect packages that only build
-with debhelper commands, but it may expose bugs in commands not included in
-debhelper.
-
-=back
-
-=back
+The list of supported compatibility levels and the related upgrade check
+list has moved to L<debhelper-compat-upgrade-checklist(7)>.
 
 =head1 NOTES
 
@@ -569,13 +553,45 @@ If none are given, debhelper programs default to acting on all packages listed
 in the control file, with the exceptions below.
 
 First, any package whose B<Architecture> field in B<debian/control> does not
-match the build architecture will be excluded
+match the B<DEB_HOST_ARCH> architecture will be excluded
 (L<Debian Policy, section 5.6.8>).
 
 Also, some additional packages may be excluded based on the contents of the
 B<DEB_BUILD_PROFILES> environment variable and B<Build-Profiles> fields in
 binary package stanzas in B<debian/control>, according to the draft policy at
 L<https://wiki.debian.org/BuildProfileSpec>.
+
+=head3 Interaction between package selections and Build-Profiles
+
+Build-Profiles affect which packages are included in the package
+selections mechanisms in debhelper.  Generally, the package selections
+are described from the assumption that all packages are enabled.  This
+section describes how the selections react when a package is disabled
+due to the active Build-Profiles (or lack of active Build-Profiles).
+
+=over 4
+
+=item -a/--arch, -i/--indep OR no selection options (a raw "dh_X" call)
+
+The package disabled by Build-Profiles is silently excluded from the
+selection.
+
+Note you will receive a warning if I<all> packages related to these
+selections are disabled.  In that case, it generally does not make
+sense to do the build in the first place.
+
+=item -N I<package> / --no-package I<package>
+
+The option is accepted and effectively does nothing.
+
+=item -p I<package> / --package I<package>
+
+The option is accepted, but debhelper will not act on the package.
+
+=back
+
+Note that it does not matter whether a package is enabled or disabled
+by default.
 
 =head2 Automatic generation of Debian install scripts
 
@@ -600,8 +616,15 @@ the set command):
   my $temp="set -e\nset -- @ARGV\n" . << 'EOF';
   #DEBHELPER#
   EOF
-  system ($temp) / 256 == 0
-  	or die "Problem with debhelper scripts: $!";
+  if (system($temp)) {
+     my $exit_code = ($? >> 8) & 0xff;
+     my $signal = $? & 0x7f;
+     if ($exit_code) {
+         die("The debhelper script failed with error code: ${exit_code}");
+     } else {
+         die("The debhelper script was killed by signal: ${signal}");
+     }
+  }
 
 =head2 Automatic generation of miscellaneous dependencies.
 
@@ -647,17 +670,36 @@ F<preinst>, F<postrm>, F<prerm>, and F<config> scripts, etc.
 
 =head1 ENVIRONMENT
 
+This section describes some of the environment variables that influences
+the behaviour of debhelper or which debhelper interacts with.
+
+It is important to note that these must be actual environment variables in
+order to affect the behaviour of debhelper (not simply F<Makefile> variables).
+To specify them properly in F<debian/rules>, be sure to "B<export>" them. For
+example, "B<export DH_VERBOSE>".
+
 =over 4
 
 =item B<DH_VERBOSE>
 
-Set to B<1> to enable verbose mode. Debhelper will output every command it
-runs. Also enables verbose build logs for some build systems like autoconf.
+Set to a non-empty value to enable verbose mode.  Please see the B<-v> / B<--verbose>
+option for details.
+
+=item B<DH_QUIET>
+
+Set to a non-empty value to enable quiet mode. Debhelper will not output commands calling
+the upstream build system nor will dh print which subcommands are called
+and depending on the upstream build system might make that more quiet, too.
+This makes it easier to spot important messages but makes the output quite
+useless as buildd log.
+
+Ignored if DH_VERBOSE is also set or B<-v> / B<--verbose> is passed.
 
 =item B<DH_COMPAT>
 
 Temporarily specifies what compatibility level debhelper should run at,
-overriding any value in F<debian/compat>.
+overriding any value specified via Build-Depends on debhelper-compat or via the
+F<debian/compat> file.
 
 =item B<DH_NO_ACT>
 
@@ -665,8 +707,10 @@ Set to B<1> to enable no-act mode.
 
 =item B<DH_OPTIONS>
 
-Anything in this variable will be prepended to the command line arguments
-of all debhelper commands.
+All debhelper tools will parse command line arguments listed in this variable
+before any command option (as if they had been prepended to the command
+line arguments).  Unfortunately, some third-party provided tools may not
+support this variable and will ignore these command line arguments.
 
 When using L<dh(1)>, it can be passed options that will be passed on to each
 debhelper command, which is generally better than using DH_OPTIONS.
@@ -687,11 +731,195 @@ your package is built.
 Multiple things to exclude can be separated with colons, as in
 B<DH_ALWAYS_EXCLUDE=CVS:.svn>
 
+=item B<DH_EXTRA_ADDONS>
+
+If set, this adds the specified dh addons to be run in the appropriate places
+in the sequence of commands. This is equivalent to specifying the addon to run
+with the --with flag in the debian/rules file. Any --without calls specifying
+an addon in this environment variable will not be run.
+
+This is intended to be used by downstreams or specific local configurations
+that require a debhelper addon to be run during multiple builds without
+having to patch a large number of rules file. If at all possible, this should
+be avoided in favor of a --with flag in the rules file.
+
+=item B<DH_COLORS>, B<DPKG_COLORS>
+
+These variables can be used to control whether debhelper commands should use
+colors in their textual output.  Can be set to "always", "auto" (the default),
+or "never".
+
+Note that B<DPKG_COLOR> also affects a number of dpkg related tools and
+debhelper uses it on the assumption that you want the same color setting for
+dpkg and debhelper.  In the off-hand chance you want different color setting
+for debhelper, you can use B<DH_COLORS> instead or in addition to
+B<DPKG_COLORS>.
+
+=item B<NO_COLOR>
+
+If no explicit request for color has been given (e.g. B<DH_COLORS> and
+B<DPKG_COLORS> are both unset), the presence of this environment variable
+cause the default color setting to be "never".
+
+The variable is defined according to L<https://no-color.org/>.  In this
+project, the environment variables (such as B<DH_COLORS>) are considered
+an explicit request for color.
+
+=item B<CFLAGS>, B<CPPFLAGS>, B<CXXFLAGS>, B<OBJCFLAGS>, B<OBJCXXFLAGS>, B<GCJFLAGS>, B<FFLAGS>, B<FCFLAGS>, B<LDFLAGS>
+
+By default (in any non-deprecated compat level), debhelper will automatically
+set these flags by using L<dpkg-buildflags(1)>, when they are unset.  If you
+need to change the default flags, please use the features from
+L<dpkg-buildflags(1)> to do this (e.g. B<DEB_BUILD_MAINT_OPTIONS=hardening=all>
+or B<DEB_CPPFLAGS_MAINT_APPEND=-DCUSTOM_MACRO=true>) rather than setting the
+concrete variable directly.
+
+=item B<HOME>, B<XDG_*>
+
+In compat 13 and later, these environment variables are reset before invoking
+the upstream build system via the B<dh_auto_*> helpers.  The variables B<HOME>
+(all B<dh_auto_*> helpers) and B<XDG_RUNTIME_DIR> (B<dh_auto_test> only) will
+be set to a writable directory. All remaining variables and B<XDG_RUNTIME_DIR>
+(except for during B<dh_auto_test>) will be cleared.
+
+The B<HOME> directory will be created as an empty directory but it will be
+reused between calls to B<dh_auto_*>.  Any content will persist until
+explicitly deleted or B<dh_clean>.
+
+=item B<DEB_BUILD_OPTIONS>
+
+Please see L</Supported flags in DEB_BUILD_OPTIONS> for this environment
+variable.
+
+Please note that this variable should I<not> be altered by package maintainers
+inside F<debian/rules> to change the behaviour of debhelper.  Instead, where
+the package maintainer need these features, they should look disabling the
+relevant feature directly (e.g. by overriding the concrete tools).
+
+=item B<DEB_BUILD_MAINT_OPTIONS>
+
+This is a dpkg specific environment variable (see e.g. L<dpkg-buildflags(1)>).
+The debhelper tool suite silently ignores it.
+
+It is documented here because it has a similar name to B<DEB_BUILD_OPTIONS>,
+which make some people mistakenly assume that debhelper will also react to this
+variable.
+
 =back
+
+=head2 Supported flags in DEB_BUILD_OPTIONS
+
+The debhelper tool suite reacts to the following flags in B<DEB_BUILD_OPTIONS>.
+
+=over 4
+
+=item B<dherroron=obsolete-compat-levels>
+
+I<This is a debhelper specific value.>
+
+When B<dherroron> is present and set to B<obsolete-compat-levels>, then
+debhelper tools will promote deprecation warnings for usage of old soon
+to be removed compat levels into errors.
+
+This is useful for automated checking for code relying on deprecated
+compat levels that is scheduled for removal.
+
+This option is intended for testing purposes; not production builds.
+
+=item B<nostrip>
+
+I<This value will change the content of the debs being built.  The .deb
+packages built when this is set is therefore not bit-for-bit reproducible
+with a regular build in the general case.>
+
+This value will cause the official debhelper tools will skip actions and
+helpers that either remove, detach or deduplicate debugging symbols in
+ELF binaries.
+
+This value affects L<dh_dwz(1)> and L<dh_strip(1)>.
+
+=item B<nocheck>
+
+This value will cause the official debhelper build systems to skip runs
+of upstream test suites.
+
+Package maintainers looking to avoid running the upstream tests should
+B<not> rely on this.  Instead, they can add an empty override target
+to skip B<dh_auto_test>.
+
+This value affects L<dh_auto_test(1)>.
+
+=item B<nodoc>
+
+I<This value will change the content of the debs being built.  The .deb
+packages built when this is set is therefore not bit-for-bit reproducible
+with a regular build in the general case.>
+
+This value will cause several debhelper tools to skip installation of
+documentation such as manpages or upstream provided documentation.
+Additionally, the tools will also ignore if declared documentation is
+"missing" on the assumption that the documentation has not been built.
+
+This value effects tools I<like> L<dh_installdocs(1)>, which I<knows>
+it is working with documentation.
+
+=item B<notrimdch>
+
+I<This value will change the content of the debs being built.  The .deb
+packages built when this is set is therefore not bit-for-bit reproducible
+with a regular build in the general case.>
+
+This value will cause L<dh_installchangelogs(1)> to act as if it
+had been passed the B<--no-trim> option, forcing it to forgo removing
+older entries from changelogs.
+
+=item B<noautodbgsym>, B<noddebs>
+
+I<The official name is noautodbgsym.  The noddebs variant is accepted
+for historical reasons.>
+
+This value causes debhelper to skip the generation of automatically
+generated debug symbol packages.
+
+This value affects L<dh_strip(1)>.
+
+=item B<parallel=N>
+
+This value enables debhelper to use up to B<N> threads or processes
+(subject to parameters like B<--no-parallel> and B<--max-parallel=M>).
+Not all debhelper tools work with parallel tasks and may silently
+ignore the request.
+
+This value affects many debhelper tools.  Most notably B<dh_auto_*>,
+which will attempt to run the underlying upstream build system with
+that number of threads.
+
+=item B<terse>
+
+This value will cause the official debhelper build systems to configure
+upstream builds to be terse (i.e. reduce verbosity in their output).
+This is subject to the upstream and the debhelper build system
+supporting such features.
+
+This value affects most B<dh_auto_*> tools directly. For commands
+provided by the debhelper package, it also causes the tools to act like
+the B<DH_QUIET> environment variable was non-empty.
+
+=back
+
+Unknown flags are silently ignored.
+
+Note third-party debhelper-like tools or third-party provided build systems
+may or may not react to the above flags.  This tends to depend on
+implementation details of the tool.
 
 =head1 SEE ALSO
 
 =over 4
+
+=item L<debhelper-compat-upgrade-checklist(7)>
+
+List of supported compat levels and an upgrade checklist for each of them.
 
 =item F</usr/share/doc/debhelper/examples/>
 

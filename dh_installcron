@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,7 +7,10 @@ dh_installcron - install cron scripts into etc/cron.*
 =cut
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
@@ -27,6 +30,8 @@ cron scripts.
 =item debian/I<package>.cron.weekly
 
 =item debian/I<package>.cron.monthly
+
+=item debian/I<package>.cron.yearly
 
 =item debian/I<package>.cron.hourly
 
@@ -53,26 +58,22 @@ as the package name.
 
 init();
 
-# PROMISE: DH NOOP WITHOUT cron.hourly cron.daily cron.weekly cron.monthly cron.d
+# PROMISE: DH NOOP WITHOUT cron.hourly cron.daily cron.weekly cron.monthly cron.yearly cron.d cli-options()
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
-	foreach my $type (qw{hourly daily weekly monthly}) {
+	foreach my $type (qw{hourly daily weekly monthly yearly}) {
 		my $cron=pkgfile($package,"cron.$type");
 		if ($cron) {
-			if (! -d "$tmp/etc/cron.$type") {
-				doit("install","-o",0,"-g",0,"-d","$tmp/etc/cron.$type");
-			}
-			doit("install",$cron,"$tmp/etc/cron.$type/".pkgfilename($package));
+			install_dir("$tmp/etc/cron.$type");
+			install_prog($cron,"$tmp/etc/cron.$type/".pkgfilename($package));
 		}
 	}
-	# Seperate because this needs to be mode 644.
+	# Separate because this needs to be mode 644.
 	my $cron=pkgfile($package,"cron.d");
 	if ($cron) {
-		if (! -d "$tmp/etc/cron.d") {
-			doit("install","-o",0,"-g",0,"-d","$tmp/etc/cron.d");
-		}	
-		doit("install","-m",644,$cron,"$tmp/etc/cron.d/".pkgfilename($package));
+		install_dir("$tmp/etc/cron.d");
+		install_file($cron,"$tmp/etc/cron.d/".pkgfilename($package));
 	}
 }
 

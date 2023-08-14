@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_update_autotools_config - Update autotools config files
+
+=cut
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_update_autotools_config> [S<I<debhelper options>>]
+
+=head1 DESCRIPTION
+
+B<dh_update_autotools_config> replaces all occurrences of B<config.sub>
+and B<config.guess> in the source tree by the up-to-date versions
+found in the autotools-dev package.  The original files are backed up
+and restored by B<dh_clean>.
+
+=cut
+
+init();
+
+for my $basename (qw(config.guess config.sub)) {
+	my $new_version = "/usr/share/misc/$basename";
+	open(my $fd, '-|', 'find', '-mindepth', '1',
+		 '(', '-type', 'd', '-name', '.*', '-prune', ')',
+		 '-o', '-type', 'f', '-name', $basename, '-print')
+		or error("Cannot run find -type f -name $basename: $!");
+	while (my $filename = <$fd>) {
+		chomp($filename);
+		next if not is_autotools_config_file($filename);
+		restore_file_on_clean($filename);
+		doit('cp', '-f', $new_version, $filename);
+	}
+	close($fd);
+}
+
+sub is_autotools_config_file {
+	my ($file) = @_;
+	my ($is_autoconf_file);
+	open(my $fd, '<', $file) or error("open $file for reading failed: $!");
+	while (my $line = <$fd>) {
+		chomp($line);
+		# This is the test lintian uses.
+		if ($line =~ m{^timestamp=['"]\d{4}-\d{2}-\d{2}['"]\s*$}) {
+			$is_autoconf_file = 1;
+			last;
+		}
+		$line =~ s/\s++$//;
+		if ($line eq q{# Attempt to guess a canonical system name.}
+			or $line =~ q{^# Configuration validation subroutine script}) {
+			# Very old scripts do not have that timestamp line, but
+			# they do have these headers (which even new files also
+			# have).
+			$is_autoconf_file = 1;
+			last;
+		}
+		last if $. >= 10;
+	}
+	close($fd);
+	return $is_autoconf_file;
+}
+
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Niels Thykier <niels@thykier.net>
+
+=cut

@@ -1,0 +1,271 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_missing - check for missing files
+
+=cut
+
+use v5.28;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_missing> [B<-X>I<item>] [B<--sourcedir=>I<dir>] [S<I<debhelper options>>]
+
+=head1 DESCRIPTION
+
+B<dh_missing> compares the list of installed files with the files in
+the source directory. If any of the files (and symlinks) in the source
+directory were not installed to somewhere, it will warn on stderr
+about that (B<--list-missing>) or fail (B<--fail-missing>).
+
+Please note that in compat 11 and earlier without either of these
+options, B<dh_missing> will silently do nothing.  In compat 12,
+B<--list-missing> is the default  In compat 13 and later,
+B<--fail-missing> is the default.
+
+This may be useful if you have a large package and want to make sure that
+you don't miss installing newly added files in new upstream releases.
+
+Remember to test different kinds of builds (dpkg-buildpackage -A/-B/...) as
+you may experience varying results when only a subset of the packages are
+built.
+
+=head1 FILES
+
+=over 4
+
+=item debian/not-installed
+
+List the files that are deliberately not installed in I<any> binary
+package.  Paths listed in this file are ignored by B<dh_missing>.
+However, it is B<not> a method to exclude files from being installed
+by any of the debhelper tool.  If you want a tool to not install a
+given file, please use its B<--exclude> option (where available).
+
+B<dh_missing> will expand wildcards in this file (since debhelper 11.1).
+Wildcards without matches will be ignored.
+
+Supports substitution variables in compat 13 and later as
+documented in L<debhelper(7)>.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--list-missing>
+
+Warn on stderr about source files not installed to somewhere.
+
+Note that many dh-tools acting on a path will mark the path as
+installed even if it has been excluded via B<-X> or B<--exclude>.
+This is also seen when a dh-tool is acting on a directory and
+exclusion is used to ignore some files in the directory.  In either
+case, this will make B<dh_missing> silently assume the excluded files
+have been handled.
+
+This is the default in compat 12.
+
+=item B<--fail-missing>
+
+This option is like B<--list-missing>, except if a file was missed, it will
+not only list the missing files, but also fail with a nonzero exit code.
+
+This is the default in compat 13 and later.
+
+=back
+
+=cut
+
+init(options => {
+	"list-missing" => \$dh{LIST_MISSING},
+	"fail-missing" => \$dh{FAIL_MISSING},
+	"sourcedir=s" => \$dh{SOURCEDIR},
+});
+
+my (@installed, %helpers, %helpers_basename);
+
+my $srcdir = '.';
+if (defined($dh{SOURCEDIR})) {
+	$srcdir = $dh{SOURCEDIR};
+	$srcdir =~ s{/+$}{};
+	error("Invalid --sourcedir - must not be empty nor /") if not $srcdir;
+}
+
+if (!$dh{LIST_MISSING} && !$dh{FAIL_MISSING}) {
+	exit 0 if compat(11);
+	# --list-missing is the default in compat 12 and --fail-missing in compat 13+
+	my $option = compat(12) ? 'LIST_MISSING' : 'FAIL_MISSING';
+	$dh{$option} = 1;
+}
+
+# . as srcdir makes no sense, so this is a special case.
+if ($srcdir eq '.') {
+	$srcdir='debian/tmp';
+}
+
+if (! -d $srcdir) {
+	# If there was no explicit source directory, then we do not care
+	# if it is missing.
+	exit(0) if not defined $dh{SOURCEDIR};
+
+	if (scalar(getpackages()) == 1 && defined($dh{SOURCEDIR})) {
+		warning("$srcdir does not exist and there is only binary package.");
+		warning("Assuming everything is installed directly into the package directory.");
+		exit(0);
+	}
+	if (compat(10)) {
+		# Prevent "dh $@ --list-missing --destdir=... ..." from failing in compat 10.
+		warning("Cannot check if installation is missing files: $srcdir does not exist");
+		exit(0);
+	} else {
+		error("Cannot check if installation is missing files: $srcdir does not exist");
+	}
+}
+
+for my $file (glob('debian/.debhelper/generated/*/installed-by-*')) {
+	my ($target_pkg, $helper) = ('unknown', 'unknown');
+	my $had_files = 0;
+	my %seen;
+	if ($file =~ m@.*/([^/]+)/installed-by-(.*)@) {
+		($target_pkg, $helper) = ($1, $2);
+	}
+
+	open(my $fh, '<', $file) or error("could not open $file: $!");
+	while (my $line = <$fh>) {
+		chomp($line);
+		next if $line =~ m/^\s*$/;
+		next if $seen{$line}++; # Ignore duplicates
+		$had_files++;
+		push(@installed, $line);
+	}
+	$helpers{$helper}{$target_pkg} = $had_files;
+	close($fh);
+}
+
+my @missing;
+if ( -f 'debian/not-installed') {
+	my @not_installed = filearray('debian/not-installed');
+	for my $pattern (@not_installed) {
+		my @matches;
+		# Add an explicit d/tmp if absent as there is no point in
+		# looking outside the debian staging directory
+		$pattern =~ s:^\s*:debian/tmp/: unless $pattern =~ m:^\s*debian/tmp/:;
+		@matches = glob_expand(['.'], \&glob_expand_error_handler_silently_ignore, $pattern);
+		if (@matches) {
+			# Assume classify them as installed
+			push(@installed, @matches);
+		} else {
+			# Assume it is not a pattern and classify it as installed
+			push(@installed, $pattern);
+		}
+	}
+
+	push(@installed, @not_installed);
+}
+my $installed=join("|", map {
+	# Kill any extra slashes, for robustness.
+	y:/:/:s;
+	s:/+$::;
+	s:^(\./)*::;
+	"\Q$_\E\/.*|\Q$_\E";
+} @installed);
+$installed=qr{^($installed)$};
+
+# Lazy load File::Find
+require File::Find;
+
+File::Find::find(sub {
+	# Lazy loading of File::Find makes perl think that File::Find::dir is only used once
+	# and we might have typo'ed something
+	no warnings qw(once);
+	-f || -l || return;
+	$_="$File::Find::dir/$_";
+	if (! /$installed/ && ! excludefile($_)) {
+		my $file=$_;
+		$file=~s/^\Q$srcdir\E\///;
+		push @missing, $file;
+	}
+}, $srcdir);
+if (@missing) {
+	my $had_related_files;
+	my %seen_basename = map { basename($_) => $_ } @installed;
+	my $multiarch = dpkg_architecture_value("DEB_HOST_MULTIARCH");
+	my $seen_ma_value = 0;
+	for my $file (sort(@missing)) {
+		my $basename = basename($file);
+		if (exists($seen_basename{$basename})) {
+			my $alt_source = $seen_basename{$basename};
+			$had_related_files //= [$file, $alt_source];
+			warning("$file exists in $srcdir but is not installed to anywhere (related file: \"$alt_source\")");
+		} else {
+			warning("$file exists in $srcdir but is not installed to anywhere ");
+		}
+		$seen_ma_value = 1 if index($file, $multiarch) > -1;
+	}
+	if ($had_related_files) {
+		my ($missing, $alt_source) = $had_related_files->@*;
+		my $error = $dh{FAIL_MISSING} ? 'error' : 'warning';
+		nonquiet_print();
+		nonquiet_print('While detecting missing files, dh_missing noted some files with a similar name to those');
+		nonquiet_print("that were missing.  This ${error} /might/ be resolved by replacing references to the");
+		nonquiet_print('missing files with the similarly named ones that dh_missing found - assuming the content');
+		nonquiet_print('is identical.');
+		nonquiet_print();
+		nonquiet_print('As an example, you might want to replace:');
+		nonquiet_print(" * ${alt_source}");
+		nonquiet_print('with:');
+		nonquiet_print(" * ${missing}");
+		nonquiet_print('in a file in debian/ or as argument to one of the dh_* tools called from debian/rules.');
+		nonquiet_print('(Note it is possible the paths are not used verbatim but instead directories ');
+		nonquiet_print('containing or globs matching them are used instead)');
+		nonquiet_print();
+		nonquiet_print('Alternatively, add the missing file to debian/not-installed if it cannot and should not');
+		nonquiet_print('be used.');
+		nonquiet_print();
+	}
+	nonquiet_print("The following debhelper tools have reported what they installed (with files per package)");
+	for my $helper (sort(keys(%helpers))) {
+		my $pkg_info = $helpers{$helper};
+		my @results;
+		for my $pkg (sort(keys(%{$pkg_info}))) {
+			my $no = $pkg_info->{$pkg};
+			push(@results, "${pkg} (${no})")
+		}
+		nonquiet_print(" * ${helper}: " . join(', ', @results));
+	}
+	nonquiet_print('If the missing files are installed by another tool, please file a bug against it.');
+	nonquiet_print('When filing the report, if the tool is not part of debhelper itself, please reference the');
+	nonquiet_print('"Logging helpers and dh_missing" section from the "PROGRAMMING" guide for debhelper (10.6.3+).');
+	nonquiet_print('  (in the debhelper package: /usr/share/doc/debhelper/PROGRAMMING.md.gz)');
+	nonquiet_print("Be sure to test with dpkg-buildpackage -A/-B as the results may vary when only a subset is built");
+	nonquiet_print("If the omission is intentional or no other helper can take care of this consider adding the");
+	nonquiet_print("paths to debian/not-installed.");
+	if ($seen_ma_value) {
+		nonquiet_print();
+		nonquiet_print("Remember to be careful with paths containing \"${multiarch}\", where you might need to");
+		nonquiet_print("use a wildcard or (assuming compat 13+) e.g. \${DEB_HOST_MULTIARCH} in debian/not-installed");
+		nonquiet_print("to ensure it works on all architectures (see #961104).");
+	}
+	if ($dh{FAIL_MISSING}) {
+		error("missing files, aborting");
+	}
+}
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Michael Stapelberg <stapelberg@debian.org>
+
+=cut

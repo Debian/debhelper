@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,7 +7,10 @@ dh_installlogcheck - install logcheck rulefiles into etc/logcheck/
 =cut
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
@@ -55,7 +58,7 @@ use the specified name instead of that of the package.
 
 init();
 
-# PROMISE: DH NOOP WITHOUT logcheck.cracking logcheck.violations logcheck.violations.ignore logcheck.ignore.workstation logcheck.ignore.server logcheck.ignore.paranoid
+# PROMISE: DH NOOP WITHOUT logcheck.cracking logcheck.violations logcheck.violations.ignore logcheck.ignore.workstation logcheck.ignore.server logcheck.ignore.paranoid cli-options()
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
@@ -67,12 +70,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		$typenod=~s/\.d//;
 		my $logcheck=pkgfile($package,"logcheck.$typenod");
 		if ($logcheck) {
-			if (! -d "$tmp/etc/logcheck/$type") {
-				doit("install","-o",0,"-g",0,"-d","$tmp/etc/logcheck/$type");
-			}
 			my $packagenodot=pkgfilename($package); # run-parts..
 			$packagenodot=~s/\./_/g;
-			doit("install","-m","0644",$logcheck,"$tmp/etc/logcheck/$type/$packagenodot");
+			install_dir("$tmp/etc/logcheck/$type");
+			install_file($logcheck, "$tmp/etc/logcheck/$type/$packagenodot");
 		}
 	}
 }

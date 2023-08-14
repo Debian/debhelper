@@ -1,0 +1,173 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_dwz - optimize DWARF debug information in ELF binaries via dwz
+
+=cut
+
+use strict;
+use warnings;
+use File::Find;
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_dwz> [S<I<debhelper options>>] [B<-X>I<item>] [S<B<--> I<params>>]
+
+=head1 DESCRIPTION
+
+B<dh_dwz> is a debhelper program that will optimize the (uncompressed)
+size of the DWARF debug information in ELF binaries.  It does so by
+running L<dwz(1)> on all the ELF binaries in the package.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--dwz-multifile>, B<--no-dwz-multifile>
+
+Whether L<dwz(1)> should generate a I<multifile> from the ELF binaries
+in the same package.  When enabled, if a package ships at least 2 ELF
+binaries, B<dh_dwz> will instruct L<dwz(1)> to generate a multifile
+for the package.
+
+By default, B<dh_dwz> will attempt to create a multifile but will
+continue without if L<dwz(1)> does not create one (but succeeds anyway).
+This commonly happens when the debug files do not contain debug
+symbols (e.g. a missing -g to the compiler) or when the debug
+symbols are compressed (see Debian bug #931891).  If B<--dwz-multifile>
+is passed, then B<dh_dwz> will abort with an error if L<dwz(1)> does
+not create a multifile.
+
+Note this options may not work if a package contains more ELF binaries
+than can fit on a single command line.  If this becomes a problem,
+please pass B<--no-dwz-multifile> to work around the issue.
+
+The generated multifile will be compressed with B<objcopy
+--compress-debug-sections>.
+
+Note for B<udeb> packages: B<dh_dwz> will never generate multifiles
+for B<udeb> packages.  It will still use B<dwz> to reduce the
+file size of debug files if it finds any.
+
+=item B<-X>I<item>, B<--exclude=>I<item>
+
+Exclude files that contain I<item> anywhere in their filename from being
+stripped. You may use this option multiple times to build up a list of
+things to exclude.
+
+=item B<--> I<params>
+
+Pass I<params> to L<dwz(1)> when it processes ELF binaries.  This is
+mostly useful for setting memory related parameters (e.g. -l and -L).
+
+=back
+
+=head1 NOTES
+
+If the B<DEB_BUILD_OPTIONS> environment variable contains B<nostrip>,
+nothing will be stripped, in accordance with Debian policy (section
+10.1 "Binaries").
+
+While this tool technically does not remove debug information from
+binaries, it is still skipped when the B<DEB_BUILD_OPTIONS>
+environment variable contains B<nostrip>.  This is because B<nostrip>
+is often used to optimize build times (e.g. for "build and
+test"-cycles) rather than optimizing for size.
+
+=cut
+
+my $create_multifile = 'auto';
+
+init(options => {
+	'dwz-multifile!' => \$create_multifile,
+});
+
+# This variable can be used to turn off stripping (see Policy).
+exit 0 if get_buildoption('nostrip');
+
+my @elf_files;
+
+sub testfile {
+	my $fn = $_;
+	return if -l $fn; # Always skip symlinks.
+
+	# See if we were asked to exclude this file.
+	# Note that we have to test on the full filename, including directory.
+	if (excludefile($fn)) {
+		$File::Find::prune = 1 if -d _;
+		return;
+	}
+	return if -d _;
+	# Do not process output files from dwz
+	return if index($fn, '/debug/.dwz/') > -1;
+	if (is_so_or_exec_elf_file($fn)) {
+		push(@elf_files, $fn);
+	}
+	return;
+}
+
+on_items_in_parallel(\@{$dh{DOPACKAGES}}, sub {
+foreach my $package (@_) {
+	my $tmp = tmpdir($package);
+
+	next if not -d $tmp;
+
+	@elf_files = ();
+	find({
+			wanted => \&testfile,
+			no_chdir => 1,
+		 }, $tmp);
+	next if not @elf_files;
+	# Consistent order;
+	@elf_files = sort(@elf_files);
+	my ($unique_files, $hardlinks) = find_hardlinks(@elf_files);
+	if ($create_multifile and @{$unique_files} > 1 and not is_udeb($package)) {
+		my $objcopy = cross_command($package, 'objcopy');
+		my $ma_dir = dpkg_architecture_value('DEB_HOST_MULTIARCH');
+		my $dwz_dir = "usr/lib/debug/.dwz/${ma_dir}";
+		my $m = "${dwz_dir}/${package}.debug";
+		my @dwz_options = ("-m${tmp}/${m}", "-M/${m}");
+		install_dir("${tmp}/${dwz_dir}");
+		doit('dwz', @dwz_options, @{$dh{U_PARAMS}}, '--', @{$unique_files});
+		if ( -f "${tmp}/${m}") {
+			doit($objcopy, '--compress-debug-sections', "${tmp}/${m}");
+			reset_perm_and_owner(0644, "${tmp}/${m}");
+		} else {
+			error("dwz failed to create a multifile as requested") if $create_multifile ne 'auto';
+			warning("No dwz multifile created, but not explicitly requested either so ignoring it.");
+			warning("Common issues include no debug information at all (missing -g) and");
+			warning("compressed debug information (#931891).");
+			# Clean up after ourselves to avoid leaving empty directories in packages
+			doit('rmdir', '-p', '--ignore-fail-on-non-empty', "${tmp}/${dwz_dir}");
+		}
+	} else {
+		xargs($unique_files, 'dwz', @{$dh{U_PARAMS}}, '--');
+	}
+
+
+	# Now change over any files we can that used to be hard links so
+	# they are again.
+	for my $hardlink (keys %{$hardlinks}) {
+		my $target = $hardlinks->{$hardlink};
+		# Remove old file.
+		rm_files($hardlink);
+		# Make new hardlink.
+		doit('ln', '-f', $target, $hardlink);
+	}
+}});
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Niels Thykier <niels@thykier.net>
+
+=cut

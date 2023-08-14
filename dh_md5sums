@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,8 +7,11 @@ dh_md5sums - generate DEBIAN/md5sums file
 =cut
 
 use strict;
+use warnings;
 use Cwd;
 use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
@@ -18,7 +21,7 @@ B<dh_md5sums> [S<I<debhelper options>>] [B<-x>] [B<-X>I<item>] [B<--include-conf
 
 B<dh_md5sums> is a debhelper program that is responsible for generating
 a F<DEBIAN/md5sums> file, which lists the md5sums of each file in the package.
-These files are used by the B<debsums> package.
+These files are used by B<dpkg --verify> or the L<debsums(1)> program.
 
 All files in F<DEBIAN/> are omitted from the F<md5sums> file, as are all
 conffiles (unless you use the B<--include-conffiles> switch).
@@ -32,7 +35,7 @@ The md5sums file is installed with proper permissions and ownerships.
 =item B<-x>, B<--include-conffiles>
 
 Include conffiles in the md5sums list. Note that this information is
-redundant since it is included elsewhere in Debian packages.
+redundant since it is included in F</var/lib/dpkg/status> in Debian packages.
 
 =item B<-X>I<item>, B<--exclude=>I<item>
 
@@ -48,43 +51,68 @@ init(options => {
 	"include-conffiles" => \$dh{INCLUDE_CONFFILES},
 });
 
-foreach my $package (@{$dh{DOPACKAGES}}) {
-	next if is_udeb($package);
-	
-	my $tmp=tmpdir($package);
+on_pkgs_in_parallel {
+	foreach my $package (@_) {
+		next if is_udeb($package);
 
-	if (! -d "$tmp/DEBIAN") {
-		doit("install","-d","$tmp/DEBIAN");
-	}
+		my $dbgsym_tmp = dbgsym_tmpdir($package);
+		my $tmp=tmpdir($package);
 
-	# Check if we should exclude conffiles.
-	my $exclude="";
-	if (! $dh{INCLUDE_CONFFILES} && -r "$tmp/DEBIAN/conffiles") {
-		# Generate exclude regexp.
-		open (CONFF,"$tmp/DEBIAN/conffiles");
-		while (<CONFF>) {
-			chomp;
-			s/^\///;
-			$exclude.="! -path \"./$_\" ";
+		install_dir("$tmp/DEBIAN");
+
+		# Check if we should exclude conffiles.
+		my %conffiles;
+		if (! $dh{INCLUDE_CONFFILES} && -r "$tmp/DEBIAN/conffiles") {
+			# Generate exclude regexp.
+			open(my $fd, '<', "$tmp/DEBIAN/conffiles")
+				or error("open $tmp/DEBIAN/conffiles failed: $!");
+			while (my $line = <$fd>) {
+				chomp($line);
+				next if $line !~ s{^/+}{};
+				next if $line eq '';
+				$conffiles{$line} = 1;
+			}
+			close($fd);
 		}
-		close CONFF;
+
+		generate_md5sums_file($tmp, \%conffiles);
+		if ( -d $dbgsym_tmp) {
+			install_dir("${dbgsym_tmp}/DEBIAN");
+			generate_md5sums_file($dbgsym_tmp);
+		}
 	}
-	
-	# See if we should exclude other files.
-	if (defined($dh{EXCLUDE_FIND}) && $dh{EXCLUDE_FIND} ne '') {
-		$exclude.="! \\( $dh{EXCLUDE_FIND} \\) ";
+};
+
+sub generate_md5sums_file {
+	my ($tmpdir, $conffiles) = @_;
+	my $find_pid = open(my $find_fd, '-|') // error("fork failed: $!");
+	my (@files, $pipeline_pid);
+	if (not $find_pid) {
+		# Child
+		chdir($tmpdir) or error("chdir($tmpdir) failed: $!");
+		exec { 'find' } 'find', '-type', 'f', '!', '-regex', './DEBIAN/.*', '-printf', "%P\\0";
 	}
-	
-	my $find="find . -type f $exclude ! -regex './DEBIAN/.*' -printf '%P\\0'";
-	complex_doit("(cd $tmp >/dev/null ; $find | LC_ALL=C sort -z | xargs -r0 md5sum > DEBIAN/md5sums) >/dev/null");
-	# If the file's empty, no reason to waste inodes on it.
-	if (-z "$tmp/DEBIAN/md5sums") {
-		doit("rm","-f","$tmp/DEBIAN/md5sums");
+	local $/ = "\0";  # NUL-terminated input/"lines"
+	while (my $line = <$find_fd>) {
+		chomp($line);
+		next if excludefile($line);
+		next if $conffiles and %{$conffiles} and exists($conffiles->{$line});
+		push(@files, $line);
 	}
-	else {
-		doit("chmod",644,"$tmp/DEBIAN/md5sums");
-		doit("chown","0:0","$tmp/DEBIAN/md5sums");
+	close($find_fd) or error_exitcode("find -type f ! -regex './DEBIAN/.*' -printf '%P\\0'");
+	@files = sort(@files);
+	verbose_print("cd $tmpdir >/dev/null && " . q{xargs -r0 md5sum | perl -pe 'if (s@^\\\\@@) { s/\\\\\\\\/\\\\/g; }' > DEBIAN/md5sums});
+	$pipeline_pid = open(my $pipeline_fd, '|-') // error("fork failed: $!");
+	if (not $pipeline_pid) {
+		# Child
+		chdir($tmpdir) or error("chdir($tmpdir) failed: $!");
+		exec { 'sh' } '/bin/sh', '-c', q{xargs -r0 md5sum | perl -pe 'if (s@^\\\\@@) { s/\\\\\\\\/\\\\/g; }' > DEBIAN/md5sums};
 	}
+
+	printf {$pipeline_fd} "%s\0", $_ for @files;  # @files include NUL-terminator
+	close($pipeline_fd) or error_exitcode("cd $tmpdir >/dev/null && xargs -r0 md5sum | perl -pe 'if (s@^\\\\@@) { s/\\\\\\\\/\\\\/g; }' > DEBIAN/md5sums");
+	reset_perm_and_owner(0644, "${tmpdir}/DEBIAN/md5sums");
+	return;
 }
 
 =head1 SEE ALSO

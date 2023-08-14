@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,7 +7,11 @@ dh_auto_build - automatically builds a package
 =cut
 
 use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
 use Debian::Debhelper::Dh_Buildsystems;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
@@ -40,6 +44,8 @@ B<dh_auto_build> usually passes.
 =back
 
 =cut
+
+# PROMISE: DH NOOP WITHOUT cli-options(BUILDSYSTEM) buildsystem(build)
 
 buildsystems_init();
 buildsystems_do();

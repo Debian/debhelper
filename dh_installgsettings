@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,7 +7,10 @@ dh_installgsettings - install GSettings overrides and set dependencies
 =cut
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
@@ -52,14 +55,16 @@ packages (90).
 
 =cut
 
-init();
+init(options => {
+	"priority=s" => \$dh{PRIORITY},
+});
 
 my $priority=10;
 if (defined $dh{PRIORITY}) {
 	$priority=$dh{PRIORITY};
 }
 
-# PROMISE: DH NOOP WITHOUT gsettings-override tmp(usr/share/glib-2.0/schemas)
+# PROMISE: DH NOOP WITHOUT gsettings-override tmp(usr/share/glib-2.0/schemas) cli-options()
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
@@ -68,13 +73,16 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	my $override = pkgfile($package,"gsettings-override");
 	if ($override ne '') {
-		doit("mkdir","-p",$gsettings_schemas_dir);
-		doit("install","-p","-m644",$override,"$gsettings_schemas_dir/${priority}_$package.gschema.override");
+		install_dir($gsettings_schemas_dir);
+		install_file($override,
+					 "$gsettings_schemas_dir/${priority}_$package.gschema.override");
 	}
 
 	if (-d "$gsettings_schemas_dir") {
 		# Get a list of the schemas
-		my $schemas = `find $gsettings_schemas_dir -type f \\( -name \\*.xml -o -name \\*.override \\) -printf '%P '`;
+		my $schemas = qx_cmd('find', $gsettings_schemas_dir, '-type', 'f',
+							 '(', '-name', '*.xml', '-o', '-name', '*.override',
+							 ')', '-printf', '%P');
 		if ($schemas ne '') {
 			addsubstvar($package, "misc:Depends", "dconf-gsettings-backend | gsettings-backend");
 		}

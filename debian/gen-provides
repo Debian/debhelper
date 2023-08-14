@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib qw(error);
+
+my @provides;
+my $lowest = Debian::Debhelper::Dh_Lib::LOWEST_VIRTUAL_DEBHELPER_COMPAT_LEVEL
+    // error("LOWEST_VIRTUAL_DEBHELPER_COMPAT_LEVEL is undef");
+my $highest = Debian::Debhelper::Dh_Lib::HIGHEST_STABLE_COMPAT_LEVEL
+    // error("HIGHEST_STABLE_COMPAT_LEVEL is undef");
+
+if ($highest < $lowest) {
+    error("HIGHEST_STABLE_COMPAT_LEVEL is lower than LOWEST_VIRTUAL_DEBHELPER_COMPAT_LEVEL");
+}
+
+for (my $i = $lowest ; $i <= $highest ; $i++) {
+    push(@provides, "debhelper-compat (= $i)");
+}
+print "dh:CompatLevels=" . join(", ", @provides) . "\n";
+

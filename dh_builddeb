@@ -1,4 +1,6 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -7,7 +9,10 @@ dh_builddeb - build Debian binary packages
 =cut
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
@@ -15,11 +20,16 @@ B<dh_builddeb> [S<I<debhelper options>>] [B<--destdir=>I<directory>] [B<--filena
 
 =head1 DESCRIPTION
 
-B<dh_builddeb> simply calls L<dpkg-deb(1)> to build a Debian package or
-packages.
+B<dh_builddeb> simply calls L<dpkg-deb(1)> to build a Debian package
+or packages.  It will also build dbgsym packages when L<dh_strip(1)>
+and L<dh_gencontrol(1)> have prepared them.
 
 It supports building multiple binary packages in parallel, when enabled by
 DEB_BUILD_OPTIONS.
+
+When the I<Rules-Requires-Root> field is not (effectively)
+I<binary-targets>, B<dh_builddeb> will pass B<--root-owner-group> to
+L<dpkg-deb(1)>.
 
 =head1 OPTIONS
 
@@ -66,60 +76,102 @@ else {
 	$dh{FILENAME}="/$dh{FILENAME}";
 }
 
-my $max_procs=get_buildoption("parallel") || 1;
-
-my $processes=1;
-my $exit=0;
-sub reap {
-	if (wait == -1) {
-		$processes=0;
+sub build_and_rename_deb {
+	my ($package, $destdir, $cmd, $rename_sub) = @_;
+	my $build_dir = "debian/.debhelper/scratch-space/build-${package}";
+	my ($dpkg_filename, $desired_filename);
+	mkdirs($build_dir);
+	doit(@${cmd}, $build_dir);
+	opendir(my $fd, $build_dir) or error("opendir($build_dir) failed: $!");
+	for my $name (readdir($fd)) {
+		next if $name eq '.' or $name eq '..';
+		if ($dpkg_filename) {
+			error("\"@{$cmd} ${build_dir}\" produced two debs: $dpkg_filename and $name");
+		}
+		$dpkg_filename = $name;
 	}
-	else {
-		$processes--;
-		$exit=1 if $? != 0;
+	closedir($fd);
+	if (not defined($dpkg_filename)) {
+		error("\"@{$cmd} ${build_dir}\" did not produce *any* file but was successful!?");
+	}
+	local $_ = $dpkg_filename;
+	$rename_sub->();
+	$desired_filename = $_;
+	if ($desired_filename ne $dpkg_filename) {
+		print "\tRenaming $dpkg_filename to $desired_filename\n";
+	}
+	rename_path("${build_dir}/${dpkg_filename}",
+		"${destdir}/${desired_filename}");
+}
+
+my @items;
+my @dpkg_options;
+push(@dpkg_options, '--root-owner-group') if not should_use_root();
+my @dbgsym_dpkg_options = ('--root-owner-group');
+
+
+for my $package (@{$dh{DOPACKAGES}}) {
+	push(@items, [$package, 0]);
+	if (not is_udeb($package)) {
+		my $dbgsym_tmpdir = dbgsym_tmpdir($package);
+		my $dbgsym_control = "${dbgsym_tmpdir}/DEBIAN/control";
+		if ( -f $dbgsym_control) {
+			# Only build the dbgsym package if it has a control file.
+			# People might have skipped dh_gencontrol.
+			push(@items, [$package, 1]);
+		} elsif (-d $dbgsym_tmpdir) {
+			warning("Not building dbgsym package for ${package} as it has no control file");
+			warning("Please use dh_gencontrol to avoid this issue");
+		}
 	}
 }
 
-foreach my $package (@{$dh{DOPACKAGES}}) {
-	my $pid=fork();
-	if (! defined $pid) {
-		error("fork failed! $!");
-	}
-	if ($pid) { # parent
-		$processes++;
-		reap while $processes > $max_procs;
-		next;
-	}
+on_items_in_parallel(\@items, sub {
+	foreach my $item (@_) {
+		my ($package, $dbgsym) = @{$item};
+		my $tmp=tmpdir($package);
 
-	# child
-	my $tmp=tmpdir($package);
-	if (exists $ENV{DH_ALWAYS_EXCLUDE} && length $ENV{DH_ALWAYS_EXCLUDE}) {
-		if (! compat(5)) {
+		if ($dbgsym) {
+			my $dbgsym_tmpdir = dbgsym_tmpdir($package);
+			my @cmd = ("dpkg-deb", @dbgsym_dpkg_options, @{$dh{U_PARAMS}},
+				"--build", $dbgsym_tmpdir);
+			if (DBGSYM_PACKAGE_TYPE eq DEFAULT_PACKAGE_TYPE) {
+				doit(@cmd, $dh{DESTDIR});
+			} else {
+				build_and_rename_deb($package, $dh{DESTDIR}, \@cmd,
+					sub {s/\.\Q${\DEFAULT_PACKAGE_TYPE}\E$/\.\Q${\DBGSYM_PACKAGE_TYPE}\E/g});
+			}
+			next;
+		}
+		if (exists $ENV{DH_ALWAYS_EXCLUDE} && length $ENV{DH_ALWAYS_EXCLUDE}) {
 			complex_doit("find $tmp $dh{EXCLUDE_FIND} | xargs rm -rf");
 		}
+		if (! is_udeb($package)) {
+			doit("dpkg-deb", @dpkg_options, @{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$dh{FILENAME});
+		}
 		else {
-			# Old broken code here for compatibility. Does not
-			# remove everything.
-			complex_doit("find $tmp -name $_ | xargs rm -rf")
-				foreach split(":", $ENV{DH_ALWAYS_EXCLUDE});
+			my $filename=$dh{FILENAME};
+			my @cmd = qw(dpkg-deb -z6 -Zxz -Sextreme);
+			push(@cmd, @dpkg_options);
+			push(@cmd, @{$dh{U_PARAMS}}) if $dh{U_PARAMS};
+			push(@cmd, '--build', $tmp);
+			if (! $filename) {
+				# dpkg-gencontrol does not include "Package-Type" in the
+				# control file (see #575059, #452273) for political
+				# reasons.
+				#
+				# dh_builddeb used to guess the "correct" filename, but it
+				# fell short when dpkg-gencontrol -V was used.  The best
+				# solution so far: Let dpkg-deb build the deb and
+				# have dh_builddeb fix the extension.
+				build_and_rename_deb($package, $dh{DESTDIR}, \@cmd,
+					sub { s/\.deb$/\.udeb/g });
+			} else {
+				doit(@cmd, $dh{DESTDIR}.$filename);
+			}
 		}
 	}
-	if (! is_udeb($package)) {
-		doit("dpkg-deb", @{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$dh{FILENAME});
-	}
-	else {
-		my $filename=$dh{FILENAME};
-		if (! $filename) {
-			$filename="/".udeb_filename($package);
-		}
-		doit("dpkg-deb", "-z1", "-Zxz", "-Sextreme",
-			@{$dh{U_PARAMS}}, "--build", $tmp, $dh{DESTDIR}.$filename);
-	}
-	exit 0;
-}
-
-reap while $processes;
-exit $exit;
+});
 
 =head1 SEE ALSO
 

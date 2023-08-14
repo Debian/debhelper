@@ -1,32 +1,20 @@
 v10:
 
 * escaping in config files (for whitespace)?
-* dh_installinit --restart-after-upgrade as default?
 
 Deprecated:
 
-* make a missing debian/compat an error. (started printing warning messages
-  in 20120115)
-* DH_COMPAT 1, 2, 3, 4. Can be removed once all packages are seen to be using
-  a newer version. I won't hold my breath. (2 and 3 are getting close though.)
-* dh_suidregister. Once nothing in the archive uses it.
 * dh_installmanpages.
 * dh_movefiles. I won't hold my breath. Have not added deprecation
   docs or message yet.
-* dh_undocumented
 * dh_installinit --init-script (make it warn)
 * dh_clean -k
-* dh_desktop, dh_scrollkeeper. Remove eventually..
 * -s flag, not formally deprecated yet; remove eventually
 * -u flag; add a warning on use and remove eventually
 * delsubstvar() and the last parameter to addsubstvar that makes it remove
   a string are not used in debhelper itself, but have been left in the
   library in case other things use them. Deprecate and remove.
-* dh --before , --after , --until , --remaining
 * debian/compress files
-* deprecate dh_gconf for dh_installgsettings (stuff should be migrating
-  away from gconf, and then I can just remove it -- have not added warning
-  or depreaction docs yet)
 
 Also, grep the entire archive for all dh_* command lines,
 and check to see what other switches are not being used, and maybe remove

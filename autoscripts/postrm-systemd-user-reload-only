@@ -1,0 +1,3 @@
+if [ -z "${DPKG_ROOT:-}" ] && [ "$1" = remove ] && [ -d /run/systemd/system ] ; then
+	systemctl --global daemon-reload >/dev/null || true
+fi

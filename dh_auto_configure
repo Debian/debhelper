@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,7 +7,11 @@ dh_auto_configure - automatically configure a package prior to building
 =cut
 
 use strict;
+use warnings;
+use Debian::Debhelper::Dh_Lib;
 use Debian::Debhelper::Dh_Buildsystems;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
@@ -45,6 +49,8 @@ B<dh_auto_configure> usually passes. For example:
 =back
 
 =cut
+
+# PROMISE: DH NOOP WITHOUT cli-options(BUILDSYSTEM) buildsystem(configure)
 
 buildsystems_init();
 buildsystems_do();

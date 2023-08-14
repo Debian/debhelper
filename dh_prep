@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,7 +7,10 @@ dh_prep - perform cleanups in preparation for building a binary package
 =cut
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
@@ -39,23 +42,30 @@ multiple times to build up a list of things to exclude.
 
 init();
 
+my (@clean_files, @clean_dirs, %seen);
+
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $ext=pkgext($package);
+	my $source_dir = default_sourcedir($package);
 
-	doit("rm","-f","debian/${ext}substvars")
+	push(@clean_files, "debian/${ext}substvars")
 		unless excludefile("debian/${ext}substvars");
 		
 	# These are all debhelper temp files, and so it is safe to 
 	# wildcard them.
-	complex_doit("rm -f debian/$ext*.debhelper");
-	
-	doit ("rm","-rf",$tmp."/")
+	my @temp = glob("debian/$ext*.debhelper");
+	push(@clean_files, @temp);
+	push(@clean_dirs, "debian/.debhelper/generated/${package}/");
+	push(@clean_dirs , "${tmp}/")
 		unless excludefile($tmp);
+
+	push(@clean_dirs, "${source_dir}/")
+		if (not $seen{$source_dir}++ and not excludefile($source_dir));
 }
 
-doit('rm', '-rf', 'debian/tmp') if -x 'debian/tmp' && ! compat(1) &&
-                                   ! excludefile("debian/tmp");
+xargs(\@clean_files, 'rm', '-f', '--') if @clean_files;
+xargs(\@clean_dirs, 'rm', '-fr', '--') if @clean_dirs;
 
 =head1 SEE ALSO
 

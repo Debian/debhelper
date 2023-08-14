@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,16 +7,23 @@ dh_installdirs - create subdirectories in package build directories
 =cut
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
-B<dh_installdirs> [S<I<debhelper options>>] [B<-A>] [S<I<dir> ...>]
+B<dh_installdirs> [S<I<debhelper options>>] [B<-A>] [B<--sourcedir=>I<dir>] [B<--create-in-sourcedir>] [S<I<dir> ...>]
 
 =head1 DESCRIPTION
 
 B<dh_installdirs> is a debhelper program that is responsible for creating
 subdirectories in package build directories.
+
+Many packages can get away with omitting the call to B<dh_installdirs>
+completely.  Notably, other B<dh_*> commands are expected to create
+directories as needed.
 
 =head1 FILES
 
@@ -25,6 +32,13 @@ subdirectories in package build directories.
 =item debian/I<package>.dirs
 
 Lists directories to be created in I<package>.
+
+Generally, there is no need to list directories created by the
+upstream build system or directories needed by other B<debhelper>
+commands.
+
+Supports substitution variables in compat 13 and later as
+documented in L<debhelper(7)>.
 
 =back
 
@@ -37,6 +51,23 @@ Lists directories to be created in I<package>.
 Create any directories specified by command line parameters in ALL packages
 acted on, not just the first.
 
+=item B<--create-in-sourcedir>, B<--no-create-in-sourcedir>
+
+Whether to create the specified directories in the source directory
+(usually F<debian/tmp>) I<in addition to> in the package build directory
+(usually F<< debian/I<package> >>).
+
+The default is B<--no-create-in-sourcedir>.
+
+=item B<--sourcedir=>I<dir>
+
+Consider I<dir> the source directory for the packages acted on instead
+of the default (which is usually F<debian/tmp>).
+
+Please note that this option is dependent on the
+B<--create-in-sourcedir> option (when B<--no-create-in-sourcedir> is
+in effect, this option does nothing in B<dh_installdirs>).
+
 =item I<dir> ...
 
 Create these directories in the package build directory of the first
@@ -46,17 +77,21 @@ package acted on. (Or in all packages if B<-A> is specified.)
 
 =cut
 
-init();
+my $create_in_sourcedir = 0;
 
-# PROMISE: DH NOOP WITHOUT dirs
+init(options => {
+	'sourcedir=s' => \$dh{SOURCEDIR},
+	'create-in-sourcedir!' => \$create_in_sourcedir,
+});
+
+# PROMISE: DH NOOP WITHOUT dirs cli-options()
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $file=pkgfile($package,"dirs");
+	my $srcdir = $dh{SOURCEDIR} // default_sourcedir($package);
 
-	if (! -e $tmp) {
-		doit("install","-d",$tmp);
-	}
+	install_dir($tmp) if compat(10);
 
 	my @dirs;
 
@@ -74,14 +109,22 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# be in the right directory, but more importantly, it 
 		# protects against the danger of absolute dirs being
 		# specified.
-		@dirs=map {
-				$_="$tmp/$_";
-				tr:/:/:s; # just beautification.
-				$_
-			  } @dirs;
+		my @make_dirs;
+		push(@make_dirs, map {
+				my $dir = "$tmp/$_";
+				$dir =~ tr:/:/:s; # just beautification.
+				$dir;
+			} @dirs);
+		if ($create_in_sourcedir) {
+			push(@make_dirs, map {
+					my $dir = "${srcdir}/$_";
+					$dir =~ tr:/:/:s; # just beautification.
+					$dir;
+				} @dirs);
+		}
 
 		# Create dirs.
-		doit("install","-d",@dirs);
+		install_dir(@make_dirs);
 	}
 }
 

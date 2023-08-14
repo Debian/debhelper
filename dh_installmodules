@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,8 +7,11 @@ dh_installmodules - register kernel modules
 =cut
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib;
 use File::Find;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
@@ -39,7 +42,7 @@ Installed to etc/modprobe.d/I<package>.conf in the package build directory.
 
 =over 4
 
-=item B<-n>, B<--noscripts>
+=item B<-n>, B<--no-scripts>
 
 Do not modify F<preinst>/F<postinst>/F<postrm> scripts.
 
@@ -69,7 +72,7 @@ sub find_kernel_modules {
 
 	return unless -d $searchdir;
 	find(sub {
-		if (/\.k?o$/) {
+		if (m/ [.]k?o  (?:[.](?:[gx]z|bz2))? $/x) {
 			my ($kvers)=$File::Find::dir=~m!lib/modules/([^/]+)/!;
 			if (! defined $kvers || ! length $kvers) {
 				warning("Cannot determine kernel version for module $File::Find::name");
@@ -80,34 +83,25 @@ sub find_kernel_modules {
 		}
 	}, $searchdir);
 
-	return keys %versions;
+	return sort(keys(%versions));
 }
 
-# PROMISE: DH NOOP WITHOUT modprobe tmp(lib/modules)
+# PROMISE: DH NOOP WITHOUT modprobe tmp(lib/modules) cli-options()
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
 	my $modprobe_file=pkgfile($package,"modprobe");
 
-	if (! -e $tmp) {
-		doit("install","-d",$tmp);
-	}
-
 	if ($modprobe_file) {
-		if (! -e "$tmp/etc/modprobe.d") {
-			doit("install","-d","$tmp/etc/modprobe.d");
-		}
-		my $old="/etc/modprobe.d/".pkgfilename($package);
-		my $new=$old.".conf";
-		doit("install","-m","0644",$modprobe_file,"$tmp/$new");
-		autoscript($package,"preinst","preinst-moveconffile","s!#OLD#!$old!g;s!#PACKAGE#!$package!g");
-		autoscript($package,"postinst","postinst-moveconffile","s!#OLD#!$old!g;s!#NEW#!$new!g");
+		my $path = '/etc/modprobe.d/' . pkgfilename($package) . '.conf';
+		install_dir("$tmp/etc/modprobe.d");
+		install_file($modprobe_file, "$tmp/$path");
 	}
 	
 	if (! $dh{NOSCRIPTS}) {
 		foreach my $kvers (find_kernel_modules("$tmp/lib/modules")) {
-			autoscript($package,"postinst","postinst-modules","s/#KVERS#/$kvers/g");
-			autoscript($package,"postrm","postrm-modules","s/#KVERS#/$kvers/g");
+			autoscript($package, 'postinst', 'postinst-modules', { 'KVERS' => $kvers });
+			autoscript($package, 'postrm', 'postrm-modules', { 'KVERS' => $kvers });
 		}
 	}
 }

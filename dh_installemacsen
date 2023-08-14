@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,7 +7,10 @@ dh_installemacsen - register an Emacs add on package
 =cut
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
@@ -54,7 +57,7 @@ build directory. Use B<--priority> to use a different priority than 50.
 
 =over 4
 
-=item B<-n>, B<--noscripts>
+=item B<-n>, B<--no-scripts>
 
 Do not modify F<postinst>/F<prerm> scripts.
 
@@ -79,6 +82,7 @@ instances of the same text to be added to maintainer scripts.
 
 init(options => {
 	"flavor=s" => \$dh{FLAVOR},
+	"priority=s" => \$dh{PRIORITY},
 });
 
 if (! defined $dh{PRIORITY}) {
@@ -88,7 +92,7 @@ if (! defined $dh{FLAVOR}) {
 	$dh{FLAVOR}='emacs';
 }
 
-# PROMISE: DH NOOP WITHOUT emacsen-common emacsen-install emacsen-remove emacsen-startup
+# PROMISE: DH NOOP WITHOUT emacsen-common emacsen-install emacsen-remove emacsen-startup cli-options()
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
@@ -99,41 +103,34 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $emacsen_startup=pkgfile($package,"emacsen-startup");
 
 	if ($emacsen_compat ne '') {
-		if (! -d "$tmp/usr/lib/emacsen-common/packages/compat") {
-			doit("install","-d","$tmp/usr/lib/emacsen-common/packages/compat");
-		}
-		doit("install","-m0644",$emacsen_compat,"$tmp/usr/lib/emacsen-common/packages/compat/$package");
+		install_dir("$tmp/usr/lib/emacsen-common/packages/compat");
+		install_file($emacsen_compat,
+					 "$tmp/usr/lib/emacsen-common/packages/compat/$package");
 	}
 
 	if ($emacsen_install ne '') {
-		if (! -d "$tmp/usr/lib/emacsen-common/packages/install") {
-			doit("install","-d","$tmp/usr/lib/emacsen-common/packages/install");
-		}
-		doit("install","-m0755",$emacsen_install,"$tmp/usr/lib/emacsen-common/packages/install/$package");
+		install_dir("$tmp/usr/lib/emacsen-common/packages/install");
+		install_prog($emacsen_install,"$tmp/usr/lib/emacsen-common/packages/install/$package");
 	}
 
 	if ($emacsen_remove ne '') {
-		if (! -d "$tmp/usr/lib/emacsen-common/packages/remove") {
-			doit("install","-d","$tmp/usr/lib/emacsen-common/packages/remove");
-		}
-		doit("install","-m0755","$emacsen_remove","$tmp/usr/lib/emacsen-common/packages/remove/$package");
+		install_dir("$tmp/usr/lib/emacsen-common/packages/remove");
+		install_prog("$emacsen_remove","$tmp/usr/lib/emacsen-common/packages/remove/$package");
 	}
-	
+
 	if ($emacsen_startup ne '') {
-		if (! -d "$tmp/etc/$dh{FLAVOR}/site-start.d/") {
-			doit("install","-d","$tmp/etc/$dh{FLAVOR}/site-start.d/");
-		}
-		doit("install","-m0644",$emacsen_startup,"$tmp/etc/$dh{FLAVOR}/site-start.d/$dh{PRIORITY}$package.el");
+		install_dir("$tmp/etc/$dh{FLAVOR}/site-start.d/");
+		install_file($emacsen_startup,"$tmp/etc/$dh{FLAVOR}/site-start.d/$dh{PRIORITY}$package.el");
 	}
 
 	if ($emacsen_install ne '' || $emacsen_remove ne '') {
 		if (! $dh{NOSCRIPTS}) {
 			autoscript($package,"preinst","preinst-emacsen",
-				"s/#PACKAGE#/$package/");
+				{ 'PACKAGE' => $package });
 			autoscript($package,"postinst","postinst-emacsen",
-				"s/#PACKAGE#/$package/");
+				{ 'PACKAGE' => $package });
 			autoscript($package,"prerm","prerm-emacsen",
-				"s/#PACKAGE#/$package/");
+				{ 'PACKAGE' => $package });
 		}
 	}
 }

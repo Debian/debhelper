@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,8 +7,11 @@ dh_auto_test - automatically runs a package's test suites
 =cut
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib;
 use Debian::Debhelper::Dh_Buildsystems;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
@@ -47,13 +50,11 @@ B<dh_auto_test> usually passes.
 If the B<DEB_BUILD_OPTIONS> environment variable contains B<nocheck>, no
 tests will be performed.
 
-dh_auto_test does not run the test suite when a package is being cross
-compiled.
-
 =cut
 
-if (get_buildoption("nocheck")
-    || (dpkg_architecture_value("DEB_HOST_GNU_TYPE") ne dpkg_architecture_value("DEB_BUILD_GNU_TYPE"))) {
+# PROMISE: DH NOOP WITHOUT cli-options(BUILDSYSTEM) buildsystem(test)
+
+if (get_buildoption("nocheck")) {
 	exit 0;
 }
 

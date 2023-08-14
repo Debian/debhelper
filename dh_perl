@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,9 +7,13 @@ dh_perl - calculates Perl dependencies and cleans up after MakeMaker
 =cut
 
 use strict;
+use warnings;
 use Config;
 use File::Find;
 use Debian::Debhelper::Dh_Lib;
+use constant DISTRO_PERL => $^X;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
@@ -70,6 +74,11 @@ init();
 
 my $vendorlib = substr $Config{vendorlib}, 1;
 my $vendorarch = substr $Config{vendorarch}, 1;
+if (is_cross_compiling()) {
+	my $incdir = perl_cross_incdir();
+	$vendorarch = substr qx/perl -I$incdir -MConfig -e 'print \$Config{vendorarch}'/, 1
+		if defined $incdir;
+}
 
 # Cleaning the paths given on the command line
 foreach (@ARGV) {
@@ -80,13 +89,15 @@ foreach (@ARGV) {
 my $perl = 'perl';
 # If -d is given, then the dependency is on perl-base rather than perl.
 $perl .= '-base' if $dh{D_FLAG};
-my $version;
 
 # dependency types
 use constant PROGRAM   => 1;
 use constant PM_MODULE => 2;
 use constant XS_MODULE => 4;
 use constant ARCHDEP_MODULE => 8;
+
+use constant MA_ANY_INCOMPATIBLE_TYPES => ~(PROGRAM | PM_MODULE);
+
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
@@ -107,30 +118,47 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}, @dirs if @dirs;
 
 	# find scripts
-	find sub {
-		return unless -f and (-x or /\.pl$/);
-		return if $File::Find::dir=~/\/usr\/share\/doc\//;
-		
-		local *F;
-		return unless open F, $_;
-		if (read F, local $_, 32 and m%^#!\s*(/usr/bin/perl|/usr/bin/env\s+perl)\s%) {
-			$deps |= PROGRAM;
+	$tmp =~ tr:/:/:s;
+	$tmp =~ s{[^/]\K/$}{};
+	my $usd_dir = "$tmp/usr/share/doc";
+	my $check_script = sub {
+		if ($_ eq $usd_dir) {
+			$File::Find::prune = 1 if -d $_;
+			return;
 		}
-		close F;
-	}, $tmp;
+		return unless -f and (-x _ or /\.pl$/);
+
+		return unless open(my $fd, '<', $_);
+		my $path = $_;
+		my $rewrite_shebang = 0;
+		if (read($fd, local $_, 32) and m%^#!\s*(/usr/bin/perl|${\DISTRO_PERL}|/usr/bin/env\s+perl)\s%) {
+			my $actual_perl = $1;
+			$deps |= PROGRAM;
+			$rewrite_shebang = 1 if ($actual_perl ne DISTRO_PERL);
+		}
+		close($fd);
+		rewrite_shebang($path) if $rewrite_shebang;
+	};
+	find({
+		wanted => $check_script,
+		no_chdir => 1,
+	}, $tmp);
 
 	if ($deps) {
 		my $version="";
 		if ($deps & XS_MODULE or $dh{V_FLAG_SET}) {
-			($version) = `dpkg -s $perl` =~ /^Version:\s*(\S+)/m
+			($version) = qx_cmd('dpkg', '-s', $perl) =~ /^Version:\s*(\S+)/m
 				unless $version;
 			$version = ">= $version";
 		}
-		
+
+		my $perlarch = $perl;
+		$perlarch .= ':any' if (($deps & MA_ANY_INCOMPATIBLE_TYPES) == 0) and not $dh{V_FLAG_SET};
+
 		# no need to depend on an un-versioned perl-base -- it's
 		# essential
-		addsubstvar($package, "perl:Depends", $perl, $version)
-			unless $perl eq 'perl-base' && ! length($version);
+		addsubstvar($package, "perl:Depends", $perlarch, $version)
+			if $perl ne 'perl-base' || length($version);
 
 		# add perlapi-<ver> for XS modules and other modules
 		# installed into vendorarch
@@ -147,6 +175,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				"$dir");
 		}
 	}
+}
+
+sub rewrite_shebang {
+	my ($file) = @_;
+	doit($^X, '-p', '-i', '-e',
+		's{#!\s*(/usr/bin/perl|' . quotemeta(DISTRO_PERL) . '|/usr/bin/env\s+perl)}{#! ' . DISTRO_PERL . '} if ($. == 1);',
+		$file);
+	return;
 }
 
 =head1 SEE ALSO

@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,7 +7,10 @@ dh_lintian - install lintian override files into package build directories
 =cut
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
@@ -39,7 +42,7 @@ overrides for the source package.
 
 init();
 
-# PROMISE: DH NOOP WITHOUT lintian-overrides
+# PROMISE: DH NOOP WITHOUT lintian-overrides cli-options()
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if is_udeb($package);
@@ -49,10 +52,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $overrides=pkgfile($package,"lintian-overrides");
 
 	if ($overrides ne '') {
-		if (! -d "$or_dir") {
-			 doit("install","-d","$or_dir");
-		}
-		doit("install","-p","-m644",$overrides,"$or_dir/$package");
+		install_dir($or_dir);
+		install_dh_config_file($overrides, "$or_dir/$package");
 	}
 }
 

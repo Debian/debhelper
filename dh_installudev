@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,8 +7,10 @@ dh_installudev - install udev rules files
 =cut
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib;
-use File::Find;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
@@ -18,9 +20,6 @@ B<dh_installudev> [S<I<debhelper options>>] [B<-n>] [B<--name=>I<name>] [B<--pri
 
 B<dh_installudev> is a debhelper program that is responsible for
 installing B<udev> rules files.
-
-Code is added to the F<preinst> and F<postinst> to handle the upgrade from the
-old B<udev> rules file location.
 
 =head1 FILES
 
@@ -46,10 +45,6 @@ debian/I<package>.udev.
 
 Sets the priority the file. Default is 60.
 
-=item B<-n>, B<--noscripts>
-
-Do not modify F<preinst>/F<postinst> scripts.
-
 =back
 
 =head1 NOTES
@@ -60,7 +55,9 @@ instances of the same text to be added to maintainer scripts.
 
 =cut
 
-init();
+init(options => {
+	"priority=s" => \$dh{PRIORITY},
+});
 
 # The priority used to look like z60_;
 # we need to calculate that old value to handle
@@ -81,7 +78,7 @@ if ($dh{PRIORITY}) {
 	$old_priority.="_";
 }
 
-# PROMISE: DH NOOP WITHOUT udev
+# PROMISE: DH NOOP WITHOUT udev cli-options()
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
@@ -91,26 +88,14 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		$filename = "$package.udev";
 	}
 	$filename=~s/\.udev$/.rules/;
-	my $oldfilename=$filename;
 	if (defined $dh{NAME}) {
 		$filename="$dh{NAME}.rules";
 	}
 
 	if ($rules_file) {
-		if (! -e "$tmp/lib/udev/rules.d") {
-			doit("install","-d","$tmp/lib/udev/rules.d");
-		}
 		my $rule="/lib/udev/rules.d/$dh{PRIORITY}$filename";
-		doit("install","-m","0644",$rules_file,$tmp.$rule);
-		if (! $dh{NOSCRIPTS}) {
-			# Remove old rule from /etc, unless it's modified,
-			# in which case we rename it to match the new
-			# file in /lib, so it will override.
-			my $old="/etc/udev/rules.d/$old_priority$oldfilename";
-			$rule=~s/^\/lib/\/etc/;
-			autoscript($package,"preinst","preinst-moveconffile","s!#OLD#!$old!g;s!#NEW#!$rule!g;s!#PACKAGE#!$package!g");
-			autoscript($package,"postinst","postinst-moveconffile","s!#OLD#!$old!g;s!#NEW#!$rule!g");
-		}
+		install_dir("$tmp/lib/udev/rules.d");
+		install_file($rules_file, "${tmp}${rule}");
 	}
 }
 

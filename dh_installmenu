@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 =head1 NAME
 
@@ -7,7 +7,10 @@ dh_installmenu - install Debian menu files into package build directories
 =cut
 
 use strict;
+use warnings;
 use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
@@ -42,7 +45,7 @@ in the package build directory.
 
 =over 4
 
-=item B<-n>, B<--noscripts>
+=item B<-n>, B<--no-scripts>
 
 Do not modify F<postinst>/F<postrm> scripts.
 
@@ -52,7 +55,7 @@ Do not modify F<postinst>/F<postrm> scripts.
 
 init();
 
-# PROMISE: DH NOOP WITHOUT menu menu-method
+# PROMISE: DH NOOP WITHOUT menu menu-method cli-options()
 
 foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $tmp=tmpdir($package);
@@ -60,11 +63,9 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $menu_method=pkgfile($package,"menu-method");
 	
 	if ($menu ne '') {
-		if (! -d "$tmp/usr/share/menu") {
-			doit("install","-d","$tmp/usr/share/menu");
-		}
-		doit("install","-p","-m644",$menu,"$tmp/usr/share/menu/$package");
-		
+		install_dir("$tmp/usr/share/menu");
+		install_file($menu,"$tmp/usr/share/menu/$package");
+
 		# Add the scripts if a menu-method file doesn't exist.
 		# The scripts for menu-method handle everything these do, too.
 		if ($menu_method eq "" && ! $dh{NOSCRIPTS}) {
@@ -74,14 +75,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	if ($menu_method ne '') {
-		if (!-d "$tmp/etc/menu-methods") {
-			doit("install","-d","$tmp/etc/menu-methods");
-		}
-		doit("install","-p","-m644",$menu_method,"$tmp/etc/menu-methods/$package");
+		install_dir("$tmp/etc/menu-methods");
+		install_file($menu_method,"$tmp/etc/menu-methods/$package");
 
 		if (! $dh{NOSCRIPTS}) {
-			autoscript($package,"postinst","postinst-menu-method","s/#PACKAGE#/$package/");
-			autoscript($package,"postrm","postrm-menu-method","s/#PACKAGE#/$package/");
+			autoscript($package, 'postinst', 'postinst-menu-method', { 'PACKAGE' => $package });
+			autoscript($package, 'postrm', 'postrm-menu-method', { 'PACKAGE' => $package });
 		}
 	}
 }
