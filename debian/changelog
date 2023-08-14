@@ -1,6 +1,6 @@
-debhelper (13.11.5~2.gbp4a55fa) UNRELEASED; urgency=medium
+debhelper (13.11.5~3.gbp788611) UNRELEASED; urgency=medium
 
-  ** SNAPSHOT build @4a55fa41a247a8c3d71aa1a7cd188e9b2708a11a **
+  ** SNAPSHOT build @788611c330661359d7f1e60d89638f6c70c45c70 **
 
   [ Translations ]
   * Update Portuguese translation (Américo Monteiro)
@@ -10,7 +10,27 @@ debhelper (13.11.5~2.gbp4a55fa) UNRELEASED; urgency=medium
   [ Tianon Gravi ]
   * Fix minor typo in DEB_BUILD_OPTIONS warning ("and but not" -> "but not")
 
- -- Niels Thykier <niels@thykier.net>  Sat, 04 Mar 2023 14:07:03 +0100
+  [ Niels Thykier ]
+  * AddonAPI.pm: Correct method name in error message.
+    Thanks to wferi@Github
+
+  [ Diederik de Haas ]
+  * dh_missing: Update link to PROGRAMMING.md.gz
+
+  [ Helmut Grohne ]
+  * cmake.pm: set -DBUILD_TESTING=OFF for nocheck builds
+
+  [ Johannes Schauer Marin Rodrigues ]
+  * autoscripts/postinst-init-tmpfiles: do not output to /dev/null to not hide error messages
+
+  [ Simon McVittie ]
+  * cmake.pm, meson.pm: Set DEB_PYTHON_INSTALL_LAYOUT=deb if not already set
+    (Closes: #1043136)
+  * buildsystems: Give XDG_RUNTIME_DIR spec-compliant u=rwx,og-rwx permissions
+  * meson.pm: Disable Python byte-compilation if the Meson version is new enough
+    (Closes: #1042398)
+
+ -- Niels Thykier <niels@thykier.net>  Mon, 14 Aug 2023 20:08:16 +0200
 
 debhelper (13.11.4) unstable; urgency=medium
 
