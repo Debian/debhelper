@@ -141,7 +141,7 @@ sub install_unit {
 	install_file($unit, "${path}/${script}.${installsuffix}");
 }
 
-# PROMISE: DH NOOP WITHOUT tmp(lib/systemd/system) mount path service socket target tmpfile timer
+# PROMISE: DH NOOP WITHOUT tmp(lib/systemd/system) tmp(usr/lib/systemd/system) mount path service socket target tmpfile timer
 
 my %requested_files = map { basename($_) => 1 } @ARGV;
 my %installed_files;
@@ -188,19 +188,23 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	install_unit($package, $script, 'mount', "$tmpdir/lib/systemd/system");
 	install_unit($package, $script, 'tmpfile', "$tmpdir/usr/lib/tmpfiles.d", 'conf');
 
-	find({
-		wanted => sub {
-			my $name = $File::Find::name;
-			return unless -f $name;
-			# Skip symbolic links, their only legitimate use is for
-			# adding an alias, e.g. linking smartmontools.service
-			# -> smartd.service.
-			return if -l $name;
-			return unless $name =~ m,^$tmpdir/lib/systemd/system/[^/]+$,;
-			push @installed_units, $name;
-		},
-		no_chdir => 1,
-	}, "${tmpdir}/lib/systemd/system") if -d "${tmpdir}/lib/systemd/system";
+	foreach my $unitdir ("${tmpdir}/usr/lib/systemd/system", "${tmpdir}/lib/systemd/system") {
+		find({
+			wanted => sub {
+				my $name = $File::Find::name;
+				return unless -f $name;
+				# Skip symbolic links, their only legitimate
+				# use is for adding an alias, e.g. linking
+				# smartmontools.service -> smartd.service.
+				return if -l $name;
+				return unless $name =~ m,^\Q$unitdir\E/[^/]+$,;
+				error("Unit $name is installed in both the /usr/lib/systemd/system and /lib/systemd/system directories of $package.")
+					if (grep { $_ eq $name } @installed_units);
+				push @installed_units, $name;
+			},
+			no_chdir => 1,
+		}, $unitdir) if -d $unitdir;
+	}
 
 	# Handle either only the unit files which were passed as arguments or
 	# all unit files that are installed in this package.
@@ -216,8 +220,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# Try to make the path absolute, so that the user can call
 		# dh_installsystemd bacula-fd.service
 		if ($base eq $name) {
-			# NB: This works because @installed_units contains
-			# files from precisely one directory.
+			# NB: This works because each unit in @installed_units
+			# comes from exactly one directory.
 			my ($full) = grep { basename($_) eq $base } @installed_units;
 			if (defined($full)) {
 				$name = $full;

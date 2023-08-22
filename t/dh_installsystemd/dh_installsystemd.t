@@ -116,12 +116,11 @@ each_compat_subtest {
 	unit_is_started('foo', 'foo2', 1);
 	ok(run_dh_tool('dh_clean'));
 
-
-	# lib -> usr/lib (if we ever support that)
-	make_path('debian/foo/lib/systemd/system/');
-	copy_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
+	# lib -> usr/lib
+	make_path('debian/foo/usr/lib/systemd/system/');
+	copy_file('debian/foo2.service', 'debian/foo/usr/lib/systemd/system/foo2.service');
 	ok(run_dh_tool('dh_installsystemd'));
-	ok(-e 'debian/foo/lib/systemd/system/foo2.service');
+	ok(-e 'debian/foo/usr/lib/systemd/system/foo2.service');
 	ok(find_script('foo', 'postinst'));
 	unit_is_enabled('foo', 'foo', 1);
 	unit_is_started('foo', 'foo', 1);

@@ -126,7 +126,7 @@ sub extract_key {
 }
 
 
-# PROMISE: DH NOOP WITHOUT tmp(lib/systemd/system)
+# PROMISE: DH NOOP WITHOUT tmp(lib/systemd/system) tmp(usr/lib/systemd/system)
 
 my %requested_files = map { basename($_) => 1 } @ARGV;
 my %installed_files;
@@ -138,21 +138,25 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my %aliases;
 
 	my $oldcwd = getcwd();
-	find({
-		wanted => sub {
-			my $name = $File::Find::name;
-			return unless -f;
-			return unless $name =~ m,^\Q${tmpdir}\E/lib/systemd/system/[^/]+$,;
-			if (-l) {
-				my $target = abs_path(readlink());
-				$target =~ s,^\Q${oldcwd}\E/,,g;
-				$aliases{$target} = [ $_ ];
-			} else {
-				push @installed_units, $name;
-			}
-		},
-	}, "${tmpdir}/lib/systemd/system") if -d "${tmpdir}/lib/systemd/system";
-	chdir($oldcwd);
+	foreach my $unitdir ("${tmpdir}/usr/lib/systemd/system", "${tmpdir}/lib/systemd/system") {
+		find({
+			wanted => sub {
+				my $name = $File::Find::name;
+				return unless -f;
+				return unless $name =~ m,^\Q$unitdir\E/[^/]+$,;
+				if (-l) {
+					my $target = abs_path(readlink());
+					$target =~ s,^\Q${oldcwd}\E/,,g;
+					$aliases{$target} = [ $_ ];
+				} else {
+					error("Unit $name is installed in both the /usr/lib/systemd/system and /lib/systemd/system directories of $package.")
+						if (grep { $_ eq $name } @installed_units);
+					push @installed_units, $name;
+				}
+			},
+		}, $unitdir) if -d $unitdir;
+		chdir($oldcwd);
+	}
 
 	# Handle either only the unit files which were passed as arguments or
 	# all unit files that are installed in this package.
@@ -179,8 +183,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# Try to make the path absolute, so that the user can call
 		# dh_installsystemd bacula-fd.service
 		if ($base eq $name) {
-			# NB: This works because @installed_units contains
-			# files from precisely one directory.
+			# NB: This works because each unit in @installed_units
+			# comes from exactly one directory.
 			my ($full) = grep { basename($_) eq $base } @installed_units;
 			if (defined($full)) {
 				$name = $full;
