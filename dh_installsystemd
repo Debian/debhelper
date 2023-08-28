@@ -249,30 +249,31 @@ sub extract_key {
 sub list_installed_units {
 	my ($tmpdir, $aliases) = @_;
 
-	my $lib_systemd_system = "$tmpdir/lib/systemd/system";
 	my @installed;
 
-	return unless -d $lib_systemd_system;
-	opendir(my $dh, "$lib_systemd_system") or error("Cannot opendir($lib_systemd_system): $!");
+	foreach my $unitdir ("$tmpdir/lib/systemd/system", "$tmpdir/usr/lib/systemd/system") {
+		next unless -d $unitdir;
+		opendir(my $dh, "$unitdir") or error("Cannot opendir($unitdir): $!");
 
-	foreach my $name (readdir($dh)) {
-		my $path = "$lib_systemd_system/$name";
-		next unless -f $path;
-		if (-l "$path") {
-			my $dest = basename(readlink($path));
-			$aliases->{$dest} //= [ ];
-			push @{$aliases->{$dest}}, $name;
-		} else {
-			push @installed, $name;
+		foreach my $name (readdir($dh)) {
+			my $path = "$unitdir/$name";
+			next unless -f $path;
+			if (-l "$path") {
+				my $dest = basename(readlink($path));
+				$aliases->{$dest} //= [ ];
+				push @{$aliases->{$dest}}, $name;
+			} else {
+				push @installed, $name;
+			}
 		}
-	}
 
-	closedir($dh);
+		closedir($dh);
+	}
 	return @installed;
 }
 
 
-# PROMISE: DH NOOP WITHOUT internal(bug#950723) tmp(lib/systemd/system) tmp(usr/lib/tmpfiles.d) tmp(etc/tmpfiles.d) mount path service socket target tmpfile timer cli-options()
+# PROMISE: DH NOOP WITHOUT internal(bug#950723) tmp(lib/systemd/system) tmp(usr/lib/systemd/system) tmp(usr/lib/tmpfiles.d) tmp(etc/tmpfiles.d) mount path service socket target tmpfile timer cli-options()
 
 
 # Install package maintainer supplied unit files
@@ -363,9 +364,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	# Must use while and shift because the loop alters the list.
 	while (@args) {
 		my $unit = shift @args;
-		my $path = "${tmpdir}/lib/systemd/system/${unit}";
-
-		error("Package '$package' does not install unit '$unit'.") unless (-f $path);
+		my $path = "${tmpdir}/usr/lib/systemd/system/${unit}";
+		unless (-f $path) {
+			$path = "${tmpdir}/lib/systemd/system/${unit}";
+			error("Package '$package' does not install unit '$unit'.") unless (-f $path);
+		}
 
 		# Skip template service files. Enabling, disabling, starting
 		# or stopping those services without specifying the instance

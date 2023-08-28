@@ -65,6 +65,15 @@ each_compat_from_x_to_and_incl_y_subtest(10, 10, sub {
 	unit_is_started('foo', 'foo2', 1);
 	ok(run_dh_tool('dh_clean'));
 
+	make_path('debian/foo/usr/lib/systemd/system/');
+	copy_file('debian/foo2.service', 'debian/foo/usr/lib/systemd/system/foo2.service');
+	ok(run_dh_tool('dh_systemd_enable'));
+	ok(run_dh_tool('dh_systemd_start'));
+	ok(-e "debian/foo.postinst.debhelper");
+	unit_is_enabled('foo', 'foo2', 1);
+	unit_is_started('foo', 'foo2', 1);
+	ok(run_dh_tool('dh_clean'));
+
 	make_path('debian/foo/lib/systemd/system/');
 	copy_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
 	ok(run_dh_tool('dh_systemd_enable'));
