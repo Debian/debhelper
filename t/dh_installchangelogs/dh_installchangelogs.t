@@ -13,8 +13,9 @@ use Test::DH;
 
 use constant TEST_DIR => dirname($0);
 our @TEST_DH_EXTRA_TEMPLATE_FILES = (qw(
-    debian/changelog
-    debian/control
+	debian/NEWS
+	debian/changelog
+	debian/control
 ));
 
 # Force Time::Piece to generate dch-compliant timestamps (i.e. in English).
@@ -26,14 +27,22 @@ use constant MIN_NUM_ENTRIES => 4;
 
 sub install_changelog {
 	my ($latest_offset_years, $num_years, $is_binnmu) = @_;
+	my $changesfile = "${\TEST_DIR}/debian/changelog";
+	install_changesfile($changesfile, $latest_offset_years, $num_years, $is_binnmu);
+}
+sub install_news {
+	my ($latest_offset_years, $num_years, $is_binnmu) = @_;
+	my $changesfile = "${\TEST_DIR}/debian/NEWS";
+	install_changesfile($changesfile, $latest_offset_years, $num_years, $is_binnmu);
+}
+sub install_changesfile {
+	my ($changesfile, $latest_offset_years, $num_years, $is_binnmu) = @_;
 	$is_binnmu //= 0;
 
 	my $entry_date_first = CUTOFF_DATE->add_years($latest_offset_years);
 	my $entry_date_stop = $entry_date_first->add_years(-$num_years);
 
-	my $changelog = "${\TEST_DIR}/debian/changelog";
-
-	open(my $fd, ">", $changelog) or error("open($changelog): $!");
+	open(my $fd, ">", $changesfile) or error("open($changesfile): $!");
 
 	if ($is_binnmu) {
 		my $nmu_date = $entry_date_first->add_months(-1);
@@ -72,15 +81,21 @@ sub entry_text {
 }
 
 sub changelog_lines_pkg {
-	return changelog_lines("debian/changelog");
+	return changesfile_lines("debian/changelog");
 }
 sub changelog_lines_installed {
-	return changelog_lines("debian/foo/usr/share/doc/foo/changelog.Debian");
+	return changesfile_lines("debian/foo/usr/share/doc/foo/changelog.Debian");
 }
 sub changelog_lines_binnmu {
-	return changelog_lines("debian/foo/usr/share/doc/foo/changelog.Debian.all");
+	return changesfile_lines("debian/foo/usr/share/doc/foo/changelog.Debian.all");
 }
-sub changelog_lines {
+sub news_lines_pkg {
+	return changesfile_lines("debian/NEWS");
+}
+sub news_lines_installed {
+	return changesfile_lines("debian/foo/usr/share/doc/foo/NEWS.Debian");
+}
+sub changesfile_lines {
 	my ($changelog) = @_;
 	open(my $fd, $changelog) or error("open($changelog): $!");
 	my @lines = @{readlines($fd)};
@@ -102,38 +117,52 @@ plan(tests => 8);
 my $years_after_cutoff = 2;
 my $years_of_changelog = 2;
 install_changelog($years_after_cutoff, $years_of_changelog);
+install_news($years_after_cutoff, $years_of_changelog);
 each_compat_subtest {
 	my @lines_orig = changelog_lines_pkg();
+	my @news_orig = news_lines_pkg();
 	ok(run_dh_tool("dh_installchangelogs"));
 	my @lines = changelog_lines_installed();
 	my @comments = grep(/^#/, @lines);
+	my @news = news_lines_installed();
 
 	is(@lines, @lines_orig);
 	is(@comments, 0);
+	is(@news, @news_orig);
 };
 
 # Test changelog with both recent and old entries
 $years_after_cutoff = 1;
 $years_of_changelog = 4;
 install_changelog($years_after_cutoff, $years_of_changelog);
+install_news($years_after_cutoff, $years_of_changelog);
 each_compat_subtest {
 	my @lines_orig = changelog_lines_pkg();
+	my @news_orig = news_lines_pkg();
 	ok(run_dh_tool("dh_installchangelogs"));
 	my @lines = changelog_lines_installed();
 	my @entries = dates_in_lines(@lines);
 	my @entries_old = grep { $_ < CUTOFF_DATE } @entries;
 	my @comments = grep(/^#/, @lines);
+	my @news = news_lines_installed();
+	my @news_entries = dates_in_lines(@news);
+	my @news_entries_old = grep { $_ < CUTOFF_DATE } @entries;
 
 	cmp_ok(@lines, "<", @lines_orig);
 	cmp_ok(@entries, ">", 1);
 	is(@entries_old, 0);
 	cmp_ok(@comments, ">=", 1);
+
+	cmp_ok(@news, "<", @news_orig);
+	cmp_ok(@news_entries, ">", 1);
+	is(@news_entries_old, 0);
 };
 
 # Test changelog with only old entries
 $years_after_cutoff = -1;
 $years_of_changelog = 2;
 install_changelog($years_after_cutoff, $years_of_changelog);
+install_news($years_after_cutoff - 2, 1);
 each_compat_subtest {
 	my @lines_orig = changelog_lines_pkg();
 	ok(run_dh_tool("dh_installchangelogs"));
@@ -146,6 +175,9 @@ each_compat_subtest {
 	is(@entries, MIN_NUM_ENTRIES);
 	is(@entries_old, MIN_NUM_ENTRIES);
 	cmp_ok(@comments, ">=", 1);
+
+	# All entries in NEWS are old, so it should not be installed.
+	ok(! -f "debian/foo/usr/share/doc/foo/NEWS.Debian");
 };
 
 # Test changelog with only recent entries (< oldstable) + binNUM
@@ -216,37 +248,56 @@ each_compat_subtest {
 $years_after_cutoff = 1;
 $years_of_changelog = 4;
 install_changelog($years_after_cutoff, $years_of_changelog);
+install_news($years_after_cutoff, $years_of_changelog);
 each_compat_subtest {
 	my @lines_orig = changelog_lines_pkg();
+	my @news_orig = news_lines_pkg();
 	ok(run_dh_tool("dh_installchangelogs", "--no-trim"));
 	my @lines = changelog_lines_installed();
 	my @entries = dates_in_lines(@lines);
 	my @entries_old = grep { $_ < CUTOFF_DATE } @entries;
 	my @comments = grep(/^#/, @lines);
+	my @news = news_lines_installed();
+	my @news_entries = dates_in_lines(@news);
+	my @news_entries_old = grep { $_ < CUTOFF_DATE } @entries;
 
 	is(@lines, @lines_orig);
 	cmp_ok(@entries, ">", 1);
 	cmp_ok(@entries_old, ">", 1);
 	is(@comments, 0);
+
+	is(@news, @news_orig);
+	cmp_ok(@news_entries, ">", 1);
+	cmp_ok(@news_entries_old, ">", 1);
 };
 
 # Test changelog with both recent and old entries + notrimdch
 $years_after_cutoff = 1;
 $years_of_changelog = 4;
 install_changelog($years_after_cutoff, $years_of_changelog);
+install_news($years_after_cutoff, $years_of_changelog);
 each_compat_subtest {
 	my @lines_orig = changelog_lines_pkg();
+	my @news_orig = news_lines_pkg();
 	$ENV{DEB_BUILD_OPTIONS} = "notrimdch";
 	ok(run_dh_tool("dh_installchangelogs"));
 	my @lines = changelog_lines_installed();
 	my @entries = dates_in_lines(@lines);
 	my @entries_old = grep { $_ < CUTOFF_DATE } @entries;
 	my @comments = grep(/^#/, @lines);
+	my @news = news_lines_installed();
+	my @news_entries = dates_in_lines(@news);
+	my @news_entries_old = grep { $_ < CUTOFF_DATE } @entries;
 
 	is(@lines, @lines_orig);
 	cmp_ok(@entries, ">", 1);
 	cmp_ok(@entries_old, ">", 1);
 	is(@comments, 0);
+
+	is(@news, @news_orig);
+	cmp_ok(@news_entries, ">", 1);
+	cmp_ok(@news_entries_old, ">", 1);
 };
 
 unlink("${\TEST_DIR}/debian/changelog");
+unlink("${\TEST_DIR}/debian/NEWS");
