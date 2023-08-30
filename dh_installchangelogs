@@ -167,16 +167,69 @@ sub install_debian_changelog {
 		return;
 	}
 
-	local $ENV{LC_ALL} = "C.UTF-8";
-
 	my $changelog_trimmed = generated_file($package, "dh_installchangelogs.dch.trimmed");
 	my $changelog_binnmu = generated_file($package, "dh_installchangelogs.dch.binnmu");
 
-	open(my $log1, "<", $changelog) or error("Cannot open($changelog): $!");
-	open(my $log2, ">", $changelog_trimmed) or error("Cannot open($changelog_trimmed): $!");
+	my ($error_in_changelog, $has_been_trimmed, $oldest_entry_time) =
+		prepare_changesfile("CHANGELOG", $changelog, $changelog_trimmed, $changelog_binnmu);
+
+	if ($error_in_changelog) {
+		# If the changelog could not be trimmed, fall back to the full changelog.
+		warning("$changelog could not be trimmed. The full changelog will be installed.");
+		$changelog_trimmed = $changelog;
+	} elsif ($has_been_trimmed) {
+		# Otherwise add a comment stating that this changelog has been trimmed.
+		my $note = "\n";
+		$note .= "# Older entries have been removed from this changelog.\n";
+		$note .= "# To read the complete changelog use `apt changelog $package`.\n";
+		open(my $log2, ">>", $changelog_trimmed) or error("Cannot open($changelog_trimmed): $!");
+		print($log2 $note) or error("Cannot write($changelog_trimmed): $!");
+		close($log2) or error("Cannot close($changelog_trimmed): $!");
+	}
+
+	install_file($changelog_trimmed, "$tmp/usr/share/doc/$package/$changelog_name");
+	if (-s $changelog_binnmu) {
+		install_file($changelog_binnmu, "$tmp/usr/share/doc/$package/$changelog_name.$arch");
+	}
+
+	return $oldest_entry_time;
+}
+
+sub install_debian_news {
+	my ($news, $package, $oldest_log_entry_time, $tmp) = @_;
+
+	if ($dh{NO_TRIM} || get_buildoption("notrimdch") || !defined($oldest_log_entry_time)) {
+		# Install the whole NEWS file.
+		install_file($news, "$tmp/usr/share/doc/$package/$news_name");
+		return;
+	}
+
+	my $news_trimmed = generated_file($package, "dh_installchangelogs.news.trimmed");
+
+	my ($error_in_news, $has_been_trimmed, $oldest_entry_time) =
+		prepare_changesfile("NEWS", $news, $news_trimmed, undef, $oldest_log_entry_time);
+
+	if ($error_in_news) {
+		# If the NEWS file could not be trimmed, fall back to the full NEWS file.
+		warning("$news could not be trimmed. The full NEWS file will be installed.");
+		$news_trimmed = $news;
+	}
+
+	# Install NEWS unless there are no recent news.
+	install_file($news_trimmed, "$tmp/usr/share/doc/$package/$news_name")
+		unless (-z $news_trimmed);
+}
+
+sub prepare_changesfile {
+	my ($mode, $changesfile, $changesfile_trimmed, $changelog_binnmu, $oldest_log_entry_time) = @_;
+
+	local $ENV{LC_ALL} = "C.UTF-8";
+
+	open(my $log1, "<", $changesfile) or error("Cannot open($changesfile): $!");
+	open(my $log2, ">", $changesfile_trimmed) or error("Cannot open($changesfile_trimmed): $!");
 
 	my $oldest_entry_time;
-	my $error_in_changelog = 0;
+	my $error_in_changesfile = 0;
 	my $is_binnmu = 0;
 	my $entry = "";
 	my $entry_num = 0;
@@ -216,24 +269,27 @@ sub install_debian_changelog {
 			my $entry_time;
 			eval { $entry_time = Time::Piece->strptime($timestamp, '%d %b %Y %T %z') };
 			if (! defined $entry_time) {
-				$error_in_changelog = 1;
-				warning("Could not parse timestamp '$timestamp'. $changelog will not be trimmed.");
-				truncate($log2, 0) or error("Cannot truncate($changelog_trimmed): $!");
+				$error_in_changesfile = 1;
+				warning("Could not parse timestamp '$timestamp'. $changesfile will not be trimmed.");
+				truncate($log2, 0) or error("Cannot truncate($changesfile_trimmed): $!");
 				last;
 			}
 
 			# Stop processing the changelog if we reached the cut-off date and
 			# at least MIN_NUM_ENTRIES entries have been added.
-			if (($entry_time < CUTOFF_DATE) && ($entry_num >= MIN_NUM_ENTRIES)) {
+			if (($mode eq "CHANGELOG") && ($entry_time < CUTOFF_DATE) && ($entry_num >= MIN_NUM_ENTRIES)) {
 				last;
 			}
+
+			# Stop processing the NEWS file if we reached the oldest date in the changelog.
+			if (($mode eq "NEWS") && ($entry_time < $oldest_log_entry_time)) { last; }
 
 			# Record the timestamp of what is currently the oldest entry
 			# in the trimmed changelog.
 			$oldest_entry_time = $entry_time;
 
 			# Append entry to trimmed changelog.
-			print($log2 $entry) or error("Cannot write($changelog_trimmed): $!");
+			print($log2 $entry) or error("Cannot write($changesfile_trimmed): $!");
 			$entry = "";
 			$entry_num++;
 		}
@@ -241,91 +297,10 @@ sub install_debian_changelog {
 	# If the whole changelog has not been read, then it has been trimmed.
 	my $has_been_trimmed = !eof($log1);
 
-	close($log1) or error("Cannot close($changelog): $!");
-	close($log2) or error("Cannot close($changelog_trimmed): $!");
+	close($log1) or error("Cannot close($changesfile): $!");
+	close($log2) or error("Cannot close($changesfile_trimmed): $!");
 
-	if ($error_in_changelog) {
-		# If the changelog could not be trimmed, fall back to the full changelog.
-		warning("$changelog could not be trimmed. The full changelog will be installed.");
-		$changelog_trimmed = $changelog;
-	} elsif ($has_been_trimmed) {
-		# Otherwise add a comment stating that this changelog has been trimmed.
-		my $note = "\n";
-		$note .= "# Older entries have been removed from this changelog.\n";
-		$note .= "# To read the complete changelog use `apt changelog $package`.\n";
-		open(my $log2, ">>", $changelog_trimmed) or error("Cannot open($changelog_trimmed): $!");
-		print($log2 $note) or error("Cannot write($changelog_trimmed): $!");
-		close($log2) or error("Cannot close($changelog_trimmed): $!");
-	}
-
-	install_file($changelog_trimmed, "$tmp/usr/share/doc/$package/$changelog_name");
-	if (-s $changelog_binnmu) {
-		install_file($changelog_binnmu, "$tmp/usr/share/doc/$package/$changelog_name.$arch");
-	}
-
-	return $oldest_entry_time;
-}
-
-sub install_debian_news {
-	my ($news, $package, $oldest_log_entry_time, $tmp) = @_;
-
-	if ($dh{NO_TRIM} || get_buildoption("notrimdch") || !defined($oldest_log_entry_time)) {
-		# Install the whole NEWS file.
-		install_file($news, "$tmp/usr/share/doc/$package/$news_name");
-		return;
-	}
-
-	local $ENV{LC_ALL} = "C.UTF-8";
-
-	my $news_trimmed = generated_file($package, "dh_installchangelogs.news.trimmed");
-
-	open(my $news1, "<", $news) or error("Cannot open($news): $!");
-	open(my $news2, ">", $news_trimmed) or error("Cannot open($news_trimmed): $!");
-
-	my $error_in_news = 0;
-	my $entry = "";
-	while (my $line=<$news1>) {
-		$entry .= $line;
-
-		if ($line =~ /^\s*--\s+.*?\s+<[^>]*>\s+(?<timestamp>.*)$/) {
-			my $timestamp = $+{timestamp};
-			$timestamp =~ s/^[A-Za-z]+, +//;
-
-			my $entry_time;
-			eval { $entry_time = Time::Piece->strptime($timestamp, '%d %b %Y %T %z') };
-			if (! defined $entry_time) {
-				$error_in_news = 1;
-				warning("Could not parse timestamp '$timestamp'. $news will not be trimmed.");
-				truncate($news2, 0) or error("Cannot truncate($news_trimmed): $!");
-				last;
-			}
-
-			# Stop processing the NEWS file if we reached the oldest date in the changelog.
-			if ($entry_time < $oldest_log_entry_time) {
-				last;
-			}
-
-			# Append entry to trimmed news.
-			print($news2 $entry) or error("Cannot write($news_trimmed): $!");
-			$entry = "";
-		}
-	}
-
-	close($news1) or error("Cannot close($news): $!");
-	close($news2) or error("Cannot close($news_trimmed): $!");
-
-	if ($error_in_news) {
-		# If the NEWS file could not be trimmed, fall back to the full NEWS file.
-		warning("$news could not be trimmed. The full NEWS file will be installed.");
-		$news_trimmed = $news;
-	}
-
-	if (-z $news_trimmed) {
-		# Don't install NEWS if there are no recent entries.
-		return;
-	}
-
-	install_file($news_trimmed, "$tmp/usr/share/doc/$package/$news_name");
+	return $error_in_changesfile, $has_been_trimmed, $oldest_entry_time
 }
 
 on_pkgs_in_parallel {
