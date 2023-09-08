@@ -447,6 +447,29 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	if (! $dh{NOSCRIPTS} && $need_ldconfig) {
 		autotrigger($package, 'activate-noawait', 'ldconfig');
 	}
+
+	# Handle Provides: for the t64 transition
+	if ($package !~ /^lib.*t64$/) {
+		next;
+	}
+	if (! -f "$tmp/DEBIAN/symbols" and ! -f "$tmp/DEBIAN/shlibs") {
+		next;
+	}
+
+	require Dpkg::Arch;
+	my $arch = Dpkg::Arch::get_host_arch();
+	if ($arch eq "i386" or Dpkg::Arch::debarch_to_cpubits($arch) != 32)
+	{
+		# Call isnative because it sets $dh{VERSION}
+		# as a side effect.
+		isnative($package);
+		my $version = $dh{VERSION};
+		my $compat = $package;
+		$compat =~ s/t64$//;
+		addsubstvar($package, "t64:Provides", $compat,
+		            "= $version");
+	}
+
 }
 
 unless ($ok) {
