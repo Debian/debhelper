@@ -1,0 +1,134 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh_movetousr - canonicalize location according to merged-/usr
+
+=cut
+
+use strict;
+use warnings;
+use Config;
+use File::Spec;
+use Debian::Debhelper::Dh_Lib;
+
+our $VERSION = DH_BUILTIN_VERSION;
+
+=head1 SYNOPSIS
+
+B<dh_movetousr> [S<I<debhelper options>>]
+
+=head1 DESCRIPTION
+
+B<dh_movetousr> is a debhelper program that canonicalizes paths inside
+packages according to merged-/usr. Shipping aliased paths is known
+to cause problems with B<dpkg>, so this helper moves all affected files
+to F</usr> regardless of how they were installed. The compatibility symlinks
+ensure that converted packages continue to work.
+
+In the process, absolute symbolic links may become relative or vice versa.
+
+=cut
+
+init();
+
+my @merged_directories = (
+	qw{bin lib lib64 libo32 libx32 sbin},
+);
+
+sub merge_entry {
+	my ($package, $rootdir, $location) = @_;
+	if (-l "$rootdir/usr/$location") {
+		error("cannot move $location to /usr in $package, because it exists there as a symlink");
+	} elsif (-l "$rootdir/$location") {
+		if (-e "$rootdir/usr/$location") {
+			error("cannot move symlink $location to /usr in $package, because it already exists there");
+		}
+		my $target = readlink("$rootdir/$location");
+		my $canmove = 1;
+		my @parts;
+		if ($target !~ m,^/,) {
+			@parts = split(m|/+|, $location);
+			pop @parts;
+		}
+		foreach my $part (split(m|/+|, $target)) {
+			if ($part eq '..') {
+				# If the link goes past /, recreate.
+				$canmove = 0 if ($#parts <= 0);
+				pop @parts if ($#parts >= 0);
+			} elsif ($part ne '' and $part ne '.') {
+				push @parts, $part;
+			}
+		}
+		my $newtarget = join('/', @parts);
+		if (grep { $newtarget =~ m,^\Q$_\E/, } @merged_directories) {
+			# If the link target is aliased, unalias and recreate.
+			$newtarget = "usr/" . $newtarget;
+			$canmove = 0;
+		} elsif ($target =~ m,^/usr($|/), && $newtarget =~ m,^usr/,) {
+			# If the link is absolute and points to /usr, recreate.
+			$canmove = 0;
+		}
+		if ($canmove) {
+			rename_path("$rootdir/$location", "$rootdir/usr/$location");
+		} else {
+			make_symlink("usr/$location", $newtarget, $rootdir);
+			rm_files("$rootdir/$location");
+		}
+	} elsif (-d "$rootdir/$location") {
+		my $did_mkdir = 0;
+		if (not -d "$rootdir/usr/$location") {
+			if (-e "$rootdir/usr/$location") {
+				error("cannot move directory $location to /usr in $package as it exists in /usr as a non-directory");
+			} else {
+				install_dir("$rootdir/usr/$location");
+				$did_mkdir = 1;
+			}
+		}
+		opendir(my $dh, "$rootdir/$location") or
+			error("cannot open directory $rootdir/$location: $!");
+		while (my $entry = readdir($dh)) {
+			next if ($entry eq "." or $entry eq "..");
+			merge_entry($package, $rootdir, "$location/$entry");
+		}
+		closedir($dh);
+		if ($did_mkdir) {
+			doit("chown", "--reference", "$rootdir/$location", "$rootdir/usr/$location");
+			doit("chmod", "--reference", "$rootdir/$location", "$rootdir/usr/$location");
+		}
+		verbose_print('rmdir ' . escape_shell("$rootdir/$location"))
+			if $dh{VERBOSE};
+		rmdir("$rootdir/$location") or
+			error("rmdir $rootdir/$location failed: $!");
+	} elsif (-e "$rootdir/usr/$location") {
+		error("cannot move $location to /usr in $package, because it already exists there");
+	} else {
+		rename_path("$rootdir/$location", "$rootdir/usr/$location");
+	}
+}
+
+on_pkgs_in_parallel {
+	foreach my $package (@_) {
+		my $tmp = tmpdir($package);
+
+		next if not -d $tmp;
+
+		foreach my $dir (@merged_directories) {
+			if (-d "$tmp/$dir" and not -l "$tmp/$dir") {
+				merge_entry($package, $tmp, $dir);
+			}
+		}
+	}
+};
+
+=head1 SEE ALSO
+
+L<debhelper(7)>
+
+This program is a part of debhelper.
+
+=head1 AUTHOR
+
+Helmut Grohne <helmut@subdivi.de>
+
+=cut
