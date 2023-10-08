@@ -45,7 +45,7 @@ sub unit_is_started {
 each_compat_from_x_to_and_incl_y_subtest(10, 10, sub {
 	ok(run_dh_tool('dh_systemd_enable'));
 	ok(run_dh_tool('dh_systemd_start'));
-	ok(-e "debian/foo/lib/systemd/system/foo.service");
+	ok(-e "debian/foo/usr/lib/systemd/system/foo.service");
 	ok(-e "debian/foo.postinst.debhelper");
 	unit_is_enabled('foo', 'foo', 1);
 	unit_is_started('foo', 'foo', 1);
@@ -57,7 +57,7 @@ each_compat_from_x_to_and_incl_y_subtest(10, 10, sub {
 	copy_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
 	ok(run_dh_tool('dh_systemd_enable'));
 	ok(run_dh_tool('dh_systemd_start'));
-	ok(-e "debian/foo/lib/systemd/system/foo.service");
+	ok(-e "debian/foo/usr/lib/systemd/system/foo.service");
 	ok(-e "debian/foo.postinst.debhelper");
 	unit_is_enabled('foo', 'foo', 1);
 	unit_is_started('foo', 'foo', 1);
@@ -78,7 +78,7 @@ each_compat_from_x_to_and_incl_y_subtest(10, 10, sub {
 	copy_file('debian/foo2.service', 'debian/foo/lib/systemd/system/foo2.service');
 	ok(run_dh_tool('dh_systemd_enable'));
 	ok(run_dh_tool('dh_systemd_start', '--no-start'));
-	ok(-e "debian/foo/lib/systemd/system/foo.service");
+	ok(-e "debian/foo/usr/lib/systemd/system/foo.service");
 	ok(-e "debian/foo.postinst.debhelper");
 	unit_is_enabled('foo', 'foo', 1);
 	unit_is_started('foo', 'foo', 0, 1); # present units are stopped on remove even if no start
@@ -91,7 +91,7 @@ each_compat_from_x_to_and_incl_y_subtest(10, 10, sub {
 	ok(run_dh_tool('dh_systemd_enable'));
 	ok(run_dh_tool('dh_systemd_start', '--no-start', 'debian/foo.service'));
 	ok(run_dh_tool('dh_systemd_start', '-p', 'foo', 'foo2.service'));
-	ok(-e "debian/foo/lib/systemd/system/foo.service");
+	ok(-e "debian/foo/usr/lib/systemd/system/foo.service");
 	ok(-e "debian/foo.postinst.debhelper");
 	unit_is_enabled('foo', 'foo', 1);
 	unit_is_started('foo', 'foo', 0, 1);
@@ -104,7 +104,7 @@ each_compat_from_x_to_and_incl_y_subtest(10, 10, sub {
 	ok(run_dh_tool('dh_systemd_enable', '--no-enable', 'debian/foo.service'));
 	ok(run_dh_tool('dh_systemd_enable', '-p', 'foo', 'foo2.service'));
 	ok(run_dh_tool('dh_systemd_start'));
-	ok(-e "debian/foo/lib/systemd/system/foo.service");
+	ok(-e "debian/foo/usr/lib/systemd/system/foo.service");
 	ok(-e "debian/foo.postinst.debhelper");
 	unit_is_enabled('foo', 'foo', 0);
 	unit_is_started('foo', 'foo', 1, 1);

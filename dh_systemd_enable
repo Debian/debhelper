@@ -44,8 +44,8 @@ arguments, e.g. B<dh_systemd_enable quota.service> and B<dh_systemd_enable
 
 =item debian/I<package>.service, debian/I<package>@.service
 
-If this exists, it is installed into F<<  lib/systemd/system/I<package>.service >> (or
-F<< lib/systemd/system/I<package>@.service >>) in the package build directory.
+If this exists, it is installed into F<< usr/lib/systemd/system/I<package>.service >> (or
+F<< usr/lib/systemd/system/I<package>@.service >>) in the package build directory.
 
 =item debian/I<package>.tmpfile
 
@@ -54,28 +54,28 @@ package build directory.
 
 =item debian/I<package>.target, debian/I<package>@.target
 
-If this exists, it is installed into F<< lib/systemd/system/I<package>.target >> (or
-F<< lib/systemd/system/I<package>@.target >>) in the package build directory.
+If this exists, it is installed into F<< usr/lib/systemd/system/I<package>.target >> (or
+F<< usr/lib/systemd/system/I<package>@.target >>) in the package build directory.
 
 =item debian/I<package>.socket, debian/I<package>@.socket
 
-If this exists, it is installed into F<< lib/systemd/system/I<package>.socket >> (or
-F<< lib/systemd/system/I<package>@.socket >>) in the package build directory.
+If this exists, it is installed into F<< usr/lib/systemd/system/I<package>.socket >> (or
+F<< usr/lib/systemd/system/I<package>@.socket >>) in the package build directory.
 
 =item debian/I<package>.mount
 
-If this exists, it is installed into F<< lib/systemd/system/I<package>.mount >>
+If this exists, it is installed into F<< usr/lib/systemd/system/I<package>.mount >>
 in the package build directory.
 
 =item debian/I<package>.path, debian/I<package>@.path
 
-If this exists, it is installed into F<< lib/systemd/system/I<package>.path >> (or
-F<< lib/systemd/system/I<package>@.path >>) in the package build directory.
+If this exists, it is installed into F<< usr/lib/systemd/system/I<package>.path >> (or
+F<< usr/lib/systemd/system/I<package>@.path >>) in the package build directory.
 
 =item debian/I<package>.timer, debian/I<package>@.timer
 
-If this exists, it is installed into F<< lib/systemd/system/I<package>.timer >> (or
-F<< lib/systemd/system/I<package>@.timer >>) in the package build directory.
+If this exists, it is installed into F<< usr/lib/systemd/system/I<package>.timer >> (or
+F<< usr/lib/systemd/system/I<package>@.timer >>) in the package build directory.
 
 =back
 
@@ -181,11 +181,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	for my $service_type (qw(service target socket path timer)) {
-		install_unit($package, $script, $service_type, "$tmpdir/lib/systemd/system");
-		install_unit("${package}@", "${script}@", $service_type, "$tmpdir/lib/systemd/system");
+		install_unit($package, $script, $service_type, "$tmpdir/usr/lib/systemd/system");
+		install_unit("${package}@", "${script}@", $service_type, "$tmpdir/usr/lib/systemd/system");
 	}
 
-	install_unit($package, $script, 'mount', "$tmpdir/lib/systemd/system");
+	install_unit($package, $script, 'mount', "$tmpdir/usr/lib/systemd/system");
 	install_unit($package, $script, 'tmpfile', "$tmpdir/usr/lib/tmpfiles.d", 'conf');
 
 	foreach my $unitdir ("${tmpdir}/usr/lib/systemd/system", "${tmpdir}/lib/systemd/system") {

@@ -20,7 +20,8 @@ plan(tests => 2);
 each_compat_up_to_and_incl_subtest(10, sub {
 	make_path(qw(debian/foo debian/bar debian/baz));
 	ok(run_dh_tool('dh_installinit'));
-	ok(-e "debian/foo/lib/systemd/system/foo.service");
+	ok(-e "debian/foo/usr/lib/systemd/system/foo.service");
+	ok(!-e "debian/foo/lib/systemd/system/foo.service");
 	ok(find_script('foo', 'postinst'));
 	ok(run_dh_tool('dh_clean'));
 
@@ -32,11 +33,18 @@ each_compat_from_and_above_subtest(11, sub {
 	ok(run_dh_tool('dh_installinit'));
 	ok(run_dh_tool({'quiet' => 1}, 'dh_installinit', '--name=other'));
 	ok(! -e "debian/foo/lib/systemd/system/foo.service");
+	ok(! -e "debian/foo/usr/lib/systemd/system/foo.service");
 	ok(!find_script('foo', 'postinst'));
 	ok(run_dh_tool('dh_clean'));
 
 	make_path(qw(debian/foo/lib/systemd/system/ debian/bar debian/baz));
 	copy_file('debian/foo.service', 'debian/foo/lib/systemd/system/foo.service');
+	ok(run_dh_tool('dh_installinit'));
+	ok(!find_script('foo', 'postinst'));
+	ok(run_dh_tool('dh_clean'));
+
+	make_path(qw(debian/foo/usr/lib/systemd/system/ debian/bar debian/baz));
+	copy_file('debian/foo.service', 'debian/foo/usr/lib/systemd/system/foo.service');
 	ok(run_dh_tool('dh_installinit'));
 	ok(!find_script('foo', 'postinst'));
 	ok(run_dh_tool('dh_clean'));

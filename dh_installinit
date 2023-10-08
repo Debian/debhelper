@@ -64,7 +64,7 @@ etc/init/I<package>.conf in the package build directory.
 
 =item debian/I<package>.service
 
-If this exists, it is installed into F<< lib/systemd/system/I<package>.service >> in
+If this exists, it is installed into F<< usr/lib/systemd/system/I<package>.service >> in
 the package build directory. Only used in compat levels 10 and below.
 
 =item debian/I<package>.tmpfile
@@ -276,7 +276,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $service='';
 	$service=pkgfile($package,"service") if compat(10);
 	if ($service ne '' && ! $dh{ONLYSCRIPTS}) {
-		my $path="$tmp/lib/systemd/system";
+		my $path="$tmp/usr/lib/systemd/system";
 		install_dir($path);
 		install_file($service, "$path/$script.service");
 	}

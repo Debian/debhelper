@@ -58,7 +58,7 @@ option.
       debian/I<package>@.timer
 
 If any of those files exists, they are installed into
-F<lib/systemd/system/> in the package build directory.
+F<usr/lib/systemd/system/> in the package build directory.
 
 =item debian/I<package>.tmpfile
 
@@ -291,11 +291,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $name = $dh{NAME} // $package;
 
 	for my $type (qw(service target socket path timer)) {
-		install_unit($package, $name, $type, "$tmpdir/lib/systemd/system");
-		install_unit("${package}@", "${name}@", $type, "$tmpdir/lib/systemd/system");
+		install_unit($package, $name, $type, "$tmpdir/usr/lib/systemd/system");
+		install_unit("${package}@", "${name}@", $type, "$tmpdir/usr/lib/systemd/system");
 	}
 
-	install_unit($package, $name, 'mount', "$tmpdir/lib/systemd/system");
+	install_unit($package, $name, 'mount', "$tmpdir/usr/lib/systemd/system");
 	# In compat 13+, this is handled by dh_installtmpfiles
 	install_unit($package, $name, 'tmpfile', "$tmpdir/usr/lib/tmpfiles.d", 'conf') if compat(12);
 }
