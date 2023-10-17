@@ -16,7 +16,7 @@ our $VERSION = DH_BUILTIN_VERSION;
 
 =head1 SYNOPSIS
 
-B<dh_movetousr> [S<I<debhelper options>>]
+B<dh_movetousr> [S<I<debhelper options>>] [B<--fail-noop> | B<--warn-noop>]
 
 =head1 DESCRIPTION
 
@@ -28,9 +28,28 @@ ensure that converted packages continue to work.
 
 In the process, absolute symbolic links may become relative or vice versa.
 
+=head1 OPTIONS
+
+=over 4
+
+=item B<--fail-noop>
+
+Fail if no files were found in aliased locations and therefore no change has
+been performed.
+
+=item B<--warn-noop>
+
+Warn if no files were found in aliased locations and therefore no change has
+been performed.
+
+=back
+
 =cut
 
-init();
+init(options => {
+	'fail-noop!' => sub { $dh{NOOP_LEVEL} = 'error'; },
+	'warn-noop!' => sub { $dh{NOOP_LEVEL} = 'warning'; },
+});
 
 my @merged_directories = (
 	qw{bin lib lib64 libo32 libx32 sbin},
@@ -107,7 +126,8 @@ sub merge_entry {
 	}
 }
 
-on_pkgs_in_parallel {
+my ($is_noop) = 1;
+sub process_packages {
 	foreach my $package (@_) {
 		my $tmp = tmpdir($package);
 
@@ -116,10 +136,40 @@ on_pkgs_in_parallel {
 		foreach my $dir (@merged_directories) {
 			if (-d "$tmp/$dir" and not -l "$tmp/$dir") {
 				merge_entry($package, $tmp, $dir);
+				$is_noop = 0;
 			}
 		}
 	}
-};
+}
+
+if (exists $ENV{'DEB_BUILD_PROFILES'} or not exists $dh{NOOP_LEVEL} and @{$dh{DOPACKAGES}}) {
+	on_pkgs_in_parallel(\&process_packages);
+} else {
+	process_packages(@{$dh{DOPACKAGES}});
+	if ($is_noop) {
+		warning('dh_movetousr did not move any files to /usr');
+		if (exists $ENV{DH_INTERNAL_MOVETOUSR_IS_ADDON}) {
+			if ($dh{DOARCH} and not $dh{DOINDEP} and getpackages('indep')) {
+				warning('consider moving dh-sequence-movetousr to Build-Depends-Indep');
+			} elsif ($dh{DOINDEP} and not $dh{DOARCH} and getpackages('arch')) {
+				warning('consider moving dh-sequence-movetousr to Build-Depends-Arch');
+			} else {
+				warning('consider dropping dh-sequence-movetousr from Build-Depends');
+			}
+		} else {
+			if ($dh{DOARCH} and not $dh{DOINDEP} and getpackages('indep')) {
+				warning('consider passing -i to dh_movetousr');
+			} elsif ($dh{DOINDEP} and not $dh{DOARCH} and getpackages('arch')) {
+				warning('consider passing -a to dh_movetousr');
+			} else {
+				warning('consider deleting the dh_movetousr invocation');
+			}
+		}
+		if ($dh{NOOP_LEVEL} eq 'error') {
+			error('failing as requested');
+		}
+	}
+}
 
 =head1 SEE ALSO
 

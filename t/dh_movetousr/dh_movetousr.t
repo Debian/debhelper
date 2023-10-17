@@ -27,7 +27,7 @@ each_compat_subtest {
 	make_symlink_raw_target('../../bar', 'debian/debhelper/lib/foo/rel3');
 	make_symlink_raw_target('../../../bar', 'debian/debhelper/lib/foo/rel4');
 	make_symlink_raw_target('/usr/bin/bar', 'debian/debhelper/sbin/foo');
-	ok(run_dh_tool('dh_movetousr'));
+	ok(run_dh_tool('dh_movetousr', '--fail-noop'));
 	# Files get moved.
 	ok(! -e 'debian/debhelper/lib');
 	ok(! -e 'debian/debhelper/sbin');
@@ -60,5 +60,7 @@ each_compat_subtest {
 	# policy 10.5.
 	ok(-l 'debian/debhelper/usr/sbin/foo');
 	ok(readlink('debian/debhelper/usr/sbin/foo') eq '../bin/bar');
+	ok(!run_dh_tool({ quiet => 1 }, 'dh_movetousr', '--fail-noop'));
+	ok(run_dh_tool('dh_movetousr'));
 	remove_tree('debian/debhelper');
 };
