@@ -77,9 +77,9 @@ sub merge_entry {
 		foreach my $part (split(m|/+|, $target)) {
 			if ($part eq '..') {
 				# If the link goes past /, recreate.
-				$recreate = 1 if ($#newtarget <= 0);
-				pop @newtarget if ($#newtarget >= 0);
-			} elsif ($part ne '' and $part ne '.') {
+				$recreate = 1 if (scalar @newtarget <= 1);
+				pop @newtarget if (scalar @newtarget > 0);
+			} elsif ($part ne '' && $part ne '.') {
 				push @newtarget, $part;
 			}
 		}
@@ -100,7 +100,7 @@ sub merge_entry {
 		}
 	} elsif (-d "$rootdir/$location") {
 		my $did_mkdir = 0;
-		if (not -d "$rootdir/usr/$location") {
+		if (! -d "$rootdir/usr/$location") {
 			if (-e "$rootdir/usr/$location") {
 				error("cannot move directory $location to /usr in $package as it exists in /usr as a non-directory");
 			} else {
@@ -111,7 +111,7 @@ sub merge_entry {
 		opendir(my $dh, "$rootdir/$location") or
 			error("cannot open directory $rootdir/$location: $!");
 		while (my $entry = readdir($dh)) {
-			next if ($entry eq "." or $entry eq "..");
+			next if ($entry eq "." || $entry eq "..");
 			merge_entry($package, $rootdir, "$location/$entry");
 		}
 		closedir($dh);
@@ -135,10 +135,10 @@ sub process_packages {
 	foreach my $package (@_) {
 		my $tmp = tmpdir($package);
 
-		next if not -d $tmp;
+		next if ! -d $tmp;
 
 		foreach my $dir (@merged_directories) {
-			if (-d "$tmp/$dir" and not -l "$tmp/$dir") {
+			if (-d "$tmp/$dir" && ! -l "$tmp/$dir") {
 				merge_entry($package, $tmp, $dir);
 				$is_noop = 0;
 			}
@@ -146,24 +146,24 @@ sub process_packages {
 	}
 }
 
-if (exists $ENV{'DEB_BUILD_PROFILES'} or not exists $dh{NOOP_LEVEL} and @{$dh{DOPACKAGES}}) {
+if (exists $ENV{'DEB_BUILD_PROFILES'} || ! exists $dh{NOOP_LEVEL}) {
 	on_pkgs_in_parallel(\&process_packages);
 } else {
 	process_packages(@{$dh{DOPACKAGES}});
 	if ($is_noop) {
 		warning('dh_movetousr did not move any files to /usr');
 		if (exists $ENV{DH_INTERNAL_MOVETOUSR_IS_ADDON}) {
-			if ($dh{DOARCH} and not $dh{DOINDEP} and getpackages('indep')) {
+			if ($dh{DOARCH} && ! $dh{DOINDEP} && getpackages('indep')) {
 				warning('consider moving dh-sequence-movetousr to Build-Depends-Indep');
-			} elsif ($dh{DOINDEP} and not $dh{DOARCH} and getpackages('arch')) {
+			} elsif ($dh{DOINDEP} && ! $dh{DOARCH} && getpackages('arch')) {
 				warning('consider moving dh-sequence-movetousr to Build-Depends-Arch');
 			} else {
 				warning('consider dropping dh-sequence-movetousr from Build-Depends');
 			}
 		} else {
-			if ($dh{DOARCH} and not $dh{DOINDEP} and getpackages('indep')) {
+			if ($dh{DOARCH} && ! $dh{DOINDEP} && getpackages('indep')) {
 				warning('consider passing -i to dh_movetousr');
-			} elsif ($dh{DOINDEP} and not $dh{DOARCH} and getpackages('arch')) {
+			} elsif ($dh{DOINDEP} && ! $dh{DOARCH} && getpackages('arch')) {
 				warning('consider passing -a to dh_movetousr');
 			} else {
 				warning('consider deleting the dh_movetousr invocation');

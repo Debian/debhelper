@@ -56,7 +56,7 @@ each_compat_subtest {
 	# A relative symlink going through /.. shall also become absolute.
 	ok(-l 'debian/debhelper/usr/lib/foo/rel4');
 	ok(readlink('debian/debhelper/usr/lib/foo/rel4') eq '/bar');
-	# An absolute symlink formerly crossing / shall become relative due to
+	# An absolute link pointing into /usr has to become relative due to
 	# policy 10.5.
 	ok(-l 'debian/debhelper/usr/sbin/foo');
 	ok(readlink('debian/debhelper/usr/sbin/foo') eq '../bin/bar');
