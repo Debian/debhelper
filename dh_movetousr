@@ -64,35 +64,39 @@ sub merge_entry {
 			error("cannot move symlink $location to /usr in $package, because it already exists there");
 		}
 		my $target = readlink("$rootdir/$location");
-		my $canmove = 1;
-		my @parts;
+		my $recreate = 0;  # Whether the link target should be recomputed.
+		my @newtarget;  # Represented as split m|/|. Relative to /.
 		if ($target !~ m,^/,) {
-			@parts = split(m|/+|, $location);
-			pop @parts;
+			# In case the original target is relative, prepend the
+			# basename of the link location.
+			@newtarget = split(m|/+|, $location);
+			pop @newtarget;
 		}
+		# Append the original target, resolving any '../', './' and
+		# double-slashes.
 		foreach my $part (split(m|/+|, $target)) {
 			if ($part eq '..') {
 				# If the link goes past /, recreate.
-				$canmove = 0 if ($#parts <= 0);
-				pop @parts if ($#parts >= 0);
+				$recreate = 1 if ($#newtarget <= 0);
+				pop @newtarget if ($#newtarget >= 0);
 			} elsif ($part ne '' and $part ne '.') {
-				push @parts, $part;
+				push @newtarget, $part;
 			}
 		}
-		my $newtarget = join('/', @parts);
-		if (grep { $newtarget =~ m,^\Q$_\E/, } @merged_directories) {
+		if (grep { $_ eq $newtarget[0] } @merged_directories) {
 			# If the link target is aliased, unalias and recreate.
-			$newtarget = "usr/" . $newtarget;
-			$canmove = 0;
-		} elsif ($target =~ m,^/usr($|/), && $newtarget =~ m,^usr/,) {
-			# If the link is absolute and points to /usr, recreate.
-			$canmove = 0;
+			unshift @newtarget, 'usr';
+			$recreate = 1;
+		} elsif ($target =~ m,^/, && $newtarget[0] eq 'usr') {
+			# If the original link is absolute and now points to
+			# /usr, recreate.
+			$recreate = 1;
 		}
-		if ($canmove) {
-			rename_path("$rootdir/$location", "$rootdir/usr/$location");
-		} else {
-			make_symlink("usr/$location", $newtarget, $rootdir);
+		if ($recreate) {
+			make_symlink("usr/$location", join('/', @newtarget), $rootdir);
 			rm_files("$rootdir/$location");
+		} else {
+			rename_path("$rootdir/$location", "$rootdir/usr/$location");
 		}
 	} elsif (-d "$rootdir/$location") {
 		my $did_mkdir = 0;
