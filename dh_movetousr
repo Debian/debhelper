@@ -20,13 +20,29 @@ B<dh_movetousr> [S<I<debhelper options>>] [B<--fail-noop> | B<--warn-noop>]
 
 =head1 DESCRIPTION
 
-B<dh_movetousr> is a debhelper program that canonicalizes paths inside
-packages according to merged-/usr. Shipping aliased paths is known
-to cause problems with B<dpkg>, so this helper moves all affected files
-to F</usr> regardless of how they were installed. The compatibility symlinks
-ensure that converted packages continue to work.
+B<dh_movetousr> is a B<debhelper> program that canonicalizes paths inside packages according to merged-/usr.
+Shipping aliased paths is known to cause problems with B<dpkg>, so this helper moves all affected files to F</usr> regardless of how they were installed.
+The compatibility symlinks ensure that converted packages continue to work.
+In the process, absolute symbolic links may become relative or vice versa due to Debian policy section 10.5.
 
-In the process, absolute symbolic links may become relative or vice versa.
+Please keep in mind that moving files in this way is known to cause problems.
+Known problems have been documented at L<https://people.debian.org/~helmutg/dep17.html>.
+For instance, if files have been moved between packages, use of this tool may cause file loss during upgrades (P1).
+Most problems can be detected by L<https://salsa.debian.org/helmutg/dumat>, which uses the Debian bug tracking for feedback.
+Therefore, it is recommended to upload to B<experimental> when moving files (e.g. using this helper) or restructuring packages that earlier moved files.
+A particular problem not being detected is about B<dpkg-statoverride> (P5).
+Please review uses of B<dpkg-statoverride> in maintainer scripts and update them as needed.
+For these reasons, B<dh_movetousr> is not automatically enabled in e.g. a compatibility level.
+
+While we want to move files to F</usr> in B<trixie> and beyond, we do not want to move them in B<bookworm> and earlier.
+This poses challenges to backporting packages, because any such moves have to be reverted during the backport.
+A backport of B<debhelper> to B<bookworm> shall include a stub for this helper doing nothing to achieve this goal.
+For packages that do not need to be backported (e.g. packages targeting B<forky> and beyond), consider updating locations instead of using this helper.
+When the only affected type of file is B<systemd> units, consider using B<dh_installsystemd> or detecting the unit location from C<pkgconf --variable=systemdsystemunitdir systemd> instead of this helper as both will work in backports.
+
+For further information on the state of the transition refer to L<https://wiki.debian.org/UsrMerge>.
+
+B<dh_movetousr> shall be removed from B<debhelper> during B<forky+1> is release cycle.
 
 =head1 OPTIONS
 
@@ -43,6 +59,12 @@ Warn if no files were found in aliased locations and therefore no change has
 been performed.
 
 =back
+
+=head1 EXAMPLES
+
+  Build-Depends: dh-sequence-movetousr
+
+Enable this tool in a package that uses B<dh>.
 
 =cut
 
