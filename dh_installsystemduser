@@ -260,8 +260,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	if (@start_units and not compat(13)) {
 		# The generated maintainer script code blocks use the --user
-		# option that was added to deb-systemd-invoke in version 1.61.
-		addsubstvar($package, 'misc:Depends', 'init-system-helpers', ">= 1.61~");
+		# option that was added to deb-systemd-invoke in version 1.61 and fixed in 1.66 to really daemon-reload.
+		addsubstvar($package, 'misc:Depends', 'init-system-helpers', ">= 1.66~");
 
 		my %options = ('snippet-order' => 'service');
 

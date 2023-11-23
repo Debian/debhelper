@@ -1,3 +1,6 @@
 if [ -z "${DPKG_ROOT:-}" ] && [ "$1" = remove ] && [ -d /run/systemd/system ] ; then
-	systemctl --global daemon-reload >/dev/null || true
+	# We reload user instances asynchronously here, as it's after a removal so
+	# it doesn't need to block until it completes, and we cannot rely on D-Bus
+	# being available as dbus-user-session is not a mandatory dependency
+	deb-systemd-invoke --user --no-dbus daemon-reload >/dev/null || true
 fi
