@@ -27,7 +27,7 @@ installing B<udev> rules files.
 
 =item debian/I<package>.udev
 
-Installed into F<lib/udev/rules.d/> in the package build directory.
+Installed into F<usr/lib/udev/rules.d/> in the package build directory.
 
 =back
 
@@ -93,8 +93,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	if ($rules_file) {
-		my $rule="/lib/udev/rules.d/$dh{PRIORITY}$filename";
-		install_dir("$tmp/lib/udev/rules.d");
+		my $rule="/usr/lib/udev/rules.d/$dh{PRIORITY}$filename";
+		install_dir("$tmp/usr/lib/udev/rules.d");
 		install_file($rules_file, "${tmp}${rule}");
 	}
 }
