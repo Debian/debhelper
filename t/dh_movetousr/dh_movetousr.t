@@ -13,6 +13,9 @@ plan(tests => 1);
 
 each_compat_subtest {
 	my ($compat) = @_;
+	make_path('debian/debhelper');
+	# Don't fail on an empty package.
+	ok(run_dh_tool('dh_movetousr'));
 	make_path('debian/debhelper/lib/foo');
 	make_path('debian/debhelper/lib/bar');
 	make_path('debian/debhelper/usr/lib/bar');
@@ -27,6 +30,9 @@ each_compat_subtest {
 	make_symlink_raw_target('../../bar', 'debian/debhelper/lib/foo/rel3');
 	make_symlink_raw_target('../../../bar', 'debian/debhelper/lib/foo/rel4');
 	make_symlink_raw_target('/usr/bin/bar', 'debian/debhelper/sbin/foo');
+	make_symlink_raw_target('dead', 'debian/debhelper/usr/lib/rel');
+	make_symlink_raw_target('/etc', 'debian/debhelper/usr/lib/abs1');
+	make_symlink_raw_target('/sbin/foo', 'debian/debhelper/usr/lib/abs2');
 	ok(run_dh_tool('dh_movetousr', '--fail-noop'));
 	# Files get moved.
 	ok(! -e 'debian/debhelper/lib');
@@ -60,6 +66,15 @@ each_compat_subtest {
 	# policy 10.5.
 	ok(-l 'debian/debhelper/usr/sbin/foo');
 	ok(readlink('debian/debhelper/usr/sbin/foo') eq '../bin/bar');
+	# Relative link within /usr is left alone.
+	ok(-l 'debian/debhelper/usr/lib/rel');
+	ok(readlink('debian/debhelper/usr/lib/rel') eq 'dead');
+	# Absolute link not pointing into aliased is left alone.
+	ok(-l 'debian/debhelper/usr/lib/abs1');
+	ok(readlink('debian/debhelper/usr/lib/abs1') eq '/etc');
+	# Absolute link pointing into aliased becomes relative.
+	ok(-l 'debian/debhelper/usr/lib/abs2');
+	ok(readlink('debian/debhelper/usr/lib/abs2') eq '../sbin/foo');
 	ok(!run_dh_tool({ quiet => 1 }, 'dh_movetousr', '--fail-noop'));
 	ok(run_dh_tool('dh_movetousr'));
 	remove_tree('debian/debhelper');

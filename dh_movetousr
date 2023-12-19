@@ -9,6 +9,7 @@ dh_movetousr - canonicalize location according to merged-/usr
 use strict;
 use warnings;
 use Config;
+use File::Find;
 use File::Spec;
 use Debian::Debhelper::Dh_Lib;
 
@@ -76,6 +77,7 @@ init(options => {
 my @merged_directories = (
 	qw{bin lib lib64 libo32 libx32 sbin},
 );
+my $merged_dir_pattern = join('|', @merged_directories);
 
 sub merge_entry {
 	my ($package, $rootdir, $location) = @_;
@@ -158,6 +160,24 @@ sub process_packages {
 		my $tmp = tmpdir($package);
 
 		next if ! -d $tmp;
+
+		if (-d "$tmp/usr") {
+			# Reconstruct absolute symlinks pointing from /usr into an
+			# aliased directory.
+			find (
+				{
+					wanted => sub {
+						return unless -l;
+						my $target = readlink($_);
+						return unless ($target =~ m,^/($merged_dir_pattern)(/|$),);
+						s|^\Q$tmp\E||;
+						make_symlink("$_", "usr/$target", $tmp);
+					},
+					no_chdir => 1
+				},
+				"$tmp/usr"
+			);
+		}
 
 		foreach my $dir (@merged_directories) {
 			if (-d "$tmp/$dir" && ! -l "$tmp/$dir") {
