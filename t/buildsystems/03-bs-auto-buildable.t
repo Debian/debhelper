@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 187;
+use Test::More tests => 192;
 
 use File::Temp qw(tempdir);
 use File::Basename qw(dirname);
