@@ -111,7 +111,7 @@ sub dates_in_lines {
 	return @lines_dates;
 }
 
-plan(tests => 8);
+plan(tests => 9);
 
 # Test changelog with only recent entries (< oldstable)
 my $years_after_cutoff = 2;
@@ -269,6 +269,32 @@ each_compat_subtest {
 	is(@news, @news_orig);
 	cmp_ok(@news_entries, ">", 1);
 	cmp_ok(@news_entries_old, ">", 1);
+};
+
+# Test changelog with both recent and old entries + binNMU + --no-trim
+$years_after_cutoff = 1;
+$years_of_changelog = 4;
+install_changelog($years_after_cutoff, $years_of_changelog, 1);
+install_news($years_after_cutoff, $years_of_changelog);
+each_compat_subtest {
+	my @lines_orig = changelog_lines_pkg();
+	my @entries_orig = dates_in_lines(@lines_orig);
+	my @news_orig = news_lines_pkg();
+	ok(run_dh_tool("dh_installchangelogs", "--no-trim"));
+	my @lines = changelog_lines_installed();
+	my @entries = dates_in_lines(@lines);
+	my @entries_nmu = dates_in_lines(changelog_lines_binnmu());
+	my @comments = grep(/^#/, @lines);
+	my @news = news_lines_installed();
+	my @news_entries = dates_in_lines(@news);
+
+	is(@entries, @entries_orig-1);
+	is($entries[0], $entries_orig[1]);
+	is(@comments, 0);
+
+	is(@entries_nmu, 1);
+
+	is(@news, @news_orig);
 };
 
 # Test changelog with both recent and old entries + notrimdch

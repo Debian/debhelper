@@ -161,12 +161,6 @@ sub find_changelog {
 sub install_debian_changelog {
 	my ($changelog, $package, $arch, $tmp) = @_;
 
-	if ($dh{NO_TRIM} || get_buildoption("notrimdch")) {
-		# Install the whole changelog.
-		install_file($changelog, "$tmp/usr/share/doc/$package/$changelog_name");
-		return;
-	}
-
 	my $changelog_trimmed = generated_file($package, "dh_installchangelogs.dch.trimmed");
 	my $changelog_binnmu = generated_file($package, "dh_installchangelogs.dch.binnmu");
 
@@ -225,6 +219,8 @@ sub prepare_changesfile {
 
 	local $ENV{LC_ALL} = "C.UTF-8";
 
+	my $should_be_trimmed = !$dh{NO_TRIM} && !get_buildoption("notrimdch");
+
 	open(my $log1, "<", $changesfile) or error("Cannot open($changesfile): $!");
 	open(my $log2, ">", $changesfile_trimmed) or error("Cannot open($changesfile_trimmed): $!");
 
@@ -277,12 +273,12 @@ sub prepare_changesfile {
 
 			# Stop processing the changelog if we reached the cut-off date and
 			# at least MIN_NUM_ENTRIES entries have been added.
-			if (($mode eq "CHANGELOG") && ($entry_time < CUTOFF_DATE) && ($entry_num >= MIN_NUM_ENTRIES)) {
+			if ($should_be_trimmed && ($mode eq "CHANGELOG") && ($entry_time < CUTOFF_DATE) && ($entry_num >= MIN_NUM_ENTRIES)) {
 				last;
 			}
 
 			# Stop processing the NEWS file if we reached the oldest date in the changelog.
-			if (($mode eq "NEWS") && ($entry_time < $oldest_log_entry_time)) { last; }
+			if ($should_be_trimmed && ($mode eq "NEWS") && ($entry_time < $oldest_log_entry_time)) { last; }
 
 			# Record the timestamp of what is currently the oldest entry
 			# in the trimmed changelog.
