@@ -24,8 +24,8 @@ assume that B<dh_clean> will clean up after them.
 
 It removes the package build directories, and removes some other files including
 F<debian/files>, and any detritus left behind by other debhelper commands. It
-also removes common files that should not appear in a Debian diff:
-  #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS .deps/* *.P *-stamp
+also removes common files and directories that should not appear in a Debian diff:
+  #*# *~ DEADJOE *.orig *.rej *.SUMS __pycache__ TAGS .deps/* *.P *-stamp
 
 It does not run "make clean" to clean up after the build process. Use
 L<dh_auto_clean(1)> to do things like that.
@@ -178,7 +178,7 @@ if (! $dh{D_FLAG}) {
 		 -o -name '.*.orig' -o -name .*.rej -o -name '.SUMS' \\
 		 -o -name TAGS -o \\( -path '*/.deps/*' -a -name '*.P' \\) \\
 		\\) -exec rm -f {} + \\) -o \\
-		\\( -type d -a -name autom4te.cache -prune -exec rm -rf {} + \\) \\)");
+		\\( -type d -a \\( -name autom4te.cache -o -name __pycache__ \\) -prune -exec rm -rf {} + \\) \\)");
 }
 
 if (!compat(6) && !$dh{K_FLAG}) {
