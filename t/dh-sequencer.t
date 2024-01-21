@@ -161,8 +161,8 @@ is_deeply(
 
 
 {
-	local $Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS{'build-arch'} = 1;
-	local $Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS{'build-indep'} = 1;
+	local $Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS{'build-arch'} = [1, 'debian/rules'];
+	local $Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS{'build-indep'} = [1, 'debian/rules'];
 
 	is_deeply(
 		[unpack_sequence(\%sequences, 'binary', 0, { 'build-arch' => 1, 'build-indep' => 1})],
@@ -189,7 +189,7 @@ is_deeply(
 }
 
 {
-	local $Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS{'build-indep'} = 1;
+	local $Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS{'build-indep'} = [1, 'debian/rules'];
 	is_deeply(
 		[ unpack_sequence(\%sequences, 'binary', 0, { 'build-arch' => 1 }) ],
 		[ [to_rules_target('build-indep')], _cmd_names(@i, @ba, @b) ],
@@ -208,7 +208,7 @@ is_deeply(
 }
 
 {
-    local $Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS{'build'} = 1;
+    local $Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS{'build'} = [1, 'debian/rules'];
 
     is_deeply(
         [unpack_sequence(\%sequences, 'binary')],
@@ -236,7 +236,7 @@ is_deeply(
 }
 
 {
-    local $Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS{'install-arch'} = 1;
+    local $Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS{'install-arch'} = [1, 'debian/rules'];
 
     is_deeply(
         [unpack_sequence(\%sequences, 'binary')],
@@ -255,8 +255,8 @@ is_deeply(
 }
 
 {
-	local $Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS{'install-arch'} = 1;
-	local $Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS{'build'} = 1;
+	local $Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS{'install-arch'} = [1, 'debian/rules'];
+	local $Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS{'build'} = [1, 'debian/rules'];
 
 	my $actual = [unpack_sequence(\%sequences, 'binary')];
 	# @i should be "-i"-only, @ba + @b should be both.

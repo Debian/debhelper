@@ -8,7 +8,7 @@ use warnings;
 use Test::More;
 
 my $binpath = $ENV{AUTOPKGTEST_TMP} ? '/usr/bin' : '.';
-my @progs=grep { -x $_ } glob("$binpath/dh_*");
+my @progs=grep { !m<^(?:.+/)dh_assistant> and -x $_ } glob("$binpath/dh_*");
 
 plan(tests => (@progs + @progs));
 

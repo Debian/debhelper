@@ -185,12 +185,14 @@ The output looks something like this:
              "command": "dh_strip_nondeterminism",
              "is-empty": true,
              "package-section-param": null,
+             "filename": "debian/rules",
              "target-name": "override_dh_strip_nondeterminism"
           },
           {
              "command": "dh_foo",
              "is-empty": false,
              "package-section-param": "-a",
+             "filename": "debian/rules",
              "target-name": "override_dh_foo-arch"
           }
        ]
@@ -232,6 +234,19 @@ L<dh(1)>). Note that empty override targets will still cause L<dh(1)>  to skip t
 
 This attribute defines what package selection parameter should be passed to B<dh_*> commands used
 in the hook target.  It can either be B<-a>, B<-i> or (if no parameter should be used) C<null>.
+
+=item filename
+
+This attribute reports which file the target was found it. In most cases, this will always be "debian/rules"
+though in case of include files, the target could appear in an include file.  Note this attribute is not
+super reliable as L<make(1)> only reports it for targets with a "recipe" (targets with commands inside
+them). When B<make> does not provide the filename, B<dh_assistant> blindly assumes the filename is
+"debian/rules" (as overrides via includes is not a commonly used feature).
+
+Note this accuracy of this attribute is limited about what data B<dh_assistant> can read out from the
+following command:
+
+    LC_ALL=C make -Rrnpsf debian/rules debhelper-fail-me 2>/dev/null
 
 =back
 
@@ -504,18 +519,21 @@ sub detect_hook_targets {
         no warnings qw(once);
         $explicit_targets = \%Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS;
     }
-    while (my ($target, $non_empty) = each(%{$explicit_targets})) {
+    while (my ($target, $rule_details) = each(%{$explicit_targets})) {
         next if $target !~ m{^(?:execute_before_|execute_after_|override_)(\S+?)(-indep|-arch)?$};
         my ($command, $archness) = ($1, $2);
         my $param;
         if ($archness) {
             $param = ($archness eq '-arch') ? '-a' : '-i' ;
         }
+        my ($non_empty, $filename) = @{$rule_details};
+
         my $target_info = {
             'target-name'           => $target,
             'command'               => $command,
             'package-section-param' => $param,
             'is-empty'              => $non_empty ? JSON::PP::false : JSON::PP::true,
+            'filename'              => $filename,
         };
         push(@targets, $target_info);
         push(@unverifiable_commands, $command) if not exists($seen_cmds{$command}) and not _in_path($command);

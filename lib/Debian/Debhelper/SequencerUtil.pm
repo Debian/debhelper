@@ -242,13 +242,21 @@ sub rules_explicit_target {
 						# .PHONY it will be defined too but that's ok.
 						# $2 contains target dependencies if any.
 						$current_target = $1;
-						$EXPLICIT_TARGETS{$current_target} = ($2) ? 1 : 0;
+						$EXPLICIT_TARGETS{$current_target} = [($2) ? 1 : 0, 'debian/rules'];
 					} else {
 						if (defined($current_target)) {
 							if (m/^#/) {
 								# Check if target has commands to execute
 								if (m/^#\s*(commands|recipe) to execute/) {
-									$EXPLICIT_TARGETS{$current_target} = 1;
+									my $where;
+									if (m{from ["'](\S+)["'], line \d+}) {
+										# The line is the first line of the recipe and not the target
+										# definition. To keep things simple, we just do not report the line
+										$where = [1, $1];
+									} else {
+										 $where = [1, 'debian/rules'];
+									}
+									$EXPLICIT_TARGETS{$current_target} = $where;
 								}
 							} else {
 								# Target parsed.
@@ -269,7 +277,8 @@ sub rules_explicit_target {
 		$RULES_PARSED = 1;
 	}
 
-	return $EXPLICIT_TARGETS{$target};
+	return $EXPLICIT_TARGETS{$target}[0] if exists($EXPLICIT_TARGETS{$target});
+	return;
 }
 
 sub extract_skipinfo {
