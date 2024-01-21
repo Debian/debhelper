@@ -849,12 +849,12 @@ sub _color {
 		# Support NO_COLOR (https://no-color.org/)
 		$mode //= exists($ENV{'NO_COLOR'}) ? 'never' : 'auto';
 
+		# Initialize with no color, so we are guaranteed to only do this once.
+		$_use_color = 0;
 		if ($mode eq 'auto') {
 			$_use_color = 1 if -t *STDOUT or -t *STDERR;
 		} elsif ($mode eq 'always') {
 			$_use_color = 1;
-		} else {
-			$_use_color = 0;
 		}
 
 		eval {
