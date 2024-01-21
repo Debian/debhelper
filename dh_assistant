@@ -26,7 +26,7 @@ they are not written in Perl).
 
 The B<dh_assistant> supports the following commands:
 
-=head2 active-compat-level (JSON)
+=head2 active-compat-level (AJSON)
 
 B<Synopsis>: B<dh_assistant> B<active-compat-level>
 
@@ -73,7 +73,7 @@ the B<C> is replaced by the actual compatibility level.  A full example value wo
 
 =back
 
-=head2 supported-compat-levels (JSON, CRFA)
+=head2 supported-compat-levels (AJSON, CRFA)
 
 B<Synopsis>: B<dh_assistant> B<supported-compat-levels>
 
@@ -82,7 +82,7 @@ about.
 
 This command accepts no options or arguments.
 
-=head2 which-build-system (JSON)
+=head2 which-build-system (AJSON)
 
 B<Synopsis>: B<dh_assistant> B<which-build-system> [S<I<build step>>] [S<I<build system options>>]
 
@@ -156,7 +156,7 @@ is a build system if the build system does not use/set/define that variable.
 
 =back
 
-=head2 detect-hook-targets (JSON)
+=head2 detect-hook-targets (AJSON)
 
 B<Synopsis>: B<dh_assistant> B<detect-hook-targets>
 
@@ -254,7 +254,101 @@ following command:
 
 This command accepts no options or arguments.
 
-=head2 log-installed-files
+
+=head2 detect-unknown-hook-targets (AJSON)
+
+B<Synopsis>: B<dh_assistant> B<detect-unknown-hook-targets> [--output-format=json] [command-options]
+
+Detects unknown and possibly misspelled override targets and hook targets in F<debian/rules> that
+will most likely not be used by L<dh(1)>.
+
+This command differs from B<detect-hook-targets> subtly in the scope. The B<detect-hook-targets>
+will list all targets that looks like hook targets whether they are applicable or not. This
+command show all hook targets, for which a command cannot be found in any sequence. Accordingly,
+this command is better for linting purposes whereas B<detect-hook-targets> is better if you want
+to know which hook targets are present. All the limitations listed in B<detect-hook-targets>
+about scanning the rules file apply equally to this command.
+
+This command will attempt will attempt to load any sequence add-on listed via build-dependencies
+and therefore these must be installed. Additional modules can be passed via B<--with> like with
+L<dh(1)> as needed.
+
+This command will also need one of the following perl modules to be available:
+L<Text::Levenshtein>, L<Text::LevenshteinXS>, L<Text::Levenshtein::XS>. The first one can be
+installed via B<apt install libtext-levenshtein-perl>.
+
+The text output is intended for human consumption and should be self-explanatory.  Since it is
+not stable, it will not be documented. The JSON output looks something like this:
+
+    {
+       "unknown-hook-targets": [
+          {
+             "target-name": "execute_before_dh_instlal",
+             "filename": "debian/rules",
+             "candidates": [
+                "execute_before_dh_install"
+             ]
+          }
+       ]
+    }
+
+In more details:
+
+=over 4
+
+=item unknown-hook-targets
+
+List of all the unknown hook targets found along with additional information about them.
+
+=over 4
+
+=item target-name
+
+The actual target name detected in the file (usually F<debian/rules>).
+
+=item filename
+
+This attribute reports which file the target was found it. In most cases, this will always be "debian/rules"
+though in case of include files, the target could appear in an include file.  Note this attribute is not
+super reliable as L<make(1)> only reports it for targets with a "recipe" (targets with commands inside
+them). When B<make> does not provide the filename, B<dh_assistant> blindly assumes the filename is
+"debian/rules" (as overrides via includes is not a commonly used feature).
+
+Note this accuracy of this attribute is limited about what data B<dh_assistant> can read out from the
+following command:
+
+    LC_ALL=C make -Rrnpsf debian/rules debhelper-fail-me 2>/dev/null
+
+=item candidates
+
+When not null and not empty, each element in this list are names for likely candidates for the
+"correct" name of this target.
+
+=item filename
+
+=back
+
+=back
+
+This command accepts the following options:
+
+=over 4
+
+=item B<--output-format=>I<FORMAT>
+
+Request a certain type of output format. Valid values are B<text> or B<json>.
+
+The text format is intended for human consumption and may change between versions without any
+regard for machine consumption. If you want to use this command for machine consumption, please
+use the JSON format.
+
+=item B<--with> I<addon>, B<--without> I<addon>
+
+These options behave the same as the L<dh(1)> options with the same name.
+
+=back
+
+=head2 log-installed-files (BLD)
 
 B<Synopsis>: B<dh_assistant> B<< -pI<pkg> >> I<[--on-behalf-of-cmd=dh_foo]> B<path ...>
 
@@ -302,9 +396,14 @@ meaning is defined here.
 
 =over 4
 
-=item JSON
+=item AJSON
 
-The command provides JSON output. See L</JSON OUTPUT> for details.
+The command always provides JSON output. See L</JSON OUTPUT> for details.
+
+=item OJSON
+
+The command *can* provide JSON output via B<--output-format=json>, but does not
+do so by default. See L</JSON OUTPUT> for details when using B<--output-format=json>.
 
 =item CRFA
 
@@ -314,6 +413,11 @@ Most commands must be run inside a source package root directory (a directory
 containing F<debian/control>) because debhelper will need the package metadata
 to lookup the information.  Any command with this tag are exempt from this
 requirement and is expected to work regardless of where they are run.
+
+=item BLD
+
+The command is intended to be used as a part of a package build. It may leave
+artifacts behind that will need a L<dh_clean(1)> invocation to remove.
 
 =back
 
@@ -353,14 +457,15 @@ $JSON_ENCODER = $JSON_ENCODER->pretty->space_before(0)->canonical if -t STDOUT;
 inhibit_log();
 
 my %COMMANDS = (
-    'help'                    => \&_do_help,
-    '-h'                      => \&_do_help,
-    '--help'                  => \&_do_help,
-    'active-compat-level'     => \&active_compat_level,
-    'supported-compat-levels' => \&supported_compat_levels,
-    'which-build-system'      => \&which_build_system,
-    'detect-hook-targets'     => \&detect_hook_targets,
-    'log-installed-files'     => \&log_installed_files_cmd,
+    'help'                           => \&_do_help,
+    '-h'                             => \&_do_help,
+    '--help'                         => \&_do_help,
+    'active-compat-level'            => \&active_compat_level,
+    'supported-compat-levels'        => \&supported_compat_levels,
+    'which-build-system'             => \&which_build_system,
+    'detect-hook-targets'            => \&detect_hook_targets,
+    'detect-unknown-hook-targets' => \&detect_unknown_hook_targets,
+    'log-installed-files'            => \&log_installed_files_cmd,
 );
 
 my ($COMMAND) = shift(@ARGV);
@@ -381,15 +486,18 @@ Usage: ${me} <command> [... addition arguments or options ...]
 
 The following commands are available:
   help                       Show this help
-  active-compat-level        Output information about which compat level is declared/active (JSON)
-  supported-compat-levels    Output information about supported compat levels (JSON, CRFA)
-  which-build-system         Determine which build system will be used (JSON)
-  detect-hook-targets        Detect and output possible override and hook targets (JSON)
+  active-compat-level        Output information about which compat level is declared/active (AJSON)
+  supported-compat-levels    Output information about supported compat levels (AJSON, CRFA)
+  which-build-system         Determine which build system will be used (AJSON)
+  detect-hook-targets        Detect and output possible override and hook targets (AJSON)
+  detect-unknown-hook-targets
+                             Detect unknown / typos of known hook targets (RJSON)
   log-installed-files        Mark one or more paths as "installed" so dh_missing is aware (BLD)
 
 Command tags:
 
- * JSON    The command provides JSON output.
+ * AJSON   The command always provides JSON output.
+ * RJSON   The command *can* provide JSON output via --output-format=json.
  * CRFA    Command does not need to be run from a package source directory
            (Mnemonic "Can be Run From Anywhere")
  * BLD     The command is intended to be used as a part of a package build.
@@ -401,8 +509,8 @@ not using the debhelper script API or provide introspection for third-party tool
 (e.g., linters).  Unless stated otherwise, commands must be run inside a source
 package root directory - that is, the directory containing "debian/control".
 
-Most commands use JSON output.  When stdout is a TTY, the JSON will be prettified.
-See the manpage if you want formatting in other cases.
+Most commands use or can provide JSON output.  When stdout is a TTY, the JSON will be
+prettified. See the manpage if you want formatting in other cases.
 EOF
     return;
 }
@@ -507,18 +615,177 @@ sub _in_path {
     return 0;
 }
 
+sub _load_hook_targets {
+    require Debian::Debhelper::SequencerUtil;
+    Debian::Debhelper::SequencerUtil::rules_explicit_target('does-not-matter');
+    my ($explicit_targets);
+    {
+        no warnings qw(once);
+        $explicit_targets = \%Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS;
+    }
+    return $explicit_targets;
+}
+
+sub _hook_target_variants {
+    my ($name) = @_;
+    my @base = (
+        "override_${name}",
+        "execute_before_${name}",
+        "execute_after_${name}",
+    );
+    return map {
+        (
+            $_,
+            "${_}-arch",
+            "${_}-indep",
+        )
+    } @base;
+}
+
+
+sub _load_levenshtein {
+    my @modules = (qw(
+        Text::LevenshteinXS
+        Text::Levenshtein::XS
+        Text::Levenshtein
+    ));
+    my $err;
+    for my $module (@modules) {
+        my $distance_func = eval "use $module (); \\&${module}::distance";
+        $err = $@;
+        if (defined($distance_func)) {
+            return $distance_func;
+        }
+    }
+    my $module_names = join(', ', @modules);
+    warning("Could not load any of the modules ${module_names}");
+    warning("Usually, `apt install libtext-levenshtein-perl` will fix this problem.");
+    error("This subcommand requires one of the following modules to be available: ${module_names}. Last failure was: $@");
+}
+
+sub detect_unknown_hook_targets {
+    _assert_debian_control_exists();
+    my $distance_func = _load_levenshtein();
+    require Getopt::Long;
+    Getopt::Long::config('no_ignore_case');
+    require Debian::Debhelper::SequencerUtil;
+    my $output_format = "text";
+    my (@addon_requests, $sequences, %all_overrides, %unknown_hooks);
+    my %options=(
+		"output-format=s" => \$output_format,
+        "with=s" => sub {
+			my ($option, $value) = @_;
+			push(@addon_requests, map { "+${_}" } split(",", $value));
+		},
+		"without=s" => sub {
+			my ($option, $value) = @_;
+			push(@addon_requests, map { "-${_}" } split(",", $value));
+		},
+	);
+
+    Getopt::Long::GetOptionsFromArray(\@ARGV, %options)
+        or error("Could not parse the arguments");
+    if ($output_format ne 'text' and $output_format ne 'json') {
+        error("--output-format must be either text or json\n");
+    }
+    if (@ARGV) {
+        my $value = $ARGV[0];
+        error("$COMMAND: No non-options supported - please remove ${value}");
+    }
+    my $explicit_targets = _load_hook_targets();
+    my %missing_targets = map {
+        $_ => 1
+    } grep {
+        $_ ne 'debhelper-fail-me' and !m{^(?:debian/rules|create-stamp)}
+    } keys(%{$explicit_targets});
+
+    Debian::Debhelper::SequencerUtil::load_sequence_addon('root-sequence', 'both');
+    my @addons = Debian::Debhelper::SequencerUtil::compute_selected_addons('binary', @addon_requests);
+
+    # Load addons, which can modify sequences.
+    foreach my $addon (@addons) {
+        my $addon_name = $addon->{'name'};
+        my $addon_type = $addon->{'addon-type'};
+        Debian::Debhelper::SequencerUtil::load_sequence_addon($addon_name, $addon_type);
+    }
+
+    {
+        no warnings qw(once);
+        $sequences = \%Debian::Debhelper::DH::SequenceState::sequences;
+    }
+    for my $sequence(values(%{$sequences})) {
+        my @commands = map { $_->[0] } $sequence->flatten_sequence('both', 0);
+        for my $command (@commands) {
+            next if $command =~ m{^(?:debian/rules|create-stamp)};
+            for my $variant (_hook_target_variants($command)) {
+                $all_overrides{$variant} = 1;
+                delete($missing_targets{$variant});
+            }
+        }
+    }
+    my @variants = sort(keys(%all_overrides));
+    for my $target (keys(%missing_targets)) {
+        my @closest_variants;
+        my $closest_variant_distance = 9999;
+        for my $variant (@variants) {
+            next if abs(length($target) - length($variant)) > 3;
+            my $dist = $distance_func->($target, $variant);
+            next if $dist > $closest_variant_distance or $dist > 3;
+            if ($dist < $closest_variant_distance) {
+                $closest_variant_distance = $dist;
+                @closest_variants = ();
+            }
+            push(@closest_variants, $variant);
+        }
+        next if not @closest_variants and $target !~ m{^(?:override|execute_before|execute_after)_};
+        @closest_variants = sort(@closest_variants);
+        $unknown_hooks{$target} = \@closest_variants;
+    }
+
+    if ($output_format eq 'json') {
+        my @hook_target_data;
+        for my $target (sort(keys(%unknown_hooks))) {
+            my $options = $unknown_hooks{$target};
+            my (undef, $filename) = @{$explicit_targets->{$target}};
+            push(@hook_target_data, {
+                'target-name' => $target,
+                'filename'  => $filename,
+                'candidates'  => $options,
+            });
+        }
+        my %result = (
+            "unknown-hook-targets" => \@hook_target_data,
+        );
+        _output(\%result);
+    } elsif ($output_format eq 'text') {
+        for my $target (sort(keys(%unknown_hooks))) {
+            my $options = $unknown_hooks{$target};
+            my (undef, $filename) = @{$explicit_targets->{$target}};
+            my $help = '';
+            if (@{$options}) {
+                if (scalar(@{$options}) == 1) {
+                    my $name = $options->[0];
+                    $help = " Likely a typo of ${name}";
+                } else {
+                    my $names = join(', ', @{$options});
+                    $help = " Likely a typo of one of ${names}";
+                }
+            }
+            print("The hook target ${target} in ${filename} does not seem to match any known commands. ${help}\n");
+        }
+    } else {
+        error("Internal error: Missing case for ${output_format}");
+    }
+    return;
+}
+
 sub detect_hook_targets {
     if (@ARGV) {
         error("$COMMAND: No arguments supported (please remove everything after the command)");
     }
     _assert_debian_control_exists();
-    require Debian::Debhelper::SequencerUtil;
-    Debian::Debhelper::SequencerUtil::rules_explicit_target('does-not-matter');
-    my ($explicit_targets, %result, @targets, @unverifiable_commands, %seen_cmds);
-    {
-        no warnings qw(once);
-        $explicit_targets = \%Debian::Debhelper::SequencerUtil::EXPLICIT_TARGETS;
-    }
+    my $explicit_targets = _load_hook_targets();
+    my (%result, @targets, @unverifiable_commands, %seen_cmds);
     while (my ($target, $rule_details) = each(%{$explicit_targets})) {
         next if $target !~ m{^(?:execute_before_|execute_after_|override_)(\S+?)(-indep|-arch)?$};
         my ($command, $archness) = ($1, $2);
@@ -578,7 +845,8 @@ my $handler = $COMMANDS{$COMMAND};
 if (not defined($handler)) {
     warning("Arguments/options must not be the first argument (except for --help)")
         if $COMMAND =~ m/^-/;
-    error("Unknown command: $COMMAND");
+    my $available_cmds = join(' ', sort(grep { $_ ne '-h' and $_ ne '--help' and $_ ne 'help' } keys(%COMMANDS)));
+    error("Unknown command: $COMMAND. Use \"help\" or \"--help\" as first argument for usage. Available commands: ${available_cmds}");
 }
 
 $handler->();
