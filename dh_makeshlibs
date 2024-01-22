@@ -464,8 +464,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 		# as a side effect.
 		isnative($package);
 		my $version = $dh{VERSION};
-		my $compat = $package;
-		$compat =~ s/t64$//;
+		my $compat = Debian::Debhelper::Dh_Lib::t64_compat_name($package);
+		if ($compat eq '') {
+			$compat = $package;
+			$compat =~ s/t64$//;
+		}
 		addsubstvar($package, "t64:Provides", $compat,
 		            "= $version");
 	}
