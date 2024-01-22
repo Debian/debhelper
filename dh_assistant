@@ -8,6 +8,7 @@ dh_assistant - tool for supporting debhelper tools and provide introspection
 
 use strict;
 use warnings;
+use constant EXIT_CODE_LINT_ISSUES_FOUND => 2;
 use Debian::Debhelper::Dh_Lib;
 use JSON::PP ();
 
@@ -255,7 +256,7 @@ following command:
 This command accepts no options or arguments.
 
 
-=head2 detect-unknown-hook-targets (AJSON)
+=head2 detect-unknown-hook-targets (AJSON, LINT)
 
 B<Synopsis>: B<dh_assistant> B<detect-unknown-hook-targets> [--output-format=json] [command-options]
 
@@ -342,6 +343,12 @@ The text format is intended for human consumption and may change between version
 regard for machine consumption. If you want to use this command for machine consumption, please
 use the JSON format.
 
+=item B<--no-linter-exit-code>, B<--linter-exit-code>
+
+These options control whether the command should exit with the linter exit code (2) or not (0)
+when an unknown target is found. By default, it uses the linter exit code when an unknown target
+is found.
+
 =item B<--with> I<addon>, B<--without> I<addon>
 
 These options behave the same as the L<dh(1)> options with the same name.
@@ -405,6 +412,13 @@ The command always provides JSON output. See L</JSON OUTPUT> for details.
 The command *can* provide JSON output via B<--output-format=json>, but does not
 do so by default. See L</JSON OUTPUT> for details when using B<--output-format=json>.
 
+=item LINT
+
+The command is or can be used for linting purposes. This command will exit with code 2 when an important
+issue is found.
+
+Note that commands may have options that redefine what is considered an "important" issue.
+
 =item CRFA
 
 I<Mnemonic "Can be Run From Anywhere">
@@ -464,7 +478,7 @@ my %COMMANDS = (
     'supported-compat-levels'        => \&supported_compat_levels,
     'which-build-system'             => \&which_build_system,
     'detect-hook-targets'            => \&detect_hook_targets,
-    'detect-unknown-hook-targets' => \&detect_unknown_hook_targets,
+    'detect-unknown-hook-targets'    => \&detect_unknown_hook_targets,
     'log-installed-files'            => \&log_installed_files_cmd,
 );
 
@@ -498,6 +512,8 @@ Command tags:
 
  * AJSON   The command always provides JSON output.
  * RJSON   The command *can* provide JSON output via --output-format=json.
+ * LINT    The command is or can be used for linting purposes. This command will exit with code 2
+           when an important issue is found.
  * CRFA    Command does not need to be run from a package source directory
            (Mnemonic "Can be Run From Anywhere")
  * BLD     The command is intended to be used as a part of a package build.
@@ -663,6 +679,7 @@ sub _load_levenshtein {
     error("This subcommand requires one of the following modules to be available: ${module_names}. Last failure was: $@");
 }
 
+
 sub detect_unknown_hook_targets {
     _assert_debian_control_exists();
     my $distance_func = _load_levenshtein();
@@ -671,8 +688,10 @@ sub detect_unknown_hook_targets {
     require Debian::Debhelper::SequencerUtil;
     my $output_format = "text";
     my (@addon_requests, $sequences, %all_overrides, %unknown_hooks);
+    my $lint_exit = 1;
     my %options=(
-		"output-format=s" => \$output_format,
+        "output-format=s" => \$output_format,
+        "linter-exit-code!" => \$lint_exit,
         "with=s" => sub {
 			my ($option, $value) = @_;
 			push(@addon_requests, map { "+${_}" } split(",", $value));
@@ -776,7 +795,10 @@ sub detect_unknown_hook_targets {
     } else {
         error("Internal error: Missing case for ${output_format}");
     }
-    return;
+    if ($lint_exit && %unknown_hooks) {
+        exit(EXIT_CODE_LINT_ISSUES_FOUND);
+    }
+    exit(0);
 }
 
 sub detect_hook_targets {
