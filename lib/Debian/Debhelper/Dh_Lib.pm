@@ -2768,7 +2768,7 @@ sub restore_file_on_clean {
 	}
 	$file =~ s{^\./}{}g;
 	$file =~ s{//++}{}g;
-	if ($file =~ m{^\.} or $file =~ m{/CVS/} or $file =~ m{/\.svn/}) {
+	if ($file =~ m{^\.} or $file =~ m{/CVS/} or $file =~ m{/\.}) {
 		# We do not want to smash a Vcs repository by accident.
 		warning("Attempt to store $file, which looks like a VCS file or");
 		warning("a hidden package file (like quilt's \".pc\" directory)");

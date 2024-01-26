@@ -639,8 +639,60 @@ parses the records.
 Note this command only I<marks> paths as installed. It does not actually install them - the caller should ensure
 that the paths are in fact handled (or installed).
 
+=head2 restore-file-on-clean (BLD)
 
-=head2 supports
+B<Synopsis>: B<dh_assistant> B<restore-file-on-clean> B<FILE ...>
+
+This command will take a backup of listed files and tell L<dh_clean(1)> to restore them when it runs.
+
+Note that generally you do not need to restore modified files on clean. Often you can get away with just
+removing them if they are regenerated anyway (which is the most common case for files being modified during
+builds).  Use this command when something taints a file and the build does not cope with the file being
+removed.
+
+The file is stored in B<debian/.debhelper>. If you remove this directory manually without calling
+L<dh_clean(1)> then your B<dh_assistant> provided backup is gone permanently and the restore will never
+occur. At this point, only a version control system or another backup can restore the files.
+
+The command has the following limitations:
+
+=over 4
+
+=item No thread-safety - concurrency will corrupt the restore
+
+The command relies on updating an internal index and concurrent writes will cause it to be corrupt.
+
+While most B<dh_*> commands does not use the underlying function, any of them could do so. Avoid running
+another B<dh_*> command while B<dh_assistant> processes this command (especially running multiple concurrent
+instances of B<dh_assistant restore-file-on-clean> is asking for corruption!).
+
+=item Files only, not directories nor symlinks to files
+
+This command will only restore files; not directories or symlinks to files. It will reject any non-files.
+
+Additionally, if the directory containing the file is removed, the restore will fail (as B<debhelper>
+does not track the directory, it cannot restore it reliably). If this happens, you can do a B<mkdir>
+to restore the directory and run L<dh_clean(1)> again to get the files back. After that, consider
+what went wrong and whether you are using the correct tool(s).
+
+=item Strict file names
+
+All filenames must be relative to the package root (without using the B<./> prefix). No hidden files (that
+is any file starting with a period B<.>) and no version control directories (such as B<CVS>). The checks
+are best effort.
+
+These checks are here to ensure you do not accidentally trash important data that would help you undo
+mistakes.
+
+=item Heavy duty
+
+The command takes a B<full copy> of all files you pass it. This is fine for a handful of small files,
+which is the intended use-case. If you find yourself passing 10+ files or very large files, you might
+be applying a sledgehammer where you needed a different tool.
+
+=back
+
+=head2 supports (CFFA)
 
 B<Synopsis>: B<dh_assistant> B<supports> B<COMMAND>
 
@@ -735,6 +787,7 @@ my %COMMANDS = (
     'list-commands'                => \&list_commands,
     'list-guessed-dh-config-files' => \&list_guessed_dh_config_files,
     'log-installed-files'          => \&log_installed_files_cmd,
+    'restore-file-on-clean'        => \&dh_assistant_restore_file_on_clean,
     'supports'                     => \&supports,
 );
 
@@ -766,7 +819,8 @@ The following commands are available:
   list-guessed-dh-config-files
                              List guessed "config files" for debhelper commands (AJSON)
   log-installed-files        Mark one or more paths as "installed" so dh_missing is aware (BLD)
-  supports                   Script aid: Test whether dh_assistant knows a particular command
+  restore-file-on-clean      Mark one or more files as to be restored by dh_clean (BLD)
+  supports                   Script aid: Test whether dh_assistant knows a particular command (CRFA)
 
 Command tags:
 
@@ -1283,6 +1337,33 @@ sub detect_hook_targets {
     $result{'hook-targets'} = \@targets;
     $result{'commands-not-in-path'} = \@unverifiable_commands;
     _output(\%result);
+}
+
+sub dh_assistant_restore_file_on_clean {
+    init(inhibit_log => 1);
+    if (not @ARGV) {
+        error("At least one file name is required");
+    }
+    for my $file (@ARGV) {
+        lstat($file);
+        if ( ! -f _ ) {
+            error("The path ${file} was a symlink. It must be a file; not a symlink to a file") if -l _;
+            error("The path ${file} does not exist") if not -e _;
+            error("The path ${file} was not a file and this command only supports files");
+        }
+        if ($file =~ m{[.][.]}) {
+            # Someone can provide a patch when there is a use-case for "..foo".
+            # Said patch will need to ensure the file is inside the package root dir.
+            error("Files containing \"..\" (which ${file} does) are not supported.");
+        }
+        if ($file =~ m{^/}) {
+            error("Files must be relative to the package root (which ${file} was not)")
+        }
+        if ($file =~ m{^\.} or $file =~ m{/CVS/} or $file =~ m{/\.}) {
+            error("Cowardly refusing to track hidden files / version control files (${file}).");
+        }
+        Debian::Debhelper::Dh_Lib::restore_file_on_clean($file)
+    }
 }
 
 sub log_installed_files_cmd {
