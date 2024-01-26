@@ -1,10 +1,32 @@
-debhelper (13.11.11) UNRELEASED; urgency=medium
+debhelper (13.11.11~1.gbp5186d4) UNRELEASED; urgency=medium
 
+  ** SNAPSHOT build @fe8837f2b5395e2a1a2b952ad212edd3e20375c7 **
+
+  [ Steve Langasek ]
   * Add support for an 'X-Time64-Compat' field in debian/control to allow
     overriding of the auto-generated Provides: as necessary.
     Closes: #1059941.
 
- -- Steve Langasek <vorlon@debian.org>  Wed, 03 Jan 2024 23:51:13 +0000
+  [ Niels Thykier ]
+  * dh_assistant: Exit with code 2 when unknown hook targets are found
+  * dh_assistant: Add 3 new subcommands:
+    - `supports COMMAND` can be used to programmically check whether
+      dh_assistant knows about `COMMAND`. It is a lot better than having
+      to check versions or parse `--help` output.
+    - `list-commands` can be used to determine all "debhelper commands"
+       that will run from a source package (assuming no overrides and
+       no add-on adds a non-standard sequence). This command has a
+       text and a JSON output.
+     - `list-guessed-dh-config-files` can be used to list all
+       debhelper config and their related commands. The result
+       involves a lot of guess work and will never be 100% reliable,
+       which explains the `guessed` part of the command. The output
+       is always JSON.
+
+  [ Jörg Mechnich ]
+  * qmake6.pm: Add cross-compiling support
+
+ -- Niels Thykier <niels@thykier.net>  Fri, 26 Jan 2024 16:35:02 +0100
 
 debhelper (13.11.10) unstable; urgency=medium
 
