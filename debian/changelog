@@ -1,6 +1,4 @@
-debhelper (13.11.11~2.gbp8c5a42) UNRELEASED; urgency=medium
-
-  ** SNAPSHOT build @8c5a429794473c00307278ff51eea6b19c83bac7 **
+debhelper (13.12) unstable; urgency=medium
 
   [ Steve Langasek ]
   * Add support for an 'X-Time64-Compat' field in debian/control to allow
@@ -9,7 +7,7 @@ debhelper (13.11.11~2.gbp8c5a42) UNRELEASED; urgency=medium
 
   [ Niels Thykier ]
   * dh_assistant: Exit with code 2 when unknown hook targets are found
-  * dh_assistant: Add 3 new subcommands:
+  * dh_assistant: Add the following new subcommands:
     - `supports COMMAND` can be used to programmically check whether
       dh_assistant knows about `COMMAND`. It is a lot better than having
       to check versions or parse `--help` output.
@@ -22,6 +20,8 @@ debhelper (13.11.11~2.gbp8c5a42) UNRELEASED; urgency=medium
        involves a lot of guess work and will never be 100% reliable,
        which explains the `guessed` part of the command. The output
        is always JSON.
+     - Add `restore-file-on-clean` with all its caveats. Use it with
+       care for the few cases where it is useful.  (Closes: #1051184)
   * dh_assistant: Always parse Build-Depends for sequences. This
     would have prevented `detect-unknown-hook-targets` from reporting
     issues about hook targets related to add-ons if they were loaded
@@ -29,11 +29,17 @@ debhelper (13.11.11~2.gbp8c5a42) UNRELEASED; urgency=medium
   * dh_assistant: `detect-unknown-hook-targets` now continues when
     add-ons loading fails. It will still exit with status 2 by
     default when this occurs as if it found an issue.
+  * cmake.pm: Remove compat guard for `-DBUILD_TESTING:BOOL=off`
+    on `nocheck`
+  * Dh_Lib.pm: Fix warning from `cp -n`
 
   [ Jörg Mechnich ]
-  * qmake6.pm: Add cross-compiling support
+  * qmake6.pm: Add cross-compiling support (Closes: #1059209)
 
- -- Niels Thykier <niels@thykier.net>  Fri, 26 Jan 2024 20:06:56 +0100
+  [ David (Plasma) Paul ]
+  * Add <pkg.debhelper.nonls> build profile (Closes: #1032816)
+
+ -- Niels Thykier <niels@thykier.net>  Fri, 26 Jan 2024 21:41:09 +0100
 
 debhelper (13.11.10) unstable; urgency=medium
 
