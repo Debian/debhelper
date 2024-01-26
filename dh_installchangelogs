@@ -299,6 +299,8 @@ sub prepare_changesfile {
 	return $error_in_changesfile, $has_been_trimmed, $oldest_entry_time
 }
 
+# INTROSPECTABLE: CONFIG-FILES pkgfile(changelog) pkgfile(NEWS)
+
 on_pkgs_in_parallel {
 	foreach my $package (@_) {
 		next if is_udeb($package);

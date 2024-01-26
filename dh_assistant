@@ -355,9 +355,232 @@ These options behave the same as the L<dh(1)> options with the same name.
 
 =back
 
+=head2 list-commands (RJSON)
+
+B<Synopsis>: B<dh_assistant> B<list-commands> [--output-format=json] [command-options]
+
+Load all B<dh> sequence add-ons and extract a full list of all commands that will be invoked across
+all sequences. The command makes no attempt to filter out commands that will not be run due to
+override targets or due to certain sequences not being run (by B<dh> or at all).
+
+As the command will attempt to load all plugins, they must be installed.
+
+The text output is intended for human consumption and should be self-explanatory.  Since it is
+not stable, it will not be documented. The JSON output looks something like this:
+
+    {
+       "commands": [
+          {
+             "command": "dh_auto_build"
+          },
+          {
+             "command": "dh_auto_clean"
+          },
+          [... more commands listed here... ]
+       ],
+       "issues": [
+            {
+                "issue": "load-addon",
+                "addon": "foo"
+            }
+       ]
+    }
+
+=over 4
+
+=item commands
+
+The top level key containing the list of all commands. Each element in the list are an object and
+can have the following keys:
+
+=over 4
+
+=item command
+
+The name of the command.
+
+While most commands are resolved via PATH, a sequence add-on could register a command via a full path
+(by passing the path search). If so, the command provided in this output will also use the full path.
+
+=back
+
+=item issues
+
+If present, then it is a list of one or more reasons why this output is definitely incomplete. Each element
+in the list is an object with the following keys:
+
+=over 4
+
+=item issue
+
+A key defining the issue. Currently, it is always B<load-addon>, which signals that B<dh_assistant> could
+not load the add-on listed in the B<addon> key.
+
+Parsers should assume new issue types may appear in the future.
+
+=item addon
+
+If present, it defines the name of a B<dh> sequence add-on that is related to the failure.
+
+=back
+
+=back
+
+This command accepts the following options:
+
+=over 4
+
+=item B<--output-format=>I<FORMAT>
+
+Request a certain type of output format. Valid values are B<text> or B<json>.
+
+The text format is intended for human consumption and may change between versions without any
+regard for machine consumption. If you want to use this command for machine consumption, please
+use the JSON format.
+
+=item B<--with> I<addon>, B<--without> I<addon>
+
+These options behave the same as the L<dh(1)> options with the same name.
+
+=back
+
+=head2 list-guessed-dh-config-files (AJSON)
+
+B<Synopsis>: B<dh_assistant> B<list-guessed-dh-config-files> [command-options]
+
+Load all B<dh> sequence add-ons, determine the full list of commands could be used by this
+source package and for each command used, then attempt to I<guess> which "config files"
+these commands are interested in.
+
+Note this command only guesses "per command config files". Standard global config files
+such as F<debian/control>, F<debian/rules>, and F<debian/compat> are not included in this
+output.
+
+As the command name implies, the resulting output is not a full list (and will never be).
+The B<dh_assistant> tool have to derive this from optional metadata that commands can
+choose to provide and B<dh_assistant> has no means to validate that this metadata is up
+to date.
+
+As the command will attempt to load all plugins, they must be installed.
+
+The text output is intended for human consumption and should be self-explanatory.  Since it is
+not stable, it will not be documented. The JSON output looks something like this:
+
+    {
+       "config-files": [
+          {
+             "commands": [
+                {
+                   "command": "dh_autoreconf_clean"
+                }
+             ],
+             "file-type": "pkgfile",
+             "pkgfile": "autoreconf.before"
+          },
+          {
+             "commands": [
+                {
+                   "command": "dh_installgsettings"
+                }
+             ],
+             "file-type": "pkgfile",
+             "pkgfile": "gsettings-override"
+          },
+          # [ ... more entries here ...]
+       ],
+       "issues": [
+           {
+                "issue": "load-addon",
+                "addon": "foo"
+           }
+       ]
+    }
+
+
+=over 4
+
+=item config-files
+
+The top level key containing the list of all config-files. Each element in the list are an object and
+can have the following keys:
+
+=over 4
+
+=item file-type
+
+The type of config file detected. At the time of writing, this will always be B<pkgfile>. However,
+other values may appear in the future.
+
+The B<pkgfile> key means that the config file is a B<debhelper pkgfile> (named after the B<pkgfile> sub
+in L<Debian::Debhelper::Dh_Lib> that locates the file).
+
+=item pkgfile
+
+When B<file-type> is B<pkgfile>, this key defines the name stem of the B<pkgfile>. An example, this will
+be B<install> for L<dh_install(1)>'s config file and B<docs> for L<dh_installdocs(1)>'s config file.
+
+When B<file-type> is B<not> B<pkgfile>, then this key will be absent.
+
+Typically names for these files are:
+
+     debian/PKGFILE
+     debian/PACKAGE.PKGFILE
+
+However, there are more variants caused by B<--name> plus architecture specific suffixes.
+
+=item commands
+
+This key will be a list with each element in it being an object with the following keys:
+
+=over 4
+
+=item command
+
+Name of the command that is interested in this config file. Multiple commands can be interested in the same
+config file. An example of this would be B<dh_installinit>, B<dh_installsystemd> and B<dh_installtmpfiles>,
+which all reacts to (the now) deprecated B<tmpfile> pkgfile. In the particular case, only one command reacts
+to the file for a given compat level (but that information is not available to B<dh_assistant> and therefore
+is not available in this output either).
+
+=back
+
+=back
+
+=item issues
+
+If present, then it is a list of one or more reasons why this output is definitely incomplete. Each element
+in the list is an object with the following keys:
+
+=over 4
+
+=item issue
+
+A key defining the issue. Currently, it is always B<load-addon>, which signals that B<dh_assistant> could
+not load the add-on listed in the B<addon> key.
+
+Parsers should assume new issue types may appear in the future.
+
+=item addon
+
+If present, it defines the name of a B<dh> sequence add-on that is related to the failure.
+
+=back
+
+=back
+
+This command accepts the following options:
+
+=over 4
+
+=item B<--with> I<addon>, B<--without> I<addon>
+
+These options behave the same as the L<dh(1)> options with the same name.
+
+=back
+
 =head2 log-installed-files (BLD)
 
-B<Synopsis>: B<dh_assistant> B<< -pI<pkg> >> I<[--on-behalf-of-cmd=dh_foo]> B<path ...>
+B<Synopsis>: B<dh_assistant> B<log-installed-files> B<< -pI<pkg> >> I<[--on-behalf-of-cmd=dh_foo]> B<path ...>
 
 Mark one or more paths as installed for a given package.  This is useful for telling L<dh_missing(1)> that the
 paths have been installed manually.
@@ -395,6 +618,15 @@ parses the records.
 
 Note this command only I<marks> paths as installed. It does not actually install them - the caller should ensure
 that the paths are in fact handled (or installed).
+
+
+=head2 supports
+
+B<Synopsis>: B<dh_assistant> B<supports> B<COMMAND>
+
+This command is a scripting aid to programmatically determine whether B<dh_assistant> knows about a given
+subcommand. Pass the name of a subcommand and this command will exit successfully if the subcommand was known
+and unsuccessfully otherwise.
 
 =head1 COMMAND TAGS
 
@@ -471,15 +703,18 @@ $JSON_ENCODER = $JSON_ENCODER->pretty->space_before(0)->canonical if -t STDOUT;
 inhibit_log();
 
 my %COMMANDS = (
-    'help'                           => \&_do_help,
-    '-h'                             => \&_do_help,
-    '--help'                         => \&_do_help,
-    'active-compat-level'            => \&active_compat_level,
-    'supported-compat-levels'        => \&supported_compat_levels,
-    'which-build-system'             => \&which_build_system,
-    'detect-hook-targets'            => \&detect_hook_targets,
-    'detect-unknown-hook-targets'    => \&detect_unknown_hook_targets,
-    'log-installed-files'            => \&log_installed_files_cmd,
+    'help'                         => \&_do_help,
+    '-h'                           => \&_do_help,
+    '--help'                       => \&_do_help,
+    'active-compat-level'          => \&active_compat_level,
+    'supported-compat-levels'      => \&supported_compat_levels,
+    'which-build-system'           => \&which_build_system,
+    'detect-hook-targets'          => \&detect_hook_targets,
+    'detect-unknown-hook-targets'  => \&detect_unknown_hook_targets,
+    'list-commands'                => \&list_commands,
+    'list-guessed-dh-config-files' => \&list_guessed_dh_config_files,
+    'log-installed-files'          => \&log_installed_files_cmd,
+    'supports'                     => \&supports,
 );
 
 my ($COMMAND) = shift(@ARGV);
@@ -506,7 +741,11 @@ The following commands are available:
   detect-hook-targets        Detect and output possible override and hook targets (AJSON)
   detect-unknown-hook-targets
                              Detect unknown / typos of known hook targets (RJSON)
+  list-commands              List all commands across all sequences (RJSON)
+  list-guessed-dh-config-files
+                             List guessed "config files" for debhelper commands (AJSON)
   log-installed-files        Mark one or more paths as "installed" so dh_missing is aware (BLD)
+  supports                   Script aid: Test whether dh_assistant knows a particular command
 
 Command tags:
 
@@ -680,6 +919,200 @@ sub _load_levenshtein {
 }
 
 
+sub _all_sequence_commands {
+    my ($forgive_errors, @addon_requests) = @_;
+    my ($sequences, @all_commands, @unloadable);
+    Debian::Debhelper::SequencerUtil::load_sequence_addon('root-sequence', 'both');
+    my @addons = Debian::Debhelper::SequencerUtil::compute_selected_addons('binary', @addon_requests);
+    # Load addons, which can modify sequences.
+    foreach my $addon (@addons) {
+        my $addon_name = $addon->{'name'};
+        my $addon_type = $addon->{'addon-type'};
+        eval {
+            Debian::Debhelper::SequencerUtil::load_sequence_addon($addon_name, $addon_type);
+        };
+        if (my $err = $@) {
+            die($err) if not $forgive_errors;
+            push(@unloadable, $addon_name);
+        }
+    }
+    {
+        no warnings qw(once);
+        $sequences = \%Debian::Debhelper::DH::SequenceState::sequences;
+    }
+    my %seen;
+    for my $sequence(values(%{$sequences})) {
+        my @commands = map {$_->[0]} $sequence->flatten_sequence('both', 0);
+        for my $command (@commands) {
+            next if $command =~ m{^(?:debian/rules|create-stamp)};
+            next if exists($seen{$command});
+            $seen{$command} = 1;
+            push(@all_commands, $command);
+        }
+    }
+    return \@all_commands, \@unloadable;
+}
+
+sub list_commands {
+    _assert_debian_control_exists();
+    require Getopt::Long;
+    Getopt::Long::config('no_ignore_case');
+    require Debian::Debhelper::SequencerUtil;
+    my $output_format = "text";
+    my (@addon_requests);
+    my %options=(
+        "output-format=s" => \$output_format,
+        "with=s" => sub {
+			my ($option, $value) = @_;
+			push(@addon_requests, map { "+${_}" } split(",", $value));
+		},
+		"without=s" => sub {
+			my ($option, $value) = @_;
+			push(@addon_requests, map { "-${_}" } split(",", $value));
+		},
+	);
+    Getopt::Long::GetOptionsFromArray(\@ARGV, %options)
+        or error("Could not parse the arguments");
+
+    if (@ARGV) {
+        my $value = $ARGV[0];
+        error("$COMMAND: No non-options supported - please remove ${value}");
+    }
+
+    my ($all_commands, $unloadables) = _all_sequence_commands(1, @addon_requests);
+    if ($output_format eq 'json') {
+        my @commands_json;
+        for my $command (sort(@{$all_commands})) {
+            push(@commands_json, {
+                'command' => $command,
+            });
+        }
+        my %result = (
+            "commands" => \@commands_json,
+        );
+        if (@{$unloadables}) {
+            my @issues;
+            for my $addon (@{$unloadables}) {
+                push(@issues, {
+                    "issue" => "load-addon",
+                    "addon" => $addon,
+                });
+            };
+            $result{'issues'} = \@issues;
+        }
+        _output(\%result);
+    } elsif ($output_format eq 'text') {
+        print("Commands present in at least one sequence for this source package (sorted by name):\n");
+        for my $command (sort(@{$all_commands})) {
+            print("\t${command}\n");
+        }
+        if (@{$unloadables}) {
+            my $addon_names = join(" ", @{$unloadables});
+            print("\n");
+            warning("Incomplete result. The following sequence add-ons could not be loaded: $addon_names");
+        }
+    } else {
+        error("Internal error: Missing case for ${output_format}");
+    }
+}
+
+sub _extract_annotations {
+    my ($command) = @_;
+    my @annotations;
+
+	foreach my $dir (split(':', $ENV{PATH})) {
+		if (open (my $h, "<", "$dir/$command")) {
+			while (<$h>) {
+				if (m/PROMISE: DH NOOP( WITHOUT\s+(.*))?\s*$/) {
+					if (defined($2)) {
+                        push(@annotations, split(' ', $2));
+                    } else {
+                        push(@annotations, 'always-skip');
+                    }
+				}
+                if (m/INTROSPECTABLE: CONFIG-FILES\s+(.*)\s*$/) {
+                    push(@annotations, split(' ', $1));
+                }
+			}
+			close $h;
+			return @annotations;
+		}
+	}
+	return;
+}
+
+sub list_guessed_dh_config_files {
+    _assert_debian_control_exists();
+    require Getopt::Long;
+    Getopt::Long::config('no_ignore_case');
+    require Debian::Debhelper::SequencerUtil;
+    my (@addon_requests);
+    my %options=(
+        "with=s" => sub {
+			my ($option, $value) = @_;
+			push(@addon_requests, map { "+${_}" } split(",", $value));
+		},
+		"without=s" => sub {
+			my ($option, $value) = @_;
+			push(@addon_requests, map { "-${_}" } split(",", $value));
+		},
+	);
+    Getopt::Long::GetOptionsFromArray(\@ARGV, %options)
+        or error("Could not parse the arguments");
+
+    if (@ARGV) {
+        my $value = $ARGV[0];
+        error("$COMMAND: No non-options supported - please remove ${value}");
+    }
+
+    my ($all_commands, $unloadables) = _all_sequence_commands(1, @addon_requests);
+    my $pkg_files = {};
+    for my $command (@{$all_commands}) {
+        my @annotations = _extract_annotations($command);
+        next if not @annotations or $annotations[0] eq 'always-skip';
+        for my $annotation (@annotations) {
+            my $type = 'pkgfile';
+			my $need = $annotation;
+			if ($annotation =~ m/^([a-zA-Z0-9-_]+)\((.*)\)$/) {
+				($type, $need) = ($1, $2);
+			}
+            next if $type ne 'pkgfile' and $type ne 'pkgfile-logged';
+            my $key = "pkgfile/${need}";
+            my $existing = $pkg_files->{$key};
+            if (defined($existing)) {
+                push(@{$existing->{'commands'}}, {
+                    'command' => $command,
+                });
+            } else {
+                $pkg_files->{$key} = {
+                    'file-type' => 'pkgfile',
+                    'pkgfile'   => $need,
+                    'commands'  => [{
+                        'command' => $command,
+                    }],
+                }
+            }
+        }
+    }
+
+    my @config_files = values(%{$pkg_files});
+    my %result = (
+        "config-files" => \@config_files,
+    );
+    if (@{$unloadables}) {
+        my @issues;
+        for my $addon (@{$unloadables}) {
+            push(@issues, {
+                "issue" => "load-addon",
+                "addon" => $addon,
+            });
+        };
+        $result{'issues'} = \@issues;
+    }
+    _output(\%result);
+}
+
+
 sub detect_unknown_hook_targets {
     _assert_debian_control_exists();
     my $distance_func = _load_levenshtein();
@@ -687,7 +1120,7 @@ sub detect_unknown_hook_targets {
     Getopt::Long::config('no_ignore_case');
     require Debian::Debhelper::SequencerUtil;
     my $output_format = "text";
-    my (@addon_requests, $sequences, %all_overrides, %unknown_hooks);
+    my (@addon_requests, %all_overrides, %unknown_hooks);
     my $lint_exit = 1;
     my %options=(
         "output-format=s" => \$output_format,
@@ -718,28 +1151,11 @@ sub detect_unknown_hook_targets {
         $_ ne 'debhelper-fail-me' and !m{^(?:debian/rules|create-stamp)}
     } keys(%{$explicit_targets});
 
-    Debian::Debhelper::SequencerUtil::load_sequence_addon('root-sequence', 'both');
-    my @addons = Debian::Debhelper::SequencerUtil::compute_selected_addons('binary', @addon_requests);
-
-    # Load addons, which can modify sequences.
-    foreach my $addon (@addons) {
-        my $addon_name = $addon->{'name'};
-        my $addon_type = $addon->{'addon-type'};
-        Debian::Debhelper::SequencerUtil::load_sequence_addon($addon_name, $addon_type);
-    }
-
-    {
-        no warnings qw(once);
-        $sequences = \%Debian::Debhelper::DH::SequenceState::sequences;
-    }
-    for my $sequence(values(%{$sequences})) {
-        my @commands = map { $_->[0] } $sequence->flatten_sequence('both', 0);
-        for my $command (@commands) {
-            next if $command =~ m{^(?:debian/rules|create-stamp)};
-            for my $variant (_hook_target_variants($command)) {
-                $all_overrides{$variant} = 1;
-                delete($missing_targets{$variant});
-            }
+    my ($all_commands, undef) = _all_sequence_commands(0, @addon_requests);
+    for my $command (@{$all_commands}) {
+        for my $variant (_hook_target_variants($command)) {
+            $all_overrides{$variant} = 1;
+            delete($missing_targets{$variant});
         }
     }
     my @variants = sort(keys(%all_overrides));
@@ -858,6 +1274,15 @@ sub log_installed_files_cmd {
         'package'   => $package,
         'tool_name' => $on_behalf_of,
     }, @ARGV);
+}
+
+sub supports {
+    my ($command, @more) = @ARGV;
+    if (@more or not defined($command)) {
+        error("$COMMAND: Please provide exactly one argument");
+    }
+    exit(0) if exists($COMMANDS{$command});
+    exit(2);
 }
 
 if (not defined($COMMAND)) {
