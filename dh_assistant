@@ -329,6 +329,26 @@ When not null and not empty, each element in this list are names for likely cand
 
 =back
 
+=item issues
+
+If present, then it is a list of one or more reasons why this output is definitely incomplete. Each element
+in the list is an object with the following keys:
+
+=over 4
+
+=item issue
+
+A key defining the issue. Currently, it is always B<load-addon>, which signals that B<dh_assistant> could
+not load the add-on listed in the B<addon> key.
+
+Parsers should assume new issue types may appear in the future.
+
+=item addon
+
+If present, it defines the name of a B<dh> sequence add-on that is related to the failure.
+
+=back
+
 =back
 
 This command accepts the following options:
@@ -1152,7 +1172,7 @@ sub detect_unknown_hook_targets {
         $_ ne 'debhelper-fail-me' and !m{^(?:debian/rules|create-stamp)}
     } keys(%{$explicit_targets});
 
-    my ($all_commands, undef) = _all_sequence_commands(0, @addon_requests);
+    my ($all_commands, $unloadables) = _all_sequence_commands(1, @addon_requests);
     for my $command (@{$all_commands}) {
         for my $variant (_hook_target_variants($command)) {
             $all_overrides{$variant} = 1;
@@ -1192,6 +1212,16 @@ sub detect_unknown_hook_targets {
         my %result = (
             "unknown-hook-targets" => \@hook_target_data,
         );
+        if (@{$unloadables}) {
+            my @issues;
+            for my $addon (@{$unloadables}) {
+                push(@issues, {
+                    "issue" => "load-addon",
+                    "addon" => $addon,
+                });
+            };
+            $result{'issues'} = \@issues;
+        }
         _output(\%result);
     } elsif ($output_format eq 'text') {
         for my $target (sort(keys(%unknown_hooks))) {
@@ -1209,10 +1239,15 @@ sub detect_unknown_hook_targets {
             }
             print("The hook target ${target} in ${filename} does not seem to match any known commands. ${help}\n");
         }
+        if (@{$unloadables}) {
+            my $addon_names = join(" ", @{$unloadables});
+            print("\n");
+            warning("Incomplete result. The following sequence add-ons could not be loaded: $addon_names");
+        }
     } else {
         error("Internal error: Missing case for ${output_format}");
     }
-    if ($lint_exit && %unknown_hooks) {
+    if ($lint_exit && (%unknown_hooks or @{$unloadables})) {
         exit(EXIT_CODE_LINT_ISSUES_FOUND);
     }
     exit(0);
