@@ -2796,7 +2796,7 @@ sub restore_file_on_clean {
 		if (not $in_index) {
 			# Copy and then rename so we always have the full copy of
 			# the file in the correct place (if any at all).
-			doit('cp', '-an', '--reflink=auto', $file, "${bucket_dir}/${checksum}.tmp");
+			doit('cp', '-a', '--update=none', '--reflink=auto', $file, "${bucket_dir}/${checksum}.tmp");
 			rename_path("${bucket_dir}/${checksum}.tmp", "${bucket_dir}/${checksum}");
 			print {$fd} "${checksum} ${file}\n";
 		}
@@ -2825,7 +2825,7 @@ sub restore_all_files {
 		#    (otherwise, we would be missing some of the files and have to handle
 		#     that with scary warnings)
 		# 2) The file is always fully restored or in its "pre-restore" state.
-		doit('cp', '-an', '--reflink=auto', $bucket_file, "${bucket_file}.tmp");
+		doit('cp', '--update=none', '-a', '--reflink=auto', $bucket_file, "${bucket_file}.tmp");
 		rename_path("${bucket_file}.tmp", $stored_file);
 	}
 	close($fd);
