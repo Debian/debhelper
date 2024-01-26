@@ -1,6 +1,6 @@
-debhelper (13.11.11~1.gbp5186d4) UNRELEASED; urgency=medium
+debhelper (13.11.11~2.gbp8c5a42) UNRELEASED; urgency=medium
 
-  ** SNAPSHOT build @fe8837f2b5395e2a1a2b952ad212edd3e20375c7 **
+  ** SNAPSHOT build @8c5a429794473c00307278ff51eea6b19c83bac7 **
 
   [ Steve Langasek ]
   * Add support for an 'X-Time64-Compat' field in debian/control to allow
@@ -22,11 +22,18 @@ debhelper (13.11.11~1.gbp5186d4) UNRELEASED; urgency=medium
        involves a lot of guess work and will never be 100% reliable,
        which explains the `guessed` part of the command. The output
        is always JSON.
+  * dh_assistant: Always parse Build-Depends for sequences. This
+    would have prevented `detect-unknown-hook-targets` from reporting
+    issues about hook targets related to add-ons if they were loaded
+    via `Build-Depends`.
+  * dh_assistant: `detect-unknown-hook-targets` now continues when
+    add-ons loading fails. It will still exit with status 2 by
+    default when this occurs as if it found an issue.
 
   [ Jörg Mechnich ]
   * qmake6.pm: Add cross-compiling support
 
- -- Niels Thykier <niels@thykier.net>  Fri, 26 Jan 2024 16:35:02 +0100
+ -- Niels Thykier <niels@thykier.net>  Fri, 26 Jan 2024 20:06:56 +0100
 
 debhelper (13.11.10) unstable; urgency=medium
 
