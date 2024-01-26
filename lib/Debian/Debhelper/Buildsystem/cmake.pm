@@ -141,7 +141,7 @@ sub configure {
 		$ENV{CXXFLAGS} .= ' ' . $ENV{CPPFLAGS};
 	}
 
-	if (get_buildoption("nocheck") && ! compat(13)) {
+	if (get_buildoption("nocheck")) {
 		push(@flags, "-DBUILD_TESTING:BOOL=OFF");
 	}
 
