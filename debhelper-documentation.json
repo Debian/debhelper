@@ -1,0 +1,550 @@
+{
+  "api-compat-version": 1,
+  "known-packaging-files": [
+    {
+      "path": "debian/compat",
+      "documentation-uris": [
+        "man:debhelper(7)"
+      ]
+    },
+    {
+      "path": "debian/clean",
+      "documentation-uris": [
+        "man:dh_clean(1)"
+      ],
+      "file-categories": [
+        "pkg-helper-config"
+      ],
+      "config-features": [
+        "dh-filearray",
+        "dh-glob",
+        "dh-file-list"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "symbols",
+      "file-categories": [
+        "ppf-control-file"
+      ],
+      "documentation-uris": [
+        "man:deb-symbols(5)"
+      ],
+      "debhelper-commands": [
+        "dh_makeshlibs"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "substvars",
+      "documentation-uris": [
+        "man:deb-substvars(5)"
+      ],
+      "debhelper-commands": [
+        "dh_installdeb"
+      ]
+    },
+
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "shlibs",
+      "file-categories": [
+        "ppf-control-file"
+      ],
+      "documentation-uris": [
+        "man:deb-shlibs(5)"
+      ],
+      "debhelper-commands": [
+        "dh_makeshlibs",
+        "dh_installdeb"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "triggers",
+      "documentation-uris": [
+        "man:deb-triggers(5)"
+      ],
+      "file-categories": [
+        "ppf-control-file"
+      ],
+      "debhelper-commands": [
+        "dh_installdeb"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "install",
+      "config-features": [
+        "dh-filedoublearray",
+        "dh-partial-glob",
+        "dh-install-list-dest-dir-like-dh_install"
+      ],
+      "file-categories": [
+        "pkg-helper-config"
+      ],
+      "debhelper-commands": [
+        "dh_install"
+      ],
+      "dh-compat-rules": [
+        {
+          "starting-with-compat-level": 9,
+          "add-config-features": ["dh-exec-rename"]
+        }
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "manpages",
+      "config-features": [
+        "dh-filearray",
+        "dh-install-list-fixed-dest-dir",
+        "dh-docs-only"
+      ],
+      "file-categories": [
+        "pkg-helper-config"
+      ],
+      "debhelper-commands": [
+        "dh_installman"
+      ],
+      "dh-compat-rules": [
+        {
+          "starting-with-compat-level": 9,
+          "add-config-features": ["dh-exec-rename"]
+        }
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "docs",
+      "config-features": [
+        "dh-filearray",
+        "dh-install-list-fixed-dest-dir",
+        "dh-docs-only"
+      ],
+      "file-categories": [
+        "pkg-helper-config"
+      ],
+      "debhelper-commands": [
+        "dh_installdocs"
+      ],
+      "install-pattern": "usr/share/doc/{owning_package}"
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "examples",
+      "documentation-uris": [
+        "man:dh_installexamples(1)"
+      ],
+      "config-features": [
+        "dh-filearray",
+        "dh-install-list-fixed-dest-dir",
+        "dh-docs-only"
+      ],
+      "file-categories": [
+        "pkg-helper-config"
+      ],
+      "debhelper-commands": [
+        "dh_installexamples"
+      ],
+      "install-pattern": "usr/share/doc/{owning_package}/examples"
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "links",
+      "config-features": [
+        "dh-filearray",
+        "dh-executable-config",
+        "dh-file-list"
+      ],
+      "file-categories": [
+        "pkg-helper-config"
+      ],
+      "debhelper-commands": [
+        "dh_link"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "service",
+      "file-categories": [
+        "ppf-file"
+      ],
+      "documentation-uris": [
+        "man:systemd.service(5)"
+      ],
+      "debhelper-commands": [
+        "dh_installsystemd",
+        "dh_installinit",
+        "dh_systemd_enable"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "lintian-overrides",
+      "install-pattern": "usr/share/lintian/overrides/{owning_package}",
+      "file-categories": [
+        "ppf-file",
+        "lint-config"
+      ],
+      "config-features": [
+        "dh-executable-config"
+      ],
+      "documentation-uris": [
+        "man:lintian(1)"
+      ],
+      "debhelper-commands": [
+        "dh_lintian"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "postinst",
+      "install-pattern": "DEBIAN/postinst",
+      "config-features": [
+        "dh-hash-subst"
+      ],
+      "file-categories": [
+        "ppf-control-file"
+      ],
+      "debhelper-commands": [
+        "dh_installdeb"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "preinst",
+      "install-pattern": "DEBIAN/preinst",
+      "config-features": [
+        "dh-hash-subst"
+      ],
+      "file-categories": [
+        "ppf-control-file"
+      ],
+      "debhelper-commands": [
+        "dh_installdeb"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "prerm",
+      "install-pattern": "DEBIAN/prerm",
+      "config-features": [
+        "dh-hash-subst"
+      ],
+      "file-categories": [
+        "ppf-control-file"
+      ],
+      "debhelper-commands": [
+        "dh_installdeb"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "postrm",
+      "config-features": [
+        "dh-hash-subst"
+      ],
+      "install-pattern": "DEBIAN/postrm",
+      "file-categories": [
+        "ppf-control-file"
+      ],
+      "debhelper-commands": [
+        "dh_installdeb"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "config",
+      "install-pattern": "DEBIAN/config",
+      "file-categories": [
+        "ppf-control-file"
+      ],
+      "debhelper-commands": [
+        "dh_installdebconf"
+      ]
+    },
+
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "isinstallable",
+      "install-pattern": "DEBIAN/isinstallable",
+      "config-features": [
+        "dh-hash-subst"
+      ],
+      "file-categories": [
+        "ppf-control-file"
+      ],
+      "debhelper-commands": [
+        "dh_installdeb"
+      ]
+    },
+
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "menutest",
+      "install-pattern": "DEBIAN/menutest",
+      "file-categories": [
+        "ppf-control-file"
+      ],
+      "debhelper-commands": [
+        "dh_installdeb"
+      ]
+    },
+
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "pam",
+      "file-categories": [
+        "ppf-file"
+      ],
+      "debhelper-commands": [
+        "dh_installpam"
+      ],
+      "dh-compat-rules": [
+        {
+          "starting-with-compat-level": 13,
+          "install-pattern": "usr/lib/pam.d/{name}.conf"
+        },
+        {
+          "install-pattern": "etc/pam.d/{name}.conf"
+        }
+      ]
+    },
+
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "initramfs-hook",
+      "install-pattern": "usr/share/initramfs-tools/hooks/{owning_package}",
+      "file-categories": [
+        "ppf-file"
+      ],
+      "debhelper-commands": [
+        "dh_installinitramfs"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "cron.daily",
+      "install-pattern": "etc/cron.daily/{name}",
+      "file-categories": [
+        "ppf-file"
+      ],
+      "debhelper-commands": [
+        "dh_installcron"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "cron.hourly",
+      "install-pattern": "etc/cron.hourly/{name}",
+      "file-categories": [
+        "ppf-file"
+      ],
+      "debhelper-commands": [
+        "dh_installcron"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "cron.weekly",
+      "install-pattern": "etc/cron.weekly/{name}",
+      "file-categories": [
+        "ppf-file"
+      ],
+      "debhelper-commands": [
+        "dh_installcron"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "cron.monthly",
+      "install-pattern": "etc/cron.monthly/{name}",
+      "file-categories": [
+        "ppf-file"
+      ],
+      "debhelper-commands": [
+        "dh_installcron"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "cron.yearly",
+      "install-pattern": "etc/cron.yearly/{name}",
+      "file-categories": [
+        "ppf-file"
+      ],
+      "debhelper-commands": [
+        "dh_installcron"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "cron.d",
+      "install-pattern": "etc/cron.d/{name}",
+      "file-categories": [
+        "ppf-file"
+      ],
+      "debhelper-commands": [
+        "dh_installcron"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "modprobe",
+      "install-pattern": "etc/modprobe.d/{name}.conf",
+      "file-categories": [
+        "ppf-file"
+      ],
+      "debhelper-commands": [
+        "dh_installmodules"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "ucf",
+      "file-categories": [
+        "pkg-helper-config"
+      ],
+      "config-features": [
+        "dh-filedoublearray",
+        "dh-file-list"
+      ],
+      "debhelper-commands": [
+        "dh_installmodules"
+      ]
+    },
+
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "ppp.ip-up",
+      "install-pattern": "etc/ppp/ip-up/{name}",
+      "file-categories": [
+        "ppf-file"
+      ],
+      "debhelper-commands": [
+        "dh_installppp"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "ppp.ip-down",
+      "install-pattern": "etc/ppp/ip-down/{name}",
+      "file-categories": [
+        "ppf-file"
+      ],
+      "debhelper-commands": [
+        "dh_installppp"
+      ]
+    },
+
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "logcheck.ignore.workstation",
+      "install-pattern": "etc/logcheck/ignore.d.workstation/{name}",
+      "post-formatting-rewrite": "period-to-underscore",
+      "file-categories": [
+        "ppf-file"
+      ],
+      "debhelper-commands": [
+        "dh_installlogcheck"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "logcheck.ignore.server",
+      "install-pattern": "etc/logcheck/ignore.d.server/{name}",
+      "post-formatting-rewrite": "period-to-underscore",
+      "file-categories": [
+        "ppf-file"
+      ],
+      "debhelper-commands": [
+        "dh_installlogcheck"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "logcheck.ignore.paranoid",
+      "install-pattern": "etc/logcheck/ignore.d.paranoid/{name}",
+      "post-formatting-rewrite": "period-to-underscore",
+      "file-categories": [
+        "ppf-file"
+      ],
+      "debhelper-commands": [
+        "dh_installlogcheck"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "logcheck.cracking",
+      "install-pattern": "etc/logcheck/cracking.d/{name}",
+      "post-formatting-rewrite": "period-to-underscore",
+      "file-categories": [
+        "ppf-file"
+      ],
+      "debhelper-commands": [
+        "dh_installlogcheck"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "logcheck.violations",
+      "install-pattern": "etc/logcheck/violations.d/{name}",
+      "post-formatting-rewrite": "period-to-underscore",
+      "file-categories": [
+        "ppf-file"
+      ],
+      "debhelper-commands": [
+        "dh_installlogcheck"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "logcheck.violations.ignore",
+      "install-pattern": "etc/logcheck/violations.ignore.d/{name}",
+      "post-formatting-rewrite": "period-to-underscore",
+      "file-categories": [
+        "ppf-file"
+      ],
+      "debhelper-commands": [
+        "dh_installlogcheck"
+      ]
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "copyright",
+      "install-pattern": "usr/share/doc/{owning_package}/copyright",
+      "file-categories": [
+        "ppf-file"
+      ],
+      "debhelper-commands": [
+        "dh_installdocs"
+      ],
+      "packageless-is-fallback-for-all-packages": true
+    },
+    {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "changelog",
+      "file-categories": [
+        "ppf-file"
+      ],
+      "debhelper-commands": [
+        "dh_installchangelogs"
+      ],
+      "packageless-is-fallback-for-all-packages": true
+    },
+        {
+      "detection-method": "dh.pkgfile",
+      "pkgfile": "NEWS",
+      "install-pattern": "usr/share/doc/{owning_package}/Debian.NEWS",
+      "file-categories": [
+        "ppf-file"
+      ],
+      "debhelper-commands": [
+        "dh_installchangelogs"
+      ],
+      "packageless-is-fallback-for-all-packages": true
+    }
+
+  ]
+}
