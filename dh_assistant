@@ -548,6 +548,13 @@ Typically names for these files are:
 
 However, there are more variants caused by B<--name> plus architecture specific suffixes.
 
+=item internal
+
+This key may exist and any value for it is not standardized. Use at own peril.
+
+It used for document certain specific implementation details such as bug compatibility and may change
+as the situation changes.
+
 =item commands
 
 This key will be a list with each element in it being an object with the following keys:
@@ -1142,6 +1149,7 @@ sub list_guessed_dh_config_files {
 
     my ($all_commands, $unloadables) = _all_sequence_commands(1, @addon_requests);
     my $pkg_files = {};
+    my $bug_950723;
     for my $command (@{$all_commands}) {
         my @annotations = _extract_annotations($command);
         next if not @annotations or $annotations[0] eq 'always-skip';
@@ -1151,6 +1159,9 @@ sub list_guessed_dh_config_files {
 			if ($annotation =~ m/^([a-zA-Z0-9-_]+)\((.*)\)$/) {
 				($type, $need) = ($1, $2);
 			}
+			if ($type eq 'internal') {
+				$bug_950723 = 1 if $need eq 'bug#950723';
+			}
             next if $type ne 'pkgfile' and $type ne 'pkgfile-logged';
             my $key = "pkgfile/${need}";
             my $existing = $pkg_files->{$key};
@@ -1159,13 +1170,17 @@ sub list_guessed_dh_config_files {
                     'command' => $command,
                 });
             } else {
-                $pkg_files->{$key} = {
+                $existing = {
                     'file-type' => 'pkgfile',
                     'pkgfile'   => $need,
                     'commands'  => [{
                         'command' => $command,
                     }],
-                }
+                };
+                $pkg_files->{$key} = $existing;
+            }
+            if ($bug_950723) {
+                $existing->{"internal"}{"bug#950723"} = JSON::PP::true;
             }
         }
     }
