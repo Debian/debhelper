@@ -123,8 +123,8 @@ on_pkgs_in_parallel {
 			my @dbgsym_options = (qw(
 					-UPre-Depends -URecommends -USuggests -UEnhances -UProvides -UEssential
 						-UConflicts -DPriority=optional -UHomepage -UImportant
-						-UBuilt-Using -DAuto-Built-Package=debug-symbols
-						-UProtected
+						-DAuto-Built-Package=debug-symbols
+						-UProtected -UBuilt-Using -UStatic-Built-Using
 					),
 				"-DPackage=${package}-dbgsym",
 				"-DDepends=${package} (= \${binary:Version})",
