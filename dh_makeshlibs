@@ -457,8 +457,10 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	}
 
 	require Dpkg::Arch;
+	require Dpkg::BuildFlags;
 	my $arch = Dpkg::Arch::get_host_arch();
-	if ($arch eq "i386" or Dpkg::Arch::debarch_to_cpubits($arch) != 32)
+	my $bf = Dpkg::BuildFlags->new();
+	if (Dpkg::Arch::debarch_to_cpubits($arch) != 32 or !bf->get_feature("abi", "time64"))
 	{
 		# Call isnative because it sets $dh{VERSION}
 		# as a side effect.
