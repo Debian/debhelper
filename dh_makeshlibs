@@ -455,7 +455,12 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	next if $t64_compat eq '' and $package !~ /^lib.*t64(?:-nss)?$/;
 	if ($t64_compat eq '') {
 		$t64_compat = $package;
-		$t64_compat =~ s/t64$//;
+		$t64_compat =~ s/t64//;
+		if ($t64_compat eq $package) {
+			error("Failed to derive a t64 compat name for ${package}. Please file a bug against debhelper or add"
+				  . ' the X-Time64-Compat header to d/control, in which you can provide the compat package name'
+				  . ' you want.');
+		}
 	}
 
 	require Dpkg::Arch;
