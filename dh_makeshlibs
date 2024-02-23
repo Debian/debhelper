@@ -465,7 +465,7 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 
 	require Dpkg::Arch;
 	require Dpkg::BuildFlags;
-	my $arch = Dpkg::Arch::get_host_arch();
+	my $arch = package_binary_arch($package);
 	my $bf = Dpkg::BuildFlags->new();
 	if (Dpkg::Arch::debarch_to_cpubits($arch) != 32 or !$bf->get_feature("abi", "time64")) {
 		addsubstvar($package, "t64:Provides", $t64_compat, '= ${binary:Version}');
