@@ -1,3 +1,30 @@
+debhelper (13.14) unstable; urgency=medium
+
+  [ Niels Thykier ]
+  * debhelper-documentation.json: The pam change happened in c14
+  * dh_assistant: Expose bug#950723 marker in
+    list-guessed-dh-config-files
+  * dh_installsystemduser: Add missing pkgfiles in DH NOOP promise
+  * debhelper-documentation.json: Add dh_installsystemd files
+  * debhelper-documentation.json: Add dh_installsystemduser files
+  * d/changelog: Fix typo in a previous entry
+  * dh_gencontrol: Avoid Static-Built-Using in -dbgsym packages
+    (Closes: #1062960)
+  * dh_makeshlibs: Improve handling of t64 transition support
+    - The presence of the `X-Time64-Compat` now unconditionally
+      trigger the `${t64:Provides}` substvar.
+    - Auto-detection is now extended to include t64-nss libraries
+      (The detection regex is now: `m/^lib.*t64(?:-nss)?$/`)
+    - The `${t64:Provides}` substvars now uses `${binary:Version}`
+      instead of trying to guess the version. This works better
+      for packages that manually set their own version via
+      dpkg-gencontrol's -v option.
+
+  [ Michael Hudson-Doyle ]
+  * check the dpkg "features" to decide whether to emit t64:Provides
+
+ -- Niels Thykier <niels@thykier.net>  Fri, 23 Feb 2024 08:40:03 +0000
+
 debhelper (13.13) unstable; urgency=medium
 
   * Add `debhelper-documentation` `debputy` plugin. This provides
