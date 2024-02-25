@@ -469,6 +469,11 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 	my $bf = Dpkg::BuildFlags->new();
 	if (Dpkg::Arch::debarch_to_cpubits($arch) != 32 or !$bf->get_feature("abi", "time64")) {
 		addsubstvar($package, "t64:Provides", $t64_compat, '= ${binary:Version}');
+	} else {
+		# Avoid a "unknown" substvar from dpkg-gencontrol.
+		my $ext = pkgext($package);
+		my $substvars = "debian/${ext}substvars";
+		ensure_substvars_are_present($substvars, 't64:Provides');
 	}
 }
 

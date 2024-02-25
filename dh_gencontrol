@@ -8,7 +8,6 @@ dh_gencontrol - generate and install control file
 
 use strict;
 use warnings;
-use Errno qw(ENOENT);
 use Debian::Debhelper::Dh_Lib;
 
 our $VERSION = DH_BUILTIN_VERSION;
@@ -56,32 +55,6 @@ init(options => {
 	"dpkg-gencontrol-params=s", => \$dh{U_PARAMS},
 });
 
-sub ensure_substvars_are_present {
-	my ($file, @substvars) = @_;
-	my (%vars, $fd);
-	return 1 if $dh{NO_ACT};
-	if (open($fd, '+<', $file)) {
-		while (my $line = <$fd>) {
-			my $k;
-			($k, undef) = split(m/=/, $line, 2);
-			$vars{$k} = 1 if $k;
-		}
-		# Fall-through and append the missing vars if any.
-	} else {
-		error("open(${file}) failed: $!") if $! != ENOENT;
-		open($fd, '>', $file) or error("open(${file}) failed: $!");
-	}
-
-	for my $var (@substvars) {
-		if (not exists($vars{$var})) {
-			verbose_print("echo ${var}= >> ${file}");
-			print ${fd} "${var}=\n";
-			$vars{$var} = 1;
-		}
-	}
-	close($fd) or error("close(${file}) failed: $!");
-	return 1;
-}
 
 on_pkgs_in_parallel {
 	foreach my $package (@_) {

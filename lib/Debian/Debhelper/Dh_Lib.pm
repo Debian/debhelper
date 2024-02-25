@@ -14,6 +14,7 @@ use utf8;
 # Debian#971362 comes around.
 no feature 'unicode_strings';
 
+use Errno qw(ENOENT);
 
 use constant {
 	# Lowest compat level supported
@@ -165,6 +166,7 @@ qw(
 	autotrigger
 	addsubstvar
 	delsubstvar
+	ensure_substvars_are_present
 
 	generated_file
 	restore_file_on_clean
@@ -1470,6 +1472,33 @@ sub addsubstvar {
 		return;
 	};
 	return _update_substvar($substvarfile, $update_logic, $insert_logic);
+}
+
+sub ensure_substvars_are_present {
+	my ($file, @substvars) = @_;
+	my (%vars, $fd);
+	return 1 if $dh{NO_ACT};
+	if (open($fd, '+<', $file)) {
+		while (my $line = <$fd>) {
+			my $k;
+			($k, undef) = split(m/=/, $line, 2);
+			$vars{$k} = 1 if $k;
+		}
+		# Fall-through and append the missing vars if any.
+	} else {
+		error("open(${file}) failed: $!") if $! != ENOENT;
+		open($fd, '>', $file) or error("open(${file}) failed: $!");
+	}
+
+	for my $var (@substvars) {
+		if (not exists($vars{$var})) {
+			verbose_print("echo ${var}= >> ${file}");
+			print ${fd} "${var}=\n";
+			$vars{$var} = 1;
+		}
+	}
+	close($fd) or error("close(${file}) failed: $!");
+	return 1;
 }
 
 sub _glob_expand_error_default_msg {
