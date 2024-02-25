@@ -496,10 +496,12 @@ bugfix within a compatibility level).
 
 Note that debhelper does not provide debhelper-compat for experimental or beta
 compatibility levels; packages experimenting with those compatibility levels
-should use F<debian/compat> (or, if only for selected commands, B<DH_COMPAT>).
+should put the compat level in the B<X-DH-Compat> field of the source stanza
+of the F<debian/control> file (or, if only for selected commands, the
+B<DH_COMPAT> environment variable).
 
-Prior versions of debhelper required specifying the compatibility level in the
-file F<debian/compat>, and current debhelper still supports this for backward
+Historically, debhelper required specifying the compatibility level in the
+file F<debian/compat>, and debhelper up to version 14 supports this for backward
 compatibility. To use this method, the F<debian/compat> file should contain
 the compatibility level as a single number, and no other content. If you
 specify the compatibility level by this method, your package will also need a
@@ -510,8 +512,8 @@ F<debian/control> has:
 
   Build-Depends: debhelper (>= #RECOMMENDED_COMPAT#~)
 
-Note that you must use either the build-dependency on debhelper-compat or
-the F<debian/compat> file. Whenever possible, the debhelper-compat
+Note that you must use exactly one method for specifying the default debhelper
+compat level of the package. Whenever possible, the debhelper-compat
 build-dependency is recommended.
 
 If needed be, the B<DH_COMPAT> environment variable can be used to override
@@ -698,8 +700,7 @@ Ignored if DH_VERBOSE is also set or B<-v> / B<--verbose> is passed.
 =item B<DH_COMPAT>
 
 Temporarily specifies what compatibility level debhelper should run at,
-overriding any value specified via Build-Depends on debhelper-compat or via the
-F<debian/compat> file.
+overriding the default compat level of the source package.
 
 =item B<DH_NO_ACT>
 

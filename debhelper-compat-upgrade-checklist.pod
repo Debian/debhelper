@@ -107,6 +107,16 @@ B<cmake --install>, respectively, instead of B<ninja install> and B<make install
 in the L<dh_auto_install(1)> call.  Any override of B<dh_auto_install> that
 passes extra parameters to the upstream build system should be reviewed.
 
+=item -
+
+The F<debian/compat> file is no longer accepted as a source for specifying the
+debhelper compat level. Put the compat level in the B<X-DH-Compat> field of
+the source stanza of F<debian/control>.
+
+Note to avoid breaking packages that already migrated to compat 14 immediately,
+while it was experimental this change is first enforced when compat 14 becomes
+stable.
+
 =back
 
 =item v13

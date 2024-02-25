@@ -95,6 +95,7 @@ sub run_dh_tool {
 }
 
 sub _prepare_test_root {
+	my ($a_valid_compat_level) = @_;
     my $dir = tempdir(CLEANUP => 1);
     if (not mkdir("$dir/debian", 0777)) {
         error("mkdir $dir/debian failed: $!")
@@ -107,7 +108,7 @@ sub _prepare_test_root {
             debian/changelog
         );
         for my $file (@files) {
-            copy_file($file, "${dir}/${file}");
+            copy_file($file, "${dir}/${file}") if -f $file;
         }
         if (@::TEST_DH_EXTRA_TEMPLATE_FILES) {
             my $test_dir = ($TEST_DIR //= dirname($0));
@@ -121,6 +122,12 @@ sub _prepare_test_root {
                 copy_file("${actual_dir}/${file}", "${dir}/${file}");
             }
         }
+		my $dctrl = "${dir}/debian/control";
+		my $placeholder = quotemeta('@DH_COMPAT_LEVEL@');
+		if ( -f $dctrl) {
+			system('sed', '-i', "s/${placeholder}/${a_valid_compat_level}/g", $dctrl) == 0
+				or error("sed -i s/${placeholder}/${a_valid_compat_level}/g ${dctrl} failed!?");
+		}
     }
     return $dir;
 }
@@ -135,7 +142,7 @@ sub each_compat_from_x_to_and_incl_y_subtest($$&) {
         if $high_compat > $highest;
     subtest '' => sub {
         # Keep $dir alive until the test is over
-        my $dir = _prepare_test_root;
+        my $dir = _prepare_test_root($high_compat);
         chdir($dir) or error("chdir($dir): $!");
         while ($compat <= $high_compat) {
             local $TEST_DH_COMPAT = $compat;

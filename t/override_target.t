@@ -8,7 +8,7 @@ plan(tests => 1);
 # dh's rules_explicit_target, which parses
 # slightly internal make output.
 system("mkdir -p t/tmp/debian");
-system("cp debian/control debian/compat debian/changelog t/tmp/debian");
+system("cp debian/control debian/changelog t/tmp/debian");
 open (OUT, ">", "t/tmp/debian/rules") || die "$!";
 my $binpath = $ENV{AUTOPKGTEST_TMP} ? '/usr/bin' : '../..';
 print OUT <<EOF;

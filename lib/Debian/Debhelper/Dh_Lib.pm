@@ -910,7 +910,7 @@ sub dirname {
 
 # Pass in a number, will return true iff the current compatibility level
 # is less than or equal to that number.
-my $compat_from_bd;
+my ($compat_from_bd, $compat_from_dctrl);
 {
 	my $check_pending_removals = get_buildoption('dherroron', '') eq 'obsolete-compat-levels' ? 1 : 0;
 	my $warned_compat = $ENV{DH_INTERNAL_TESTSUITE_SILENT_WARNINGS} ? 1 : 0;
@@ -922,6 +922,7 @@ my $compat_from_bd;
 	sub resetcompat {
 		undef $c;
 		undef $compat_from_bd;
+		undef $compat_from_dctrl;
 	}
 
 	sub _load_compat_info {
@@ -936,7 +937,6 @@ my $compat_from_bd;
 			close($compat_in);
 			if (! defined $l || ! length $l) {
 				error("debian/compat must contain a positive number (found an empty first line)");
-
 			}
 			else {
 				chomp $l;
@@ -946,23 +946,41 @@ my $compat_from_bd;
 				if ($new_compat !~ m/^\d+$/) {
 					error("debian/compat must contain a positive number (found: \"${new_compat}\")");
 				}
-				if (defined($compat_from_bd) and $compat_from_bd != -1) {
+				if ($compat_from_bd != -1 or $compat_from_dctrl != -1) {
 					warning("Please specify the debhelper compat level exactly once.");
 					warning(" * debian/compat requests compat ${new_compat}.");
-					warning(" * debian/control requests compat ${compat_from_bd} via \"debhelper-compat (= ${compat_from_bd})\"");
+					warning(" * debian/control requests compat ${compat_from_bd} via \"debhelper-compat (= ${compat_from_bd})\"")
+						if $compat_from_bd > -1;
+					warning(" * debian/control requests compat ${compat_from_dctrl} via \"X-DH-Compat: ${compat_from_dctrl}\"")
+						if $compat_from_dctrl > -1;
 					warning();
-					warning("Hint: If you just added a build-dependency on debhelper-compat, then please remember to remove debian/compat");
+					warning("Hint: If you just added a build-dependency on debhelper-compat, then please remember to remove debian/compat")
+						if $compat_from_bd > -1;
+					warning("Hint: If you just added a X-DH-Compat field, then please remember to remove debian/compat")
+						if $compat_from_dctrl > -1;
 					warning();
-					error("debhelper compat level specified both in debian/compat and via build-dependency on debhelper-compat");
+					error("debhelper compat level specified both in debian/compat and in debian/control");
 				}
 				$c = $new_compat;
+			}
+			if ($c >= 15 or (HIGHEST_STABLE_COMPAT_LEVEL//0) > 13) {
+				error("Sorry, debian/compat is no longer a supported source for the debhelper compat level."
+				 . " Please add a Build-Depends on `debhelper-compat (= C)` or add `X-DH-Compat: C` to the source stanza"
+				 . " of d/control and remove debian/compat.");
+			}
+			if ($c >= 13 and not $nowarn) {
+				warning("Use of debian/compat is deprecated and will be removed in debhelper (>= 14~).")
 			}
 			$delared_compat_source = 'debian/compat';
 		} elsif ($compat_from_bd != -1) {
 			$c = $compat_from_bd;
 			$delared_compat_source = "Build-Depends: debhelper-compat (= $c)";
+		} elsif ($compat_from_dctrl != -1) {
+			$c = $compat_from_dctrl;
+			$delared_compat_source = "X-DH-Comat: $c";
 		} elsif (not $nowarn) {
-			error("Please specify the compatibility level in debian/compat or via Build-Depends: debhelper-compat (= X)");
+			# d/compat deliberately omitted since we do not want to recommend users to it.
+			error("Please specify the compatibility level in debian/control. Such as, via Build-Depends: debhelper-compat (= X)");
 		}
 
 		$declared_compat = int($c);
@@ -1867,6 +1885,9 @@ sub _parse_debian_control {
 			# Continuation line
 			s/^\s[.]?//;
 			push(@{$bd_field_value}, $_) if $bd_field_value;
+			error('X-DH-Compat should not need to span multiple lines')
+				if ($field_name and $field_name eq 'x-dh-compat');
+
 			# Ensure it is not completely empty or the code below will assume the paragraph ended
 			$_ = '.' if not $_;
 		} elsif (not $_ and not %seen_fields) {
@@ -1901,11 +1922,15 @@ sub _parse_debian_control {
 			} elsif ($field_name =~ /^(?:build-depends(?:-arch|-indep)?)$/) {
 				$bd_field_value = [$value];
 				$bd_fields{$field_name} = $bd_field_value;
+			} elsif ($field_name eq 'x-dh-compat') {
+				error('The X-DH-Compat field must contain a single integer') if ($value !~ m/^\d+$/);
+				$compat_from_dctrl = int($value);
 			}
 		}
 		last if not $_ or eof;
 	}
 	error("could not find Source: line in control file.") if not defined($sourcepackage);
+	$compat_from_dctrl //= -1;
 	if (%bd_fields) {
 		my ($dh_compat_bd, $final_level);
 		my %field2addon_type = (
@@ -1979,6 +2004,12 @@ sub _parse_debian_control {
 	} else {
 		$compat_from_bd = -1;
 	}
+
+	error(
+		'The X-DH-Compat field cannot be used together with a Build-Dependency on debhelper-compat.'
+			. ' Please remove one of the two.'
+	) if ($compat_from_bd > -1 and $compat_from_dctrl > -1);
+
 
 	%seen_fields = ();
 	$field_name = undef;

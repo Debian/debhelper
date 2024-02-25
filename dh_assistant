@@ -62,13 +62,21 @@ B<declared-compat-level>) or one of:
 
 The compatibility level was declared in the first line F<debian/compat> file.
 
+=item X-DH-Compat: <C>
+
+The compatibility was declared in the F<debian/control> via a the B<X-DH-Compat>
+field. In the output, the B<C> is replaced by the actual compatibility level.
+A full example value would be:
+
+   X-DH-Compat: 15
+
 =item Build-Depends: debhelper-compat (= <C>)
 
 The compatibility was declared in the F<debian/control> via a build dependency on the
 B<< debhelper-compat (= <C>) >> package in the B<Build-Depends> field.  In the output,
 the B<C> is replaced by the actual compatibility level.  A full example value would be:
 
-   Build-Depends: debhelper-compat (= 13)
+   Build-Depends: debhelper-compat (= 15)
 
 =back
 
