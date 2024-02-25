@@ -18,8 +18,9 @@ debhelper (13.14) unstable; urgency=medium
   * dh_gencontrol: Avoid Static-Built-Using in -dbgsym packages
     (Closes: #1062960)
   * dh_makeshlibs: Improve handling of t64 transition support
-    - The presence of the `X-Time64-Compat` now unconditionally
-      trigger the `${t64:Provides}` substvar.
+    - The presence of the `X-Time64-Compat` now ensures that the
+      `${t64:Provides}` substvar is always considered regardless
+      of the package name.
     - Auto-detection is now extended to include t64-nss libraries
       (The detection regex is now: `m/^lib.*t64(?:-nss)?$/`)
     - The `${t64:Provides}` substvars now uses `${binary:Version}`
