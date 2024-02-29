@@ -251,6 +251,8 @@ if (@{$dh{DOPACKAGES}} > 1 and $dh{DOC_MAIN_PACKAGE}) {
 if ($dh{DOC_MAIN_PACKAGE}) {
 	assert_opt_is_known_package($dh{DOC_MAIN_PACKAGE}, '--doc-main-package');
 }
+assert_opt_is_known_package($dh{LINK_DOC}, '--link-doc') if ($dh{LINK_DOC});
+
 
 # INTROSPECTABLE: CONFIG-FILES pkgfile(docs) pkgfile(copyright) pkgfile(TODO) pkgfile(README.Debian)
 

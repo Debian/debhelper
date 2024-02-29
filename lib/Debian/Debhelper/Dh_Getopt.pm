@@ -59,7 +59,9 @@ sub AddPackage { my($option,$value)=@_;
 }
 
 # Sets a package as the debug package.
-sub SetDebugPackage { my($option,$value)=@_;
+sub SetDebugPackage {
+	my ($option, $value) = @_;
+	assert_opt_is_known_package($value, '--dbg-package');
 	$dh{DEBUGPACKAGE} = $value;
 	# For backwards compatibility
 	$dh{DEBUGPACKAGES} = [$value];
