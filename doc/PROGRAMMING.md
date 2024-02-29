@@ -366,6 +366,9 @@ The following keys are also set in the `%dh` hash when you call `init()`:
   which the `$file` is/was in, must be present when `dh_clean` is
   called.
 
+  Note: This feature is also accessible via `dh_assistant restore-file-on-clean`
+  since debhelper/13.12
+
 - `make_symlink($src, $dest, $tmp)`
 
   Creates a Policy compliant system link called `$dest` pointing to
