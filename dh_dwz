@@ -88,8 +88,20 @@ init(options => {
 
 # This variable can be used to turn off stripping (see Policy).
 exit 0 if get_buildoption('nostrip');
+if (not has_tool('dwz')) {
+    warning("Assuming bootstrap scenario and skipping regular dh_dwz feature, since dwz is not in PATH!");
+    exit 0;
+}
 
 my @elf_files;
+
+sub has_tool {
+	my ($cmd) = @_;
+	for my $p (split(m/:/, $ENV{PATH})) {
+		return 1 if -f -x "${p}/${cmd}";
+	}
+	return 0;
+}
 
 sub testfile {
 	my $fn = $_;
