@@ -55,6 +55,13 @@ init(options => {
 	"dpkg-gencontrol-params=s", => \$dh{U_PARAMS},
 });
 
+if (not compat(13)) {
+	# Load once early, so each child does not have to load these again (they are expensive
+	# compared to Debian::Debhelper::Dh_Lib).
+	require Dpkg::Control;
+	require Dpkg::Control::Fields;
+}
+
 
 on_pkgs_in_parallel {
 	foreach my $package (@_) {
@@ -73,9 +80,10 @@ on_pkgs_in_parallel {
 		install_dir("$tmp/DEBIAN");
 
 		# avoid gratuitous warnings
-		ensure_substvars_are_present($substvars, 'misc:Depends', 'misc:Pre-Depends');
+		ensure_substvars_are_present($substvars, 'misc:Depends', 'misc:Pre-Depends')
+			if not compat(14);
 
-		my (@debug_info_params, $build_ids, @multiarch_params);
+		my (@debug_info_params, $build_ids, @pkg_gencontrol_args);
 		if ( -d $dbgsym_info_dir ) {
 			$build_ids = read_dbgsym_build_ids($dbgsym_info_dir);
 		}
@@ -123,7 +131,7 @@ on_pkgs_in_parallel {
 				push(@dbgsym_options, '-UReplaces', '-UBreaks');
 			}
 			install_dir("${dbgsym_tmp}/DEBIAN");
-			doit("dpkg-gencontrol", "-p${package}", "-l$changelog", "-T$substvars",
+			doit("dpkg-gencontrol", "-p${package}", "-l$changelog", "-T/dev/null",
 				"-P${dbgsym_tmp}",@{$dh{U_PARAMS}}, @dbgsym_options);
 
 			reset_perm_and_owner(0644, "${dbgsym_tmp}/DEBIAN/control");
@@ -134,14 +142,31 @@ on_pkgs_in_parallel {
 			push(@debug_info_params, "-DBuild-Ids=${build_ids}");
 		}
 
-		# Remove explicit "Multi-Arch: no" headers to avoid autorejects by dak.
-		push (@multiarch_params, '-UMulti-Arch')
+		# Remove explicit "Multi-Arch: no" headers to avoid auto-rejects by dak.
+		push (@pkg_gencontrol_args, '-UMulti-Arch')
 			if (package_multiarch($package) eq 'no');
+		my $dctrl;
+		$dctrl = Debian::Debhelper::Dh_Lib::dh_gencontrol_automatic_substvars($package, $substvars)
+			if not compat(13);
+		$dctrl //= 'debian/control';
 
 		# Generate and install control file.
-		doit("dpkg-gencontrol", "-p$package", "-l$changelog", "-T$substvars",
-			"-P$tmp", @debug_info_params, @multiarch_params,
-			@{$dh{U_PARAMS}});
+		eval {
+			doit("dpkg-gencontrol", "-p$package", "-l$changelog", "-T$substvars",
+			    "-c${dctrl}", "-P$tmp", @debug_info_params, @pkg_gencontrol_args,
+			    @{$dh{U_PARAMS}});
+		};
+		if (my $err = "$@") {
+			if ($dctrl ne 'debian/control') {
+				warning('The dpkg-control command failed. Here is the content of the rewritten d/control file');
+				warning(' used to add relationship substvars for you (in case that is part of the problem).');
+				print(" --- Content of $dctrl\n");
+				system('cat', $dctrl);
+				print(" --- End of content for $dctrl\n");
+			}
+			error($err);
+		}
+
 
 		# This chmod is only necessary if the user sets the umask to
 		# something odd.

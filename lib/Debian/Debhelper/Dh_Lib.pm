@@ -3189,6 +3189,67 @@ sub assert_opt_is_known_package {
 }
 
 
+sub dh_gencontrol_automatic_substvars {
+	my ($package, $substvars_file) = @_;
+	return if not -f $substvars_file;
+
+	require Dpkg::Control;
+	require Dpkg::Control::Fields;
+	open(my $sfd, '+<', $substvars_file) or error("open $substvars_file: $!");
+	my @dep_fields = Dpkg::Control::Fields::field_list_pkg_dep();
+	my %known_dep_fields = map { lc($_) => 1 } @dep_fields;
+	my (%field_vars);
+	while (my $line = <$sfd>) {
+		next if $line =~ m{^\s*(?:[#].*)?$};
+		chomp($line);
+		# Ignore `$=` because they will work without us doing anything (which in turn means
+		# we might not have to rewrite the file).
+		next if $line !~ m{(\w[-:0-9A-Za-z]*)(?:[?!])?\=(?:.*)};
+		my $key = $1;
+		next if ($key !~ m/:([-0-9A-Za-z]+)$/);
+		my $field_name_lc = lc($1);
+		next if not exists($known_dep_fields{$field_name_lc});
+		my $substvar = '${' . $key . '}';
+		push(@{$field_vars{$field_name_lc}}, $substvar);
+	}
+	close($sfd);
+	return if not %field_vars;
+
+	open(my $ocfd, '<', 'debian/control') or error("open debian/control: $!");
+	my $src_stanza = Dpkg::Control->new;
+	my $pkg_stanza;
+	$src_stanza->parse($ocfd, 'debian/control') or error("No source stanza!?");
+	while (1) {
+		$pkg_stanza = Dpkg::Control->new;
+		$pkg_stanza->parse($ocfd, 'debian/control') // error("EOF before the ${package} stanza appeared!?");
+		last if $pkg_stanza->{'Package'} eq $package;
+	}
+	close($ocfd);
+
+	my $rewritten_dctrl = generated_file($package, "rewritten-dctrl");
+	for my $field_name (@dep_fields) {
+		my $field_name_lc = lc($field_name);
+		# No merging required
+		next if not exists($field_vars{$field_name_lc});
+		my $field_value = $pkg_stanza->{$field_name};
+		my $merge_value = join(", ", @{$field_vars{$field_name_lc}});
+		if (defined($field_value) and $field_value !~ m{^\s*+$}) {
+			$field_value .= ", ";
+			$field_value .= $merge_value;
+		} else {
+			$field_value = $merge_value;
+		}
+		$pkg_stanza->{$field_name} = $merge_value;
+	}
+	open(my $wfd, '>', $rewritten_dctrl) or error("open ${rewritten_dctrl}: $!");
+	$src_stanza->output($wfd);
+	print {$wfd} "\n";
+	$pkg_stanza->output($wfd);
+	close($wfd) or error("Failed to close/flush ${rewritten_dctrl}: $!");
+	return $rewritten_dctrl;
+}
+
+
 sub _internal_optional_file_args {
 	state $_disable_file_seccomp;
 	if (not defined($_disable_file_seccomp)) {

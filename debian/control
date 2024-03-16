@@ -36,8 +36,6 @@ Depends: autotools-dev,
          libdpkg-perl (>= 1.17.14),
          man-db <!pkg.debhelper.bootstrap>,
          po-debconf,
-         ${misc:Depends},
-         ${perl:Depends},
 Breaks:
 # To ensure cmake understands -DCMAKE_INSTALL_RUNSTATEDIR=/run as used in compat 11
 # - Can be dropped (with the caveat that cmake packages may behave differently
@@ -72,8 +70,6 @@ Description: helper programs for debian/rules
 Package: libdebhelper-perl
 Section: perl
 Architecture: all
-Depends: ${misc:Depends},
-         ${perl:Depends},
 Replaces: debhelper (<< 12.6~),
 Breaks: debhelper (<< 12.6~),
 Multi-Arch: foreign

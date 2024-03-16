@@ -119,8 +119,58 @@ stable.
 
 =item -
 
+The B<dh_control> tool now automatically applies relationship substvars to
+relevant fields. That means that many substvars such as B<${misc:Depends}>
+and B<${misc:Depends}> no longer need to be explicitly mentioned in
+F<debian/control>. This applies to any substvar named after a field that
+the installed version of B<dpkg> considers a relation or dependency-like
+field. At the time of writing, the list consists of:
+
+=over 4
+
+=item Pre-Depends
+
+=item Depends
+
+=item Recommends
+
+=item Suggests
+
+=item Enhances
+
+=item Conflicts
+
+=item Breaks
+
+=item Replaces
+
+=item Provides
+
+=item Built-Using
+
+=item Static-Built-Using
+
+=back
+
+Note that other substvars such as B<${binary:Version}> are unaffected by
+this change and should still be used explicitly as necessary. Additionally,
+for B<Essential: yes> packages that manually promoted B<${shlibs:Depends}>
+into B<Pre-Depends> field, B<dh_shlibdeps> will handle this automatically
+as well (see the next compat item).
+
+See L<https://lists.debian.org/debian-devel/2024/02/msg00230.html> for the
+details of this proposal. The summary in
+L<https://lists.debian.org/debian-devel/2024/03/msg00030.html> also covers
+when the substvars need tweaking.  The most common case involves using
+the B<-d> option from B<dpkg-shlibdeps> possibly via B<dh_shlibdeps>.
+
+=item -
+
 The B<dh_shlibdeps> tool now defaults to using B<${shlibs:Pre-Depends}> for
 packages that are B<Essential: yes>.
+
+Note due to the B<dh_gencontrol> change above, any package using B<dh_gencontrol>
+will not have to do anything for this migration.
 
 =back
 
