@@ -355,12 +355,18 @@ B<dh_install> cannot rename files or directories, it can only install them
 with the names they already have into wherever you want in the package
 build tree.
 
-However, renaming can be achieved by using B<dh-exec> with compatibility level 9 or
-later.  An example debian/I<package>.install file using B<dh-exec>
-could look like:
+There is also no way to filter out results based on build profiles or
+architecture. For documentation content, consider using B<dh_installdocs> or
+B<dh_installexamples> as those helpers account for the B<nodoc> build
+profile.
+
+However, renaming and filtering can be achieved by using B<dh-exec>
+with compatibility level 9 or later.  An example debian/I<package>.install
+file using B<dh-exec> could look like:
 
  #!/usr/bin/dh-exec
  debian/default.conf => /etc/my-package/start.conf
+ build/foo /usr/bin <!pkg.bar.nofoo>
 
 Please remember the following three things:
 
@@ -373,7 +379,7 @@ Please remember the following three things:
 =item * The install file must be marked as executable.
 
 =back
-  
+
 =head1 SEE ALSO
 
 L<debhelper(7)>

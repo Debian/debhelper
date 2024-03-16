@@ -226,6 +226,17 @@ with an error if the text contains many substitution variables (50) or
 they expand beyond a certain size (4096 characters or 3x length of
 the original input - whichever is bigger).
 
+=head3 Substitution limitations: filtering
+
+The built-in substitution cannot be used to "filter" out content. Attempts
+to create "comments" or "empty lines" via substitution will result in those
+variables being considered a token in its own right with the content given.
+
+If you want filtering, consider using an executable debhelper config file
+with B<dh-exec> as interpreter. The B<dh-exec> tool supports several
+features out of the box. Though keep in mind that B<dh-exec> has its own
+substitution logic that can feature interact with the one from debhelper.
+
 =head2 Executable debhelper config files
 
 If you need additional flexibility, many of the debhelper tools
@@ -254,11 +265,13 @@ code should indicate success).
 In compatibility level 13+, the output will be subject to substitutions
 (see L</Substitutions in debhelper config files>) where the tool
 support these.  Remember to be careful if your generator I<also> provides
-substitutions as this can cause unnecessary confusion.
+substitutions as this can cause unnecessary confusion. Notably, the
+commonly used B<dh-exec> tool has its own substitution support.
 
 Otherwise, the output will be used exactly as-is.  Notably, debhelper
 will I<not> expand wildcards or strip comments or strip whitespace
-in the output.
+in the output it reads. The B<dh-exec> tool has an output filter on
+by default that will prune these things out.
 
 =back
 
