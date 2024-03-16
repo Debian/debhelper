@@ -123,9 +123,11 @@ qw(
 	package_binary_arch
 	package_declared_arch
 	package_multiarch
+	package_is_essential
 	package_section
 	package_arch
 	package_type
+	package_field
 	process_pkg
 	compute_doc_main_package
 	isnative
@@ -1819,16 +1821,12 @@ sub samearch {
 #
 # As a side effect, populates %package_arches and %package_types
 # with the types of all packages (not only those returned).
-my (%package_types, %package_arches, %package_multiarches, %packages_by_type,
-    %package_sections, $sourcepackage, %package_cross_type,
-    %package_t64_compat, %dh_bd_sequences);
+my (%packages_by_type, $sourcepackage, %dh_bd_sequences, %package_fields);
 
 # Resets the arrays; used mostly for testing
 sub resetpackages {
 	undef $sourcepackage;
-	%package_types = %package_arches = %package_multiarches =
-	    %packages_by_type = %package_sections = %package_cross_type = 
-	    %package_t64_compat = ();
+	%package_fields = %packages_by_type = ();
 	%dh_bd_sequences = ();
 }
 
@@ -2091,12 +2089,14 @@ sub _parse_debian_control {
 					error("Unknown value of X-DH-Build-For-Type \"$cross_type\" for package $package");
 				}
 
-				$package_types{$package} = _strip_spaces($field_values{'package-type'} // 'deb');
-				$package_arches{$package} = $arch;
-				$package_multiarches{$package} = _strip_spaces($field_values{'multi-arch'} // '');
-				$package_sections{$package} = _strip_spaces($field_values{'section'} // $source_section);
-				$package_cross_type{$package} = $cross_type;
-				$package_t64_compat{$package} = _strip_spaces($field_values{'x-time64-compat'} // '');
+				$field_values{'package-type'} = _strip_spaces($field_values{'package-type'} // 'deb');
+				$field_values{'architecture'} = $arch;
+				$field_values{'multi-arch'} = _strip_spaces($field_values{'multi-arch'} // '');
+				$field_values{'section'} = _strip_spaces($field_values{'section'} // $source_section);
+				$field_values{'x-dh-build-for-type'} = $cross_type;
+				$field_values{'x-time64-compat'} = _strip_spaces($field_values{'x-time64-compat'} // '');
+				my %fields = %field_values;
+				$package_fields{$package} = \%fields;
 				push(@{$packages_by_type{'all-listed-in-control-file'}}, $package);
 
 				if (defined($build_profiles)) {
@@ -2195,11 +2195,11 @@ sub package_arch {
 sub package_binary_arch {
 	my $package=shift;
 
-	if (! exists $package_arches{$package}) {
+	if (! exists($package_fields{$package})) {
 		warning "package $package is not in control info";
 		return hostarch();
 	}
-	return 'all' if $package_arches{$package} eq 'all';
+	return 'all' if $package_fields{$package}{'architecture'} eq 'all';
 	return dpkg_architecture_value('DEB_TARGET_ARCH') if package_cross_type($package) eq 'target';
 	return hostarch();
 }
@@ -2208,22 +2208,22 @@ sub package_binary_arch {
 sub package_declared_arch {
 	my $package=shift;
 
-	if (! exists $package_arches{$package}) {
+	if (! exists($package_fields{$package})) {
 		warning "package $package is not in control info";
 		return hostarch();
 	}
-	return $package_arches{$package};
+	return $package_fields{$package}{'architecture'};
 }
 
 # Returns whether the package specified Architecture: all
 sub package_is_arch_all {
 	my $package=shift;
 
-	if (! exists $package_arches{$package}) {
+	if (! exists($package_fields{$package})) {
 		warning "package $package is not in control info";
 		return hostarch();
 	}
-	return $package_arches{$package} eq 'all';
+	return $package_fields{$package}{'architecture'} eq 'all';
 }
 
 # Returns the multiarch value of a package.
@@ -2232,13 +2232,38 @@ sub package_multiarch {
 
 	# Test the architecture field instead, as it is common for a
 	# package to not have a multi-arch value.
-	if (! exists $package_arches{$package}) {
+	if (! exists($package_fields{$package})) {
 		warning "package $package is not in control info";
 		# The only sane default
 		return 'no';
 	}
-	return $package_multiarches{$package} // 'no';
+	return $package_fields{$package}{'multi-arch'} // 'no';
 }
+
+sub package_is_essential {
+	my ($package) = @_;
+
+	# Test the architecture field instead, as it is common for a
+	# package to not have a multi-arch value.
+	if (! exists($package_fields{$package})) {
+		warning "package $package is not in control info";
+		# The only sane default
+		return 0;
+	}
+	my $essential = $package_fields{$package}{'essential'} // 'no';
+	return $essential eq 'yes';
+}
+
+sub package_field {
+	my ($package, $field, $default_value) = @_;
+		if (! exists($package_fields{$package})) {
+		warning "package $package is not in control info";
+		return $default_value;
+	}
+	return $package_fields{$package}{$field} if exists($package_fields{$package}{$field});
+	return $default_value;
+}
+
 
 # Returns the (raw) section value of a package (possibly including component).
 sub package_section {
@@ -2246,11 +2271,11 @@ sub package_section {
 
 	# Test the architecture field instead, as it is common for a
 	# package to not have a multi-arch value.
-	if (! exists $package_sections{$package}) {
+	if (! exists($package_fields{$package})) {
 		warning "package $package is not in control info";
 		return 'unknown';
 	}
-	return $package_sections{$package} // 'unknown';
+	return $package_fields{$package}{'section'} // 'unknown';
 }
 
 sub package_cross_type {
@@ -2258,31 +2283,31 @@ sub package_cross_type {
 
 	# Test the architecture field instead, as it is common for a
 	# package to not have a multi-arch value.
-	if (! exists $package_cross_type{$package}) {
+	if (! exists($package_fields{$package})) {
 		warning "package $package is not in control info";
 		return 'host';
 	}
-	return $package_cross_type{$package} // 'host';
+	return $package_fields{$package}{'x-dh-build-for-type'} // 'host';
 }
 
 sub package_type {
 	my ($package) = @_;
 
-	if (! exists $package_types{$package}) {
+	if (! exists($package_fields{$package})) {
 		warning "package $package is not in control info";
 		return DEFAULT_PACKAGE_TYPE;
 	}
-	return $package_types{$package};
+	return $package_fields{$package}{'package-type'};
 }
 
 sub t64_compat_name {
 	my ($package) = @_;
 
-	if (! exists $package_t64_compat{$package}) {
+	if (! exists($package_fields{$package})) {
 		warning "package $package is not in control info";
 		return '';
 	}
-	return $package_t64_compat{$package};
+	return $package_fields{$package}{'x-time64-compat'};
 }
 
 # Return true if a given package is really a udeb.
@@ -3117,11 +3142,11 @@ sub compute_doc_main_package {
 	# under its own package name.
 	return $doc_package if $target_package !~ s/-doc$//;
 	# FOO-doc hosts the docs for FOO; seems reasonable
-	return $target_package if exists($package_types{$target_package});
+	return $target_package if exists($package_fields{$target_package});
 	if ($doc_package =~ m/^lib./) {
 		# Special case, "libFOO-doc" can host docs for "libFOO-dev"
 		my $lib_dev = "${target_package}-dev";
-		return $lib_dev if exists($package_types{$lib_dev});
+		return $lib_dev if exists($package_fields{$lib_dev});
 		# Technically, we could go look for a libFOO<something>-dev,
 		# but atm. it is presumed to be that much of a corner case
 		# that it warrents an override.

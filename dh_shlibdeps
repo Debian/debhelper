@@ -184,7 +184,7 @@ on_pkgs_in_parallel {
 			if (defined($dh{LIBPACKAGE})) {
 				@opts = map { '-S' . tmpdir($_) } @{$dh{LIBPACKAGE}};
 			}
-
+			push(@opts, '-dPre-Depends') if not compat(14) and package_is_essential($package);
 			push @opts, "-tudeb" if is_udeb($package);
 
 			if ($dh{L_PARAMS}) {
