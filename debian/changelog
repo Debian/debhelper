@@ -1,6 +1,6 @@
-debhelper (13.14.2~1.gbp5b96b1) UNRELEASED; urgency=medium
+debhelper (13.14.2~2.gbpd44c98) UNRELEASED; urgency=medium
 
-  ** SNAPSHOT build @5b96b19b456fe5e094f2870327a753b4b3ece0dc **
+  ** SNAPSHOT build @d44c984b1dcb68cb545eee53af642226ba569885 **
 
   * d/changelog: Fix typo of Felix Geyer
   * dh_makeshlibs: Ensure t64:Provides is always provided (but
@@ -10,9 +10,39 @@ debhelper (13.14.2~1.gbp5b96b1) UNRELEASED; urgency=medium
   * Validate ensure values to --dbg-package and --link-doc are
     known packages
   * PROGRAMMING.md: Add a note about `dh_assistant`
-  * Make it easier to re-bootstrap without `dwz`
+  * Make it easier to re-bootstrap without `dwz` (and also `man-db`).
+    This is a new build profile that build `debhelper` with fewer
+    dependencies. Note that this profile causes `debhelper` to produce
+    a different result in some cases. Packages built with this minimal
+    version of debhelper should be rebuilt when bootstrapping is
+    complete.
+  * dh_shlibdeps: Use ${shlibs:Pre-Depends} for Essential packages
+    in compat 14+.
+  * dh_gencontrol: Automatically apply relationship substvars in
+    compat 14+
+  * Clearly document how to do filtering (which is via dh-exec)
+    (Closes: #1065742)
+  * Reject debhelper config files without a package prefix for
+    multi-binary packages in compat 15. Starting in compat 14, it will
+    now trigger a warning to have `debian/install` instead of
+    `debian/package.install` when `debian/control` contains 2 or more
+    binary packages. In compat 15, this is promoted to an error.  The
+    main exceptions are files like `debian/changelog`, `debian/NEWS`,
+    and `debian/copyright`, which are applied to all packages and can
+    still be used without a prefix. (Closes: #1014537)
+  * cmake.pm: Pass ASFLAGS as ASMFLAGS to cmake [c14] (Closes: #1036760)
+  * meson.pm: Pass --auto-features=auto in compat 14+
+    (Closes: #1030011, #1062508)
+  * Dh_Lib.pm: Simplify reset_perm_and_owner so it only works with int
+    now. The only misbehaving call-sites where in debhelper itself
+    according to codesearch.debian.net and were fixed as well.
+  * Dh_Lib.pm: Bump perl version requirement to 5.28 (Closes: #1001403)
+  * dh_makeshlibs: Skip directories known not to contain SONAMEs
+    (Closes: #1063126)
+  * Restructure debhelper upgrade compat checklist for compat 14 in an
+    attempt to make it easier for consumers.
 
- -- Niels Thykier <niels@thykier.net>  Tue, 05 Mar 2024 15:06:32 +0100
+ -- Niels Thykier <niels@thykier.net>  Sun, 17 Mar 2024 10:41:32 +0100
 
 debhelper (13.14.1) unstable; urgency=medium
 
