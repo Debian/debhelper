@@ -736,23 +736,14 @@ sub rename_path {
 
 sub reset_perm_and_owner {
 	my ($mode, @paths) = @_;
-	my $_mode;
 	my $use_root = should_use_root();
-	# Dark goat blood to tell 0755 from "0755"
-	if (length( do { no warnings "numeric"; $mode & "" } ) ) {
-		# 0755, leave it alone.
-		$_mode = $mode;
-	} else {
-		# "0755" -> convert to 0755
-		$_mode = oct($mode);
-	}
 	if ($dh{VERBOSE}) {
-		verbose_print(sprintf('chmod %#o -- %s', $_mode, escape_shell(@paths)));
+		verbose_print(sprintf('chmod %#o -- %s', $mode, escape_shell(@paths)));
 		verbose_print(sprintf('chown 0:0 -- %s', escape_shell(@paths))) if $use_root;
 	}
 	return if $dh{NO_ACT};
 	for my $path (@paths) {
-		chmod($_mode, $path) or error(sprintf('chmod(%#o, %s): %s', $mode, $path, $!));
+		chmod($mode, $path) or error(sprintf('chmod(%#o, %s): %s', $mode, $path, $!));
 		if ($use_root) {
 			chown(0, 0, $path) or error("chown(0, 0, $path): $!");
 		}
@@ -2434,7 +2425,7 @@ sub debhelper_script_subst {
 			close($in_fd);
 			close($out_fd) or error("close($tmp/DEBIAN/$script) failed: $!");
 		}
-		reset_perm_and_owner('0755', "$tmp/DEBIAN/$script");
+		reset_perm_and_owner(0755, "$tmp/DEBIAN/$script");
 	}
 	elsif (@generated_scripts) {
 		if ($dh{VERBOSE}) {
@@ -2455,7 +2446,7 @@ sub debhelper_script_subst {
 			}
 			close($out_fd) or error("close($tmp/DEBIAN/$script) failed: $!");
 		}
-		reset_perm_and_owner('0755', "$tmp/DEBIAN/$script");
+		reset_perm_and_owner(0755, "$tmp/DEBIAN/$script");
 	}
 }
 
