@@ -140,6 +140,7 @@ sub configure {
 		$ENV{CFLAGS}   .= ' ' . $ENV{CPPFLAGS};
 		$ENV{CXXFLAGS} .= ' ' . $ENV{CPPFLAGS};
 	}
+	$ENV{ASMFLAGS} = $ENV{ASFLAGS} if exists($ENV{ASFLAGS}) and not exists($ENV{ASMFLAGS}) and not compat(13);
 
 	if (get_buildoption("nocheck")) {
 		push(@flags, "-DBUILD_TESTING:BOOL=OFF");
