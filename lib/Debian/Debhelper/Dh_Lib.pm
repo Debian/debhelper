@@ -6,7 +6,7 @@
 
 package Debian::Debhelper::Dh_Lib;
 
-use v5.24;
+use v5.28;
 use warnings;
 use utf8;
 
