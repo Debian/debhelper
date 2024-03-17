@@ -224,6 +224,19 @@ sub _all_so_files {
 	return if not -d $root_dir;
 	my (@all_so_files, @so_file_data);
 	my $objdump = cross_command($package, "objdump");
+	my $ma = package_multiarch($package);
+	my $ma_quoted = quotemeta($ma);
+	my $skip_dir_parent = qr{
+		/usr/lib(?:/${ma_quoted})?/?$
+	}x;
+	# Maybe this should be an allow list instead (#204975)
+	my $skip_dir_basename = qr{
+		  jni
+		| python(?:\d+[.][^/]++)?
+		| perl(?:5|-base)?
+		| ruby(?:gems-integration)?
+	}x;
+
 	require File::Find;
 	File::Find::find(sub {
 		# Lazy loading of File::Find makes perl think that File::Find::dir is only used once
@@ -231,6 +244,10 @@ sub _all_so_files {
 		no warnings qw(once);
 		# Only real/regular files
 		-l && return;
+		if ( -d and $File::Find::dir =~ $skip_dir_parent and $_ =~ $skip_dir_basename) {
+			$File::Find::prune = 1;
+			return;
+		}
 		-f _ || return;
 		my $path = "$File::Find::dir/$_";
 		return if excludefile($path);
