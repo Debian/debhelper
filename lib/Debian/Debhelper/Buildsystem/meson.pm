@@ -82,6 +82,7 @@ sub configure {
 	# default. We can only use this option to turn it off in versions
 	# where the option exists.
 	push(@opts, "-Dpython.bytecompile=-1") if $version >= '1.2.0';
+	push(@opts, '--auto-features=auto') if not compat(13);
 
 	if (is_cross_compiling()) {
 		# http://mesonbuild.com/Cross-compilation.html
