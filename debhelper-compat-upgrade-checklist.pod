@@ -173,6 +173,10 @@ Static-Built-Using
 
 =back
 
+This means that B<Depends: foo, ${misc:Depends}> in F<debian/control> can
+now be reduced to B<Depends: foo> and B<Depends: ${misc:Depends}, ${shlibs:Depends}>
+can be removed entirely as examples of how the feature works.
+
 Note that other substvars such as B<${binary:Version}> are unaffected by
 this change and should still be used explicitly as necessary. Additionally,
 for B<Essential: yes> packages that manually promoted B<${shlibs:Depends}>
@@ -203,10 +207,10 @@ F<debian/control>.
 
 The primary exception to this change are files such as F<debian/changelog>,
 F<debian/NEWS>, and F<debian/copyright>, where the same file is used for all
-packages by default.  These cases will remain unchanged.
+packages by default.  These cases will remain unchanged.  The debhelper tool
+using the files will trigger warnings on usage.
 
 In compat 15 (or later), this is changed to an error.
-
 
 =item -
 
