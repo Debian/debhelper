@@ -3235,12 +3235,13 @@ sub dh_gencontrol_automatic_substvars {
 		my $field_value = $pkg_stanza->{$field_name};
 		my $merge_value = join(", ", @{$field_vars{$field_name_lc}});
 		if (defined($field_value) and $field_value !~ m{^\s*+$}) {
+			$field_value =~ s/,\s*$//;
 			$field_value .= ", ";
 			$field_value .= $merge_value;
 		} else {
 			$field_value = $merge_value;
 		}
-		$pkg_stanza->{$field_name} = $merge_value;
+		$pkg_stanza->{$field_name} = $field_value;
 	}
 	open(my $wfd, '>', $rewritten_dctrl) or error("open ${rewritten_dctrl}: $!");
 	$src_stanza->output($wfd);
