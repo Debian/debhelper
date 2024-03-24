@@ -78,7 +78,7 @@ on_pkgs_in_parallel {
 
 		# avoid gratuitous warnings
 		ensure_substvars_are_present($substvars, 'misc:Depends', 'misc:Pre-Depends')
-			if not compat(14);
+			if compat(14);
 
 		my (@debug_info_params, $build_ids, @pkg_gencontrol_args);
 		if ( -d $dbgsym_info_dir ) {
