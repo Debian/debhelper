@@ -189,6 +189,10 @@ L<https://lists.debian.org/debian-devel/2024/03/msg00030.html> also covers
 when the substvars need tweaking.  The most common case involves using
 the B<-d> option from B<dpkg-shlibdeps> possibly via B<dh_shlibdeps>.
 
+Note: This change changes will cause false-positives from an unfixed
+B<lintian>. Please check L<https://bugs.debian.org/1067653> for B<lintian>
+support for this change.
+
 =item -
 
 The B<dh_shlibdeps> tool now defaults to using B<${shlibs:Pre-Depends}> for
