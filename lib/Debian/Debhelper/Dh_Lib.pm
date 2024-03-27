@@ -3191,7 +3191,7 @@ sub assert_opt_is_known_package {
 
 
 sub dh_gencontrol_automatic_substvars {
-	my ($package, $substvars_file) = @_;
+	my ($package, $substvars_file, $has_dbgsym) = @_;
 	return if not -f $substvars_file;
 
 	require Dpkg::Control;
@@ -3199,14 +3199,21 @@ sub dh_gencontrol_automatic_substvars {
 	open(my $sfd, '+<', $substvars_file) or error("open $substvars_file: $!");
 	my @dep_fields = Dpkg::Control::Fields::field_list_pkg_dep();
 	my %known_dep_fields = map { lc($_) => 1 } @dep_fields;
-	my (%field_vars);
+	my (%field_vars, $needs_dbgsym);
 	while (my $line = <$sfd>) {
 		next if $line =~ m{^\s*(?:[#].*)?$};
 		chomp($line);
+		next if $line !~ m{(\w[-:0-9A-Za-z]*)([?!\$]?=)(?:.*)};
+		my $key = $1;
+		my $assignment = $2;
 		# Ignore `$=` because they will work without us doing anything (which in turn means
 		# we might not have to rewrite the file).
-		next if $line !~ m{(\w[-:0-9A-Za-z]*)(?:[?!])?\=(?:.*)};
-		my $key = $1;
+		if ($assignment eq '$=') {
+			$needs_dbgsym = 1;
+			next;
+		}
+		# If there is "required" substvar, then it will not be used for the dbgsym.
+		$needs_dbgsym = 1 if $assignment eq '!=';
 		next if ($key !~ m/:([-0-9A-Za-z]+)$/);
 		my $field_name_lc = lc($1);
 		next if not exists($known_dep_fields{$field_name_lc});
@@ -3214,7 +3221,7 @@ sub dh_gencontrol_automatic_substvars {
 		push(@{$field_vars{$field_name_lc}}, $substvar);
 	}
 	close($sfd);
-	return if not %field_vars;
+	return if not %field_vars and not $needs_dbgsym;
 
 	open(my $ocfd, '<', 'debian/control') or error("open debian/control: $!");
 	my $src_stanza = Dpkg::Control->new;
@@ -3247,8 +3254,18 @@ sub dh_gencontrol_automatic_substvars {
 	$src_stanza->output($wfd);
 	print {$wfd} "\n";
 	$pkg_stanza->output($wfd);
+	if ($has_dbgsym) {
+		my $dbgsym_stanza = Dpkg::Control->new;
+		# Minimal stanza to avoid substvars warnings. Most fields are still set
+		# via -D.
+		$dbgsym_stanza->{'Package'} = "${package}-dbgsym";
+		$dbgsym_stanza->{'Architecture'} = $pkg_stanza->{"Architecture"};
+		$dbgsym_stanza->{'Description'} = "debug symbols for ${package}";
+		print {$wfd} "\n";
+		$dbgsym_stanza->output($wfd);
+	}
 	close($wfd) or error("Failed to close/flush ${rewritten_dctrl}: $!");
-	return $rewritten_dctrl;
+	return ($rewritten_dctrl, $has_dbgsym);
 }
 
 

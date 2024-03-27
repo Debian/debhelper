@@ -84,8 +84,18 @@ on_pkgs_in_parallel {
 		if ( -d $dbgsym_info_dir ) {
 			$build_ids = read_dbgsym_build_ids($dbgsym_info_dir);
 		}
+		my $has_dbgsym = -d $dbgsym_tmp;
 
-		if ( -d $dbgsym_tmp) {
+		my ($dctrl, $added_dbgsym_version);
+		($dctrl, $added_dbgsym_version) = Debian::Debhelper::Dh_Lib::dh_gencontrol_automatic_substvars($package, $substvars, $has_dbgsym)
+			if not compat(13);
+		$dctrl //= 'debian/control';
+
+
+		if ($has_dbgsym) {
+			my $dbgsym_package = $added_dbgsym_version ? "${package}-dbgsym" : $package;
+			my $dbgsym_ctrl = $added_dbgsym_version ? $dctrl : 'debian/control';
+			my $dbgsym_substvar = $added_dbgsym_version ? '/dev/null' : $substvars;
 			my $multiarch = package_multiarch($package);
 			my $section = package_section($package);
 			my $replaces = read_dbgsym_migration($dbgsym_info_dir);
@@ -128,8 +138,20 @@ on_pkgs_in_parallel {
 				push(@dbgsym_options, '-UReplaces', '-UBreaks');
 			}
 			install_dir("${dbgsym_tmp}/DEBIAN");
-			doit("dpkg-gencontrol", "-p${package}", "-l$changelog", "-T/dev/null",
-				"-P${dbgsym_tmp}",@{$dh{U_PARAMS}}, @dbgsym_options);
+			eval {
+				doit("dpkg-gencontrol", "-p${dbgsym_package}", "-l$changelog", "-T${dbgsym_substvar}",
+					"-c${dbgsym_ctrl}", "-P${dbgsym_tmp}", @{$dh{U_PARAMS}}, @dbgsym_options);
+			};
+			if (my $err = "$@") {
+				if ($dbgsym_ctrl ne 'debian/control') {
+					warning('The dpkg-control command failed. Here is the content of the rewritten d/control file');
+					warning(' used to add relationship substvars for you (in case that is part of the problem).');
+					print(" --- Content of $dbgsym_ctrl\n");
+					system('cat', $dbgsym_ctrl);
+					print(" --- End of content for $dbgsym_ctrl\n");
+				}
+				error($err);
+			}
 
 			reset_perm_and_owner(0644, "${dbgsym_tmp}/DEBIAN/control");
 		} elsif ($build_ids) {
@@ -142,10 +164,6 @@ on_pkgs_in_parallel {
 		# Remove explicit "Multi-Arch: no" headers to avoid auto-rejects by dak.
 		push (@pkg_gencontrol_args, '-UMulti-Arch')
 			if (package_multiarch($package) eq 'no');
-		my $dctrl;
-		$dctrl = Debian::Debhelper::Dh_Lib::dh_gencontrol_automatic_substvars($package, $substvars)
-			if not compat(13);
-		$dctrl //= 'debian/control';
 
 		# Generate and install control file.
 		eval {
