@@ -734,6 +734,11 @@ meaning is defined here.
 
 This command will or may execute content from the package. Do not run on untrusted packages.
 
+Note: This tag only applies if the command will I<out of the box> be unsafe. As an example, commands that
+parse the output of B<make> is inherently unsafe, because it is trivial B<make> to have B<make> run
+code even in B<--dry-run> mode. As a counter example, commands that only loads B<dh> add-ons will be
+considered safe, because B<PERL5LIB> is assumed to be curated to only include trusted plugins.
+
 =item AJSON
 
 The command always provides JSON output. See L</JSON OUTPUT> for details.
