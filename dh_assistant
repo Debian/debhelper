@@ -165,12 +165,16 @@ is a build system if the build system does not use/set/define that variable.
 
 =back
 
-=head2 detect-hook-targets (AJSON)
+=head2 detect-hook-targets (EXEC, AJSON)
 
 B<Synopsis>: B<dh_assistant> B<detect-hook-targets>
 
 Detects possible override targets and hook targets that L<dh(1)> might use (provided that the
 relevant command is in the sequence).
+
+**UNSAFE**: This command relies on the output of L<make>. Even it its dry-run mode, B<make> may
+execute commands from F<debian/rules>. Avoid using on packages from untrusted sources, where you
+have not reviewed the packaging for backdoors.
 
 The detection is based on scanning the rules file for any target that I<might look> like a hook
 target and can therefore list targets that are in fact not hook targets (or are but will never
@@ -264,12 +268,16 @@ following command:
 This command accepts no options or arguments.
 
 
-=head2 detect-unknown-hook-targets (AJSON, LINT)
+=head2 detect-unknown-hook-targets (EXEC, AJSON, LINT)
 
 B<Synopsis>: B<dh_assistant> B<detect-unknown-hook-targets> [--output-format=json] [command-options]
 
 Detects unknown and possibly misspelled override targets and hook targets in F<debian/rules> that
 will most likely not be used by L<dh(1)>.
+
+**UNSAFE**: This command relies on the output of L<make>. Even it its dry-run mode, B<make> may
+execute commands from F<debian/rules>. Avoid using on packages from untrusted sources, where you
+have not reviewed the packaging for backdoors.
 
 This command differs from B<detect-hook-targets> subtly in the scope. The B<detect-hook-targets>
 will list all targets that looks like hook targets whether they are applicable or not. This
@@ -722,6 +730,10 @@ meaning is defined here.
 
 =over 4
 
+=item EXEC
+
+This command will or may execute content from the package. Do not run on untrusted packages.
+
 =item AJSON
 
 The command always provides JSON output. See L</JSON OUTPUT> for details.
@@ -734,7 +746,8 @@ do so by default. See L</JSON OUTPUT> for details when using B<--output-format=j
 =item LINT
 
 The command is or can be used for linting purposes. This command will exit with code 2 when an important
-issue is found.
+issue is found. B<Be careful> if the command is also tagged with B<EXEC>. When this happens, the
+command should only be used on trusted content.
 
 Note that commands may have options that redefine what is considered an "important" issue.
 
@@ -789,6 +802,9 @@ $JSON_ENCODER = $JSON_ENCODER->pretty->space_before(0)->canonical if -t STDOUT;
 # We never use the log file for this tool
 inhibit_log();
 $Debian::Debhelper::Dh_Lib::PARSE_DH_SEQUENCE_INFO = 1;
+# Force commands to opt-in
+$Debian::Debhelper::Dh_Lib::ALLOW_UNSAFE_EXECUTION = 0;
+
 
 my %COMMANDS = (
     'help'                         => \&_do_help,
@@ -827,9 +843,9 @@ The following commands are available:
   active-compat-level        Output information about which compat level is declared/active (AJSON)
   supported-compat-levels    Output information about supported compat levels (AJSON, CRFA)
   which-build-system         Determine which build system will be used (AJSON)
-  detect-hook-targets        Detect and output possible override and hook targets (AJSON)
+  detect-hook-targets        Detect and output possible override and hook targets (EXEC, AJSON)
   detect-unknown-hook-targets
-                             Detect unknown / typos of known hook targets (RJSON)
+                             Detect unknown / typos of known hook targets (EXEC, RJSON)
   list-commands              List all commands across all sequences (RJSON)
   list-guessed-dh-config-files
                              List guessed "config files" for debhelper commands (AJSON)
@@ -839,6 +855,7 @@ The following commands are available:
 
 Command tags:
 
+ * EXEC    *UNSAFE*: The command may execute code from the package. Do not use on unsafe content.
  * AJSON   The command always provides JSON output.
  * RJSON   The command *can* provide JSON output via --output-format=json.
  * LINT    The command is or can be used for linting purposes. This command will exit with code 2
@@ -873,6 +890,10 @@ sub _output {
     my ($kvpairs) = @_;
     print $JSON_ENCODER->encode($kvpairs);
     return;
+}
+
+sub _allow_unsafe_execution() {
+    $Debian::Debhelper::Dh_Lib::ALLOW_UNSAFE_EXECUTION = 1;
 }
 
 sub active_compat_level {
@@ -1213,6 +1234,7 @@ sub list_guessed_dh_config_files {
 
 sub detect_unknown_hook_targets {
     _assert_debian_control_exists();
+    _allow_unsafe_execution();
     my $distance_func = _load_levenshtein();
     require Getopt::Long;
     Getopt::Long::config('no_ignore_case');
@@ -1335,6 +1357,7 @@ sub detect_hook_targets {
         error("$COMMAND: No arguments supported (please remove everything after the command)");
     }
     _assert_debian_control_exists();
+    _allow_unsafe_execution();
     my $explicit_targets = _load_hook_targets();
     my (%result, @targets, @unverifiable_commands, %seen_cmds);
     while (my ($target, $rule_details) = each(%{$explicit_targets})) {

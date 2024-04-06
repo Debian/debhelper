@@ -228,6 +228,7 @@ sub rules_explicit_target {
 	my ($target) = @_;
 
 	if (! $RULES_PARSED) {
+		Debian::Debhelper::Dh_Lib::assert_unsafe_execution_is_ok();
 		my $processing_targets = 0;
 		my $not_a_target = 0;
 		my $current_target;

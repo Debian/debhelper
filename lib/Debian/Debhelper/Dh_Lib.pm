@@ -248,6 +248,8 @@ our $DEB822_FIELD_REGEX = qr/
     /xoa;
 
 our $PARSE_DH_SEQUENCE_INFO = 0;
+# Safety valve for `dh_assistant`. Not intended for anyone else.
+our $ALLOW_UNSAFE_EXECUTION = 1;
 
 # We need logging in compat 9 or in override/hook targets (for --remaining-packages to work)
 # - This option is a global toggle to disable logs for special commands (e.g. dh or dh_clean)
@@ -3284,6 +3286,12 @@ sub _internal_optional_file_args {
 	}
 	return('--no-sandbox') if $_disable_file_seccomp;
 	return;
+}
+
+sub assert_unsafe_execution_is_ok {
+	if (not $Debian::Debhelper::Dh_Lib::ALLOW_UNSAFE_EXECUTION) {
+		error("Internal error: The command did not want to allow unsafe execution, but was about to trigger it!");
+	}
 }
 
 1
