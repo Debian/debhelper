@@ -972,7 +972,7 @@ my ($compat_from_bd, $compat_from_dctrl);
 			$delared_compat_source = "Build-Depends: debhelper-compat (= $c)";
 		} elsif ($compat_from_dctrl != -1) {
 			$c = $compat_from_dctrl;
-			$delared_compat_source = "X-DH-Comat: $c";
+			$delared_compat_source = "X-DH-Compat: $c";
 		} elsif (not $nowarn) {
 			# d/compat deliberately omitted since we do not want to recommend users to it.
 			error("Please specify the compatibility level in debian/control. Such as, via Build-Depends: debhelper-compat (= X)");
