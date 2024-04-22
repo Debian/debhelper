@@ -32,8 +32,7 @@ In compat 14+, tmpfiles.d files are copied into the F<postrm> script, and
 they are used with systemd-tmpfiles --remove after the package is removed
 and --purge when the package is purged. This allows one to use the
 tmpfiles.d mechanism to clean up files that are no longer needed after a
-package has been removed/purged. Can be disabled with --no-remove and/or
---no-purge.
+package has been removed/purged.
 
 
 =head1 OPTIONS
@@ -42,17 +41,9 @@ package has been removed/purged. Can be disabled with --no-remove and/or
 
 =item B<--name=>I<name>
 
-This option controls both a prefix used for lookng up maintainer provided
+This option controls both a prefix used for looking up maintainer provided
 tmpfiles.d configuration files (those mentioned in the L</FILES> section)
 and also the base name used for the installed version of the file.
-
-=item B<--no-remove>
-
-Do not call systemd-tmpfiles --remove when the package is removed.
-
-=item B<--no-purge>
-
-Do not call systemd-tmpfiles --purge when the package is purged.
 
 =back
 
@@ -81,10 +72,7 @@ maintainer scripts.
 
 =cut
 
-init(options => {
-	"no-remove" => \$dh{NO_REMOVE},
-	"no-purge" => \$dh{NO_PURGE},
-});
+init();
 
 sub uniq {
 	my %seen;
@@ -148,12 +136,8 @@ foreach my $package (@{$dh{DOPACKAGES}}) {
 				chomp $lines;
 
 				if ($lines) {
-					if (! $dh{NO_PURGE}) {
-						push(@purge, $lines);
-					}
-					if (! $dh{NO_REMOVE}) {
-						push(@remove, $lines);
-					}
+					push(@purge, $lines);
+					push(@remove, $lines);
 				}
 			}
 		},

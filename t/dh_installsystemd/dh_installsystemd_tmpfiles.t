@@ -84,7 +84,7 @@ END
 
 	open(my $fd, '>', 'debian/foo/usr/lib/tmpfiles.d/bar.conf') or error("open(bar.conf) failed: $!");
 	print $fd $purge_file;
-	close($fd);
+	close($fd) or error("close(bar.conf) failed: $!");
 
 	ok(run_dh_tool('dh_installtmpfiles'));
 	# dh_installtmpfiles do not install services
