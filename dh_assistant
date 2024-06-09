@@ -752,7 +752,7 @@ do so by default. See L</JSON OUTPUT> for details when using B<--output-format=j
 
 The command is or can be used for linting purposes. This command will exit with code 2 when an important
 issue is found. B<Be careful> if the command is also tagged with B<EXEC>. When this happens, the
-command should only be used on trusted content.
+command should only be used on trusted content (see the B<EXEC> tag for details).
 
 Note that commands may have options that redefine what is considered an "important" issue.
 
@@ -850,7 +850,7 @@ The following commands are available:
   which-build-system         Determine which build system will be used (AJSON)
   detect-hook-targets        Detect and output possible override and hook targets (EXEC, AJSON)
   detect-unknown-hook-targets
-                             Detect unknown / typos of known hook targets (EXEC, RJSON)
+                             Detect unknown / typos of known hook targets (EXEC, LINT, RJSON)
   list-commands              List all commands across all sequences (RJSON)
   list-guessed-dh-config-files
                              List guessed "config files" for debhelper commands (AJSON)
@@ -864,7 +864,7 @@ Command tags:
  * AJSON   The command always provides JSON output.
  * RJSON   The command *can* provide JSON output via --output-format=json.
  * LINT    The command is or can be used for linting purposes. This command will exit with code 2
-           when an important issue is found.
+           when an important issue is found. Be careful when using commands also tagged EXEC!
  * CRFA    Command does not need to be run from a package source directory
            (Mnemonic "Can be Run From Anywhere")
  * BLD     The command is intended to be used as a part of a package build.
