@@ -1,14 +1,16 @@
 # Translation of the debhelper documentation to German.
 # Copyright (C) 1997-2011 Joey Hess.
 # This file is distributed under the same license as the debhelper package.
-# Copyright (C) of this file 2011-2017, 2019, 2020 Chris Leick and 2020, 2022 Erik Pfannenstein
+# Copyright (C) of this file 2011-2017, 2019, 2020 Chris Leick,
+# 2020, 2022 Erik Pfannenstein,
+# 2024 Christoph Brinkhaus
 msgid ""
 msgstr ""
-"Project-Id-Version: debhelper 12.9\n"
+"Project-Id-Version: debhelper 13.15.3\n"
 "Report-Msgid-Bugs-To: debhelper@packages.debian.org\n"
-"POT-Creation-Date: 2024-03-27 15:54+0100\n"
+"POT-Creation-Date: 2024-04-09 10:00+0200\n"
 "PO-Revision-Date: 2023-01-11 22:00+0100\n"
-"Last-Translator: Erik Pfannenstein <debianignatz@gmx.de>\n"
+"Last-Translator: Christoph Brinkhaus <c.brinkhaus@t-online.de>\n"
 "Language-Team: German <debian-l10n-german@lists.debian.org>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -134,7 +136,7 @@ msgid ""
 msgstr ""
 "Um ein neues Debian-Paket unter Benutzung von Debhelper zu erstellen, können "
 "Sie einfach eine Beispielregeldatei kopieren und manuell bearbeiten. Oder "
-"Sie probieren das Paket B<dh-make> aus; dieses enthält einenL<dh_make|"
+"Sie probieren das Paket B<dh-make> aus; dieses enthält einen L<dh_make|"
 "dh_make(1)>-Befehl, welcher den Prozess teilweise automatisiert. Für eine "
 "behutsamere Einführung enthält das Paket ucB<maint-guide> ein Lernprogramm, "
 "mit dem Sie Ihr erstes Paket unter mit Hilfe von Debhelper erstellen."
@@ -174,7 +176,7 @@ msgstr "#LIST#"
 #. type: =head2
 #: debhelper.pod:47
 msgid "Deprecated Commands"
-msgstr "Missbilligte Befehle"
+msgstr "Veraltete Befehle"
 
 #. type: textblock
 #: debhelper.pod:49
@@ -243,19 +245,10 @@ msgstr ""
 "Formate, entnehmen Sie den entsprechenden Handbuchseiten. Im Allgemeinen "
 "sind diese Dateien Listen von Dateien, die bearbeitet werden, eine Datei pro "
 "Zeile. Einige Programme in Debhelper bedienen sich Paaren von Dateien und "
-"Zielen oder etwas kompiziertere Formate."
+"Zielen oder etwas kompliziertere Formate."
 
 #. type: textblock
 #: debhelper.pod:79
-#, fuzzy
-#| msgid ""
-#| "Note for the first (or only) binary package listed in F<debian/control>, "
-#| "debhelper will use F<debian/foo> when there's no F<debian/I<package>.foo> "
-#| "file.  However, it is often a good idea to keep the F<I<package>.> prefix "
-#| "as it is more explicit.  The primary exception to this are files that "
-#| "debhelper by default installs in every binary package when it does not "
-#| "have a package prefix (such as F<debian/copyright> or F<debian/"
-#| "changelog>)."
 msgid ""
 "Note if there is only one binary package listed in F<debian/control>, then "
 "debhelper will use F<debian/foo> when there's no F<debian/I<package>.foo> "
@@ -264,13 +257,13 @@ msgid ""
 "binary packages. However, it is often a good idea to keep the F<I<package>.> "
 "prefix as it is more explicit and also required when upgrading to compat 15."
 msgstr ""
-"Beachten Sie, dass Debhelper für das erste (oder einzige) in F<debian/"
-"control> aufgeführte Binärpaket F<debian/foo> benutzen wird, wenn es keine "
-"F<debian/I<Paket>.foo>-Datei gibt. Oft ist es jedoch eine gute Idee, das "
-"Präfix F<I<Paket>.> zu behalten, da es eindeutiger ist. Die Hauptausnahme "
-"davon bilden Dateien, die Debhelper standardmäßig in jedem Binärpaket "
-"installiert, wenn es kein Paketpräfix besitzt (wie F<debian/copyright> oder "
-"F<debian/changelog>)."
+"Beachten Sie, das debhelper F<debian/foo> verwenden wird, wenn nur ein "
+"Binärpaket in F<debian/control> aufgeführt ist und es keine Datei "
+"F<debian/I<package>.foo> gibt. In Kompatibilitätsstufen vor 15 geschieht "
+"dies auch für das erste in F<debian/control> aufgeführte Binärpaket, "
+"falls es mehrere Binärpakete gibt. Oft ist es jedoch eine gute Idee, "
+"das Präfix F<I<Paket>.> zu behalten, da es eindeutiger ist und beim "
+"Upgrade auf Kompatibilitätsstufe 15 sowieso benötigt wird."
 
 #. type: textblock
 #: debhelper.pod:86
@@ -280,6 +273,10 @@ msgid ""
 "copyright> and F<debian/changelog>, where the files are generally used and "
 "needed for all binary packages."
 msgstr ""
+"Außerdem gibt es einige spezielle Fälle, in denen Debhelper immer auf eine "
+"präfix-lose Version zurückfällt. Das sind Fälle wie F<debian/copyright> "
+"und F<debian/changelog>, in denen die Dateien generell für alle Binärpakete "
+"verwendet werden und notwendig sind."
 
 #. type: textblock
 #: debhelper.pod:91
@@ -586,10 +583,8 @@ msgstr ""
 
 #. type: =head3
 #: debhelper.pod:233
-#, fuzzy
-#| msgid "Substitution limits"
 msgid "Substitution limitations: filtering"
-msgstr "Ersetzungsbeschränkungen"
+msgstr "Ersetzungsbeschränkungen: Filterung"
 
 #. type: textblock
 #: debhelper.pod:235
@@ -599,6 +594,10 @@ msgid ""
 "those variables being considered a token in its own right with the content "
 "given."
 msgstr ""
+"Die eingebaute Ersetzung kann nicht dazu verwendet werden, Inhalte "
+"zu »filtern«. Versuche, »Kommentare« oder »Leerzeilen« mittels Ersetzungen "
+"zu erzeugen hat als Ergebnis, dass diese Variablen selbst als Markierung "
+"innerhalb des gegebenen Inhalts interpretiert werden."
 
 #. type: textblock
 #: debhelper.pod:239
@@ -608,6 +607,11 @@ msgid ""
 "features out of the box. Though keep in mind that B<dh-exec> has its own "
 "substitution logic that can feature interact with the one from debhelper."
 msgstr ""
+"Falls Sie filtern wollen erwägen Sie die Verwendung einer ausführbaren Debhelper-"
+"Konfigurationsdatei mit B<dh-exec> als Interpreter. Das Werkzeug B<dh-exec> "
+"unterstützt zahlreiche Funktionalitäten standardmäßig. Denken Sie aber daran, "
+"dass B<dh-exec> seine eigene Logik für Ersetzungen hat, die mit den "
+"Funktionalitäten von Debhelper interagieren kann."
 
 #. type: =head2
 #: debhelper.pod:244
@@ -661,12 +665,6 @@ msgstr ""
 
 #. type: textblock
 #: debhelper.pod:269
-#, fuzzy
-#| msgid ""
-#| "In compatibility level 13+, the output will be subject to substitutions "
-#| "(see L</Substitutions in debhelper config files>) where the tool support "
-#| "these.  Remember to be careful if your generator I<also> provides "
-#| "substitutions as this can cause unnecessary confusion."
 msgid ""
 "In compatibility level 13+, the output will be subject to substitutions (see "
 "L</Substitutions in debhelper config files>) where the tool support these.  "
@@ -678,15 +676,11 @@ msgstr ""
 "(siehe L</Ersetzungen in Debhelper-Konfigurationsdateien>), soweit das "
 "Werkzeug diese unterstützt. Denken Sie daran, Vorsicht walten zu lassen, "
 "falls Ihr Generator I<auch> Ersetzungen bereitstellt, da dies zu unnötiger "
-"Verwirrung führen kann."
+"Verwirrung führen kann. Im besonderen verfügt das üblicherweise verwendete Werkzeug "
+"B<dh-exec> über eine eigene Unterstützung für Ersetzungen."
 
 #. type: textblock
 #: debhelper.pod:275
-#, fuzzy
-#| msgid ""
-#| "Otherwise, the output will be used exactly as-is.  Notably, debhelper "
-#| "will I<not> expand wildcards or strip comments or strip whitespace in the "
-#| "output."
 msgid ""
 "Otherwise, the output will be used exactly as-is.  Notably, debhelper will "
 "I<not> expand wildcards or strip comments or strip whitespace in the output "
@@ -695,7 +689,8 @@ msgid ""
 msgstr ""
 "Andernfalls wird die Ausgabe exakt so benutzt, wie sie ist. Insbesondere "
 "wird Debhelper Platzhalter I<nicht> expandieren oder Kommentare und "
-"Leerzeichen aus der Ausgabe entfernen."
+"Leerraumzeichen aus der Ausgabe entfernen. Das Werkzeug B<dh-exec> verfügt über "
+"ein Ausgangsfilter, das diese Dinge standardmäßig entfernt."
 
 #. type: textblock
 #: debhelper.pod:282
@@ -839,7 +834,7 @@ msgid ""
 msgstr ""
 "wirkt sich nicht auf die Pakete aus, die dieser Debhelper-Befehl bereits "
 "durchlaufen hat (d.h. falls der Befehl im Debhelper-Protokoll des Pakets "
-"auftaucht). Falls Sie zum Beispiel den Befehl nur bei einigen Binäraketen "
+"auftaucht). Falls Sie zum Beispiel den Befehl nur bei einigen Binärpaketen "
 "mit speziellen Optionen aufrufen müssen, geben Sie diese Option beim letzten "
 "Aufruf des Befehls an, um die restlichen Pakete mit Standardeinstellungen zu "
 "verarbeiten."
@@ -868,6 +863,9 @@ msgid ""
 "B<Deprecated>: This option has no practical use in compat 15 or later as the "
 "behaviour it affects is removed in compat 15."
 msgstr ""
+"B<Veraltet>: Diese Option hat für Kompatibilitätsstufe 15 und neuer keinen "
+"praktischen Nutzen, weil deren Auswirkung in Kompatibilitätsstufe 15 entfernt "
+"worden ist."
 
 #. type: textblock
 #: debhelper.pod:346
@@ -897,7 +895,7 @@ msgid ""
 msgstr ""
 "Dies wird von L<dh(1)> verwandt, wenn benutzerdefinierte Optionen an alle "
 "von ihm ausgeführten Befehle weitergereicht werden. Falls der Befehl die "
-"angegebene Option oder das ganze Bündel von Optionen unterstützt,kommt er "
+"angegebene Option oder das ganze Bündel von Optionen unterstützt, kommt er "
 "zum Tragen. Falls nicht, wird er ignoriert."
 
 #. type: =head1
@@ -1333,14 +1331,9 @@ msgstr ""
 "(wie für die Veröffentlichung einer neuen Funktionalität oder einer "
 "Fehlerbehebung innerhalb einer Kompatibilitätsstufe)."
 
+# FIXME: s/source/B<source>/
 #. type: textblock
 #: debhelper.pod:517
-#, fuzzy
-#| msgid ""
-#| "Note that debhelper does not provide debhelper-compat for experimental or "
-#| "beta compatibility levels; packages experimenting with those "
-#| "compatibility levels should use F<debian/compat> (or, if only for "
-#| "selected commands, B<DH_COMPAT>)."
 msgid ""
 "Note that debhelper does not provide debhelper-compat for experimental or "
 "beta compatibility levels; packages experimenting with those compatibility "
@@ -1350,23 +1343,14 @@ msgid ""
 msgstr ""
 "Beachten Sie, dass Debhelper-Compat nicht für experimentelle oder Beta-"
 "Kompatibilitätsstufen vorgesehen ist. Pakete, die mit diesen "
-"Kompatibilitätsstufen experimentieren, sollten F<debian/compat> oder, falls "
-"nur ausgewählte Befehle betroffen sind, B<DH_COMPAT> verwenden."
+"Kompatibilitätsstufen experimentieren, sollten die Kompatibilitätsstufe in "
+"das Feld B<X-DH-Compat> des Source-Abschnitts der Datei F<debian/control> "
+"eintragen (oder, falls nur für bestimmte Befehle, in die "
+"Umgebungsvariable B<DH_COMPAT>)."
 
-# Profided by Markus Hiereth and Helge Kreutzmann, thanks!
+# Provided by Markus Hiereth and Helge Kreutzmann, thanks!
 #. type: textblock
 #: debhelper.pod:523
-#, fuzzy
-#| msgid ""
-#| "Prior versions of debhelper required specifying the compatibility level "
-#| "in the file F<debian/compat>, and current debhelper still supports this "
-#| "for backward compatibility. To use this method, the F<debian/compat> file "
-#| "should contain the compatibility level as a single number, and no other "
-#| "content. If you specify the compatibility level by this method, your "
-#| "package will also need a versioned build dependency on a version of the "
-#| "debhelper package equal to (or greater than) the compatibility level your "
-#| "package uses. So, if you specify compatibility level #RECOMMENDED_COMPAT# "
-#| "in F<debian/compat>, ensure F<debian/control> has:"
 msgid ""
 "Historically, debhelper required specifying the compatibility level in the "
 "file F<debian/compat>, and debhelper up to version 14 supports this for "
@@ -1379,9 +1363,9 @@ msgid ""
 "ensure F<debian/control> has:"
 msgstr ""
 "Frühere Versionen von Debhelper benötigten die Angabe der "
-"Kompatibilitätsstufe in der Datei F<debian/compat>. Das aktuelle Debhelper "
-"unterstützt dies zum Zweck der Rückwärtskompatibilität weiterhin. Um diese "
-"Methode zu verwenden, sollte die Datei F<debian/compat> die "
+"Kompatibilitätsstufe in der Datei F<debian/compat>, und Debhelper bis zur "
+"Version 14 unterstützen dies zum Zweck der Rückwärtskompatibilität. "
+"Um diese Methode zu verwenden, sollte die Datei F<debian/compat> die "
 "Kompatibilitätsstufe als einzelne Zahl enthalten und keinen weiteren Inhalt. "
 "Falls Sie die Kompatibilitätsstufe mit dieser Methode angeben, muss Ihr "
 "Paket auch eine passende versionierte Bauabhängigkeit auf das Paket "
@@ -1403,19 +1387,14 @@ msgstr ""
 
 #. type: textblock
 #: debhelper.pod:535
-#, fuzzy
-#| msgid ""
-#| "Note that you must use either the build-dependency on debhelper-compat or "
-#| "the F<debian/compat> file. Whenever possible, the debhelper-compat build-"
-#| "dependency is recommended."
 msgid ""
 "Note that you must use exactly one method for specifying the default "
 "debhelper compat level of the package. Whenever possible, the debhelper-"
 "compat build-dependency is recommended."
 msgstr ""
-"Beachten Sie, dass Sie entweder die Bauabhängigkeit auf debhelper-compat "
-"oder die F<debian/compat>-Datei verwenden müssen. Wo immer möglich, "
-"empfiehlt sich die debhelper-compat-Bauabhängigkeit."
+"Beachten Sie, dass Sie genau eine Methode verwenden müssen, um die "
+"standardmäßige Kompatibilitätsstufe eines Pakets anzugeben. Wo "
+"immer möglich, empfiehlt sich die Bauabhängigkeit auf Debhelper-Compat."
 
 #. type: textblock
 #: debhelper.pod:539
@@ -1428,7 +1407,7 @@ msgid ""
 "that may be surprising to maintainers or reviewers (or, in the long term, to "
 "yourself)."
 msgstr ""
-"Falls nötig, kann die B<DH_COMPAT>-Umgebungsvariable dazu verwendet werden, "
+"Falls nötig, kann die Umgebungsvariable B<DH_COMPAT> dazu verwendet werden, "
 "die Kompatibilitätsstufe für einen bestimmten Befehl außer Kraft zu setzen. "
 "Diese Funktionalität eignet sich hauptsächlich für die vorübergehende "
 "Anhebung einiger Befehle auf eine neue Kompatibilitätsstufe oder zum "
@@ -1465,6 +1444,9 @@ msgid ""
 "The list of supported compatibility levels and the related upgrade check "
 "list has moved to L<debhelper-compat-upgrade-checklist(7)>."
 msgstr ""
+"Die Liste unterstützter Kompatibilitätsstufen und die entsprechende "
+"Upgrade-Prüfliste sind nach L<debhelper-compat-upgrade-checklist(7)> "
+"verschoben worden."
 
 #. type: =head1
 #: debhelper.pod:559 dh_auto_test:48 dh_dwz:69 dh_installcatalogs:67
@@ -1537,7 +1519,7 @@ msgid ""
 msgstr ""
 "Außerdem können einige zusätzliche Paket basierend auf dem Inhalt der "
 "Umgebungsvariable B<DEB_BUILD_PROFILES> und den Feldern B<Build-Profiles> in "
-"den Absätzen für binäre Pakete in B<debian/control> ausgeschlossen werden. "
+"den Abschnitten für binäre Pakete in B<debian/control> ausgeschlossen werden. "
 "Dies geschieht gemäß der Entwurfrichtlinie unter L<https://wiki.debian.org/"
 "BuildProfileSpec>."
 
@@ -1782,7 +1764,7 @@ msgid ""
 "need to also use the B<-p> flag to specify which binary package the "
 "debhelper program will act on."
 msgstr ""
-"Manchmal wollen Sie möglicherweise ein anderes temporäres Vezeichnis "
+"Manchmal wollen Sie möglicherweise ein anderes temporäres Verzeichnis "
 "benutzen. Dies wird durch den Schalters B<-P> unterstützt. »B<dh_installdocs "
 "-Pdebian/tmp>« wird zum Beispiel B<debian/tmp> als temporäres Verzeichnis "
 "nutzen. Beachten Sie, dass die Debhelper-Programme nur auf ein einzelnes "
@@ -1807,7 +1789,7 @@ msgid ""
 "and F<config> scripts, etc."
 msgstr ""
 "Debhelper beinhaltet Unterstützung für Udebs. Um ein Udeb mit Debhelper zu "
-"erstellen, fügen Sie dem Absatz des Pakets in F<debian/control> »B<Package-"
+"erstellen, fügen Sie dem Abschnitt des Pakets in F<debian/control> »B<Package-"
 "Type: udeb>« hinzu. Debhelper wird versuchen, Udebs zu erstellen, die der "
 "Debian-Installer-Richtlinie entsprechen, indem die erzeugten Paketdateien "
 "mit F<.udeb> enden, keine Dokumentation in ein Udeb installiert wird und "
@@ -1875,7 +1857,7 @@ msgstr ""
 "aufrufen, noch wird dh auflisten, welche Unterbefehle aufgerufen werden. "
 "Abhängig vom benutzten Bausystem wird auch dieses weniger Details ausgeben. "
 "Dadurch wird es einfacher, wichtige Nachrichten zu erkennen, die Ausgabe "
-"wird jedoch als Buildd-Protokoll ziemlich nutzlos."
+"wird jedoch als Build-Protokoll ziemlich nutzlos."
 
 #. type: textblock
 #: debhelper.pod:718
@@ -1891,18 +1873,13 @@ msgstr "B<DH_COMPAT>"
 
 #. type: textblock
 #: debhelper.pod:722
-#, fuzzy
-#| msgid ""
-#| "Temporarily specifies what compatibility level debhelper should run at, "
-#| "overriding any value specified via Build-Depends on debhelper-compat or "
-#| "via the F<debian/compat> file."
 msgid ""
 "Temporarily specifies what compatibility level debhelper should run at, "
 "overriding the default compat level of the source package."
 msgstr ""
 "gibt vorübergehend an, auf welcher Kompatibilitätsstufe Debhelper ausgeführt "
-"werden soll und setzt dabei jeden Wert außer Kraft, der über Build-Depends "
-"in Debhelper-compat oder über die Datei F<debian/compat> angegeben wurde."
+"werden soll und setzt dabei die standardmäßige Kompatibilitätsstufe aus dem "
+"Quellpaket außer Kraft."
 
 #. type: =item
 #: debhelper.pod:725
@@ -2122,7 +2099,7 @@ msgid ""
 "cleared."
 msgstr ""
 "In Kompatibilitätsstufe 13 und darüber werden diese Umgebungsvariablen "
-"zurückgesetzt, bevor das Originalautoren-Bausystem via B<dh_auto_*> "
+"zurückgesetzt, bevor das Bausystem der Originalautoren via B<dh_auto_*> "
 "angeworfen wird. Die B<HOME>- (B<dh_auto_*>-Hilfsprogramme) und die "
 "B<XDG_RUNTIME_DIR>-Variable (nur B<dh_auto_test>) werden auf ein "
 "beschreibbares Verzeichnis gesetzt. Alle anderen Variablen und "
@@ -2209,7 +2186,7 @@ msgstr ""
 #. type: =item
 #: debhelper.pod:837
 msgid "B<dherroron=obsolete-compat-levels>"
-msgstr "dherroron=obsolete-compat-levels>"
+msgstr "B<dherroron=obsolete-compat-levels>"
 
 #. type: textblock
 #: debhelper.pod:839
@@ -2224,8 +2201,8 @@ msgid ""
 "be removed compat levels into errors."
 msgstr ""
 "Wenn B<dherroron> vorhanden und auf B<obsolete-compat-levels> gesetzt ist, "
-"werden die Debhelper-Werkzeuge die Missbilligungswarnungen für auf der "
-"Abschussliste stehenden Kompaitiblitätsstufen zu Fehlern erheben."
+"werden die Debhelper-Werkzeuge die Missbilligungswarnungen für die in "
+"naher Zukunft zu entfernenden Kompatiblitätsstufen zu Fehlern erheben."
 
 #. type: textblock
 #: debhelper.pod:845
@@ -2321,7 +2298,7 @@ msgstr ""
 "Dieser Wert wird mehrere Debhelper-Tools anweisen, die Installation von "
 "Dokumentation wie Handbuchseiten oder von den Originalautoren "
 "bereitgestellte Dokumentation auszulassen. Außerdem werden die Werkzeuge es "
-"ignorieren, wenndie deklarierte Dokumentation fehlt, unter der Annahme, dass "
+"ignorieren, wenn die deklarierte Dokumentation fehlt, unter der Annahme, dass "
 "sie nicht gebaut wurde."
 
 #. type: textblock
@@ -2345,6 +2322,9 @@ msgid ""
 "passed the B<--no-trim> option, forcing it to forgo removing older entries "
 "from changelogs."
 msgstr ""
+"Dieser Wert bewirkt, dass L<dh_installchangelogs(1)> arbeitet, als ob es "
+"mit B<--no-trim> aufgerufen worden wäre. Damit wird erzwungen, keine alten "
+"Einträge aus Changelogs zu entfernen."
 
 #. type: =item
 #: debhelper.pod:897
@@ -2427,6 +2407,9 @@ msgid ""
 "by the debhelper package, it also causes the tools to act like the "
 "B<DH_QUIET> environment variable was non-empty."
 msgstr ""
+"Dieser Wert betrifft die meisten B<dh_auto_*>-Werkzeuge direkt. Für Befehle, "
+"die vom Debhelper-Paket bereitgestellt werden führt es dazu, das sie so "
+"arbeiten, als ob die Umgebungsvariable B<DH_QUIET> nicht leer wäre."
 
 #. type: textblock
 #: debhelper.pod:931
@@ -2540,14 +2523,10 @@ msgid ""
 "debhelper compat levels"
 msgstr ""
 "debhelper-compat-upgrade-checklist - Upgrade-Prüfliste für "
-"unterstützteDebhelper-Kompaitiblitätsstufen"
+"unterstützte Debhelper-Kompatiblitätsstufen"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:9
-#, fuzzy
-#| msgid ""
-#| "This document is an upgrade checklist of all the supported debhelper "
-#| "compat levels. It also lists all the support debhelper compat levels."
 msgid ""
 "This document is an upgrade checklist of all the supported debhelper compat "
 "levels. It also lists all the supported debhelper compat levels."
@@ -2762,6 +2741,11 @@ msgid ""
 ">> (from F<debian/foo>) where I<package> is the first binary package listed "
 "in F<debian/control>."
 msgstr ""
+"Jetzt ist es in den meisten Fällen ein Fehler, paketlose Versionen von Debhelper "
+"Konfigurationsdateien zu verwenden, wenn zwei oder mehr Binärpakete in "
+"F<debian/control> aufgeführt sind. Veraltete Dateien sollten (von F<debian/foo>) "
+"in F<< debian/I<Paket>.foo umbenannt werden, wobei I<Paket> das erste der "
+"in F<debian/control> aufgeführten Binärpakete ist."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:55
@@ -2770,6 +2754,9 @@ msgid ""
 "F<debian/NEWS>, and F<debian/copyright>, where the same file is used for all "
 "packages by default.  These cases will remain unchanged."
 msgstr ""
+"Die Hauptausnahme bei dieser Änderung sind Dateien wie F<debian/changelog>, "
+"F<debian/NEWS> und F<debian/copyright>, wo die gleiche Datei per Voreinstellung "
+"für alle Pakete verwendet wird. Diese Fälle bleiben unverändert."
 
 #. type: =item
 #: debhelper-compat-upgrade-checklist.pod:61
@@ -2788,7 +2775,7 @@ msgid ""
 "F<< /usr/lib/pam.d/I<package> >> instead of F<< /etc/pam.d/I<package> >>."
 msgstr ""
 "Das B<dh_installpam>-Werkzeug wird die PAM-Konfigurationsdateien nicht mehr "
-"unter F<< /etc/pam.d/I<Paket> >>, sondern unter F<< /usr/lib/pam.d/I<Paet> "
+"unter F<< /etc/pam.d/I<Paket> >>, sondern unter F<< /usr/lib/pam.d/I<Paket> "
 ">> installieren."
 
 #. type: textblock
@@ -2806,6 +2793,8 @@ msgstr ""
 msgid ""
 "Packages using the B<dh> sequencer should be aware the following changes:"
 msgstr ""
+"Pakete, die den B<dh>-Sequenzer verwenden, sollten folgende Änderungen "
+"berücksichtigen:"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:85
@@ -2823,6 +2812,9 @@ msgid ""
 "units, start them on installation, restart them on upgrades and stop them on "
 "uninstalling the package."
 msgstr ""
+"Das Werkzeug B<dh_installsystemduser> aktiviert jetzt in der Voreinstellung "
+"Systemd-User-Units, startet sie bei der Installation, startet sie bei "
+"Upgrades neu und stoppt sie bei der Deinstallation eines Pakets."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:96
@@ -2845,12 +2837,15 @@ msgstr ""
 "Sequenz nach B<dh_link> und nicht mehr nach B<dh_installinitramfs> "
 "ausgeführt."
 
+# FIXME: s/that has/that have/
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:107
 msgid ""
 "I<< This item only applies to source packages that has exactly one "
 "B<Package> stanza in F<debian/control>. >>"
 msgstr ""
+"I<< Dieser Punkt ist nur auf Quellpakete anwendbar, die genau einen "
+"Abschnitt B<Paket> in F<debian/control> haben. >>"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:109
@@ -2889,61 +2884,69 @@ msgid ""
 "installed version of B<dpkg> considers a relation or dependency-like field. "
 "At the time of writing, the list consists of:"
 msgstr ""
+"Das Werkzeug B<dh_control> wendet nun automatisch Ersetzungsvariable "
+"mit Beziehungen auf die relevanten Felder an. Das bedeutet, dass viele "
+"Ersetzungsvariable wie B<${misc:Depends}> und B<${shlibs:Depends}> nicht "
+"mehr explizit in F<debian/control> aufgeführt werden müssen. Das betrifft "
+"jede Ersetzungsvariable, die nach einem Feld benannt wird, das die "
+"installierte Version von B<dpkg> als eine Beziehung oder ein "
+"abhängigkeitsähnliches Feld versteht.  Zur Zeit der Erstellung des "
+"Dokuments besteht diese Liste aus:"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:138
 msgid "Pre-Depends"
-msgstr ""
+msgstr "Pre-Depends"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:142
 msgid "Depends"
-msgstr ""
+msgstr "Depends"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:146
 msgid "Recommends"
-msgstr ""
+msgstr "Recommends"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:150
 msgid "Suggests"
-msgstr ""
+msgstr "Suggests"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:154
 msgid "Enhances"
-msgstr ""
+msgstr "Enhances"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:158
 msgid "Conflicts"
-msgstr ""
+msgstr "Conflicts"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:162
 msgid "Breaks"
-msgstr ""
+msgstr "Breaks"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:166
 msgid "Replaces"
-msgstr ""
+msgstr "Replaces"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:170
 msgid "Provides"
-msgstr ""
+msgstr "Provides"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:174
 msgid "Built-Using"
-msgstr ""
+msgstr "Built-Using"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:178
 msgid "Static-Built-Using"
-msgstr ""
+msgstr "Static-Built-Using"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:182
@@ -2952,6 +2955,10 @@ msgid ""
 "now be reduced to B<Depends: foo> and B<Depends: ${misc:Depends}, ${shlibs:"
 "Depends}> can be removed entirely as examples of how the feature works."
 msgstr ""
+"Das bedeutet, dass zum Beispiel B<Depends: foo, ${misc:Depends}> in "
+"F<debian/control> zu B<Depends: foo> verkürzt werden kann. Ausserdem kann "
+"als Beispiel für diese Funktionalität B<Depends: ${misc:Depends}, "
+"${shlibs:Depends}> komplett entfernt werden."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:186
@@ -2962,6 +2969,12 @@ msgid ""
 "into B<Pre-Depends> field, B<dh_shlibdeps> will handle this automatically as "
 "well (see the next compat item)."
 msgstr ""
+"Beachten Sie, dass andere Ersetzungsvariable wie B${binary:Version} von "
+"dieser Änderung nicht betroffen sind und weiterhin wenn notwendig explizit "
+"verwendet werden sollen.  Bei Paketen, bei denen B<Essential: yes> gesetzt "
+"ist und bei denen manuell das Feld B<${shlibs:Depends}> in das Feld "
+"B<Pre-Depends> übertragen wurde, wird B<dh_shlibdeps> dies ebenfalls "
+"automatisch handhaben (siehe den nächsten Punkt zu Kompatibilitätsstufen)."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:192
@@ -2972,7 +2985,14 @@ msgid ""
 "The most common case involves using the B<-d> option from B<dpkg-shlibdeps> "
 "possibly via B<dh_shlibdeps>."
 msgstr ""
+"Siehe L<https://lists.debian.org/debian-devel/2024/02/msg00230.html> für "
+"Details zu diesem Vorschlag. Die Zusammenfassung in L<https://lists.debian"
+".org/debian-devel/2024/03/msg00030.html> behandelt auch die Fälle, bei "
+"denen Ersetzungsvariable eine Anpassung benötigen. Der allgemeinste Fall "
+"beinhaltet die Verwendung der Option B<-d> von B<dpkg-shlibdeps>, "
+"möglicherweise durch B<dh_shlibdeps>."
 
+# FIXME: s/This change changes/This change/
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:198
 msgid ""
@@ -2980,6 +3000,9 @@ msgid ""
 "B<lintian>. Please check L<https://bugs.debian.org/1067653> for B<lintian> "
 "support for this change."
 msgstr ""
+"Hinweis: Diese Änderung wird Falsch-positiv-Bewertungen von einem nicht korrigiertem "
+"B<lintian> verursachen. Bitte prüfen Sie anhand von L<https://bugs.debian.org/1067653>, "
+"ob B<lintian> diese Änderung unterstützt."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:204
@@ -2987,6 +3010,8 @@ msgid ""
 "The B<dh_shlibdeps> tool now defaults to using B<${shlibs:Pre-Depends}> for "
 "packages that are B<Essential: yes>."
 msgstr ""
+"Das Werkzeug B<dh_shlibdeps> verwendet in der Voreinstellung "
+"B<${shlibs:Pre-Depends}> für Pakete mit B<Essential: yes>."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:207
@@ -2994,6 +3019,9 @@ msgid ""
 "Note due to the B<dh_gencontrol> change above, any package using "
 "B<dh_gencontrol> will not have to do anything for this migration."
 msgstr ""
+"Beachten Sie, dass durch die obige Änderung von B<dh_gencontrol> "
+"jedes Paket, das B<dh_gencontrol> verwendet, nicht von dieser "
+"Migration betroffen ist."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:212
@@ -3004,6 +3032,11 @@ msgid ""
 "debian/I<package>.foo >> (from F<debian/foo>) where I<package> is the first "
 "binary package listed in F<debian/control>."
 msgstr ""
+"Es veranlasst nun in den meisten Fällen eine Warnung, die paketlosen Versionen "
+"von Debhelper-Konfigurationsdateien zu verwenden, wenn zwei oder mehr Binärpakete in "
+"F<debian/control> aufgeführt sind. Veraltete Dateien sollten (von F<debian/foo>) "
+" in F<< debian/I<Paket>.foo umbenannt werden, wobei I<Paket> das erste der "
+"in F<debian/control> aufgeführten Binärpakete ist."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:218
@@ -3013,11 +3046,15 @@ msgid ""
 "packages by default.  These cases will remain unchanged.  The debhelper tool "
 "using the files will trigger warnings on usage."
 msgstr ""
+"Die Hauptausnahme bei dieser Änderung sind Dateien wie F<debian/changelog>, "
+"F<debian/NEWS> und F<debian/copyright>, wo die gleiche Datei per Voreinstellung "
+"für alle Pakete verwendet wird. Diese Fälle bleiben unverändert. Das "
+"Werkzeug Debhelper wird bei Verwendung dieser Dateien eine Warnung auslösen."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:223
 msgid "In compat 15 (or later), this is changed to an error."
-msgstr ""
+msgstr "In Kompatibilitätsstufe 15 (oder neuer) ist das geändert zu einem Fehler."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:227
@@ -3025,6 +3062,8 @@ msgid ""
 "Packages using the B<cmake> build system should be aware of the following "
 "changes:"
 msgstr ""
+"Pakete, die das Bausystem B<cmake> verwenden, sollten die folgenden "
+"Änderungen beachten:"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:233
@@ -3032,7 +3071,7 @@ msgid ""
 "The B<cmake> buildsystem now passes B<-DCMAKE_BUILD_RPATH_USE_ORIGIN=ON> to "
 "L<cmake(1)> to avoid some reproducibility issues."
 msgstr ""
-"Das B<cmake>-Bausystem gibt jetzt B<-DCMAKE_BUILD_RPATH_USE_ORIGIN=ON> an "
+"Das Bausystem B<cmake> gibt jetzt B<-DCMAKE_BUILD_RPATH_USE_ORIGIN=ON> an "
 "L<cmake(1)> weiter, womit einige Reproduzierbarkeitsprobleme vermieden "
 "werden."
 
@@ -3044,27 +3083,23 @@ msgid ""
 "name B<cmake> expects, while the latter (B<ASFLAGS>) is the name that L<dpkg-"
 "buildpackage(1)> uses."
 msgstr ""
+"Das Bausystem B<cmake> setzt nun die Umgebungsvariable B<ASMFLAGS> falls sie "
+"nicht gesetzt ist und B<ASFLAGS> vorhanden ist. Der erstere Name (B<ASMFLAGS>) "
+"ist der Name, den B<cmake> erwartet, während der letztere (B<ASFLAGS>) der "
+"Name ist, den L<dpkg-buildpackage(1)> verwendet."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:245
-#, fuzzy
-#| msgid ""
-#| "The B<meson+ninja> and B<cmake> build systems now use B<meson install> "
-#| "and B<cmake --install>, respectively, instead of B<ninja install> and "
-#| "B<make install> in the L<dh_auto_install(1)> call.  Any override of "
-#| "B<dh_auto_install> that passes extra parameters to the upstream build "
-#| "system should be reviewed."
 msgid ""
 "The B<cmake> build systems now use B<cmake --install> instead of B<make "
 "install> in the L<dh_auto_install(1)> call.  Any override of "
 "B<dh_auto_install> that passes extra parameters to the upstream build system "
 "should be reviewed."
 msgstr ""
-"Die B<meson+ninja>- und B<cmake>-Bausysteme verwenden im "
-"L<dh_auto_install(1)>-Aufruf jetzt B<meson install> bzw. B<cmake --install> "
-"anstelle von B<ninja install> und B<make install>. Jede Außerkraftsetzung "
-"von B<dh_auto_install>, die Extra-Parameter an das Bausystem der "
-"Originalautoren weiterreicht, sollte überprüft werden."
+"Das Bausystem B<cmake> verwendet im L<dh_auto_install(1)>-Aufruf jetzt "
+"B<cmake --install> anstelle von B<ninja install>. Jede "
+"Außerkraftsetzung von B<dh_auto_install>, die Extra-Parameter an das "
+"Bausystem der Originalautoren weiterreicht, sollte überprüft werden."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:253
@@ -3072,40 +3107,30 @@ msgid ""
 "Packages using the B<meson> build system should be aware of the following "
 "changes:"
 msgstr ""
+"Pakete, die das Bausystem B<meson> verwenden, sollten die folgenden "
+"Änderungen beachten:"
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:259
-#, fuzzy
-#| msgid ""
-#| "The B<autoconf> buildsystem now passes B<--runstatedir=/run> to F<./"
-#| "configure>."
 msgid ""
 "The B<meson> build system now passes B<--auto-features=enabled> to B<meson>."
 msgstr ""
-"Das B<autoconf>-Bausystem übergibt nun B<--runstatedir=/run> an F<./"
-"configure>."
+"Das Bausystem B<meson> übergibt nun B<--auto-features=enabled> an B<meson>."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:263
-#, fuzzy
-#| msgid ""
-#| "The B<meson+ninja> and B<cmake> build systems now use B<meson install> "
-#| "and B<cmake --install>, respectively, instead of B<ninja install> and "
-#| "B<make install> in the L<dh_auto_install(1)> call.  Any override of "
-#| "B<dh_auto_install> that passes extra parameters to the upstream build "
-#| "system should be reviewed."
 msgid ""
 "The B<meson+ninja> build system now use B<meson install> instead of B<ninja "
 "install> in the L<dh_auto_install(1)> call.  Any override of "
 "B<dh_auto_install> that passes extra parameters to the upstream build system "
 "should be reviewed."
 msgstr ""
-"Die B<meson+ninja>- und B<cmake>-Bausysteme verwenden im "
-"L<dh_auto_install(1)>-Aufruf jetzt B<meson install> bzw. B<cmake --install> "
-"anstelle von B<ninja install> und B<make install>. Jede Außerkraftsetzung "
-"von B<dh_auto_install>, die Extra-Parameter an das Bausystem der "
-"Originalautoren weiterreicht, sollte überprüft werden."
+"Das Bausystem B<meson+ninja> verwendet im L<dh_auto_install(1)>-Aufruf "
+"jetzt B<meson install> anstelle von B<ninja install>. Jede "
+"Außerkraftsetzung von B<dh_auto_install>, die Extra-Parameter an das "
+"Bausystem der Originalautoren weiterreicht, sollte überprüft werden."
 
+# FIXME: s/source/B<source>/
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:271
 msgid ""
@@ -3113,6 +3138,9 @@ msgid ""
 "the debhelper compat level. Put the compat level in the B<X-DH-Compat> field "
 "of the source stanza of F<debian/control>."
 msgstr ""
+"Die Datei F<debian/compat> wird nicht mehr als Quelle zur Spezifikation der "
+"Debhelper-Kompatibilitätsstufe akzeptiert. Setzen Sie die Kompatibilitätsstufe "
+"in dem Feld B<X-DH-Compat> des Source-Abschnitts von F<debian/control>."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:275
@@ -3121,6 +3149,10 @@ msgid ""
 "immediately, while it was experimental this change is first enforced when "
 "compat 14 becomes stable."
 msgstr ""
+"Beachten Sie, dass diese Änderung das erste Mal in Kraft gesetzt wird, wenn "
+"Kompatibilitätsstufe 14 als stabil deklariert wird. Damit wird vermieden, "
+"Pakete zu beschädigen, die schon zu Kompatibilitätsstufe 14 migriert "
+"wurden, während diese Änderung noch experimentell war."
 
 #. type: =item
 #: debhelper-compat-upgrade-checklist.pod:281
@@ -3212,8 +3244,6 @@ msgstr ""
 "einfachste Lösung, die Handbuchseite aus F<< debian/I<package>.manpages >> "
 "zu entfernen (davon ausgehend, dass beide Versionen identisch sind)."
 
-# FIXME: s/resets/reset
-# FIXME: last line: missing "is"
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:332
 msgid ""
@@ -3226,12 +3256,11 @@ msgstr ""
 "können Sie Sie der Beschreibung für die Umgebungsvariablen in L</"
 "ENVIRONMENT> entnehmen."
 
-# FIXME: Double "between"
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:336
 msgid "I<This feature changed between debhelper 13 and debhelper 13.2.>"
 msgstr ""
-"I<Dieses Funktionsmerkmal hat sich zwischen Debhelper 13 und Debhelper 13.2 "
+"I<Dieses Funktionalität hat sich zwischen Debhelper 13 und Debhelper 13.2 "
 "geändert.>"
 
 #. type: textblock
@@ -3369,7 +3398,7 @@ msgid ""
 "installation process. If for some reason you need previous behavior, "
 "override the flag:"
 msgstr ""
-"Das B<cmake>-Bausystem übergibt nun B<-"
+"Das Bausystem B<cmake> übergibt nun B<-"
 "DCMAKE_SKIP_INSTALL_ALL_DEPENDENCY=ON> an L<cmake(1)>, um den automatischen "
 "Installationsprozess zu beschleunigen. Falls Sie aus irgendeinem Grund beim "
 "alten Verhalten bleiben möchten, übersteuern Sie den Schalter:"
@@ -3593,7 +3622,7 @@ msgstr ""
 "bereitgestellte F<conffiles>-Datei, weil das als unnötig erachtet wurde. Das "
 "B<remove-on-upgrade> aus Dpkg Version 1.20 machte die Datei jedoch wieder "
 "relevant und B<dh_installdeb> installiert sie jetzt wieder in den "
-"Kompaitiblitätsstufen 12 und aufwärts."
+"Kompatiblitätsstufen 12 und höher."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:511
@@ -3686,7 +3715,7 @@ msgid ""
 "available in Debian#887904 and L<https://lists.debian.org/debian-"
 "release/2019/04/msg01442.html>."
 msgstr ""
-"Von der Kompatibilitätsstufe 11 wird für neue Pakete abgeraten, da sie vvon "
+"Von der Kompatibilitätsstufe 11 wird für neue Pakete abgeraten, da sie von "
 "Funktionalitätswechselwirkungen zwischen L<dh_installinit> und "
 "L<dh_installsystemd> betroffen ist, die dazu führen, dass in manchen Fällen "
 "Dienste nicht korrekt laufen. Bitte erwägen Sie, stattdessen die "
@@ -3758,7 +3787,7 @@ msgid ""
 "program=true\"> to L<make(1)>.  Derivative buildsystems (e.g. B<configure> "
 "or B<cmake>) are unaffected by this change."
 msgstr ""
-"Das B<makefile>-Bausystem übergibt nun B<INSTALL=\"install --strip-"
+"Das Bausystem B<makefile> übergibt nun B<INSTALL=\"install --strip-"
 "program=true\"> an L<make(1)>. Davon abgeleitete Bausysteme (z. B. "
 "B<configure> oder B<cmake>) sind von dieser Änderung nicht betroffen."
 
@@ -3768,7 +3797,7 @@ msgid ""
 "The B<autoconf> buildsystem now passes B<--runstatedir=/run> to F<./"
 "configure>."
 msgstr ""
-"Das B<autoconf>-Bausystem übergibt nun B<--runstatedir=/run> an F<./"
+"Das Bausystem B<autoconf> übergibt nun B<--runstatedir=/run> an F<./"
 "configure>."
 
 #. type: textblock
@@ -3777,7 +3806,7 @@ msgid ""
 "The B<cmake> buildsystem now passes B<-DCMAKE_INSTALL_RUNSTATEDIR=/run> to "
 "L<cmake(1)>."
 msgstr ""
-"Das B<cmake>-Bausystem übergibt nun B<-DCMAKE_INSTALL_RUNSTATEDIR=/run> an "
+"Das Bausystem B<cmake> übergibt nun B<-DCMAKE_INSTALL_RUNSTATEDIR=/run> an "
 "L<cmake(1)>."
 
 #. type: textblock
@@ -3823,7 +3852,7 @@ msgid ""
 "specify documentation."
 msgstr ""
 "Bekannte Ausnahmen umfassen das Bauen mit dem Profil B<nodoc>, bei dem die "
-"obigen Werkzeuge stillschweigend fehlschlagende Suchen mit Mustern erlauben,"
+"obigen Werkzeuge stillschweigend fehlschlagende Suchen mit Mustern erlauben, "
 "welche zur Angabe von Dokumentation verwendet werden."
 
 #. type: textblock
@@ -3904,7 +3933,7 @@ msgid ""
 "I<most> of the documentation in a different path to comply with the "
 "recommendation from Debian policy §12.3 (since version 3.9.7)."
 msgstr ""
-"Die Werkzeuge B<dh_installdocs> und B<dh_installexamples> können jezt die "
+"Die Werkzeuge B<dh_installdocs> und B<dh_installexamples> können jetzt die "
 "I<meiste> Dokumentation in einem anderen Pfad installieren, um die "
 "Empfehlung der Debian-Richtlinien §12.3 (seit Version 3.9.7) zu erfüllen."
 
@@ -3949,7 +3978,7 @@ msgstr ""
 "Die Option B<--doc-main-package> kann benutzt werden, wenn die automatische "
 "Erkennung unzureichend ist oder um den Pfad auf seinen vorherigen Wert "
 "zurückzusetzen, falls es einen Grund gibt, von der Empfehlung der Debian-"
-"Richlinien abzuweichen."
+"Richtlinien abzuweichen."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:682
@@ -4054,7 +4083,7 @@ msgid ""
 msgstr ""
 "Der Befehl B<dh> wird keinen der veralteten Parameter zur »manuellen "
 "Sequenzsteuerung« (B<--before>, B<--after>, etc.) akzeptieren. Bitte "
-"verwenden Sie stattdessen Aufhebungsziele (override targts)."
+"verwenden Sie stattdessen Aufhebungsziele (override targets)."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:738
@@ -4232,6 +4261,7 @@ msgstr "v9"
 msgid "Changes from v8 are:"
 msgstr "Änderungen gegenüber v8 sind:"
 
+# FIXME: s/autoconf/B<autoconf>/
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:827
 msgid ""
@@ -4239,7 +4269,7 @@ msgid ""
 "directories to autoconf in --libdir and --libexecdir."
 msgstr ""
 "Multiarch-Unterstützung. Insbesondere gibt B<dh_auto_configure> Multiarch-"
-"Verzeichnisse an Autoconf in --libdir and --libexecdir weiter."
+"Verzeichnisse an B<autoconf> in --libdir und --libexecdir weiter."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:832
@@ -4264,6 +4294,7 @@ msgstr ""
 "B<dh_strip> komprimiert Debug-Symboldateien, um die Größe der installierten "
 "»-dbg«-Paketen zu verringern."
 
+# FIXME: s/autoconf/B<autoconf>/
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:844
 msgid ""
@@ -4271,7 +4302,7 @@ msgid ""
 "libexecdir when using autoconf."
 msgstr ""
 "B<dh_auto_configure> enthält keinen Quellpaketnamen in --libexecdir, wenn "
-"Autoconf benutzt wird."
+"B<autoconf> benutzt wird."
 
 #. type: textblock
 #: debhelper-compat-upgrade-checklist.pod:849
@@ -4523,7 +4554,7 @@ msgid ""
 msgstr ""
 "Falls B<dh_install> keine Dateien im derzeitigen (oder dem  via B<--"
 "sourcedir> mitgegebenen) Verzeichnis findet, sucht es sie ersatzweise in "
-"F<debian/tmp>. Das ermöglicht es ihm, ohne dass es bsondere Parameter "
+"F<debian/tmp>. Das ermöglicht es ihm, ohne dass es besondere Parameter "
 "benötigt, mit B<dh_auto_install> zusammenzuarbeiten, welches nach F<debian/"
 "tmp> installiert."
 
@@ -4565,7 +4596,7 @@ msgid ""
 "in reverse order for the F<prerm> and F<postrm> scripts."
 msgstr ""
 "Befehle, die Fragmente von Betreuerskripten erzeugen, werden die Fragmente "
-"für die F<prerm>- und F<postrm>-Skripte in umgekehrter Reiherfolge anordnen."
+"für die F<prerm>- und F<postrm>-Skripte in umgekehrter Reihenfolge anordnen."
 
 #. type: textblock
 #: debhelper-obsolete-compat.pod:64
@@ -4575,7 +4606,7 @@ msgid ""
 "directory."
 msgstr ""
 "B<dh_installwm> wird einen untergeordneten Handbuchseiten-Link für F<x-"
-"window-manager.1.gz> installieren. falls es die Handbuchseite in F<usr/share/"
+"window-manager.1.gz> installieren, falls es die Handbuchseite in F<usr/share/"
 "man/man1> im Bauverzeichnis des Pakets entdeckt."
 
 #. type: textblock
@@ -4982,6 +5013,27 @@ msgid ""
 "    }\n"
 "\n"
 msgstr ""
+"    $ dh_assistant detect-hook-targets\n"
+"    {\n"
+"       \"commands-not-in-path\": [\n"
+"          \"dh_foo\"\n"
+"       ],\n"
+"       \"hook-targets\": [\n"
+"          {\n"
+"             \"command\": \"dh_strip_nondeterminism\",\n"
+"             \"is-empty\": true,\n"
+"             \"package-section-param\": null,\n"
+"             \"target-name\": \"override_dh_strip_nondeterminism\"\n"
+"          },\n"
+"          {\n"
+"             \"command\": \"dh_foo\",\n"
+"             \"is-empty\": false,\n"
+"             \"package-section-param\": \"-a\",\n"
+"             \"target-name\": \"override_dh_foo-arch\"\n"
+"          }\n"
+"       ]\n"
+"    }\n"
+"\n"
 
 #. type: textblock
 #: dh:119
@@ -5175,7 +5227,7 @@ msgid ""
 "      endif\n"
 "\n"
 msgstr ""
-"      # EINFACH: Dies hier ist genaus durchdefiniert. Das Hook-Ziel wird immer \n"
+"      # EINFACH: Dies hier ist genauso durchdefiniert. Das Hook-Ziel wird immer \n"
 "      # ausgeführt und dh_bar wird übersprungen. Der »vielleicht ausführen«-Teil ist \n"
 "      # bedingt, so wie man es erwarten würde.\n"
 "      #\n"
@@ -5430,7 +5482,7 @@ msgstr ""
 "deterministisch ist, wenn die Erweiterung nicht verfügbar ist (z. B. während "
 "des Aufräumens). Dies impliziert, dass einige Erweiterungen mit diesen "
 "Beschränkungen inkompatibel sind und nur über B<Build-Depends> (oder manuell "
-"ber F<debian/rules>) benutzt werden können. Derzeit können derartige "
+"über F<debian/rules>) benutzt werden können. Derzeit können derartige "
 "Erweiterungen nur Befehle zu Sequenzen hinzufügen."
 
 #. type: =item
@@ -5584,7 +5636,7 @@ msgid ""
 "either and instead run your own commands."
 msgstr ""
 "Manchmal ist ein Paket den L<dh_auto_configure(1)> und L<dh_auto_build(1)> "
-"so fremd, dass sie nicht automaitsch einschätzen können, was daran zu machen "
+"so fremd, dass sie nicht automatisch einschätzen können, was daran zu machen "
 "ist. Um ihre Ausführung zu verhindern und stattdessen Ihre eigenen Befehle "
 "einzusetzen, schreiben Sie Folgendes: "
 
@@ -6257,7 +6309,7 @@ msgid ""
 "build process manually."
 msgstr ""
 "Es ist beabsichtigt, dass diese Vorgehensweise für 90% der Pakete "
-"funktioniert.Falls sie das nicht tut, möchten Sie bitte jegliche Benutzung "
+"funktioniert. Falls sie das nicht tut, möchten Sie bitte jegliche Benutzung "
 "von B<dh_auto_build> überspringen und den Bauprozess nur manuell ausführen."
 
 #. type: textblock
@@ -6828,13 +6880,7 @@ msgstr ""
 
 #. type: verbatim
 #: dh_clean:25
-#, fuzzy, no-wrap
-#| msgid ""
-#| "It removes the package build directories, and removes some other files including\n"
-#| "F<debian/files>, and any detritus left behind by other debhelper commands. It\n"
-#| "also removes common files that should not appear in a Debian diff:\n"
-#| "  #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS .deps/* *.P *-stamp\n"
-#| "\n"
+#, no-wrap
 msgid ""
 "It removes the package build directories, and removes some other files including\n"
 "F<debian/files>, and any detritus left behind by other debhelper commands. It\n"
@@ -6846,7 +6892,7 @@ msgstr ""
 "F<debian/files>, außerdem sämtlichen Müll, den andere Debhelper-Programme \n"
 "hinterlassen haben. Es löscht auch verschiedene Dateien, die nicht in \n"
 "einem Debian-Diff auftauchen sollten:\n"
-"  #*# *~ DEADJOE *.orig *.rej *.SUMS TAGS .deps/* *.P *-stamp\n"
+"  #*# *~ DEADJOE *.orig *.rej *.SUMS __pycache__ TAGS .deps/* *.P *-stamp\n"
 "\n"
 
 #. type: textblock
@@ -7194,7 +7240,7 @@ msgid ""
 "\"Binaries\")."
 msgstr ""
 "Falls die Umgebungsvariable B<DEB_BUILD_OPTIONS> B<nostrip> enthält, werden "
-"getreu der Debian-Richlinie (Abschnitt 10.1. »Binaries«) keine Symbole "
+"getreu der Debian-Richtlinie (Abschnitt 10.1. »Binaries«) keine Symbole "
 "entfernt."
 
 #. type: textblock
@@ -7387,7 +7433,7 @@ msgid ""
 "as those are handled by triggers.)  These commands are inserted into the "
 "maintainer scripts by L<dh_installdeb(1)>."
 msgstr ""
-"Worum es sich kümmert ist das Hinzufügen von Beteruerskriptfragmenten, um "
+"Worum es sich kümmert ist das Hinzufügen von Betreuerskriptfragmenten, um "
 "B<update-icon-caches> für Symbolverzeichnisse aufzurufen. (Dies gilt nicht "
 "für GNOME- und Hicolor-Symbole, da diese von Auslösern gehandhabt werden.) "
 "Diese Befehle werden durch L<dh_installdeb(1)> in die Betreuerskripte "
@@ -7736,30 +7782,25 @@ msgid ""
 "B<dh_installexamples> as those helpers account for the B<nodoc> build "
 "profile."
 msgstr ""
+"Es gibt keine Möglichkeit, Ergebnisse basierend auf Bauprofilen oder "
+"Architektur auszufiltern. Ziehen Sie für Dokumentation die Verwendung von "
+"B<dh_installdocs> oder B<dh_installexamples> in Betracht, weil diese "
+"Hilfsprogramme für das Bauprofil B<nodoc> zuständig sind."
 
 #. type: textblock
 #: dh_install:363
-#, fuzzy
-#| msgid ""
-#| "However, renaming can be achieved by using B<dh-exec> with compatibility "
-#| "level 9 or later.  An example debian/I<package>.install file using B<dh-"
-#| "exec> could look like:"
 msgid ""
 "However, renaming and filtering can be achieved by using B<dh-exec> with "
 "compatibility level 9 or later.  An example debian/I<package>.install file "
 "using B<dh-exec> could look like:"
 msgstr ""
-"Umbenennen kann jedoch durch Verwenden von B<dh-exec> mit der "
+"Umbenennung und Filterung kann jedoch durch Verwenden von B<dh-exec> mit der "
 "Kompatibilitätsstufe 9 oder höher erreicht werden. Eine debian/I<package>."
 "install-Beispieldatei, die B<dh-exec> verwendet, könnte wie folgt aussehen:"
 
 #. type: verbatim
 #: dh_install:367
-#, fuzzy, no-wrap
-#| msgid ""
-#| " #!/usr/bin/dh-exec\n"
-#| " debian/default.conf => /etc/my-package/start.conf\n"
-#| "\n"
+#, no-wrap
 msgid ""
 " #!/usr/bin/dh-exec\n"
 " debian/default.conf => /etc/my-package/start.conf\n"
@@ -7768,6 +7809,7 @@ msgid ""
 msgstr ""
 " #!/usr/bin/dh-exec\n"
 " debian/default.conf => /etc/my-package/start.conf\n"
+" build/foo /usr/bin <!pkg.bar.nofoo>\n"
 "\n"
 
 #. type: textblock
@@ -7988,6 +8030,11 @@ msgid ""
 "performed if the B<--no-trim> option is passed or if the "
 "B<DEB_BUILD_OPTIONS> environment variable contains B<notrimdch>."
 msgstr ""
+"Die B<debchange>-artigen Debian-Changelogs sind so gekürzt, dass sie nur "
+"Einträge nach dem Datum der Veröffentlichung von I<oldstable> enthalten. Die "
+"Kürzung wird nicht durchgeführt, wenn die Option B<--no-trim> "
+"angegeben ist oder die Umgebungsvariable B<DEB_BUILD_OPTIONS> "
+"B<notrimdch> enthält."
 
 #. type: =item
 #: dh_installchangelogs:57
@@ -8782,7 +8829,7 @@ msgstr ""
 #. type: textblock
 #: dh_installdebconf:70
 msgid "Do not modify F<postrm> script."
-msgstr "Ncht das F<postrm>-Skript ändern."
+msgstr "Nicht das F<postrm>-Skript ändern."
 
 #. type: textblock
 #: dh_installdebconf:74
@@ -9177,7 +9224,7 @@ msgid ""
 "share/doc-base/doc-id."
 msgstr ""
 "sind als doc-base-Steuerdateien installiert. Beachten Sie, dass die Doc-ID "
-"vom Eintrag B<Document:> in der bestreffenden Doc-base-Steuerdatei bestimmt "
+"vom Eintrag B<Document:> in der betreffenden Doc-base-Steuerdatei bestimmt "
 "wird. In dem Fall, dass mehrere Doc-base-Dateien in einem einzelnen "
 "Quellpaket die gleiche Doc-ID gemeinsam benutzen, werden sie nach usr/share/"
 "doc-base/package statt nach usr/share/doc-base/doc-id installiert."
@@ -9275,7 +9322,7 @@ msgid ""
 msgstr ""
 "setzt das Hauptpaket für ein Dokumentationspaket. Dies wird zur Installation "
 "der Dokumentation des Dokumentationspakets in F<< /usr/share/doc/"
-"I<Hauptpaket> >> benutzt, wie es das Debian-Richlinienhandbuch 3.9.7 in "
+"I<Hauptpaket> >> benutzt, wie es das Debian-Richtlinienhandbuch 3.9.7 in "
 "§12.3 empfiehlt."
 
 #. type: textblock
@@ -9358,7 +9405,7 @@ msgid ""
 "to make the documentation directory of a package be a dangling symlink, "
 "before calling B<dh_installdocs>.)"
 msgstr ""
-"(Eine ältere Methode, die dasselbe errecht und die immer noch unterstützt "
+"(Eine ältere Methode, die dasselbe erreicht und die immer noch unterstützt "
 "wird, besteht darin, das Dokumentationsverzeichnis eines Pakets als defekten "
 "symbolischen Link zu erstellen, bevor B<dh_installdocs> aufgerufen wird.)"
 
@@ -9635,6 +9682,10 @@ msgid ""
 "F<< /usr/share/doc/I<package>/examples/examples >>, which is rarely what you "
 "want."
 msgstr ""
+"Falls die Originalautoren ein F<examples> Verzeichnis bereitstellen, werden "
+"Sie in dieser Datei meist eher B<examples/*> als B<examples> verwenden wollen. "
+"Das letztere würde F<< /usr/share/doc/I<package>/examples/examples >> erzeugen, "
+"was Sie selten wollen."
 
 #. type: textblock
 #: dh_installexamples:54
@@ -9872,7 +9923,7 @@ msgid ""
 "warnings from lintian about init.d scripts not being included in the package."
 msgstr ""
 "In Kompatibilitätsstufe 10 oder älter: Falls ein Paket nur eine Systemd-"
-"Dienstdatei mitbringt und kein Sysvinit-Skript bereitgestellt wird, möchten "
+"Dienstdatei mitbringt und kein SysVinit-Skript bereitgestellt wird, möchten "
 "Sie möglicherweise den Aufruf von »dh_installinit« für dieses Paket "
 "ausschließen (z. B. per B<-N>). Andernfalls könnten Sie von Lintian "
 "Warnungen vor »init.d«-Skripte bekommen, die nicht im Paket enthalten sind."
@@ -9940,17 +9991,12 @@ msgstr "debian/I<Paket>.service"
 
 #. type: textblock
 #: dh_installinit:67
-#, fuzzy
-#| msgid ""
-#| "If this exists, it is installed into F<< lib/systemd/system/I<package>."
-#| "service >> in the package build directory. Only used in compat levels 10 "
-#| "and below."
 msgid ""
 "If this exists, it is installed into F<< usr/lib/systemd/system/I<package>."
 "service >> in the package build directory. Only used in compat levels 10 and "
 "below."
 msgstr ""
-"Falls vorhanden, wird es in F<< lib/systemd/system/I<Paket>.service >> im "
+"Falls vorhanden, wird es in F<< usr/lib/systemd/system/I<Paket>.service >> im "
 "Paketbauverzeichnis installiert. Wird nur in Kompatibilitätsstufen 10 und "
 "darunter benutzt."
 
@@ -9965,7 +10011,7 @@ msgid ""
 "If this exists, it is installed into usr/lib/tmpfiles.d/I<package>.conf in "
 "the package build directory. Only used in compat levels 10 and below."
 msgstr ""
-"Falls vorhanden, wird es in lib/systemd/system/I<Paket>.conf im "
+"Falls vorhanden, wird es in usr/lib/systemd/system/I<Paket>.conf im "
 "Paketbauverzeichnis installiert. Wird nur in Kompatibilitätsstufen 10 und "
 "darunter benutzt."
 
@@ -10155,7 +10201,7 @@ msgid ""
 "started."
 msgstr ""
 "B<Beachten Sie>, dass diese Option nicht beeinflusst, ob die Dienste "
-"gestartet werden. Bitte denken Sie daran, auch B<--no-start> zuverwenden, "
+"gestartet werden. Bitte denken Sie daran, auch B<--no-start> zu verwenden, "
 "falls der Dienst nicht gestartet werden soll."
 
 #. type: textblock
@@ -10226,7 +10272,7 @@ msgstr ""
 "verwendet wird, sucht und installiert B<dh_installinit> Dateien mit dem "
 "Namen F<debian/package.name.init>, F<debian/package.name.default> und "
 "F<debian/package.name.upstart> an Stelle der üblichen F<debian/package."
-"init>, F<debian/package.default> and F<debian/package.upstart>."
+"init>, F<debian/package.default> und F<debian/package.upstart>."
 
 #. type: =item
 #: dh_installinit:184
@@ -10678,10 +10724,8 @@ msgstr ""
 
 #. type: textblock
 #: dh_installman:119
-#, fuzzy
-#| msgid "An example F<debian/manpages> file could look like this:"
 msgid "An example F<< debian/I<package>.manpages >> file could look like this:"
-msgstr "Eine F<debian/manpages>-Datei könnte wie folgt aussehen:"
+msgstr "Eine F<< debian/I<Paket>.manpages >>-Datei könnte wie folgt aussehen:"
 
 #. type: verbatim
 #: dh_installman:121
@@ -10719,7 +10763,7 @@ msgid ""
 msgstr ""
 "Eine ältere Version dieses Programms, L<dh_installmanpages(1)>, wird immer "
 "noch von einigen Paketen benutzt. Daher ist es immer noch in Debhelper "
-"enthalten. Es is jedoch wegen seiner der Intuition widersprechenden und "
+"enthalten. Es ist jedoch wegen seiner der Intuition widersprechenden und "
 "uneinheitlichen Schnittstelle veraltet. Verwenden Sie stattdessen dieses "
 "Programm."
 
@@ -11152,10 +11196,8 @@ msgstr "debian/I<Paket>.udev"
 
 #. type: textblock
 #: dh_installudev:30
-#, fuzzy
-#| msgid "Installed into F<lib/udev/rules.d/> in the package build directory."
 msgid "Installed into F<usr/lib/udev/rules.d/> in the package build directory."
-msgstr "installiert in F<lib/udev/rules.d/> im Paketbauverzeichnis."
+msgstr "installiert in F<usr/lib/udev/rules.d/> im Paketbauverzeichnis."
 
 #. type: textblock
 #: dh_installudev:40
@@ -11432,7 +11474,7 @@ msgid ""
 msgstr ""
 "listet Paare von Quell- und Zieldateien auf, von denen symbolische Links "
 "erstellt werden sollen. Jedes Paar sollte in einer eigenen Zeile stehen, in "
-"der Quell- und Zieldatei durch Leerzeichen getrennt sind."
+"der Quell- und Zieldatei durch Leerraumzeichen getrennt sind."
 
 #. type: textblock
 #: dh_link:56
@@ -11695,7 +11737,6 @@ msgstr ""
 "erkennen. Bitte benutzen Sie die nachfolgenden Optionen B<--add-udeb> und "
 "B<--no-add-udeb>, wenn diese automatische Erkennung nicht ausreicht."
 
-# FIXME s/and is/and are/
 #. type: textblock
 #: dh_makeshlibs:36
 msgid ""
@@ -11908,7 +11949,7 @@ msgid ""
 "packages.  Note that symbols are not supported for udeb packages, which "
 "solely relies on shlibs for dependency handling."
 msgstr ""
-"Alterantiv kann dies ausreichen, falls (und nur falls) das Paket "
+"Alternativ kann dies ausreichen, falls (und nur falls) das Paket "
 "Symbolversionierung verwendet (siehe L<dpkg-gensymbols(1)>) und I<keine> "
 "Udeb-Pakete baut. Beachten Sie, dass Symbole nicht von Udeb-Paketen "
 "unterstützt werden, die sich bei der Behandlung von Abhängigkeiten "
@@ -12303,7 +12344,7 @@ msgid ""
 "B<${perl:Depends}> substitutions and adding them to substvars files."
 msgstr ""
 "B<dh_perl> ist ein Debhelper-Programm, das für das Erzeugen der B<${perl:"
-"Depends}>-Ersetzung zuständig ist und um diese dann den Substvars-Dateien "
+"Depends}>-Ersetzung zuständig ist und um diese dann den »substvars«-Dateien "
 "hinzuzufügen."
 
 #. type: textblock
@@ -12731,7 +12772,7 @@ msgid ""
 "to replace with an automatically generated debug symbol package, please see "
 "the B<--dbgsym-migration> option."
 msgstr ""
-"B<Diese Option ist nun eine Option für besondere Zwecke und Sie benötigensie "
+"B<Diese Option ist nun eine Option für besondere Zwecke und Sie benötigen sie "
 "normalerweise nicht>. In den meisten Fällen sollte es nur wenige Gründe "
 "geben, diese Option für neue Quellpakete zu benutzen, da Debhelper "
 "automatisch Pakete zur Fehlersuche (»Dbgsym-Pakete«) erzeugt. B<Falls Sie "
@@ -12900,7 +12941,7 @@ msgid ""
 "symbol packages."
 msgstr ""
 "Falls die Umgebungsvariable B<DEB_BUILD_OPTIONS> B<nostrip> enthält, werden "
-"getreu der Debian-Richlinie (Abschnitt 10.1. »Binaries«) keine Symbole "
+"getreu der Debian-Richtlinie (Abschnitt 10.1. »Binaries«) keine Symbole "
 "entfernt. Dies wird auch das Erstellen automatischer Fehlersuch-Symbolpakete "
 "verhindern."
 
@@ -12925,7 +12966,7 @@ msgstr ""
 #. type: textblock
 #: dh_strip:135
 msgid "Debian policy, version 3.0.1"
-msgstr "Debian-Richlinie, Version 3.0.1"
+msgstr "Debian-Richtlinie, Version 3.0.1"
 
 #. type: textblock
 #: dh_testdir:5
@@ -13227,18 +13268,13 @@ msgstr "debian/I<Paket>.service, debian/I<Paket>@.service"
 
 #. type: textblock
 #: dh_systemd_enable:47
-#, fuzzy
-#| msgid ""
-#| "If this exists, it is installed into F<< lib/systemd/system/I<package>."
-#| "service >> (or F<< lib/systemd/system/I<package>@.service >>) in the "
-#| "package build directory."
 msgid ""
 "If this exists, it is installed into F<< usr/lib/systemd/system/I<package>."
 "service >> (or F<< usr/lib/systemd/system/I<package>@.service >>) in the "
 "package build directory."
 msgstr ""
-"Falls vorhanden, wird es in F<< lib/systemd/system/I<Paket>.service >> (oder "
-"F<< lib/systemd/system/I<Paket>@.service >>) im Paketbauverzeichnis "
+"Falls vorhanden, wird es in F<< usr/lib/systemd/system/I<Paket>.service >> (oder "
+"F<< usr/lib/systemd/system/I<Paket>@.service >>) im Paketbauverzeichnis "
 "installiert."
 
 #. type: textblock
@@ -13257,18 +13293,13 @@ msgstr "debian/I<Paket>.target, debian/I<Paket>@.target"
 
 #. type: textblock
 #: dh_systemd_enable:57
-#, fuzzy
-#| msgid ""
-#| "If this exists, it is installed into F<< lib/systemd/system/I<package>."
-#| "target >> (or F<< lib/systemd/system/I<package>@.target >>) in the "
-#| "package build directory."
 msgid ""
 "If this exists, it is installed into F<< usr/lib/systemd/system/I<package>."
 "target >> (or F<< usr/lib/systemd/system/I<package>@.target >>) in the "
 "package build directory."
 msgstr ""
-"Falls vorhanden, wird es in F<< lib/systemd/system/I<Paket>.target >>(oder "
-"F<< lib/systemd/system/I<Paket>@.target >>) im Paketbauverzeichnis "
+"Falls vorhanden, wird es in F<< usr/lib/systemd/system/I<Paket>.target >>(oder "
+"F<< usr/lib/systemd/system/I<Paket>@.target >>) im Paketbauverzeichnis "
 "installiert."
 
 #. type: =item
@@ -13278,18 +13309,13 @@ msgstr "debian/I<Paket>.socket, debian/I<Paket>@.socket"
 
 #. type: textblock
 #: dh_systemd_enable:62
-#, fuzzy
-#| msgid ""
-#| "If this exists, it is installed into F<< lib/systemd/system/I<package>."
-#| "socket >> (or F<< lib/systemd/system/I<package>@.socket >>) in the "
-#| "package build directory."
 msgid ""
 "If this exists, it is installed into F<< usr/lib/systemd/system/I<package>."
 "socket >> (or F<< usr/lib/systemd/system/I<package>@.socket >>) in the "
 "package build directory."
 msgstr ""
-"Falls vorhanden, wird es in F<< lib/systemd/system/I<Paket>.socket >> (oder "
-"F<< lib/systemd/system/I<Paket>@.socket >>) im Paketbauverzeichnis "
+"Falls vorhanden, wird es in F<< usr/lib/systemd/system/I<Paket>.socket >> (oder "
+"F<< usr/lib/systemd/system/I<Paket>@.socket >>) im Paketbauverzeichnis "
 "installiert."
 
 #. type: =item
@@ -13299,15 +13325,11 @@ msgstr "debian/I<Paket>.mount"
 
 #. type: textblock
 #: dh_systemd_enable:67
-#, fuzzy
-#| msgid ""
-#| "If this exists, it is installed into F<< lib/systemd/system/I<package>."
-#| "mount >> in the package build directory."
 msgid ""
 "If this exists, it is installed into F<< usr/lib/systemd/system/I<package>."
 "mount >> in the package build directory."
 msgstr ""
-"Falls vorhanden, wird es in F<< lib/systemd/system/I<Paket>.mount >> im "
+"Falls vorhanden, wird es in F<< usr/lib/systemd/system/I<Paket>.mount >> im "
 "Paketbauverzeichnis installiert."
 
 #. type: =item
@@ -13317,18 +13339,13 @@ msgstr "debian/I<Paket>.path, debian/I<Paket>@.path"
 
 #. type: textblock
 #: dh_systemd_enable:72
-#, fuzzy
-#| msgid ""
-#| "If this exists, it is installed into F<< lib/systemd/system/I<package>."
-#| "path >> (or F<< lib/systemd/system/I<package>@.path >>) in the package "
-#| "build directory."
 msgid ""
 "If this exists, it is installed into F<< usr/lib/systemd/system/I<package>."
 "path >> (or F<< usr/lib/systemd/system/I<package>@.path >>) in the package "
 "build directory."
 msgstr ""
-"Falls vorhanden, wird es in F<< lib/systemd/system/I<Paket>.path >> (oder "
-"F<< lib/systemd/system/I<Paket>@.path >>) im Paketbauverzeichnis installiert."
+"Falls vorhanden, wird es in F<< usr/lib/systemd/system/I<Paket>.path >> (oder "
+"F<< usr/lib/systemd/system/I<Paket>@.path >>) im Paketbauverzeichnis installiert."
 
 #. type: =item
 #: dh_systemd_enable:75
@@ -13337,18 +13354,13 @@ msgstr "debian/I<Paket>.timer, debian/I<Paket>@.timer"
 
 #. type: textblock
 #: dh_systemd_enable:77
-#, fuzzy
-#| msgid ""
-#| "If this exists, it is installed into F<< lib/systemd/system/I<package>."
-#| "timer >> (or F<< lib/systemd/system/I<package>@.timer >>) in the package "
-#| "build directory."
 msgid ""
 "If this exists, it is installed into F<< usr/lib/systemd/system/I<package>."
 "timer >> (or F<< usr/lib/systemd/system/I<package>@.timer >>) in the package "
 "build directory."
 msgstr ""
-"Falls vorhanden, wird es in F<< lib/systemd/system/I<Paket>.timer >> (oder "
-"F<< lib/systemd/system/I<Paket>@.timer >>) im Paketbauverzeichnis "
+"Falls vorhanden, wird es in F<< usr/lib/systemd/system/I<Paket>.timer >> (oder "
+"F<< usr/lib/systemd/system/I<Paket>@.timer >>) im Paketbauverzeichnis "
 "installiert."
 
 #. type: textblock
@@ -13392,7 +13404,7 @@ msgid ""
 msgstr ""
 "Beachten Sie, dass dieser Befehl nicht idempotent ist. Zwischen mehreren "
 "Aufrufen dieses Befehls sollte L<dh_prep(1)> (mit den selben Argumenten) "
-"ausgefürt werden. Ansonsten könnte er zur Folge haben, dass den "
+"ausgeführt werden. Ansonsten könnte er zur Folge haben, dass den "
 "Betreuerskripten mehrere Instanzen des gleichen Textes hinzugefügt werden."
 
 #. type: textblock
