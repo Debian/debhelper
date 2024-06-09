@@ -957,7 +957,7 @@ debhelper (13.1) unstable; urgency=low
   * dh_installman: Improve error messages and handling of broken
     section numbers.  Notably, the auto-detection no longer picks
     section numbers that look suspiciously like a version number
-    (or a date).  This can cause dh_installman to reject manpages
+    (or a date).  This can cause dh_installman to reject man pages
     if it can no longer guess a suitable section for the manpage
     Thanks to Paul Gevers for reporting the bug.
     (Closes: #958343)
@@ -3516,7 +3516,7 @@ debhelper (9.20160618) unstable; urgency=medium
     Thanks to Helmut Grohne for the report.
   * dh_installcatalogs: Apply patch from Helmut Grohne to
     explicitly trigger a new update-sgmlcatalog trigger,
-    since dpkg does not triger conffiles on package removal.
+    since dpkg does not trigger conffiles on package removal.
     (Closes: #825005)
   * dh_installcatalos: Apply patch from Helmut Grohne to
     remove autoscript for a transition that completed in
@@ -8100,7 +8100,7 @@ debhelper (4.0.8) unstable; urgency=low
 debhelper (4.0.7) unstable; urgency=low
 
   * dh_strip: If a file is an ELF shared binary, does not have a .so.* in its
-    name, stirp it as a ELF binary. It seems that GNUstep has files of this
+    name, strip it as a ELF binary. It seems that GNUstep has files of this
     sort. See bug #35733 (not sufficient to close all of it).
 
  -- Joey Hess <joeyh@debian.org>  Wed, 22 May 2002 20:40:09 -0400
@@ -8157,7 +8157,7 @@ debhelper (4.0.0) unstable; urgency=low
 
   * dh_movefiles has long been a sore point in debhelper. Inherited
     from debstd, its interface and implementation suck, and I have maintained
-    it while never really deigning to use it. Now there is a remplacment:
+    it while never really deigning to use it. Now there is a replacement:
     dh_install, which ...
     - copies files, doesn't move them. Closes: #75360, #82649
     - doesn't have that whole annoying debian/package.files vs. debian/files
@@ -9133,7 +9133,7 @@ debhelper (2.1.9) unstable; urgency=low
   * dh_installmodules: corrected the code added to maintainer scripts so it
     does not call depmod -a. update-modules (which it always called)_
     handles calling depmod if doing so is appropriate. Packages built with
-    proir versions probably have issues on systems with non-modular
+    prior versions probably have issues on systems with non-modular
     kernels, and should be rebuilt. Closes: #71841
 
  -- Joey Hess <joeyh@debian.org>  Sun, 17 Sep 2000 14:40:45 -0700
@@ -10734,7 +10734,7 @@ debhelper (1.1.20) unstable; urgency=low
 
 debhelper (1.1.19) unstable; urgency=low
 
-  * dh_installmanpages: look at basename of man pacges specified on command
+  * dh_installmanpages: look at basename of man pages specified on command
     line to skip, for backwards compatibility.
 
  -- Joey Hess <joeyh@debian.org>  Thu, 10 Sep 1998 11:31:42 -0700
@@ -11684,8 +11684,8 @@ debhelper (0.8) unstable; urgency=low
 
 debhelper (0.7) unstable; urgency=low
 
-  * Sped up some things by removing unnecesary for loops.
-  * dh_installdocs: behavior modifcation: if there is a debian/TODO, it is
+  * Sped up some things by removing unnecessary for loops.
+  * dh_installdocs: behavior modification: if there is a debian/TODO, it is
     named like a debian/changelog file: if the package is a debian native
     package, it is installed as TODO. If the package is not a native package,
     it is installed as TODO.Debian.
@@ -11694,7 +11694,7 @@ debhelper (0.7) unstable; urgency=low
   * Added dh_undocumented program, which can set up undocumented.7 symlinks.
   * Moved dh_installdebfiles to come after dh_fixperms in the example rules
     files. (dh_installdebfiles makes sure it installs things with the proper
-    permissions, and this reorganization makes the file a bit more flexable
+    permissions, and this reorganization makes the file a bit more flexible
     in a few situations.)
 
  -- Joey Hess <joeyh@debian.org>  Mon, 13 Oct 1997 20:08:05 -0400
