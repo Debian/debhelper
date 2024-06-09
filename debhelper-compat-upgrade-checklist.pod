@@ -104,7 +104,7 @@ B<dh_installinitramfs> in the default B<dh> sequence.
 
 =item -
 
-I<< This item only applies to source packages that has exactly one B<Package> stanza in F<debian/control>. >>
+I<< This item only applies to source packages that have exactly one B<Package> stanza in F<debian/control>. >>
 
 The B<dh> sequencer will warn if the B<single-binary> addon is implicitly activated to
 warn maintainers of the pending compat 15 change in B<dh_auto_install>.
@@ -195,9 +195,9 @@ L<https://lists.debian.org/debian-devel/2024/03/msg00030.html> also covers
 when the substvars need tweaking.  The most common case involves using
 the B<-d> option from B<dpkg-shlibdeps> possibly via B<dh_shlibdeps>.
 
-Note: This change changes will cause false-positives from an unfixed
-B<lintian>. Please check L<https://bugs.debian.org/1067653> for B<lintian>
-support for this change.
+Note: This change will cause false-positives from an unfixed
+B<lintian>. Please check L<https://bugs.debian.org/1067653> for
+B<lintian> support for this change.
 
 =item -
 
@@ -270,7 +270,7 @@ passes extra parameters to the upstream build system should be reviewed.
 
 The F<debian/compat> file is no longer accepted as a source for specifying the
 debhelper compat level. Put the compat level in the B<X-DH-Compat> field of
-the source stanza of F<debian/control>.
+the B<Source> stanza of F<debian/control>.
 
 Note to avoid breaking packages that already migrated to compat 14 immediately,
 while it was experimental this change is first enforced when compat 14 becomes
@@ -506,7 +506,7 @@ Note the B<--> before the B<--libexecdir> parameter.
 
 B<Retroactively removed in debhelper/13.5>:
 
-The B<dh_installdeb> tool would no longer installs the maintainer provided
+The B<dh_installdeb> tool would no longer install the maintainer provided
 F<conffiles> file as it was deemed unnecessary.  However, the
 B<remove-on-upgrade> from dpkg/1.20 made the file relevant again and
 B<dh_installdeb> now installs it again in compat levels 12+.
@@ -640,8 +640,8 @@ B<dh_installinfo> incorrectly ignore B<--sourcedir>.
 =item -
 
 The B<perl-makemaker> and B<perl-build> build systems no longer pass
-B<-I.> to perl.  Packages that still need this behaviour can emulate
-it by using the B<PERL5LIB> environment variable.  E.g. by adding
+B<-I.> to perl.  Packages that relies on this behavior can often use the
+B<PERL5LIB> environment variable as a substitute.  E.g. by adding
 B<export PERL5LIB=.> in their debian/rules file (or similar).
 
 =item -
@@ -830,7 +830,7 @@ Changes from v8 are:
 =item -
 
 Multiarch support. In particular, B<dh_auto_configure> passes
-multiarch directories to autoconf in --libdir and --libexecdir.
+multiarch directories to B<autoconf> in --libdir and --libexecdir.
 
 =item -
 
@@ -847,7 +847,7 @@ size of -dbg packages.
 =item -
 
 B<dh_auto_configure> does not include the source package name
-in --libexecdir when using autoconf.
+in --libexecdir when using B<autoconf>.
 
 =item -
 
