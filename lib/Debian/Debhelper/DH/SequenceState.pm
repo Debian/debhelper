@@ -21,6 +21,7 @@ our (
 	@options,
 	# Options passed by name (to assist can_skip with which options are used)
 	%seen_options,
+	%commands_removed_by_sequence,
 	# Whether there were sequences of options that inhibit certain optimizations
 	# * $unoptimizable_option_bundle => can skip iff cli-options hint is present and empty
 	# * $unoptimizable_user_option => We can never skip anything (non-option seen)

@@ -306,7 +306,15 @@ not stable, it will not be documented. The JSON output looks something like this
                 "execute_before_dh_install"
              ]
           }
-       ]
+       ],
+      "hook-targets-for-disabled-commands": [
+          {
+             "filename": "debian/rules",
+             "target-name": "override_dh_builddeb",
+             "removed-by": "zz-debputy"
+          }
+       ],
+
     }
 
 In more details:
@@ -341,7 +349,42 @@ following command:
 When not null and not empty, each element in this list are names for likely candidates for the
 "correct" name of this target.
 
+=back
+
+=item hook-targets-for-disabled-commands
+
+List of known hook targets found related to disabled commands along with additional information about them.
+
+=over 4
+
+=item target-name
+
+The actual target name detected in the file (usually F<debian/rules>).
+
 =item filename
+
+This attribute reports which file the target was found it. In most cases, this will always be "debian/rules"
+though in case of include files, the target could appear in an include file.  Note this attribute is not
+super reliable as L<make(1)> only reports it for targets with a "recipe" (targets with commands inside
+them). When B<make> does not provide the filename, B<dh_assistant> blindly assumes the filename is
+"debian/rules" (as overrides via includes is not a commonly used feature).
+
+Note this accuracy of this attribute is limited about what data B<dh_assistant> can read out from the
+following command:
+
+    LC_ALL=C make -Rrnpsf debian/rules debhelper-fail-me 2>/dev/null
+
+=item removed-by
+
+If present, this denotes the B<dh> add-on that removed the command from the sequence (thereby disabling
+this command for that package).
+
+Note this field is not present in all cases. As an example, as obsolete commands (such as B<dh_gconf>) are
+not part of any sequence by the time they are marked as obsolete.
+
+If you (as a consumer) need to know whether a command is obsolete or the particular reason why a command
+was disabled, please file a feature request to get that data. The absence of B<removed-by> is not
+guaranteed to imply the command is obsolete.
 
 =back
 
@@ -414,6 +457,11 @@ not stable, it will not be documented. The JSON output looks something like this
           },
           [... more commands listed here... ]
        ],
+       "removed-commands": [
+           {
+             "command": "dh_gconf"
+          },
+       ]
        "issues": [
             {
                 "issue": "load-addon",
@@ -437,6 +485,34 @@ The name of the command.
 
 While most commands are resolved via PATH, a sequence add-on could register a command via a full path
 (by passing the path search). If so, the command provided in this output will also use the full path.
+
+=back
+
+=item disabled-commands
+
+The top level key containing the list of all known commands that have been disabled. Each element in
+the list are an object and can have the following keys:
+
+=over 4
+
+=item command
+
+The name of the command.
+
+While most commands are resolved via PATH, a sequence add-on could register a command via a full path
+(by passing the path search). If so, the command provided in this output will also use the full path.
+
+=item removed-by
+
+If present, this denotes the B<dh> add-on that removed the command from the sequence (thereby disabling
+this command for that package).
+
+Note this field is not present in all cases. As an example, as obsolete commands (such as B<dh_gconf>) are
+not part of any sequence by the time they are marked as obsolete.
+
+If you (as a consumer) need to know whether a command is obsolete or the particular reason why a command
+was disabled, please file a feature request to get that data. The absence of B<removed-by> is not
+guaranteed to imply the command is obsolete.
 
 =back
 
@@ -484,9 +560,12 @@ These options behave the same as the L<dh(1)> options with the same name.
 
 B<Synopsis>: B<dh_assistant> B<list-guessed-dh-config-files> [command-options]
 
-Load all B<dh> sequence add-ons, determine the full list of commands could be used by this
-source package and for each command used, then attempt to I<guess> which "config files"
-these commands are interested in.
+Load all B<dh> sequence add-ons declaratively depended on, determine the full list of
+commands could be relevant for this source package and for each command used, then
+attempt to I<guess> which "config files" these commands are interested in.
+
+The command will include config files for commands that are not active with current add-ons,
+since the commands might be run manually from hook targets.
 
 Note this command only guesses "per command config files". Standard global config files
 such as F<debian/control>, F<debian/rules>, and F<debian/compat> are not included in this
@@ -497,7 +576,8 @@ The B<dh_assistant> tool have to derive this from optional metadata that command
 choose to provide and B<dh_assistant> has no means to validate that this metadata is up
 to date.
 
-As the command will attempt to load all plugins, they must be installed.
+As the command will attempt to load all plugins referenced by the package, they must
+be installed.
 
 The text output is intended for human consumption and should be self-explanatory.  Since it is
 not stable, it will not be documented. The JSON output looks something like this:
@@ -508,6 +588,7 @@ not stable, it will not be documented. The JSON output looks something like this
              "commands": [
                 {
                    "command": "dh_autoreconf_clean"
+                   "is-active": true
                 }
              ],
              "file-type": "pkgfile",
@@ -517,6 +598,7 @@ not stable, it will not be documented. The JSON output looks something like this
              "commands": [
                 {
                    "command": "dh_installgsettings"
+                   "is-active": true
                 }
              ],
              "file-type": "pkgfile",
@@ -584,6 +666,29 @@ config file. An example of this would be B<dh_installinit>, B<dh_installsystemd>
 which all reacts to (the now) deprecated B<tmpfile> pkgfile. In the particular case, only one command reacts
 to the file for a given compat level (but that information is not available to B<dh_assistant> and therefore
 is not available in this output either).
+
+=item is-active
+
+A boolean that determines whether the command is active with the loaded sequences. When false, the command
+is known to debhelper, but it is not run automatically via B<dh>. The command might be explicitly removed
+by a sequence, marked as obsolete or possibly known to debhelper a command that would activate in a different
+command level (than the one currently active).
+
+Note that commands that are not "active" can often still be invoked manually from F<debian/rules> via hook
+targets. Therefore, this reflects whether B<dh> would call the command directly or provide its standard
+hook targets for the command.
+
+=item removed-by
+
+If present, this denotes the B<dh> add-on that removed the command from the sequence (thereby disabling
+this command for that package).
+
+Note this field is not present in all cases even when B<is-active> is true. As an example, as obsolete
+commands (such as B<dh_gconf>) are not part of any sequence by the time they are marked as obsolete.
+
+If you (as a consumer) need to know whether a command is obsolete or the particular reason why a command
+was disabled, please file a feature request to get that data. The absence of B<removed-by> plus
+B<is-active> being false is not guaranteed to imply the command is obsolete.
 
 =back
 
@@ -1037,7 +1142,7 @@ sub _load_levenshtein {
 
 sub _all_sequence_commands {
     my ($forgive_errors, @addon_requests) = @_;
-    my ($sequences, @all_commands, @unloadable);
+    my ($sequences, @all_commands, @unloadable, $commands_removed_by_sequence);
     Debian::Debhelper::SequencerUtil::load_sequence_addon('root-sequence', 'both');
     my @addons = Debian::Debhelper::SequencerUtil::compute_selected_addons('binary', @addon_requests);
     # Load addons, which can modify sequences.
@@ -1055,8 +1160,10 @@ sub _all_sequence_commands {
     {
         no warnings qw(once);
         $sequences = \%Debian::Debhelper::DH::SequenceState::sequences;
+        $commands_removed_by_sequence = \%Debian::Debhelper::DH::SequenceState::commands_removed_by_sequence;
     }
     my %seen;
+    my %disabled_commands = %{$commands_removed_by_sequence};  # Copy
     for my $sequence(values(%{$sequences})) {
         my @commands = map {$_->[0]} $sequence->flatten_sequence('both', 0);
         for my $command (@commands) {
@@ -1064,9 +1171,10 @@ sub _all_sequence_commands {
             next if exists($seen{$command});
             $seen{$command} = 1;
             push(@all_commands, $command);
+            delete($disabled_commands{$command});
         }
     }
-    return \@all_commands, \@unloadable;
+    return \@all_commands, \%disabled_commands, \@unloadable;
 }
 
 sub list_commands {
@@ -1094,18 +1202,32 @@ sub list_commands {
         my $value = $ARGV[0];
         error("$COMMAND: No non-options supported - please remove ${value}");
     }
-
-    my ($all_commands, $unloadables) = _all_sequence_commands(1, @addon_requests);
+    my ($all_commands, $disabled_commands, $unloadables) = _all_sequence_commands(1, @addon_requests);
     if ($output_format eq 'json') {
-        my @commands_json;
+        my (@commands_json, %known_commands);
         for my $command (sort(@{$all_commands})) {
             push(@commands_json, {
                 'command' => $command,
             });
+            $known_commands{$command} = 1;
         }
         my %result = (
             "commands" => \@commands_json,
         );
+        if (%{$disabled_commands}) {
+            my @remove_commands;
+            while (my ($command, $addon) = each(%{$disabled_commands})) {
+                next if $known_commands{$command};
+                my $data = {
+                    'command' => $command,
+                };
+                $data->{'removed-by'} = $addon if $addon;
+                push(@remove_commands, $data);
+            }
+            if (@remove_commands) {
+                $result{'disabled-commands'} = \@remove_commands;
+            }
+        }
         if (@{$unloadables}) {
             my @issues;
             for my $addon (@{$unloadables}) {
@@ -1181,10 +1303,11 @@ sub list_guessed_dh_config_files {
         error("$COMMAND: No non-options supported - please remove ${value}");
     }
 
-    my ($all_commands, $unloadables) = _all_sequence_commands(1, @addon_requests);
+    my ($active_commands, $disabled_cmds, $unloadables) = _all_sequence_commands(1, @addon_requests);
     my $pkg_files = {};
     my $bug_950723;
-    for my $command (@{$all_commands}) {
+    my @all_commands = (@{$active_commands}, keys(%{$disabled_cmds}));
+    for my $command (@all_commands) {
         my @annotations = _extract_annotations($command);
         next if not @annotations or $annotations[0] eq 'always-skip';
         for my $annotation (@annotations) {
@@ -1199,17 +1322,22 @@ sub list_guessed_dh_config_files {
             next if $type ne 'pkgfile' and $type ne 'pkgfile-logged';
             my $key = "pkgfile/${need}";
             my $existing = $pkg_files->{$key};
+            my $is_active = not exists($disabled_cmds->{$command});
+            my $command_data = {
+                'command'   => $command,
+                'is-active' => $is_active,
+            };
+            if (not $is_active) {
+                my $removed_by = $disabled_cmds->{$command};
+                $command_data->{'removed-by'} = $removed_by if $removed_by;
+            }
             if (defined($existing)) {
-                push(@{$existing->{'commands'}}, {
-                    'command' => $command,
-                });
+                push(@{$existing->{'commands'}}, $command_data);
             } else {
                 $existing = {
                     'file-type' => 'pkgfile',
                     'pkgfile'   => $need,
-                    'commands'  => [{
-                        'command' => $command,
-                    }],
+                    'commands'  => [$command_data],
                 };
                 $pkg_files->{$key} = $existing;
             }
@@ -1248,8 +1376,8 @@ sub detect_unknown_hook_targets {
     my (@addon_requests, %all_overrides, %unknown_hooks);
     my $lint_exit = 1;
     my %options=(
-        "output-format=s" => \$output_format,
-        "linter-exit-code!" => \$lint_exit,
+        "output-format=s"                      => \$output_format,
+        "linter-exit-code!"                    => \$lint_exit,
         "with=s" => sub {
 			my ($option, $value) = @_;
 			push(@addon_requests, map { "+${_}" } split(",", $value));
@@ -1276,10 +1404,15 @@ sub detect_unknown_hook_targets {
         $_ ne 'debhelper-fail-me' and !m{^(?:debian/rules|create-stamp)}
     } keys(%{$explicit_targets});
 
-    my ($all_commands, $unloadables) = _all_sequence_commands(1, @addon_requests);
-    for my $command (@{$all_commands}) {
+    my ($activate_commands, $disabled_commands, $unloadables) = _all_sequence_commands(1, @addon_requests);
+    my @hook_targets_for_disabled_commands;
+    my @all_commands = (@{$activate_commands}, keys(%{$disabled_commands}));
+    for my $command (@all_commands) {
         for my $variant (_hook_target_variants($command)) {
             $all_overrides{$variant} = 1;
+            if (exists($missing_targets{$variant}) and exists($disabled_commands->{$command})) {
+                push(@hook_targets_for_disabled_commands, [$variant, $disabled_commands->{$command}]);
+            }
             delete($missing_targets{$variant});
         }
     }
@@ -1303,7 +1436,7 @@ sub detect_unknown_hook_targets {
     }
 
     if ($output_format eq 'json') {
-        my @hook_target_data;
+        my (@hook_target_data, @disabled_targets_data);
         for my $target (sort(keys(%unknown_hooks))) {
             my $options = $unknown_hooks{$target};
             my (undef, $filename) = @{$explicit_targets->{$target}};
@@ -1313,8 +1446,19 @@ sub detect_unknown_hook_targets {
                 'candidates'  => $options,
             });
         }
+        for my $rm_data (@hook_targets_for_disabled_commands) {
+            my ($target, $removed_by_sequence) = @{$rm_data};
+            my (undef, $filename) = @{$explicit_targets->{$target}};
+            my $data =  {
+                'target-name' => $target,
+                'filename'    => $filename,
+            };
+            $data->{'removed-by'} = $removed_by_sequence if $removed_by_sequence;
+            push(@disabled_targets_data, $data);
+        }
         my %result = (
-            "unknown-hook-targets" => \@hook_target_data,
+            "unknown-hook-targets"               => \@hook_target_data,
+            "hook-targets-for-disabled-commands" => \@disabled_targets_data,
         );
         if (@{$unloadables}) {
             my @issues;

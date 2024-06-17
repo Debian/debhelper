@@ -74,8 +74,9 @@ sub _insert {
 
 sub remove_command {
 	my ($this, $command) = @_;
-	$this->{'_cmds'} = [grep { $_->{'command'} ne $command } @{$this->{'_cmds'}}];
-	return;
+	my $cmds = $this->{'_cmds'};
+	$this->{'_cmds'} = [grep { $_->{'command'} ne $command } @{$cmds}];
+	return scalar(@{$this->{'_cmds'}}) < scalar(@{$cmds});
 }
 
 sub add_command_at_start {

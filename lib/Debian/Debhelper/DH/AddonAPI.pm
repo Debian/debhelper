@@ -143,12 +143,15 @@ sub insert_after {
 sub remove_command {
 	my ($command) = @_;
 	# Implement if actually needed (I *think* it basically means to transform dh_foo to dh_foo -a/-i)
+	# Remember to adapt the `commands_removed_by_sequence` logic to handle this one as well.
 	_assert_not_conditional_sequence_addon('remove_command');
 	my @affected_sequences = _sequences_containing_cmd($command);
 	@affected_sequences = _filter_sequences_for_conditional_add_ons(@affected_sequences);
 	return 1 if not @affected_sequences;
 	for my $seq (@affected_sequences) {
-		$seq->remove_command($command);
+		if ($seq->remove_command($command)) {
+			$Debian::Debhelper::DH::SequenceState::commands_removed_by_sequence{$command} = $DH_INTERNAL_ADDON_NAME;
+		}
 	}
 	return 1;
 }
@@ -221,6 +224,7 @@ sub declare_command_obsolete {
 	}
 	_assert_not_conditional_sequence_addon('declare_command_obsolete');
 	$Debian::Debhelper::DH::SequenceState::obsolete_command{$command} = [$DH_INTERNAL_ADDON_NAME, $error_compat];
+	$Debian::Debhelper::DH::SequenceState::commands_removed_by_sequence{$command} = '';
 	return 1;
 }
 
