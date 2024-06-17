@@ -13,7 +13,7 @@ our @TEST_DH_EXTRA_TEMPLATE_FILES = (qw(
 	debian/changelog
 	debian/control
 	debian/foo.user.service
-	debian/baz.user.service
+	debian/foo.baz.user.service
 ));
 
 

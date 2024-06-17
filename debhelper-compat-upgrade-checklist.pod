@@ -56,6 +56,17 @@ The primary exception to this change are files such as F<debian/changelog>,
 F<debian/NEWS>, and F<debian/copyright>, where the same file is used for all
 packages by default.  These cases will remain unchanged.
 
+=item -
+
+It is now an error to use a packaging file without the package prefix for
+B<--name> even if the source package only produces one binary package. As example,
+if you had a F<debian/bar.service> with the following snippet in F<debian/rules>:
+
+ override_dh_installsystemd:
+    dh_installsystemd -p foo --name bar
+
+Then you need to rename F<debian/bar.service> to F<debian/foo.bar.service>.
+
 =back
 
 =item v14
@@ -219,6 +230,19 @@ The primary exception to this change are files such as F<debian/changelog>,
 F<debian/NEWS>, and F<debian/copyright>, where the same file is used for all
 packages by default.  These cases will remain unchanged.  The debhelper tool
 using the files will trigger warnings on usage.
+
+In compat 15 (or later), this is changed to an error.
+
+=item -
+
+It is now triggers a warning to use a packaging file without the package prefix for
+B<--name> even if the source package only produces one binary package. As example,
+if you had a F<debian/bar.service> with the following snippet in F<debian/rules>:
+
+ override_dh_installsystemd:
+    dh_installsystemd -p foo --name bar
+
+Then you need to rename F<debian/bar.service> to F<debian/foo.bar.service>.
 
 In compat 15 (or later), this is changed to an error.
 

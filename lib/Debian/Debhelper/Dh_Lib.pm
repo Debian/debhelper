@@ -1123,8 +1123,15 @@ sub default_sourcedir {
 					);
 			}
 			push(@try, "debian/$package.$filename");
+			my $nameless_variant = "debian/$filename";
+			if (defined $dh{NAME} and not compat(13) and -f $nameless_variant) {
+				warning('The use of prefix-less debhelper config files with --name is deprecated.');
+				warning("Please rename \"${nameless_variant}\" to \"debian/$dh{MAINPACKAGE}.${filename}\"");
+				error("Named prefix-less debhelper config files is not supported in compat 15 and later")
+					if not compat(14);
+				warning('Named prefix-less debhelper config files will trigger an error in compat 15 or later');
+			}
 			if ($nameless_variant_handling or (not defined($nameless_variant_handling) and $package eq $dh{MAINPACKAGE})) {
-				my $nameless_variant = "debian/$filename";
 				push(@try, $nameless_variant);
 				if (getpackages() > 1 and not $nameless_variant_handling and not compat(13) and -f $nameless_variant) {
 					warning('The use of prefix-less debhelper config files is deprecated.');
