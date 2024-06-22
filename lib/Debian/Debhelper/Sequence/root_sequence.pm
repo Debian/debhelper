@@ -79,20 +79,28 @@ qw{
 qw{
 	dh_installwm
 	dh_installxfonts
-	dh_strip_nondeterminism
-	dh_compress
-	dh_fixperms
-	dh_missing
-});
+}, 	(!compat(13) ? qw() : qw(
+		dh_strip_nondeterminism
+		dh_compress
+		dh_fixperms
+)),
+	qw(dh_missing),
+);
 
 # Looking for dh_dwz, dh_strip, dh_makeshlibs, dh_shlibdeps (et al)?  They are
 # in the elf-tools addon.
-my @b=qw{
+my @b = (
+	(!compat(13) ? qw(
+		dh_fixperms
+		dh_strip_nondeterminism
+		dh_compress
+) : qw()),
+qw{
 	dh_installdeb
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
-};
+});
 
 _add_sequence('build', SEQUENCE_ARCH_INDEP_SUBSEQUENCES, @bd);
 _add_sequence('install', SEQUENCE_ARCH_INDEP_SUBSEQUENCES, to_rules_target("build"), @i);

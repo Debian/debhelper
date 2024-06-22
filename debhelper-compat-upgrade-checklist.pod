@@ -93,6 +93,30 @@ Packages using the B<dh> sequencer should be aware the following changes:
 
 =item -
 
+The order and placement has changed for B<dh_strip_nondeterminism>,
+B<dh_compress>, and B<dh_fixperm>. Previously, these three commands
+were run in the listed order between B<dh_installxfonts> and
+B<dh_missing>.
+
+Their new placement is after B<dh_missing> (arch:all) or
+B<dh_shlibdeps> (arch:any) and before B<dh_installdeb>. Additionally,
+their new order is B<dh_fixperms>, B<dh_strip_nondeterminism>, and
+then B<dh_compress>.
+
+This change may require updates to third-party add-ons that use either
+of these three commands as anchor or to hook targets for any of these
+commands that made assumptions about the command order.
+
+Additionally, B<dh_strip_nondeterminism> and B<dh_compress> plus any commands added
+by third-party add-ons using these as anchors will no longer be able to rely on the
+mode/ownership normalization by B<dh_fixperms>, which may expose bugs in the form
+of incorrect mode or ownership in the resulting deb.
+
+Please file any such bugs against the relevant tool. Feel free to include the
+B<debhelper> maintainers in CC.
+
+=item -
+
 The tool B<dh_installsysusers> is now included in the default sequence. This
 helper tool will process systemd sysusers files.
 
