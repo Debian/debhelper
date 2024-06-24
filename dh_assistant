@@ -1305,11 +1305,11 @@ sub list_guessed_dh_config_files {
 
     my ($active_commands, $disabled_cmds, $unloadables) = _all_sequence_commands(1, @addon_requests);
     my $pkg_files = {};
-    my $bug_950723;
     my @all_commands = (@{$active_commands}, keys(%{$disabled_cmds}));
     for my $command (@all_commands) {
         my @annotations = _extract_annotations($command);
         next if not @annotations or $annotations[0] eq 'always-skip';
+        my $bug_950723;
         for my $annotation (@annotations) {
             my $type = 'pkgfile';
 			my $need = $annotation;
