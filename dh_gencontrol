@@ -62,6 +62,9 @@ if (not compat(13)) {
 	require Dpkg::Control::Fields;
 }
 
+# The `substvars` file ius not quite a pkgfile, but it works similar enough that people might
+# be surprised if it was bit detected.
+# INTROSPECTABLE: CONFIG-FILES pkgfile(substvars)
 
 on_pkgs_in_parallel {
 	foreach my $package (@_) {
